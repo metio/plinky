@@ -31,6 +31,7 @@ export function PlayStage() {
         hideKeyboard,
         fingerStrip,
         hintNotes,
+        listenPlayback,
         holdFractions,
         keyRange,
         id,
@@ -123,6 +124,10 @@ export function PlayStage() {
                             // other mode passes the player's own setting through.
                             labels={aids.noteLabels}
                             expected={hintNotes}
+                            // While Listen demonstrates the piece the keys follow it, in
+                            // each hand's colour, so the two parts can be watched as well
+                            // as heard.
+                            sounding={listenPlayback.sounding}
                             wrong={matcher.lastWrong}
                             holds={holdFractions}
                             from={keyRange.from}

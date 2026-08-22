@@ -5,6 +5,7 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import {
     collectMatchSteps,
     collectSteps,
@@ -122,6 +123,14 @@ function fakeOsmd(
         shown: () => shown,
     };
 }
+
+// A score marked mezzo-forte throughout. The dynamics no longer come off the engraver, so
+// a test that wants a loudness in force says so — which is the honest way round: it is
+// stating what the score writes rather than mimicking an object shape.
+const MARKED: ScoreMarks = {
+    ...NO_SCORE_MARKS,
+    dynamics: [{ whole: 0, volume: 80, ramp: false }],
+};
 
 function render(positions: Position[], options: Parameters<typeof useScoreMatcher>[1] = {}) {
     const handle = fakeOsmd(positions);
@@ -514,7 +523,7 @@ describe("what the score asks of each key", () => {
 
     it("gives the accented note of a chord its own loudness", () => {
         const { osmd } = fakeOsmd([[{ midi: 60 }, { midi: 67, accent: true }]]);
-        const [plain, accented] = collectMatchSteps(osmd, "both")[0]?.expected ?? [];
+        const [plain, accented] = collectMatchSteps(osmd, "both", MARKED)[0]?.expected ?? [];
         expect(plain?.velocity).not.toBeNull();
         expect(accented?.velocity as number).toBeGreaterThan(plain?.velocity as number);
     });
@@ -522,9 +531,11 @@ describe("what the score asks of each key", () => {
     it("reports what each struck key was asked for, in the order they were played", () => {
         // The chord is cleared low-then-high here; the expectations must follow the
         // player's order, not the score's, or an accent lands on the wrong key.
-        const view = render([[{ midi: 60 }, { midi: 67, accent: true }]], {});
+        const view = render([[{ midi: 60 }, { midi: 67, accent: true }]], { marks: MARKED });
         const cleared: CorrectInfo[] = [];
-        view.rerender({ opts: { onCorrect: (info: CorrectInfo) => cleared.push(info) } });
+        view.rerender({
+            opts: { marks: MARKED, onCorrect: (info: CorrectInfo) => cleared.push(info) },
+        });
         act(() => {
             view.result.current.start();
         });
@@ -540,5 +551,75 @@ describe("what the score asks of each key", () => {
         expect(accentedAsked as number).toBeGreaterThan(plainAsked as number);
         // …and each key's own strike is carried alongside it.
         expect(info?.velocities).toEqual([40, 100]);
+    });
+});
+
+describe("the lookahead a surface can ask for without a run", () => {
+    // The notes highway draws whatever is coming next, and that is the same question
+    // whether a graded run or Listen is walking the music. Tying it to a run meant Listen
+    // dropped the highway and showed the staff — throwing away the reading mode chosen.
+    const PIECE: Position[] = [[60], [62], [64], [65], [67]];
+
+    it("fills the lookahead from a position, with no run started", () => {
+        const { result } = render(PIECE);
+        expect(result.current.upcoming).toEqual([]);
+        act(() => result.current.preview(0));
+        expect(result.current.upcoming.map((step) => step.pitches)).toEqual([
+            [60],
+            [62],
+            [64],
+            [65],
+            [67],
+        ]);
+        expect(result.current.practicing).toBe(false);
+    });
+
+    it("starts at the position asked for, so the note now sounding leads", () => {
+        const { result } = render(PIECE);
+        act(() => result.current.preview(0.5));
+        expect(result.current.upcoming[0]?.pitches).toEqual([64]);
+    });
+
+    it("tolerates an onset that rounding moved by a hair", () => {
+        // Whole-note onsets are summed from fractions, so the same place in the music can
+        // arrive a few bits under. Missing the position would start the lookahead one note
+        // late for the whole piece.
+        const { result } = render(PIECE);
+        act(() => result.current.preview(0.5 - 1e-9));
+        expect(result.current.upcoming[0]?.pitches).toEqual([64]);
+    });
+
+    it("empties the lookahead past the end rather than looping back", () => {
+        const { result } = render(PIECE);
+        act(() => result.current.preview(99));
+        expect(result.current.upcoming).toEqual([]);
+    });
+
+    it("leaves a run's lookahead alone", () => {
+        // A run knows where the player actually is, which is not where the notation says
+        // the clock is — so Listen's idea of the position must not overwrite it.
+        const { result } = render(PIECE);
+        act(() => result.current.start(0));
+        act(() => result.current.registerNote(60));
+        const during = result.current.upcoming.map((step) => step.pitches);
+        act(() => result.current.preview(0));
+        expect(result.current.upcoming.map((step) => step.pitches)).toEqual(during);
+    });
+
+    it("re-reads the engraving after a reset, and not before", () => {
+        const first = fakeOsmd(PIECE);
+        let handle = first;
+        const { result } = renderHook(() => useScoreMatcher(() => handle.osmd, {}));
+        act(() => result.current.preview(0));
+        expect(result.current.upcoming[0]?.pitches).toEqual([60]);
+
+        // The page now holds a different engraving — a transpose, a reload.
+        handle = fakeOsmd([[72], [74]]);
+        act(() => result.current.preview(0));
+        expect(result.current.upcoming[0]?.pitches).toEqual([60]);
+
+        act(() => result.current.resetPreview());
+        act(() => result.current.preview(0));
+        expect(result.current.upcoming[0]?.pitches).toEqual([72]);
     });
 });

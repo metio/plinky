@@ -10,6 +10,8 @@ import { http, HttpResponse } from "msw";
 // the global fetch) keeps every test isolated — no stub can leak to the next one.
 export const handlers = [
     http.get("*/songs/manifest.json", () => HttpResponse.json([])),
+    // The per-piece slices of that manifest, which is what resolving one piece reads.
+    http.get("*/songs/index/:slice.json", () => HttpResponse.json([])),
     http.get("*/songs/:dir/:id.mxl", () => new HttpResponse(null, { status: 404 })),
     http.get("*/exercises/manifest.json", () => HttpResponse.json([])),
     http.get("*/exercises/studies/:cid.mxl", () => new HttpResponse(null, { status: 404 })),

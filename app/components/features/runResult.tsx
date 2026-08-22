@@ -1,14 +1,16 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { Grade } from "../../../core/grade";
+import { type Grade, isOptionalReading, scoreReadings } from "../../../core/grade";
+import { readingExplanation, readingLabel } from "../../lib/scoreReadingLabels";
+import { Fragment } from "react";
 import type { TempoCurve } from "../../../core/runOutcome";
-import { type Grid, handsPlayed, laggingHand, type RunNote } from "../../../core/shareCard";
+import { laggingHand, type RunNote } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
+import { Disclosure } from "../ui/disclosure";
 import { Button } from "../ui/button";
 import { GradeLetter } from "../ui/gradeLetter";
 import { PerformanceStrip } from "../ui/performanceStrip";
-import { ShareCard } from "./shareCard";
 import { TempoGraph } from "../ui/tempoGraph";
 
 // The result a finished self-paced run drops into view: the grade with its
@@ -21,11 +23,8 @@ export function RunResult({
     grade,
     notes,
     tolerance,
-    grid,
     tempoCurve,
     tempoScale,
-    daily,
-    title,
     ephemeral,
     runSaved,
     onSaveTake,
@@ -33,13 +32,10 @@ export function RunResult({
     grade: Grade;
     notes: RunNote[];
     tolerance: number;
-    grid: Grid | null;
     tempoCurve: TempoCurve | null;
     // Re-references the run to the piece's tempo so the lagging-hand read matches the
     // share grid's rows.
     tempoScale: number;
-    daily?: number;
-    title: string;
     ephemeral?: boolean;
     runSaved: "idle" | "saved" | "failed";
     onSaveTake: () => void;
@@ -47,7 +43,6 @@ export function RunResult({
     // Which hand trailed the other (null on a single-hand run), read at the same tempo
     // scale as the share grid so the readout matches its rows.
     const handVerdict = laggingHand(notes, { tempoScale });
-    const hands = handsPlayed(notes);
     return (
         <>
             {!ephemeral &&
@@ -66,30 +61,37 @@ export function RunResult({
             <div className="flex items-center gap-4 rounded-md border border-line p-3">
                 <GradeLetter letter={grade.letter} />
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
-                    <dt className="text-muted">{m.scores_accuracy()}</dt>
-                    <dd className="text-right font-mono tabular-nums">{grade.accuracy}%</dd>
-                    <dt className="text-muted">{m.scores_timing()}</dt>
-                    <dd className="text-right font-mono tabular-nums">{grade.timing}%</dd>
-                    <dt className="text-muted">{m.scores_flow()}</dt>
-                    <dd className="text-right font-mono tabular-nums">{grade.flow}%</dd>
-                    {grade.dynamics !== null && (
-                        <>
-                            <dt className="text-faint">{m.scores_dynamics()}</dt>
-                            <dd className="text-right font-mono tabular-nums text-muted">
-                                {grade.dynamics}%
+                    {scoreReadings(grade).map(({ id, value }) => (
+                        <Fragment key={id}>
+                            <dt className={isOptionalReading(id) ? "text-faint" : "text-muted"}>
+                                {readingLabel[id]()}
+                            </dt>
+                            <dd
+                                className={`text-right font-mono tabular-nums ${
+                                    isOptionalReading(id) ? "text-muted" : ""
+                                }`}
+                            >
+                                {value}%
                             </dd>
-                        </>
-                    )}
-                    {grade.expression !== null && (
-                        <>
-                            <dt className="text-faint">{m.scores_expression()}</dt>
-                            <dd className="text-right font-mono tabular-nums text-muted">
-                                {grade.expression}%
-                            </dd>
-                        </>
-                    )}
+                        </Fragment>
+                    ))}
                 </dl>
             </div>
+            {/* The numbers are meaningless until somebody says what they measure, and a
+                player who has just finished a run is exactly who wants to know. Folded away
+                because it is read once and then known — the readouts themselves are what
+                this panel is for. */}
+            <Disclosure summary={m.scores_explain_toggle()}>
+                <dl className="space-y-1 text-xs text-muted">
+                    {scoreReadings(grade).map(({ id }) => (
+                        <Fragment key={id}>
+                            <dt className="font-medium text-body">{readingLabel[id]()}</dt>
+                            <dd>{readingExplanation[id]()}</dd>
+                        </Fragment>
+                    ))}
+                </dl>
+                <p className="text-xs text-muted">{m.scores_explain_letter()}</p>
+            </Disclosure>
             <PerformanceStrip notes={notes} tolerance={tolerance} />
             {tempoCurve && (
                 <section className="space-y-1">
@@ -109,28 +111,6 @@ export function RunResult({
                           ? m.hand_left_lagged()
                           : m.hand_right_lagged()}
                 </p>
-            )}
-            {grid && (
-                <ShareCard
-                    grid={grid}
-                    caption={m.share_heading()}
-                    gridLabel={m.share_grid_label()}
-                    rowLabels={
-                        hands.length > 1
-                            ? hands.map((staff) => (staff === 0 ? m.hand_right() : m.hand_left()))
-                            : [m.share_row_you()]
-                    }
-                    boast={
-                        daily != null
-                            ? m.daily_share_boast({ number: daily, grade: grade.letter })
-                            : m.share_boast({ title })
-                    }
-                    heading={
-                        daily != null
-                            ? m.daily_share_boast({ number: daily, grade: grade.letter })
-                            : title
-                    }
-                />
             )}
         </>
     );

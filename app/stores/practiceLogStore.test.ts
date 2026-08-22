@@ -75,3 +75,42 @@ describe("practiceLogStore", () => {
         expect(store.addManual({ date: "2026-06-23", minutes: 10 })).toBe(false);
     });
 });
+
+describe("a manual entry the log will not take", () => {
+    // The store's boolean is what a "saved" indicator gates on, and a rejected entry
+    // leaves the log untouched — which the no-op rule reads as success. So the panel said
+    // saved for something thrown away.
+    it("reports failure rather than success", () => {
+        const store = createPracticeLogStore(memoryStore());
+        expect(store.addManual({ date: "not-a-day", minutes: 30 })).toBe(false);
+        expect(store.addManual({ date: "2026-08-20", minutes: 0 })).toBe(false);
+        expect(store.addManual({ date: "2026-08-20", minutes: 99_999 })).toBe(false);
+        expect(store.load()).toEqual([]);
+    });
+
+    it("reports failure for one the cap slices straight back off", () => {
+        // The log keeps the newest 2000. An entry dated before the oldest of those is
+        // added, sorted, and cut — the array changes, so a naive check calls it saved,
+        // and the player is told a row landed that nobody will ever see again.
+        const store = createPracticeLogStore(memoryStore());
+        const full = Array.from({ length: 2000 }, (_, index) => ({
+            start: Date.UTC(2026, 0, 1) + index * 86_400_000,
+            end: Date.UTC(2026, 0, 1) + index * 86_400_000 + 60_000,
+            activeMs: 60_000,
+            notes: 0,
+            pieces: [],
+            manual: true,
+            mood: null,
+            label: "",
+        }));
+        store.save(full);
+        expect(store.addManual({ date: "2020-01-01", minutes: 30 })).toBe(false);
+        expect(store.load()).toHaveLength(2000);
+    });
+
+    it("still reports success for one it takes", () => {
+        const store = createPracticeLogStore(memoryStore());
+        expect(store.addManual({ date: "2026-08-20", minutes: 30 })).toBe(true);
+        expect(store.load()).toHaveLength(1);
+    });
+});

@@ -109,18 +109,6 @@ describe("buildYouData", () => {
         expect(buildYouData(input({ items, reviewCap: 2 })).reviews).toHaveLength(2);
     });
 
-    it("counts the catalogue pool per grade", () => {
-        const catalogue: GradeCatalogItem[] = [
-            { id: "a", title: "A", grade: 1, cost: 1, kind: "piece" },
-            { id: "b", title: "B", grade: 1, cost: 1, kind: "piece" },
-            { id: "c", title: "C", grade: 3, cost: 1, kind: "piece" },
-        ];
-        const sizes = buildYouData(input({ catalogue })).poolSizes;
-        expect(sizes.get(1)).toBe(2);
-        expect(sizes.get(3)).toBe(1);
-        expect(sizes.get(2)).toBeUndefined();
-    });
-
     describe("badges", () => {
         it("awards a star tier once a grade holds enough mastered pieces", () => {
             const bronze = buildYouData(input({ items: pieces(1, STAR_THRESHOLDS.bronze) }));

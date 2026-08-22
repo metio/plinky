@@ -1,0 +1,21 @@
+<svg style="width:100%;height:100%;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+<!-- Plinky's mark: the capital P of Literata, the face the app sets every title in and the
+     letter the name begins with, with the counter of its bowl inked pink. The pink is the
+     plink — one note — and it is the only pink in Plinky: here, and on the dot of the i in
+     the wordmark.
+
+     The outline is a derivative of Literata (SIL Open Font License 1.1), cut at weight 700
+     and optical size 24. The optical size is the whole tuning: it is where the counter is
+     fullest and roundest while the serifs are still sturdy enough to hold at a favicon's
+     size. Below it the counter narrows to a sliver; above 40 the strokes thin and the bowl
+     starts to part from the stem.
+
+     The letter sits inside the maskable safe zone (the middle 80%), so a launcher may round
+     or crop the square without eating it. Everything else — the PNG renders, the favicon,
+     the brand kit — is generated from this file by `npm run icons` and `npm run brand`. -->
+  <rect width="192" height="192" fill="#2b4374"/>
+  <g transform="translate(24.9 170.0) scale(0.2099 -0.2099)">
+    <path d="M48 0L48 63L92 70Q111 73 117 82.5Q123 92 123 121L123 589Q123 613 116.5 623Q110 633 89 636L48 642L48 705L349 705Q400 705 443 698.5Q486 692 520.5 677Q555 662 579.5 638.5Q604 615 616.5 580.5Q629 546 629 500Q629 449 613.5 410.5Q598 372 571 344.5Q544 317 510.5 300.5Q477 284 441 276.5Q405 269 372 269Q345 269 322.5 270.5Q300 272 290 274L290 122Q290 95 296.5 84Q303 73 329 70L397 63L397 0Z" fill="#fcf7ea"/>
+    <path d="M334 347Q396 347 427 384.5Q458 422 458 496Q458 544 444 574Q430 604 403 618Q376 632 332 632L290 632L290 350Q298 349 309.5 348Q321 347 334 347Z" fill="#d81b7a"/>
+  </g>
+</svg>

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
+import { usePrefs } from "../../hooks/usePrefs";
 import type { Assignment } from "../../../core/assignment";
 import { todayKey } from "../../../core/daily";
 import { deadlineFor } from "../../../core/repertoire";
@@ -9,6 +10,7 @@ import type { trackSteps } from "../../../core/tracks";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { CheckIcon } from "../ui/icons";
+import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 
 export type AssignmentSteps = ReturnType<typeof trackSteps>;
@@ -23,11 +25,19 @@ export function AssignmentStepList({
     steps,
     titleOf,
     isMissing,
+    incipitOf,
 }: {
     steps: AssignmentSteps;
     titleOf: (id: string) => string;
     isMissing: (id: string) => boolean;
+    // A step's opening bars, where the catalogue carries them. An ordered set of pieces
+    // is where the mark earns most: a list of titles somebody else chose tells you
+    // nothing about the music until you open each one.
+    incipitOf?: (id: string) => string | undefined;
 }) {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     return (
         <ol className="space-y-1">
             {steps.map((step, index) => (
@@ -49,13 +59,23 @@ export function AssignmentStepList({
                     ) : (
                         <Link
                             to={`/play/${step.scoreId}`}
-                            className={
+                            // Every step opens its piece, not only the one you are on, and
+                            // a row of plain text does not say so on a screen with no
+                            // hover. The same tinted row the library uses marks them as
+                            // things you can press.
+                            className={`flex min-w-0 items-center gap-2 rounded-md px-1.5 py-1 hover:bg-subtle ${
                                 step.status === "current"
                                     ? "font-medium text-accent-strong"
-                                    : "text-body hover:underline"
-                            }
+                                    : "text-body"
+                            }`}
                         >
-                            {titleOf(step.scoreId)}
+                            <BakedIncipit
+                                mark={incipitOf?.(step.scoreId)}
+                                label={titleOf(step.scoreId)}
+                                colored={prefs.colorNotes}
+                                className="shrink-0 text-faint"
+                            />
+                            <span className="min-w-0 truncate">{titleOf(step.scoreId)}</span>
                         </Link>
                     )}
                 </li>

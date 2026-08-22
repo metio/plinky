@@ -12,7 +12,7 @@ import {
 } from "../../core/elapsed";
 import { graceOnsetsMs } from "../../core/grace";
 import { pedalledAt } from "../../core/pedal";
-import { type DynamicPoint, volumeAt } from "../../core/dynamics";
+import { volumeAt } from "../../core/dynamics";
 
 // How many notes the practised hand has to play at the cursor. Only whether a position is
 // worth stopping at is asked here, so it needs neither dynamics nor timing: seeking is
@@ -32,12 +32,14 @@ function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreP
     return playable;
 }
 import { lengthScaleOf, velocityOf } from "../../core/expression";
+import { interpretedWeight } from "../../core/interpretation";
+import { octaveShiftAt } from "../../core/octaveShift";
+import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { slurredOnwardAt } from "../../core/slur";
 import type { ScoreParts } from "../../core/parts";
 import {
     isGraceNote,
     playOrder,
-    readDynamics,
-    readPedalSpans,
     readParts,
     readScoreExpression,
     readStartTempo,
@@ -59,9 +61,25 @@ import {
     upcomingSteps,
 } from "../../core/matcher";
 
-// How many positions ahead the notes-highway look-ahead surfaces — enough to fill the
-// tall highway panel that stands in for the score.
-const HIGHWAY_LOOKAHEAD = 8;
+// How many positions ahead the notes-highway look-ahead surfaces. The panel spans a
+// fixed stretch of music, so what fills it is a question about the music rather than a
+// count: this is generous enough that a run of semiquavers still reaches the top, and
+// the ones that fall off it are dropped without being drawn.
+const HIGHWAY_LOOKAHEAD = 32;
+
+// Whole-note onsets are summed from fractions, so two positions that are the same place in
+// the music can differ in the last bits. A sixty-fourth is 1/64 of a whole; anything this
+// small is rounding rather than music.
+const WHOLE_EPSILON = 1 / 1024;
+
+// The fields upcomingSteps does not read, so a lookahead can be built from steps and an
+// index alone rather than from a run that does not exist.
+const EMPTY_STATE: Omit<MatcherState, "steps" | "index"> = {
+    hit: [],
+    wrong: 0,
+    sinceWrong: 0,
+    complete: false,
+};
 
 export type { Hand } from "../../core/matcher";
 
@@ -90,7 +108,7 @@ type StepGroup = Omit<
     MatchStep,
     "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor" | "slackMs" | "pedalled"
 > & {
-    expected: { velocity: number | null; soundQuarters: number }[];
+    expected: { velocity: number | null; soundQuarters: number; writtenQuarters: number }[];
     // The ornament's own written length, for placing it before the beat. Zero on the
     // group that IS the beat.
     graceQuarters: number;
@@ -104,11 +122,15 @@ function stepsAtCursor(
     osmd: OpenSheetMusicDisplay,
     hand: Hand,
     parts: ScoreParts,
-    dynamics: readonly DynamicPoint[],
+    marks: ScoreMarks,
 ): PositionSteps {
+    const whole = osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0;
     // The dynamic in force at this position, read once: it is a property of where the
     // cursor sits, not of any one note under it.
-    const dynamicVolume = volumeAt(dynamics, osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0);
+    const dynamicVolume = volumeAt(marks.dynamics, whole);
+    // Likewise the arch: a slur is a span, and every note under it is joined onward
+    // whether or not the engraving hung a mark on that particular note.
+    const slurredOnward = slurredOnwardAt(marks.slurs, whole);
     // A fermata belongs to the position too: it holds whatever is sounding, and a rest can
     // carry one. So it is read across everything under the cursor, including the notes the
     // practised hand does not play.
@@ -129,7 +151,11 @@ function stepsAtCursor(
         // What each pitch is asked for, pushed alongside `pitches` so the two stay
         // aligned. Kept in quarter notes here and turned into milliseconds once the
         // position's tempo is known, which is where the chord's own hold is converted.
-        const expected: { velocity: number | null; soundQuarters: number }[] = [];
+        const expected: {
+            velocity: number | null;
+            soundQuarters: number;
+            writtenQuarters: number;
+        }[] = [];
         let holdQuarters = 0;
         let graceQuarters = 0;
         for (const note of group) {
@@ -151,7 +177,7 @@ function stepsAtCursor(
             if (!expression.strike) {
                 continue;
             }
-            pitches.push(note.halfTone + 12);
+            pitches.push(note.halfTone + 12 + octaveShiftAt(marks.octaveShifts, whole));
             pitchStaves.push(staff ?? 0);
             pitchHands.push(handOfStaff(staff, parts));
             // Each key is asked for on its own terms: its own accent over the standing
@@ -160,10 +186,24 @@ function stepsAtCursor(
             expected.push({
                 velocity:
                     dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
-                soundQuarters: expression.soundQuarters * lengthScaleOf(expression),
+                soundQuarters:
+                    expression.soundQuarters *
+                    lengthScaleOf({
+                        articulation: expression.articulation,
+                        // From the span: a note in the middle of an arch carries no slur of
+                        // its own, and reading it as unslurred would grade a phrase played
+                        // legato as one played staccato.
+                        slurred: slurredOnward,
+                    }),
+                // The same length before articulation narrows it: what this one key is
+                // written to last, which is what its hold indicator draws. A whole note
+                // under a quaver is the ordinary case for two hands, and one length for
+                // the whole position would drain the quaver's fill at the whole note's
+                // pace long after that hand had moved on.
+                writtenQuarters: expression.soundQuarters,
             });
-            // The group's own length is its longest note: what the hold indicator draws,
-            // and how long it keeps ringing.
+            // The group's own length is its longest note: how long the position keeps
+            // ringing, which is not the same as how long any one key is held.
             holdQuarters = Math.max(holdQuarters, expression.soundQuarters);
             if (isGraceNote(note)) {
                 graceQuarters = Math.max(graceQuarters, expression.notatedQuarters);
@@ -189,7 +229,9 @@ function stepsAtCursor(
         advanceQuarters: shortestLength(osmd),
         // The tempo in force, so a piece that changes speed is measured by the clock it
         // is written against rather than one average for the whole score.
-        bpm: readTempo(osmd.cursor.iterator) ?? NOMINAL_BPM,
+        // From the file, so a tempo written mid-bar takes effect where it is written
+        // rather than at the barline before it — which is what the engraver could only do.
+        bpm: tempoAt(marks.tempi, whole) ?? readTempo(osmd.cursor.iterator) ?? NOMINAL_BPM,
         stretch: fermata ? FERMATA_STRETCH : 1,
         groups,
     };
@@ -205,15 +247,21 @@ function stepsAtCursor(
 function askedFor(
     event: { step: MatchStep; playedPitches: number[] },
     ratio: number,
-): { expectedVelocities: (number | null)[]; expectedHoldsMs: number[] } {
+): {
+    expectedVelocities: (number | null)[];
+    expectedHoldsMs: number[];
+    writtenHoldsMs: number[];
+} {
     const expectedVelocities: (number | null)[] = [];
     const expectedHoldsMs: number[] = [];
+    const writtenHoldsMs: number[] = [];
     for (const pitch of event.playedPitches) {
         const asked = event.step.expected?.[event.step.pitches.indexOf(pitch)];
         expectedVelocities.push(asked?.velocity ?? null);
         expectedHoldsMs.push(asked ? asked.holdMs / ratio : 0);
+        writtenHoldsMs.push(asked ? asked.writtenHoldMs / ratio : 0);
     }
-    return { expectedVelocities, expectedHoldsMs };
+    return { expectedVelocities, expectedHoldsMs, writtenHoldsMs };
 }
 
 // When each hand got to this position: the EARLIEST arrival among the pitches that
@@ -241,16 +289,22 @@ function staffArrivals(event: {
 // playable position for the chosen hand, in play order. Leaves the cursor reset.
 // Exported so the duet can lift the sitting-out hand's positions the same way,
 // reading the identical staff split the run itself matches on.
-export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): MatchStep[] {
+export function collectMatchSteps(
+    osmd: OpenSheetMusicDisplay,
+    hand: Hand,
+    // The score's markings, read from the file rather than off the engraver. Defaulted so a
+    // caller that only wants the notes — the duet's onsets, the sample prefetch's pitches —
+    // need not carry a document it has no use for.
+    marks: ScoreMarks = NO_SCORE_MARKS,
+): MatchStep[] {
     // Which staves are the practised instrument's, worked out from the sheet rather than
     // assumed: on an art song the piano is staves 1 and 2, and staff 0 is the singer.
     const parts = readParts(osmd);
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it is a property of where a position sits rather than of the position.
-    const dynamics = readDynamics(osmd);
     // Where the score asks for the sustain pedal, so a passage meant to be pedalled is
     // not read as one played staccato.
-    const pedals = readPedalSpans(osmd);
+    const pedals = marks.pedals;
     osmd.cursor.reset();
     // Every position the performance passes through, playable or not, because elapsed time
     // is only recoverable from a walk with no holes in it: two positions that follow each
@@ -261,7 +315,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     const walked: (PositionSteps & { bar: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
-            ...stepsAtCursor(osmd, hand, parts, dynamics),
+            ...stepsAtCursor(osmd, hand, parts, marks),
             bar: osmd.cursor.iterator.CurrentMeasureIndex,
         });
         osmd.cursor.next();
@@ -302,6 +356,10 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
                 // placed ahead of the beat; on the note it decorates, the half of its own
                 // length an appoggiatura would take.
                 pedalled: pedalledAt(pedals, position.whole),
+                // How the position is weighted for where it sits — read from the printed
+                // onset, not the elapsed one, because a bar's stresses are a property of
+                // the page and a repeat revisits the same bar.
+                interpretation: interpretedWeight(marks.bars, marks.slurs, position.whole),
                 slackMs:
                     ornament.length === 0
                         ? 0
@@ -312,6 +370,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
                 expected: expected.map((pitch) => ({
                     velocity: pitch.velocity,
                     holdMs: quartersMs(pitch.soundQuarters * stretch, bpm),
+                    writtenHoldMs: quartersMs(pitch.writtenQuarters * stretch, bpm),
                 })),
                 // Overwritten below for all but the last.
                 advancesCursor: true,
@@ -386,6 +445,9 @@ export type CorrectInfo = {
     // dynamic with that note's own accent, and how long that key is meant to be down.
     expectedVelocities: (number | null)[];
     expectedHoldsMs: number[];
+    // How long each struck key is WRITTEN to last, index-aligned with `pitches` — the
+    // hold indicator's own figure, per key rather than per position.
+    writtenHoldsMs: number[];
     // How hard each was actually struck, index-aligned with `pitches`.
     velocities: number[];
     // How much the timing windows are widened here — non-zero only around an ornament.
@@ -422,6 +484,10 @@ export function useScoreMatcher(
         onWrong?: (info: { index: number; misses: number }) => void;
         tempo?: number;
         hand?: Hand;
+        // The score's markings, read from the file. What a run is graded against — the
+        // loudness each note asks for, the arch that holds it, the octave line over it —
+        // comes from here rather than from the engraver's object graph.
+        marks?: ScoreMarks;
         // Forgiving advance: when the player plays a note belonging to the NEXT position,
         // treat the current one as done (crediting only what they played) and move on, so
         // a slip — especially the wrong hand in a two-hand piece — never freezes the run.
@@ -487,6 +553,52 @@ export function useScoreMatcher(
         setPracticing(false);
     }, [getOsmd]);
 
+    // The lookahead for a surface that walks the music without grading it — Listen. The
+    // notes highway draws whatever is coming next, and "what is coming next" is the same
+    // question whoever is asking: the same steps, off the same engraving. Tying it to a
+    // graded run instead meant Listen dropped the highway and showed the staff, throwing
+    // away the reading mode the player chose.
+    //
+    // Collecting walks the cursor, so it is done ONCE and then only re-indexed. A walk per
+    // sounded note would reset the cursor Listen is steering, and re-read the whole
+    // engraving between two beats.
+    const previewRef = useRef<{ hand: Hand; steps: MatchStep[] } | null>(null);
+
+    // Drop the collected steps: the engraving they were read from is gone (a reload, a
+    // transpose), so re-indexing them would point at music no longer on the page.
+    const resetPreview = useCallback(() => {
+        previewRef.current = null;
+    }, []);
+
+    const preview = useCallback(
+        (fromWhole: number) => {
+            const osmd = getOsmd();
+            // A run owns the lookahead while it lasts — it knows where the player actually
+            // is, which is not where the notation says the clock is.
+            if (!osmd || practicingRef.current) {
+                return;
+            }
+            const hand = optionsRef.current.hand ?? "both";
+            if (previewRef.current === null || previewRef.current.hand !== hand) {
+                previewRef.current = {
+                    hand,
+                    steps: collectMatchSteps(osmd, hand, optionsRef.current.marks),
+                };
+            }
+            const steps = previewRef.current.steps;
+            // The position at or after the asked-for onset, so the note now sounding is the
+            // first block on the highway — the same place a run's lookahead starts from.
+            const index = steps.findIndex((step) => step.whole >= fromWhole - WHOLE_EPSILON);
+            setUpcoming(
+                upcomingSteps(
+                    { ...EMPTY_STATE, steps, index: index < 0 ? steps.length : index },
+                    HIGHWAY_LOOKAHEAD,
+                ),
+            );
+        },
+        [getOsmd],
+    );
+
     // Begin a run. `fromWhole` — a notated onset in whole notes from the top of the
     // piece — starts partway through, at the first playable position at or after it,
     // so taking over from Listen (or resuming a paused run) continues from the shared
@@ -502,7 +614,7 @@ export function useScoreMatcher(
                 return;
             }
             const hand = optionsRef.current.hand ?? "both";
-            const all = collectMatchSteps(osmd, hand);
+            const all = collectMatchSteps(osmd, hand, optionsRef.current.marks);
             // The first position at or after the resume point; -1 when none remains
             // (the cursor sits past the last note), which leaves nothing to play.
             const startIndex =
@@ -530,7 +642,10 @@ export function useScoreMatcher(
             // so the first step's position anchors every later relative index.
             runStartIndexRef.current = steps[0] ? all.indexOf(steps[0]) : 0;
             runTempoRef.current = optionsRef.current.tempo ?? 100;
-            runStartBpmRef.current = readStartTempo(osmd) ?? NOMINAL_BPM;
+            runStartBpmRef.current =
+                tempoAt(optionsRef.current.marks?.tempi ?? [], 0) ??
+                readStartTempo(osmd) ??
+                NOMINAL_BPM;
             runHandRef.current = hand;
             practicingRef.current = true;
             setBar(currentBar(state));
@@ -651,5 +766,7 @@ export function useScoreMatcher(
         start,
         stop,
         registerNote,
+        preview,
+        resetPreview,
     };
 }

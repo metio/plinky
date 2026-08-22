@@ -31,8 +31,6 @@ export type MidiNoteEvent = {
     timestamp: number;
 };
 
-export const MAX_EVENTS = 100;
-
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 // MIDI note 60 is middle C (C4), so the octave is offset by one below the raw
@@ -48,6 +46,14 @@ export function noteName(note: number): string {
 const PITCH_CLASSES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
 export function pitchClass(note: number): string {
     return PITCH_CLASSES[((note % 12) + 12) % 12]!;
+}
+
+// A pitch as a screen reader should say it: "C sharp 4", not "C♯4". The glyph is
+// announced as "number" or read as nothing at all, and an octave digit run onto the
+// letter is spoken as one word, so both are spelled out.
+export function spokenPitch(note: number): string {
+    const octave = Math.floor(note / 12) - 1;
+    return `${pitchClass(note).replace("♯", " sharp")} ${octave}`;
 }
 
 // The MIDI control-change number each pedal speaks on: sustain 64, sostenuto 66, soft 67.

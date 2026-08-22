@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button } from "../components/ui/button";
 import { ReportBack } from "../components/features/reportBack";
-import { linkClasses } from "../components/ui/classes";
+import { linkClasses, sectionHeadingClasses } from "../components/ui/classes";
 import { LocalizedLink } from "../components/ui/localizedLink";
 import { downloadBlob } from "../lib/download";
 import { Show } from "../components/features/conditional";
@@ -46,6 +46,7 @@ import { trackSteps } from "../../core/tracks";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/assignments";
 import { localizedHref } from "../components/ui/href";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.assignments_heading(), m.meta_assignments_description());
@@ -156,7 +157,12 @@ export default function AssignmentsRoute() {
         );
 
     const steps = (list: AssignmentSteps) => (
-        <AssignmentStepList steps={list} titleOf={titleOf} isMissing={known.isMissing} />
+        <AssignmentStepList
+            steps={list}
+            titleOf={titleOf}
+            isMissing={known.isMissing}
+            incipitOf={known.incipitOf}
+        />
     );
 
     const onSave = () => {
@@ -259,10 +265,7 @@ export default function AssignmentsRoute() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.assignments_heading()}</h1>
-                <p className="text-sm text-muted">{m.assignments_intro()}</p>
-            </header>
+            <PageHeader title={m.assignments_heading()} hint={m.assignments_intro()} />
 
             {status && (
                 <p
@@ -290,7 +293,7 @@ export default function AssignmentsRoute() {
 
             {tab === "list" && incoming && (
                 <section className="space-y-2 rounded-md border border-accent-line bg-accent-surface/50 p-4 dark:bg-accent-surface/30">
-                    <h2 className="font-semibold">{m.assignments_received_heading()}</h2>
+                    <h2 className={sectionHeadingClasses}>{m.assignments_received_heading()}</h2>
                     <p className="text-sm text-muted">
                         {m.assignments_received_detail({
                             name: incoming.name,
@@ -336,7 +339,7 @@ export default function AssignmentsRoute() {
 
             <Show when={tab === "list" && builtin.length > 0}>
                 <section className="space-y-3">
-                    <h2 className="font-semibold">{m.assignments_builtin_heading()}</h2>
+                    <h2 className={sectionHeadingClasses}>{m.assignments_builtin_heading()}</h2>
                     <ul className="space-y-2">
                         {builtin.map((assignment) => {
                             const list = stepsFor(assignment);
@@ -368,7 +371,7 @@ export default function AssignmentsRoute() {
             {tab === "list" && (
                 <section className="space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h2 className="font-semibold">{m.assignments_yours_heading()}</h2>
+                        <h2 className={sectionHeadingClasses}>{m.assignments_yours_heading()}</h2>
                         <Button variant="secondary" onClick={() => fileRef.current?.click()}>
                             {m.assignments_import_file()}
                         </Button>

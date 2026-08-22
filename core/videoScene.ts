@@ -6,15 +6,11 @@
 // geometry and wording here keeps them testable and the painter thin.
 
 import type { Attribution } from "./attribution";
+import { keyLane } from "./keyboardGeometry";
 import { maxOf, minOf } from "./stats";
 
 // Black keys sit above the gap after these white-key positions within an
 // octave (C, D, F, G, A — no black key after E and B).
-const BLACK_AFTER = new Set([0, 2, 5, 7, 9]);
-
-function isBlack(pitch: number): boolean {
-    return [1, 3, 6, 8, 10].includes(pitch % 12);
-}
 
 export type SceneKey = {
     pitch: number;
@@ -39,31 +35,28 @@ export function sceneRange(pitches: number[]): { from: number; to: number } {
     return { from, to };
 }
 
-// Lay the keys of [from..to] across 0..1: white keys split the width evenly,
-// each black key straddles the boundary after its white neighbour at 60% of a
-// white key's width — the familiar piano proportions, resolution-independent.
+// The keys of [from..to] laid across 0..1, from the app's own keyboard geometry.
+//
+// The same `keyLane` the on-screen keyboard and the practice highway are drawn from, in
+// the units a painter wants rather than the percentages CSS wants. Two implementations of
+// piano proportions was one too many: they agreed by coincidence, and a change to the
+// instrument on screen would silently have stopped matching the instrument in the export.
+//
+// Whites first and blacks after, because the painter draws in order and a black key has to
+// land on top of the whites it straddles.
 export function sceneKeys(from: number, to: number): SceneKey[] {
-    const whites: number[] = [];
-    for (let pitch = from; pitch <= to; pitch++) {
-        if (!isBlack(pitch)) {
-            whites.push(pitch);
-        }
-    }
-    const whiteWidth = 1 / Math.max(1, whites.length);
-    const keys: SceneKey[] = whites.map((pitch, index) => ({
-        pitch,
-        x: index * whiteWidth,
-        width: whiteWidth,
-        black: false,
-    }));
-    for (let index = 0; index < whites.length; index++) {
-        const pitch = whites[index]!;
-        if (BLACK_AFTER.has(pitch % 12) && pitch + 1 <= to && pitch + 1 >= from) {
+    const keys: SceneKey[] = [];
+    for (const black of [false, true]) {
+        for (let pitch = from; pitch <= to; pitch++) {
+            const lane = keyLane(pitch, from, to);
+            if (!lane || lane.white === black) {
+                continue;
+            }
             keys.push({
-                pitch: pitch + 1,
-                x: (index + 1) * whiteWidth - whiteWidth * 0.3,
-                width: whiteWidth * 0.6,
-                black: true,
+                pitch,
+                x: lane.leftPct / 100,
+                width: lane.widthPct / 100,
+                black,
             });
         }
     }
@@ -79,8 +72,17 @@ export function sceneKeys(from: number, to: number): SceneKey[] {
 // the drawable region.
 export type HighwayBlock = {
     pitch: number;
+    // When the note sounds, on whatever clock the caller handed in. Carried so a painter
+    // that keeps its blocks between frames — the DOM one, whose blocks are elements that
+    // move — can tell one from another across a shift of the origin. A canvas painter,
+    // which redraws everything every frame, has no use for it.
+    startMs: number;
     // The finger the note is played with, where the performance knows it.
     finger?: number;
+    // The hand that plays it, where the score says. Carried alongside the finger because
+    // the two pictures colour by different things — practice by hand, an export by
+    // whichever the person making it chose — and one block model has to serve both.
+    hand?: "left" | "right";
     x: number;
     width: number;
     onsetFrac: number;
@@ -93,7 +95,13 @@ export type HighwayBlock = {
 // so blocks fall and are sized by real duration, unlike the position-indexed
 // on-screen highway.
 export function highwayBlocks(
-    notes: readonly { pitch: number; startMs: number; durationMs: number; finger?: number }[],
+    notes: readonly {
+        pitch: number;
+        startMs: number;
+        durationMs: number;
+        finger?: number;
+        hand?: "left" | "right";
+    }[],
     keys: readonly SceneKey[],
     tMs: number,
     windowMs: number,
@@ -112,7 +120,9 @@ export function highwayBlocks(
         }
         blocks.push({
             pitch: note.pitch,
+            startMs: note.startMs,
             finger: note.finger,
+            hand: note.hand,
             x: key.x,
             width: key.width,
             onsetFrac,
@@ -202,8 +212,16 @@ export function stepCenterAt(
         const a = onsets[index] ?? 0;
         const b = onsets[index + 1] ?? a;
         if (tMs < b) {
-            const from = centers[index] ?? 0;
-            const to = centers[Math.min(index + 1, centers.length - 1)] ?? from;
+            // Clamped, because the two lists can be different lengths and often are: the
+            // onsets are the take's own, while the centres come from an engraving whose
+            // notes were quantised to a grid — a hand-played chord's three near-misses
+            // collapse into one step. Reading past the end used to fall back to 0, which
+            // is the TOP of the sheet: the score panel jumped back to bar one partway
+            // through and stayed there. Holding the last centre keeps the page where the
+            // music left it.
+            const last = centers.length - 1;
+            const from = centers[Math.min(index, last)] ?? 0;
+            const to = centers[Math.min(index + 1, last)] ?? from;
             const progress = b > a ? (tMs - a) / (b - a) : 1;
             return from + (to - from) * progress;
         }

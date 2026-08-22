@@ -6,6 +6,8 @@ import { cleanup, screen } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
+import { memoryStore } from "../adapters/memoryStore";
+import { saveUserScore } from "../lib/catalog";
 import { server } from "../test-setup.node";
 import { renderWithServices } from "../testing/renderWithServices";
 import PersonPage from "./person";
@@ -69,6 +71,61 @@ describe("PersonPage", () => {
         ]);
         expect(links[0]?.getAttribute("href")).toContain("/play/s1");
         expect(screen.queryByText(/Gymnopédie/)).toBeNull();
+    });
+
+    it("lists a composer whose work here is all studies", async () => {
+        // The piece count on this page is baked from the song AND exercise manifests, and
+        // the page listed from the songs alone — so Ferdinand Beyer, whose whole presence
+        // in the catalogue is three studies, got a page announcing three pieces and
+        // showing none.
+        server.use(
+            http.get("*/songs/manifest.json", () => HttpResponse.json(MANIFEST)),
+            http.get("*/exercises/manifest.json", () =>
+                HttpResponse.json([
+                    {
+                        id: "x1",
+                        title: "Beyer No. 8",
+                        composer: "Ferdinand Beyer",
+                        grade: 1,
+                        cost: 0,
+                        kind: "study",
+                        license: "CC0-1.0",
+                        tempo: 90,
+                        beatsPerBar: 4,
+                    },
+                    // A study crediting nobody belongs to no page.
+                    { id: "x2", title: "Anon study", grade: 1, cost: 0, kind: "study" },
+                ]),
+            ),
+        );
+        renderWithServices(pageAt("ferdinand-beyer"));
+        expect(await screen.findByRole("heading", { name: "Ferdinand Beyer" })).toBeTruthy();
+        const study = await screen.findByRole("link", { name: /Beyer No\. 8/ });
+        expect(study.getAttribute("href")).toContain("/play/x1");
+        expect(screen.queryByText(/Anon study/)).toBeNull();
+    });
+
+    it("lists a piece the player imported themselves", async () => {
+        // The library's composer list counts what is on this device, imports included, so
+        // a page that read only the shipped catalogue credited a composer with a piece it
+        // then refused to show. The comment here promised imports "layer on top" and
+        // nothing ever laid them on.
+        server.use(
+            http.get("*/songs/manifest.json", () => HttpResponse.json(MANIFEST)),
+            http.get("*/exercises/manifest.json", () => HttpResponse.json([])),
+        );
+        const store = memoryStore();
+        saveUserScore(store, {
+            id: "mine",
+            title: "My Own Prelude",
+            composer: "J.S. Bach",
+            xml: "<score/>",
+            tempo: 90,
+        } as Parameters<typeof saveUserScore>[1]);
+        renderWithServices(pageAt("johann-sebastian-bach"), { store });
+        // Beside the two the catalogue ships under two different spellings of his name.
+        expect(await screen.findByRole("link", { name: /My Own Prelude/ })).toBeTruthy();
+        expect(screen.getAllByRole("link", { name: /Menuet|Air|My Own/ })).toHaveLength(3);
     });
 
     it("says so when the slug matches nobody", async () => {

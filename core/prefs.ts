@@ -11,6 +11,7 @@ import {
     type LightProfileId,
 } from "./lightProfile";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+import type { InstrumentRange } from "./instrumentRange";
 import type { MicCalibration } from "./pitch";
 import { type DecayMode, REVIEW_CAP } from "./review";
 
@@ -33,12 +34,16 @@ export type NoteLabels = "all" | "c" | "solfege" | "off";
 export type Prefs = {
     sound: boolean;
     volume: number; // 0..100
+    // How much of the room is heard around the piano, 0..100 — 0 is dry, 100 the room as
+    // designed. A phone speaker in a hard room genuinely wants less of it than headphones
+    // do, and a player who finds reverb muddy should be able to say so.
+    reverb: number;
     masteryThreshold: Letter; // grade a score must reach to count as learned
     handSpan: HandSpan;
-    // Print the suggested fingering numbers on the staff. Off by default for a cleaner
-    // score — a player turns them on (in Settings, or with the in-play toggle) when they
-    // want the hint, the way they'd read fingering off printed sheet music only when
-    // stuck.
+    // Print the suggested fingering numbers on the staff. One of the reading aids, so it
+    // rides the skill ladder: on for the two beginner rungs and off from Confident down,
+    // and stripped entirely by a sight-read. On by default, because a fresh device reads
+    // as Starter and a starter is given every aid to shed rather than none to find.
     showFingerings: boolean;
     // Whether the score joins fast notes into beam groups. "auto" (the default) follows
     // the piece's difficulty — flags on the easy grades a beginner reads note-by-note,
@@ -75,10 +80,6 @@ export type Prefs = {
     // note (often the wrong hand on a two-hand piece) was missed, so a mistake never
     // freezes you mid-piece. Off waits for every note, which builds accuracy.
     forgiving: boolean;
-    // Live green/amber/red feedback as you finger a passage. On by default, but the
-    // guidance-hypothesis warns constant feedback can stunt self-judgement, so a learner
-    // can fade it off and rely on the post-phrase summary.
-    fingerHints: boolean;
     // How a grade decays when its pieces go unreviewed: gentle keeps the grade and
     // only dulls its shine, competitive lets it actually slip — the opt-in challenge.
     decayMode: DecayMode;
@@ -136,6 +137,11 @@ export type Prefs = {
     // wizard, or null when the player has never run it (the detector's own defaults
     // stand in). Stored per device — a different room needs a different tuning.
     micCalibration: MicCalibration | null;
+    // Which keys the player's instrument has, when it is not a full piano — measured by
+    // playing its lowest and highest key. Null leaves it to be read off a connected
+    // device's name, and failing that assumed to be all 88 (see core/instrumentRange).
+    // Stored per device, because the keyboard in this room is what it describes.
+    instrumentRange: InstrumentRange | null;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -157,10 +163,15 @@ export const METRONOME_SUBDIVISIONS = [1, 2, 3, 4];
 export const REVEAL_TRIES = [1, 2, 3];
 
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
-const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
-const NOTE_LABELS: NoteLabels[] = ["all", "c", "solfege", "off"];
+// Both orders run from most help to none, and the keyboard's tap-to-cycle controls walk
+// them in that order — so this is the one list of what each setting may be, rather than a
+// validation list and a cycle that can disagree about what exists.
+export const NOTE_HINT_CYCLE: NoteHints[] = ["always", "miss", "never"];
+export const NOTE_LABEL_CYCLE: NoteLabels[] = ["all", "c", "solfege", "off"];
 const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
+// Shared by volume and reverb: both are a whole percentage a slider produces, and both have
+// exactly one bad value to guard against — one outside the scale.
 export function clampVolume(value: number): number {
     return Math.max(0, Math.min(100, Math.round(value)));
 }
@@ -202,17 +213,19 @@ function defaults(): Prefs {
     return {
         sound: true,
         volume: 80,
+        reverb: 100,
         masteryThreshold: "A",
         handSpan: { left: null, right: null },
-        showFingerings: false,
+        showFingerings: true,
         beams: "auto",
-        // These five aid fields are exactly the "starter" rung of core/readingLevel's
+        // These aid fields are exactly the "starter" rung of core/readingLevel's
         // ladder, so a device that has touched nothing reads as a real level rather than
         // "Custom" — a strange thing to tell someone who has changed nothing — and the
         // run panel's beginner layout, which keys off the level, reaches the people it
         // was built for. Starter is the whole point of a beginner-first app: every aid
-        // on, including the notes highway, until the reader chooses otherwise. A test
-        // pins the pairing, so moving either side without the other fails.
+        // on, including the notes highway and the printed fingering, until the reader
+        // chooses otherwise. A test pins the pairing, so moving either side without the
+        // other fails.
         showAccompaniment: false,
         colorNotes: true,
         noteHints: "always",
@@ -223,7 +236,6 @@ function defaults(): Prefs {
         lightLeftChannel: defaultChannels("casio").left,
         lightRightChannel: defaultChannels("casio").right,
         forgiving: true,
-        fingerHints: true,
         decayMode: "gentle",
         reviewCap: REVIEW_CAP,
         barsPerRow: 0,
@@ -241,7 +253,25 @@ function defaults(): Prefs {
         hiddenNotes: false,
         revealTries: 1,
         micCalibration: null,
+        instrumentRange: null,
     };
+}
+
+// A stored instrument range is trusted only when it is two whole notes on a piano, the
+// right way round, and at least an octave apart. A backwards or one-key range would make
+// every piece unplayable while looking like a setting, so it is dropped rather than
+// honoured.
+function cleanInstrumentRange(value: unknown): InstrumentRange | null {
+    if (!value || typeof value !== "object") {
+        return null;
+    }
+    const range = value as Record<string, unknown>;
+    const key = (x: unknown): x is number =>
+        typeof x === "number" && Number.isInteger(x) && x >= 0 && x <= 127;
+    if (!key(range.from) || !key(range.to) || range.to - range.from < 12) {
+        return null;
+    }
+    return { from: range.from, to: range.to };
 }
 
 // A stored calibration is trusted only when every field is a finite number in a
@@ -297,16 +327,16 @@ export function parsePrefs(raw: string | null): Prefs {
             lightLeftChannel: cleanChannel(parsed.lightLeftChannel, base.lightLeftChannel),
             lightRightChannel: cleanChannel(parsed.lightRightChannel, base.lightRightChannel),
             volume: num(parsed.volume, clampVolume, base.volume),
+            reverb: num(parsed.reverb, clampVolume, base.reverb),
             masteryThreshold: oneOf(parsed.masteryThreshold, LETTERS, base.masteryThreshold),
             handSpan: cleanHandSpan(parsed.handSpan),
             showFingerings: bool(parsed.showFingerings, base.showFingerings),
             beams: oneOf(parsed.beams, BEAMS, base.beams),
             showAccompaniment: bool(parsed.showAccompaniment, base.showAccompaniment),
             colorNotes: bool(parsed.colorNotes, base.colorNotes),
-            noteHints: oneOf(parsed.noteHints, NOTE_HINTS, base.noteHints),
-            noteLabels: oneOf(parsed.noteLabels, NOTE_LABELS, base.noteLabels),
+            noteHints: oneOf(parsed.noteHints, NOTE_HINT_CYCLE, base.noteHints),
+            noteLabels: oneOf(parsed.noteLabels, NOTE_LABEL_CYCLE, base.noteLabels),
             forgiving: bool(parsed.forgiving, base.forgiving),
-            fingerHints: bool(parsed.fingerHints, base.fingerHints),
             decayMode: oneOf(parsed.decayMode, DECAY_MODES, base.decayMode),
             reviewCap: oneOf(parsed.reviewCap, REVIEW_CAPS, base.reviewCap),
             barsPerRow: oneOf(parsed.barsPerRow, BARS_PER_ROW, base.barsPerRow),
@@ -331,8 +361,39 @@ export function parsePrefs(raw: string | null): Prefs {
             hiddenNotes: bool(parsed.hiddenNotes, base.hiddenNotes),
             revealTries: oneOf(parsed.revealTries, REVEAL_TRIES, base.revealTries),
             micCalibration: cleanCalibration(parsed.micCalibration),
+            instrumentRange: cleanInstrumentRange(parsed.instrumentRange),
         };
     } catch {
         return base;
     }
+}
+
+// The staff and the keyboard as they really are, with every aid off. Two surfaces want
+// this for two reasons: the placement drill, whose result would otherwise depend on how
+// much help the player had switched on, and the keyboard tour, which teaches finding a key
+// by the pattern of the black ones — a lesson that labelled keys skip entirely. A placement drill that can be taken with the notes falling down a highway, the
+// noteheads coloured by name and the keys labelled is not measuring reading — and one
+// taken with hidden notes or the cursor waiting is measuring something else again. So the
+// test supplies its own preferences instead of the player's, and nothing on the page can
+// change them.
+//
+// What it does NOT touch: sound, volume, the key map, hand span, the keyboard's theme.
+// Those are how a person's instrument is set up rather than how much the page is helping,
+// and taking them away would leave a player unable to use their own keyboard.
+export function unaidedPrefs(base: Prefs): Prefs {
+    return {
+        ...base,
+        colorNotes: false,
+        noteLabels: "off",
+        noteHints: "never",
+        showFingerings: false,
+        highway: false,
+        treadmill: false,
+        hiddenNotes: false,
+        keyLights: false,
+        raceGhost: false,
+        // Printed music beams its quavers; reading them one flag at a time is the aid.
+        beams: "on",
+        barNumbers: true,
+    };
 }

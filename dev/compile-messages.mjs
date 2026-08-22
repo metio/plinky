@@ -12,7 +12,11 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { compile } from "@inlang/paraglide-js";
 
-const settings = JSON.parse(readFileSync("./project.inlang/settings.json", "utf8"));
+// The inlang project to compile. PLINKY_INLANG_PROJECT points at a copy carrying a
+// narrower locale list — design-sync compiles one language, because a bundle holding all
+// 26 is three quarters message data.
+const project = process.env.PLINKY_INLANG_PROJECT ?? "./project.inlang";
+const settings = JSON.parse(readFileSync(`${project}/settings.json`, "utf8"));
 const locales = settings.locales;
 
 // The locale a per-locale build is pinned to (see the experimentalStaticLocale
@@ -40,7 +44,7 @@ const urlPatterns = [
 ];
 
 await compile({
-    project: "./project.inlang",
+    project,
     outdir: "./app/paraglide",
     // Order is the whole behaviour. `url` first: a /de/ link renders German for
     // whoever opens it, so a shared link is honest regardless of the reader's own

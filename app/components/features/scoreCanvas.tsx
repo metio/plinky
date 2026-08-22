@@ -3,11 +3,13 @@
 
 import { usePrefsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
+import { ScoreSkeleton } from "../ui/scoreSkeleton";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
 import { NotesHighway } from "./notesHighway";
 import { usePlaySession } from "./playSession";
 
-// The score itself: the bordered scroll box OSMD renders into, plus the load-error notice.
+// The score itself: the bordered scroll box OSMD renders into, the staff that stands in
+// while it fills, plus the load-error notice.
 // It attaches the session's container ref (OSMD renders here) and forwards a click to the
 // loop's bar picker; everything about what's drawn lives in the session's render surface.
 // In full screen the keyboard's quick controls ride this box's corner rather than taking
@@ -22,6 +24,7 @@ export function ScoreCanvas() {
         loadError,
         matcher,
         listenPlayback,
+        keepUp,
         loop,
         title,
         hideKeyboard,
@@ -33,11 +36,25 @@ export function ScoreCanvas() {
         sightRead,
     } = usePlaySession();
     const prefsStore = usePrefsStore();
-    // In the notes-highway reading mode, a tall highway covers the staff while playing —
-    // OSMD stays mounted and rendered underneath (the matcher walks its cursor), so the
-    // staff is hidden, not unmounted. Only while a run is on: at rest the score shows so
-    // the piece can be read, looped and set up.
-    const highwayActive = aids.highway && matcher.practicing;
+    // In the notes-highway reading mode, a tall highway covers the staff — OSMD stays
+    // mounted and rendered underneath (the cursor keeps walking it), so the staff is
+    // hidden, not unmounted.
+    //
+    // Full screen is the session: it is entered to play or to listen, and it is left to
+    // read, loop and set the piece up. So the reading mode holds for as long as the player
+    // is in there, rather than only while something is moving — tying it to movement meant
+    // the view flipped to the staff every time they paused, which is a reading mode that
+    // keeps being taken away rather than one they chose.
+    //
+    // Full screen is also the ONLY place it appears. Listening from the piece's own page is
+    // reading, not playing — somebody there wants the score in front of them, and replacing
+    // it with falling blocks answers a question they did not ask. The reading mode belongs
+    // to the playing surface.
+    //
+    // It also hands the staff back when there is nothing ahead to draw: the piece has run
+    // out, and the result belongs on the score anyway.
+    const somethingAhead = matcher.upcoming.length > 0;
+    const highwayActive = aids.highway && somethingAhead && fullscreen;
     // The score slot's size: full screen hands it the spare height (flex-1); a phone gets
     // a fixed slice so the keys still fit; otherwise a tall band that scrolls if taller.
     // The highway takes this same slot so it stands exactly where the staff did.
@@ -82,6 +99,10 @@ export function ScoreCanvas() {
                             upcoming={matcher.upcoming}
                             from={keyRange.from}
                             to={keyRange.to}
+                            // Only the tempo-locked play-along has a clock. Self-paced
+                            // practice waits for the player, and a picture that fell
+                            // anyway would leave them behind their own notes.
+                            advanceMs={keepUp.running ? keepUp.stepMs : null}
                         />
                     </div>
                 </div>
@@ -156,6 +177,16 @@ export function ScoreCanvas() {
                           } ${slotSize}`
                 }
             />
+            {/* Engraving a piece takes a second or two on a slow device, and the box it
+            renders into stands empty for all of it. The staff stands in over that box —
+            over, not in it, because the container belongs to the engraver and anything put
+            inside it is swept away on the next render. Nothing here takes a press: the
+            score underneath is still the thing being pointed at. */}
+            {!ready && !loadError && !highwayActive && (
+                <div className="pointer-events-none absolute inset-3">
+                    <ScoreSkeleton engraving />
+                </div>
+            )}
             {loadError && <p className="p-2 text-sm text-danger">{m.score_load_error()}</p>}
         </div>
     );

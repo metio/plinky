@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useMemo } from "react";
+import { noteGain } from "../../core/loudness";
+import { wetFor } from "../../core/room";
 import type { PedalKind } from "../../core/pedals";
 import { useAudioEngine, usePrefsStore } from "../contexts/services";
 
@@ -19,6 +21,10 @@ export type PlayNoteOptions = {
     // hovers down a list arriving as one chord, minutes later. A note the player asked
     // for is worth hearing late; decoration is not.
     decorative?: boolean;
+    // The score asks for the sustain pedal at this note. Listen models pedalling by
+    // lengthening notes rather than by pressing the engine's pedal, so this is how the
+    // engine learns that the dampers are off and the rest of the instrument is ringing.
+    pedalled?: boolean;
 };
 
 export type UseSynthResult = {
@@ -52,13 +58,16 @@ export function useSynth(): UseSynthResult {
     const gainFor = useCallback(
         (velocity: number): number | null => {
             const prefs = prefsStore.load();
-            if (!prefs.sound) {
-                return null;
-            }
-            const gain = (velocity / 127) * 0.32 * (prefs.volume / 100);
-            return gain > 0 ? gain : null;
+            // The room is a property of the graph rather than of a note, so it is set here
+            // rather than folded into the gain. Applied on the way to every strike instead
+            // of watched from an effect: the room is only audible when something sounds, so
+            // the moment before a note is exactly when the setting has to be right — and
+            // there is no subscription to mount, unmount or forget. Idempotent, and the
+            // engine ramps rather than jumps.
+            audio.setRoom(wetFor(prefs.reverb));
+            return noteGain(prefs, velocity);
         },
-        [prefsStore],
+        [prefsStore, audio],
     );
 
     const playNote = useCallback(
@@ -75,7 +84,12 @@ export function useSynth(): UseSynthResult {
             audio.resume();
             audio.strike({
                 note,
+                pedalled: options.pedalled ?? false,
                 gain,
+                // The force, before the volume preference was folded into the gain: a
+                // recorded piano picks its recording by this, and scaling that recording by
+                // velocity again would apply the dynamic twice.
+                velocity: options.velocity ?? 90,
                 duration: options.duration ?? 1.1,
                 delay: Math.max(0, options.delay ?? 0),
             });
@@ -90,7 +104,7 @@ export function useSynth(): UseSynthResult {
                 return;
             }
             audio.resume();
-            audio.press(note, gain);
+            audio.press(note, gain, options.velocity ?? 90);
         },
         [gainFor, audio],
     );

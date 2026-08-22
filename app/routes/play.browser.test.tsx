@@ -2,18 +2,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { reveal } from "../testing/controls";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { fakeMidi } from "../adapters/fakeMidi";
 import { ServicesProvider } from "../contexts/services";
 import { loadBundledScores } from "../lib/catalog";
-import { browserStore } from "../adapters/browserStore";
 import { httpFetcher } from "../adapters/httpFetcher";
-import { createOnboardingStore } from "../stores/onboardingStore";
-import { parsePrefs } from "../../core/prefs";
 import Play from "./play";
 import type { Route } from "./+types/play";
+import { m } from "../paraglide/messages.js";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
 // The browser context arrives with MIDI pre-granted; without a fake seam the
@@ -80,6 +79,83 @@ describe("Play", () => {
         expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
     });
 
+    it("puts the score first, with what you can do to the piece one fold away", async () => {
+        // Both folds are closed at rest, so a piece's page opens on the piece.
+        //
+        // Closed is asserted through the fold itself rather than by looking for what it
+        // holds. The panel collapses to a zero-height grid row and marks its contents
+        // inert — which is what takes them out of the tab order and the accessibility
+        // tree — but the nodes stay in the DOM, so a query for a control inside a shut
+        // fold still finds it and proves nothing about what a player can reach.
+        renderPlay(bundledId("ode to joy"));
+        const play = await screen.findByRole("button", { name: m.run_group_practice_title() });
+        const sheet = screen.getByRole("button", { name: m.run_group_sheet_title() });
+        for (const fold of [play, sheet]) {
+            expect(fold.getAttribute("aria-expanded")).toBe("false");
+            const panel = document.getElementById(fold.getAttribute("aria-controls") ?? "");
+            expect(panel?.querySelector("[inert]")).toBeTruthy();
+        }
+    });
+
+    it("opens onto everything that is about this piece and no other", async () => {
+        renderPlay(bundledId("ode to joy"));
+        await screen.findByRole("button", { name: m.run_group_practice_title() });
+        reveal(m.run_group_practice_title);
+        // Both cards are in the one fold: how the run behaves, and what you can put on
+        // top of it.
+        expect(screen.getByText(m.run_group_pace_title())).toBeTruthy();
+        expect(screen.getByText(m.run_group_challenge_title())).toBeTruthy();
+        expect(screen.getByRole("tablist", { name: m.run_pace_label() })).toBeTruthy();
+        expect(screen.getByRole("switch", { name: m.sight_read() })).toBeTruthy();
+        expect(screen.getByRole("switch", { name: m.race_ghost_toggle() })).toBeTruthy();
+    });
+
+    it("flips the fingering switch at once and says the sheet is catching up", async () => {
+        // Redrawing a sheet takes long enough to notice, and doing it in the same beat as
+        // the switch's own commit means the browser never paints the new position first —
+        // the switch sits unmoved for the whole redraw, which reads as a press that missed
+        // and invites a second press that undoes it. So the switch moves immediately and
+        // the wait is named beside it.
+        renderPlay(bundledId("ode to joy"));
+        await screen.findByRole("button", { name: m.run_group_sheet_title() }, { timeout: 30000 });
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
+        reveal(m.run_group_sheet_title);
+        const fingering = screen.getByRole("switch", { name: m.action_finger_numbers() });
+        const before = fingering.getAttribute("aria-checked");
+        fireEvent.click(fingering);
+        // Both in the very next paint, with no waiting: the new position AND the wait.
+        expect(fingering.getAttribute("aria-checked")).not.toBe(before);
+        expect(screen.getByRole("status", { name: m.score_redrawing() })).toBeTruthy();
+        // And it goes away by itself once the sheet has caught up.
+        await waitFor(
+            () => expect(screen.queryByRole("status", { name: m.score_redrawing() })).toBeNull(),
+            { timeout: 30000 },
+        );
+    }, 90000);
+
+    it("stands a staff in while the piece is still arriving", async () => {
+        // Opening a piece is a megabyte of engraver, the catalogue and then the notation,
+        // and on a slow device that is seconds of nothing on screen at all. The wait is
+        // drawn as the thing being waited for, and it names which part of the wait it is.
+        renderPlay(bundledId("ode to joy"));
+        // Whichever half of the wait this render is in, one of the two stands there.
+        await waitFor(() =>
+            expect(
+                screen.queryByText(m.score_loading_fetching()) ??
+                    screen.queryByText(m.score_loading_engraving()),
+            ).toBeTruthy(),
+        );
+        // And both are gone once the notation is up — a placeholder that outlives what it
+        // stood in for is worse than none.
+        await waitFor(() => expect(document.querySelector("svg#osmdSvgPage1")).toBeTruthy(), {
+            timeout: 30000,
+        });
+        await waitFor(() => {
+            expect(screen.queryByText(m.score_loading_fetching())).toBeNull();
+            expect(screen.queryByText(m.score_loading_engraving())).toBeNull();
+        });
+    }, 90000);
+
     it("keeps the play surface free of MIDI-connect chrome", async () => {
         // Connecting a device is a one-time setup task that lives in Settings
         // (with a getting-started step pointing there); a playing surface never
@@ -89,25 +165,4 @@ describe("Play", () => {
         expect(screen.queryByRole("button", { name: "Connect MIDI" })).toBeNull();
         expect(screen.queryByText(/No piano\?/)).toBeNull();
     }, 90000);
-
-    it("switches hidden-notes practice on from a ?mode=ear deep link and marks it tried", async () => {
-        const id = bundledId("twinkle");
-        const props = { params: { scoreId: id } } as unknown as Route.ComponentProps;
-        render(
-            <MemoryRouter initialEntries={[`/play/${id}?mode=ear`]}>
-                <ServicesProvider services={midiFake}>
-                    <MidiProvider>
-                        <Play {...props} />
-                    </MidiProvider>
-                </ServicesProvider>
-            </MemoryRouter>,
-        );
-        // The drill lives inside Practice now: the link lands on the score with
-        // the hidden-notes pref switched on and the discovery step ticked.
-        await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
-        await expect
-            .poll(() => createOnboardingStore(browserStore).marked().has("earTried"))
-            .toBe(true);
-        expect(parsePrefs(browserStore.get("plinky:prefs")).hiddenNotes).toBe(true);
-    });
 });

@@ -3,14 +3,15 @@
 
 import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
-import { parsePrefs, type Prefs } from "./prefs";
+import { unaidedPrefs, DEFAULT_PREFS, parsePrefs, type Prefs } from "./prefs";
 
 const BASE: Prefs = {
     sound: true,
     volume: 80,
+    reverb: 100,
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
-    showFingerings: false,
+    showFingerings: true,
     beams: "auto",
     showAccompaniment: false,
     colorNotes: true,
@@ -23,7 +24,6 @@ const BASE: Prefs = {
     lightRightChannel: 4,
     highway: true,
     forgiving: true,
-    fingerHints: true,
     decayMode: "gentle",
     reviewCap: 8,
     barsPerRow: 0,
@@ -40,6 +40,7 @@ const BASE: Prefs = {
     hiddenNotes: false,
     revealTries: 1,
     micCalibration: null,
+    instrumentRange: null,
 };
 
 const CALIBRATION = { noiseFloor: 0.02, softLevel: 0.03, loudLevel: 0.2, octaveShift: -1 };
@@ -102,9 +103,11 @@ describe("parsePrefs", () => {
         expect(parsePrefs(stored({ barNumbers: false })).barNumbers).toBe(false);
     });
 
-    it("defaults fingering numbers off and keeps the stored toggle", () => {
-        expect(parsePrefs(null).showFingerings).toBe(false);
-        expect(parsePrefs(stored({ showFingerings: true })).showFingerings).toBe(true);
+    it("defaults fingering numbers on with the starter rung, and keeps the stored toggle", () => {
+        // Printed fingering is one of the reading aids, so it starts where every other aid
+        // starts: on, for a beginner to shed rather than to find.
+        expect(parsePrefs(null).showFingerings).toBe(true);
+        expect(parsePrefs(stored({ showFingerings: false })).showFingerings).toBe(false);
     });
 
     it("defaults note hints to always-on and rejects an unknown value", () => {
@@ -185,6 +188,20 @@ describe("mic calibration prefs", () => {
         );
     });
 
+    it("keeps a measured instrument range", () => {
+        const range = { from: 36, to: 96 };
+        expect(parsePrefs(stored({ instrumentRange: range })).instrumentRange).toEqual(range);
+    });
+
+    it("drops an instrument range that no piece could be played on", () => {
+        // Backwards, and under an octave wide: both would leave every piece unplayable
+        // while looking like a deliberate setting.
+        expect(parsePrefs(stored({ instrumentRange: { from: 96, to: 36 } })).instrumentRange).toBeNull();
+        expect(parsePrefs(stored({ instrumentRange: { from: 60, to: 64 } })).instrumentRange).toBeNull();
+        expect(parsePrefs(stored({ instrumentRange: { from: 21.5, to: 108 } })).instrumentRange).toBeNull();
+        expect(parsePrefs(stored({ instrumentRange: { from: 21 } })).instrumentRange).toBeNull();
+    });
+
     it("drops a calibration whose velocity anchors collapsed", () => {
         const collapsed = { ...CALIBRATION, softLevel: 0.2, loudLevel: 0.2 };
         expect(parsePrefs(stored({ micCalibration: collapsed })).micCalibration).toBeNull();
@@ -211,5 +228,45 @@ describe("mic calibration prefs", () => {
 
     it("defaults to null when nothing is stored", () => {
         expect(parsePrefs(null).micCalibration).toBeNull();
+    });
+});
+
+describe("unaidedPrefs", () => {
+    it("turns off every reading aid, whatever the player set", () => {
+        const helped: Prefs = {
+            ...DEFAULT_PREFS,
+            colorNotes: true,
+            noteLabels: "all",
+            noteHints: "always",
+            showFingerings: true,
+            highway: true,
+            treadmill: true,
+            hiddenNotes: true,
+            keyLights: true,
+            raceGhost: true,
+            beams: "off",
+        };
+        const strict = unaidedPrefs(helped);
+        expect(strict.colorNotes).toBe(false);
+        expect(strict.noteLabels).toBe("off");
+        expect(strict.noteHints).toBe("never");
+        expect(strict.showFingerings).toBe(false);
+        expect(strict.highway).toBe(false);
+        expect(strict.treadmill).toBe(false);
+        expect(strict.hiddenNotes).toBe(false);
+        expect(strict.keyLights).toBe(false);
+        expect(strict.raceGhost).toBe(false);
+        expect(strict.beams).toBe("on");
+    });
+
+    it("leaves the player's own instrument alone", () => {
+        // How loud, which keys, how big a hand: those are the person's setup, not the
+        // page helping them read.
+        const mine: Prefs = { ...DEFAULT_PREFS, volume: 30, sound: false, keyboardTheme: "wood" };
+        const strict = unaidedPrefs(mine);
+        expect(strict.volume).toBe(30);
+        expect(strict.sound).toBe(false);
+        expect(strict.keyboardTheme).toBe("wood");
+        expect(strict.keyMap).toEqual(mine.keyMap);
     });
 });

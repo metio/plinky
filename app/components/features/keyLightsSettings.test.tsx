@@ -5,8 +5,8 @@
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { NOTHING_LIT, TEST_CHORD } from "../../../core/keyLights";
-import { defaultChannels } from "../../../core/lightProfile";
 import { DEFAULT_PREFS, type Prefs } from "../../../core/prefs";
+import { defaultChannels } from "../../../core/lightProfile";
 import { fakeKeyLights } from "../../adapters/fakeKeyLights";
 import { m } from "../../paraglide/messages.js";
 import { choose, chosen, switchOn, toggle } from "../../testing/controls";
@@ -17,10 +17,17 @@ afterEach(cleanup);
 
 // The panel takes its port as a prop, so it mounts with no Web MIDI anywhere near it —
 // which is the whole reason the Settings route does the wiring instead.
-function mount(overrides: Partial<Prefs> = {}) {
+function mount(overrides: Partial<Prefs> = {}, deviceNames: string[] = []) {
     const lights = fakeKeyLights();
     let prefs: Prefs = { ...DEFAULT_PREFS, ...overrides };
-    const panel = () => <KeyLightsSettings prefs={prefs} update={update} keyLights={lights} />;
+    const panel = () => (
+        <KeyLightsSettings
+            prefs={prefs}
+            update={update}
+            keyLights={lights}
+            deviceNames={deviceNames}
+        />
+    );
     const update = (patch: Partial<Prefs>) => {
         prefs = { ...prefs, ...patch };
         view.rerender(panel());
@@ -108,5 +115,20 @@ describe("KeyLightsSettings", () => {
         expect(lights.lit()).toEqual(TEST_CHORD);
         fireEvent.click(screen.getByRole("button", { name: m.lights_test_off() }));
         expect(lights.lit()).toEqual(NOTHING_LIT);
+    });
+
+    it("takes the maker from the instrument's own name when lighting is switched on", () => {
+        // An EZ-300 says what it is; asking somebody to pick the maker of the piano in
+        // front of them is a question the app can usually answer itself.
+        const { prefsNow } = mount({}, ["YAMAHA Digital Keyboard EZ-300"]);
+        toggle(m.lights_enable);
+        expect(prefsNow().lightProfile).toBe("yamaha");
+        expect(prefsNow().lightLeftChannel).toBe(defaultChannels("yamaha").left);
+    });
+
+    it("leaves the maker alone for an instrument it does not recognise", () => {
+        const { prefsNow } = mount({}, ["Some Other Piano"]);
+        toggle(m.lights_enable);
+        expect(prefsNow().lightProfile).toBe(DEFAULT_PREFS.lightProfile);
     });
 });

@@ -16,9 +16,10 @@ export function helpAnchorFor(pathname: string): string {
     if (rest.startsWith("/play")) return "play";
     if (rest.startsWith("/compose")) return "compose";
     if (rest.startsWith("/daily")) return "daily";
-    if (rest.startsWith("/library")) return "library";
+    if (rest.startsWith("/music")) return "music";
+    if (rest.startsWith("/learn")) return "learn";
     if (rest.startsWith("/assignments")) return "assignments";
-    if (rest.startsWith("/you")) return "you";
+    if (rest.startsWith("/stats")) return "you";
     if (rest.startsWith("/review")) return "review";
     if (rest.startsWith("/settings")) return "settings";
     if (rest === "" || rest === "/") return "home";
@@ -53,7 +54,7 @@ export function HelpLink() {
             to={`${localizedHref("/help")}#${anchor}`}
             onClick={onClick}
             aria-label={m.nav_help()}
-            className="text-muted hover:text-ink"
+            className="rounded-md p-1 text-muted hover:text-ink focus-visible:ring-2 focus-visible:ring-accent-ring"
         >
             <QuestionIcon className="h-5 w-5" />
         </Link>

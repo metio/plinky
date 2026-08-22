@@ -1,0 +1,200 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+import { testMasteryStore } from "../testing/stores";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router";
+import { afterEach, describe, expect, it } from "vitest";
+import { browserStore } from "../adapters/browserStore";
+import { domXmlCodec } from "../adapters/domXmlCodec";
+import { makeAssignment } from "../../core/assignment";
+import { createAssignmentsStore } from "../stores/assignmentsStore";
+import { buildScore, loadBundledScores, saveUserScore } from "../lib/catalog";
+
+import AssignmentsRoute from "./assignments";
+import Music from "./music";
+import { m } from "../paraglide/messages.js";
+
+// Bundled scores are keyed by their content-fingerprint id, so look one up by title.
+const bundledId = (titleFragment: string): string =>
+    loadBundledScores().find((score) => score.title.toLowerCase().includes(titleFragment))?.id ??
+    "";
+
+const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
+
+// A single unbreakable word wider than a phone so a row that fails to truncate would
+// push the whole page — and the fixed bottom nav — past the viewport edge.
+const LONG_TITLE = "Supercalifragilisticexpialidociousandthensomemoreletters";
+const LONG_TITLE_XML = `<?xml version="1.0"?><score-partwise><work><work-title>${LONG_TITLE}</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
+
+afterEach(() => {
+    cleanup();
+    localStorage.clear();
+});
+
+// Renders in the browser project so the catalogue glob and DOMParser-based grading
+// run as they do in the app; the song manifest fetch 404s here, leaving the bundled
+// exercises, which is what these assertions cover.
+// The address the router holds, which under MemoryRouter is not window.location.
+let seenSearch = "";
+function AddressProbe() {
+    seenSearch = useLocation().search;
+    return null;
+}
+
+function renderMusic() {
+    seenSearch = "";
+    return render(
+        <MemoryRouter>
+            <Music />
+            <AddressProbe />
+        </MemoryRouter>,
+    );
+}
+
+describe("Music", () => {
+    it("lists bundled scores and links each to its play page", async () => {
+        renderMusic();
+        const ode = await screen.findByText("Ode to Joy");
+        expect(ode.closest("a")?.getAttribute("href")).toContain(
+            `/play/${bundledId("ode to joy")}`,
+        );
+    });
+
+    it("filters the list by the search box", async () => {
+        renderMusic();
+        await screen.findByText("Ode to Joy");
+        fireEvent.change(screen.getByRole("searchbox"), { target: { value: "no-such-piece" } });
+        expect(await screen.findByText("No scores match your search.")).toBeTruthy();
+    });
+
+    it("types without putting a navigation between the key and the letter", async () => {
+        // The reported bug: the box was fed from the page's address, so every keystroke
+        // was a router navigation and the value shown had been through one. Typed at
+        // speed the field lagged and characters went missing.
+        //
+        // What is asserted is the shape of the fix rather than the symptom, because the
+        // symptom needs real keystroke timing that fireEvent cannot produce: the letters
+        // are in the box immediately, and the address has not moved at all yet. Wired the
+        // old way the address changes on the first keystroke, and this fails there.
+        renderMusic();
+        await screen.findByText("Ode to Joy");
+        const box = screen.getByRole("searchbox") as HTMLInputElement;
+
+        const word = "moonlight";
+        for (let at = 1; at <= word.length; at++) {
+            fireEvent.change(box, { target: { value: word.slice(0, at) } });
+            expect(box.value).toBe(word.slice(0, at));
+        }
+        expect(seenSearch).not.toContain("q=");
+
+        // Late rather than never: the address is what carries a search through opening a
+        // piece and coming back, and what a shared link holds.
+        await waitFor(() => expect(seenSearch).toContain("q=moonlight"), { timeout: 5000 });
+        // And the shelf agrees with the box.
+        await waitFor(() => expect(screen.queryByText("Ode to Joy")).toBeNull(), {
+            timeout: 5000,
+        });
+    });
+
+    it("offers a multi-select grade filter", async () => {
+        renderMusic();
+        await screen.findByText("Ode to Joy");
+        // Grade chips 1–8 narrow the catalogue by difficulty.
+        const one = screen.getByLabelText("Grade 1");
+        const two = screen.getByLabelText("Grade 8");
+        expect(one).toBeTruthy();
+        expect(two).toBeTruthy();
+        // Each chip is an independent toggle, so several grades can be lit at once.
+        fireEvent.click(one);
+        fireEvent.click(two);
+        expect(one.getAttribute("aria-pressed")).toBe("true");
+        expect(two.getAttribute("aria-pressed")).toBe("true");
+        // Clicking a lit chip clears just that grade.
+        fireEvent.click(one);
+        expect(one.getAttribute("aria-pressed")).toBe("false");
+        expect(two.getAttribute("aria-pressed")).toBe("true");
+    });
+
+    it("stars and unstars a piece", async () => {
+        renderMusic();
+        await screen.findByText("Ode to Joy");
+        const star = screen.getAllByLabelText(m.scores_favorite())[0];
+        if (!star) {
+            throw new Error("no favorite control");
+        }
+        fireEvent.click(star);
+        expect(await screen.findByLabelText(m.scores_unfavorite())).toBeTruthy();
+    });
+
+    it("removes an imported score only after the delete is confirmed", async () => {
+        saveUserScore(browserStore, buildScore(domXmlCodec, USER_XML, []));
+        renderMusic();
+        expect(await screen.findByText("My Tune")).toBeTruthy();
+        // The first click only arms the confirm — the unrecoverable delete shouldn't
+        // fire on a single misclick.
+        fireEvent.click(screen.getByLabelText("Remove"));
+        expect(screen.getByText("My Tune")).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Remove?" }));
+        await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
+    });
+
+    it("warns that a score is used by an assignment, deletes anyway, and the step goes missing", async () => {
+        const score = buildScore(domXmlCodec, USER_XML, []);
+        saveUserScore(browserStore, score);
+        createAssignmentsStore(browserStore).save(
+            makeAssignment({ id: "set", name: "Set", items: [{ id: score.id }] }),
+        );
+        const view = renderMusic();
+        expect(await screen.findByText("My Tune")).toBeTruthy();
+        fireEvent.click(screen.getByLabelText("Remove"));
+        // The armed confirm names the blast radius instead of a bare "Remove?".
+        fireEvent.click(screen.getByRole("button", { name: "Used by 1 assignment — remove?" }));
+        await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
+        view.unmount();
+        // The assignment survives the delete; its step now reads as missing.
+        render(
+            <MemoryRouter>
+                <AssignmentsRoute />
+            </MemoryRouter>,
+        );
+        expect(await screen.findByText("Set")).toBeTruthy();
+        expect(await screen.findByText("No longer on this device")).toBeTruthy();
+    });
+
+    it("gives a long title the shrink-and-truncate contract so it can't widen the row", async () => {
+        saveUserScore(browserStore, buildScore(domXmlCodec, LONG_TITLE_XML, []));
+        renderMusic();
+        const title = await screen.findByText(LONG_TITLE);
+        // The title link clips with an ellipsis…
+        expect(title.className).toContain("truncate");
+        // …which only takes effect if every flex ancestor up to the row card is allowed
+        // to shrink below its content. Without min-w-0 on the column and the card, an
+        // unbreakable title pushes the row — and the fixed bottom nav — past the
+        // viewport edge.
+        const column = title.parentElement as HTMLElement;
+        expect(column.className).toContain("min-w-0");
+        const card = title.closest("div") as HTMLElement;
+        expect(card.className).toContain("min-w-0");
+        expect(card.className).toContain("flex-1");
+    });
+
+    it("filters to only the pieces due for review", async () => {
+        // Ode to Joy is overdue; Twinkle has no mastery, so it isn't due.
+        testMasteryStore.save(bundledId("ode to joy"), {
+            bestScore: 90,
+            learned: true,
+            backlog: false,
+            intervalDays: 5,
+            reviewAt: Date.now() - 86_400_000,
+            updatedAt: 0,
+            deadline: "",
+        });
+        renderMusic();
+        expect(await screen.findByText("Twinkle, Twinkle, Little Star")).toBeTruthy();
+
+        fireEvent.click(screen.getByRole("button", { name: /due now/i }));
+        expect(screen.getByText("Ode to Joy")).toBeTruthy();
+        await waitFor(() => expect(screen.queryByText("Twinkle, Twinkle, Little Star")).toBeNull());
+    });
+});

@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { tempoTerm } from "../../../core/tempoTerm";
+import { useDismissable } from "../../hooks/useDismissable";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { BumpValue } from "../ui/stepper";
@@ -11,7 +12,6 @@ import { Button, IconButton } from "../ui/button";
 import { CloseIcon, FingersIcon, PlayIcon, RotateIcon, SpeakerIcon, StopIcon } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
 import { usePlaySession } from "./playSession";
-import { RunSetup } from "./runSetup";
 
 // The play controls. Full screen keeps only what you reach for WHILE playing — Listen,
 // Practice/Stop, progress, restart, tempo, and the fingering-editor workspace. Settings
@@ -32,28 +32,30 @@ export function PlayTransport() {
         playAlong,
         fingerStrip,
         setFingerStrip,
-        exitFullscreen,
+        leavePlaySurface,
         tempo,
         setTempo,
         lockTempo,
         sightRead,
     } = usePlaySession();
 
-    // Listen lives only in the full-screen top bar. Playing enters full screen on every
-    // device, so that is the one place it's reachable — which keeps the inline /play view to
-    // a single primary action (Practice), the piece's front door.
+    // Listen appears twice, and means slightly different things in the two places. In the
+    // full-screen bar it is the transport control beside Practice. On the resting page it
+    // answers "what does this sound like?" — a question asked before committing to the
+    // playing surface, so it sounds the piece where the reader already is rather than
+    // throwing them into full screen to hear it.
     //
     // Both transport buttons keep a constant label and a single icon slot that flips
     // play ↔ stop, so starting or stopping never reflows the bar: the label is the
     // button's identity, the icon (plus aria-pressed) is its state. Listen wears the
     // speaker — playback you hear — leaving the play triangle to Practice, the mode
     // where you play.
-    const listenButton = (
+    const listenButton = (onStage: boolean) => (
         <Button
             variant="secondary"
             disabled={!ready || keepUp.running}
             aria-pressed={listenPlayback.playing}
-            onClick={() => (listenPlayback.playing ? listenPlayback.stop() : listen())}
+            onClick={() => (listenPlayback.playing ? listenPlayback.stop() : listen(onStage))}
         >
             {listenPlayback.playing ? <StopIcon /> : <SpeakerIcon />}
             {m.action_listen()}
@@ -97,7 +99,7 @@ export function PlayTransport() {
         <>
             <FullScreen>
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
-                    {listenButton}
+                    {listenButton(true)}
                     {practiceButton}
                     <Show when={matcher.practicing}>
                         <span className="text-sm tabular-nums text-muted">
@@ -135,7 +137,7 @@ export function PlayTransport() {
                     </ToggleIconButton>
                     <IconButton
                         variant="primary"
-                        onClick={exitFullscreen}
+                        onClick={leavePlaySurface}
                         label={m.action_exit_fullscreen()}
                         className="ml-auto"
                     >
@@ -148,11 +150,16 @@ export function PlayTransport() {
             the rest of the transport live in the full-screen top bar (above), reachable
             once play begins, so the resting /play view stays uncluttered. */}
             <FullScreen off>
-                {/* Run setup sits right beside Practice — the disclosure's button
-                joins the action row, its panel wraps to a full-width line below. */}
+                {/* One primary action above the score, where it is first in reach. What
+                    the piece can be played AS is named under the score (see PlaySurface):
+                    the staff is what a reader came for, and two cards of controls between
+                    the title and the music would push it off a phone. */}
                 <div className="flex flex-wrap items-center gap-3">
                     {practiceButton}
-                    <RunSetup />
+                    {/* Secondary beside the primary: the piece still has one front door,
+                        and hearing it first is the ordinary thing to want before walking
+                        through. */}
+                    {listenButton(false)}
                 </div>
             </FullScreen>
         </>
@@ -164,8 +171,12 @@ export function PlayTransport() {
 // instead of a full-width row.
 function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: number) => void }) {
     const [open, setOpen] = useState(false);
+    // Closes on a press elsewhere or on Escape, like the export menu — a popover opened
+    // mid-play and then thought better of is one a player should be able to dismiss without
+    // hunting for the control that opened it.
+    const enclosing = useDismissable<HTMLSpanElement>(open, () => setOpen(false));
     return (
-        <span className="relative">
+        <span className="relative" ref={enclosing}>
             <button
                 type="button"
                 onClick={() => setOpen((value) => !value)}

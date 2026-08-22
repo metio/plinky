@@ -33,6 +33,25 @@ describe("KeyMapping", () => {
         expect(services.prefs.load().keyMap.left.a).toBe(0);
     });
 
+    it("keeps a binding that took its key from the other hand", () => {
+        const { services } = renderWithServices(<KeyMapping />);
+        // 'j' is the left hand's A♯. Give it to the right hand's C, then read the layout
+        // back the way a reload does — through the store's validator.
+        fireEvent.click(screen.getByRole("button", { name: /Rebind C, Right hand/i }));
+        fireEvent.keyDown(window, { key: "j" });
+
+        const stored = services.prefs.load().keyMap;
+        expect(stored.right.j).toBe(0);
+        expect("j" in stored.left).toBe(false);
+        expect(screen.getByRole("button", { name: /Rebind C, Right hand/i }).textContent).toContain(
+            "J",
+        );
+        // The slot it came from reads as unbound, not as the default layout returning.
+        expect(screen.getByRole("button", { name: /Rebind A♯, Left hand/i }).textContent).toContain(
+            "—",
+        );
+    });
+
     it("cancels an armed rebind on Escape without changing the binding", () => {
         const { services } = renderWithServices(<KeyMapping />);
         const cap = screen.getByRole("button", { name: /Rebind C, Left hand/i });
@@ -42,23 +61,6 @@ describe("KeyMapping", () => {
 
         expect(cap.getAttribute("aria-pressed")).toBe("false");
         expect(services.prefs.load().keyMap.left.z).toBe(0);
-    });
-
-    it("marks the keys discovery step on engaging, even when the defaults are kept", () => {
-        const { services } = renderWithServices(<KeyMapping />);
-        expect(services.onboarding.marked().has("keysCustomized")).toBe(false);
-        // Arm a cap then cancel: the layout stays at the default, but engaging with the
-        // editor still ticks off the discovery step — so liking the defaults isn't a dead end.
-        fireEvent.click(screen.getByRole("button", { name: /Rebind C, Left hand/i }));
-        fireEvent.keyDown(window, { key: "Escape" });
-        expect(services.onboarding.marked().has("keysCustomized")).toBe(true);
-        expect(services.prefs.load().keyMap.left.z).toBe(0);
-    });
-
-    it("marks the keys discovery step when the standard layout is kept via reset", () => {
-        const { services } = renderWithServices(<KeyMapping />);
-        fireEvent.click(screen.getByRole("button", { name: "Reset to default" }));
-        expect(services.onboarding.marked().has("keysCustomized")).toBe(true);
     });
 
     it("restores the default layout on reset", () => {

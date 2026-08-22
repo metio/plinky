@@ -81,3 +81,54 @@ export function keyboardDepthFraction(id: string): number {
         KEYBOARD_DEPTHS.find((depth) => depth.id === id)?.fraction ?? KEYBOARD_DEPTHS[0]!.fraction
     );
 }
+
+// Colouring a note by the hand that plays it — the practice highway's own scheme, offered
+// here too so the two pictures can be made to match.
+//
+// The reason it lives beside the others rather than only on the play surface: the schemes
+// are a shared list on purpose. An export and a practice run draw the same falling notes,
+// and a viewer who learns what a colour means while practising should not have to learn it
+// again watching a video of themselves. The two renderers paint in different mediums —
+// baked hexes on a dark stage, theme tokens on a page that follows the reader's light — so
+// what is shared is the set of choices, not the pigments, and a test asserts every scheme
+// in the list is answered by both.
+export const BY_HAND = "hand";
+
+// The hands, as the lit values the video's dark stage wants. The teal and indigo the play
+// surface uses for the same job, which is the whole point of offering it.
+export const HAND_COLORS: Record<"left" | "right", string> = {
+    left: "#14b8a6",
+    right: "#6366f1",
+};
+
+export function handColorHex(hand: "left" | "right" | undefined, fallback: string): string {
+    return hand ? HAND_COLORS[hand] : fallback;
+}
+
+// Every way a falling note can be coloured, in the order a picker offers them: the flat
+// colours, then the two that read something off the music.
+export const HIGHWAY_SCHEMES: readonly string[] = [
+    ...NOTE_COLORS.filter((color) => color.id !== BY_FINGER).map((color) => color.id),
+    BY_FINGER,
+    BY_HAND,
+];
+
+// What a scheme says about one note. Pure, and the one place the decision is made — each
+// renderer turns the answer into its own medium rather than deciding for itself.
+export type NotePaint =
+    | { kind: "finger"; finger: number | undefined }
+    | { kind: "hand"; hand: "left" | "right" | undefined }
+    | { kind: "flat"; id: string };
+
+export function notePaint(
+    scheme: string,
+    note: { finger?: number; hand?: "left" | "right" },
+): NotePaint {
+    if (scheme === BY_FINGER) {
+        return { kind: "finger", finger: note.finger };
+    }
+    if (scheme === BY_HAND) {
+        return { kind: "hand", hand: note.hand };
+    }
+    return { kind: "flat", id: scheme };
+}

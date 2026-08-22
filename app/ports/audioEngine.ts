@@ -13,8 +13,22 @@ import type { PedalKind } from "../../core/pedals";
 export type NoteStrike = {
     note: number; // MIDI note number
     gain: number;
+    // How hard the key was hit, 0..127, before the volume preference was folded into
+    // `gain`. A synthesised voice needs only the gain; a recorded one needs this, because
+    // which recording answers the note IS the dynamic — scaling it by velocity again would
+    // play a pianissimo layer pianissimo twice.
+    velocity: number;
     duration: number; // seconds
     delay: number; // seconds from now on the audio clock
+    // Whether this note sounds with the dampers off — the score asks for the sustain pedal
+    // here, or a player is holding it. The other strings answer a struck one, which is what
+    // the pedal actually sounds like beyond "notes last longer".
+    //
+    // Carried on the strike rather than read from the engine's own pedal state, because
+    // Listen never presses the pedal: it models pedalling by lengthening each note, so the
+    // engine would see a piece with a pedal marking on every bar as one played with the
+    // pedal up. Live play sets the pedal for real and answers the same question from it.
+    pedalled?: boolean;
 };
 
 // A metronome tick: the accented downbeat, a plain beat, or a subdivision.
@@ -48,7 +62,7 @@ export interface AudioEngine {
     // so the sound follows the player's own key hold — a quick release sounds staccato, a
     // long hold sustains. Re-pressing a still-sounding note restarts it. `gain` is the final
     // loudness (0..1), velocity and volume already applied.
-    press(note: number, gain: number): void;
+    press(note: number, gain: number, velocity: number): void;
     // End a sustaining voice, ringing it out over a tail scaled to how long it was held —
     // unless a pedal is holding it, when it keeps ringing until the pedal lifts. holdScale
     // (default 1) lengthens the ring as if the key had been held that many times longer, so
@@ -63,6 +77,12 @@ export interface AudioEngine {
     // state is a process-lifetime singleton, so nothing else guarantees this on unmount or
     // route change. Idempotent; safe with no audio context.
     allNotesOff(): void;
+    // How much of the room is heard around the instrument, as a final wet gain (0 = dry).
+    //
+    // A graph-level property rather than a per-note one, which is why it is a method here
+    // where the volume preference is folded into each strike's `gain` instead: there is one
+    // room, and every voice already in it is in the same one.
+    setRoom(wet: number): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted.
     click(time: number, kind: ClickKind, gain: number): void;
     // Whether the engine synthesized this pitch recently enough that a

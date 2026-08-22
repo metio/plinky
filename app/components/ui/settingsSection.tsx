@@ -2,17 +2,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
+import { sectionHeadingClasses } from "./classes";
 
 const CHIP: Record<"accent" | "danger", string> = {
     accent: "bg-accent-surface text-accent",
     danger: "bg-danger-surface text-danger",
 };
 
-// A titled block of related settings. With an `icon` it renders as a card — the
-// icon in a soft chip, a plain-language title and hint, the controls below — so
-// each group of settings reads as one friendly, self-explaining unit. Without an
-// icon it is the quiet inline variant for a panel nested inside a card (Hand size
-// under Fingering); `level` keeps the document outline sound there.
+// A titled block of related things. With an `icon` it renders as a card — the icon in a
+// soft chip, a plain-language title and hint, the controls below — so each group of
+// settings reads as one friendly, self-explaining unit.
+//
+// Without an icon it is the quiet variant: a small brass label over a hairline, which is
+// how every labelled group in the app announces itself — the day's three moments, the
+// groups inside a run's set-up panel, a panel nested in a settings card. One definition,
+// so a reader learns the shape once. `level` keeps the document outline sound where it
+// nests.
 export function SettingsSection({
     title,
     hint,
@@ -22,7 +27,8 @@ export function SettingsSection({
     children,
 }: {
     title: string;
-    hint?: string;
+    // Usually a sentence; a node where the hint is itself somewhere to go.
+    hint?: ReactNode;
     icon?: ReactNode;
     tone?: "accent" | "danger";
     level?: 2 | 3;
@@ -31,17 +37,13 @@ export function SettingsSection({
     const Heading = level === 2 ? "h2" : "h3";
 
     if (icon === undefined) {
-        const heading = (
-            <Heading className="text-sm font-medium uppercase tracking-wide text-muted">
-                {title}
-            </Heading>
-        );
+        const heading = <Heading className={sectionHeadingClasses}>{title}</Heading>;
         return (
             <section className="space-y-3">
                 {hint === undefined ? (
                     heading
                 ) : (
-                    <div>
+                    <div className="space-y-1.5">
                         {heading}
                         <p className="text-sm text-muted">{hint}</p>
                     </div>

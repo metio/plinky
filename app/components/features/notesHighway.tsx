@@ -1,18 +1,31 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { keybedMaxWidthPx, keyLane } from "../../../core/keyboardGeometry";
+import { keybedMaxWidthPx } from "../../../core/keyboardGeometry";
+import { highwayBlocks, sceneKeys } from "../../../core/videoScene";
 import type { UpcomingStep } from "../../../core/matcher";
 import { m } from "../../paraglide/messages.js";
 
-// The notes highway: the upcoming notes as blocks stacked in their key's lane
-// above the on-screen keyboard, the imminent one flush at the bottom against the
-// keys and later ones climbing away, so a beginner can see which key comes next —
-// and read the shape of the run — without decoding the staff. It advances by
-// position, not a clock (a cleared note drops out and the stack slides down),
-// which suits self-paced practice and keeps the grade untouched. Blocks land on
-// the same lanes the keyboard draws (shared `keyLane` geometry), and the panel
-// caps + centres to the same width so the columns line up with the keys below.
+// The notes highway: the upcoming notes as blocks in their key's lane above the
+// on-screen keyboard, the imminent one flush at the bottom against the keys and later
+// ones climbing away, so a beginner can see which key comes next — and read the shape
+// of the run — without decoding the staff. Blocks land on the same lanes the keyboard
+// draws (shared `keyLane` geometry), and the panel caps + centres to the same width so
+// the columns line up with the keys below.
+//
+// A block is as tall as its note is long, and sits as far above the strike line as it is
+// far off in the music. This is the whole point of a falling-note picture: it is the one
+// reading aid that shows LENGTH, so a whole note held under a run of quavers has to stand
+// over them. Drawn a row per position instead, every note is the same block and a piece
+// of music reads as a list of keys to press.
+//
+// What it still does NOT do is run on a clock. The origin is the position the player is
+// on, so nothing falls until a note is cleared and the stack slides down — self-paced
+// practice, and the grade untouched. Time sets the scale, not the motion.
+//
+// The clock is the step model's own, at the written tempi, and the holds come off it
+// too, so the two are in the same units whatever the practice dial says. A slower dial
+// stretches both together and the picture keeps its proportions.
 
 // Left-hand notes read teal, everything else (right hand, or a chord spanning both)
 // reads the same indigo the keyboard lights the expected key with, for continuity.
@@ -34,25 +47,81 @@ const SHADES = {
 // because a chord spanning the grand staff is the common case — 41% of positions in the
 // catalogue — and colouring it all one hand tells the reader the opposite of what the
 // two colours are for.
-function blockClass(hand: "left" | "right" | undefined, row: number): string {
-    const tier = row === 0 ? 0 : 1;
-    return SHADES[hand ?? "right"][tier]!;
+//
+// Practice is fixed on the by-hand scheme rather than offering the export's picker: here
+// the colours are telling the player something, where in an export they are taste. Which
+// hand gets which colour is shared with the export as `HAND_COLORS` — the same teal and
+// indigo, in hexes there and in theme tokens here, because a picture that follows the
+// reader's light and one baked onto a dark stage cannot share a pigment.
+function blockClass(hand: "left" | "right" | undefined, imminent: boolean): string {
+    return SHADES[hand ?? "right"][imminent ? 0 : 1]!;
 }
+
+// A note shorter than this still needs to be seen: a grace note is a few milliseconds
+// and would otherwise draw as nothing at all.
+const MIN_BLOCK_PCT = 1.5;
+
+// Enough to part two notes that touch, so a legato run of crotchets reads as crotchets
+// rather than as one long column.
+const GAP_PCT = 0.8;
+
+// How long the stack takes to settle after a note is cleared, when nothing is running to a
+// clock. Long enough to read as movement rather than a jump, short enough not to lag behind
+// somebody playing briskly.
+const SETTLE_MS = 200;
 
 export function NotesHighway({
     upcoming,
     from,
     to,
-    rows = 8,
+    windowMs = 4_000,
+    advanceMs = null,
 }: {
     upcoming: UpcomingStep[];
     from: number;
     to: number;
-    // How many positions of look-ahead to stack across the panel's height.
-    rows?: number;
+    // How much music the panel's height spans, in the step model's milliseconds. This is
+    // a zoom, not a speed — nothing moves on its own — so it decides how much of what is
+    // coming fits above the keys, and a note's share of it is its share of the height.
+    //
+    // Deliberately its own number rather than the video export's window, which looks like
+    // the same knob and is not: that one runs on a clock, where the window is how far
+    // ahead you see and tuning it changes how fast the picture moves. Tying them together
+    // would let a change to the look of an export quietly rescale practice.
+    windowMs?: number;
+    // How long the position now open lasts, when something is playing to a clock — the
+    // tempo-locked play-along, where the music does not wait. Given it, the blocks descend
+    // over exactly that time and the picture moves continuously, the way the exported
+    // video does. Without it the music waits for the player, so the stack settles into its
+    // new place after each note is cleared and holds there. Advance by the clock, or
+    // advance by the note: the two ways of practising want different pictures, and this is
+    // the one number that tells them apart.
+    advanceMs?: number | null;
 }) {
-    const rowPct = 100 / rows;
+    // The position the player is on sits at the strike line, and everything else is
+    // measured from it. Not a clock reading: this is what keeps the picture still until
+    // a note is cleared.
+    const origin = upcoming[0]?.atMs ?? 0;
+    const span = Math.max(1, windowMs);
     const maxWidth = keybedMaxWidthPx(from, to);
+    // What is on the highway and where, decided by the one function the exported video
+    // reads too. The two pictures differ in what they hand it as "now" — a video hands it
+    // the clock, practice hands it the position the player is on, which is what keeps the
+    // stack still until a note is cleared — and in what they paint it onto. They no longer
+    // differ in where a block goes or how tall it is, which they used to work out twice.
+    const blocks = highwayBlocks(
+        upcoming.flatMap((step) =>
+            step.pitches.map((pitch, note) => ({
+                pitch,
+                startMs: step.atMs,
+                durationMs: step.pitchHoldsMs[note] ?? 0,
+                hand: step.pitchHands[note],
+            })),
+        ),
+        sceneKeys(from, to),
+        origin,
+        span,
+    );
 
     return (
         // Fills its container's height and caps + centres to the keybed width, so a tall
@@ -64,27 +133,32 @@ export function NotesHighway({
             style={{ maxWidth }}
         >
             <div className="relative h-full w-full overflow-hidden rounded-md bg-subtle">
-                {upcoming.slice(0, rows).flatMap((step, row) =>
-                    step.pitches.map((pitch, note) => {
-                        const lane = keyLane(pitch, from, to);
-                        if (!lane) {
-                            return null;
-                        }
-                        return (
-                            <span
-                                key={`${step.index}-${pitch}`}
-                                aria-hidden="true"
-                                className={`absolute rounded-sm shadow-sm transition-[bottom] duration-200 ease-out motion-reduce:transition-none ${blockClass(step.pitchHands[note], row)}`}
-                                style={{
-                                    left: `${lane.leftPct}%`,
-                                    width: `${lane.widthPct}%`,
-                                    bottom: `${row * rowPct}%`,
-                                    height: `${rowPct - 2}%`,
-                                }}
-                            />
-                        );
-                    }),
-                )}
+                {blocks.map((block) => {
+                    // 0 at the strike line, 1 at the top of the panel — the same
+                    // fractions the exported video's painter reads, turned into the
+                    // percentages CSS wants instead of the pixels a canvas wants.
+                    const bottom = Math.max(0, block.onsetFrac) * 100;
+                    const length = (block.endFrac - Math.max(0, block.onsetFrac)) * 100;
+                    return (
+                        <span
+                            key={`${block.pitch}-${block.startMs}`}
+                            aria-hidden="true"
+                            className={`absolute rounded-sm shadow-sm transition-[bottom] motion-reduce:transition-none ${blockClass(block.hand, block.onsetFrac <= 0)}`}
+                            style={{
+                                left: `${block.x * 100}%`,
+                                width: `${block.width * 100}%`,
+                                bottom: `${bottom}%`,
+                                height: `${Math.max(MIN_BLOCK_PCT, length - GAP_PCT)}%`,
+                                // On a clock the descent lasts exactly as long as the
+                                // note does, and at a constant rate — anything eased
+                                // would hurry and then dawdle against a steady pulse.
+                                // Off it, a short ease is a settle rather than a fall.
+                                transitionDuration: `${advanceMs ?? SETTLE_MS}ms`,
+                                transitionTimingFunction: advanceMs ? "linear" : "ease-out",
+                            }}
+                        />
+                    );
+                })}
                 {/* The strike line: where a block meets its key. */}
                 <span
                     aria-hidden="true"

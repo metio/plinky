@@ -61,7 +61,7 @@ describe("the derived noindex list", () => {
         for (const path of [
             "/impressum",
             "/datenschutz",
-            "/you",
+            "/stats",
             "/review",
             "/settings",
             "/basics",

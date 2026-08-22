@@ -37,6 +37,6 @@ describe("locale resolution at the bare root", () => {
 
     it("lets a localized link win over the stored choice, so a shared link is honest", () => {
         localStorage.setItem(localStorageKey, "de");
-        expect(getLocaleForUrl("http://localhost:3000/fr/library")).toBe("fr");
+        expect(getLocaleForUrl("http://localhost:3000/fr/music")).toBe("fr");
     });
 });

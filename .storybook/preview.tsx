@@ -11,6 +11,10 @@ import "../app/app.css";
 // face, or the story screenshots would rasterize whatever system font the
 // machine happens to have — the one cross-machine difference we can remove.
 import "@fontsource-variable/inter/wght.css";
+// And the display face, which headings resolve to (--font-display in app.css). Without
+// it a story renders titles in whatever serif the machine has, so the screenshots — and
+// anything generated from them — show a typeface the app never ships.
+import "@fontsource-variable/literata/wght.css";
 // Emoji too: the sans stack ends in "Noto Color Emoji", and this @font-face
 // satisfies it with one pinned webfont — otherwise every emoji glyph comes
 // from the OS, and Fedora's and ubuntu's system emoji draw differently.

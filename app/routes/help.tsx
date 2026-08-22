@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect } from "react";
-import { linkClasses } from "../components/ui/classes";
-import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { paragraphs } from "../../core/help";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/help";
+import { PageHeader } from "../components/ui/pageHeader";
+import { sectionHeadingClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -54,7 +54,7 @@ const SECTIONS: {
     },
     {
         key: "home",
-        title: m.nav_home,
+        title: m.nav_today,
         text: m.help_text_home,
         image: "home",
         imageAlt: m.help_shot_home,
@@ -69,11 +69,16 @@ const SECTIONS: {
     { key: "playSetup", title: m.help_section_play_setup, text: m.help_text_play_setup },
     { key: "playGrading", title: m.help_section_play_grading, text: m.help_text_play_grading },
     {
-        key: "library",
-        title: m.nav_library,
-        text: m.help_text_library,
-        image: "library",
-        imageAlt: m.help_shot_library,
+        key: "music",
+        title: m.music_title,
+        text: m.help_text_music,
+        image: "music",
+        imageAlt: m.help_shot_music,
+    },
+    {
+        key: "learn",
+        title: m.nav_learn,
+        text: m.help_text_learn,
     },
     {
         key: "daily",
@@ -105,9 +110,9 @@ const SECTIONS: {
     },
     {
         key: "you",
-        title: m.nav_you,
+        title: m.nav_stats,
         text: m.help_text_you,
-        image: "you",
+        image: "stats",
         imageAlt: m.help_shot_you,
     },
     {
@@ -131,11 +136,33 @@ function HelpBlock({ section }: { section: (typeof SECTIONS)[number] }) {
     return (
         <div className="space-y-3">
             {section.image && (
+                // Every shot is captured at the same size by dev/help-screenshots, and
+                // saying so reserves the space before the file arrives. Without it each
+                // lazy-loaded picture pushes the rest of the page down as it lands, and
+                // fifteen sections of that is a page that will not sit still.
                 <img
-                    src={`/help/${section.image}.webp`}
+                    // The picture is of the app in the reader's own language: help that
+                    // describes a button by a name the screenshot beside it does not use
+                    // is help that has to be translated twice by the person reading it.
+                    // A reader only ever fetches their own, so twenty-six sets cost a
+                    // visitor exactly what one did.
+                    src={`/help/${getLocale()}/${section.image}.webp`}
                     alt={section.imageAlt?.() ?? ""}
                     loading="lazy"
-                    className="w-full rounded-lg border border-line"
+                    width={1200}
+                    height={750}
+                    className="h-auto w-full rounded-lg border border-line"
+                    // A locale whose pictures have not been taken yet falls back to the
+                    // English ones rather than showing a broken image. The generator takes
+                    // every locale, so this is for the window between adding a language
+                    // and the next screenshot run — not a state anybody should stay in.
+                    onError={(event) => {
+                        const image = event.currentTarget;
+                        const fallback = `/help/en/${section.image}.webp`;
+                        if (!image.src.endsWith(fallback)) {
+                            image.src = fallback;
+                        }
+                    }}
                 />
             )}
             <div className="space-y-2 text-sm text-body">
@@ -163,54 +190,12 @@ export default function Help() {
     }, []);
 
     return (
-        <main className="mx-auto max-w-3xl space-y-10 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.help_title()}</h1>
-                <p className="text-sm text-muted">{m.help_intro()}</p>
-            </header>
-
-            <p className="text-sm text-body">
-                {m.help_glossary_lead()}{" "}
-                <Link to="/glossary/" className={linkClasses}>
-                    {m.glossary_title()}
-                </Link>
-            </p>
-
-            {/* The theory the glossary assumes: it says what a mark means, this says
-                why the music is built that way. Reached from here rather than from the
-                home page, because it is something you come looking for. */}
-            <p className="text-sm text-body">
-                {m.help_theory_lead()}{" "}
-                <Link to="/theory/" className={linkClasses}>
-                    {m.theory_title()}
-                </Link>
-            </p>
-
-            {/* The small look-it-up things — a circle of fifths, a scale, a tempo read
-                off your own tapping. They belong beside the glossary: both answer a
-                question that comes up in the middle of practising. */}
-            <p className="text-sm text-body">
-                {m.help_tools_lead()}{" "}
-                <Link to="/tools/" className={linkClasses}>
-                    {m.tools_title()}
-                </Link>
-            </p>
-
-            {/* The keyboard tour's only other door is the home checklist, which goes away
-                once it is dismissed or finished — so this is where it stays findable, and
-                where someone comes back to it having forgotten where middle C was. */}
-            <p className="text-sm text-body">
-                {m.help_basics_lead()}{" "}
-                <Link to="/basics/" className={linkClasses}>
-                    {m.basics_title()}
-                </Link>
-            </p>
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <PageHeader title={m.help_title()} hint={m.help_intro()} />
 
             {SECTIONS.map((section) => (
                 <section key={section.key} id={section.key} className="scroll-mt-20 space-y-4">
-                    <h2 className="border-b border-line pb-1 text-lg font-semibold">
-                        {section.title()}
-                    </h2>
+                    <h2 className={sectionHeadingClasses}>{section.title()}</h2>
                     <HelpBlock section={section} />
                 </section>
             ))}

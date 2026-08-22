@@ -179,8 +179,10 @@ describe("handsPlayed", () => {
         expect(handsPlayed(spaced(6))).toEqual([0]);
     });
 
-    it("is both hands, right (0) before left (1), for a grand-staff run", () => {
-        expect(handsPlayed([...spaced(3, 1), ...spaced(3, 0)])).toEqual([0, 1]);
+    it("is both hands, left (1) before right (0), for a grand-staff run", () => {
+        // Not the printed order. The staves are numbered down the page, so ascending puts
+        // the right hand on top — and the grid is a picture of a keyboard, not of the page.
+        expect(handsPlayed([...spaced(3, 1), ...spaced(3, 0)])).toEqual([1, 0]);
     });
 
     it("defaults to the top hand when no staff was recorded", () => {
@@ -207,8 +209,8 @@ describe("handGrid", () => {
         // stays green: the whole point of per-hand grading.
         const grid = handGrid([...spaced(6, 0), ...slow(6, 3, 1)]);
         expect(grid).toHaveLength(2);
-        expect(grid[0]?.every((cell) => cell === "best")).toBe(true); // right, at tempo
-        expect(grid[1]?.every((cell) => cell === "weak")).toBe(true); // left, slow
+        expect(grid[0]?.every((cell) => cell === "weak")).toBe(true); // left first, slow
+        expect(grid[1]?.every((cell) => cell === "best")).toBe(true); // right, at tempo
     });
 
     it("counts a both-staves moment toward both hands' rows", () => {
@@ -269,10 +271,11 @@ describe("coloured blocks (visual regression)", () => {
         expect(gridEmoji(handGrid(slow(12, 3)))).toMatchInlineSnapshot(`"🟥🟥🟥🟥🟥🟥"`);
     });
 
-    it("shows a lagging left hand as a red second row under a green right", () => {
+    it("shows a lagging left hand as a red FIRST row above a green right", () => {
+        // Left on top: the grid reads like a keyboard, low hand first.
         expect(gridEmoji(handGrid([...spaced(6, 0), ...slow(6, 3, 1)]))).toMatchInlineSnapshot(`
-          "🟩🟩🟩🟩🟩🟩
-          🟥🟥🟥🟥🟥🟥"
+          "🟥🟥🟥🟥🟥🟥
+          🟩🟩🟩🟩🟩🟩"
         `);
     });
 

@@ -55,6 +55,27 @@ const ALIASES: Record<string, string> = {
     ravel: "Maurice Ravel",
     "n. rimsky-korsakov": "Nikolai Rimsky-Korsakov",
     "chopinff": "Frédéric Chopin",
+    // Misspellings, each carried by a single score. Mechanical cleanup cannot reach these
+    // — nothing in the string says it is wrong — so a page held one piece under a name a
+    // letter away from the composer's, invisible from his own page and too thin to be
+    // prerendered. Found by baking the index and comparing rare names against populated
+    // ones; a manifest edit would not have lasted, since the import scripts rewrite it.
+    "craude debussy": "Claude Debussy",
+    "calude debussy": "Claude Debussy",
+    "wolfgang amedeus mozart": "Wolfgang Amadeus Mozart",
+    "eric satie": "Erik Satie",
+    "george frederic handel": "George Frideric Handel",
+    "edward grieg": "Edvard Grieg",
+    // A transliteration rather than an error, folded because one catalogue should spell a
+    // person one way.
+    "sergeï rachmaninov": "Sergei Rachmaninoff",
+    // The only credit in the catalogue carrying a Ravel catalogue number, which the
+    // work-number stripping does not know ("M." is not among the prefixes it recognises).
+    // One entry rather than a new prefix: a bare "M" before digits is a likelier initial
+    // than a catalogue mark.
+    "maurice ravel m. 19": "Maurice Ravel",
+    "nikolai andreyevitch rimsky-korsakov": "Nikolai Rimsky-Korsakov",
+    "turlough carolan": "Turlough O'Carolan",
     "frédérick chopin": "Frédéric Chopin",
     "g. f. händel": "George Frideric Handel",
     "georg friedrich händel": "George Frideric Handel",
@@ -145,7 +166,32 @@ export function canonicalComposer(raw: string): string {
 // link, no page. Matched as words anywhere in the credit, so an enriched
 // attribution ("Traditional — …, 1761") stays a non-person too.
 const NOT_A_PERSON =
-    /\b(trad|traditional|traditionnel|anonymous|anonymus|anon|volkslied|gregorian|plainchant|folk\s?song|spiritual|shanty)\b/i;
+    /\b(trad|traditional|traditionnel|anonymous|anonymus|anonimo|anónimo|anon|volkslied|gregorian|plainchant|folk\s?song|spiritual|shanty)\b/i;
+
+// The longest a credit can be and still be somebody's name. Real ones run well under
+// this — the catalogue's longest genuine composer is "Corona Elisabeth Wilhelmine
+// Schröter" at 36 characters — and what runs past it is a sentence: one credit carries a
+// paragraph of singing instructions in French.
+const LONGEST_NAME = 80;
+
+// A credit that cannot be anybody, whatever it says. The harvested corpora put source
+// URLs, contact addresses and hymn-tune codes in the composer field, and until the
+// directory listed every composer these were hidden by the piece-count floor the
+// prerender index happens to apply — the junk simply never reached three pieces. A person
+// page for a URL helps nobody, and the first name in an alphabetical directory should not
+// be a hymnary.org link.
+//
+// Deliberately only the certain cases. "Composer: Johann Sebastian Bach Transcribed by:
+// ekoi" is a clumsy credit for a real person, and guessing at those with a regex would
+// cost more than it saved; those are for dev/catalog-curation.json.
+function cannotBeAPerson(name: string): boolean {
+    return (
+        name.length > LONGEST_NAME ||
+        /https?:|www\.|@/.test(name) ||
+        // Nothing to read as a name: a bare catalogue code, or digits alone.
+        !/\p{L}/u.test(name)
+    );
+}
 
 // The person's URL segment: the canonical name lowercased, diacritics stripped,
 // anything non-alphanumeric folded to single hyphens — stable, readable, and
@@ -157,7 +203,7 @@ export function personSlug(raw: string): string {
     // (arranged from a traditional Negro Spiritual)" is a piece BY Burleigh — and
     // testing before that aside is stripped hands his work to nobody.
     const name = canonicalComposer(raw);
-    if (NOT_A_PERSON.test(name)) {
+    if (NOT_A_PERSON.test(name) || cannotBeAPerson(name)) {
         return "";
     }
     return name
@@ -166,6 +212,18 @@ export function personSlug(raw: string): string {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
+}
+
+// The best a slug can be turned back into a name, for the composer nobody in the
+// catalogue is credited as — a player's own import, or a hand-typed URL. The slug has
+// lost the diacritics and the capitalisation, so this recovers only word boundaries;
+// a name the catalogue does know is always read from the catalogue instead.
+export function nameFromSlug(slug: string): string {
+    return slug
+        .split("-")
+        .filter(Boolean)
+        .map((word) => (word[0] ?? "").toUpperCase() + word.slice(1))
+        .join(" ");
 }
 
 // What a person page needs to know about one piece, whatever catalogue it
@@ -177,6 +235,9 @@ export type PersonPiece = {
     grade?: number;
     license?: string;
     source?: string;
+    // The piece's opening bars as the manifest bakes them, so a composer's list can be
+    // read as music rather than as a column of titles.
+    incipit?: string;
 };
 
 export type Person = {
@@ -188,6 +249,38 @@ export type Person = {
 // Group pieces by composer identity: one Person per slug, pieces sorted easy
 // first (grade, then title), people sorted by how much of the catalogue they
 // hold. Pieces with no usable composer are left out — they have no page.
+// Who the catalogue credits and how much of theirs there is — the directory's whole
+// question, and none of the rest of peopleFrom's answer.
+export type PersonCount = { slug: string; name: string; pieces: number };
+
+// Grouping every piece by composer means canonicalizing thousands of credits, which is a
+// regex chain apiece — but a catalogue of three thousand pieces holds only a few hundred
+// distinct spellings, so the answer is cached per raw string and each one is worked out
+// once. Building no per-composer piece lists and sorting none of them is the rest of the
+// saving: peopleFrom does both, at some cost, for a page that reads them.
+export function composerCounts(pieces: readonly { composer: string }[]): PersonCount[] {
+    const resolved = new Map<string, { slug: string; name: string } | null>();
+    const counts = new Map<string, PersonCount>();
+    for (const piece of pieces) {
+        let identity = resolved.get(piece.composer);
+        if (identity === undefined) {
+            const slug = personSlug(piece.composer);
+            identity = slug ? { slug, name: canonicalComposer(piece.composer) } : null;
+            resolved.set(piece.composer, identity);
+        }
+        if (!identity) {
+            continue;
+        }
+        const seen = counts.get(identity.slug);
+        if (seen) {
+            seen.pieces += 1;
+        } else {
+            counts.set(identity.slug, { ...identity, pieces: 1 });
+        }
+    }
+    return [...counts.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export function peopleFrom(pieces: PersonPiece[]): Person[] {
     const bySlug = new Map<string, Person>();
     for (const piece of pieces) {
@@ -217,5 +310,19 @@ export function peopleFrom(pieces: PersonPiece[]): Person[] {
 // The one person a page shows, or null when nothing in the catalogue matches
 // the slug.
 export function personFor(pieces: PersonPiece[], slug: string): Person | null {
-    return peopleFrom(pieces).find((person) => person.slug === slug) ?? null;
+    // Narrow to this composer's pieces first, then group. Grouping the whole catalogue
+    // and keeping one of the result builds five hundred people and sorts every one of
+    // their piece lists to answer a question about a single person. The slug of a credit
+    // is cached per raw string, because three thousand pieces carry only a few hundred
+    // distinct spellings and canonicalizing one is a chain of regexes.
+    const slugs = new Map<string, string>();
+    const mine = pieces.filter((piece) => {
+        let seen = slugs.get(piece.composer);
+        if (seen === undefined) {
+            seen = personSlug(piece.composer);
+            slugs.set(piece.composer, seen);
+        }
+        return seen === slug;
+    });
+    return mine.length > 0 ? (peopleFrom(mine)[0] ?? null) : null;
 }

@@ -47,18 +47,39 @@ flake only defines the gates that are Plinky's own.
 
 ## The gate
 
-**Run every gate locally before pushing, and check the exit code of each one.**
-Not a subset, not "the ones the change looks related to" — a gate you skip is a
-gate CI runs for you, slower and after the push. The whole point of the flake is
-that local and CI resolve identical tools, so there is no gate here that is
-"CI's job".
+**Run every cheap gate locally before pushing, and check the exit code of each
+one.** Not a subset of those, not "the ones the change looks related to" — a
+cheap gate you skip is a gate CI runs for you, slower and after the push. The
+whole point of the flake is that local and CI resolve identical tools.
 
-The only acceptable reason to skip one is that this host physically cannot run
-it. This is a Fedora Atomic (ostree) machine with rootless Podman and
-nix-portable, so a gate needing `kind`, a privileged container, a system-level
-nix daemon, or real MIDI/audio hardware could qualify. **Plinky has no such gate
-today** — everything below runs here, so the local list and CI are the same list.
-If that ever changes, name the excluded gate and the host reason right here.
+**Four gates belong to CI, and must not be run here.** They saturate this
+machine for tens of minutes at a time and make it unusable while they do —
+which is a host limit like any other, and CI has a fleet for exactly this:
+
+| Gate | Why it stays on CI |
+| --- | --- |
+| `npm run coverage` | Instruments the whole tree and reruns every project; load average past 30 on this box. |
+| `npm run test:storybook` | 290 screenshots across two themes, one browser round-trip each. Run it only when baselines genuinely need refreshing (`-- -u` after a deliberate visual change), never as a check. |
+| `ci-lighthouse` | Builds the site, then drives 22 pages through headless Chrome. |
+| `npm run a11y:light` / `a11y:dark` | Builds the site, then axe over the same 22 pages, twice. |
+
+Push and read the run instead. If one of them fails on CI and the failure is not
+obvious from the log, *then* reproduce that single gate locally, alone, and say
+so — a deliberate one-off, not the routine.
+
+The other host limit is the ordinary one: this is a Fedora Atomic (ostree)
+machine with rootless Podman and nix-portable, so a gate needing `kind`, a
+privileged container, a system-level nix daemon, or real MIDI/audio hardware
+could not run here at all. Plinky has no such gate today.
+
+`ci-build` dies with `EMFILE: too many open files, watch` when this host's inotify
+instances (`fs.inotify.max_user_instances`, 128) are exhausted — an editor plus a few
+builds is enough. `CHOKIDAR_USEPOLLING=true nix develop --command ci-build` polls
+instead of watching and completes.
+
+Never run two `nix develop --command npm …` invocations concurrently: each
+regenerates the gitignored `app/paraglide/`, and a mid-read resolve error fails
+a dozen files spuriously. One at a time.
 
 Check exit codes directly — `$?` after a pipe reports the *last* command's
 status, so `npm run x | tail` reports `tail`'s success and hides the failure.
@@ -70,27 +91,30 @@ The repo's own gates:
 npm run typecheck
 npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode)
-npm run test:storybook # every story, light and dark, against its baseline
-npm run coverage      # ratchet thresholds — a drop fails the build (skips the
-                      # storybook project: screenshots measure no lines and starve
+npm run test:storybook # CI ONLY as a check; locally only `-- -u` to refresh baselines
+npm run coverage      # CI ONLY — ratchet thresholds; a drop fails the build (skips
+                      # the storybook project: screenshots measure no lines and starve
                       # under instrumentation, so CI runs them as their own gate)
 npm run arch          # layer rules + confined globals
 npm run tailwind      # every class name compiles against app.css (blocking)
 npm run tokens        # colour is named by role, not hue (blocking)
 npm run messages:check # every locale carries every message (blocking)
+npm run news:check    # NEWS.md still matches changelog.yaml (blocking)
 npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
 npm run lint          # biome lint + format; a WARNING fails it too
                       # (--error-on-warnings), so dead code cannot accumulate
 npm run nav           # navigation-depth budget
+npm run brand         # regenerates brand/ from app.css + the icon (not a gate)
+npm run icons         # regenerates public/ icons + favicon from icon.svg (not a gate)
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # makes git call a file binary, and a binary file reviews
                       # as an empty diff
 nix develop --command ci-build   # the single-locale (en) build CI + the deploy measure
 npm run size          # bundle budget — measures the ci-build output
-npm run a11y:light    # axe over the built site (builds it first)
-npm run a11y:dark
-nix develop --command ci-lighthouse  # perf/SEO/CLS budgets (builds the site it audits)
+npm run a11y:light    # CI ONLY — axe over the built site (builds it first)
+npm run a11y:dark     # CI ONLY
+nix develop --command ci-lighthouse  # CI ONLY — perf/SEO/CLS budgets (builds the site)
 ```
 
 **Every per-visitor budget measures the same build, and each gate now produces it.**
@@ -126,6 +150,22 @@ nix develop --command ci-markdown
 installed `node_modules` still matches `package-lock.json` — after a rebase or
 pull that bumps a dependency, run `npm ci` first, or the local gate runs older
 tools than CI's fresh install and can pass what CI fails.
+
+## The design system on claude.ai/design
+
+Plinky's components are published as a design system, so a design agent builds with the
+real parts instead of generic ones. `/design-sync` in Claude Code runs it: it compiles
+every storied component into a bundle, screenshots each preview against this repo's own
+Storybook render, and uploads only what matched. `.design-sync/` holds the settings
+(`config.json`), the repo-specific gotchas (`NOTES.md`), the conventions header the agent
+reads (`conventions.md`), and the four hand-owned previews; everything else there is
+generated and gitignored.
+
+Two things to know before running it. It compiles `app/paraglide/` for **English and
+German alone** — all 26 locales are three quarters of the bundle and push it past the
+upload's size cap — so **run `npm run messages` afterwards** or the tree stays
+two-language. And it builds a reference Storybook into `.design-sync/sb-reference/`, which
+no repo gate builds, so a `.storybook/` change can break it while every gate stays green.
 
 ## Conventions the tools don't fully enforce
 
@@ -222,6 +262,16 @@ tools than CI's fresh install and can pass what CI fails.
   key (or carrying an orphan one), so a string can't ship English-only and
   silently fall back. Then `npm run messages` regenerates the gitignored
   `app/paraglide/`.
+- **A hand-made correction to catalogue metadata goes in `dev/catalog-curation.json`**,
+  never straight into `public/songs/manifest.json`. The manifest is written by
+  `songs:import` from the harvested corpora, so an edit there survives until the next
+  import and no longer; the curation file is keyed by song id (a fingerprint of the notes,
+  so it outlives re-slugging and re-licensing) and re-applied by `npm run songs:bake`,
+  which is the CI gate. Only `title` and `composer` may be corrected — a licence is a
+  legal fact about the score, and grade and cost are derived from the notes. Each entry
+  carries a `why`. A composer's *spelling* is a different question: `ALIASES` in
+  `core/person.ts` maps a spelling to one person for display, across every piece bearing
+  it, now and in future.
 - **Every file** carries the two SPDX header lines declaring the Plinky Authors
   and the AGPL-3.0-or-later licence (or a `REUSE.toml` entry when the format can't
   hold comments), like the top of this file. The catalogue is the exception: scores
@@ -240,17 +290,31 @@ tools than CI's fresh install and can pass what CI fails.
   it records decisions: a reversal gets a new row saying so, leaving the original
   in place, because a reader who cannot see that a path was abandoned will propose
   it again. Nothing in it is user-facing — player-visible changes still go to
-  `NEWS.md` and `README.md` in the [VOICE.md](VOICE.md) register.
-- **Update NEWS.md in the same change**, for anything a player would notice — a
-  new feature, a changed behaviour, a bug they'd have hit. Plinky has no
-  versions, tags or releases (every push to main deploys), so nothing else
-  records what changed and nothing generates it from the log: unwritten at the
-  time means unwritten for good. Entries are `## <D Month YYYY>` headings,
-  newest first. Write for a player, not a contributor — what is different on
-  screen and why it matters — in the [VOICE.md](VOICE.md) register. Purely
-  internal work gets no entry; when a day is mostly internal, say the small
-  user-visible part and stop rather than padding it. Note that `ci-markdown`
-  only lints **tracked** files, so `git add NEWS.md` before running it.
+  `changelog.yaml` and `README.md` in the [VOICE.md](VOICE.md) register.
+- **Add an entry to `changelog.yaml` in the same change**, for anything a player
+  would notice — a new feature, a changed behaviour, a bug they'd have hit.
+  Plinky has no versions, tags or releases (every push to main deploys), so
+  nothing else records what changed and nothing generates it from the log:
+  unwritten at the time means unwritten for good. Write for a player, not a
+  contributor — what is different on screen and why it matters — in the
+  [VOICE.md](VOICE.md) register. Purely internal work gets no entry; when a day
+  is mostly internal, say the small user-visible part and stop rather than
+  padding it.
+
+  Releases are newest first, one per shipping day, with a `label` (`night`,
+  `evening`) where a day shipped more than once. An entry is usually just its
+  Markdown, written as a literal block; `twip: false` holds one back from the
+  weekly round-up posted to the subreddit, and everything else goes in it — an
+  entry only exists here if a player would notice, so opting *in* would mean a
+  forgotten field silently posts nothing.
+
+  **`NEWS.md` is generated from it and must not be hand-edited.** The README
+  sends players to that file, so it stays Markdown; `npm run news` renders it
+  and `npm run news:check` is a blocking gate. `typecheck` regenerates it
+  first, so editing the list and running any gate is enough — but the rendered
+  file is tracked, so it appears in the diff and gets committed with the entry.
+  Note that `ci-markdown` only lints **tracked** files, so `git add NEWS.md`
+  before running it.
 
 ## Product guardrails
 

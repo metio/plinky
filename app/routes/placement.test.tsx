@@ -8,13 +8,20 @@ import { MemoryRouter } from "react-router";
 import { memoryStore } from "../adapters/memoryStore";
 import { m } from "../paraglide/messages.js";
 import { renderWithServices } from "../testing/renderWithServices";
+import { usePrefs } from "../hooks/usePrefs";
 import Placement from "./placement";
 
 // OSMD only renders in a real browser, so the score itself is a stub here; what
 // this covers is the surface around it — the ladder's state on screen, and the
 // result being written once.
+// The stub reads the preferences the drill hands it, so a test can assert what the run
+// is actually given rather than what the page meant to give it.
+const seenPrefs = vi.fn();
 vi.mock("../components/features/scoreViewer", () => ({
-    ScoreViewer: () => <div data-testid="score" />,
+    ScoreViewer: () => {
+        seenPrefs(usePrefs().prefs);
+        return <div data-testid="score" />;
+    },
 }));
 
 afterEach(cleanup);
@@ -64,5 +71,31 @@ describe("Placement", () => {
 
         // Nothing is written until the ladder actually ends.
         expect(store.get("plinky:placement")).toBeNull();
+    });
+
+    it("reads on its own terms, whatever the player turned on", () => {
+        // Every aid on: coloured noteheads, labelled keys, the notes falling down a
+        // highway, the next key always shown. A test taken like that measures nothing.
+        const helped = JSON.stringify({
+            colorNotes: true,
+            noteLabels: "all",
+            noteHints: "always",
+            highway: true,
+            showFingerings: true,
+            hiddenNotes: true,
+            keyLights: true,
+        });
+        seenPrefs.mockClear();
+        mount({ "plinky:prefs": helped });
+        fireEvent.click(screen.getByRole("button", { name: m.placement_start() }));
+
+        const prefs = seenPrefs.mock.calls.at(-1)?.[0];
+        expect(prefs.colorNotes).toBe(false);
+        expect(prefs.noteLabels).toBe("off");
+        expect(prefs.noteHints).toBe("never");
+        expect(prefs.highway).toBe(false);
+        expect(prefs.showFingerings).toBe(false);
+        expect(prefs.hiddenNotes).toBe(false);
+        expect(prefs.keyLights).toBe(false);
     });
 });

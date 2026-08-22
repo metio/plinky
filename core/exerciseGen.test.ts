@@ -7,6 +7,7 @@ import {
     EXERCISE_TILES,
     type ExerciseConfig,
     exerciseTitle,
+    exerciseTitleParts,
     generateExercise,
     type Hands,
     type Interval,
@@ -318,5 +319,137 @@ describe("an id names the exercise, not the route taken to it", () => {
             }
         }
         expect([...new Set(duplicates)].slice(0, 5)).toEqual([]);
+    });
+});
+
+describe("exerciseTitleParts", () => {
+    const base: ExerciseConfig = {
+        type: "major-scale",
+        key: "c",
+        octaves: 1,
+        hands: "right",
+        inversion: 0,
+        interval: "single",
+    };
+
+    it("names the key as a musician writes it, and leaves the words to the caller", () => {
+        // The parts, not a sentence: "C major scale" has a different shape in every
+        // language, so nothing here may assume English word order.
+        expect(exerciseTitleParts({ ...base, key: "eflat" })).toEqual({
+            key: "E\u266d",
+            type: "major-scale",
+            forms: [],
+        });
+        expect(exerciseTitleParts({ ...base, key: "fsharp" }).key).toBe("F\u266f");
+    });
+
+    it("says only what makes this one different from the plain form", () => {
+        expect(exerciseTitleParts({ ...base, octaves: 2, hands: "both" }).forms).toEqual([
+            "two-octaves",
+            "both-hands",
+        ]);
+        expect(exerciseTitleParts({ ...base, interval: "thirds" }).forms).toEqual(["thirds"]);
+    });
+
+    it("never claims a form the notes do not have", () => {
+        // Normalisation drops an inversion from a scale and contrary motion from an
+        // arpeggio; a title that kept them would describe a piece nobody is playing.
+        expect(exerciseTitleParts({ ...base, inversion: 2 }).forms).toEqual([]);
+        expect(
+            exerciseTitleParts({ ...base, type: "major-arpeggio", hands: "contrary" }).forms,
+        ).toEqual(["both-hands"]);
+    });
+
+    it("orders the forms the same way whatever the exercise", () => {
+        // The list reads as one phrase, so its order has to be fixed rather than falling
+        // out of which branches happened to run.
+        expect(
+            exerciseTitleParts({
+                ...base,
+                interval: "sixths",
+                octaves: 2,
+                hands: "left",
+            }).forms,
+        ).toEqual(["sixths", "two-octaves", "left-hand"]);
+    });
+
+    it("agrees with the English title the score itself carries", () => {
+        const config: ExerciseConfig = { ...base, type: "dim7-arpeggio", inversion: 1 };
+        const { key, forms } = exerciseTitleParts(config);
+        const title = exerciseTitle(config);
+        expect(title.startsWith(key)).toBe(true);
+        expect(forms).toEqual(["inversion-1"]);
+        expect(title).toContain("1st inversion");
+    });
+
+    it("has a name for every kind of exercise the tiles offer", () => {
+        for (const tile of EXERCISE_TILES) {
+            const { type } = exerciseTitleParts(tile);
+            expect(type).toBe(tile.type);
+            expect(exerciseTitle(tile).length).toBeGreaterThan(0);
+        }
+    });
+});
+
+describe("contrary motion", () => {
+    // Both hands play THE SAME SCALE in opposite directions. Reading the notes back out of
+    // the score is the only way to see that: a wrong scale in one hand is a wrong sound,
+    // not an error, so nothing else in the build would have said a word.
+    const midisOf = (xml: string, part: string) => {
+        const chunk = xml.split(`<part id="${part}"`)[1]?.split("</part>")[0] ?? "";
+        const BASE: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        return [
+            ...chunk.matchAll(
+                /<step>(\w)<\/step>\s*(?:<alter>(-?\d+)<\/alter>\s*)?<octave>(\d+)<\/octave>/g,
+            ),
+        ].map((m) => (Number(m[3]) + 1) * 12 + BASE[m[1]!]! + Number(m[2] ?? 0));
+    };
+    const hands = (type: Parameters<typeof generateExercise>[0]["type"]) => {
+        const xml = generateExercise({
+            type,
+            key: "c",
+            octaves: 1,
+            hands: "contrary",
+            inversion: 0,
+            interval: "single",
+        });
+        return { right: midisOf(xml, "P1"), left: midisOf(xml, "P2") };
+    };
+
+    it("gives both hands the same number of notes, whatever the scale", () => {
+        // The defect this pins: the descending hand was always a plain diatonic scale, so
+        // a chromatic exercise put 25 notes against 15 and the hands never met.
+        for (const type of [
+            "major-scale",
+            "natural-minor-scale",
+            "harmonic-minor-scale",
+            "melodic-minor-scale",
+            "chromatic-scale",
+        ] as const) {
+            const { right, left } = hands(type);
+            expect(`${type}: ${left.length}`).toBe(`${type}: ${right.length}`);
+        }
+    });
+
+    it("descends by semitone in a chromatic exercise", () => {
+        expect(hands("chromatic-scale").left.slice(0, 5)).toEqual([60, 59, 58, 57, 56]);
+    });
+
+    it("keeps the raised seventh going down in harmonic minor", () => {
+        // What makes it harmonic: B natural in both directions, not the B flat a plain
+        // diatonic descent produces.
+        expect(hands("harmonic-minor-scale").left.slice(0, 3)).toEqual([60, 59, 56]);
+    });
+
+    it("descends natural in melodic minor, and rises raised", () => {
+        const { left } = hands("melodic-minor-scale");
+        expect(left.slice(0, 3)).toEqual([60, 58, 56]);
+        // Coming back up, the sixth and seventh are raised: A natural and B natural, not
+        // the A flat and B flat the descent used.
+        expect(left.slice(-3)).toEqual([57, 59, 60]);
+    });
+
+    it("mirrors the major scale, which is the case that always worked", () => {
+        expect(hands("major-scale").left.slice(0, 4)).toEqual([60, 59, 57, 55]);
     });
 });

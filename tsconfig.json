@@ -3,7 +3,8 @@
     "**/*",
     "**/.server/**/*",
     "**/.client/**/*",
-    ".react-router/types/**/*"
+    ".react-router/types/**/*",
+    ".storybook/**/*"
   ],
   "exclude": ["dev/*.mts", "pdmx", "studio"],
   "compilerOptions": {

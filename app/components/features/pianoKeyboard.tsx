@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import type { NoteLabels } from "../../../core/prefs";
-import { useMidiConnection } from "../../contexts/midi";
+import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { Keyboard } from "../ui/keyboard";
@@ -14,6 +14,7 @@ import { MidiBadge } from "./midiBadge";
 // play next is highlighted, and a wrong key flashes red.
 export function PianoKeyboard({
     expected = [],
+    sounding,
     wrong = null,
     holds,
     from = 60,
@@ -22,6 +23,8 @@ export function PianoKeyboard({
     labels: labelsOverride,
 }: {
     expected?: number[];
+    // Notes the app is sounding right now, by hand — what Listen lights as it plays.
+    sounding?: ReadonlyMap<number, "left" | "right">;
     wrong?: { note: number; seq: number } | null;
     // Remaining fraction per just-played note for the hold-duration fill.
     holds?: ReadonlyMap<number, number>;
@@ -36,7 +39,8 @@ export function PianoKeyboard({
     // everything else.
     labels?: NoteLabels;
 }) {
-    const { heldNotes, pressKey, releaseKey, pedalHeld, subscribe } = useMidiConnection();
+    const { pressKey, releaseKey, pedalHeld, subscribe } = useMidiConnection();
+    const heldNotes = useHeldNotes();
     const savedLabels = useNoteLabels();
     const labels = labelsOverride ?? savedLabels;
     const theme = useKeyboardTheme();
@@ -69,6 +73,7 @@ export function PianoKeyboard({
             well={well}
             lit={new Set(heldNotes)}
             expected={expected}
+            sounding={sounding}
             wrong={wrong}
             holds={holds}
             labels={labels}

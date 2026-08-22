@@ -94,7 +94,9 @@ const MINOR_SLUGS = [
     "d",
 ];
 
-const niceKey = (slug: string): string =>
+// A key slug as a musician writes it — "eflat" is E♭. Exported because a warm-up that
+// offers the next rung of the arcade should say which key it is about to ask for.
+export const keyName = (slug: string): string =>
     slug.endsWith("sharp")
         ? `${slug[0]!.toUpperCase()}♯`
         : slug.endsWith("flat")
@@ -185,6 +187,44 @@ function scaleLine(type: ExerciseType, tonic: string, fifths: number, octaves: n
     }
     if (type === "melodic-minor-scale") {
         return turn(raise(base, tonic, [5, 6]), base); // raised 6/7 up, natural down
+    }
+    return turn(base, base);
+}
+
+// The same line, for a hand travelling the other way: down from the tonic and back.
+//
+// Contrary motion is both hands playing THE SAME SCALE in opposite directions, so the
+// descending hand has to be built from the type's own rule. Built from a plain diatonic
+// descent instead, a chromatic scale gave that hand a diatonic one — a different scale,
+// and ten notes shorter, so the hands never met — and both minors that alter a degree
+// gave it the natural minor.
+//
+// `raise` works by scale degree rather than by position, so the alteration rules carry
+// over to a descending line unchanged.
+function scaleLineDown(
+    type: ExerciseType,
+    tonic: string,
+    fifths: number,
+    octaves: number,
+): Note[] {
+    if (type === "chromatic-scale") {
+        const root = midiOf({ letter: tonic, octave: 4, alter: alterFor(tonic, fifths) });
+        const down: Note[] = [];
+        for (let s = 0; s <= 12 * octaves; s++) down.push(spell(root - s, true));
+        const up: Note[] = [];
+        for (let s = 12 * octaves - 1; s >= 0; s--) up.push(spell(root - s, false));
+        return down.concat(up);
+    }
+    const base = diatonic(tonic, fifths, octaves, -1);
+    if (type === "harmonic-minor-scale") {
+        // The raised seventh stands in both directions, which is what makes it harmonic.
+        const r = raise(base, tonic, [6]);
+        return turn(r, r);
+    }
+    if (type === "melodic-minor-scale") {
+        // Natural on the way down, raised sixth and seventh on the way back up — the
+        // ascending rule, read in the direction this hand actually travels.
+        return turn(base, raise(base, tonic, [5, 6]));
     }
     return turn(base, base);
 }
@@ -369,8 +409,7 @@ export function generateExercise(raw: ExerciseConfig): string {
     } else if (hands === "contrary") {
         // Both hands start on the tonic and mirror: right ascends, left descends. Only
         // scales reach here — effectiveHands sends an arpeggio down the "both" branch.
-        const descending = diatonic(tonic, fx, config.octaves, -1);
-        const down = turn(descending, descending);
+        const down = scaleLineDown(config.type, tonic, fx, config.octaves);
         parts = [
             { id: "P1", clef: "G", positions: main },
             { id: "P2", clef: "F", positions: down.map((note) => [note]) },
@@ -393,21 +432,57 @@ const SCALE_LABEL: Record<string, string> = {
     "dim7-arpeggio": "diminished 7th arpeggio",
 };
 
-export function exerciseTitle(raw: ExerciseConfig): string {
+// What an exercise is called, before anything says it: the key it is in, what it is, and
+// the ways this one differs from the plain form. The words are the caller's, because
+// "C major scale" is a sentence with a different shape in every language — Germans join
+// it up, Japanese puts the key inside the word — so a translator writes the whole title
+// rather than a noun somebody else concatenates a key onto.
+export type ExerciseForm =
+    | "thirds"
+    | "sixths"
+    | "two-octaves"
+    | "left-hand"
+    | "both-hands"
+    | "contrary"
+    | "inversion-1"
+    | "inversion-2";
+
+export type ExerciseTitle = { key: string; type: ExerciseType; forms: ExerciseForm[] };
+
+export function exerciseTitleParts(raw: ExerciseConfig): ExerciseTitle {
     const config = normalizeExercise(raw);
-    const parts = [`${niceKey(config.key)} ${SCALE_LABEL[config.type]}`];
-    const hands = config.hands;
-    const forms: string[] = [];
-    if (config.interval === "thirds") forms.push("in thirds");
-    if (config.interval === "sixths") forms.push("in sixths");
-    if (config.octaves === 2) forms.push("2 octaves");
-    if (hands === "left") forms.push("left hand");
-    if (hands === "both") forms.push("both hands");
-    if (hands === "contrary") forms.push("contrary motion");
-    if (config.inversion === 1) forms.push("1st inversion");
-    if (config.inversion === 2) forms.push("2nd inversion");
-    return forms.length ? `${parts[0]} · ${forms.join(", ")}` : parts[0]!;
+    const forms: ExerciseForm[] = [];
+    if (config.interval === "thirds") forms.push("thirds");
+    if (config.interval === "sixths") forms.push("sixths");
+    if (config.octaves === 2) forms.push("two-octaves");
+    if (config.hands === "left") forms.push("left-hand");
+    if (config.hands === "both") forms.push("both-hands");
+    if (config.hands === "contrary") forms.push("contrary");
+    if (config.inversion === 1) forms.push("inversion-1");
+    if (config.inversion === 2) forms.push("inversion-2");
+    return { key: keyName(config.key), type: config.type, forms };
 }
+
+// The English name, for the score's own <work-title> and for the tooling that builds the
+// exercise manifest. What a player reads is named in their language by the app; a
+// MusicXML file exported from here carries the one spelling every catalogue of scales
+// has used, whoever opens it.
+export function exerciseTitle(raw: ExerciseConfig): string {
+    const { key, type, forms } = exerciseTitleParts(raw);
+    const named = `${key} ${SCALE_LABEL[type]}`;
+    return forms.length ? `${named} · ${forms.map((form) => FORM_LABEL[form]).join(", ")}` : named;
+}
+
+const FORM_LABEL: Record<ExerciseForm, string> = {
+    thirds: "in thirds",
+    sixths: "in sixths",
+    "two-octaves": "2 octaves",
+    "left-hand": "left hand",
+    "both-hands": "both hands",
+    contrary: "contrary motion",
+    "inversion-1": "1st inversion",
+    "inversion-2": "2nd inversion",
+};
 
 // --- id <-> config ----------------------------------------------------------
 

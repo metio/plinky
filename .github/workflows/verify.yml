@@ -65,6 +65,21 @@ jobs:
       # The catalogue's grades must match the octiles of the committed song costs, so a
       # dedup/import that forgot `npm run songs:bake` can't ship inconsistent grades.
       - run: nix develop --command ci-bake-check
+      # And nothing a machine transcribed rather than a person engraved, nor a second copy
+      # of a work already here. Both were found by ear before they were found by anything
+      # else, and neither shows up in a grade or a bar count.
+      - run: nix develop --command ci-prune-check
+  news:
+    name: news
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
+      # NEWS.md is rendered from changelog.yaml, and the weekly round-up reads the same
+      # list — so a hand-edited file, or an entry added without regenerating, would leave
+      # the page players are sent to disagreeing with what gets posted.
+      - run: nix develop --command ci-news-check
   nav:
     name: nav
     runs-on: ubuntu-latest
@@ -138,7 +153,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, dco, bake-check, nav, arch, bytes, tailwind, tokens, i18n, ci-parity]
+    needs: [frontend, dco, bake-check, news, nav, arch, bytes, tailwind, tokens, i18n, ci-parity]
     if: always()
     runs-on: ubuntu-latest
     steps:

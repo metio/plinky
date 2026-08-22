@@ -8,7 +8,7 @@ import { stripBeams } from "../../core/beams";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import type { MeasureBox } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
-import { usePrefsStore, useXmlCodec } from "../contexts/services";
+import { usePrefsStore, useScheduler, useXmlCodec } from "../contexts/services";
 import { annotateFingerings } from "../lib/fingerScore";
 import { collectMeasureBoxes, restoreNotePaint, snapshotNotePaint } from "../lib/scoreColor";
 import { seekToWhole } from "../lib/scoreCursor";
@@ -49,7 +49,26 @@ export type OsmdScore = {
     // Bumped after every successful render (a reload or an in-place fingering redraw), so
     // an overlay that OSMD's fresh SVG drops — the loop selection — can be repainted.
     renderVersion: number;
+    // True while a reading toggle's redraw is pending or running. The control that flipped
+    // shows its new position immediately and says the sheet is catching up.
+    redrawing: boolean;
 };
+
+// How the noteheads are coloured, as the options OSMD wants — one definition, so the fresh
+// load and the in-place toggle cannot come to disagree about what "on" means.
+//
+// The enum arrives with the engraver, which is imported on demand to keep it out of the
+// bundle every page pays for, so it is handed in rather than imported here.
+type ColoringModesEnum = { CustomColorSet: unknown; XML: unknown };
+
+function colorOptions(on: boolean, modes: ColoringModesEnum) {
+    return {
+        coloringEnabled: on,
+        coloringMode: (on ? modes.CustomColorSet : modes.XML) as never,
+        coloringSetCustom: on ? BOOMWHACKER_SET : undefined,
+        colorStemsLikeNoteheads: on,
+    };
+}
 
 export function useOsmdScore(
     containerRef: RefObject<HTMLDivElement | null>,
@@ -125,7 +144,22 @@ export function useOsmdScore(
     const prefsStore = usePrefsStore();
     const xmlCodec = useXmlCodec();
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
+    // The engraver's colouring enum, kept from the on-demand import for the toggle below.
+    const coloringModesRef = useRef<ColoringModesEnum | null>(null);
+    // The colouring the loaded sheet was drawn with, so the toggle acts on a real change and
+    // never rebuilds the graphic model straight after a reload that already applied it.
+    const appliedColorRef = useRef(colorNotes);
+    // Read live by the loader: colouring is no longer a reload input, so the value captured
+    // when the reload was scheduled could be a toggle or two out of date by the time the
+    // engraver arrives.
+    const colorNotesRef = useRef(colorNotes);
+    colorNotesRef.current = colorNotes;
     const [ready, setReady] = useState(false);
+    // Whether an in-place redraw is under way. A reading toggle changes what is drawn, and
+    // redrawing a long piece takes long enough to notice — so the switch reports its new
+    // position at once and this says the sheet is catching up, rather than the switch
+    // appearing not to have registered the press.
+    const [redrawing, setRedrawing] = useState(false);
     const [loadError, setLoadError] = useState(false);
     const [staffCount, setStaffCount] = useState(1);
     const [measureCount, setMeasureCount] = useState(1);
@@ -150,6 +184,11 @@ export function useOsmdScore(
     onReloadRef.current = onReload;
     const onRenderedRef = useRef(onRendered);
     onRenderedRef.current = onRendered;
+    // Read from a ref so asking for a frame never re-creates the redraw callback, which
+    // every reading toggle depends on being stable.
+    const scheduler = useScheduler();
+    const schedulerRef = useRef(scheduler);
+    schedulerRef.current = scheduler;
     const onFingeringRedrawRef = useRef(onFingeringRedraw);
     onFingeringRedrawRef.current = onFingeringRedraw;
 
@@ -184,17 +223,34 @@ export function useOsmdScore(
     // and we own it outright (OSMD's own followCursor is off) so the two never fight. The
     // treadmill scrolls horizontally under a fixed gaze; the wrapped layout scrolls
     // vertically to the current staff row. Off only when the player turns follow off.
+    // Keep the note being played in view — by scrolling the SCORE, never the page.
+    //
+    // `scrollIntoView` walks up every scrollable ancestor, and outside the playing surface
+    // the outermost of those is the document: listening to a piece while reading something
+    // else on the page dragged the whole thing away, once per note. The score box is its own
+    // scroller, so moving that alone follows the music and leaves the reader where they are.
     const centerCursor = useCallback(() => {
-        if (!scrollFollowRef.current) {
+        const box = containerRef.current;
+        const el = osmdRef.current?.cursor?.cursorElement;
+        if (!scrollFollowRef.current || !box || !el) {
             return;
         }
-        const el = osmdRef.current?.cursor?.cursorElement;
-        el?.scrollIntoView(
+        const boxAt = box.getBoundingClientRect();
+        const elAt = el.getBoundingClientRect();
+        // The treadmill lays the music out in one line and scrolls sideways; everything else
+        // wraps into systems and scrolls down.
+        box.scrollBy(
             treadmill
-                ? { inline: "center", block: "nearest", behavior: "smooth" }
-                : { block: "center", inline: "nearest", behavior: "smooth" },
+                ? {
+                      left: elAt.left - boxAt.left - (boxAt.width - elAt.width) / 2,
+                      behavior: "smooth",
+                  }
+                : {
+                      top: elAt.top - boxAt.top - (boxAt.height - elAt.height) / 2,
+                      behavior: "smooth",
+                  },
         );
-    }, [treadmill]);
+    }, [treadmill, containerRef]);
 
     // Reload OSMD whenever the score or a reading-mode input changes, stopping any
     // playback/practice first (a layout change mid-run would otherwise strand its running
@@ -208,6 +264,9 @@ export function useOsmdScore(
         onReloadRef.current();
         import("opensheetmusicdisplay")
             .then(({ ColoringModes, OpenSheetMusicDisplay }) => {
+                // Kept for the colour toggle below, which runs long after this import.
+                coloringModesRef.current = ColoringModes;
+                appliedColorRef.current = colorNotesRef.current;
                 if (cancelled || !containerRef.current) {
                     return;
                 }
@@ -235,10 +294,7 @@ export function useOsmdScore(
                     // handles hollow vs. solid noteheads itself, and the feedback halos ride
                     // behind the notes, so this leaves both untouched. Off is the default
                     // black notation (XML colour).
-                    coloringEnabled: colorNotes,
-                    coloringMode: colorNotes ? ColoringModes.CustomColorSet : ColoringModes.XML,
-                    coloringSetCustom: colorNotes ? BOOMWHACKER_SET : undefined,
-                    colorStemsLikeNoteheads: colorNotes,
+                    ...colorOptions(colorNotesRef.current, ColoringModes),
                 });
                 osmdRef.current = osmd;
                 const rules = (
@@ -343,7 +399,6 @@ export function useOsmdScore(
         treadmill,
         showBeams,
         showAccompaniment,
-        colorNotes,
         focus,
     ]);
 
@@ -356,47 +411,114 @@ export function useOsmdScore(
     // the labels are created afresh per the rule — all when on, none when off. The reload
     // effect sets the rule to the live toggle on every fresh render, so this acts only on a
     // real change and never fires a redundant rebuild straight after a reload.
+    // The redraw itself, once the browser has had its frame to paint the control that
+    // asked for it.
+    const drawNow = useCallback(
+        (osmd: OpenSheetMusicDisplay, apply: () => void) => {
+            apply();
+            // Remember where the cursor stands and whether a run or Listen is driving it, so
+            // it resumes on the same note: updateGraphic() re-initialises it to the start.
+            const cursor = osmd.cursor;
+            const wasVisible = !cursor.hidden;
+            const at = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
+            // Capture the run's paint before the render drops every halo, to re-apply after —
+            // the green cleared notes and the blue Listen trail record how far the piece has
+            // been played, and would otherwise vanish on a mid-run toggle.
+            const paint = snapshotNotePaint(osmd);
+            osmd.updateGraphic();
+            osmd.render();
+            // A fresh render carries no measure boxes or overlay: re-measure the bars for the
+            // loop selection and click-to-select. The render-version bump lets the caller
+            // repaint the loop overlay the fresh SVG dropped.
+            const svg = containerRef.current?.querySelector("svg");
+            measureBoxesRef.current =
+                svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
+            paintedRef.current = restoreNotePaint(osmd, paint);
+            onFingeringRedrawRef.current();
+            // Step the reset cursor back to where it stood — OSMD has no direct seek — and
+            // show it again where a run or Listen was using it, re-centring the treadmill.
+            if (wasVisible) {
+                seekToWhole(cursor, at);
+                cursor.show();
+                centerCursor();
+            }
+            setRenderVersion((version) => version + 1);
+        },
+        [centerCursor, containerRef],
+    );
+
+    // Redraw the sheet WITHOUT re-parsing it, for a setting that changes only how the music
+    // is drawn rather than what it contains.
+    //
+    // Re-parsing is the expensive path and the disruptive one: it clears the sheet, which
+    // collapses the score box, which on the piece's own page jumps the reader's scroll
+    // position to somewhere else entirely. It also throws away the run in progress. So a
+    // rule that only affects drawing is applied to the loaded sheet and the graphic model
+    // rebuilt around it — which does mean carrying the state a fresh render drops.
+    const redrawInPlace = useCallback(
+        (apply: () => void) => {
+            const osmd = osmdRef.current;
+            // `ready` is the value from THIS render, and a reload beginning in the same
+            // commit has already cleared the sheet in its cleanup — so it can still read
+            // true over an OSMD with nothing in it, and updateGraphic() below would walk
+            // undefined staves. Nothing is lost by standing down: the reload applies every
+            // one of these rules itself, from a ref, so the value in force is the live one
+            // either way.
+            if (!osmd || !ready || !osmd.Sheet) {
+                return;
+            }
+            // Hand the browser a frame before the heavy part. React has already committed the
+            // switch's new position, but a synchronous updateGraphic()/render() here runs
+            // before that commit is ever painted — so the switch would sit visibly unmoved
+            // for the whole redraw, which reads as a press that did not land.
+            setRedrawing(true);
+            schedulerRef.current.frame(() => {
+                // The sheet can go away between the frame being asked for and it arriving —
+                // a reload, or the page leaving. Both reapply every rule themselves.
+                if (osmdRef.current !== osmd || !osmd.Sheet) {
+                    setRedrawing(false);
+                    return;
+                }
+                drawNow(osmd, apply);
+                setRedrawing(false);
+            });
+        },
+        [ready, drawNow],
+    );
+
+    // The on-staff fingering. The numbers are always baked into the loaded sheet; flipping
+    // OSMD's RenderFingerings rule alone isn't enough, because a bare render() repositions
+    // the cached fingering labels but never destroys them, leaving stale numbers over the
+    // reclaimed space when switching off. updateGraphic() rebuilds the graphic model from
+    // the parsed sheet, so the labels are created afresh per the rule — all when on, none
+    // when off.
+    useEffect(() => {
+        const rules = (osmdRef.current as unknown as { rules?: { RenderFingerings: boolean } })
+            ?.rules;
+        // The reload sets this rule on every fresh render, so this acts only on a real
+        // change and never fires a redundant rebuild straight after a reload.
+        if (!rules || rules.RenderFingerings === showFingerings) {
+            return;
+        }
+        redrawInPlace(() => {
+            rules.RenderFingerings = showFingerings;
+        });
+    }, [showFingerings, redrawInPlace]);
+
+    // Colouring the noteheads by pitch. A drawing rule like the fingering above, and it used
+    // to force a full re-parse — which on the piece's own page threw the reader's scroll
+    // position across the document every time the toggle was pressed.
     useEffect(() => {
         const osmd = osmdRef.current;
-        if (!osmd || !ready) {
+        const modes = coloringModesRef.current;
+        if (!osmd || !modes || appliedColorRef.current === colorNotes) {
             return;
         }
-        const rules = (osmd as unknown as { rules: { RenderFingerings: boolean } }).rules;
-        if (rules.RenderFingerings === showFingerings) {
-            return;
-        }
-        rules.RenderFingerings = showFingerings;
-        // Remember where the cursor stands and whether a run or Listen is driving it, so it
-        // resumes on the same note: updateGraphic() re-initialises the cursor to the start.
-        const cursor = osmd.cursor;
-        const wasVisible = !cursor.hidden;
-        const at = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
-        // Capture the run's paint before the render drops every halo, to re-apply it after —
-        // the green cleared notes and the blue Listen trail record how far the piece has been
-        // played, and would otherwise vanish on a mid-run fingering toggle.
-        const paint = snapshotNotePaint(osmd);
-        osmd.updateGraphic();
-        osmd.render();
-        // A fresh render carries no measure boxes or overlay: re-measure the bars for the
-        // loop selection and click-to-select. The render-version bump lets the caller repaint
-        // the loop overlay the fresh SVG dropped.
-        const svg = containerRef.current?.querySelector("svg");
-        measureBoxesRef.current =
-            svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
-        // The fresh render rebuilt every notehead, dropping any run paint injected into the
-        // old SVG — re-apply the snapshot, keeping the painted flag when it held marks, then
-        // the ear-mode conceal so hidden answers stay hidden, before the cursor is restored.
-        paintedRef.current = restoreNotePaint(osmd, paint);
-        onFingeringRedrawRef.current();
-        // Step the reset cursor back to where it stood — OSMD has no direct seek — and show
-        // it again where a run or Listen was using it, re-centring the treadmill.
-        if (wasVisible) {
-            seekToWhole(cursor, at);
-            cursor.show();
-            centerCursor();
-        }
-        setRenderVersion((version) => version + 1);
-    }, [showFingerings, ready, centerCursor, containerRef]);
+        appliedColorRef.current = colorNotes;
+        redrawInPlace(() => {
+            osmd.setOptions(colorOptions(colorNotes, modes));
+        });
+    }, [colorNotes, redrawInPlace]);
 
     return {
         getOsmd,
@@ -411,5 +533,6 @@ export function useOsmdScore(
         resetPaint,
         wipePaint,
         renderVersion,
+        redrawing,
     };
 }

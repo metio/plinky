@@ -103,8 +103,9 @@ export type MatchStep = {
     holdQuarters: number;
     // How long the position is meant to keep RINGING, in milliseconds at the written
     // tempi — its longest note at the tempo in force here, extended by a fermata. This
-    // is the chord's own length, what the hold indicator draws; `expected` carries what
-    // each individual key is asked for. Scaled by the same dial ratio as `elapsedMs`.
+    // is the chord's own length; `expected` carries what each individual key is asked
+    // for, including the length its own hold indicator draws. Scaled by the same dial
+    // ratio as `elapsedMs`.
     holdMs: number;
     // What the score asks for at each pitch, index-aligned with `pitches`: the standing
     // dynamic with that note's own accent applied (null when the score marks none), and
@@ -116,10 +117,30 @@ export type MatchStep = {
     // its longest note grades the player against marks the score never put there, and
     // silently ignores the ones it did.
     //
+    // `writtenHoldMs` is the same length before articulation narrows it: what the key
+    // is written to last, which is what its hold indicator draws. Two hands rarely hold
+    // for the same time — a whole note under a quaver is the ordinary case — so drawing
+    // every key at the position's own length drains the quaver's fill at the whole
+    // note's pace, long after that hand has moved on.
+    //
     // Absent on a step model lifted for something other than a graded run — the duet's
     // other hand, a fingering walk — which needs the pitches and nothing about how they
     // are meant to sound.
-    expected?: { velocity: number | null; holdMs: number }[];
+    expected?: { velocity: number | null; holdMs: number; writtenHoldMs: number }[];
+    // What fraction of its written loudness this position is actually played at, for where
+    // it sits in its bar and its phrase — a downbeat at full weight, an offbeat lighter, a
+    // slurred arch settling as it resolves.
+    //
+    // Kept beside `expected` rather than folded into it, because the two answer different
+    // questions and only one of them is a fact about the page. `expected[].velocity` is what
+    // the score asks for, and it is what a run is graded against; a player is never marked
+    // down for weighting a bar the way a metronome would not. This is how it is played, and
+    // only something turning the score into a sounding performance reads it.
+    //
+    // Absent where nothing is known — a step model collected without the score's marks
+    // weights nothing, and reads as 1, so a caller that only wanted the pitches gets the
+    // same notes it always did.
+    interpretation?: number;
 };
 
 // A pitch of the current position that has sounded, and when. The time comes from the
@@ -190,6 +211,24 @@ export type UpcomingStep = {
     // score's parts rather than from the staff index alone.
     pitchHands: Hand2[];
     staves: number[];
+    // When the position sounds, on the step model's own clock. A look-ahead drawn from
+    // this spaces its notes by the music rather than by how many of them there are: a
+    // count of positions says a minim and a semiquaver are the same distance apart,
+    // which is the one thing a falling-note picture exists to show.
+    atMs: number;
+    // How long each pitch is WRITTEN to last, index-aligned with `pitches`.
+    //
+    // Per pitch because a whole note under a quaver is the ordinary case, and the
+    // position's own length is its longest note — reading the picture off that draws the
+    // quaver as long as the whole note beneath it.
+    //
+    // Written rather than sounded, so it agrees with the hold indicator the key itself
+    // draws: articulation shortens what you do with a note, not what is printed, and a
+    // staccato crotchet drawn as a semiquaver would teach the touch as the value.
+    //
+    // Falls back to the position's own length on a step model lifted without `expected`
+    // — the duet's other hand, a fingering walk — which carries no per-key detail.
+    pitchHoldsMs: number[];
 };
 
 export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[] {
@@ -201,6 +240,10 @@ export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[
             pitchStaves: step.pitchStaves,
             pitchHands: step.pitchHands,
             staves: step.staves,
+            atMs: step.elapsedMs,
+            pitchHoldsMs: step.pitches.map(
+                (_, note) => step.expected?.[note]?.writtenHoldMs ?? step.holdMs,
+            ),
         }));
 }
 

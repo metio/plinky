@@ -49,5 +49,25 @@ __pycache__/
 /reports/
 
 
-# Promo clips rendered by npm run promo:videos — generated, never committed
+# Promo clips rendered by npm run promo:videos — generated, never committed. The landscape
+# full-length cut for YouTube lands beside them.
 /promo/
+/promo-youtube/
+/promo-thumbs/
+
+# Piano demos rendered by npm run piano:demo, and any sample library unpacked to compare
+# against. The library is 1.2 GB and is not ours to redistribute.
+/piano-demo/
+/piano-pack/
+
+# design-sync: build artifacts, transient scratch and verification working state.
+# The durable set (config.json, NOTES.md, conventions.md, previews/, overrides/) is committed.
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.design-sync/pkg/
+.design-sync/project.inlang/
+.design-sync/types/
+.ds-sync/
+ds-bundle/

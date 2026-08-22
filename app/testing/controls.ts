@@ -51,3 +51,17 @@ export function pressed(label: Label): boolean {
         screen.getByRole("button", { name: text(label) }).getAttribute("aria-pressed") === "true"
     );
 }
+
+// Open a Disclosure so what it holds can be operated.
+//
+// A shut fold keeps its contents in the DOM and marks them inert, so a query still finds
+// a control inside one while a browser refuses to deliver the click — the test then reads
+// as though it pressed something and nothing happened. Naming the fold is what keeps a
+// browser test honest about the clicks a player actually makes. Opening an already-open
+// fold would close it, so this asks first.
+export function reveal(summary: Label): void {
+    const fold = screen.getByRole("button", { name: text(summary) });
+    if (fold.getAttribute("aria-expanded") !== "true") {
+        fireEvent.click(fold);
+    }
+}

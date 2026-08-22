@@ -16,5 +16,13 @@ export default defineConfig({
     // The optional local PDMX corpus (the gitignored input to dev/import-pdmx.mts)
     // holds ~225k files — far past the OS file-watcher limit. It is never imported
     // or served, so keep the watcher off it.
-    server: { watch: { ignored: ["**/pdmx/**"] } },
+    //
+    // PLINKY_NO_WATCH turns the watcher off altogether, for the tooling that wants this
+    // server only as a way to hand compiled modules to a browser: the promo renders take an
+    // hour, and an edit anywhere in the tree during that hour would otherwise reload the
+    // page out from under whatever frame was being drawn. Nothing is being developed while
+    // a render runs, so there is nothing for a watcher to notice.
+    server: {
+        watch: process.env.PLINKY_NO_WATCH ? null : { ignored: ["**/pdmx/**"] },
+    },
 });

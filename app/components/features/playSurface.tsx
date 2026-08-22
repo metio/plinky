@@ -10,9 +10,11 @@ import { PlayStage } from "./playStage";
 import { PlayTransport } from "./playTransport";
 import { RaceVerdict } from "./raceVerdict";
 import { RunResult } from "./runResult";
+import { RunShare } from "./runShare";
 import { SectionBest } from "./sectionBest";
 import { ScoreCanvas } from "./scoreCanvas";
 import { TakesPanel } from "./takesPanel";
+import { RunSetup } from "./runSetup";
 
 // The play surface: everything inside the full-screen shell, arranged from siblings that
 // each read the shared play session. It owns no state — the transport bar, the score, the
@@ -37,6 +39,7 @@ export function PlaySurface() {
         runResult,
         runTempoScale,
         gradePanelRef,
+        assessment,
         runsView,
         showScore,
         takes,
@@ -103,6 +106,19 @@ export function PlaySurface() {
                 )}
                 <ScoreCanvas />
 
+                {/* Under the music: how you play this piece, and the challenges you can
+                    put on it. They used to be one fold called "Set up your run" — two for
+                    a beginner — so nothing on the page named a single one of them. */}
+                {/* An assessment supplies its own preferences — the aids it measures the
+                    absence of — so there is nothing here to set. Rendering the panel with
+                    every control inert would be worse than leaving it out: a switch that
+                    does nothing reads as a bug. */}
+                {!assessment && (
+                    <FullScreen off>
+                        <RunSetup />
+                    </FullScreen>
+                )}
+
                 <FullScreen off>
                     <Show when={ghostRace.sharedFromLink}>
                         <p className="text-sm text-muted">{m.ghost_shared_loaded()}</p>
@@ -130,11 +146,8 @@ export function PlaySurface() {
                                 grade={runResult.grade}
                                 notes={runResult.notes}
                                 tolerance={runResult.tolerance}
-                                grid={runResult.grid}
                                 tempoCurve={runResult.tempoCurve}
                                 tempoScale={runTempoScale}
-                                daily={daily}
-                                title={title}
                                 ephemeral={ephemeral}
                                 runSaved={runResult.saved}
                                 onSaveTake={saveCurrentTake}
@@ -148,6 +161,18 @@ export function PlaySurface() {
                                     notes={runResult.notes}
                                     tolerance={runResult.tolerance}
                                     tempoScale={runTempoScale}
+                                />
+                            )}
+                            {/* At the very foot: the readouts above are what the player came
+                            for, and showing somebody else is what you do after reading
+                            them. */}
+                            {runResult.grid && (
+                                <RunShare
+                                    grid={runResult.grid}
+                                    notes={runResult.notes}
+                                    letter={runResult.grade.letter}
+                                    title={title}
+                                    daily={daily}
                                 />
                             )}
                         </div>

@@ -28,6 +28,7 @@ import { EarKeyboard } from "./earKeyboard";
 import { EarLadder } from "./earLadder";
 import { EarSequence } from "./earSequence";
 import { EarStage } from "./earStage";
+import { EmptyState } from "../ui/emptyState";
 
 // The one-line prompt on the resting start card, per exercise.
 const BLURB: Record<EarExerciseId, () => string> = {
@@ -146,18 +147,61 @@ export function EarSession({
 
     if (question === null) {
         return (
-            <div className="space-y-4 rounded-xl border border-line p-8 text-center">
-                <p className="text-sm text-muted">{BLURB[exercise]()}</p>
+            <EmptyState body={BLURB[exercise]()}>
                 <Button variant="primary" onClick={next}>
                     {m.ear_start()}
                 </Button>
-            </div>
+            </EmptyState>
         );
     }
 
     return (
         <div className="space-y-6">
-            <EarStage notes={question.notes} autoPlay={true} />
+            <EarStage
+                notes={question.notes}
+                autoPlay={true}
+                status={
+                    <p className="text-xs text-muted">
+                        <span>{m.ear_score({ correct: score.correct, asked: score.asked })}</span>
+                        {" \u00b7 "}
+                        <span>
+                            {rounds.length} / {EAR_SESSION_ROUNDS}
+                        </span>
+                    </p>
+                }
+            >
+                {/* One slot, three jobs, in the order a round meets them: leave this
+                    question unanswered, take the next one, or start another run. Skipping
+                    records nothing — a question you did not answer is not a question you
+                    got wrong, and a drill you cannot walk away from is one you stop
+                    opening. */}
+                {done ? (
+                    // In a review the caller owns what comes next; standalone, offer another run.
+                    onComplete ? null : (
+                        <Button variant="primary" onClick={practiseAgain}>
+                            {m.ear_again()}
+                        </Button>
+                    )
+                ) : settled ? (
+                    <Button variant="primary" onClick={next}>
+                        {m.ear_next()}
+                    </Button>
+                ) : (
+                    <Button variant="ghost" onClick={next}>
+                        {m.ear_skip()}
+                    </Button>
+                )}
+            </EarStage>
+
+            <p aria-live="polite" className="text-center text-sm font-medium text-ink">
+                {done
+                    ? m.ear_session_recorded()
+                    : settled
+                      ? wasCorrect
+                          ? m.ear_verdict_right()
+                          : m.ear_verdict_close()
+                      : m.ear_prompt()}
+            </p>
 
             {question.kind === "intervals" ? (
                 <EarLadder
@@ -224,38 +268,6 @@ export function EarSession({
                     }
                 />
             )}
-
-            <div className="flex items-center justify-between gap-4">
-                <p aria-live="polite" className="text-sm font-medium text-ink">
-                    {done
-                        ? m.ear_session_recorded()
-                        : settled
-                          ? wasCorrect
-                              ? m.ear_verdict_right()
-                              : m.ear_verdict_close()
-                          : m.ear_prompt()}
-                </p>
-                {done ? (
-                    // In a review the caller owns what comes next; standalone, offer another run.
-                    onComplete ? null : (
-                        <Button variant="primary" onClick={practiseAgain}>
-                            {m.ear_again()}
-                        </Button>
-                    )
-                ) : settled ? (
-                    <Button variant="primary" onClick={next}>
-                        {m.ear_next()}
-                    </Button>
-                ) : null}
-            </div>
-
-            <p className="text-xs text-muted">
-                <span>{m.ear_score({ correct: score.correct, asked: score.asked })}</span>
-                {" · "}
-                <span>
-                    {rounds.length} / {EAR_SESSION_ROUNDS}
-                </span>
-            </p>
         </div>
     );
 }

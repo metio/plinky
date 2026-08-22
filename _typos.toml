@@ -20,6 +20,15 @@ nd = "nd"
 # canonicalization must recognize — the alias's whole job is mapping it to
 # "Anonymous".
 anonymus = "anonymus"
+# "tre corde" is the Italian direction that releases the soft pedal — "three strings",
+# the hammers striking all of them again after una corda. A real term in the score
+# reader's vocabulary, not a misspelling of "the" or "tree".
+tre = "tre"
+# "corde" likewise: strings.
+corde = "corde"
+# "gamme" is French for a scale, quoted in the README and NEWS as an example of a
+# piece being named in the reader's own language.
+gamme = "gamme"
 # "ist" is German ("is"), kept verbatim in the machine-translation notice's prevail
 # clause "maßgeblich ist die deutsche Fassung", which every translated legal page —
 # including the checked English base — carries word for word.
@@ -46,8 +55,13 @@ ist = "ist"
 # route components — typos only knows English, so it flags those legitimate German
 # words. The prose itself now lives in messages/ (the English base stays checked);
 # the German is authoritative and every other locale is a machine translation.
+# dev/catalog-curation.json is keyed by the same content-addressed song ids as the
+# manifest above, and their letter runs read as misspellings ("…jqyY", "6Ue…"). Every
+# entry added would flag a new one. The cost is that the short "why" notes in it go
+# unchecked, which is the same bargain the manifest already makes.
 [files]
 extend-exclude = [
+    "dev/catalog-curation.json",
     "messages/*",
     "!messages/en.json",
     "studio/seed/help.ndjson",

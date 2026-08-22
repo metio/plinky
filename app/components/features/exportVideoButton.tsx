@@ -16,7 +16,7 @@ import {
     DEFAULT_NOTE_COLOR,
     KEYBOARD_DEPTHS,
     keyboardDepthFraction,
-    NOTE_COLORS,
+    HIGHWAY_SCHEMES,
     BY_FINGER,
     noteColorHex,
 } from "../../../core/videoLook";
@@ -45,6 +45,7 @@ const NOTE_COLOR_LABELS: Record<string, () => string> = {
     amber: m.video_note_color_amber,
     lime: m.video_note_color_lime,
     finger: m.video_note_color_finger,
+    hand: m.video_note_color_hand,
 };
 
 const DEPTH_LABELS: Record<string, () => string> = {
@@ -71,6 +72,7 @@ export function ExportVideoButton({
     const theme = useKeyboardTheme();
     const [supported, setSupported] = useState(false);
     const [progress, setProgress] = useState<number | null>(null);
+    const [failed, setFailed] = useState(false);
     // Staff renders the notation (and/or keyboard); Highway drops the staff for
     // Synthesia-style falling blocks over the keys.
     const [format, setFormat] = useState<"staff" | "highway">("staff");
@@ -107,6 +109,7 @@ export function ExportVideoButton({
 
     const save = async () => {
         setProgress(0);
+        setFailed(false);
         try {
             const base = SIZES[quality];
             const width = orientation === "portrait" ? base.height : base.width;
@@ -141,7 +144,7 @@ export function ExportVideoButton({
                           showWordmark,
                           keyColors,
                           accent: noteColorHex(noteColor),
-                          byFinger: noteColor === BY_FINGER,
+                          scheme: noteColor,
                           keyboardDepth: keyboardDepthFraction(keyboardDepth),
                       })
                     : takeScenePainter({
@@ -163,6 +166,12 @@ export function ExportVideoButton({
                 setProgress,
             );
             downloadBlob(blob, "video/mp4", `${takeFileStem(title, take)}.mp4`);
+        } catch {
+            // An encoder that gives up, a frame the painter cannot draw, a browser that
+            // refuses the codec. Without this the rejection escapes the handler entirely
+            // and the bar simply returns to idle: the player waited through a whole export
+            // and is told nothing, with no file and no reason.
+            setFailed(true);
         } finally {
             setProgress(null);
         }
@@ -216,9 +225,11 @@ export function ExportVideoButton({
                 {format === "highway" && (
                     <>
                         <SegmentedControl
-                            options={NOTE_COLORS.map((color) => ({
-                                id: color.id,
-                                label: (NOTE_COLOR_LABELS[color.id] ?? color.id.toString)(),
+                            // The shared list, so a scheme added for the practice highway
+                            // shows up here too rather than being added twice or once.
+                            options={HIGHWAY_SCHEMES.map((id) => ({
+                                id,
+                                label: (NOTE_COLOR_LABELS[id] ?? id.toString)(),
                             }))}
                             value={noteColor}
                             onChange={setNoteColor}
@@ -283,6 +294,14 @@ export function ExportVideoButton({
                         ? m.takes_download_video()
                         : m.takes_video_progress({ percent: Math.round(progress * 100) })}
                 </Button>
+                {failed && (
+                    // Said in place rather than thrown: a rejection inside an async click
+                    // handler never reaches an error boundary, so without this the player
+                    // waits out a whole export and is told nothing at all.
+                    <p role="status" className="w-full text-sm text-danger">
+                        {m.feature_broken()}
+                    </p>
+                )}
             </div>
         </Disclosure>
     );

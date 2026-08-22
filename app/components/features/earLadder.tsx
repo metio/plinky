@@ -1,42 +1,21 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { IntervalId } from "../../../core/theory";
-import { semitonesOf, SEMITONES_PER_OCTAVE } from "../../../core/theory";
+import { type IntervalId, semitonesOf } from "../../../core/theory";
 import { intervalName } from "../../lib/theoryNames";
 import { answerClasses, type Verdict } from "./earVerdict";
 import { m } from "../../paraglide/messages.js";
 
-// The answer surface for the interval exercise. An interval IS a distance, so the
-// choices are rungs on a ladder at their true height — unison at the foot, the octave
-// at the top, everything else spaced by the semitones it actually spans. Picking an
-// answer is picking a height, which is the same judgement the ear just made.
+// The answer surface for the interval exercise. An interval is a distance, so the choices
+// are stacked in the order they sound — the octave at the top, the unison at the foot —
+// and picking one is picking a height, which is the same judgement the ear just made.
 //
-// The rungs of an easy round sit far apart; a harder round fills the gaps in. That
-// crowding is the difficulty, drawn rather than described.
+// The rungs sit flush against each other whatever the round offers. Hanging each at its
+// true distance instead left an easy round of three intervals as three rungs adrift in an
+// octave of blank space, and the drill opens on exactly that round.
 
 // The app's standard minimum tap target, so a rung is as pressable as any button.
 const RUNG_HEIGHT = 44;
-
-// The span is sized so that ONE SEMITONE IS ONE RUNG. That is the invariant the whole
-// component rests on: at the fullest level every interval is offered, the closest pair
-// sits a semitone apart, and each still gets a whole tap target with no overlap. It
-// also means the airiness of an easy round is real rather than decorative — three rungs
-// across the same octave simply have further to sit apart.
-const LADDER_HEIGHT = RUNG_HEIGHT * SEMITONES_PER_OCTAVE;
-
-// Every rung is centred on the height it names, so the unison and the octave each hang
-// half a rung past the span's ends. The fieldset is that much taller and the measured
-// span sits inset within it, which keeps the outermost rungs inside the component
-// instead of overflowing whatever contains it.
-const INSET = RUNG_HEIGHT / 2;
-const BOX_HEIGHT = LADDER_HEIGHT + RUNG_HEIGHT;
-
-// Where a rung sits, as a percentage from the foot of the ladder. The rung is centred
-// on its height, so the label lines up with the distance it names.
-function offsetOf(interval: IntervalId): number {
-    return (semitonesOf(interval) / SEMITONES_PER_OCTAVE) * 100;
-}
 
 export function EarLadder({
     choices,
@@ -51,20 +30,19 @@ export function EarLadder({
     onChoose: (interval: IntervalId) => void;
 }) {
     const settled = answer !== null;
-    const rungs = [...choices].sort((a, b) => semitonesOf(a) - semitonesOf(b));
+    // Widest first: the top of the stack is the widest leap, as it is on a keyboard and on
+    // a staff.
+    const rungs = [...choices].sort((a, b) => semitonesOf(b) - semitonesOf(a));
 
     return (
         <fieldset
-            className="relative mx-auto w-full min-w-0 max-w-md"
-            style={{ height: `${BOX_HEIGHT}px` }}
+            className="relative mx-auto flex w-full min-w-0 max-w-md flex-col"
             aria-label={m.ear_ladder_label()}
         >
-            {/* The measuring line the rungs hang off — the ladder's own upright. It spans
-                the octave exactly, so its ends mark the unison and the octave. */}
+            {/* The measuring line the rungs hang off — the ladder's own upright. */}
             <div
                 aria-hidden="true"
-                className="absolute left-4 w-px bg-subtle-strong"
-                style={{ top: `${INSET}px`, bottom: `${INSET}px` }}
+                className="absolute bottom-0 left-4 top-0 w-px bg-subtle-strong"
             />
             {rungs.map((interval) => {
                 const verdict: Verdict = !settled
@@ -83,13 +61,8 @@ export function EarLadder({
                         key={interval}
                         disabled={settled}
                         onClick={() => onChoose(interval)}
-                        className={`absolute left-0 right-0 flex items-center rounded-md border px-4 text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, dimmed)}`}
-                        style={{
-                            height: `${RUNG_HEIGHT}px`,
-                            // Measured against the inset span, not the padded box, so a
-                            // rung still lands on the exact height it names.
-                            bottom: `${INSET + (offsetOf(interval) / 100) * LADDER_HEIGHT - RUNG_HEIGHT / 2}px`,
-                        }}
+                        className={`flex items-center rounded-md border px-4 text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, dimmed)}`}
+                        style={{ height: `${RUNG_HEIGHT}px` }}
                     >
                         {interval === answer && settled ? (
                             <span className="mr-2 text-xs font-semibold uppercase tracking-wide">

@@ -31,12 +31,16 @@ export function usePracticeReport(
     // a calendar, and one drawn from the wall clock renders differently every day.
     now: Date,
 ): PracticeReport | null {
+    // The day the window ends on, not the instant. Callers default `now` to a fresh Date,
+    // so keying the memo on it would mean keying on a new object every render — the memo
+    // would never once hold, and summarizeRange would walk the whole log and build a map
+    // of up to a year of days on every render of the panel and of everything above it.
+    const to = todayKey(now);
     return useMemo(() => {
         if (!log) {
             return null;
         }
-        const to = todayKey(now);
         // Inclusive of both ends, so "7 days" draws seven cells and not eight.
         return summarizeRange(log, shiftDay(to, -(RANGE_DAYS[range] - 1)), to);
-    }, [log, range, now]);
+    }, [log, range, to]);
 }

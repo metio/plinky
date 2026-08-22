@@ -64,13 +64,20 @@ describe("renderTakeAudio", () => {
     });
 
     it("clips a short note's ring so a staccato stays crisp", async () => {
-        // Same pitch, one short (staccato) and one long (held). Measured the same distance
-        // past each note's own notated end, only the held note is still ringing — the short
-        // note's tail is capped to a crisp fraction of its length.
+        // Same pitch, same onset, one short (staccato) and one long (held), compared at the
+        // same INSTANT — a window after the short note has been damped and while the long
+        // one is still sounding. Only the short note's tail is capped, so only it has gone
+        // quiet.
+        //
+        // The same instant matters, and did not used to: each note was measured the same
+        // distance past its OWN end, which put the two windows at different absolute times.
+        // That was sound while a note's own tail was the only thing ringing. It stopped being
+        // sound when the piano got a room, because the room's tail decays from the onset
+        // rather than from the note's end, and the earlier window therefore carried more of
+        // it. Same onset, same instant, and the room contributes equally to both.
         const staccato = await renderTakeAudio([note(0, 60, 100, 80)], 24_000);
         const held = await renderTakeAudio([note(0, 60, 100, 800)], 24_000);
-        const past = (durMs: number) =>
-            [(LEAD_IN_MS + durMs + 150) / 1000, (LEAD_IN_MS + durMs + 300) / 1000] as const;
-        expect(peak(staccato, ...past(80))).toBeLessThan(peak(held, ...past(800)));
+        const after = [(LEAD_IN_MS + 400) / 1000, (LEAD_IN_MS + 550) / 1000] as const;
+        expect(peak(staccato, ...after)).toBeLessThan(peak(held, ...after) / 2);
     });
 });

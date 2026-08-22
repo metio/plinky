@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type ItemKind, practiceHref } from "../../../core/practisable";
+import { usePrefs } from "../../hooks/usePrefs";
 import { buttonClasses } from "../ui/button";
-import { linkClasses } from "../ui/classes";
+import { BakedIncipit } from "../ui/incipit";
+import { linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { m } from "../../paraglide/messages.js";
 
@@ -15,12 +17,15 @@ import { m } from "../../paraglide/messages.js";
 export function RefreshQueue({
     reviews,
 }: {
-    reviews: Array<{ id: string; title: string; kind: ItemKind }>;
+    reviews: Array<{ id: string; title: string; kind: ItemKind; incipit?: string }>;
 }) {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     const due = reviews.length > 0;
     return (
         <section className="space-y-2">
-            <h2 className="text-sm font-medium text-muted">{m.grades_refresh_heading()}</h2>
+            <h2 className={sectionHeadingClasses}>{m.grades_refresh_heading()}</h2>
             {!due && <p className="text-sm text-muted">{m.grades_all_fresh()}</p>}
             <p className="text-sm text-muted">{m.refresh_why()}</p>
             {due ? (
@@ -30,7 +35,15 @@ export function RefreshQueue({
                     </Link>
                     <ul className="space-y-1 text-sm">
                         {reviews.map((review) => (
-                            <li key={review.id}>
+                            <li key={review.id} className="flex items-center gap-2">
+                                {/* What is fading, drawn: the opening bars are the
+                                    quickest way to remember which piece this was. */}
+                                <BakedIncipit
+                                    mark={review.incipit}
+                                    label={review.title}
+                                    colored={prefs.colorNotes}
+                                    className="shrink-0 text-faint"
+                                />
                                 <Link to={practiceHref(review)} className={linkClasses}>
                                     {review.title}
                                 </Link>

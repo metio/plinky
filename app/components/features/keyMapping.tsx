@@ -7,6 +7,7 @@ import {
     type Hand,
     HANDS,
     type KeyMap,
+    keyCapOf,
     keyForSlot,
     keyPlaysNote,
     NOTE_LABELS,
@@ -15,7 +16,6 @@ import {
     SEMITONES,
 } from "../../../core/keyMap";
 import { type PedalKind, PEDAL_KINDS } from "../../../core/pedals";
-import { useOnboardingStore } from "../../contexts/services";
 import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -35,15 +35,6 @@ const PEDAL_LABEL: Record<PedalKind, () => string> = {
 // pedal — or null when idle.
 type Arming = { kind: "note"; hand: Hand; semitone: number } | { kind: "pedal"; pedal: PedalKind };
 
-// The label shown on a key cap. The space key prints as a word so it isn't a blank
-// cap; everything else shows uppercased, the way it's printed on a real keyboard.
-function keyCap(key: string | null): string {
-    if (key === null) {
-        return "—";
-    }
-    return key === " " ? "␣" : key.toUpperCase();
-}
-
 // Remap which computer key plays each note, per hand. Each note is a cap showing its
 // current key; clicking it arms the cap, and the next key pressed becomes its binding.
 // Saving notifies the prefs store's subscribers, so the keyboard input layer picks up
@@ -52,17 +43,11 @@ function keyCap(key: string | null): string {
 export function KeyMapping() {
     const { prefs, update } = usePrefs();
     const map = prefs.keyMap;
-    const onboarding = useOnboardingStore();
     // The slot or pedal currently listening for a key, or null when idle.
     const [arming, setArming] = useState<Arming | null>(null);
     // Set when a pedal bind is refused because the pressed key already plays a note, so the
     // editor can say why rather than appearing to swallow the keystroke.
     const [pedalClash, setPedalClash] = useState(false);
-
-    // Engaging with the editor — arming a cap to rebind, or resetting to the standard
-    // layout — ticks off the "set up your keys" discovery step, so a player content with
-    // the defaults completes it too, not only one who lands on a non-default binding.
-    const markEngaged = () => onboarding.markDiscovered("keysCustomized");
 
     const persist = useCallback((next: KeyMap) => update({ keyMap: next }), [update]);
 
@@ -131,7 +116,6 @@ export function KeyMapping() {
                                     key={semitone}
                                     type="button"
                                     onClick={() => {
-                                        markEngaged();
                                         setPedalClash(false);
                                         setArming(armed ? null : { kind: "note", hand, semitone });
                                     }}
@@ -150,7 +134,7 @@ export function KeyMapping() {
                                         {NOTE_LABELS[semitone]}
                                     </span>
                                     <span className="font-mono text-sm font-semibold">
-                                        {armed ? "…" : keyCap(keyForSlot(map, hand, semitone))}
+                                        {armed ? "…" : keyCapOf(keyForSlot(map, hand, semitone))}
                                     </span>
                                 </button>
                             );
@@ -168,7 +152,6 @@ export function KeyMapping() {
                                 key={pedal}
                                 type="button"
                                 onClick={() => {
-                                    markEngaged();
                                     setPedalClash(false);
                                     setArming(armed ? null : { kind: "pedal", pedal });
                                 }}
@@ -184,7 +167,7 @@ export function KeyMapping() {
                                     {PEDAL_LABEL[pedal]()}
                                 </span>
                                 <span className="font-mono text-sm font-semibold">
-                                    {armed ? "…" : keyCap(map.pedals[pedal])}
+                                    {armed ? "…" : keyCapOf(map.pedals[pedal])}
                                 </span>
                             </button>
                         );
@@ -205,7 +188,6 @@ export function KeyMapping() {
                 <Button
                     variant="secondary"
                     onClick={() => {
-                        markEngaged();
                         setArming(null);
                         persist(DEFAULT_KEY_MAP);
                     }}

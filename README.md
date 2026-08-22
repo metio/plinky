@@ -26,7 +26,12 @@ There are no version numbers to wait for — every change goes live as it lands.
 
 ## Practising a score
 
-Open any score and Plinky renders it as real notation, led by a single action:
+Open any score and Plinky renders it as real notation. Under the title sits the piece's
+**incipit** — its opening bars on a small staff, the way a thematic catalogue names a work,
+coloured by note name when you have that reading aid on. The same mark names pieces in
+lists: today's practice, the pieces due a refresh, and a composer's whole catalogue. It
+ships with the catalogue rather than being read from each score, so a list draws itself
+with nothing to fetch. Then a single action leads:
 **Practice**. Pressing it drops into **full screen** — the score and keyboard to
 themselves, the screen kept awake (and on a phone the browser's URL bar reclaimed for
 the music) — and starts a note-by-note guide: read the note, play it, and the cursor
@@ -42,8 +47,13 @@ a wide desktop alike.
 There you'll also find **Listen**, which plays the piece back so you hear it first,
 lighting up each note as it sounds so your eye can follow along. Listen plays it the way
 it's written — **staccato** notes clipped short, **slurs** flowing legato, **accents**
-struck harder, and the **dynamics** (soft to loud) shaping each note — with tied notes
-held rather than re-struck. Listen and Practice
+struck harder, the **dynamics** (soft to loud) shaping each note, **tremolos** shaking,
+**glissandos** sweeping, and a ***rit.*** or an ***accel.*** giving in the pulse where the
+score asks for one — with tied notes held rather than re-struck. Pieces that print no
+markings at all still breathe in phrases, with the tune brought out of the chord under it.
+The piano stands in a small **room** you can turn up or down in Settings, and a **recorded
+grand** is what you hear by default — its recordings arrive a piece at a time, so nothing is
+downloaded before you play. Listen and Practice
 **hand off to each other** — let the computer play a tricky passage then take over
 mid-phrase, or play a while and hand it back — and your place is kept, even if you
 step out of full screen and come back to it; the **restart** control (or finishing
@@ -73,8 +83,10 @@ small screen, or switch to **treadmill** reading — the piece laid out as one c
 line that scrolls under a fixed gaze as you play, so your eyes rest in one place. Turn on
 the **notes highway** and the staff gives way to a tall lane of the upcoming notes,
 descending in each key's column toward the keys as you play (Synthesia-style, two hands
-coloured apart) — so a beginner can see which key comes next without decoding the staff;
-it advances by position, so it stays self-paced.
+coloured apart) — so a beginner can see which key comes next without decoding the staff.
+Each block is as tall as its note is long and sits as far up the lane as it is far off in
+the music, so a whole note held in the left hand stands over the run of quavers above it.
+It advances by position rather than on a clock, so it stays self-paced.
 **Bar
 numbers** on each row's first bar make a passage easy to find (and line up with the
 loop's from/to), or you can turn them off for a cleaner staff. **Beams** — the bars
@@ -93,7 +105,9 @@ wrong key flashes red; whether the correct key then lights up is your call — b
 default it always shows the next note, or you can ask for a nudge only after a slip,
 or read the music unaided. When the next note is shown, playing it leaves a fading
 fill on the key for as long as the note is written to last, so you can see how long
-to keep holding — not just which key to press. A fresh device starts at **New starter** — every aid on, the notes highway included,
+to keep holding — not just which key to press. On the home page, that same keyboard
+names what you are holding as you hold it — the note, the interval, or the chord —
+so a shape you stumbled on stops being a shape you cannot look up. A fresh device starts at **New starter** — every aid on, the notes highway included,
 because someone who has never read music cannot start at the staff — and finishing the
 keyboard tour puts you there explicitly. A single **Skill level** picks all
 these reading aids together — from a new starter with every help on to a sight-reader
@@ -179,9 +193,9 @@ repetition**, resurfacing for review on a widening schedule so it actually stick
 one-tap **review session** walks you through everything that's fading, and you can
 **shelve** anything you're not working on right now.
 
-## Modes
+## Features, one by one
 
-- **Library** — the catalogue: bundled scales, arpeggios, and familiar tunes like
+- **Music** — the catalogue: bundled scales, arpeggios, and familiar tunes like
   *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import, in two tabs.
   **Search** finds something to play: search, star, filter by kind, grade, or what's
   **due now**, and open one to practise. **Manage** grows and safeguards the library:
@@ -277,7 +291,7 @@ one-tap **review session** walks you through everything that's fading, and you c
   longer on the device (a deleted import, a link from elsewhere) is labelled as
   missing instead of leading to a dead end, and a one-tap action prunes those steps;
   importing a shared assignment says up front how many of its pieces resolve here,
-  and deleting a score from the Library warns when saved assignments still use it.
+  and deleting a score from Music warns when saved assignments still use it.
 - **Find your level** — a placement test, reached from the You page. Read a drill;
   if it goes well the next is harder, and three shaky runs stop it. It reports one
   number and the grade it lands near, so a newcomer starts where they actually read
@@ -314,8 +328,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
   carries an optional *About this grade* note.
 
-**Meet the keyboard** — the first item on that checklist, and the only one that needs no
-piano, no cable and no reading. Six steps for someone who has never touched a keyboard:
+**Meet the keyboard** — the first thing on **Learn**, and the only part of Plinky that
+needs no piano, no cable and no reading. Six steps for someone who has never touched a keyboard:
 the black keys come in twos and threes, middle C sits left of a group of two, the white
 keys are seven names that start over, a black key has two names — and then the leap
 beginners find hardest, that a dot printed on a staff is a key under your hand. Every
@@ -324,27 +338,43 @@ whichever you have. A key that isn't the one asked for still sounds and simply d
 count: wandering along the keys is how a keyboard gets learned, and nothing here keeps
 score. It's entirely optional, and it never asks twice.
 
-On the **home page**, a gentle, dismissible **Getting started** checklist explains how
-Plinky works and walks the first session in order — set yourself up (connect your MIDI
-piano in Settings, then hand size and key mapping, so everything after is tailored to
-you), then play your first piece (your
-first assignment when you have one), then find the level you read at — before pointing
-out the app's other corners. The
-steps that put your fingers on keys right away carry a small **Jump right in** marker,
-the shortcut for anyone who'd rather play first and configure later. Finding your level
-sits just after that first piece rather than before it: by then the cursor and the
-feedback colours are familiar, so the placement test measures your reading instead of a
-screen you've never seen — and anyone who already plays meets the shortcut past the
-beginner grades without going looking for it. The **Today**
-panel alongside it lists the day's practice as one-tap links — pieces due for review,
-the daily challenge, and **your open assignment's next step** ("Continue *First
-steps* — step 2 of 5"), which goes straight into that piece; while an assignment is
-open, its next step stands in for the generic something-new suggestion, so the path
-you (or your teacher) chose is always one tap from the front page. The first time you
-open a score a one-time tip explains the three modes and the listen-then-play-slowly
-loop — a guided tour where you land, never a gate on progress.
+## Four places, and the shape of a day
 
-**What the marks mean** — a glossary of notation, linked from Help. Every symbol you
+Plinky has four permanent places, each answering a different question: **Today** (what
+shall I play now), **Music** (what is there to play), **Learn** (what does this mean),
+and **You** (how am I getting on). Settings and Help stay as the two icons in the corner.
+
+**Today** is the front page, and it is the day's practice in the shape a teacher gives
+an hour:
+
+- **Warm up** — the day's challenge, your next rung of the sight-reading arcade, a fresh
+  drill, a round of ear training.
+- **Work on** — your open assignment's next step ("Continue *First steps* — step 2 of
+  5"), which goes straight into that piece, whatever is fading and wants a refresh, or
+  the gentlest piece you haven't learned yet. A **Surprise me** button picks one for you.
+- **Learn one thing** — a lesson from the theory course, a mark from the glossary, a way
+  to practise, or the keyboard tour if you've never played. The pick comes from the day's
+  number, so it holds still while you look at it and moves on tomorrow.
+
+They are headings, never steps. Nothing counts them, nothing ticks them off, and skipping
+one costs nothing — the same promise as the missing streak. Below them, a small
+**Getting started** strip carries the three things that tailor everything after them:
+connecting a MIDI piano (or letting Plinky listen), your hand size, and your
+computer-keyboard keys. It goes away for good once they're done, or when you dismiss it.
+
+**Learn** gathers the schoolroom in the order you meet it — meet the keyboard, how the
+music works, what the marks mean, ear training, ways to practise, the little tools, and
+finding your level. Under a **Teaching** heading at the foot of it sit the two halves of
+setting work for somebody else: **assignments** (an ordered set of pieces is a course of
+study, whoever laid it out — your teacher, or you) and **Collect results**, where a
+teacher reads back the codes their students send. **Music** is everything there is to
+play: the catalogue, anything you import, and Compose for music you make yourself. The
+daily challenge and Compose keep their own web addresses, so existing links still work.
+
+The first time you open a score a one-time tip explains the three modes and the
+listen-then-play-slowly loop — a guided tour where you land, never a gate on progress.
+
+**What the marks mean** — a glossary of notation, linked from Help. Eighteen symbols you
 meet in a score, grouped by what it controls: how long a note lasts, how you touch it,
 how loud it is, and where on the page you are. Each one gets a bar of real notation,
 drawn by the same engine that draws your pieces, and a **Hear it** button. Where the
@@ -364,22 +394,88 @@ in it says nothing at all.
 
 ## How the music works
 
-[How the music works](https://plinky.fun/en/theory/) is a short course — eight lessons
-on the theory the page assumes you already have. The stave as a picture of the
-keyboard; half steps and whole steps; the octave; the major and minor scales; why a
-piece carries sharps; triads; and the one key that turns a major chord minor. Each
-lesson is a paragraph and something to play, so the idea arrives through your ears as
-well as your eyes. The glossary tells you what a mark means, this tells you why the
-music is built that way.
+[How the music works](https://plinky.fun/en/theory/) is a short course — fourteen
+lessons on the theory the page assumes you already have. The stave as a picture of the
+keyboard; half steps and whole steps; the octave; what a notehead's shape says about
+length; rests; the two staves a piano reads at once; the major and minor scales; why a
+piece carries sharps; the pair of keys that share one signature; triads; the one key
+that turns a major chord minor; the three chords that carry most tunes; and the sound of
+a phrase ending. Each lesson is a paragraph and something to play or a bar of real
+notation to read, so the idea arrives through your ears as well as your eyes. The
+glossary tells you what a mark means, this tells you why the music is built that way.
+
+## Rhythm
+
+[Rhythm](https://plinky.fun/en/rhythm/) is the one trainer with no notes in it. A line of
+notation, a count-in, and the only question is *when* — tap it back on a MIDI piano, your
+computer keys, or the button on the page. Nothing else asks that question on its own:
+everywhere else in Plinky your timing is measured while you are also busy finding the
+right notes, so a wobbly run never says which of the two went wrong.
+
+Thirteen rungs, each adding exactly one idea to the one before it: the beat, then rests,
+then notes longer than a beat, then the beat divided into eighths, three-four time, the
+long-short dotted figure, sixteenths, the dotted pair, triplets, and compound time
+counted in dotted beats. The ladder is numbered rather than named, because what a rung
+contains is the notation in front of you.
+
+Afterwards each note carries a mark: on time, close, out, or never played. A note you
+missed is reported as missed rather than as a note played badly — and a tap that landed
+near nothing is counted separately, so reading a rhythm wrongly and playing one loosely
+never look like the same mistake.
+
+## Hearing a piece
+
+**Listen** plays a piece to you. It sits beside Practice on the piece's own page, where it
+answers the question you actually have before deciding to play something, and again in the
+full-screen bar once you are playing — there it hands the piece back and forth with
+Practice, each picking up where the other left off.
+
+While it plays, the keys light as the notes sound: left hand teal, right hand indigo, the
+same two colours the falling-notes highway uses, so the two parts can be watched as well as
+heard.
+
+## What the page says, and what you hear
+
+Plinky plays the marks, not just the notes. Dynamics and hairpins set how loud each note
+is struck; staccato clips a note, tenuto leans on it, an accent strikes it harder. A slur
+holds each note into the next so a phrase is joined rather than merely adjacent. Trills,
+mordents and turns are played as the figures they stand for, reaching for the next note
+*of the key* — a trill in E flat turns to the B flat. A chord with the wavy line beside it
+is rolled from the bottom up with every note left ringing. The sustain pedal pools the
+harmony where the score asks for it, a fermata waits, ties hold, and a passage under an
+8va line sounds an octave up from where it is drawn.
+
+Where a piece marks none of this — and many teaching studies deliberately mark nothing —
+Plinky supplies what a player would. The bar carries its own weighting: the first beat
+takes most, the middle beat next, the notes falling between beats least, so a four-four
+bar sounds unlike a three-four one rather than merely lasting longer. A phrase under a
+slur settles at its end instead of stopping dead. It is slight on purpose, and it never
+plays a note louder than the page asks — what is printed is a ceiling, and interpretation
+lives underneath it.
+
+That shaping is in what you **hear**, and nowhere else. A run is graded against what the
+score actually says, so nobody is ever marked down for missing an accent that was never
+written.
 
 ## Little tools
 
 [Little tools](https://plinky.fun/en/tools/) is the look-it-up page: no account, no
 instrument, nothing to set up. A **circle of fifths** where picking a key names its
 signature and its relative minor and sounds its chord — and where each key spells its
-own notes, so D flat major reads as D flat and never as C sharp. A **scale explorer**
+own notes, so D flat major reads as D flat and never as C sharp. Its seven chords save
+as **one worksheet**, in order and under the name of the key, rather than as seven
+separate pictures of chords that no longer look like they belong together. A **scale explorer**
 and a **chord explorer** that light the notes on a keyboard from any root and play
-them back. And a **tap tempo** reader: tap along and it tells you the number.
+them back — and either can be saved as a **picture**, keys marked and named, for a
+lesson plan or a printout, or **for print** as the drawing itself, which comes out at
+whatever size the paper is. Fourteen scales and eighteen chord types, the modes complete
+and the sixths, suspensions and ninths included. **Between two chords** answers the question a chart cannot:
+why one change falls under the hand and another fights it, by naming the notes both
+chords hold and counting how far the rest have to travel. An **interval finder**: pick
+a starting note and a distance to see where it lands and hear it struck together and
+apart. A **tap tempo** reader: tap along and it tells you the number. And a
+**metronome** that takes that number straight from it, so finding a tempo and playing
+at it is one job.
 
 ## Composing
 
@@ -389,7 +485,10 @@ playback is exactly what you played; the staff is an approximate sketch, snapped
 grid so it reads as notation, with simultaneous notes drawn as chords. Play along to
 the **metronome** with a one-bar count-in for a tidier rhythm, set a **checkpoint** to
 keep the good part and retry the tail, then **share the take by link** or download it
-as **MIDI** or **MusicXML**. Open a MIDI or MusicXML file back in to pick up where you
+as **MIDI** or **MusicXML**. Knowing a tune you can't yet play up to speed is its own
+problem, so **Write it note by note** turns the keys into pitch names and lets you say how
+long each note lasts — chords are keys pressed together, and there's a rest and an undo.
+It can be switched on partway through a take. Open a MIDI or MusicXML file back in to pick up where you
 left off on another device.
 
 ## Sharing
@@ -436,6 +535,13 @@ practice went — every day in the range, shaded against the busiest one. A quie
 is drawn as a quiet week. Nothing here counts consecutive days and nothing reproaches
 a gap.
 
+**Where your time went** turns the same minutes the other way round: a row per piece,
+longest-practised first, each saying when you last touched it. A diary ordered by date
+cannot show you the piece you are quietly forgetting, because the forgotten piece is
+the one that stops appearing. Nothing here is a target — a piece nobody has played for
+three weeks is a piece nobody has played for three weeks, and what to do about that is
+yours.
+
 Played at a piano Plinky wasn't listening to? Add those minutes yourself. Hand-logged
 time is marked as such wherever it appears, so the picture stays honest. Any sitting
 can carry a note and a word for how it went, and the whole log downloads as a
@@ -473,6 +579,13 @@ nothing already there is touched.
   *Connect MIDI*; Plinky reconnects it automatically on your next visit. Web MIDI is
   available in Chrome, Edge, and Firefox on desktop and Android; Safari and iOS do
   not expose it — there, let Plinky listen instead (below) or use the keyboard fallback.
+- **With fewer than 88 keys** — a 61-key or 49-key keyboard has no key for the notes at
+  the ends of the piano, so a piece that reaches past yours moves into it by whole
+  octaves: same intervals, same fingering, a different register. Plinky reads the size
+  off the instrument's name where the name gives it away, and **Keyboard size** in
+  Settings measures it exactly — press the key at each end and it has the range. The
+  caption beside the transpose control says when a piece has been moved, and *Reset to
+  the written key* puts it back where it was printed.
 - **With an acoustic piano (or any piano, no cable)** — start **listening** in
   Settings and Plinky hears your playing through the microphone, one note at a
   time, feeding the same practice flow a MIDI keyboard does. Pitch heard from a
@@ -530,7 +643,13 @@ piano is connected, a quiet plug otherwise — so you can see at a glance whethe
 instrument is hooked up.
 
 Sound is synthesised in the browser, so the on-screen and computer keyboards make
-sound everywhere — MIDI is only for *input* from a real piano. iPhones normally mute
+sound everywhere — MIDI is only for *input* from a real piano. **Settings → Sound** can
+swap that synthesised piano for a **recorded grand**: the Salamander Grand Piano by
+Alexander Holm (CC-BY), sixteen recordings of every key depending on how hard it is
+struck. There is nothing to download and wait for — a piece fetches the couple of dozen
+recordings it needs while you read it, a few hundred kilobytes each, and they are kept on
+your device; a note whose recording has not arrived is played by the synthesised voice, so
+nothing ever waits. Exported videos carry whichever piano you heard. iPhones normally mute
 browser audio under **Silent Mode**, so Plinky declares itself a playback audio
 session (iOS 16.4+) to play through it like a music app, and re-wakes sound after a
 call or app switch interrupts it. On an older iPhone, or if you still hear nothing,
@@ -557,11 +676,32 @@ drives playback from one shared audio clock.
 Plinky walks its cursor to match the pitches under each position against what you
 play — the same engine behind every mode.
 
+## The brand kit
+
+`brand/` holds the mark, the palette with each colour's role, a type specimen and
+ready-made social images — everything somebody needs to make something *about* Plinky. It
+is generated: `npm run brand` rebuilds it from `app/app.css` and `public/icon.svg`, so a
+poster cannot end up in a palette the app has moved on from. `brand/README.md` carries the
+rules, including the three colours that mean something and must never be borrowed for
+decoration.
+
+Plinky's components are also published as a design system, so a design tool builds with
+the real parts rather than generic ones: every storied component compiles into a bundle
+alongside its type contract and a preview, and each preview is verified against this
+repo's own Storybook render before it ships. `.design-sync/` holds the settings and the
+notes; the sync itself is run with `/design-sync` in Claude Code.
+
 ## Translations
 
 Plinky speaks 26 languages, and contributions are welcome — see
 [TRANSLATING.md](TRANSLATING.md) for how to add a translation. Untranslated strings
 fall back to English, so every language always works while it catches up.
+
+Music has its own vocabulary in each of them, so the pieces are named in the reader's
+language too: a scale is a *Tonleiter*, a *gamme*, a *音階*, and the key goes where that
+language puts it — `{key}-Dur-Tonleiter` in German, `Gamme de {key} majeur` in French.
+Every generated scale and arpeggio is titled from the message catalogue rather than from
+the English name baked into the score.
 
 Plinky talks like a piano teacher who is glad you showed up: it invites rather than
 instructs, and never nags about a missed day. [VOICE.md](VOICE.md) is the contract
@@ -570,9 +710,11 @@ register is part of the string.
 
 ## Help page
 
-The **?** in the header opens a help page that explains Plinky area by area — one
-section per part of the app, and it drops you on the section for the page you came
-from. The text is translated with the rest of the UI, so a reader gets it in their own
+The **?** in the header opens a help page that explains how each part of Plinky
+behaves — one section per area, and it drops you on the section for the page you came
+from. It is a manual rather than a table of contents: the pages it used to list at the
+top now live on **Learn**, where they can be found without knowing to look under a
+question mark. The text is translated with the rest of the UI, so a reader gets it in their own
 language, and the pictures of each page live in `public/help/`.
 
 Content and app ship together: the words are messages like every other string, held to

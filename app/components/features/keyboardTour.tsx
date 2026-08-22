@@ -16,9 +16,9 @@ import {
     type TourStep,
     tourProgress,
 } from "../../../core/keyboardTour";
-import { buildSnippet, type SnippetNote } from "../../../core/glossaryScore";
+import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../../core/glossaryScore";
 import { holdScaleFor } from "../../../core/midi";
-import { useMidiConnection, useMidiInput } from "../../contexts/midi";
+import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
@@ -55,25 +55,6 @@ const STEP_BODY: Record<string, () => string> = {
     highLow: m.tour_high_low_body,
 };
 
-// The natural letter each white key carries; black keys have none, and the tour never
-// staffs one — spelling a black key would mean choosing between a sharp and a flat, a
-// decision none of these steps is making. A core test pins that, so the gaps are
-// unreachable rather than quietly drawn as something else.
-const NATURAL_OF: (string | null)[] = [
-    "C",
-    null,
-    "D",
-    null,
-    "E",
-    "F",
-    null,
-    "G",
-    null,
-    "A",
-    null,
-    "B",
-];
-
 // A step's staff pitches, drawn on the same engine as every real score so what is
 // learned here looks like what will be met in a piece.
 function staffXml(step: TourStep): string | null {
@@ -97,7 +78,8 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     const synth = useSynth();
     const labels = useNoteLabels();
     const theme = useKeyboardTheme();
-    const { heldNotes, pressKey, releaseKey } = useMidiConnection();
+    const { pressKey, releaseKey } = useMidiConnection();
+    const heldNotes = useHeldNotes();
 
     const step = currentStep(state);
     const ready = stepReady(state);

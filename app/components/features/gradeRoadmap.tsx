@@ -13,6 +13,7 @@ import {
 } from "../../lib/gradeProgress";
 import { m } from "../../paraglide/messages.js";
 import { Show } from "./conditional";
+import { LocalizedLink as Link } from "../ui/localizedLink";
 
 type EarnedTier = Exclude<StarTier, "none">;
 const STAR: Record<EarnedTier, string> = { bronze: "🥉", silver: "🥈", gold: "🥇" };
@@ -43,13 +44,11 @@ export function GradeRoadmap({
     level,
     mode,
     now,
-    poolSizes,
 }: {
     items: GradedMastery[];
     level: number;
     mode: DecayMode;
     now: number;
-    poolSizes: Map<number, number>;
 }) {
     const grades = Array.from({ length: MAX_GRADE }, (_, i) => i + 1);
     return (
@@ -59,7 +58,6 @@ export function GradeRoadmap({
                 const tier = starTier(mastered);
                 const next = nextStar(mastered);
                 const { due } = gradeFreshness(items, grade, mode, now);
-                const total = poolSizes.get(grade) ?? 0;
                 return (
                     <li
                         key={grade}
@@ -70,18 +68,26 @@ export function GradeRoadmap({
                         }`}
                     >
                         <div className="flex items-center justify-between gap-3">
-                            <span className="flex items-center gap-2">
+                            {/* The grade opens its pieces. A ladder of eight rows that
+                                cannot be pressed reads as a level-select screen; being
+                                able to press Grade 8 on your first day, and land on four
+                                hundred pieces you may play, says what no sentence can. */}
+                            <Link
+                                to={`/music?grade=${grade}`}
+                                className="flex items-center gap-2 rounded-md px-1 hover:text-accent-strong hover:underline"
+                            >
                                 <span className="font-semibold">{m.grades_grade({ grade })}</span>
                                 {tier !== "none" && (
                                     <span role="img" aria-label={STAR_LABEL[tier]()}>
                                         {STAR[tier]}
                                     </span>
                                 )}
-                            </span>
+                            </Link>
                             <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-muted">
-                                <span className="tabular-nums">
-                                    {m.grades_pool({ mastered, total })}
-                                </span>
+                                {/* No ratio. The pool is four hundred pieces a grade —
+                                    a denominator nobody is meant to finish, and printing
+                                    it turns a shelf into a requirement. What guides is the
+                                    distance to the next star, which is right beside it. */}
                                 <span className="text-muted">
                                     {next
                                         ? m.grades_to_next({

@@ -4,8 +4,8 @@
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
-import { pitchClass } from "../../../core/midi";
-import { solfegeOf } from "../../../core/notes";
+import { spokenPitch } from "../../../core/midi";
+import { keyLabelOf } from "../../../core/notes";
 import type { NoteLabels } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
@@ -41,37 +41,24 @@ const SYLLABLES: Array<() => string> = [
     m.solfege_si,
 ];
 
-// The label to print on a key, or null for none. "all" labels every key by letter;
-// "c" prints only on the C keys, the landmark that orients a beginner (the white key
-// just left of each two-black-key group); "solfege" names every key the way a reader
-// raised on do-re-mi already thinks of it; "off" prints nothing.
-function keyLabel(note: number, labels: NoteLabels): string | null {
-    if (labels === "all") {
-        return pitchClass(note);
-    }
-    if (labels === "c" && ((note % 12) + 12) % 12 === 0) {
-        return "C";
-    }
-    if (labels === "solfege") {
-        const { degree, sharp } = solfegeOf(note);
-        return `${SYLLABLES[degree]?.() ?? ""}${sharp ? SHARP_GLYPH : ""}`;
-    }
-    return null;
-}
-
-// The typographic sharp pitchClass prints, and the word a screen reader should say
-// instead — a bare "#" (or the "♯" glyph) is read as "number"/"pound", not "sharp".
+// The typographic sharp a solfège syllable takes when it names a raised note.
 const SHARP_GLYPH = "♯";
-const SPOKEN_SHARP = " sharp";
 
-// A key's spoken name: "C sharp 4", not "C#4" — the sharp is spelled and the octave is
-// spaced off the letter so a screen reader announces the pitch a player expects.
-function spokenNote(note: number): string {
-    const octave = Math.floor(note / 12) - 1;
-    return `${pitchClass(note).replace(SHARP_GLYPH, SPOKEN_SHARP)} ${octave}`;
+// Which label the setting calls for, said in the reader's own language: the syllables
+// are translated copy, so core decides what to print and this spells it.
+function keyLabel(note: number, labels: NoteLabels): string | null {
+    const label = keyLabelOf(note, labels);
+    if (label === null) {
+        return null;
+    }
+    if (label.kind === "letter") {
+        return label.letter;
+    }
+    return `${SYLLABLES[label.degree]?.() ?? ""}${label.sharp ? SHARP_GLYPH : ""}`;
 }
 
 const NONE: ReadonlySet<number> = new Set();
+const NO_SOUNDING: ReadonlyMap<number, "left" | "right"> = new Map();
 const NO_HOLDS: ReadonlyMap<number, number> = new Map();
 
 // The shrinking fill that shows how long a just-played note is meant to be held:
@@ -99,6 +86,7 @@ export function Keyboard({
     from,
     to,
     lit = NONE,
+    sounding = NO_SOUNDING,
     expected = [],
     wrong = null,
     rise = false,
@@ -114,6 +102,15 @@ export function Keyboard({
     from: number;
     to: number;
     lit?: ReadonlySet<number>;
+    // Notes the app itself is sounding right now, each with the hand that plays it — what
+    // Listen lights while it demonstrates the piece.
+    //
+    // These colours mean HAND here, where everywhere else on this keyboard a colour means
+    // state (play this / you played it / that was wrong). Overloading them is deliberate
+    // and safe because listening is a mode of its own: nothing is being asked of the
+    // player, so there is no state to confuse it with — and it is the same teal and indigo
+    // the notes highway uses for the same two hands.
+    sounding?: ReadonlyMap<number, "left" | "right">;
     expected?: number[];
     // How much of each just-played note's written length remains (1 at the strike,
     // 0 at its release), keyed by note — drives the shrinking hold-duration fill.
@@ -454,22 +451,41 @@ export function Keyboard({
             ? "bg-danger-fill"
             : lit.has(note)
               ? "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held"
-              : expected.includes(note)
-                ? "bg-accent-surface"
-                : theme.white;
+              : // A key the player is holding wins over one the app is sounding: their own
+                // hands are the more urgent fact on the instrument in front of them.
+                sounding.get(note) === "left"
+                ? "bg-hand-left-soft"
+                : sounding.get(note) === "right"
+                  ? "bg-hand-right-soft"
+                  : expected.includes(note)
+                    ? "bg-accent-surface"
+                    : theme.white;
+    // An expected black key is ringed, not repainted. Filling it with the next-note colour
+    // stops it being a black key — fine mid-piece, where the key is pointed at rather than
+    // named, and wrong in the first lesson of all, which says "press any black key" over a
+    // keyboard whose black keys have turned blue.
     const blackState = (note: number) =>
         flash?.note === note
             ? "bg-danger"
             : lit.has(note)
               ? "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held"
-              : expected.includes(note)
-                ? "bg-key-next"
-                : theme.black;
+              : // A sounding black key IS filled, unlike an expected one: the reason an
+                // expected black key is only ringed is that "press any black key" must
+                // still read as black, and nothing is being asked for here.
+                sounding.get(note) === "left"
+                ? "bg-hand-left"
+                : sounding.get(note) === "right"
+                  ? "bg-hand-right"
+                  : expected.includes(note)
+                    ? `${theme.black} ring-2 ring-inset ring-key-next`
+                    : theme.black;
     // A black key's name is pale because the key is nearly black — but every state that
     // means something (wrong, held, play this) fills it with a bright colour, and pale
     // grey on those is well under the contrast floor. The name follows the fill.
     const blackLabel = (note: number) =>
-        flash?.note === note || lit.has(note) || expected.includes(note)
+        // The expected key keeps its black fill now, so its name keeps the pale ink that
+        // reads on black; only the states that flood the key with colour change it.
+        flash?.note === note || lit.has(note) || sounding.has(note)
             ? "text-key-ink"
             : "text-key-black-ink";
 
@@ -498,7 +514,7 @@ export function Keyboard({
                         <button
                             key={note}
                             type="button"
-                            aria-label={spokenNote(note)}
+                            aria-label={spokenPitch(note)}
                             aria-pressed={lit.has(note)}
                             tabIndex={note === roved ? 0 : -1}
                             data-note={note}
@@ -535,7 +551,7 @@ export function Keyboard({
                         <button
                             key={note}
                             type="button"
-                            aria-label={spokenNote(note)}
+                            aria-label={spokenPitch(note)}
                             aria-pressed={lit.has(note)}
                             tabIndex={note === roved ? 0 : -1}
                             data-note={note}
@@ -570,7 +586,7 @@ export function Keyboard({
                 )}
             </div>
             <span key={flash?.seq} className="sr-only" role="status" aria-live="assertive">
-                {flashNote !== null ? m.keyboard_wrong_note({ note: spokenNote(flashNote) }) : ""}
+                {flashNote !== null ? m.keyboard_wrong_note({ note: spokenPitch(flashNote) }) : ""}
             </span>
         </div>
     );

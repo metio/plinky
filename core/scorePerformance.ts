@@ -10,16 +10,18 @@ import type { Hand2, MatchStep } from "./matcher";
 // Everything that renders a video — the scene painter, the offline audio render — takes
 // RecordedNote[], because a video is of something somebody played. A catalogue piece has
 // nobody's playing behind it, so there is nothing to render until the score itself is
-// turned into a performance: every note struck on time, held for its written length, at
-// an even touch.
+// turned into a performance: every note struck on time, held for its written length, and
+// struck at what the page asks for where it asks for anything — the standing dynamic with
+// the note's accent on it, weighted for where the position falls in its bar and its phrase.
+// An unmarked score falls back to an even touch, which is what every score used to get.
 //
 // The step model already carries what that needs. Since repeats, tempo marks and fermatas
 // were folded into it, `elapsedMs` is where a position genuinely falls in time and
 // `holdMs` how long it should ring, both at the tempi the score writes — so this is a
 // change of shape, not a second interpretation of the music.
 
-// A steady touch. Loud enough to sound present, short of the ceiling so an accented note
-// in an expressive score still has somewhere to go.
+// The touch a note gets when the page asks for none. Loud enough to sound present, short of
+// the ceiling so an accented note in an expressive score still has somewhere to go.
 export const EVEN_VELOCITY = 88;
 
 export type PerformanceOptions = {
@@ -53,6 +55,18 @@ function fingeringOf(steps: readonly MatchStep[]): Map<Hand2, number[][]> {
     ]);
 }
 
+// How hard this key is struck. The score's own dynamic where it writes one — with that
+// note's accent already applied — weighted for where the position sits in its bar and its
+// phrase. Both come off the step model, which is the same reading the app plays and grades
+// from, so a rendered video and a listened-to piece are one performance rather than two.
+//
+// Where the step model carries neither — collected without the score's marks, which is what
+// a caller wanting only pitches does — this is the even touch it always was.
+function velocityFor(step: MatchStep, index: number): number {
+    const written = step.expected?.[index]?.velocity ?? EVEN_VELOCITY;
+    return Math.max(1, Math.min(127, Math.round(written * (step.interpretation ?? 1))));
+}
+
 export function performanceOf(
     steps: readonly MatchStep[],
     { speed = 1, withinMs }: PerformanceOptions = {},
@@ -82,7 +96,7 @@ export function performanceOf(
                 pitch,
                 startMs,
                 durationMs: Math.max(1, holdMs * scale),
-                velocity: EVEN_VELOCITY,
+                velocity: velocityFor(step, index),
                 hand,
                 ...(finger === undefined ? {} : { finger }),
             });

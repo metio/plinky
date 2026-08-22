@@ -9,14 +9,15 @@ describe("onboardingStore", () => {
     it("starts with nothing marked and remembers a markable step", () => {
         const store = createOnboardingStore(memoryStore());
         expect(store.marked().size).toBe(0);
-        store.markDiscovered("earTried");
-        expect(store.marked().has("earTried")).toBe(true);
+        store.markDiscovered("keyboardMet");
+        expect(store.marked().has("keyboardMet")).toBe(true);
     });
 
-    it("ignores derived steps, whose completion is read from real state", () => {
+    it("ignores anything that is not a step it keeps", () => {
+        // The store took eleven ids when a checklist showed them; one is read now, and a
+        // stale id from an older device must not come back as a step.
         const store = createOnboardingStore(memoryStore());
-        store.markDiscovered("played");
-        store.markDiscovered("dailyDone");
+        store.markDiscovered("played" as never);
         expect(store.marked().size).toBe(0);
     });
 
@@ -24,18 +25,20 @@ describe("onboardingStore", () => {
         const kv = memoryStore();
         const set = vi.spyOn(kv, "set");
         const store = createOnboardingStore(kv);
-        store.markDiscovered("composed");
+        store.markDiscovered("keyboardMet");
         const onChange = vi.fn();
         store.subscribe(onChange);
-        store.markDiscovered("composed");
+        store.markDiscovered("keyboardMet");
         expect(set).toHaveBeenCalledTimes(1);
         expect(onChange).not.toHaveBeenCalled();
     });
 
     it("drops non-markable junk from a tampered store", () => {
         const store = createOnboardingStore(
-            memoryStore({ "plinky:discovered": JSON.stringify(["earTried", "played", "bogus"]) }),
+            memoryStore({
+                "plinky:discovered": JSON.stringify(["keyboardMet", "played", "bogus"]),
+            }),
         );
-        expect([...store.marked()]).toEqual(["earTried"]);
+        expect([...store.marked()]).toEqual(["keyboardMet"]);
     });
 });

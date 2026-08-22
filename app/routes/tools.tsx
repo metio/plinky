@@ -1,31 +1,49 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { CIRCLE, type CircleKey, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
-import { bpmOf, NO_TAPS, type TapState, tap, tapCount } from "../../core/tapTempo";
+import {
+    bpmOf,
+    MAX_BPM,
+    MIN_BPM,
+    NO_TAPS,
+    type TapState,
+    tap,
+    tapCount,
+} from "../../core/tapTempo";
 import { NOTE_LABELS } from "../../core/keyMap";
 import {
     CHORD_QUALITIES,
     type ChordQuality,
     chordPitches,
+    INTERVAL_IDS,
+    type IntervalId,
     NOTE_TEXT,
     noteNameOf,
     SCALE_IDS,
     type ScaleId,
     scalePitches,
+    semitonesOf,
+    pitchClassOf,
 } from "../../core/theory";
-import { Keyboard } from "../components/ui/keyboard";
+import { ChordChanges } from "../components/features/chordChanges";
+import { FeatureBoundary } from "../components/features/featureBoundary";
+import { SaveDiagram, SavePictureButton } from "../components/features/savePictureButton";
+import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
-import { useScheduler } from "../contexts/services";
-import type { SchedulerHandle } from "../ports/scheduler";
+import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
-import { chordName, scaleName } from "../lib/theoryNames";
+import { chordName, intervalName, scaleName } from "../lib/theoryNames";
+import { diatonicSheetDiagrams } from "../../core/chordSheet";
+import { svgDiagramSheet } from "../../core/keyboardDiagram";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/tools";
+import { PageHeader } from "../components/ui/pageHeader";
+import { Card } from "../components/ui/card";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -44,14 +62,9 @@ export function meta(_args: Route.MetaArgs) {
 
 // Middle C's octave, so every tool sounds and draws in the same register a beginner
 // sits in front of.
-const ROOT = 60;
-const KEY_FROM = 60;
-const KEY_TO = 84;
+const ROOT = DEMO_FROM;
 
-// One beat's sound for a scale or chord button — long enough to hear, short enough
-// that a whole scale plays in a couple of seconds.
 const NOTE_SECONDS = 0.45;
-const STEP_MS = 260;
 
 function Panel({
     title,
@@ -63,13 +76,13 @@ function Panel({
     children: React.ReactNode;
 }) {
     return (
-        <section className="space-y-3 rounded-lg border border-line bg-surface p-4">
+        <Card className="space-y-3">
             <div className="space-y-1">
-                <h2 className="font-medium text-body">{title}</h2>
-                <p className="text-xs text-muted">{hint}</p>
+                <h2 className="text-base font-semibold text-ink">{title}</h2>
+                <p className="text-sm text-muted">{hint}</p>
             </div>
             {children}
-        </section>
+        </Card>
     );
 }
 
@@ -95,18 +108,24 @@ function CircleOfFifths() {
     };
     return (
         <Panel title={m.tools_circle_title()} hint={m.tools_circle_hint()}>
-            <ul className="flex flex-wrap gap-2">
-                {CIRCLE.map((key) => (
-                    <li key={key.tonic}>
-                        <Button
-                            variant={key.tonic === selected.tonic ? "primary" : "secondary"}
-                            onClick={() => pick(key)}
-                        >
-                            {spell(key.tonic, key)}
-                        </Button>
-                    </li>
-                ))}
-            </ul>
+            {/* Picking one of twelve is the same gesture as picking one of thirteen
+                scales two panels down, so it is the same control — a filled primary
+                Button meant "the thing to press", which a key you have not chosen is
+                not. */}
+            <SegmentedControl
+                options={CIRCLE.map((key) => ({
+                    id: String(key.tonic),
+                    label: spell(key.tonic, key),
+                }))}
+                value={String(selected.tonic)}
+                onChange={(tonic) => {
+                    const key = CIRCLE.find((one) => String(one.tonic) === tonic);
+                    if (key) {
+                        pick(key);
+                    }
+                }}
+                label={m.tools_circle_title()}
+            />
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
                 <dt className="text-muted">{m.tools_circle_signature()}</dt>
                 <dd>
@@ -117,6 +136,22 @@ function CircleOfFifths() {
                 <dt className="text-muted">{m.tools_circle_relative()}</dt>
                 <dd>{m.tools_circle_minor({ note: spell(selected.relativeMinor, selected) })}</dd>
             </dl>
+            {/* The seven chords leave together or not at all. Saved one at a time they
+                arrive as seven files with no order and no title, and what they were
+                teaching — that they belong to this key, in this sequence — is the part
+                that goes missing. */}
+            <SaveDiagram
+                svg={() =>
+                    svgDiagramSheet({
+                        title: m.tools_circle_sheet_title({
+                            key: spell(selected.tonic, selected),
+                        }),
+                        diagrams: diatonicSheetDiagrams(ROOT + selected.tonic, selected.spelling),
+                    })
+                }
+                filename={`plinky-chords-${spell(selected.tonic, selected)}`}
+                pictureLabel={m.tools_circle_save_chords()}
+            />
         </Panel>
     );
 }
@@ -124,34 +159,8 @@ function CircleOfFifths() {
 // Plays a sequence one note at a time through the injected scheduler, so a scale
 // unfolds rather than sounding as a cluster. Timers are the scheduler's, never the
 // browser's — the architecture confines them and a test needs to advance them.
-function useSequencePlayer() {
-    const synth = useSynth();
-    const scheduler = useScheduler();
-    // Every strike still waiting to happen. A scale left running when the page goes —
-    // or a second press landing on top of the first — would otherwise keep striking
-    // notes into a route nobody is on any more.
-    const pending = useRef<SchedulerHandle[]>([]);
-    const stop = useCallback(() => {
-        for (const handle of pending.current) {
-            scheduler.cancel(handle);
-        }
-        pending.current = [];
-    }, [scheduler]);
-    useEffect(() => stop, [stop]);
-    return (pitches: number[]) => {
-        stop();
-        for (const [index, pitch] of pitches.entries()) {
-            pending.current.push(
-                scheduler.after(index * STEP_MS, () =>
-                    synth.playNote(pitch, { duration: NOTE_SECONDS }),
-                ),
-            );
-        }
-    };
-}
-
-// The twelve roots, spelled from the same table the computer keyboard and the
-// perfect-pitch answer keys use, so a note reads identically wherever it appears.
+// The twelve roots, labelled the way the keyboard is: a root here is a key under the
+// hand rather than a key signature.
 function tonicOptions(): { id: string; label: string }[] {
     return Array.from({ length: 12 }, (_, pitch) => ({
         id: String(pitch),
@@ -162,7 +171,6 @@ function tonicOptions(): { id: string; label: string }[] {
 function ScaleExplorer() {
     const [tonic, setTonic] = useState("0");
     const [scale, setScale] = useState<ScaleId>("major");
-    const play = useSequencePlayer();
     const pitches = scalePitches(ROOT + Number(tonic), scale);
     return (
         <Panel title={m.tools_scales_title()} hint={m.tools_scales_hint()}>
@@ -178,10 +186,22 @@ function ScaleExplorer() {
                 onChange={setScale}
                 options={SCALE_IDS.map((id) => ({ id, label: scaleName(id) }))}
             />
-            <Keyboard from={KEY_FROM} to={KEY_TO} lit={new Set(pitches)} labels="c" />
-            <Button variant="secondary" onClick={() => play(pitches)}>
-                {m.tools_hear_it()}
-            </Button>
+            <SoundingKeyboard
+                lit={pitches}
+                phrases={[{ notes: pitches, spread: true }]}
+                label={m.tools_hear_it()}
+            />
+            {/* A scale is as worth taking away as a chord, and the README and the
+                changelog both said so before this existed. The span holds it: a scale
+                from the twelfth semitone reaches an octave above, which is inside the two
+                the picture draws. */}
+            <SavePictureButton
+                from={ROOT}
+                to={ROOT + 24}
+                keys={pitches.map((note) => ({ note }))}
+                caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(tonic)))]} ${scaleName(scale)}`}
+                filename="plinky-scale"
+            />
         </Panel>
     );
 }
@@ -189,7 +209,6 @@ function ScaleExplorer() {
 function ChordExplorer() {
     const [root, setRoot] = useState("0");
     const [quality, setQuality] = useState<ChordQuality>("major");
-    const synth = useSynth();
     const pitches = chordPitches(ROOT + Number(root), quality);
     return (
         <Panel title={m.tools_chords_title()} hint={m.tools_chords_hint()}>
@@ -205,16 +224,97 @@ function ChordExplorer() {
                 onChange={setQuality}
                 options={CHORD_QUALITIES.map((id) => ({ id, label: chordName(id) }))}
             />
-            <Keyboard from={KEY_FROM} to={KEY_TO} lit={new Set(pitches)} labels="c" />
-            <Button
-                variant="secondary"
-                onClick={() => {
-                    for (const pitch of pitches) {
-                        synth.playNote(pitch, { duration: NOTE_SECONDS * 2 });
-                    }
-                }}
-            >
-                {m.tools_hear_it()}
+            <SoundingKeyboard
+                lit={pitches}
+                phrases={[{ notes: pitches }]}
+                label={m.tools_hear_it()}
+            />
+            <SavePictureButton
+                from={ROOT}
+                to={ROOT + 24}
+                keys={pitches.map((note) => ({ note }))}
+                caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(root)))]} ${chordName(quality)}`}
+                filename="plinky-chord"
+            />
+        </Panel>
+    );
+}
+
+// Two notes and the distance between them. The scale and chord panels answer "what is
+// in this?"; this one answers "how far is that?", which is the question a reader asks
+// with a finger on the page rather than on the keys.
+function IntervalFinder() {
+    const [root, setRoot] = useState("0");
+    const [interval, pickInterval] = useState<IntervalId>("perfect-fifth");
+    const from = ROOT + Number(root);
+    const to = from + semitonesOf(interval);
+    return (
+        <Panel title={m.tools_interval_title()} hint={m.tools_interval_hint()}>
+            <SegmentedControl
+                label={m.tools_root()}
+                value={root}
+                onChange={setRoot}
+                options={tonicOptions()}
+            />
+            <SegmentedControl
+                label={m.tools_interval_label()}
+                value={interval}
+                onChange={pickInterval}
+                options={INTERVAL_IDS.map((id) => ({ id, label: intervalName(id) }))}
+            />
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-body">
+                <dt className="text-muted">{m.tools_interval_lands()}</dt>
+                <dd>{NOTE_LABELS[to % 12] ?? ""}</dd>
+            </dl>
+            {/* Sounded together and then apart: an interval is a distance you can hear
+                either way round, and hearing both is how the name sticks. */}
+            <SoundingKeyboard
+                lit={[from, to]}
+                phrases={[{ notes: [from, to] }, { notes: [from, to], spread: true }]}
+                label={m.tools_hear_it()}
+            />
+        </Panel>
+    );
+}
+
+// The click on its own, away from a piece. The tempo it keeps is the one the tap tool
+// found, because tapping along to something and then playing at that speed is one
+// errand rather than two.
+const BEATS_IN_A_BAR = ["2", "3", "4", "6"];
+
+// A walking pace: fast enough to be a pulse, slow enough to play something over.
+const DEFAULT_BPM = 90;
+
+function Metronome({ bpm, onBpm }: { bpm: number; onBpm: (bpm: number) => void }) {
+    const [on, setOn] = useState(false);
+    const [beats, setBeats] = useState("4");
+    useMetronome(on, bpm, Number(beats));
+    return (
+        <Panel title={m.tools_metro_title()} hint={m.tools_metro_hint()}>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-body">
+                <label className="flex flex-1 items-center gap-3">
+                    <span className="text-muted">{m.tools_metro_tempo()}</span>
+                    <input
+                        type="range"
+                        min={MIN_BPM}
+                        max={MAX_BPM}
+                        value={bpm}
+                        onChange={(event) => onBpm(Number(event.target.value))}
+                        className="h-11 min-w-48 flex-1 accent-accent-solid"
+                    />
+                </label>
+                <span className="font-mono text-2xl tabular-nums text-body">
+                    {m.tools_tap_bpm({ bpm })}
+                </span>
+            </div>
+            <SegmentedControl
+                label={m.tools_metro_beats()}
+                value={beats}
+                onChange={setBeats}
+                options={BEATS_IN_A_BAR.map((id) => ({ id, label: id }))}
+            />
+            <Button variant={on ? "secondary" : "primary"} onClick={() => setOn((was) => !was)}>
+                {on ? m.tools_metro_stop() : m.tools_metro_start()}
             </Button>
         </Panel>
     );
@@ -223,7 +323,7 @@ function ChordExplorer() {
 // Tap along and read the tempo back. Wall-clock rather than the monotonic scheduler
 // clock: a tap is an event in the player's own time, and the reading is handed to a
 // metronome that speaks in beats a minute.
-function TapTempo() {
+function TapTempo({ onFound }: { onFound: (bpm: number) => void }) {
     const [state, setState] = useState<TapState>(NO_TAPS);
     const bpm = bpmOf(state);
     return (
@@ -231,7 +331,14 @@ function TapTempo() {
             <div className="flex flex-wrap items-center gap-3">
                 <Button
                     variant="primary"
-                    onClick={() => setState((current) => tap(current, Date.now()))}
+                    onClick={() => {
+                        const next = tap(state, Date.now());
+                        setState(next);
+                        const found = bpmOf(next);
+                        if (found !== null) {
+                            onFound(found);
+                        }
+                    }}
                 >
                     {m.tools_tap_action()}
                 </Button>
@@ -253,16 +360,39 @@ function TapTempo() {
 // tapping. Each one is a thing a player looks up mid-practice, and each is built from
 // the same engines the rest of Plinky runs on.
 export default function ToolsRoute() {
+    // The tempo the tap tool finds is the tempo the metronome should keep, so the number
+    // lives in the one place both panels can see rather than being typed in twice.
+    const [bpm, setBpm] = useState(DEFAULT_BPM);
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.tools_title()}</h1>
-                <p className="text-sm text-muted">{m.tools_intro()}</p>
-            </header>
-            <CircleOfFifths />
-            <ScaleExplorer />
-            <ChordExplorer />
-            <TapTempo />
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <PageHeader title={m.tools_title()} hint={m.tools_intro()} />
+            {/* A boundary per tool. Each one is a self-contained thing a player looks up
+                mid-practice, reading nothing the others read — so a stumble in the chord
+                arithmetic has no business taking the metronome away from somebody who
+                came for the metronome. The tap tempo and the metronome share a number and
+                so share a boundary: split, a crash in one would leave the other holding a
+                tempo whose source had vanished. */}
+            <FeatureBoundary feature="CircleOfFifths">
+                <CircleOfFifths />
+            </FeatureBoundary>
+            <FeatureBoundary feature="ScaleExplorer">
+                <ScaleExplorer />
+            </FeatureBoundary>
+            <FeatureBoundary feature="ChordExplorer">
+                <ChordExplorer />
+            </FeatureBoundary>
+            <FeatureBoundary feature="ChordChanges">
+                <Panel title={m.tools_changes_title()} hint={m.tools_changes_hint()}>
+                    <ChordChanges root={ROOT} />
+                </Panel>
+            </FeatureBoundary>
+            <FeatureBoundary feature="IntervalFinder">
+                <IntervalFinder />
+            </FeatureBoundary>
+            <FeatureBoundary feature="TapTempoAndMetronome">
+                <TapTempo onFound={setBpm} />
+                <Metronome bpm={bpm} onBpm={setBpm} />
+            </FeatureBoundary>
         </main>
     );
 }

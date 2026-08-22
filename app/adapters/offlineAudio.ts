@@ -3,7 +3,7 @@
 
 import type { RecordedNote } from "../../core/composition";
 import { LEAD_IN_MS, videoDurationMs } from "../../core/videoFrames";
-import { renderStrike } from "./webAudioEngine";
+import { renderStrike, sampleVoiceFor } from "./webAudioEngine";
 
 // Renders a take's audio deterministically for the video export: every note
 // struck into an OfflineAudioContext with the live synth's own voice, faster
@@ -26,12 +26,22 @@ export function renderTakeAudio(
     const durationS = videoDurationMs(notes) / 1000;
     const ctx = new OfflineAudioContext(2, Math.ceil(durationS * sampleRate), sampleRate);
     for (const note of notes) {
-        renderStrike(ctx, {
-            note: note.pitch,
-            gain: (note.velocity / 127) * REPLAY_GAIN,
-            duration: note.durationMs / 1000,
-            delay: (LEAD_IN_MS + note.startMs) / 1000,
-        });
+        const gain = (note.velocity / 127) * REPLAY_GAIN;
+        renderStrike(
+            ctx,
+            {
+                note: note.pitch,
+                gain,
+                velocity: note.velocity,
+                duration: note.durationMs / 1000,
+                delay: (LEAD_IN_MS + note.startMs) / 1000,
+            },
+            // Whatever the speakers would use for this note. A recording that never
+            // arrived is played by the synth here exactly as it was in the room, so an
+            // export always sounds like the take it is of — and never fails for the want
+            // of a recording.
+            sampleVoiceFor(note.pitch, note.velocity),
+        );
     }
     return ctx.startRendering();
 }

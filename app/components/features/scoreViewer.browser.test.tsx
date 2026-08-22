@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { choose, reveal, switchOn, toggle } from "../../testing/controls";
 import { testPrefsStore } from "../../testing/stores";
+import { m } from "../../paraglide/messages.js";
 import { useState } from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
@@ -114,7 +116,6 @@ describe("ScoreViewer", () => {
         );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         const toggle = await screen.findByRole("switch", { name: "Metronome" }, { timeout: 30000 });
         expect(toggle.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(toggle);
@@ -181,23 +182,22 @@ describe("ScoreViewer", () => {
         );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         // Follow-the-note is on by default; flipping it takes effect without a reload.
         const follow = await screen.findByRole("switch", { name: "Follow the note" });
         expect(follow.getAttribute("aria-checked")).toBe("true");
         fireEvent.click(follow);
         expect(follow.getAttribute("aria-checked")).toBe("false");
-        // Fingering numbers are off by default (the flipped setting); the toggle turns
-        // them on for the session.
+        // Fingering rides the reading ladder, so which way it starts is that ladder's
+        // business; what this asserts is that flipping it takes effect for the session.
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
-        expect(fingers.getAttribute("aria-checked")).toBe("false");
+        const before = fingers.getAttribute("aria-checked");
         fireEvent.click(fingers);
         await waitFor(() =>
             expect(
                 screen
                     .getByRole("switch", { name: "Finger position numbers" })
                     .getAttribute("aria-checked"),
-            ).toBe("true"),
+            ).toBe(before === "true" ? "false" : "true"),
         );
     });
 
@@ -213,15 +213,18 @@ describe("ScoreViewer", () => {
         await awaitReady();
         const score = screen.getByRole("img", { name: "T" });
         const textCount = () => score.querySelectorAll("text").length;
-        const baseline = textCount();
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
+        // Fingering starts on, with the starter rung of the reading ladder.
+        const withNumbers = textCount();
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
-        // On: the fingering digits are drawn, adding text nodes to the staff.
+        expect(fingers.getAttribute("aria-checked")).toBe("true");
+        // Off: every digit is gone, not left stranded over the reclaimed space.
         fireEvent.click(fingers);
-        await waitFor(() => expect(textCount()).toBeGreaterThan(baseline), { timeout: 30000 });
-        // Off: every one of them is gone again.
+        await waitFor(() => expect(textCount()).toBeLessThan(withNumbers), { timeout: 30000 });
+        const bare = textCount();
+        // On again: they come back, which needs the graphic model rebuilt rather than
+        // merely re-rendered.
         fireEvent.click(fingers);
-        await waitFor(() => expect(textCount()).toBe(baseline), { timeout: 30000 });
+        await waitFor(() => expect(textCount()).toBeGreaterThan(bare), { timeout: 30000 });
     });
 
     it("runs a tempo-locked play-along and reports how many notes you kept up with", async () => {
@@ -238,8 +241,8 @@ describe("ScoreViewer", () => {
         });
         // Turn on Keep up, then start — with no notes played every beat is a miss, but the
         // clock-driven run still counts in, runs to the end, and reports the tally.
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
-        fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
+        reveal(m.run_group_practice_title);
+        choose(m.run_pace_label, m.keep_up_toggle);
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         expect(
             await screen.findByText(/kept up with 0 of/i, undefined, { timeout: 30000 }),
@@ -260,12 +263,11 @@ describe("ScoreViewer", () => {
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
-        fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
-        // Draw the fingering numbers before the run, then let the run play over them.
+        reveal(m.run_group_practice_title);
+        choose(m.run_pace_label, m.keep_up_toggle);
+        // The run plays over drawn fingering numbers, which the starter rung has on.
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
-        fireEvent.click(fingers);
-        await waitFor(() => expect(fingers.getAttribute("aria-checked")).toBe("true"));
+        expect(fingers.getAttribute("aria-checked")).toBe("true");
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         // The run counts in, plays to the end and reports the tally.
         expect(
@@ -318,8 +320,8 @@ describe("ScoreViewer", () => {
         // interactive — a keep-up run bails while osmd is still null.
         await awaitReady();
         // Turn on Keep up and start the tempo-locked run.
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
-        fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
+        reveal(m.run_group_practice_title);
+        choose(m.run_pace_label, m.keep_up_toggle);
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         // The keep-up run counts in, runs to the end and reports its tally, leaving full
         // screen — the moment both result panels would coexist.
@@ -389,7 +391,7 @@ describe("ScoreViewer", () => {
         // can re-layout after its first paint (Gecko especially), so the measure boxes
         // may still be settling; a 30%-width point on a three-bar line sits in bar 1,
         // so poll the click until it lands rather than firing once.
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
+        reveal(m.run_group_practice_title);
         fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
         await waitFor(
             () => {
@@ -424,7 +426,6 @@ describe("ScoreViewer", () => {
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         const treadmill = screen.getByRole("switch", { name: "Treadmill" });
         expect(treadmill.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(treadmill);
@@ -455,7 +456,6 @@ describe("ScoreViewer", () => {
             expect(
                 (screen.getByRole("button", { name: "Practice" }) as HTMLButtonElement).disabled,
             ).toBe(false);
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         // Turning the loop on repeats the whole piece — no bar-picking needed.
         fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
         expect(screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked")).toBe(
@@ -486,7 +486,6 @@ describe("ScoreViewer", () => {
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         const barNumbers = screen.getByRole("switch", { name: "Bar numbers" });
         // On by default, matching the persisted preference.
         expect(barNumbers.getAttribute("aria-checked")).toBe("true");
@@ -523,7 +522,6 @@ describe("ScoreViewer", () => {
             );
         await ready();
         const score = screen.getByRole("img", { name: "T" });
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         const treadmill = screen.getByRole("switch", { name: "Treadmill" });
         // Each layout change rebuilds OSMD on the same container; without clearing the
         // old render its SVG would stay behind, piling up a new staff every toggle.
@@ -676,10 +674,10 @@ describe("ScoreViewer", () => {
         expect(await screen.findByText("Run saved", undefined, { timeout: 30000 })).toBeTruthy();
     });
 
-    it("enters full screen to play even on a large screen, where Listen lives", async () => {
+    it("enters full screen to play even on a large screen", async () => {
         // Force a roomy desktop viewport (no media query matches), the case that used to
-        // stay inline. The play surface holds Listen and the in-play toggles, so a large
-        // screen enters full screen to play just as a phone does.
+        // stay inline. The play surface holds the in-play toggles, so a large screen enters
+        // full screen to play just as a phone does.
         vi.stubGlobal("matchMedia", (query: string) => ({
             matches: false,
             addEventListener: () => {},
@@ -693,15 +691,41 @@ describe("ScoreViewer", () => {
         );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
-        // At rest the /play view is a single action: Listen is not inline, it waits in the
-        // full-screen top bar, and there's no exit control until play begins.
-        expect(screen.queryByRole("button", { name: "Listen" })).toBeNull();
+        // At rest the /play view offers Practice and Listen — the piece's front door, and
+        // the ordinary question of what it sounds like — but nothing to exit, because
+        // nothing has been entered.
+        expect(screen.getByRole("button", { name: "Listen" })).toBeTruthy();
         expect(screen.queryByRole("button", { name: "Exit full screen" })).toBeNull();
-        // Practice enters full screen on the large screen too, surfacing the exit control
-        // and Listen alongside it.
+        // Practice enters full screen on the large screen too, surfacing the exit control.
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         expect(await screen.findByRole("button", { name: "Exit full screen" })).toBeTruthy();
         expect(screen.getByRole("button", { name: "Listen" })).toBeTruthy();
+        reqFs.mockRestore();
+    });
+
+    it("listens from the page without opening full screen", async () => {
+        // The point of having Listen inline at all. It answers "what does this sound like?"
+        // — a question asked BEFORE committing to the playing surface, so answering it by
+        // throwing the reader into full screen would answer a different one.
+        const reqFs = vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase, { beatsPerBar: 4 });
+        await awaitReady();
+
+        fireEvent.click(screen.getByRole("button", { name: "Listen" }));
+        await expect
+            .poll(
+                () => screen.getByRole("button", { name: "Listen" }).getAttribute("aria-pressed"),
+                { timeout: 30000 },
+            )
+            .toBe("true");
+        // Playing, and still on the page: nothing asked the browser for full screen, and
+        // there is nothing to exit.
+        expect(reqFs).not.toHaveBeenCalled();
+        expect(screen.queryByRole("button", { name: "Exit full screen" })).toBeNull();
         reqFs.mockRestore();
     });
 
@@ -1155,7 +1179,6 @@ describe("ScoreViewer", () => {
             () => 0.5,
         );
         mount(grand, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         // The selector appears once OSMD reports two staves; its three options name
         // the hands. This also exercises the OSMD staff API the matcher filters on.
         expect(await screen.findByRole("tab", { name: "Right" }, { timeout: 30000 })).toBeTruthy();
@@ -1169,7 +1192,6 @@ describe("ScoreViewer", () => {
             () => 0.5,
         );
         mount(grand, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         const left = await screen.findByRole("tab", { name: "Left" }, { timeout: 30000 });
         fireEvent.click(left);
         await expect
@@ -1198,7 +1220,6 @@ describe("ScoreViewer", () => {
         // Wait until the score is interactive, then confirm the single-staff piece offers
         // no hand choice.
         await awaitReady();
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         expect(screen.queryByRole("tab", { name: "Right" })).toBeNull();
         expect(screen.queryByRole("tab", { name: "Left" })).toBeNull();
     });
@@ -1209,7 +1230,6 @@ describe("ScoreViewer", () => {
             () => 0.5,
         );
         mount(phrase, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         const loop = await screen.findByRole("switch", { name: "Loop" }, { timeout: 30000 });
         expect(loop.getAttribute("aria-checked")).toBe("false");
         expect(screen.queryByLabelText("Loop from bar")).toBeNull();
@@ -1230,7 +1250,6 @@ describe("ScoreViewer", () => {
             () => 0.5,
         );
         mount(phrase, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         fireEvent.click(await screen.findByRole("switch", { name: "Loop" }, { timeout: 30000 }));
         const from = screen.getByLabelText("Loop from bar") as HTMLInputElement;
         const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
@@ -1262,7 +1281,6 @@ describe("ScoreViewer", () => {
             timeout: 30000,
         });
         // The transpose control lives in the resting Run-setup disclosure.
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         const up = screen.getByLabelText("Transpose up a semitone");
         fireEvent.click(up);
         fireEvent.click(up);
@@ -1301,7 +1319,6 @@ describe("ScoreViewer", () => {
         await awaitReady();
         // Open Run setup (where transpose would live) and confirm it isn't there —
         // a locked-tempo challenge must stay in the written key for everyone.
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         expect(screen.queryByText("Transpose")).toBeNull();
     });
 
@@ -1318,7 +1335,6 @@ describe("ScoreViewer", () => {
             );
             mount(phrase, { beatsPerBar: 4 });
             await awaitReady();
-            fireEvent.click(screen.getByText("Set up your run"));
             fireEvent.click(screen.getByRole("switch", { name: "Sight-read this piece" }));
             await awaitReady();
         };
@@ -1330,16 +1346,53 @@ describe("ScoreViewer", () => {
             );
             mount(phrase, { beatsPerBar: 4 });
             await awaitReady();
-            fireEvent.click(screen.getByText("Set up your run"));
 
-            expect(screen.queryByText("Time to study")).toBeNull();
-            fireEvent.click(screen.getByRole("switch", { name: "Sight-read this piece" }));
+            reveal(m.run_group_practice_title);
+            expect(screen.queryByText(m.sight_read_study())).toBeNull();
+            fireEvent.click(screen.getByRole("switch", { name: m.sight_read() }));
 
-            expect(screen.getByText("Time to study")).toBeTruthy();
-            expect(screen.getByText("Tempo")).toBeTruthy();
+            expect(screen.getByText(m.sight_read_study())).toBeTruthy();
+            // The pace lives in "How you play", one control for the whole run, rather
+            // than a second copy inside this block writing the same state.
+            expect(screen.getAllByText(m.run_pace_label())).toHaveLength(1);
             // The read-ahead drill needs your own progress through the score, so it is
             // offered only while the run waits for you.
-            expect(screen.getByRole("switch", { name: "Bars disappear behind you" })).toBeTruthy();
+            expect(screen.getByRole("switch", { name: m.sight_read_vanish() })).toBeTruthy();
+        });
+
+        it("shows every reading aid off while the mode is on, from one decision", async () => {
+            // Sight-reading is defined as the top rung of the skill ladder — no aids at
+            // all — and `sightRead.aids` is where that is decided, once, for the run AND
+            // for what the panel shows. Each switch used to override itself, so an aid
+            // added to the ladder and forgotten in the panel would read as on while the
+            // run read without it. Asserted over the whole set, so a new aid that misses
+            // this fails here rather than silently.
+            const phrase = generateDrill(
+                { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+                () => 0.5,
+            );
+            mount(phrase, { beatsPerBar: 4 });
+            await awaitReady();
+
+            reveal(m.run_group_practice_title);
+            reveal(m.run_group_sheet_title);
+            const aidSwitches = [m.forgiving_toggle, m.color_notes_toggle, m.highway_toggle];
+            // Every one of them on first, or the assertion below would pass over a panel
+            // that had them off anyway.
+            for (const label of aidSwitches) {
+                if (!switchOn(label)) {
+                    toggle(label);
+                }
+                expect(switchOn(label)).toBe(true);
+            }
+
+            fireEvent.click(screen.getByRole("switch", { name: m.sight_read() }));
+            for (const label of aidSwitches) {
+                expect(switchOn(label)).toBe(false);
+                expect(screen.getByRole("switch", { name: label() }).hasAttribute("disabled")).toBe(
+                    true,
+                );
+            }
         });
 
         it("studies the piece before the run rather than starting one", async () => {
@@ -1453,7 +1506,6 @@ describe("ScoreViewer", () => {
         const openSetup = async () => {
             mount(fourBars(), { beatsPerBar: 4 });
             await awaitReady();
-            fireEvent.click(screen.getByText("Set up your run"));
         };
 
         it("offers nothing to focus until there is a loop to focus on", async () => {

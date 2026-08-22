@@ -128,11 +128,12 @@ export function ComposeStage({
                         <p className="pt-3 text-xs text-muted">{m.compose_sketch_note()}</p>
                     )}
                 </div>
-                {/* The keys live in full screen only — the same surface play grants
-                    a run — and only while shown, so hiding them leaves no stray row. */}
-                {fullscreen && !hideKeyboard && (
-                    <PianoKeyboard from={keyWindow.from} to={keyWindow.to} />
-                )}
+                {/* The keys are always here. A phone has no MIDI socket and no computer
+                    keyboard, so without them the page offers a touch visitor no way to
+                    make a sound at all — and the page's own opening line promises "the
+                    keys below". Full screen gives them the width; resting, they sit under
+                    the sketch as the invitation the home page makes with the same keys. */}
+                {!hideKeyboard && <PianoKeyboard from={keyWindow.from} to={keyWindow.to} />}
             </section>
         </FullscreenProvider>
     );

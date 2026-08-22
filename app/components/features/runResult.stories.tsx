@@ -3,13 +3,12 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { Grade } from "../../../core/grade";
-import type { Grid, RunNote } from "../../../core/shareCard";
+import type { RunNote } from "../../../core/shareCard";
 import { RunResult } from "./runResult";
 
 // Purely presentational: every readout derives from the pinned run handed in, so a
 // story is just a hand-written run — no stores, no clock.
 const meta: Meta<typeof RunResult> = {
-    title: "Features/RunResult",
     component: RunResult,
 };
 export default meta;
@@ -56,22 +55,13 @@ const mixedGrade: Grade = {
     letter: "C",
 };
 
-const goodGrid: Grid = [["best", "best", "good", "best", "good", "best"]];
-
-const mixedGrid: Grid = [
-    ["best", "good", "good", "best", "good", "good"],
-    ["ok", "weak", "ok", "weak", "weak", "none"],
-];
-
 export const CleanRun: Story = {
     args: {
         grade: goodGrade,
         notes: singleHand,
         tolerance: 1,
-        grid: goodGrid,
         tempoCurve: null,
         tempoScale: 1,
-        title: "Ode to Joy",
         runSaved: "idle",
         onSaveTake: () => {},
     },
@@ -82,7 +72,6 @@ export const TwoHandDaily: Story = {
         grade: mixedGrade,
         notes: twoHands,
         tolerance: 1,
-        grid: mixedGrid,
         tempoCurve: {
             points: Array.from({ length: 14 }, (_, i) => ({
                 index: i + 1,
@@ -92,8 +81,6 @@ export const TwoHandDaily: Story = {
             hotspots: [{ startIndex: 7, endIndex: 9 }],
         },
         tempoScale: 1,
-        daily: 42,
-        title: "Minuet in G",
         runSaved: "saved",
         onSaveTake: () => {},
     },
@@ -104,10 +91,8 @@ export const SaveFailed: Story = {
         grade: goodGrade,
         notes: singleHand,
         tolerance: 1,
-        grid: goodGrid,
         tempoCurve: null,
         tempoScale: 1,
-        title: "Ode to Joy",
         runSaved: "failed",
         onSaveTake: () => {},
     },

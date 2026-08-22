@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { holdScaleFor } from "../../../core/midi";
-import { useMidiConnection, useMidiInput } from "../../contexts/midi";
+import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
 import { Keyboard } from "../ui/keyboard";
+import { ChordReadout } from "./chordReadout";
 import { MidiBadge } from "./midiBadge";
 
 // One octave, C4–C5 — enough to be unmistakably a piano, small enough to sit on a
@@ -27,7 +28,8 @@ export function HeroKeyboard() {
     const theme = useKeyboardTheme();
     // The shared input funnel: touch taps and a connected MIDI keyboard both flow through
     // it, and heldNotes is the single source of truth for which keys are down (and lit).
-    const { heldNotes, pressKey, releaseKey } = useMidiConnection();
+    const { pressKey, releaseKey } = useMidiConnection();
+    const heldNotes = useHeldNotes();
 
     // Sound the app's own piano voice for whatever the funnel reports — a live voice on
     // note-on, released on note-off — so the hold shapes the sound exactly as it does in
@@ -43,17 +45,24 @@ export function HeroKeyboard() {
     // on. A MIDI note held then is genuinely still down and left to its device's note-off.
 
     return (
-        <Keyboard
-            from={FROM}
-            to={TO}
-            lit={new Set(heldNotes)}
-            rise
-            labels={labels}
-            well="mx-auto w-full max-w-md"
-            theme={theme}
-            badge={<MidiBadge />}
-            onPress={pressKey}
-            onRelease={releaseKey}
-        />
+        <>
+            <Keyboard
+                from={FROM}
+                to={TO}
+                lit={new Set(heldNotes)}
+                rise
+                labels={labels}
+                well="mx-auto w-full max-w-md"
+                theme={theme}
+                badge={<MidiBadge />}
+                onPress={pressKey}
+                onRelease={releaseKey}
+            />
+            {/* What the hands are holding, named as they hold it. The keyboard is already
+                here to be pressed for its own sake; saying what came out turns idle
+                noodling into the one lesson nobody can look up — you cannot search for a
+                sound you have no name for. */}
+            <ChordReadout notes={heldNotes} />
+        </>
     );
 }

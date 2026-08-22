@@ -86,6 +86,29 @@ describe("ExportMenu", () => {
         expect(screen.getByText(/MuseScore/)).toBeTruthy();
     });
 
+    it("closes on a press elsewhere and on Escape", () => {
+        // Reported: the menu could only be dismissed by pressing Export again, so a player
+        // who opened it and changed their mind had to hunt for the one control that shut it
+        // while every stray press landed on the page behind it.
+        openMenu();
+        expect(screen.getByText(/GarageBand/)).toBeTruthy();
+        fireEvent.pointerDown(document.body);
+        expect(screen.queryByText(/GarageBand/)).toBeNull();
+
+        fireEvent.click(screen.getByRole("button", { name: "Export" }));
+        expect(screen.getByText(/GarageBand/)).toBeTruthy();
+        fireEvent.keyDown(document, { key: "Escape" });
+        expect(screen.queryByText(/GarageBand/)).toBeNull();
+    });
+
+    it("does not close on a press inside itself", () => {
+        // The panel is what the menu is for. Shutting on its own contents would make every
+        // option unreachable.
+        openMenu();
+        fireEvent.pointerDown(screen.getByText(/GarageBand/));
+        expect(screen.getByText(/GarageBand/)).toBeTruthy();
+    });
+
     it("downloads a .mid file named from the title, then closes", async () => {
         openMenu();
         fireEvent.click(screen.getByRole("button", { name: /Export MIDI/ }));

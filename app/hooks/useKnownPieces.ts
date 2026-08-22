@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useMemo, useState } from "react";
+import { encodeIncipit, readIncipit } from "../../core/incipit";
 import { useServices } from "../contexts/services";
 import { loadCatalog } from "../lib/catalog";
 
@@ -15,11 +16,16 @@ export type KnownPieces = {
     ready: boolean;
     isMissing(id: string): boolean;
     titleOf(id: string): string | null;
+    // The piece's opening bars, encoded, where the catalogue carries them — so a list
+    // of pieces can draw each one without asking the network for anything. Undefined
+    // for a piece with no mark, which a caller shows as a plain row.
+    incipitOf(id: string): string | undefined;
 };
 
 export function useKnownPieces(): KnownPieces {
-    const { store, songs, exercises } = useServices();
+    const { store, songs, exercises, xml } = useServices();
     const [titles, setTitles] = useState<Map<string, string> | null>(null);
+    const [marks, setMarks] = useState<Map<string, string>>(new Map());
     useEffect(() => {
         let cancelled = false;
         Promise.all([exercises.manifest(), songs.manifest()]).then(([exerciseList, songList]) => {
@@ -33,23 +39,43 @@ export function useKnownPieces(): KnownPieces {
                 return;
             }
             const map = new Map<string, string>();
-            for (const piece of [...loadCatalog(store), ...exerciseList, ...songList]) {
+            const found = new Map<string, string>();
+            const local = loadCatalog(store);
+            for (const piece of [...local, ...exerciseList, ...songList]) {
                 if (!map.has(piece.id)) {
                     map.set(piece.id, piece.title);
                 }
+                // The catalogue bakes a mark per piece (dev/bake-incipits); an exercise
+                // manifest carries none, and a local score has its notation right here,
+                // so it is read rather than looked up.
+                const baked = "incipit" in piece ? piece.incipit : undefined;
+                if (typeof baked === "string" && !found.has(piece.id)) {
+                    found.set(piece.id, baked);
+                }
+            }
+            for (const score of local) {
+                if (found.has(score.id)) {
+                    continue;
+                }
+                const opening = readIncipit(xml, score.xml);
+                if (opening) {
+                    found.set(score.id, encodeIncipit(opening));
+                }
             }
             setTitles(map);
+            setMarks(found);
         });
         return () => {
             cancelled = true;
         };
-    }, [store, songs, exercises]);
+    }, [store, songs, exercises, xml]);
     return useMemo(
         () => ({
             ready: titles !== null,
             isMissing: (id: string) => titles !== null && !titles.has(id),
             titleOf: (id: string) => titles?.get(id) ?? null,
+            incipitOf: (id: string) => marks.get(id),
         }),
-        [titles],
+        [titles, marks],
     );
 }

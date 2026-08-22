@@ -6,6 +6,7 @@ import {
     useCallback,
     useContext,
     useEffect,
+    useMemo,
     useRef,
     useState,
     type ReactNode,
@@ -17,7 +18,6 @@ import {
     ON_SCREEN_DEVICE,
     isFocusGatedInput,
     keyToNote,
-    MAX_EVENTS,
     MAX_OCTAVE_OFFSET,
     MIN_OCTAVE_OFFSET,
     noteName,
@@ -85,11 +85,8 @@ type MidiContextValue = {
     status: MidiStatus;
     error: string | null;
     devices: MidiDevice[];
-    events: MidiNoteEvent[];
-    heldNotes: number[];
     octaveOffset: number;
     requestAccess: () => void;
-    clearEvents: () => void;
     subscribe: (listener: NoteListener) => () => void;
     // Play a note from the on-screen keyboard through the same funnel as MIDI.
     pressKey: (note: number, velocity?: number) => void;
@@ -124,6 +121,14 @@ const MidiContext = createContext<MidiContextValue | null>(null);
 
 // A single connection shared across the whole app: connecting once persists
 // across route changes, and the computer-keyboard fallback is always live.
+// The keys down right now, changing on every note. Separate from the connection context
+// so that reading one does not mean re-rendering for the other.
+const MidiHeldContext = createContext<number[]>([]);
+
+export function useHeldNotes(): number[] {
+    return useContext(MidiHeldContext);
+}
+
 export function MidiProvider({ children }: { children: ReactNode }) {
     // Injected capabilities: the MIDI seam itself, and the store the dev reset
     // bridge wipes — the provider renders inside ServicesProvider, so overrides
@@ -134,7 +139,6 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
     const [devices, setDevices] = useState<MidiDevice[]>([]);
-    const [events, setEvents] = useState<MidiNoteEvent[]>([]);
     const [heldNotes, setHeldNotes] = useState<number[]>([]);
     const [octaveOffset, setOctaveOffset] = useState(0);
 
@@ -217,7 +221,6 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 timestamp,
             };
 
-            setEvents((prev) => [noteEvent, ...prev].slice(0, MAX_EVENTS));
             setHeldNotes((prev) => {
                 if (kind === "noteon") {
                     return prev.includes(note) ? prev : [...prev, note].sort((a, b) => a - b);
@@ -612,8 +615,6 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         };
     }, [midi, requestAccess]);
 
-    const clearEvents = useCallback(() => setEvents([]), []);
-
     // Computer-keyboard fallback. The active octave and the key→note map are kept in
     // refs so the listeners stay stable while still reading the latest values; the map
     // is refreshed when Settings saves a remap, so a new layout takes effect at once.
@@ -749,30 +750,61 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         };
     }, []);
 
-    const value: MidiContextValue = {
-        support,
-        status,
-        error,
-        devices,
-        events,
-        heldNotes,
-        octaveOffset,
-        requestAccess,
-        clearEvents,
-        subscribe,
-        pressKey,
-        releaseKey,
-        pedalHeld,
-        echoNote,
-        silenceEcho,
-        keyLights: keyLights.current,
-        micStatus,
-        startMic,
-        stopMic,
-        startCalibration,
-    };
+    // Everything that does not move when a key goes down, held stable so that pressing one
+    // does not re-render every component that merely listens for notes.
+    //
+    // The keys currently down are their own context. They change on every note-on and
+    // note-off, and while they lived in this object so did every consumer's render: the
+    // play session reads five things from here, none of which a keypress touches, and was
+    // re-rendering on each one anyway. Four components light keys and genuinely want the
+    // per-note update; they take it from the held-notes context and nobody else pays.
+    const lights = keyLights.current;
+    const value: MidiContextValue = useMemo(
+        () => ({
+            support,
+            status,
+            error,
+            devices,
+            octaveOffset,
+            requestAccess,
+            subscribe,
+            pressKey,
+            releaseKey,
+            pedalHeld,
+            echoNote,
+            silenceEcho,
+            keyLights: lights,
+            micStatus,
+            startMic,
+            stopMic,
+            startCalibration,
+        }),
+        [
+            lights,
+            support,
+            status,
+            error,
+            devices,
+            octaveOffset,
+            requestAccess,
+            subscribe,
+            pressKey,
+            releaseKey,
+            pedalHeld,
+            echoNote,
+            silenceEcho,
+            micStatus,
+            startMic,
+            stopMic,
+            startCalibration,
+        ],
+    );
 
-    return <MidiContext.Provider value={value}>{children}</MidiContext.Provider>;
+    return (
+        <MidiContext.Provider value={value}>
+            <MidiHeldContext.Provider value={heldNotes}>{children}</MidiHeldContext.Provider>
+        </MidiContext.Provider>
+    );
 }
 
 function useMidiContext(): MidiContextValue {

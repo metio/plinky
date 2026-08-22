@@ -43,6 +43,7 @@ not return without meeting the argument.
 - [Capability: artist pages](#capability-artist-pages)
 - [Capability: daily comparison](#capability-daily-comparison)
 - [Capability: progress vault](#capability-progress-vault)
+- [Capability: the recorded piano](#capability-the-recorded-piano)
 - [Declined: ranked competition](#declined-ranked-competition)
 - [Deferred: the artist marketplace](#deferred-the-artist-marketplace)
 - [Data model](#data-model)
@@ -590,7 +591,7 @@ saying so. What it removes is the transcription step.
 around 8 KB. A real MusicXML file exceeds that, and a submitter needs a GitHub
 account.
 
-**Flow.** The submitter uses the existing `/library/import` surface, which already
+**Flow.** The submitter uses the existing `/music/import` surface, which already
 parses and previews the score locally. On submit, the client posts the metadata
 and the compressed score in one request. The worker validates size and metadata,
 writes the object through its R2 binding, and records a pending row. A maintainer
@@ -972,6 +973,118 @@ language, what leaves the device.
 supported way to move a device and the supported way to recover. The vault is a
 convenience layered on top of it, and it is designed so that its worst failure
 costs a player nothing they still hold locally.
+
+## Capability: the recorded piano
+
+**Live as of 2026-08-16, and not a backend.** The recorded grand piano is static bytes on
+object storage, no Worker, no state, no identity — the first thing Plinky serves from
+anywhere but its own origin. It is recorded here because it is the first non-Pages origin
+and because the next person to add one should find the reasoning.
+
+The instrument is the Salamander Grand Piano V3 by Alexander Holm, CC-BY-3.0: 29 sampled
+keys on a minor-third grid, sixteen velocity layers each, plus key-off noises and string
+resonances. Encoded to Opus at 96 kb/s it is 621 files and about 82 MB — and **nobody
+downloads that.** Each recording is its own URL, a piece asks for a couple of dozen of
+them, and the app knows which before it plays a note, so the cost that matters is a
+session. Measured across the catalogue, grade 1 to grade 8:
+
+| what | files | fetched |
+| --- | --- | --- |
+| a first study | 3 | 0.4 MB |
+| a grade 4 piece | 15 | 2.9 MB |
+| a grade 8 piece | 24 | 4.2 MB |
+| sixteen pieces, every grade | — | **4.8 MB in total** |
+
+The curve flattens almost at once, because pieces reuse the same recordings. That is why
+there is no download button, no progress bar and no quality tier: the instrument arrives
+while somebody plays, and a recording that has not arrived is a note the synthesised voice
+plays. **A note-on never waits** — the port's `bufferFor` is synchronous and answers null,
+which is what makes all of the above safe.
+
+### The bucket
+
+An R2 bucket, `plinky-samples`, published read-only at `samples.plinky.fun`. R2 has no
+egress charge, which is the whole reason it is R2 rather than anything else: this is a
+read-mostly pile of immutable audio served to browsers.
+
+The path carries a version — `/v1/…` — and **a published version is immutable**. Every
+recording is cached by URL on the player's device; a re-encode under an unchanged name is
+the one change a cache cannot notice. A new encoding is `/v2/`, and the client's base URL
+moves with it.
+
+Setting it up, once:
+
+1. **Create the bucket.** Cloudflare dashboard → R2 → *Create bucket*, named
+   `plinky-samples`, in the automatic location. Leave it private for now.
+2. **Build the pack**, with the library unpacked somewhere outside the repository:
+   `npm run piano:build -- --library <dir> --out piano-pack`. It writes
+   `piano-pack/v1/` — 621 `.opus` files, a `manifest.json` carrying the licence, and a
+   `README.txt` beside it with the credit and the byte count.
+3. **Upload it** under the same `v1/` prefix. The dashboard refuses more than a hundred
+   files at a time and a pack is six hundred, so `npm run piano:upload -- --bucket
+   plinky-samples` drives wrangler once per object, eight at a time, and remembers what
+   landed so a dropped connection costs only the rest. It needs `CLOUDFLARE_ACCOUNT_ID`
+   and `CLOUDFLARE_API_TOKEN` in the environment — an R2 token with object read/write on
+   this bucket alone — and never takes them as arguments, because a token on a command
+   line ends up in shell history.
+
+   By hand it is `npx wrangler r2 object put plinky-samples/v1/<name> --file <path>
+   --remote`. **`--remote` is not optional**: without it wrangler writes to a local
+   simulator and reports success. Upload `manifest.json` **last** — while it is absent the
+   app has no pack at all, which is a better half-uploaded state than a manifest naming
+   recordings that have not arrived. Serve the audio as `audio/ogg` and everything with
+   `cache-control: public, max-age=31536000, immutable`.
+4. **Give it a domain.** Bucket → *Settings* → *Public access* → *Custom domain* →
+   `samples.plinky.fun`. Cloudflare adds the DNS record itself when the zone is on the
+   same account. Do **not** enable the `r2.dev` public URL: it is rate-limited and its
+   hostname would end up in a cache somewhere.
+5. **Allow the app to read it.** Bucket → *Settings* → *CORS policy*: `GET` and `HEAD`
+   from `https://plinky.fun` and the preview origin, no credentials. Without this the
+   fetches fail as CORS errors even though the objects are public.
+6. **Cache it hard.** A Cache Rule on `samples.plinky.fun/*` with an edge TTL of a year
+   and *Respect origin* off. The bytes are immutable by construction, so nothing here can
+   go stale. Objects uploaded through the dashboard carry no `cache-control` of their own
+   — `npm run piano:upload` sets one, the dashboard does not — so without the rule every
+   recording is revalidated on each visit. It still works, because the app keeps its own
+   copy in Cache Storage; it is just paid for twice.
+
+Then **check it**: `npm run piano:verify` asks the origin about every object the manifest
+names, compares each size with what was built, and reads the headers a browser will need.
+An upload of six hundred objects fails partially and quietly — a few time out, the manifest
+lands anyway, and the app plays a synthesised note wherever a recording is missing, which
+sounds like nothing being wrong.
+
+Nothing in CI touches the bucket. The pack is built and uploaded by hand when the
+instrument changes, which — for a library published in 2016 — is close to never.
+
+### Checking it works
+
+Three checks, at three levels, because this feature failed at a level none of the others
+could see. `npm run piano:verify` asks the origin about every object the manifest names —
+an upload of six hundred objects fails partially and quietly. `scoreViewer.samples.browser`
+mounts a piece against a **cold** sample source (enabled, no manifest, nothing decoded —
+the state after any page load) and asserts it asks for its own recordings; a warm fixture
+passes whether the prefetch works or not, which is what made the hole easy to leave. And
+`npm run piano:smoke -- --base <url>` drives a real deployment: turns the switch on, opens
+a piece on a fresh load, and fails if no recordings are fetched or a CORS error appears.
+
+The smoke check is not a CI gate. It needs a deployment, an origin and a bucket, and a gate
+depending on three live things cries wolf. Run it after deploying, and after touching
+anything about where the recordings come from — the bucket's CORS, the custom domain, the
+base URL, the prefetch.
+
+**The failure it exists for:** `prepare()` once took recordings rather than notes, so a
+caller had to resolve them through the manifest first; the manifest only ever lives in
+memory; and so on every page load the prefetch waited for something only it would have
+fetched. Every unit test passed. The feature was inert in production and nothing in the
+suite could tell.
+
+### What is owed
+
+CC-BY means the credit is a condition, not a courtesy. `manifest.json` carries the
+instrument, the author, the licence and the source; `core/sampledPiano.ts` renders it, and
+Settings shows it under the switch whenever the recorded piano is on. A pack that travels
+without its licence is a pack that cannot ship.
 
 ## Declined: ranked competition
 
@@ -1625,7 +1738,7 @@ backend dependency and can ship at any time, including before phase 0. Only edit
 a profile without a maintainer needs the backend, and that rides the submission
 queue rather than an endpoint of its own.
 
-Exit criteria: a submission travels from `/library/import` through review to a
+Exit criteria: a submission travels from `/music/import` through review to a
 pull request without the submitter holding a GitHub account; fingerprinting runs
 in Actions rather than in a Worker; orphaned uploads are collected within 24
 hours; an artist edits their own links through a capability link and cannot touch
@@ -1726,7 +1839,7 @@ is to be the thing a future session reads instead of re-deriving the design.
 **Update it in the same change that contradicts it.** A pull request that changes
 an endpoint, a schema, a limit or an invariant updates the relevant section in the
 same commit. This is the same rule the repository already applies to `README.md`
-and `NEWS.md`, for the same reason: unwritten at the time means unwritten for
+and `changelog.yaml`, for the same reason: unwritten at the time means unwritten for
 good. `CLAUDE.md` carries it as a standing convention so that it reaches a session
 that never opens this file.
 
@@ -1756,5 +1869,5 @@ moves to [Decisions](#decisions) with its answer and its reasoning, and is remov
 from the list. A question list that only grows is a list nobody reads.
 
 **Nothing here is user-facing.** This document describes internal design. Player-visible
-changes belong in `NEWS.md` and `README.md` as they ship, in the voice `VOICE.md`
+changes belong in `changelog.yaml` and `README.md` as they ship, in the voice `VOICE.md`
 sets, and no part of this document's phrasing should reach the interface.

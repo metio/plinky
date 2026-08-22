@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import type { AudioEngine } from "../ports/audioEngine";
+import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
-import { renderWithServices } from "../testing/renderWithServices";
+import { m } from "../paraglide/messages.js";
 import Home from "./home";
 
 afterEach(() => {
@@ -27,57 +26,37 @@ function renderHome() {
 }
 
 describe("Home", () => {
-    it("offers the destination cards, and not the daily (it lives in the Today panel)", () => {
+    it("leads with the day rather than with a pitch", async () => {
         renderHome();
-        for (const label of ["Library →", "Assignments →", "Compose →", "Ear training →"]) {
-            expect(screen.getByText(label)).toBeTruthy();
-        }
-        // The daily is in the Today panel, so it is deliberately not a card of its own.
-        expect(screen.queryByText("Daily challenge →")).toBeNull();
+        // The day's own session owns the heading, since only the reader's clock knows
+        // which day it is. It arrives naming the weekday and the part of it.
+        const heading = await screen.findByRole("heading", { level: 1 });
+        expect(heading.textContent).toBeTruthy();
+        expect(screen.queryByRole("heading", { level: 1, name: m.home_heading() })).toBeNull();
     });
 
-    it("plinks a rising note on mouse hover over the feature cards, but not on touch", () => {
-        const strike = vi.fn();
-        const audio: AudioEngine = {
-            now: () => 0,
-            running: () => true,
-            resume: () => {},
-            unlock: () => {},
-            strike,
-            press: () => {},
-            release: () => {},
-            setPedal: () => {},
-            allNotesOff: () => {},
-            click: () => {},
-        };
-        renderWithServices(
-            <MemoryRouter>
-                <MidiProvider>
-                    <Home />
-                </MidiProvider>
-            </MemoryRouter>,
-            { audio },
-        );
-
-        const card = screen.getByText("Library →").closest("a") as HTMLElement;
-        fireEvent.pointerEnter(card, { pointerType: "mouse" });
-        expect(strike).toHaveBeenCalledTimes(1);
-        expect(strike.mock.calls[0]?.[0]?.note).toBe(60);
-
-        // A tap fires pointerenter too; it must stay silent so touch browsing
-        // doesn't read as phantom key presses.
-        fireEvent.pointerEnter(card, { pointerType: "touch" });
-        expect(strike).toHaveBeenCalledTimes(1);
+    it("keeps the introduction in the document for a first visit", () => {
+        renderHome();
+        // Prerendered, so a crawler and a stranger both read it. The pre-paint
+        // bootstrap hides it on a device that has played, which is a class on
+        // <html> rather than a different tree — so it is always rendered here.
+        expect(screen.getByText(m.home_heading())).toBeTruthy();
+        expect(screen.getByText(m.home_eyebrow())).toBeTruthy();
     });
 
-    it("routes into the library and the assignments", () => {
+    it("leaves the keyboard to the warm-up rather than the pitch", () => {
         renderHome();
-        // Links are localized; the test setup pins the locale to the base.
-        expect(screen.getByText("Library →").closest("a")?.getAttribute("href")).toBe(
-            "/en/library/",
-        );
-        expect(screen.getByText("Assignments →").closest("a")?.getAttribute("href")).toBe(
-            "/en/assignments/",
-        );
+        // Somewhere to put your hands belongs to the day's practice, where it is the
+        // first thing asked of them — not to the paragraph explaining what Plinky is.
+        expect(screen.queryByText(m.home_keyboard_hint())).toBeNull();
+    });
+
+    it("sends browsing to the two hubs instead of listing destinations itself", () => {
+        renderHome();
+        // The destination cards moved onto Music and Learn: a page that suggests
+        // four times over has decided nothing for the reader.
+        expect(screen.queryByText(`${m.home_assignments()} →`)).toBeNull();
+        expect(screen.queryByText(`${m.play_compose()} →`)).toBeNull();
+        expect(screen.queryByText(`${m.ear_title()} →`)).toBeNull();
     });
 });

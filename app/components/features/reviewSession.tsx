@@ -14,6 +14,8 @@ import { m } from "../../paraglide/messages.js";
 import { EarSession } from "./earSession";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { ScoreViewer } from "./scoreViewer";
+import { PageHeader } from "../ui/pageHeader";
+import { EmptyState } from "../ui/emptyState";
 
 const BACK = `text-sm ${linkClasses}`;
 
@@ -76,30 +78,30 @@ export function ReviewSession() {
     // Landing here early should reward the curiosity, not dead-end it.
     if (total === 0) {
         return (
-            <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-                <h1 className="text-2xl font-semibold">{m.review_heading()}</h1>
-                <p className="text-sm text-muted">{m.review_empty()}</p>
-                <p className="text-sm text-muted">{m.refresh_why()}</p>
-                <div className="flex flex-wrap items-center gap-4">
-                    <Link to="/library" className={BACK}>
+            <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+                <PageHeader title={m.review_heading()} hint={m.review_empty()} />
+                <EmptyState body={m.refresh_why()}>
+                    <Link to="/music" className={BACK}>
                         {m.today_browse()}
                     </Link>
-                    <Link to="/you" className={BACK}>
+                    <Link to="/stats" className={BACK}>
                         {m.review_back()}
                     </Link>
-                </div>
+                </EmptyState>
             </main>
         );
     }
 
     if (done) {
         return (
-            <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-                <h1 className="text-2xl font-semibold">🎉 {m.review_complete_heading()}</h1>
+            <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                    🎉 {m.review_complete_heading()}
+                </h1>
                 <p className="text-sm text-muted">
                     {m.review_complete_summary({ refreshed, shelved })}
                 </p>
-                <Link to="/you" className={BACK}>
+                <Link to="/stats" className={BACK}>
                     {m.review_back()}
                 </Link>
             </main>
@@ -135,10 +137,12 @@ export function ReviewSession() {
     const ear = current?.kind === "ear" ? earItemById(current.id) : undefined;
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-2">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h1 className="text-2xl font-semibold">{m.review_heading()}</h1>
+                    <h1 className="font-display text-3xl font-semibold tracking-tight">
+                        {m.review_heading()}
+                    </h1>
                     <span className="text-sm tabular-nums text-muted">
                         {m.review_progress({ index: index + 1, total })}
                     </span>
@@ -187,7 +191,7 @@ export function ReviewSession() {
                 <Button variant="ghost" onClick={shelve}>
                     {m.review_shelve()}
                 </Button>
-                <Link to="/you" className={`${BACK} ml-auto`}>
+                <Link to="/stats" className={`${BACK} ml-auto`}>
                     {m.review_end()}
                 </Link>
             </div>

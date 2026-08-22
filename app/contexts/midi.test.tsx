@@ -10,7 +10,7 @@ import { type FakeMidi, fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { memoryStore } from "../adapters/memoryStore";
 import { ON_SCREEN_DEVICE } from "../../core/midi";
 import { ServicesProvider } from "./services";
-import { MidiProvider, useMidiConnection, useMidiInput } from "./midi";
+import { MidiProvider, useMidiConnection, useMidiInput, useHeldNotes } from "./midi";
 
 // The provider takes its MIDI seam injected, so the whole flow — support probe,
 // permission resume, request, hot-plug, messages — runs against the fake with
@@ -25,13 +25,17 @@ const wrapperWith = (midi: FakeMidi) => {
     );
 };
 
+// The keys down live in their own context now, so a test that wants both reads both. The
+// split is the point: pressing a key re-renders what lights keys, and nothing else.
+const useMidiState = () => ({ ...useMidiConnection(), heldNotes: useHeldNotes() });
+
 afterEach(cleanup);
 
 describe("MidiProvider", () => {
     it("connects, lists devices, and wires the input handler", async () => {
         const input = fakeMidiInput({ id: "in-1", name: "Test Piano", manufacturer: "Acme" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         expect(result.current.support).toBe("supported");
 
         await act(async () => {
@@ -47,7 +51,7 @@ describe("MidiProvider", () => {
 
     it("reports a denied request", async () => {
         const midi = fakeMidi({ rejectWith: "denied" });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -57,7 +61,7 @@ describe("MidiProvider", () => {
     it("reports an unsupported platform without ever requesting", async () => {
         const midi = fakeMidi({ supported: false });
         const request = vi.spyOn(midi, "request");
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         expect(result.current.support).toBe("unsupported");
         await act(async () => {
             result.current.requestAccess();
@@ -68,21 +72,21 @@ describe("MidiProvider", () => {
 
     it("silently resumes a previously granted connection on mount", async () => {
         const midi = fakeMidi({ permission: "granted" });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await waitFor(() => expect(result.current.status).toBe("ready"));
     });
 
     it("never prompts while permission is still undecided", async () => {
         const midi = fakeMidi({ permission: "prompt" });
         const request = vi.spyOn(midi, "request");
-        renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {});
         expect(request).not.toHaveBeenCalled();
     });
 
     it("refreshes the device list on a hot-plug and closes the connection on unmount", async () => {
         const midi = fakeMidi({ inputs: [] });
-        const { result, unmount } = renderHook(() => useMidiConnection(), {
+        const { result, unmount } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(midi),
         });
         await act(async () => {
@@ -101,7 +105,7 @@ describe("MidiProvider", () => {
     it("releases a held note when its device disconnects, so nothing sticks on", async () => {
         const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -119,7 +123,7 @@ describe("MidiProvider", () => {
     it("releases a held note when its device flips to disconnected without leaving the list", async () => {
         const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -139,7 +143,7 @@ describe("MidiProvider", () => {
         const piano = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
         const pad = fakeMidiInput({ id: "in-2", name: "Drum Pad" });
         const midi = fakeMidi({ inputs: [piano, pad] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -161,7 +165,7 @@ describe("MidiProvider", () => {
     it("does not cut a held MIDI note short when the window loses focus", async () => {
         const input = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -176,7 +180,7 @@ describe("MidiProvider", () => {
     it("releases the device's held notes on an all-notes-off control change", async () => {
         const input = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -197,7 +201,7 @@ describe("MidiProvider", () => {
         const ons: number[] = [];
         const offs: number[] = [];
         const useProbe = () => {
-            const c = useMidiConnection();
+            const c = useMidiState();
             useMidiInput({
                 onNoteOn: (e) => ons.push(e.note),
                 onNoteOff: (e) => offs.push(e.note),
@@ -228,7 +232,7 @@ describe("MidiProvider", () => {
     });
 
     it("plays from the computer keyboard and shifts the octave", () => {
-        const { result } = renderHook(() => useMidiConnection(), {
+        const { result } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z" })));
@@ -241,7 +245,7 @@ describe("MidiProvider", () => {
     });
 
     it("releases keys still held when the window loses focus", () => {
-        const { result } = renderHook(() => useMidiConnection(), {
+        const { result } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z" })));
@@ -253,7 +257,7 @@ describe("MidiProvider", () => {
     });
 
     it("releases an on-screen-keyboard note still held on blur", () => {
-        const { result } = renderHook(() => useMidiConnection(), {
+        const { result } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         // A pointer held on an on-screen key, then an OS app-switch, never delivers
@@ -265,19 +269,26 @@ describe("MidiProvider", () => {
     });
 
     it("ends a blur-released on-screen note on its own device, keeping its ring-out", () => {
-        const { result } = renderHook(() => useMidiConnection(), {
+        const { result } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(fakeMidi()),
+        });
+        // Read through a listener, which is how everything that cares about a release
+        // learns of one — the provider no longer keeps a log of its own.
+        const onNoteOff = vi.fn();
+        act(() => {
+            result.current.subscribe({ onNoteOff });
         });
         act(() => result.current.pressKey(67));
         act(() => window.dispatchEvent(new Event("blur")));
         // The release carries the on-screen device (its gentle hold-scale), not a
         // flattened precise "MIDI" that would clip the note's ring-out and recorded hold.
-        expect(result.current.events[0]?.kind).toBe("noteoff");
-        expect(result.current.events[0]?.device).toBe(ON_SCREEN_DEVICE);
+        expect(onNoteOff).toHaveBeenCalledWith(
+            expect.objectContaining({ kind: "noteoff", note: 67, device: ON_SCREEN_DEVICE }),
+        );
     });
 
     it("releases a computer-keyboard note by physical key even if the glyph changed", () => {
-        const { result } = renderHook(() => useMidiConnection(), {
+        const { result } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         // Press 'z' (KeyZ). A modifier engaged before release reports a different glyph,
@@ -288,8 +299,8 @@ describe("MidiProvider", () => {
         expect(result.current.heldNotes).not.toContain(60);
     });
 
-    it("plays from the on-screen keyboard bridge, notifies subscribers, and clears events", () => {
-        const { result } = renderHook(() => useMidiConnection(), {
+    it("plays from the on-screen keyboard bridge and notifies subscribers", () => {
+        const { result } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         const onNoteOn = vi.fn();
@@ -301,13 +312,9 @@ describe("MidiProvider", () => {
         act(() => result.current.pressKey(64));
         expect(result.current.heldNotes).toContain(64);
         expect(onNoteOn).toHaveBeenCalled();
-        expect(result.current.events.length).toBeGreaterThan(0);
 
         act(() => result.current.releaseKey(64));
         expect(result.current.heldNotes).not.toContain(64);
-
-        act(() => result.current.clearEvents());
-        expect(result.current.events).toEqual([]);
         act(() => unsubscribe());
     });
 
@@ -316,7 +323,7 @@ describe("MidiProvider", () => {
         const midi = fakeMidi({ inputs: [input] });
         const pedals: [PedalKind, boolean][] = [];
         const useProbe = () => {
-            const c = useMidiConnection();
+            const c = useMidiState();
             useMidiInput({ onPedal: (pedal, down) => pedals.push([pedal, down]) });
             return c;
         };
@@ -350,7 +357,7 @@ describe("MidiProvider", () => {
             </ServicesProvider>
         );
         const useProbe = () => {
-            const c = useMidiConnection();
+            const c = useMidiState();
             useMidiInput({ onPedal: (pedal, down) => pedals.push([pedal, down]) });
             return c;
         };
@@ -379,7 +386,7 @@ describe("a cable pulled out and put back", () => {
         // over a cable lying on the floor.
         const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -395,7 +402,7 @@ describe("a cable pulled out and put back", () => {
     it("plays again when the cable goes back in, without a trip to the settings", async () => {
         const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });
@@ -419,7 +426,7 @@ describe("a cable pulled out and put back", () => {
         // a port the app has never bound a handler to.
         const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
         const midi = fakeMidi({ inputs: [input] });
-        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        const { result } = renderHook(() => useMidiState(), { wrapper: wrapperWith(midi) });
         await act(async () => {
             result.current.requestAccess();
         });

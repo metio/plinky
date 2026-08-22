@@ -26,28 +26,15 @@ export type PracticeMethod = {
     // Roughly how long one go at it takes, in minutes — the "dose" that turns a
     // method from an idea into something that fits in tonight's practice.
     minutes: number;
-    // Where in Plinky to do it. A route the player can follow straight from the
-    // page, so reading about a method and trying it are one step apart.
-    href: string;
 };
 
 export const METHODS: PracticeMethod[] = [
-    { id: "chunking", minutes: 10, href: "/library/" },
-    { id: "slow", minutes: 10, href: "/library/" },
-    { id: "handsApart", minutes: 10, href: "/library/" },
-    { id: "hearingFirst", minutes: 5, href: "/ear/" },
-    { id: "interleaving", minutes: 15, href: "/review/" },
-    { id: "spacing", minutes: 10, href: "/you/" },
+    { id: "chunking", minutes: 10 },
+    { id: "slow", minutes: 10 },
+    { id: "handsApart", minutes: 10 },
+    // Its own words are "listen to the phrase, then turn the noteheads blank and find it
+    // by ear" — which is the hidden-notes switch on a piece, not the interval drill.
+    { id: "hearingFirst", minutes: 5 },
+    { id: "interleaving", minutes: 15 },
+    { id: "spacing", minutes: 10 },
 ];
-
-export function methodById(id: string): PracticeMethod | null {
-    return METHODS.find((method) => method.id === id) ?? null;
-}
-
-// The methods that fit in the time available, shortest first. A player with ten
-// minutes should not be handed the fifteen-minute one and told to hurry.
-export function methodsWithin(minutes: number): PracticeMethod[] {
-    return METHODS.filter((method) => method.minutes <= minutes).sort(
-        (left, right) => left.minutes - right.minutes,
-    );
-}

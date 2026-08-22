@@ -2,45 +2,29 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { memoryStore } from "../../adapters/memoryStore";
-import { ServicesProvider } from "../../contexts/services";
-import { createMasteryStore } from "../../stores/masteryStore";
-import { createPrefsStore } from "../../stores/prefsStore";
-import { GradeBadge } from "./gradeBadge";
+import { GradeBadgeView } from "./gradeBadge";
 
-// The badge derives grade and skill from injected mastery + prefs stores. The
-// stories keep mastery empty — an untouched store resolves to Grade 0 / ⚡0
-// without touching the catalogue or the clock, so the frame is deterministic.
-const meta: Meta<typeof GradeBadge> = {
+// The badge from plain values, so each standing it can show is a frame of its own —
+// what the header carries is decided by the container, which shows nothing at all until
+// there is something to report.
+const meta: Meta<typeof GradeBadgeView> = {
     title: "Features/GradeBadge",
-    component: GradeBadge,
+    component: GradeBadgeView,
 };
 export default meta;
 
-type Story = StoryObj<typeof GradeBadge>;
+type Story = StoryObj<typeof GradeBadgeView>;
 
-export const FreshDevice: Story = {
-    render: function Render() {
-        const store = memoryStore();
-        return (
-            <ServicesProvider
-                services={{ mastery: createMasteryStore(store), prefs: createPrefsStore(store) }}
-            >
-                <GradeBadge />
-            </ServicesProvider>
-        );
-    },
+// The first thing to master lifts the skill rating long before it lifts the grade, so
+// the cap stays grey while the number beside it is real.
+export const Starting: Story = {
+    args: { level: 0, skill: 12, competitive: false },
+};
+
+export const Earned: Story = {
+    args: { level: 3, skill: 214, competitive: false },
 };
 
 export const CompetitiveMode: Story = {
-    render: function Render() {
-        const store = memoryStore();
-        const prefs = createPrefsStore(store);
-        prefs.save({ ...prefs.load(), decayMode: "competitive" });
-        return (
-            <ServicesProvider services={{ mastery: createMasteryStore(store), prefs }}>
-                <GradeBadge />
-            </ServicesProvider>
-        );
-    },
+    args: { level: 3, skill: 189, competitive: true },
 };

@@ -4,6 +4,7 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { m } from "../../paraglide/messages.js";
 import { ComposeControls } from "./composeControls";
 
 const noop = () => {};
@@ -83,5 +84,25 @@ describe("ComposeControls", () => {
         expect(onClear).not.toHaveBeenCalled();
         fireEvent.click(screen.getByRole("button", { name: "Clear all?" }));
         expect(onClear).toHaveBeenCalledTimes(1);
+    });
+
+    it("holds the count-in while notes are being written rather than played", () => {
+        // Counting in puts a player on the grid before they play. Step entry writes the
+        // timing, so there is nothing to be in time with and the click would just run on.
+        mount({ stepping: true });
+        const countIn = screen.getByRole("button", {
+            name: m.compose_count_in(),
+        }) as HTMLButtonElement;
+        expect(countIn.disabled).toBe(true);
+        expect(screen.getByText(m.compose_count_in_stepping())).toBeTruthy();
+    });
+
+    it("offers the count-in when notes are played", () => {
+        mount();
+        const countIn = screen.getByRole("button", {
+            name: m.compose_count_in(),
+        }) as HTMLButtonElement;
+        expect(countIn.disabled).toBe(false);
+        expect(screen.queryByText(m.compose_count_in_stepping())).toBeNull();
     });
 });

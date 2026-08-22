@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useState } from "react";
 import { Attribution } from "../components/ui/attribution";
+import { ScoreIncipit } from "../components/features/scoreIncipit";
 import { Button } from "../components/ui/button";
 import { attributionFor } from "../../core/attribution";
 import { canonicalComposer, personSlug } from "../../core/person";
@@ -18,20 +18,27 @@ import { FavoriteButton } from "../components/features/favoriteButton";
 import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
+import { ScoreSkeleton } from "../components/ui/scoreSkeleton";
 import { TransposeProvider } from "../components/features/transposeContext";
-import { useOnboardingStore, usePrefsStore } from "../contexts/services";
 import { useScore } from "../hooks/useScore";
 // meta() runs outside the React tree (the router calls it statically), so it
 // cannot receive injected services — the real adapter is wired here directly,
 // the same way the composition root wires its defaults.
 import { browserStore } from "../adapters/browserStore";
 import { resolveScore } from "../lib/catalog";
+import { warmEngraver } from "../lib/warmEngraver";
 import { parseExerciseId } from "../../core/exerciseGen";
 
 import { breadcrumbData, musicCompositionData, routeMeta } from "../../core/site";
+
+// Reaching this module means a piece is being opened, and a piece always needs engraving.
+// Starting the fetch here overlaps it with the rest of the page's startup instead of
+// queueing it behind the whole tree rendering first.
+warmEngraver();
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
+import { useSearchParams } from "react-router";
 
 export function meta({ params }: Route.MetaArgs) {
     // Bundled scores resolve at prerender (no localStorage), so each one gets its
@@ -50,8 +57,8 @@ export function meta({ params }: Route.MetaArgs) {
     // matching the prerendered /person/:slug and the on-page composer link.
     const slug = score.composer ? personSlug(score.composer) : "";
     const trail = [
-        { name: m.nav_home(), path: "/" },
-        { name: m.nav_library(), path: "/library/" },
+        { name: m.nav_today(), path: "/" },
+        { name: m.music_title(), path: "/music/" },
         ...(slug ? [{ name: canonicalComposer(score.composer), path: `/person/${slug}/` }] : []),
         { name: score.title, path: `/play/${score.id}/` },
     ];
@@ -63,42 +70,32 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export default function PlayRoute({ params }: Route.ComponentProps) {
-    const onboarding = useOnboardingStore();
-    const prefsStore = usePrefsStore();
     // Resolves a tick after paint: undefined while loading, null when there is no
     // such score, "unavailable" when a fetch failed — a retry bumps `attempt`
     // to ask again (a failed fetch is never cached).
     const [attempt, setAttempt] = useState(0);
     const resolved = useScore(params.scoreId, attempt);
     const score = resolved === "unavailable" ? undefined : resolved;
-    const [mode, setMode] = useState<PlayMode>("play");
+    // ?tab=runs opens straight onto your saved runs, so a recording can be linked to —
+    // the shelf's list of takes points here.
+    const [searchParams] = useSearchParams();
+    const [mode, setMode] = useState<PlayMode>(
+        searchParams.get("tab") === "runs" ? "runs" : "play",
+    );
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.
     const [transpose, setTranspose] = useState(0);
 
-    // The drills live inside Practice now, but the discovery checklist's old
-    // ?mode=ear|fingering deep links keep working: an ear link switches the
-    // hidden-notes practice pref on, and both mark their discovery step — the
-    // page stays on the score, where the drill actually happens.
-    const [searchParams] = useSearchParams();
-    useEffect(() => {
-        const requested = searchParams.get("mode");
-        if (requested === "ear") {
-            prefsStore.save({ ...prefsStore.load(), hiddenNotes: true });
-            onboarding.markDiscovered("earTried");
-        } else if (requested === "fingering") {
-            onboarding.markDiscovered("fingeringTried");
-        }
-    }, [searchParams, onboarding, prefsStore]);
-
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             {score && (
                 <TransposeProvider value={{ transpose, setTranspose }}>
                     <header className="space-y-1">
                         <div className="flex items-start justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-2xl font-semibold">{score.title}</h1>
+                                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                                    {score.title}
+                                </h1>
                                 {/* Right beside the name, so keeping a piece is a thought
                                 you can act on while playing it rather than an errand in
                                 the library. */}
@@ -122,7 +119,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 {personSlug(score.composer) ? (
                                     <Link
                                         to={`/person/${personSlug(score.composer)}`}
-                                        className="hover:text-accent hover:underline"
+                                        className="hover:text-accent-strong hover:underline"
                                     >
                                         {canonicalComposer(score.composer)}
                                     </Link>
@@ -131,6 +128,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 )}
                             </p>
                         )}
+                        {/* The piece's opening bar, under its name — the mark a
+                            thematic catalogue would file it by. */}
+                        <ScoreIncipit xml={score.xml} title={score.title} />
                         <Attribution
                             composer={score.composer}
                             license={score.license}
@@ -140,32 +140,38 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
 
                     <PlayModeBar mode={mode} onChange={setMode} />
 
-                    <Show when={mode === "play" || mode === "runs"}>
-                        {parseExerciseId(score.id) && (
-                            <ExerciseForms config={parseExerciseId(score.id)!} />
+                    {parseExerciseId(score.id) && (
+                        <ExerciseForms config={parseExerciseId(score.id)!} />
+                    )}
+                    <ScoreViewer
+                        key={score.id}
+                        id={score.id}
+                        xml={score.xml}
+                        title={score.title}
+                        credit={creditLine(
+                            score.title,
+                            attributionFor({
+                                composer: score.composer,
+                                license: score.license,
+                                source: score.source,
+                            }),
                         )}
-                        <ScoreViewer
-                            key={score.id}
-                            id={score.id}
-                            xml={score.xml}
-                            title={score.title}
-                            credit={creditLine(
-                                score.title,
-                                attributionFor({
-                                    composer: score.composer,
-                                    license: score.license,
-                                    source: score.source,
-                                }),
-                            )}
-                            initialTempo={score.tempo}
-                            beatsPerBar={score.beatsPerBar}
-                            canShareGhost
-                            runsView={mode === "runs"}
-                            onShowScore={() => setMode("play")}
-                        />
-                    </Show>
+                        initialTempo={score.tempo}
+                        beatsPerBar={score.beatsPerBar}
+                        canShareGhost
+                        runsView={mode === "runs"}
+                        onShowScore={() => setMode("play")}
+                    />
                 </TransposeProvider>
             )}
+            {/* Resolving a piece means the catalogue and then the piece itself, which on a
+            slow connection is seconds of a page with nothing on it at all. The staff it is
+            about to appear on stands in the meantime, in the slot it will occupy. */}
+            <Show when={resolved === undefined}>
+                <div className="h-64">
+                    <ScoreSkeleton />
+                </div>
+            </Show>
             <Show when={score === null}>
                 <p className="text-sm text-muted">{m.play_not_found()}</p>
             </Show>

@@ -39,7 +39,6 @@ export function PlayModeBar({
                     label={m.mode_label()}
                 />
             </div>
-            <CoachMark id="play-modes">{m.coach_play_modes()}</CoachMark>
             {mode === "play" && <CoachMark id="practice-loop">{m.coach_practice_loop()}</CoachMark>}
         </div>
     );

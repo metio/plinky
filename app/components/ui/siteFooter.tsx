@@ -14,6 +14,7 @@ const CHANNELS: { brand: Brand; label: string; href: string }[] = [
         label: "Facebook",
         href: "https://www.facebook.com/profile.php?id=61591963944991",
     },
+    { brand: "reddit", label: "Reddit", href: "https://www.reddit.com/r/plinky_piano/" },
     { brand: "github", label: "GitHub", href: "https://github.com/metio/plinky" },
 ];
 
@@ -23,19 +24,26 @@ const CHANNELS: { brand: Brand; label: string; href: string }[] = [
 export function SiteFooter() {
     return (
         <footer className="mt-12 border-t border-line px-6 py-4 font-sans print:hidden">
-            <div className="mx-auto flex max-w-3xl items-center justify-between">
+            {/* Wraps rather than shrinks. Four channels, two legal pages and the way to
+                the people behind Plinky do not fit across a phone in one line, and the
+                fixes that keep them on one — dropping the About label, tightening the
+                icons — cost the thing each of them was for. Stacked and centred is what a
+                narrow screen has room for; the row returns as soon as there is width. */}
+            <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-between">
                 <div className="flex items-center gap-3 text-sm text-muted">
-                    {/* The heart is the quiet way to the people behind Plinky; it
-                        fills in on hover, a small warm tell. */}
+                    {/* The way to the people behind Plinky. The heart says how they feel
+                        about it; the word says where the link goes, which a heart on its
+                        own never did — it sat beside two labelled legal pages as the one
+                        thing a curious visitor had to guess at. */}
                     <Link
                         to={localizedHref("/about")}
-                        aria-label={m.nav_about()}
-                        className="group rounded-md p-1 text-faint hover:text-love focus-visible:ring-2 focus-visible:ring-love-ring"
+                        className="group flex items-center gap-1.5 rounded-md p-1 hover:text-love focus-visible:ring-2 focus-visible:ring-love-ring"
                     >
                         <HeartIcon
                             filled
-                            className="h-5 w-5 opacity-70 transition group-hover:opacity-100"
+                            className="h-5 w-5 text-faint opacity-70 transition group-hover:text-love group-hover:opacity-100"
                         />
+                        {m.nav_about()}
                     </Link>
                 </div>
                 {/* The provider information German law requires, reachable from every page.

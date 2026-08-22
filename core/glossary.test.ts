@@ -24,12 +24,15 @@ const bar = (notes: Snippet["notes"], over: Partial<Snippet> = {}): Snippet => (
 
 describe("performSnippet", () => {
     it("clips a staccato note to half its written length", () => {
-        const plain = performSnippet(bar([{ step: "C", octave: 5, value: "quarter" }]));
+        // Against the WRITTEN length, not against a plain note: a plain note is played with
+        // a small lift of its own, and comparing the two would tie this assertion to a
+        // decision about unmarked notes that has nothing to do with staccato.
+        const written = 60 / GLOSSARY_TEMPO;
         const clipped = performSnippet(
             bar([{ step: "C", octave: 5, value: "quarter", articulation: "staccato" }]),
         );
 
-        expect(clipped[0]?.duration).toBeCloseTo((plain[0]?.duration ?? 0) / 2);
+        expect(clipped[0]?.duration).toBeCloseTo(written / 2);
     });
 
     it("strikes an accented note harder", () => {
@@ -64,7 +67,8 @@ describe("performSnippet", () => {
         );
 
         expect(strikes).toHaveLength(1);
-        expect(strikes[0]?.duration).toBeCloseTo(2 * (60 / GLOSSARY_TEMPO));
+        // Both notes' time, less the small lift every unmarked note is played with.
+        expect(strikes[0]?.duration).toBeCloseTo(2 * (60 / GLOSSARY_TEMPO) * 0.94);
     });
 
     it("carries a dynamic down the phrase until another replaces it", () => {

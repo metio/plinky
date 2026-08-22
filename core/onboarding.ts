@@ -1,90 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { History } from "./history";
-import { isDefaultKeyMap } from "./keyMap";
-import type { Prefs } from "./prefs";
+// What the app remembers about corners you have already met.
+//
+// This was an eleven-step discovery checklist, and the strip that showed it is gone: the
+// day's practice makes those offers where each belongs instead. One step survives, because
+// something still reads it — finishing the keyboard tour is what stops the day's "learn
+// one thing" from offering the tour again, and it leaves no other trace to read back.
+export type DiscoveryId = "keyboardMet";
 
-// The feature-discovery checklist: a gentle, opt-in nudge to meet the app's corners,
-// never a gate on progression. Some steps are read from real state (you've played,
-// you've set your hand, you've done a daily); the rest are marked the first time you
-// reach a feature, since "tried Ear once" leaves no other trace to read back.
-export type DiscoveryId =
-    | "keyboardMet"
-    | "midiConnected"
-    | "played"
-    | "placed"
-    | "handSet"
-    | "dailyDone"
-    | "earTried"
-    | "fingeringTried"
-    | "composed"
-    | "imported"
-    | "keysCustomized";
-
-// The steps marked by doing them — features that record no lasting state of their own.
-// keysCustomized is here too so it can be reached by engaging with the key editor:
-// changing a key already shows in the saved map, but a player happy with the standard
-// layout leaves no such trace, so opening the editor and touching it counts as well.
-export const MARKABLE: readonly DiscoveryId[] = [
-    // Finishing the tour is the only trace it leaves; there is nothing else to read back.
-    "keyboardMet",
-    "midiConnected",
-    "earTried",
-    "fingeringTried",
-    "composed",
-    "imported",
-    "keysCustomized",
-];
-
-// What the discovery steps are computed from. The caller loads these from its
-// stores and hands the data in — this module only derives.
-export type DiscoveryState = {
-    prefs: Prefs;
-    // Whether any piece carries mastery state (any entry at all counts as playing).
-    masteredCount: number;
-    history: History;
-    // The number of the last daily completed, 0 for none.
-    lastDaily: number;
-    // Whether a placement test has ever been finished. Read from the saved result, so
-    // like `played` it cannot be reached by merely visiting the page.
-    placementTaken: boolean;
-    // The markable steps already reached.
-    marked: ReadonlySet<DiscoveryId>;
-};
-
-// Which discovery steps are done: the derived ones from the given state, the rest
-// from the marked set.
-export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean> {
-    const { prefs, masteredCount, history, lastDaily, placementTaken, marked } = state;
-    const span = prefs.handSpan;
-    return {
-        keyboardMet: marked.has("keyboardMet"),
-        // Connecting is a one-time setup step; once a device has ever been seen,
-        // the mark persists even when the piano is unplugged today.
-        midiConnected: marked.has("midiConnected"),
-        played: masteredCount > 0 || Object.values(history).some((notes) => notes > 0),
-        // Finishing the test writes a rating and a grade; opening it and walking away
-        // leaves nothing, which is the honest reading — the step is "you know your
-        // level", and an abandoned test tells you nothing.
-        placed: placementTaken,
-        handSet: span.left !== null || span.right !== null,
-        dailyDone: lastDaily > 0,
-        earTried: marked.has("earTried"),
-        fingeringTried: marked.has("fingeringTried"),
-        composed: marked.has("composed"),
-        imported: marked.has("imported"),
-        // Done once you've made the keys your own, or engaged with the editor and kept
-        // the standard layout — so a player who likes the defaults isn't stuck on a step
-        // that a non-default binding is otherwise the only way to reach.
-        keysCustomized: marked.has("keysCustomized") || !isDefaultKeyMap(prefs.keyMap),
-    };
-}
-
-export type DiscoveryProgress = { done: number; total: number; allDone: boolean };
-
-export function discoveryProgress(done: Record<DiscoveryId, boolean>): DiscoveryProgress {
-    const values = Object.values(done);
-    const count = values.filter(Boolean).length;
-    return { done: count, total: values.length, allDone: count === values.length };
-}
+// Marked by doing it: finishing the tour records nothing else.
+export const MARKABLE: readonly DiscoveryId[] = ["keyboardMet"];

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { Button } from "../components/ui/button";
 import { DailyReveal } from "../components/features/dailyReveal";
 import { ExportMenu } from "../components/features/exportMenu";
@@ -15,6 +16,7 @@ import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/daily";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -41,8 +43,13 @@ const WARMUP: DrillOptions = { ...DEFAULT_DRILL, bars: 8, beatsPerBar: 4, low: 7
 
 export default function DailyRoute() {
     const daily = useDailyStore();
+    const [searchParams] = useSearchParams();
     const [today, setToday] = useState<Today | null>(null);
-    const [mode, setMode] = useState<"challenge" | "warmup">("challenge");
+    // ?tab=warmup opens the warm-up directly — Today's warm-up offers a fresh drill,
+    // and landing on the day's challenge instead would be a different thing entirely.
+    const [mode, setMode] = useState<"challenge" | "warmup">(
+        searchParams.get("tab") === "warmup" ? "warmup" : "challenge",
+    );
 
     // Warm-up (the old sprint): a fresh generated phrase each run; bumping the
     // counter regenerates and remounts the viewer.
@@ -70,6 +77,13 @@ export default function DailyRoute() {
             regenerate(drill);
         }
     };
+    // A deep link lands on the tab with no press to generate its phrase, so the first
+    // one is made here instead. Runs once: the guard clears as soon as it lands.
+    useEffect(() => {
+        if (mode === "warmup" && !warmupXml) {
+            regenerate(drill);
+        }
+    });
     // Changing the shape of the drill regenerates it: the panel describes the piece
     // in front of you, so leaving the old one up would make every control read as
     // broken until the next press.
@@ -79,24 +93,18 @@ export default function DailyRoute() {
     };
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
-            <header className="space-y-1">
-                <div className="flex items-start justify-between gap-2">
-                    <h1 className="text-2xl font-semibold">
-                        {today
-                            ? m.daily_title({ number: today.number })
-                            : m.daily_title({ number: "…" })}
-                    </h1>
-                    {/* The same take-it-with-you actions a play page's title line
-                    carries: print the phrase, or download it as MIDI/MusicXML. */}
-                    {today && (
-                        <div className="flex shrink-0 items-center gap-1">
-                            <ExportMenu xml={today.xml} title={`Plinky #${today.number}`} />
-                        </div>
-                    )}
-                </div>
-                <p className="text-sm text-muted">{m.daily_intro()}</p>
-            </header>
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <PageHeader
+                title={
+                    today ? m.daily_title({ number: today.number }) : m.daily_title({ number: "…" })
+                }
+                hint={m.daily_intro()}
+                // The same take-it-with-you actions a play page's title line carries:
+                // print the phrase, or download it as MIDI/MusicXML.
+                actions={
+                    today ? <ExportMenu xml={today.xml} title={`Plinky #${today.number}`} /> : null
+                }
+            />
 
             <SegmentedControl
                 options={[

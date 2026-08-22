@@ -18,11 +18,25 @@ import type { Score } from "../../core/score";
 
 export type { Score } from "../../core/score";
 
-const files = import.meta.glob("../../scores/*.musicxml", {
-    query: "?raw",
-    import: "default",
-    eager: true,
-}) as Record<string, string>;
+// Vite replaces this call with the scores' text at build time. `import.meta.glob` is
+// Vite's own, and under any other bundler it is undefined — so the read is deferred and
+// guarded, and a tool that compiles these components outside the app (the design-system
+// sync) gets an empty catalogue rather than a module that throws as it loads.
+let bundled: Record<string, string> | undefined;
+function bundledFiles(): Record<string, string> {
+    if (bundled === undefined) {
+        try {
+            bundled = import.meta.glob("../../scores/*.musicxml", {
+                query: "?raw",
+                import: "default",
+                eager: true,
+            }) as Record<string, string>;
+        } catch {
+            bundled = {};
+        }
+    }
+    return bundled;
+}
 
 const STORAGE_KEY = "plinky:scores";
 
@@ -32,24 +46,23 @@ export { slugify };
 // The demo pieces inlined into the bundle, identical for everyone. Finger exercises
 // and the song catalogue load as on-demand assets instead, keeping the JS small.
 export function loadBundledScores(): Score[] {
-    return Object.entries(files).map(([_path, xml]) => {
+    return Object.entries(bundledFiles()).map(([_path, xml]) => {
         // Same content-fingerprint id scheme as every other piece. The bundled
         // MusicXML is our own generated output, so the pure text pass reads it —
-        // no parser, which also keeps FIRST_SONG_ID's module-load derivation pure.
+        // no parser.
         return {
             id: songId(xml),
             ...readScoreMetaFromText(xml),
             description: "",
             xml,
             bundled: true,
+            // Recorded here rather than in each file: these are our own transcriptions,
+            // under the terms REUSE.toml already declares for scores/*.musicxml.
+            license: "CC0-1.0",
+            source: "plinky",
         };
     });
 }
-
-// The bundled piece a true beginner starts on — a Grade 1 demo, resolved by title so links
-// to it track its content-fingerprint id instead of a hard-coded filename.
-export const FIRST_SONG_ID =
-    loadBundledScores().find((score) => score.title.toLowerCase().includes("twinkle"))?.id ?? "";
 
 // Coerce a stored entry into a usable Score, or drop it. A missing string title
 // would otherwise throw in the catalogue's localeCompare sort and take down the
@@ -80,6 +93,12 @@ function normalizeUserScore(raw: unknown): Score | null {
         bundled: false,
         ...(typeof value.license === "string" ? { license: value.license } : {}),
     };
+}
+
+// The imported scores exactly as stored, for a caller that wants to know whether they
+// have changed without paying to parse them — the key itself stays in here.
+export function userScoresRaw(kv: KeyValueStore): string | null {
+    return kv.get(STORAGE_KEY);
 }
 
 export function loadUserScores(kv: KeyValueStore): Score[] {

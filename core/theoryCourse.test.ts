@@ -43,7 +43,40 @@ describe("LESSONS", () => {
             }
         }
     });
+
+    it("gives every written example something to sound and a full bar to draw", () => {
+        for (const lesson of LESSONS) {
+            if (lesson.demo.kind !== "stave") {
+                continue;
+            }
+            // The example is pressable, so it has to have notes behind it; and a lesson
+            // about length is only honest if its bars actually add up.
+            expect(lesson.demo.play.length, lesson.id).toBeGreaterThan(0);
+            const beats = lesson.demo.notes.reduce(
+                (total, note) => total + (BEATS[note.value] ?? 0) * (note.dotted ? 1.5 : 1),
+                0,
+            );
+            expect(beats % 4, lesson.id).toBe(0);
+        }
+    });
+
+    it("plays more than one chord in every run of them", () => {
+        for (const lesson of LESSONS) {
+            if (lesson.demo.kind === "progression") {
+                expect(lesson.demo.chords.length, lesson.id).toBeGreaterThan(1);
+            }
+        }
+    });
 });
+
+// A bar's worth of each written length, for the sum above.
+const BEATS: Record<string, number> = {
+    whole: 4,
+    half: 2,
+    quarter: 1,
+    eighth: 0.5,
+    sixteenth: 0.25,
+};
 
 describe("lessonById", () => {
     it("finds a lesson, and nothing for one that does not exist", () => {

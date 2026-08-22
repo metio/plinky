@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import type { EarNote } from "../../../core/earExercise";
 import type { SchedulerHandle } from "../../ports/scheduler";
 import { useScheduler } from "../../contexts/services";
@@ -18,7 +18,21 @@ import { m } from "../../paraglide/messages.js";
 // That shows the SHAPE of the question — one note, or two in sequence, or two at once —
 // which the player is allowed to know, while giving away no pitch, which they aren't.
 
-export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: boolean }) {
+export function EarStage({
+    notes,
+    autoPlay,
+    status,
+    children,
+}: {
+    notes: EarNote[];
+    autoPlay: boolean;
+    // How the run stands, under the dots: near the thing being counted rather than at the
+    // foot of the page.
+    status?: ReactNode;
+    // Rendered beside Play again. Moving on is the other half of listening again, so the
+    // two controls belong in one row, and only the caller knows what moving on means.
+    children?: ReactNode;
+}) {
     const synth = useSynth();
     const scheduler = useScheduler();
     const [lit, setLit] = useState<readonly number[]>([]);
@@ -68,7 +82,7 @@ export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: bool
     }, [autoPlay, clear, play]);
 
     return (
-        <div className="flex flex-col items-center gap-6 rounded-xl bg-surface px-6 py-10">
+        <div className="flex flex-col items-center gap-4 rounded-xl bg-surface px-6 py-8">
             <div className="flex h-16 items-center justify-center gap-4">
                 {notes.map((_note, index) => {
                     const sounding = lit.includes(index);
@@ -92,10 +106,15 @@ export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: bool
                     );
                 })}
             </div>
-            <Button variant="secondary" onClick={play}>
-                <EarIcon className="h-4 w-4" />
-                {m.ear_play_again()}
-            </Button>
+            {status}
+
+            <div className="flex flex-wrap items-center justify-center gap-3">
+                <Button variant="secondary" onClick={play}>
+                    <EarIcon className="h-4 w-4" />
+                    {m.ear_play_again()}
+                </Button>
+                {children}
+            </div>
         </div>
     );
 }

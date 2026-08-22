@@ -4,6 +4,7 @@
 import { NOTE_LABELS } from "../../../core/keyMap";
 import { noteNameOf, type NoteNameId, type PitchClass } from "../../../core/theory";
 import { m } from "../../paraglide/messages.js";
+import { optionVerdict } from "../../../core/earAnswer";
 import { answerClasses, VERDICT_FILL, type Verdict } from "./earVerdict";
 
 // The answer surface for the perfect-pitch exercise. The question is "which note was
@@ -30,27 +31,12 @@ const BLACK: { pitchClass: PitchClass; boundary: number }[] = [
     { pitchClass: 10, boundary: 6 },
 ];
 
-const WHITE_WIDTH = 100 / WHITE.length;
-const BLACK_WIDTH = WHITE_WIDTH * 0.62;
-
-function verdictFor(
-    name: NoteNameId,
-    answer: NoteNameId | null,
-    given: NoteNameId | null,
-): Verdict {
-    if (answer === null) {
-        return null;
-    }
-    if (name === answer) {
-        return "correct";
-    }
-    return name === given ? "wrong" : null;
-}
-
-// A white key is an answer surface like any other, but its resting face is a piano
-// key rather than a card.
+// A white key waiting to be pressed: the instrument's own colours rather than a card's.
 const WHITE_IDLE =
     "border-line-strong bg-key-white text-key-ink hover:bg-key-hover hover:text-accent-strong";
+
+const WHITE_WIDTH = 100 / WHITE.length;
+const BLACK_WIDTH = WHITE_WIDTH * 0.62;
 
 function whiteClasses(verdict: Verdict, settled: boolean): string {
     return answerClasses(verdict, settled, WHITE_IDLE);
@@ -89,7 +75,7 @@ export function EarKeyboard({
             <div className="flex h-full w-full gap-1">
                 {WHITE.map((pitchClass) => {
                     const name = noteNameOf(pitchClass);
-                    const verdict = verdictFor(name, answer, given);
+                    const verdict = optionVerdict(name, answer, given);
                     return (
                         <button
                             type="button"
@@ -106,7 +92,7 @@ export function EarKeyboard({
             {BLACK.filter(({ pitchClass }) => offered(pitchClass)).map(
                 ({ pitchClass, boundary }) => {
                     const name = noteNameOf(pitchClass);
-                    const verdict = verdictFor(name, answer, given);
+                    const verdict = optionVerdict(name, answer, given);
                     return (
                         <button
                             type="button"

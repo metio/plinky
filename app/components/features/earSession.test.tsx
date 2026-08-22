@@ -50,6 +50,21 @@ function playSession(answerName: string, autoStarted = false) {
 }
 
 describe("EarSession", () => {
+    it("skips a question without counting it against the run", () => {
+        mount({ autoStart: true });
+        // A question you walked away from is not a question you got wrong.
+        expect(screen.getByText(m.ear_score({ correct: 0, asked: 0 }))).toBeTruthy();
+        press(m.ear_skip());
+        expect(screen.getByText(m.ear_score({ correct: 0, asked: 0 }))).toBeTruthy();
+        expect(screen.getByText(`0 / ${EAR_SESSION_ROUNDS}`)).toBeTruthy();
+        // Answering swaps the same slot from walking away to moving on.
+        expect(screen.queryByRole("button", { name: m.ear_next() })).toBeNull();
+        press("Unison");
+        expect(screen.queryByRole("button", { name: m.ear_skip() })).toBeNull();
+        expect(screen.getByRole("button", { name: m.ear_next() })).toBeTruthy();
+        expect(screen.getByText(`1 / ${EAR_SESSION_ROUNDS}`)).toBeTruthy();
+    });
+
     it("rests on a start card before the first question", () => {
         mount();
         expect(screen.getByRole("button", { name: m.ear_start() })).toBeTruthy();

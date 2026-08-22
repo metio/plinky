@@ -31,7 +31,7 @@ describe("useHoldIndicator", () => {
     it("fills a note to full at the strike and drains it to gone over its length", () => {
         const { scheduler, result } = harness();
 
-        act(() => result.current.begin([60], 1000));
+        act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
         expect(result.current.holdFractions.get(60)).toBe(1);
 
         paint(scheduler, 500);
@@ -45,32 +45,74 @@ describe("useHoldIndicator", () => {
 
     it("arms a fill per pitch of a chord", () => {
         const { result } = harness();
-        act(() => result.current.begin([60, 64, 67], 800));
+        act(() =>
+            result.current.begin([
+                { note: 60, durationMs: 800 },
+                { note: 64, durationMs: 800 },
+                { note: 67, durationMs: 800 },
+            ]),
+        );
         expect(result.current.holdFractions.get(60)).toBe(1);
         expect(result.current.holdFractions.get(64)).toBe(1);
         expect(result.current.holdFractions.get(67)).toBe(1);
     });
 
+    it("drains each key on its own written length, not the position's longest", () => {
+        const { scheduler, result } = harness();
+        // The ordinary two-hand case: a whole note under a quaver. One length for the
+        // whole position would leave the quaver's fill draining at the slow hand's pace
+        // long after that hand had moved on.
+        act(() =>
+            result.current.begin([
+                { note: 48, durationMs: 2000 },
+                { note: 72, durationMs: 250 },
+            ]),
+        );
+
+        paint(scheduler, 250);
+        expect(result.current.holdFractions.has(72)).toBe(false);
+        expect(result.current.holdFractions.get(48)).toBeCloseTo(0.875);
+        // The long hand keeps its own frame loop running.
+        expect(scheduler.pending().frames).toBe(1);
+    });
+
+    it("skips a key with no length and still arms the ones that have it", () => {
+        const { result } = harness();
+        act(() =>
+            result.current.begin([
+                { note: 60, durationMs: 0 },
+                { note: 64, durationMs: 500 },
+            ]),
+        );
+        expect(result.current.holdFractions.has(60)).toBe(false);
+        expect(result.current.holdFractions.get(64)).toBe(1);
+    });
+
     it("re-arms a note's fill to its full length when it is struck again", () => {
         const { scheduler, result } = harness();
-        act(() => result.current.begin([60], 1000));
+        act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
         paint(scheduler, 800);
         expect(result.current.holdFractions.get(60)).toBeCloseTo(0.2);
 
-        act(() => result.current.begin([60], 1000));
+        act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
         expect(result.current.holdFractions.get(60)).toBe(1);
     });
 
     it("ignores a non-positive duration", () => {
         const { scheduler, result } = harness();
-        act(() => result.current.begin([60], 0));
+        act(() => result.current.begin([{ note: 60, durationMs: 0 }]));
         expect(result.current.holdFractions.has(60)).toBe(false);
         expect(scheduler.pending().frames).toBe(0);
     });
 
     it("clear drops every fill and cancels the frame loop", () => {
         const { scheduler, result } = harness();
-        act(() => result.current.begin([60, 64], 1000));
+        act(() =>
+            result.current.begin([
+                { note: 60, durationMs: 1000 },
+                { note: 64, durationMs: 1000 },
+            ]),
+        );
         expect(scheduler.pending().frames).toBe(1);
 
         act(() => result.current.clear());
@@ -80,7 +122,7 @@ describe("useHoldIndicator", () => {
 
     it("leaves no frame armed after unmount", () => {
         const { scheduler, result, unmount } = harness();
-        act(() => result.current.begin([60], 1000));
+        act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
         expect(scheduler.pending().frames).toBe(1);
         unmount();
         expect(scheduler.pending().frames).toBe(0);

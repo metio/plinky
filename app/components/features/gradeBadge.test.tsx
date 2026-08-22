@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, screen } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradedMastery } from "../../lib/gradeProgress";
@@ -54,7 +54,18 @@ const mount = () =>
     );
 
 describe("GradeBadge", () => {
-    it("shows a Grade 0 before any grade is earned, so /grades stays reachable", async () => {
+    it("shows on a device that has mastered nothing, because it is the way to the stats", async () => {
+        // It used to wait until it had news, on the grounds that the navigation named the
+        // page anyway. The navigation no longer does — this badge is the door — and a door
+        // that appears only once you have earned something is one a new player never finds.
+        loadMock.mockResolvedValue([]);
+        mount();
+        await waitFor(() => expect(loadMock).toHaveBeenCalled());
+        expect(screen.getByRole("link", { name: /grade/i })).toBeTruthy();
+    });
+
+    it("appears with the skill rating before there is a grade to show", async () => {
+        // Mastering a piece raises the skill long before five of them raise the grade.
         loadMock.mockResolvedValue(mastered(1, 4)); // short of Bronze
         mount();
         const link = await screen.findByRole("link", { name: /grade/i });

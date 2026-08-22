@@ -53,6 +53,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
         // the matcher makes, through the same rule.
         const groups = playOrder([...cursor.NotesUnderCursor()], (note) => note);
         for (const [order, group] of groups.entries()) {
+            const whole = cursor.iterator.currentTimeStamp?.RealValue ?? 0;
             const play: KeepUpStep["play"] = [];
             const accompany: KeepUpStep["accompany"] = [];
             const lengths: number[] = [];
@@ -76,6 +77,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                 }
             }
             steps.push({
+                whole,
                 play,
                 accompany,
                 lengths,
@@ -103,6 +105,10 @@ export function useKeepUp({
     tempo,
     beatsPerBar,
     centerCursor,
+    // Where the music has reached, before the position sounds. The notes highway reads it
+    // to draw what is coming — without it the highway has nothing to advance and simply
+    // does not appear, which is what a tempo-locked run looked like until now.
+    onPosition,
     markPainted,
     onFinish,
 }: {
@@ -113,6 +119,10 @@ export function useKeepUp({
     beatsPerBar: number;
     // Re-centre the treadmill after each cursor step; a no-op elsewhere.
     centerCursor: () => void;
+    // Where the music has reached, before the position sounds. The notes highway reads it
+    // to draw what is coming — without it there is nothing to advance and the highway does
+    // not appear at all, which is what a tempo-locked run looked like until now.
+    onPosition?: (whole: number) => void;
     // A run paints the score — the "play now" window, then a green/red hit/miss
     // trail it leaves in place. The surface tracks that something is painted so the
     // next run re-renders to wipe it; without this signal last run's marks persist.
@@ -125,6 +135,10 @@ export function useKeepUp({
     // Live during a play-along run, then the result once it finishes.
     const [running, setRunning] = useState(false);
     const [progress, setProgress] = useState({ inTime: 0, done: 0 });
+    // How long the position now open lasts, in real milliseconds at the tempo being played.
+    // The notes highway reads it to descend at exactly the music's pace: told how long the
+    // step takes, the blocks glide over precisely that time instead of settling after it.
+    const [stepMs, setStepMs] = useState<number | null>(null);
     const [result, setResult] = useState<KeepUpResult | null>(null);
     // The pitches of the beat currently open, for the on-screen keyboard to light —
     // cleared when no run owns the input so stale keys never linger lit.
@@ -148,6 +162,7 @@ export function useKeepUp({
         stateRef.current = startKeepUp();
         setRunning(false);
         setExpected([]);
+        setStepMs(null);
         getOsmd()?.cursor?.hide();
     };
 
@@ -246,6 +261,7 @@ export function useKeepUp({
         const finish = () => {
             activeRef.current = false;
             setRunning(false);
+            setStepMs(null);
             setExpected([]);
             cursor.hide();
             setResult(scoreKeepUp(stateRef.current.hits));
@@ -256,6 +272,9 @@ export function useKeepUp({
         const tick = () => {
             closeStep();
             const current = steps[step];
+            if (current) {
+                onPosition?.(current.whole);
+            }
             if (!current) {
                 finish();
                 return;
@@ -269,7 +288,9 @@ export function useKeepUp({
             }
             step += 1;
             centerCursor();
-            chain.push(tick, listenStepMs(current.lengths, localTempo(current), current.stretch));
+            const dwell = listenStepMs(current.lengths, localTempo(current), current.stretch);
+            setStepMs(dwell);
+            chain.push(tick, dwell);
         };
 
         // A one-bar count-in on the metronome (already ticking) before the first note.
@@ -294,5 +315,16 @@ export function useKeepUp({
         }
     };
 
-    return { running, progress, result, expected, active, start, stop, clearResult, registerNote };
+    return {
+        running,
+        progress,
+        result,
+        expected,
+        active,
+        start,
+        stop,
+        clearResult,
+        registerNote,
+        stepMs,
+    };
 }

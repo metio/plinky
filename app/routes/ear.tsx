@@ -11,6 +11,7 @@ import { ChoiceField } from "../components/ui/fields";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/ear";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -60,11 +61,8 @@ export default function Ear() {
     const levels = LEVEL_LABELS[exercise];
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.ear_title()}</h1>
-                <p className="text-sm text-muted">{m.ear_intro()}</p>
-            </header>
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <PageHeader title={m.ear_title()} hint={m.ear_intro()} />
 
             <ChoiceField
                 label={m.ear_exercise_label()}

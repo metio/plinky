@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { canonicalComposer, peopleFrom, personFor, personSlug } from "./person";
+import {
+    canonicalComposer,
+    nameFromSlug,
+    peopleFrom,
+    personFor,
+    personSlug,
+} from "./person";
 
 // Spellings lifted verbatim from the shipped manifest — the whole point of the
 // canonicalization is that these real variants land on one name.
@@ -22,6 +28,28 @@ describe("canonicalComposer", () => {
         for (const variant of BACH_VARIANTS) {
             expect(canonicalComposer(variant)).toBe("Johann Sebastian Bach");
         }
+    });
+
+    it("folds a misspelled credit onto the composer it meant", () => {
+        // Each of these is one score in the catalogue, spelled a letter away from a
+        // composer with dozens. Nothing in the string says it is wrong, so only the table
+        // can merge them — and unmerged, each owned a page holding a single piece that
+        // could not be reached from the real composer's.
+        expect(canonicalComposer("CRAUDE DEBUSSY")).toBe("Claude Debussy");
+        expect(canonicalComposer("Calude Debussy")).toBe("Claude Debussy");
+        expect(canonicalComposer("Wolfgang Amedeus Mozart")).toBe("Wolfgang Amadeus Mozart");
+        expect(canonicalComposer("Eric Satie")).toBe("Erik Satie");
+        expect(canonicalComposer("George Frederic Handel")).toBe("George Frideric Handel");
+        expect(canonicalComposer("Sergeï Rachmaninov")).toBe("Sergei Rachmaninoff");
+        // Cleaned of its work number first, then folded.
+        expect(canonicalComposer("Edward Grieg Op. 54 No.3")).toBe("Edvard Grieg");
+        // A catalogue number the work-number stripping does not recognise.
+        expect(canonicalComposer("Maurice Ravel M. 19")).toBe("Maurice Ravel");
+    });
+
+    it("gives a folded misspelling the same page as the name it folds to", () => {
+        expect(personSlug("CRAUDE DEBUSSY")).toBe(personSlug("Claude Debussy"));
+        expect(personSlug("Eric Satie")).toBe(personSlug("Erik Satie"));
     });
 
     it("strips parenthesized asides and bare trailing dates", () => {
@@ -188,5 +216,25 @@ describe("an arrangement's aside is not a claim about who wrote it", () => {
         for (const credit of ["Gregorian chant", "Volkslied", "Traditional", "Anonymous"]) {
             expect(personSlug(credit)).toBe("");
         }
+    });
+});
+
+describe("nameFromSlug", () => {
+    it("reads a slug back as words, for a composer the catalogue credits nobody by", () => {
+        expect(nameFromSlug("clara-schumann")).toBe("Clara Schumann");
+        expect(nameFromSlug("bach")).toBe("Bach");
+    });
+
+    it("survives the shapes a hand-typed URL arrives in", () => {
+        expect(nameFromSlug("")).toBe("");
+        expect(nameFromSlug("-")).toBe("");
+        expect(nameFromSlug("--erik--satie--")).toBe("Erik Satie");
+    });
+
+    it("round-trips a slug this very module made, up to the diacritics it dropped", () => {
+        // personSlug strips accents and case, so the name cannot come back whole. What
+        // must come back is the word boundaries: a page title of "Faure" is a spelling a
+        // reader forgives, "faure" is not.
+        expect(nameFromSlug(personSlug("Gabriel Faur\u00e9"))).toBe("Gabriel Faure");
     });
 });

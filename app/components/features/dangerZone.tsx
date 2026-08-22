@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
-import { useStore } from "../../contexts/services";
+import { useSampleSource, useStore } from "../../contexts/services";
 import { PREFIX, resetDevice } from "../../lib/resetDevice";
 import { m } from "../../paraglide/messages.js";
 import { ConfirmButton } from "../ui/confirmButton";
@@ -14,10 +14,15 @@ import { SettingsSection } from "../ui/settingsSection";
 // points at the Library backup for anyone who wants to keep their scores first.
 export function DangerZone() {
     const store = useStore();
+    const samples = useSampleSource();
     const [failed, setFailed] = useState(false);
 
     const reset = () => {
         resetDevice(store);
+        // The recordings are not in localStorage — they are a cache of their own, tens of
+        // megabytes of it — so wiping the keys would leave the device holding the one
+        // thing a player asking to start fresh would most notice still being there.
+        void samples.forget();
         // A refused removal leaves Plinky keys behind. Reloading would hide that the
         // wipe never took, so report it and let the player try again instead.
         if (store.keys().some((key) => key.startsWith(PREFIX))) {

@@ -12,7 +12,6 @@ import {
     surprisePick,
     masteredInGrade,
     nextStar,
-    poolSizes,
     skillRating,
     starTier,
 } from "./gradeProgress";
@@ -250,13 +249,5 @@ describe("surprisePick", () => {
 
     it("has nothing to pick from an empty catalogue", () => {
         expect(surprisePick([], 1, new Set(), 0)).toBeNull();
-    });
-});
-
-describe("poolSizes", () => {
-    it("counts each grade's pool", () => {
-        const sizes = poolSizes([cat("a", 1, 1), cat("b", 1, 2), cat("c", 2, 1)]);
-        expect(sizes.get(1)).toBe(2);
-        expect(sizes.get(2)).toBe(1);
     });
 });

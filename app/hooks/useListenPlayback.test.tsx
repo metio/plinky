@@ -6,6 +6,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
+import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import type { Take } from "../../core/takes";
 import { collectListenSteps, useListenPlayback } from "./useListenPlayback";
 
@@ -26,6 +27,43 @@ vi.mock("../lib/scoreCursor", () => ({
 // fields (articulations, ties, slurs) can be injected to drive the expressive reader, and
 // `volume` writes a dynamic onto the sheet the way OSMD parses one — on the measure, at
 // the top of the piece, standing over every position.
+
+// A walk whose pitch changes from position to position, for the shaping that depends on the
+// notes rather than on the clock. Each position is one quarter, as in fakeOsmd.
+function lineOsmd(halfTones: readonly (number | number[])[]) {
+    let position = 0;
+    const cursor = {
+        reset: vi.fn(() => {
+            position = 0;
+        }),
+        show: vi.fn(),
+        hide: vi.fn(),
+        next: vi.fn(() => {
+            position++;
+        }),
+        iterator: {
+            get EndReached() {
+                return position >= halfTones.length;
+            },
+            get CurrentMeasureIndex() {
+                return position;
+            },
+            get currentTimeStamp() {
+                return { RealValue: position * 0.25 };
+            },
+        },
+        NotesUnderCursor: () => {
+            const here = halfTones[position] ?? 60;
+            return (Array.isArray(here) ? here : [here]).map((halfTone) => ({
+                Length: { RealValue: 0.25 },
+                isRest: () => false,
+                halfTone,
+            }));
+        },
+    };
+    return { cursor, Sheet: { SourceMeasures: [] } } as unknown as OpenSheetMusicDisplay;
+}
+
 function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, volume?: number) {
     let position = 0;
     const cursor = {
@@ -43,6 +81,12 @@ function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, volume?
             },
             get CurrentMeasureIndex() {
                 return position;
+            },
+            // Each position is one quarter — a quarter of a whole — so onsets advance the
+            // way a real walk's do. A fake that reported the same onset everywhere would
+            // let a caller reading the position pass while reading it wrongly.
+            get currentTimeStamp() {
+                return { RealValue: position * 0.25 };
             },
         },
         NotesUnderCursor: () => [
@@ -79,7 +123,11 @@ const playNote = vi.fn();
 const onLap = vi.fn();
 let loopState: { on: boolean; from: number; to: number };
 
-function mount(osmd: OpenSheetMusicDisplay | null) {
+const onPosition = vi.fn();
+
+// The score's markings. They no longer come off the engraver, so a test that wants a
+// dynamic in force says what the score writes rather than mimicking an object shape.
+function mount(osmd: OpenSheetMusicDisplay | null, marks: ScoreMarks = NO_SCORE_MARKS) {
     return renderHook(() =>
         useListenPlayback({
             getOsmd: () => osmd,
@@ -88,6 +136,8 @@ function mount(osmd: OpenSheetMusicDisplay | null) {
             loop: () => loopState,
             onLap,
             centerCursor: () => {},
+            onPosition,
+            marks,
             markPainted: () => {},
             isPracticing: () => false,
         }),
@@ -117,16 +167,111 @@ describe("collectListenSteps", () => {
                     accent: false,
                     marcato: false,
                     slurred: false,
+                    pedalled: false,
+                    hand: "right",
                 },
             ],
             dynamicVolume: null,
             lengths: [1],
             whole: 0,
             measureIndex: 0,
+            soft: false,
+            contour: 1,
             bpm: NOMINAL_BPM,
             stretch: 1,
             advancesCursor: true,
+            interpretation: 1,
         });
+    });
+
+    it("reports the pedal as well as ringing under it", () => {
+        // Two separate facts about a pedalled note, and only one of them is its length.
+        // `soundQuarters` rings to the end of the span, which is what the ear hears as
+        // "held". `pedalled` is that the dampers are off the OTHER strings, which is the
+        // rest of what a pedal does and which no amount of lengthening conveys — a recorded
+        // piano has a resonance to play for it.
+        const pedalled = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            pedals: [{ from: 0, to: 4 }],
+        });
+        expect(pedalled[0]?.notes[0]?.pedalled).toBe(true);
+        expect(pedalled[0]?.notes[0]?.soundQuarters).toBeGreaterThan(1);
+
+        const dry = collectListenSteps(fakeOsmd(2));
+        expect(dry[0]?.notes[0]?.pedalled).toBe(false);
+    });
+
+    it("shakes a tremolo instead of holding one long note", () => {
+        // The mark is shorthand for a repetition. Printed but not played, the page shows a
+        // shimmer and the ear hears a plain long note — and a reader learning to recognise
+        // the sign hears nothing happen where it is written.
+        const steps = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            tremolos: [{ from: 0, to: 0.5, beams: 2, pair: null }],
+        });
+        expect(steps.length).toBeGreaterThan(2);
+        expect(
+            steps.every((step) =>
+                step.notes.every((note) => note.pitch === steps[0]?.notes[0]?.pitch),
+            ),
+        ).toBe(true);
+    });
+
+    it("rocks an alternating tremolo between the two written chords", () => {
+        const steps = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            tremolos: [
+                {
+                    from: 0,
+                    to: 0.5,
+                    beams: 2,
+                    pair: [
+                        { at: 0, pitches: [36] },
+                        { at: 0.5, pitches: [43] },
+                    ],
+                },
+            ],
+        });
+        const sounded = steps.slice(0, 4).map((step) => step.notes[0]?.pitch);
+        expect(sounded[0]).not.toBe(sounded[1]);
+        expect(sounded[0]).toBe(sounded[2]);
+        expect(sounded[1]).toBe(sounded[3]);
+    });
+
+    it("sweeps a glissando across the keys between its two notes", () => {
+        const steps = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            glissandos: [{ from: 0, to: 0.5, arrivesAt: 72 }],
+        });
+        const swept = steps.map((step) => step.notes[0]?.pitch ?? 0);
+        expect(swept.length).toBeGreaterThan(2);
+        // Rising, and stopping short of the arrival — the note it lands on is a position of
+        // its own and sounds by itself, so sweeping onto it would strike it twice.
+        expect(swept.slice(0, 3)).toEqual([...swept.slice(0, 3)].sort((a, b) => a - b));
+    });
+
+    it("gentles a passage under the soft pedal", () => {
+        const softly = collectListenSteps(fakeOsmd(1), {
+            ...NO_SCORE_MARKS,
+            softs: [{ from: 0, to: 4 }],
+        });
+        expect(softly[0]?.soft).toBe(true);
+        expect(collectListenSteps(fakeOsmd(1))[0]?.soft).toBe(false);
+    });
+
+    it("leans into the top of a rising line", () => {
+        // The four-bar arch knows nothing about the notes, so it plays every group of four
+        // bars identically. This is the half of the shaping that follows the actual line.
+        const steps = collectListenSteps(lineOsmd([48, 52, 55, 60, 64, 67, 72]));
+        const weights = steps.map((step) => step.contour);
+        expect(weights.at(-1)).toBeGreaterThan(weights[0] as number);
+        // Never above what the page asked for.
+        expect(Math.max(...weights)).toBeLessThanOrEqual(1);
+    });
+
+    it("leaves a line that goes nowhere unshaped", () => {
+        const steps = collectListenSteps(lineOsmd([60, 60, 60, 60]));
+        expect(steps.every((step) => step.contour === 1)).toBe(true);
     });
 
     it("drops a rest from the sounding notes but keeps its length for the beat", () => {
@@ -147,7 +292,12 @@ describe("useListenPlayback", () => {
         expect(result.current.playing).toBe(true);
         // The first entry sounds immediately, sustained per the 120 BPM tempo, at the
         // default velocity since the score marks no dynamic.
-        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 90 });
+        // 0.5 s written, less the small lift an unmarked note is played with.
+        expect(playNote).toHaveBeenCalledWith(60, {
+            duration: 0.5 * 0.94,
+            velocity: 90,
+            pedalled: false,
+        });
 
         // Each quarter at 120 BPM is 500ms; after both entries the walk ends.
         act(() => void vi.advanceTimersByTime(500));
@@ -156,6 +306,21 @@ describe("useListenPlayback", () => {
         expect(result.current.playing).toBe(false);
         expect(onLap).toHaveBeenCalledTimes(1);
         expect(osmd.cursor.hide).toHaveBeenCalled();
+    });
+
+    it("reports where the music has reached, before the position sounds", () => {
+        // The notes highway reads this to draw what is coming. Reporting after the notes
+        // sound would leave the highway one position behind the ear for the whole piece;
+        // not reporting at all is what made Listen drop the highway and show the staff.
+        const osmd = fakeOsmd(3);
+        const { result } = mount(osmd);
+
+        act(() => result.current.start(0));
+        expect(onPosition).toHaveBeenNthCalledWith(1, 0);
+        act(() => void vi.advanceTimersByTime(500));
+        expect(onPosition).toHaveBeenNthCalledWith(2, 0.25);
+        act(() => void vi.advanceTimersByTime(500));
+        expect(onPosition).toHaveBeenNthCalledWith(3, 0.5);
     });
 
     it("ignores a second start while one walk owns the cursor", () => {
@@ -211,13 +376,41 @@ describe("useListenPlayback", () => {
         expect(result.current.activeReplayId).toBeNull();
     });
 
+    it("brings the tune out of the chord under it", () => {
+        // A chord is not one sound: the top of the texture is the tune and the notes under
+        // it are accompaniment. Struck at one level a four-part texture is a block with the
+        // melody buried in the middle of it.
+        const { result } = mount(lineOsmd([[48, 60, 64, 72]]));
+        act(() => result.current.start(0));
+        const struck = new Map(
+            playNote.mock.calls.map(([pitch, options]) => [
+                pitch as number,
+                options?.velocity ?? 0,
+            ]),
+        );
+        act(() => result.current.stop());
+
+        // The walk reports half-tones and the sounding pitch is twelve above them.
+        const top = struck.get(84) as number;
+        expect(struck.get(76)).toBeLessThan(top);
+        expect(struck.get(72)).toBeLessThan(top);
+        // The bass holds the harmony up, so it sits under the tune but above the inner
+        // voices rather than being buried with them.
+        expect(struck.get(60)).toBeGreaterThan(struck.get(72) as number);
+        expect(struck.get(60)).toBeLessThan(top);
+    });
+
     it("plays the score's expression — staccato clips, accent strikes harder, dynamics set loudness", () => {
         // A staccato note (articulationEnum 6) clips to half its length.
         const staccato = mount(
             fakeOsmd(1, { ParentVoiceEntry: { Articulations: [{ articulationEnum: 6 }] } }),
         );
         act(() => staccato.result.current.start(0));
-        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.25, velocity: 90 });
+        expect(playNote).toHaveBeenCalledWith(60, {
+            duration: 0.25,
+            velocity: 90,
+            pedalled: false,
+        });
         act(() => staccato.result.current.stop());
         playNote.mockClear();
 
@@ -232,9 +425,16 @@ describe("useListenPlayback", () => {
         playNote.mockClear();
 
         // A marked dynamic sets the loudness outright.
-        const soft = mount(fakeOsmd(1, {}, 40));
+        const soft = mount(fakeOsmd(1), {
+            ...NO_SCORE_MARKS,
+            dynamics: [{ whole: 0, volume: 40, ramp: false }],
+        });
         act(() => soft.result.current.start(0));
-        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 40 });
+        expect(playNote).toHaveBeenCalledWith(60, {
+            duration: 0.5 * 0.94,
+            velocity: 40,
+            pedalled: false,
+        });
         act(() => soft.result.current.stop());
     });
 
@@ -279,7 +479,8 @@ describe("useListenPlayback", () => {
 
         // The first note sounds for half a second at 120 BPM; the echo says the same
         // in milliseconds.
-        expect(echoed[0]).toEqual([60, 90, 500]);
+        // Milliseconds, and the same small lift the sounded note gets.
+        expect(echoed[0]).toEqual([60, 90, 470]);
     });
 
     it("plays perfectly well with no echo wired at all", () => {
@@ -291,5 +492,25 @@ describe("useListenPlayback", () => {
 
         expect(result.current.playing).toBe(true);
         expect(playNote).toHaveBeenCalledTimes(1);
+    });
+
+    it("says which notes are sounding, and in which hand", async () => {
+        // What the on-screen keyboard lights while Listen demonstrates a piece. "Now" is a
+        // fact only this clock knows — not the position the cursor is drawn on (an ornament
+        // leaves it where it is) and not the one the matcher last saw before standing down.
+        const osmd = fakeOsmd(2);
+        const { result } = mount(osmd);
+
+        expect(result.current.sounding.size).toBe(0);
+        act(() => result.current.start(0));
+        expect([...result.current.sounding]).toEqual([[60, "right"]]);
+
+        act(() => void vi.advanceTimersByTime(500));
+        expect(result.current.sounding.size).toBe(1);
+
+        // Stopping puts the keys out; leaving the last chord lit for ever is worse than
+        // never having lit it.
+        act(() => result.current.stop());
+        expect(result.current.sounding.size).toBe(0);
     });
 });

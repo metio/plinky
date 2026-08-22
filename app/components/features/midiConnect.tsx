@@ -1,18 +1,19 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useMidiConnection } from "../../contexts/midi";
+import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { noteName } from "../../../core/midi";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { KeyboardHint } from "../ui/keyboardHint";
+import { sectionLabelClasses } from "../ui/classes";
 
 // Connect a MIDI keyboard and confirm it works: the connect button, the inputs it
 // finds, and a live read-out of the keys being pressed. Settings hides this whole
 // block where Web MIDI is unsupported, so there's no unsupported state here.
 export function MidiConnect() {
-    const { support, status, error, devices, heldNotes, octaveOffset, requestAccess } =
-        useMidiConnection();
+    const heldNotes = useHeldNotes();
+    const { support, status, error, devices, octaveOffset, requestAccess } = useMidiConnection();
 
     return (
         <div className="space-y-4">
@@ -41,9 +42,7 @@ export function MidiConnect() {
             <KeyboardHint octaveOffset={octaveOffset} />
 
             <div>
-                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
-                    {m.midi_debug_inputs()}
-                </h3>
+                <h3 className={`mb-2 ${sectionLabelClasses}`}>{m.midi_debug_inputs()}</h3>
                 {devices.length === 0 ? (
                     <p className="text-sm text-muted">{m.midi_debug_no_inputs()}</p>
                 ) : (
@@ -68,9 +67,7 @@ export function MidiConnect() {
             </div>
 
             <div>
-                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
-                    {m.midi_debug_held_notes()}
-                </h3>
+                <h3 className={`mb-2 ${sectionLabelClasses}`}>{m.midi_debug_held_notes()}</h3>
                 {heldNotes.length === 0 ? (
                     <p className="text-sm text-muted">{m.midi_debug_press_key()}</p>
                 ) : (

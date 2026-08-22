@@ -18,12 +18,14 @@ import {
 } from "../../../core/practiceSession";
 import { usePracticeLogStore } from "../../contexts/services";
 import { usePracticeLog, usePracticeReport } from "../../hooks/usePracticeLog";
+import { practiceDuration as duration } from "../../lib/practiceDuration";
 import { downloadBlob } from "../../lib/download";
 import { printPage } from "../../lib/printPage";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
+import { compactFieldClasses, sectionHeadingClasses } from "../ui/classes";
 
 // The practice diary, rolled up. How long, on which days, and what it felt like —
 // the retrospective a player keeps for themselves and the summary a teacher asks
@@ -56,13 +58,6 @@ const HEAT_CLASS = [
     "bg-heat-strong",
     "bg-heat-deep",
 ] as const;
-
-function duration(ms: number): string {
-    const totalMinutes = Math.round(ms / 60_000);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return hours > 0 ? m.practice_hm({ hours, minutes }) : m.practice_m({ minutes });
-}
 
 function Stat({ label, value }: { label: string; value: string }) {
     return (
@@ -195,7 +190,7 @@ function BackLogForm({ now }: { now: Date }) {
                         value={date}
                         max={todayKey(now)}
                         onChange={(event) => setDate(event.target.value)}
-                        className="rounded-md border border-line bg-surface px-2 py-1 text-body"
+                        className={compactFieldClasses}
                     />
                 </label>
                 <label className="space-y-1 text-sm">
@@ -207,7 +202,7 @@ function BackLogForm({ now }: { now: Date }) {
                         max={MAX_MANUAL_MINUTES}
                         value={minutes}
                         onChange={(event) => setMinutes(event.target.value)}
-                        className="w-24 rounded-md border border-line bg-surface px-2 py-1 text-body"
+                        className={`w-24 ${compactFieldClasses}`}
                     />
                 </label>
             </div>
@@ -218,7 +213,7 @@ function BackLogForm({ now }: { now: Date }) {
                     value={label}
                     maxLength={MAX_LABEL_LENGTH}
                     onChange={(event) => setLabel(event.target.value)}
-                    className="w-full rounded-md border border-line bg-surface px-2 py-1 text-body"
+                    className={`w-full ${compactFieldClasses}`}
                 />
             </label>
             <Button onClick={submit}>{m.practice_add_action()}</Button>
@@ -274,7 +269,7 @@ export function PracticeReport({
     return (
         <section className="space-y-4">
             <div className="space-y-1">
-                <h2 className="text-sm font-medium text-body">{m.practice_report_title()}</h2>
+                <h2 className={sectionHeadingClasses}>{m.practice_report_title()}</h2>
                 <p className="text-xs text-muted">{m.practice_report_intro()}</p>
             </div>
 

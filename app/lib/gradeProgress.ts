@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { loadBundledScores, loadUserScores } from "./catalog";
+import { loadBundledScores, loadUserScores, userScoresRaw } from "./catalog";
 import { earCatalogItems } from "./earProgress";
+import { encodeIncipit, readIncipit } from "../../core/incipit";
 import type { ItemKind } from "../../core/practisable";
 import type { Letter } from "../../core/grade";
 import type { XmlCodec } from "../../core/xml";
@@ -35,6 +36,9 @@ export type GradedMastery = {
     cost: number;
     kind: ItemKind;
     mastery: Mastery;
+    // Rides along from the catalogue entry, so a list of what is fading can draw each
+    // piece rather than only naming it.
+    incipit?: string;
 };
 
 // Whether a piece counts toward its grade under the decay rule. Gentle counts every
@@ -150,6 +154,9 @@ export type GradeCatalogItem = {
     grade: number;
     cost: number;
     kind: ItemKind;
+    // The piece's opening bars, encoded — what a row draws to name it. Rides along from
+    // the manifest, or is read straight off a bundled or imported score's own notation.
+    incipit?: string;
 };
 
 // Where the fetched manifests come from — structurally the song/exercise
@@ -157,7 +164,13 @@ export type GradeCatalogItem = {
 // catalogue.
 // What a source manifest carries per item — a ladder item minus its kind, since a
 // manifest only ever describes pieces. buildCatalogue stamps the kind on.
-export type ManifestItem = { id: string; title: string; grade: number; cost: number };
+export type ManifestItem = {
+    id: string;
+    title: string;
+    grade: number;
+    cost: number;
+    incipit?: string;
+};
 
 export type CatalogSources = {
     // Null signals a failed fetch (see the source contracts); the catalogue
@@ -173,7 +186,39 @@ export type CatalogSources = {
 // The whole gradeable catalogue, keyed by id: songs and exercises from their
 // manifests (grade + cost precomputed), bundled and imported scores graded from their
 // MusicXML. The pools the grades draw from.
+// The last catalogue built, per store.
+//
+// Building one walks three thousand manifest entries and parses the MusicXML of every
+// bundled and imported score, and both loaders below call it — so the Home panel that
+// wants each of them paid for it twice, and the header badge paid again on every
+// preference saved anywhere in the app. The manifests behind it are already cached for
+// the session; this caches the assembling.
+//
+// Keyed on the store, so each test's isolated world keeps its own; validated against the
+// sources it was built from and against the raw imported-scores string, so importing or
+// removing a score rebuilds it rather than serving a catalogue that has quietly lost a
+// piece. A WeakMap because a store that goes away should take its catalogue with it.
+type BuiltCatalogue = {
+    songs: CatalogSources["songs"];
+    exercises: CatalogSources["exercises"];
+    xml: XmlCodec;
+    scores: string | null;
+    index: Map<string, GradeCatalogItem>;
+};
+const BUILT = new WeakMap<KeyValueStore, BuiltCatalogue>();
+
 async function buildCatalogue(sources: CatalogSources): Promise<Map<string, GradeCatalogItem>> {
+    const scores = userScoresRaw(sources.store);
+    const cached = BUILT.get(sources.store);
+    if (
+        cached &&
+        cached.songs === sources.songs &&
+        cached.exercises === sources.exercises &&
+        cached.xml === sources.xml &&
+        cached.scores === scores
+    ) {
+        return cached.index;
+    }
     const index = new Map<string, GradeCatalogItem>();
     // A failed manifest (null) contributes nothing this pass; the catalogue is
     // rebuilt on the next load, so the gap heals once the network is back.
@@ -205,14 +250,26 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
         if (right.length + left.length === 0) {
             continue;
         }
+        // The notation is already open here, so the mark costs one more read of it —
+        // which is why a bundled demo and a score you imported yourself carry one just
+        // as a catalogue piece does.
+        const opening = readIncipit(sources.xml, score.xml);
         index.set(score.id, {
             id: score.id,
             title: score.title,
             grade: gradeOf(sources.xml, score.id, score.xml),
             cost: rawDifficulty(sources.xml, score.xml),
             kind: "piece",
+            ...(opening ? { incipit: encodeIncipit(opening) } : {}),
         });
     }
+    BUILT.set(sources.store, {
+        songs: sources.songs,
+        exercises: sources.exercises,
+        xml: sources.xml,
+        scores,
+        index,
+    });
     return index;
 }
 
@@ -311,13 +368,4 @@ export function surprisePick(
         return null;
     }
     return pool[((seed % pool.length) + pool.length) % pool.length]!;
-}
-
-// How many pieces each grade's pool holds, indexed by grade.
-export function poolSizes(catalogue: GradeCatalogItem[]): Map<number, number> {
-    const sizes = new Map<number, number>();
-    for (const item of catalogue) {
-        sizes.set(item.grade, (sizes.get(item.grade) ?? 0) + 1);
-    }
-    return sizes;
 }

@@ -8,13 +8,14 @@ import {
     IMPRECISE_HOLD_SCALE,
     isFocusGatedInput,
     isPreciseInput,
-    MIC_DEVICE,
     KEYBOARD_DEVICE,
     keyToNote,
+    MIC_DEVICE,
     noteName,
     ON_SCREEN_DEVICE,
     parseMidiMessage,
     pitchClass,
+    spokenPitch,
 } from "./midi";
 
 describe("noteName", () => {
@@ -212,5 +213,21 @@ describe("holdScaleFor", () => {
 
     it("leaves the microphone untouched — it opens no live voice", () => {
         expect(holdScaleFor(MIC_DEVICE)).toBe(1);
+    });
+});
+
+describe("spokenPitch", () => {
+    it("spells the sharp, which the glyph would have a screen reader say as a number", () => {
+        expect(spokenPitch(61)).toBe("C sharp 4");
+    });
+
+    it("spaces the octave off the letter so it is announced as its own figure", () => {
+        expect(spokenPitch(60)).toBe("C 4");
+        expect(spokenPitch(72)).toBe("C 5");
+    });
+
+    it("numbers the octaves the way a piano is labelled, middle C in the fourth", () => {
+        expect(spokenPitch(21)).toBe("A 0"); // the lowest key of an 88-key piano
+        expect(spokenPitch(108)).toBe("C 8"); // and the highest
     });
 });

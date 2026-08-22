@@ -22,7 +22,7 @@ describe("Play meta", () => {
             .find((data) => data?.["@type"] === "BreadcrumbList");
         expect(breadcrumb).toBeTruthy();
         const items = breadcrumb!.itemListElement as { name: string }[];
-        expect(items[0]?.name).toBe(m.nav_home());
+        expect(items[0]?.name).toBe(m.nav_today());
         expect(items.at(-1)?.name).toBe(score.title);
     });
 });

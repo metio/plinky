@@ -15,6 +15,7 @@ import { useBarWindow } from "../../hooks/useBarWindow";
 import { type FingerMap, fingerKey } from "../../stores/fingeringStore";
 
 import type { FingerQuality } from "../../../core/fingeringScore";
+import { ConfirmButton } from "../ui/confirmButton";
 
 // Gentle per-position colours for the live feedback — informative, never
 // alarming — each paired with a glyph so the verdict doesn't rely on colour
@@ -222,6 +223,20 @@ export function FingeringStrip({
                     >
                         ›
                     </button>
+                    {/* A fingering you have talked yourself into can be talked back out
+                        of. The store could always clear a piece; nothing ever offered it,
+                        so the only way back was to overwrite every note by hand — or wipe
+                        the whole device in Settings. */}
+                    <ConfirmButton
+                        label={m.fingering_reset()}
+                        confirmLabel={m.action_remove_confirm()}
+                        onConfirm={() => {
+                            fingering.clear(id);
+                            setMap(fingering.load(id));
+                        }}
+                    >
+                        ↺
+                    </ConfirmButton>
                 </span>
             </div>
 

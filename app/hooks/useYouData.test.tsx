@@ -71,7 +71,6 @@ describe("useYouData", () => {
         expect(data?.workingGrade).toBe(2);
         // The gentlest next-grade piece leads the suggestions.
         expect(data?.upNext[0]?.id).toBe("g2-easy");
-        expect(data?.poolSizes.get(2)).toBe(2);
         expect(data?.reviews).toEqual([]);
     });
 

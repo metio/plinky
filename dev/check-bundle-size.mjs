@@ -298,7 +298,100 @@ const BUDGET_VENDOR_KB = 324;
 // consent banner, the Settings toggle and the click tracker. Cloudflare's beacon is a
 // script tag in the document rather than anything bundled, so what replaced roughly
 // three kilobytes of app code weighs nothing here.
-const BUDGET_APP_KB = 331;
+//
+// 333. Four places instead of five: a Learn hub gathering the pages that used to hang
+// off the help page, the day's practice as three moments, and the help text rewritten
+// to describe them. Copy is inlined per locale, so a paragraph costs more than the
+// component that renders it — most of the kilobyte and a half is the new help sections
+// and the Learn page's own prose, not the route.
+//
+// 336. Incipits: the reader that lifts a piece's opening bars, the drawing that puts
+// them on a staff, and the encoding that carries one per piece in the catalogue
+// manifest. Two kilobytes of app code; the marks themselves are manifest bytes, not
+// bundle bytes, and cost about 39 KB gzipped on a file the browsing visitor already
+// fetches.
+//
+// 337. The front page greets the moment you arrived — the weekday from the reader's own
+// clock, the part of day from a pure hour test — over a line saying where you stand.
+//
+// 338. The theory course remembers which lessons have been met, so the day's practice
+// offers the next one and stops offering a course there is nothing left of.
+// 339. Scales and arpeggios are named in the reader's language: seventeen title and form
+// strings per locale, plus the table that picks one. The manifest's English titles are
+// still there — they name the score's own <work-title> — so this pays for the language
+// the reader actually gets, in a build carrying one locale.
+// 340. A piece's page names what can be done to it. The twelve ways to work a piece used
+// to sit behind a fold — two for a beginner — so the page carried a summary and nothing
+// else; now How you play and Extra challenge are on it, the eight-grade map says every
+// piece is open and links to each grade's shelf, and every library row draws its opening
+// bars. The marks themselves are manifest bytes, not bundle bytes.
+// 342. Your own recordings are listed on the shelf — a piece was the only way to reach
+// one, so a take whose title you had forgotten was unreachable — and Today's setup steps
+// moved into the three moments, which cost a component and gave one back.
+// 343. One Card and one PageHeader replaced eight hand-rolled panels and twenty-two
+// title blocks. A shared component costs a little more than the markup it replaces, and
+// buys a page that cannot drift again.
+// 346. Six more theory lessons — length, silence, the left hand's clef, the relative
+// minor and the two chord lessons — and two more little tools, an interval finder and the
+// metronome the tap tool now hands its number to. The lessons are copy and a table; the
+// tools are two panels over engines that were already running.
+// 348. Six more marks in the glossary, and the rule that finds each of them in a piece —
+// including ledger lines, which nothing in a file marks, so they are worked out from the
+// pitch and the clef.
+// 350. The recorded grand piano: the mapping from a key and a force to a recording, the
+// cache that holds them, the sampled voice, and the switch that asks for it. The
+// recordings themselves are not here and never will be — they are fetched from their own
+// origin, a piece's worth at a time.
+// 360. Fitting a piece to the keyboard actually plugged in: the range read off a score,
+// the octave shift that brings it into reach, and the panel that remembers which
+// instrument it is. Step entry, which writes a piece down a note at a time rather than
+// playing it. The composer directory, which lists everybody the catalogue credits
+// instead of the few with pages the prerender holds. And the baked opening bars taking
+// a colour, so the shelf and the piece it opens agree about what a note is called.
+// 365. The rhythm trainer: the graded ladder of figures and the generator that fills a
+// bar from them, the nearest-first matching that decides which written note a tap was
+// aimed at, and the notation. That last one is drawn here rather than engraved — a
+// rhythm has no pitch, so it needs no clef, no key and no staff to place anything on,
+// and routing it through the score engine would pull the whole notation machinery onto
+// a page that needs none of it. Drawing it costs about a kilobyte; the engine would
+// have cost the page its whole budget. Also: the diatonic chord worksheet and the
+// second export format on the tools page, and the practice-time-per-piece panel.
+// 367. Reading the music out of the file instead of out of the engraver: the timeline
+// (onsets, lengths, chords, backups, ties, divisions), the marks written over it
+// (dynamics and hairpins, pedal, octave lines, arches, the key), and the repeat structure.
+// About a kilobyte, and it buys the retirement of the readers that caused the two worst
+// silent bugs this app has had — dynamics that returned null for every real score for
+// years, and slurs that joined only the first note of every phrase — plus correct timing
+// on the thirteen per cent of the catalogue that overruns its own barlines.
+// 368. Telling the player what is happening while they wait, and while the numbers at the
+// end of a run are read: the staff that stands in for a piece that is still arriving (with
+// a word for which half of the wait it is), the spinner beside the finger-numbers switch,
+// the key for the coloured dots, and the fold-away explanation of what each score measures.
+// Almost all of it is the strings; the drawing is a handful of lines. Measured first — a
+// throttled-CPU, throttled-network benchmark (dev/bench-score.mjs) put a piece at three to
+// five seconds before a single mark appeared, of which about half is the engraver's own
+// work and cannot be given back. So it is spent on making the wait legible rather than on
+// pretending it is shorter.
+// 369. Reading one piece's row out of a slice of the catalogue rather than the whole
+// manifest, and asking for the engraver from the route module instead of waiting for the
+// score component to mount. A third of a kilobyte of shard arithmetic and a one-line warm-up,
+// against 1.45 s off the time a piece takes to appear on a throttled phone — 7.75 s to
+// 6.30 s at four-times CPU over Fast 4G, measured cold with dev/bench-score.mjs, ranges not
+// overlapping. It also takes 600 KB off what opening a piece downloads at all, which is the
+// part that matters on a metered connection.
+// 370. What the page says, reaching the sound at last. A rit. or an accel. now gives in the
+// pulse instead of doing nothing — 660 pieces in the catalogue print one — and a piece that
+// changes key part way through spells its ornaments from the key it is actually in, which
+// 383 of them need. Both are timelines the file reader already had the walk for, so the cost
+// is the interpolation and the vocabulary of words engravings use for "slower".
+// 371. The last of the shorthand the page uses and the sound ignored: the tremolo (135
+// pieces, and the alternating form is two thirds of them), the glissando (12), the middle
+// pedal, and the soft pedal (59). Each is a figure or a foot that has to be spelled out to
+// be heard, and each was printed and silent.
+// 372. Menus that close the way every other menu closes — a press elsewhere, or Escape.
+// A fifth of a kilobyte for a hook two of them share, against a reported bug where the only
+// way out of the Export menu was the button that opened it.
+const BUDGET_APP_KB = 372;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

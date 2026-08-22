@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useSearchParams } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { fakeMidi } from "../adapters/fakeMidi";
@@ -12,6 +12,14 @@ import { switchOn } from "../testing/controls";
 import Compose from "./compose";
 
 let mounted: HTMLElement[] = [];
+
+// Lets a test change the address the way the app one day might, from inside the router.
+let setParams: ReturnType<typeof useSearchParams>[1] = () => {};
+function AddressProbe() {
+    const [, setter] = useSearchParams();
+    setParams = setter;
+    return null;
+}
 
 // The browser context arrives with MIDI pre-granted; without a fake seam the
 // provider would silently open a REAL Web MIDI connection under every test.
@@ -103,6 +111,52 @@ describe("Compose", () => {
         await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
             timeout: 30000,
         });
+    });
+
+    it("does not reload a shared take over the work when the address changes", async () => {
+        // The loader runs whenever anything in the address changes, not only on arrival.
+        // Every run used to apply the shared notes again — over whatever the player had
+        // done to them since. Nothing on this page writes a parameter today, which is the
+        // only reason it never happened; this pins it as a fact about the code.
+        const { encodeComposition } = await import("../../core/composition");
+        const code = encodeComposition({
+            notes: [
+                { pitch: 60, startMs: 0, durationMs: 400, velocity: 90 },
+                { pitch: 62, startMs: 500, durationMs: 400, velocity: 90 },
+            ],
+            tempo: 120,
+            beatsPerBar: 4,
+        });
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        mounted.push(container);
+        render(
+            <MemoryRouter initialEntries={[`/compose?c=${code}`]}>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Compose />
+                        <AddressProbe />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+            { container },
+        );
+        expect(await screen.findByText("2 notes")).toBeTruthy();
+
+        await strike(67);
+        expect(await screen.findByText("3 notes")).toBeTruthy();
+
+        // Something else in the address moves, with the shared code still on it.
+        act(() => {
+            setParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.set("tab", "anything");
+                return next;
+            });
+        });
+
+        // The player's third note is still there.
+        expect(await screen.findByText("3 notes")).toBeTruthy();
     });
 
     it("asks before Clear wipes the take", async () => {

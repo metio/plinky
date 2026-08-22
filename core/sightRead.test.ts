@@ -23,6 +23,7 @@ describe("sight-read aids", () => {
             colorNotes: false,
             forgiving: false,
             highway: false,
+            showFingerings: false,
         });
     });
 });

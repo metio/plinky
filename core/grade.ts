@@ -29,6 +29,49 @@ export type Grade = {
     letter: Letter;
 };
 
+// Which readings a graded run has, in the order they are shown, and which of them this
+// particular run earned.
+//
+// One list, because the readings appear in two places — the panel at the end of a run and
+// the list of saved takes — and they had drifted: the takes list showed accuracy, timing and
+// flow, and silently dropped the dynamics and expression the very same take had stored.
+// Nothing could have caught that, because each place named its own rows by hand and both
+// were internally consistent.
+//
+// The ids are what a reading IS; what it is called belongs to the layer that has the
+// player's language. Adding a reading to Grade means adding it here, once, and both places
+// gain it.
+export type ScoreReading = "accuracy" | "timing" | "flow" | "dynamics" | "expression";
+
+// The three that every run earns come first, then the two a run only earns when the score
+// asks for them — an unmarked piece and a computer keyboard cannot be graded on dynamics
+// or expression, and a null there means "not asked", never "scored zero".
+const READINGS: { id: ScoreReading; of: (grade: Grade) => number | null }[] = [
+    { id: "accuracy", of: (grade) => grade.accuracy },
+    { id: "timing", of: (grade) => grade.timing },
+    { id: "flow", of: (grade) => grade.flow },
+    { id: "dynamics", of: (grade) => grade.dynamics },
+    { id: "expression", of: (grade) => grade.expression },
+];
+
+export function scoreReadings(grade: Grade): { id: ScoreReading; value: number }[] {
+    const out: { id: ScoreReading; value: number }[] = [];
+    for (const { id, of } of READINGS) {
+        const value = of(grade);
+        if (value !== null) {
+            out.push({ id, value });
+        }
+    }
+    return out;
+}
+
+// Whether a reading is one every run earns, or one the score has to ask for. The two are
+// shown differently — the optional pair sit quieter, because their absence is ordinary and
+// says nothing about the playing.
+export function isOptionalReading(id: ScoreReading): boolean {
+    return id === "dynamics" || id === "expression";
+}
+
 // A gold "S" tier above an A–F gradient that runs green → red. Contrast-safe
 // text colours (light / dark) at the large size the grade letter is shown.
 export const GRADE_COLOR: Record<Letter, string> = {
@@ -146,6 +189,13 @@ export function computeGrade({
             letter: "F",
         };
     }
+    // A shown 100 means a hundred, not a rounded one. Plain rounding turns 249 right notes
+    // out of 250 into "100%", and the flawless milestone reads those shown figures — so a
+    // run with a wrong note in it was congratulated for having none. Everything short of
+    // perfect stops at 99, which costs a fraction of a percent of precision and buys the
+    // number back its meaning.
+    const show = (value: number) => (value >= 100 ? 100 : Math.min(99, Math.round(value)));
+
     const accuracy = (correct / attempts) * 100;
 
     // A perfectly-timed note counts full, a "good" one partially, an "off" one
@@ -158,9 +208,9 @@ export function computeGrade({
     const score = Math.round((accuracy + timing + flow) / 3);
 
     return {
-        accuracy: Math.round(accuracy),
-        timing: Math.round(timing),
-        flow: Math.round(flow),
+        accuracy: show(accuracy),
+        timing: show(timing),
+        flow: show(flow),
         dynamics: dynamics ? Math.round(dynamics.evenness) : null,
         expression: expression ? expression.score : null,
         score,

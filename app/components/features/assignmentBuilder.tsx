@@ -7,7 +7,7 @@ import type { AssignmentDraft } from "../../hooks/useAssignmentDraft";
 import { useDragReorder } from "../../hooks/useDragReorder";
 import { m } from "../../paraglide/messages.js";
 import { Button, IconButton } from "../ui/button";
-import { compactFieldClasses as FIELD } from "../ui/classes";
+import { compactFieldClasses, compactFieldClasses as FIELD } from "../ui/classes";
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from "../ui/icons";
 import { Show } from "./conditional";
 
@@ -120,7 +120,7 @@ export function AssignmentBuilder({
             </Show>
             <Show when={draft.visible < matches.length}>
                 <Button variant="secondary" onClick={draft.showMore}>
-                    {m.library_show_more()}
+                    {m.music_show_more()}
                 </Button>
             </Show>
 
@@ -237,7 +237,7 @@ export function AssignmentBuilder({
                         type="date"
                         value={draft.dueOn}
                         onChange={(event) => draft.setDueOn(event.target.value)}
-                        className="rounded-md border border-line bg-surface px-2 py-1 text-body"
+                        className={compactFieldClasses}
                     />
                     <span className="text-xs">{m.assignments_due_hint()}</span>
                 </label>

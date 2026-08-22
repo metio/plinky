@@ -5,28 +5,31 @@ import type { ReactNode } from "react";
 import { useLocation } from "react-router";
 import { withTrailingSlash } from "../../../core/site";
 import { m } from "../../paraglide/messages.js";
-import { BookIcon, CalendarIcon, GradCapIcon, HomeIcon, NotesIcon } from "./icons";
+import { BookIcon, GradCapIcon, MicIcon, NotesIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
 import { localizedHref } from "./href";
 
-// The app's primary destinations. Before this, every section was reachable only as a
-// home-page tile, so moving between Library/Daily/Compose/You meant a round-trip
-// through home — these get a persistent bar (a bottom tab bar on phones, header links
-// on wide screens). Settings stays the header gear; the rest reach from here or home.
+// The app's four permanent places, each answering a different question: what shall I
+// play now, what is there to play, what does this mean, how am I getting on. Naming
+// them as one kind of thing is the point — a bar that mixes a page, a place, a piece
+// and a verb teaches no model, so nothing can be predicted from it.
+//
+// The daily challenge is a *today* thing and leads the warm-up on Today; Compose is
+// music you make and sits on Music beside the music you import. Both keep their URLs.
+// Settings and Help stay the header icons.
 const DESTINATIONS: {
     to: string;
     label: () => string;
     Icon: (props: { className?: string }) => ReactNode;
 }[] = [
-    { to: "/", label: m.nav_home, Icon: HomeIcon },
-    { to: "/library", label: m.nav_library, Icon: BookIcon },
-    { to: "/daily", label: m.nav_daily, Icon: CalendarIcon },
-    { to: "/compose", label: m.nav_compose, Icon: NotesIcon },
-    { to: "/you", label: m.nav_you, Icon: GradCapIcon },
+    { to: "/music", label: m.music_title, Icon: NotesIcon },
+    { to: "/learn", label: m.nav_learn, Icon: BookIcon },
+    { to: "/compose", label: m.nav_compose, Icon: MicIcon },
+    { to: "/teach", label: m.nav_teach, Icon: GradCapIcon },
 ];
 
 // Marks the current section. Home matches only its exact path; the rest also match
-// their sub-pages (e.g. /library stays lit while reading a piece under it). Both sides
+// their sub-pages (e.g. /music stays lit while reading a piece under it). Both sides
 // are normalized to the trailing-slash form the links carry, so a visitor who arrives
 // on the bare path before the host redirects still sees their section lit.
 function useIsActive(): (to: string) => boolean {
@@ -35,7 +38,7 @@ function useIsActive(): (to: string) => boolean {
         const href = localizedHref(to);
         const here = withTrailingSlash(pathname);
         // Every href ends in "/", so the prefix test covers the exact match too and
-        // cannot mistake a sibling section (/library/ never matches /librarything/).
+        // cannot mistake a sibling section (/music/ never matches /musicology/).
         return to === "/" ? here === href : here.startsWith(href);
     };
 }
@@ -57,8 +60,10 @@ export function BottomNav() {
                             <Link
                                 to={to}
                                 aria-current={active ? "page" : undefined}
-                                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 py-2 text-xs font-medium ${
-                                    active ? "text-accent" : "text-muted"
+                                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 border-t-2 py-2 text-xs font-medium ${
+                                    active
+                                        ? "border-spark text-ink"
+                                        : "border-transparent text-muted"
                                 }`}
                             >
                                 <Icon className="h-6 w-6" />
@@ -84,8 +89,10 @@ export function HeaderNav({ className = "" }: { className?: string }) {
                         key={to}
                         to={to}
                         aria-current={active ? "page" : undefined}
-                        className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                            active ? "text-accent" : "text-muted hover:text-ink"
+                        className={`border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                            active
+                                ? "border-spark text-ink"
+                                : "border-transparent text-muted hover:text-ink"
                         }`}
                     >
                         {label()}

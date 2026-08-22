@@ -85,6 +85,47 @@ export const GLOSSARY: GlossaryEntry[] = [
         },
     },
     {
+        // Held past its written length, at the player's discretion. The plain reading is
+        // the same bar taken in time, so the pause is the whole difference.
+        id: "fermata",
+        category: "length",
+        shown: {
+            ...TREBLE,
+            notes: [
+                { step: "G", octave: 4, value: "quarter" },
+                { step: "A", octave: 4, value: "quarter" },
+                { step: "B", octave: 4, value: "half", fermata: true },
+            ],
+        },
+        plain: {
+            ...TREBLE,
+            notes: [
+                { step: "G", octave: 4, value: "quarter" },
+                { step: "A", octave: 4, value: "quarter" },
+                { step: "B", octave: 4, value: "half" },
+            ],
+        },
+    },
+    {
+        // The bar that joins fast notes into beat groups. Nothing to compare: the beam is
+        // how the same rhythm is written, not a change to it.
+        id: "beam",
+        category: "length",
+        shown: {
+            ...TREBLE,
+            notes: [
+                { step: "C", octave: 5, value: "eighth", beam: "begin" },
+                { step: "B", octave: 4, value: "eighth", beam: "end" },
+                { step: "A", octave: 4, value: "eighth", beam: "begin" },
+                { step: "G", octave: 4, value: "eighth", beam: "end" },
+                { step: "F", octave: 4, value: "eighth", beam: "begin" },
+                { step: "E", octave: 4, value: "eighth", beam: "end" },
+                { step: "D", octave: 4, value: "quarter" },
+            ],
+        },
+        plain: null,
+    },
+    {
         id: "rest",
         category: "length",
         shown: {
@@ -123,6 +164,28 @@ export const GLOSSARY: GlossaryEntry[] = [
                 { step: "B", octave: 4, value: "quarter" },
                 { step: "A", octave: 4, value: "quarter" },
                 { step: "G", octave: 4, value: "quarter" },
+            ],
+        },
+    },
+    {
+        // Held for its full value and leaned on a little — the opposite instruction to
+        // staccato, and the one a beginner meets right after it.
+        id: "tenuto",
+        category: "touch",
+        shown: {
+            ...TREBLE,
+            notes: [
+                { step: "E", octave: 4, value: "quarter", articulation: "tenuto" },
+                { step: "F", octave: 4, value: "quarter", articulation: "tenuto" },
+                { step: "G", octave: 4, value: "half", articulation: "tenuto" },
+            ],
+        },
+        plain: {
+            ...TREBLE,
+            notes: [
+                { step: "E", octave: 4, value: "quarter" },
+                { step: "F", octave: 4, value: "quarter" },
+                { step: "G", octave: 4, value: "half" },
             ],
         },
     },
@@ -202,6 +265,30 @@ export const GLOSSARY: GlossaryEntry[] = [
                 { step: "E", octave: 5, value: "quarter" },
                 { step: "D", octave: 5, value: "quarter" },
                 { step: "C", octave: 5, value: "half" },
+            ],
+        },
+    },
+    {
+        // Loudness as a journey rather than a level. The plain reading holds one dynamic
+        // throughout, which is exactly what the hairpin is there to stop you doing.
+        id: "hairpin",
+        category: "loudness",
+        shown: {
+            ...TREBLE,
+            notes: [
+                { step: "C", octave: 4, value: "quarter", wedge: "crescendo" },
+                { step: "E", octave: 4, value: "quarter" },
+                { step: "G", octave: 4, value: "quarter" },
+                { step: "C", octave: 5, value: "quarter", wedge: "stop" },
+            ],
+        },
+        plain: {
+            ...TREBLE,
+            notes: [
+                { step: "C", octave: 4, value: "quarter", dynamic: "p" },
+                { step: "E", octave: 4, value: "quarter" },
+                { step: "G", octave: 4, value: "quarter" },
+                { step: "C", octave: 5, value: "quarter" },
             ],
         },
     },
@@ -292,6 +379,38 @@ export const GLOSSARY: GlossaryEntry[] = [
         },
         plain: null,
     },
+    {
+        // The stave is five lines, and the music does not stop there. Nothing to compare:
+        // a ledger line changes where a note is written, never how it sounds.
+        id: "ledger",
+        category: "place",
+        shown: {
+            ...TREBLE,
+            notes: [
+                { step: "C", octave: 4, value: "quarter" },
+                { step: "A", octave: 4, value: "quarter" },
+                { step: "C", octave: 6, value: "half" },
+            ],
+        },
+        plain: null,
+    },
+    {
+        // Go back and play it again. The example sounds twice, since a repeat that played
+        // once would be teaching the opposite of what it says.
+        id: "repeat",
+        category: "place",
+        shown: {
+            ...TREBLE,
+            repeat: true,
+            notes: [
+                { step: "G", octave: 4, value: "quarter" },
+                { step: "A", octave: 4, value: "quarter" },
+                { step: "B", octave: 4, value: "quarter" },
+                { step: "G", octave: 4, value: "quarter" },
+            ],
+        },
+        plain: null,
+    },
 ];
 
 export type GlossaryStrike = {
@@ -301,9 +420,32 @@ export type GlossaryStrike = {
     delay: number; // seconds from the start of the phrase
 };
 
+// A fermata's note is held about half as long again — enough that the pause is the thing
+// you hear, without stopping the example dead.
+const FERMATA_STRETCH = 1.5;
+
+// The two ends a hairpin travels between. A crescendo starts at the quieter and arrives at
+// the louder; a diminuendo does the reverse.
+const WEDGE_FROM = 45;
+const WEDGE_TO = 112;
+
 // Turn a written bar into what the speakers should do with it. Rests take their time
-// without sounding; a tie sounds once and holds through its continuation.
+// without sounding; a tie sounds once and holds through its continuation. A repeated
+// example sounds twice, because that is what the mark asks for.
 export function performSnippet(snippet: Snippet, tempo = GLOSSARY_TEMPO): GlossaryStrike[] {
+    const once = performOnce(snippet, tempo);
+    if (!snippet.repeat) {
+        return once;
+    }
+    const bar = phraseQuarters(snippet) * (60 / tempo);
+    return [...once, ...once.map((strike) => ({ ...strike, delay: strike.delay + bar }))];
+}
+
+function phraseQuarters(snippet: Snippet): number {
+    return snippet.notes.reduce((sum, note) => sum + noteQuarters(note), 0);
+}
+
+function performOnce(snippet: Snippet, tempo: number): GlossaryStrike[] {
     const beatSeconds = 60 / tempo;
     const strikes: GlossaryStrike[] = [];
     let elapsedQuarters = 0;
@@ -312,6 +454,11 @@ export function performSnippet(snippet: Snippet, tempo = GLOSSARY_TEMPO): Glossa
     let insideSlur = false;
     // The last index already sounded as part of a tie, so its continuation is silent.
     let heldThrough = -1;
+    // Where a hairpin opened, and how many notes it spans, so each note under it lands a
+    // step further along the ramp. A mark about getting louder has to actually do it.
+    const wedgeStart = snippet.notes.findIndex((note) => note.wedge && note.wedge !== "stop");
+    const wedgeEnd = snippet.notes.findIndex((note) => note.wedge === "stop");
+    const wedgeKind = wedgeStart >= 0 ? snippet.notes[wedgeStart]?.wedge : undefined;
 
     snippet.notes.forEach((note, index) => {
         if (note.dynamic) {
@@ -324,6 +471,14 @@ export function performSnippet(snippet: Snippet, tempo = GLOSSARY_TEMPO): Glossa
         const slurred = insideSlur && note.slur !== "stop";
         if (note.slur === "stop") {
             insideSlur = false;
+        }
+
+        // Under a hairpin the dynamic is a ramp rather than a level, so it overrides the
+        // standing one for as long as the hairpin lasts.
+        if (wedgeKind && wedgeEnd > wedgeStart && index >= wedgeStart && index <= wedgeEnd) {
+            const along = (index - wedgeStart) / (wedgeEnd - wedgeStart);
+            const travelled = wedgeKind === "crescendo" ? along : 1 - along;
+            dynamicVolume = Math.round(WEDGE_FROM + travelled * (WEDGE_TO - WEDGE_FROM));
         }
 
         const midi = snippetMidi(note, snippet.fifths);
@@ -353,7 +508,9 @@ export function performSnippet(snippet: Snippet, tempo = GLOSSARY_TEMPO): Glossa
             strikes.push({
                 note: midi,
                 velocity: played.velocity,
-                duration: played.durationSeconds,
+                duration: note.fermata
+                    ? played.durationSeconds * FERMATA_STRETCH
+                    : played.durationSeconds,
                 delay: elapsedQuarters * beatSeconds,
             });
         }
@@ -365,7 +522,7 @@ export function performSnippet(snippet: Snippet, tempo = GLOSSARY_TEMPO): Glossa
 // How long the whole phrase takes, so a player can be shown as busy for exactly as
 // long as it sounds.
 export function snippetSeconds(snippet: Snippet, tempo = GLOSSARY_TEMPO): number {
-    const quarters = snippet.notes.reduce((sum, note) => sum + noteQuarters(note), 0);
+    const quarters = phraseQuarters(snippet) * (snippet.repeat ? 2 : 1);
     return quarters * (60 / tempo);
 }
 

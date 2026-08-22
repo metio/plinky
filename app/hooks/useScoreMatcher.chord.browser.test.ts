@@ -66,8 +66,32 @@ describe("a position whose notes are not all the same", () => {
         // fraction of it, and neither is told to do what the other was told.
         expect(held?.holdMs).toBeGreaterThan(0);
         expect(clipped?.holdMs).toBeLessThan((held?.holdMs ?? 0) / 4);
-        // The chord's own ringing length — what the hold indicator draws — is still its
-        // longest note, so the indicator is unchanged by the split.
+        // The chord's own ringing length is still its longest note.
         expect(step?.holdMs).toBe(held?.holdMs);
+        // The written lengths split the same way, before articulation narrows them: a
+        // whole note and a quarter, four to one. This is what each key's own hold
+        // indicator drains on.
+        expect(clipped?.writtenHoldMs).toBeCloseTo((held?.writtenHoldMs ?? 0) / 4);
+        // Staccato shortens the sound, never the written value the indicator draws.
+        expect(clipped?.writtenHoldMs).toBeGreaterThan(clipped?.holdMs ?? 0);
+    });
+
+    it("gives a slow hand and a fast one their own hold lengths", async () => {
+        // The ordinary two-hand case: the left holds a whole note while the right plays
+        // a quaver. Drawing both fills at the position's own length leaves the right
+        // hand's key draining at the left hand's pace long after that hand moved on.
+        const osmd = await load(
+            score(`<measure number="1">${ATTRIBUTES}
+                ${voiceNote("C", 16, "whole", 1)}
+                ${backup(16)}
+                ${voiceNote("G", 2, "eighth", 2)}
+                ${rest(14, "half", 2)}
+            </measure>`),
+        );
+
+        const step = collectMatchSteps(osmd, "both")[0];
+        const [slow, fast] = step?.expected ?? [];
+        expect(slow?.writtenHoldMs).toBeCloseTo((fast?.writtenHoldMs ?? 0) * 8);
+        expect(fast?.writtenHoldMs).toBeGreaterThan(0);
     });
 });

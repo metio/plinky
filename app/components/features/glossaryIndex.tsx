@@ -4,6 +4,7 @@
 import { CATEGORIES, entriesIn } from "../../../core/glossary";
 import { CATEGORY_NAMES, symbolName } from "../../lib/glossaryLabels";
 import { m } from "../../paraglide/messages.js";
+import { sectionLabelClasses } from "../ui/classes";
 
 // The way in: every symbol, grouped by what it controls.
 //
@@ -25,9 +26,7 @@ export function GlossaryIndex({
                     {/* A group label rather than a heading: the page's heading outline is
                     its title and the symbol being read, and four more headings inside the
                     index would bury that. The list carries the name for a screen reader. */}
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted">
-                        {CATEGORY_NAMES[category]()}
-                    </p>
+                    <p className={sectionLabelClasses}>{CATEGORY_NAMES[category]()}</p>
                     <ul aria-label={CATEGORY_NAMES[category]()}>
                         {entriesIn(category).map((entry) => {
                             const current = entry.id === selected;

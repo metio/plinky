@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { progressGrid } from "../../core/lifetime";
 import type { Grid } from "../../core/shareCard";
 import { useServices } from "../contexts/services";
@@ -40,19 +40,38 @@ export function useYouData(): YouData | null {
         };
     }, [services]);
 
-    if (items === null) {
-        return null;
-    }
+    // Read every render, so a milestone reached while the page is open still counts —
+    // they are two store reads, and as a number and a boolean they key the memo below by
+    // value rather than freezing it.
+    const reachedGrade = services.milestones.reachedGrade();
+    const flawless = services.milestones.flawlessDone();
+    const { decayMode, reviewCap } = prefs;
 
-    return buildYouData({
-        items,
-        catalogue,
-        mode: prefs.decayMode,
-        reviewCap: prefs.reviewCap,
-        summary,
-        fingerprint,
-        reachedGrade: services.milestones.reachedGrade(),
-        flawless: services.milestones.flawlessDone(),
-        now: Date.now(),
-    });
+    // Derived once per change of input rather than once per render. Inside, this filters
+    // and sorts the whole grade catalogue and walks the mastery for every grade; outside,
+    // it was re-run by each of the three async loads at mount and again on every
+    // preference saved anywhere in the app.
+    //
+    // The clock is read inside the memo rather than passed into it: as a dependency,
+    // Date.now() would differ every render and the memo would never once hold. What it
+    // decides — whether a piece has come due — moves on the scale of days.
+    const data = useMemo(
+        () =>
+            items === null
+                ? null
+                : buildYouData({
+                      items,
+                      catalogue,
+                      mode: decayMode,
+                      reviewCap,
+                      summary,
+                      fingerprint,
+                      reachedGrade,
+                      flawless,
+                      now: Date.now(),
+                  }),
+        [items, catalogue, decayMode, reviewCap, summary, fingerprint, reachedGrade, flawless],
+    );
+
+    return data;
 }

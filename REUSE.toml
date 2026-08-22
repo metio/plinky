@@ -76,7 +76,21 @@ SPDX-FileCopyrightText = "The catalogue score contributors"
 SPDX-License-Identifier = "CC-BY-SA-2.5"
 
 [[annotations]]
+path = ["dev/catalog-curation.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
 path = ["public/songs/manifest.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# The same manifest cut into slices, so opening one piece reads about ten kilobytes
+# instead of six hundred. Written by `npm run songs:bake` from the manifest above.
+[[annotations]]
+path = ["public/songs/index/*.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
@@ -101,7 +115,30 @@ SPDX-License-Identifier = "CC0-1.0"
 # image, and the founder portraits on the About page: declared here so the asset
 # files stay untouched.
 [[annotations]]
-path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp", "public/help/*.webp"]
+path = ["dev/help-shots.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp", "public/help/*/*.webp"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# The brand kit: every file in it is rendered by dev/build-brand.mjs from the app's own
+# tokens and the icon, so they are our own art and carry the project's licence. The
+# JSON and the images cannot hold a comment; the README does and is left alone.
+[[annotations]]
+path = ["brand/**/*.png", "brand/**/*.svg", "brand/palette.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# The design-sync settings: our own configuration for the component sync, in a format that
+# holds no comment.
+[[annotations]]
+path = [".design-sync/config.json", ".design-sync/tsconfig.types.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

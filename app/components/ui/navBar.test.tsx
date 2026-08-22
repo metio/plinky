@@ -5,6 +5,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
+import { m } from "../../paraglide/messages.js";
 import { localizeHref } from "../../paraglide/runtime.js";
 import { localizedHref } from "./href";
 import { BottomNav } from "./navBar";
@@ -27,33 +28,33 @@ const current = () =>
         ?.textContent;
 
 describe("BottomNav active section", () => {
-    it("lights Home only on the exact root path", () => {
+    it("lights nothing on the home page, which the mark leads to instead", () => {
         at("/");
-        expect(current()).toMatch(/home/i);
+        expect(current()).toBeUndefined();
     });
 
     it("lights the section that owns the current path", () => {
-        at("/library");
-        expect(current()).toMatch(/library/i);
+        at("/music");
+        expect(current()).toBe(m.music_title());
     });
 
     it("keeps a section lit while on one of its sub-pages", () => {
-        at("/library/some-piece");
-        expect(current()).toMatch(/library/i);
+        at("/music/some-piece");
+        expect(current()).toBe(m.music_title());
     });
 
-    it("does not light Home on a sub-page of another section", () => {
-        at("/you");
-        expect(current()).not.toMatch(/home/i);
+    it("lights nothing on a page no section owns", () => {
+        at("/stats");
+        expect(current()).toBeUndefined();
     });
 
     it("lights the section on the trailing-slash path the links carry", () => {
-        at("/library/");
-        expect(current()).toMatch(/library/i);
+        at("/music/");
+        expect(current()).toBe(m.music_title());
     });
 
     it("does not light a section whose name only prefixes the current path", () => {
-        at("/librarything");
+        at("/musicology");
         expect(current()).toBeUndefined();
     });
 });
@@ -62,7 +63,8 @@ describe("BottomNav hrefs", () => {
     it("point at the trailing-slash form the prerendered page is served under", () => {
         at("/");
         const hrefs = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
-        expect(hrefs).toContain(localizedHref("/library"));
+        expect(hrefs).toContain(localizedHref("/music"));
+        expect(hrefs).toContain(localizedHref("/learn"));
         for (const href of hrefs) {
             expect(href).toMatch(/\/$/);
         }

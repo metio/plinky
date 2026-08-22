@@ -33,7 +33,6 @@ function expectValid(prefs: Prefs): void {
     expect(typeof prefs.showFingerings).toBe("boolean");
     expect(typeof prefs.colorNotes).toBe("boolean");
     expect(typeof prefs.forgiving).toBe("boolean");
-    expect(typeof prefs.fingerHints).toBe("boolean");
     expect(typeof prefs.barNumbers).toBe("boolean");
     expect(typeof prefs.metronomeAccent).toBe("boolean");
     expect(typeof prefs.metronomeAdaptive).toBe("boolean");
@@ -114,7 +113,6 @@ describe("parsePrefs properties", () => {
                         "noteHints",
                         "noteLabels",
                         "forgiving",
-                        "fingerHints",
                         "decayMode",
                         "reviewCap",
                         "barsPerRow",

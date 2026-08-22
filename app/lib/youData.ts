@@ -16,7 +16,6 @@ import {
     type GradedMastery,
     gradeSuggestions,
     masteredInGrade,
-    poolSizes,
     skillRating,
     starTier,
 } from "./gradeProgress";
@@ -36,9 +35,8 @@ export type YouData = {
     // The gentlest unmastered pieces of the working grade — what to play next.
     upNext: GradeCatalogItem[];
     // Pieces due a refresh, resolved to titles for linking.
-    reviews: Array<{ id: string; title: string; kind: ItemKind }>;
+    reviews: Array<{ id: string; title: string; kind: ItemKind; incipit?: string }>;
     // How many catalogue pieces each grade holds.
-    poolSizes: Map<number, number>;
     summary: PracticeSummary | null;
     fingerprint: Grid | null;
     // The collectible badge set, earned flags included.
@@ -84,9 +82,13 @@ export function buildYouData(input: YouInput): YouData {
         upNext: gradeSuggestions(catalogue, workingGrade, masteredIds, SUGGESTION_COUNT),
         reviews: dueReviews(items, now, input.reviewCap).map((id) => {
             const item = byId.get(id);
-            return { id, title: item?.title ?? id, kind: item?.kind ?? "piece" };
+            return {
+                id,
+                title: item?.title ?? id,
+                kind: item?.kind ?? "piece",
+                ...(item?.incipit ? { incipit: item.incipit } : {}),
+            };
         }),
-        poolSizes: poolSizes(catalogue),
         summary: input.summary,
         fingerprint: input.fingerprint,
         achievements: earnedAchievements(input, level),

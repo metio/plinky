@@ -12,10 +12,11 @@ import {
 import { noindexMeta, routeMeta } from "../../core/site";
 import { Button } from "../components/ui/button";
 import { useStore } from "../contexts/services";
-import { resolveScore } from "../lib/catalog";
+import { loadCatalog } from "../lib/catalog";
 import { downloadBlob } from "../lib/download";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/collect";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     // A teacher's working surface over codes they were sent — nothing to index.
@@ -27,7 +28,15 @@ export function meta(_args: Route.MetaArgs) {
 // blank column nobody can identify.
 function usePieceTitles(): (id: string) => string {
     const store = useStore();
-    return useCallback((id: string) => resolveScore(store, id)?.title ?? id, [store]);
+    // One pass over the catalogue, not one per lookup. Resolving a score by id reads and
+    // parses the whole stored library each time, and this is called once per column while
+    // the page re-renders on every keystroke in the paste box — so a class list of ten
+    // steps rebuilt the catalogue ten times per letter typed.
+    const titles = useMemo(
+        () => new Map(loadCatalog(store).map((score) => [score.id, score.title])),
+        [store],
+    );
+    return useCallback((id: string) => titles.get(id) ?? id, [titles]);
 }
 
 // The other end of a handed-back assignment: paste in whatever arrived and read it
@@ -48,11 +57,8 @@ export default function CollectRoute() {
         downloadBlob(reportsToCsv(reports, titleOf), "text/csv", "plinky-assignment.csv");
 
     return (
-        <main className="mx-auto max-w-5xl space-y-5 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.collect_title()}</h1>
-                <p className="text-sm text-muted">{m.collect_intro()}</p>
-            </header>
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <PageHeader title={m.collect_title()} hint={m.collect_intro()} />
 
             <label className="block space-y-1">
                 <span className="text-sm font-medium text-body">{m.collect_paste()}</span>

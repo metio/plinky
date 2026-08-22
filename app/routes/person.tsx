@@ -2,27 +2,39 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
+import { usePrefs } from "../hooks/usePrefs";
 import { useParams } from "react-router";
-import { type Person, type PersonPiece, personFor } from "../../core/person";
+import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../core/person";
+import { BakedIncipit } from "../components/ui/incipit";
 import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, personData, routeMeta } from "../../core/site";
-import { loadBundledScores } from "../lib/catalog";
+import { loadBundledScores, loadUserScores } from "../lib/catalog";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
-import { useSongSource } from "../contexts/services";
+import { useExerciseSource, useSongSource, useStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/person";
+import { PageHeader } from "../components/ui/pageHeader";
+import { GradeChip } from "../components/features/scoreGrade";
+
+// A stored score as a person piece.
+const asPiece = (score: {
+    id: string;
+    title: string;
+    composer: string;
+    license?: string;
+}): PersonPiece => ({
+    id: score.id,
+    title: score.title,
+    composer: score.composer,
+    ...(score.license ? { license: score.license } : {}),
+});
 
 // The bundled catalogue as person pieces — available synchronously (no storage,
 // no network), so both meta() and the first render resolve the composer at
-// prerender time. The user's own imports layer on top once the manifest loads.
+// prerender time.
 function bundledPieces(): PersonPiece[] {
-    return loadBundledScores().map((score) => ({
-        id: score.id,
-        title: score.title,
-        composer: score.composer,
-        ...(score.license ? { license: score.license } : {}),
-    }));
+    return loadBundledScores().map(asPiece);
 }
 
 // The composer a slug names, with no network and no manifest: the bundled pieces
@@ -40,16 +52,6 @@ function knownPerson(slug: string): Person | null {
     return indexed ? { slug, name: indexed.name, pieces: [] } : null;
 }
 
-// The fallback for a slug the catalogue credits nobody by — a user's own import, or a
-// hand-typed URL: prettify the slug so the tab still reads as a name.
-function nameFromSlug(slug: string): string {
-    return slug
-        .split("-")
-        .filter(Boolean)
-        .map((word) => word[0]?.toUpperCase() + word.slice(1))
-        .join(" ");
-}
-
 export function meta({ params }: Route.MetaArgs) {
     const slug = params.slug ?? "";
     // The bundled composer resolves at prerender, so a bundled composer's page
@@ -64,8 +66,8 @@ export function meta({ params }: Route.MetaArgs) {
         tags.push({ "script:ld+json": personData(person, locale) });
         tags.push({
             "script:ld+json": breadcrumbData(locale, [
-                { name: m.nav_home(), path: "/" },
-                { name: m.nav_library(), path: "/library/" },
+                { name: m.nav_today(), path: "/" },
+                { name: m.music_title(), path: "/music/" },
                 { name: person.name, path: `/person/${person.slug}/` },
             ]),
         });
@@ -77,8 +79,22 @@ export function meta({ params }: Route.MetaArgs) {
 // piece one tap from being practised. Auto-generated for every composer the
 // catalogue credits — living artists' curated profiles layer on top later.
 export default function PersonPage() {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     const { slug } = useParams();
     const songs = useSongSource();
+    // The studies too, not only the songs: the piece count on this page is baked from BOTH
+    // manifests, so listing from one of them gave a composer whose work here is all studies
+    // a page announcing three pieces and showing none. Ferdinand Beyer, whose catalogue
+    // presence is three exercises, was the first to have a page at all and so the first to
+    // show it.
+    const exercises = useExerciseSource();
+    // And the scores the player brought themselves. The comment here used to say imports
+    // "layer on top once the manifest loads" and nothing ever laid them on: a piece you
+    // imported credited to Chopin counted towards him on the library's composer list and
+    // was missing from his page. Read on the client only — prerendering has no storage.
+    const store = useStore();
     // Seed with the bundled catalogue so the composer's pieces are in the first
     // render (prerendered HTML, then instant on load); the manifest merges the
     // user's imports in a beat later.
@@ -98,11 +114,18 @@ export default function PersonPage() {
         setPerson(knownPerson(slug ?? ""));
         setLoading(true);
         (async () => {
-            const manifest = (await songs.manifest()) ?? [];
+            const [manifest, studies] = await Promise.all([songs.manifest(), exercises.manifest()]);
             if (cancelled) {
                 return;
             }
-            const pieces: PersonPiece[] = [...manifest, ...bundledPieces()];
+            const pieces: PersonPiece[] = [
+                ...loadUserScores(store).map(asPiece),
+                ...(manifest ?? []),
+                // A study need not credit anybody; an empty credit belongs to no person,
+                // which is what personSlug already makes of it.
+                ...(studies ?? []).map((study) => ({ ...study, composer: study.composer ?? "" })),
+                ...bundledPieces(),
+            ];
             const resolved = personFor(pieces, slug ?? "");
             // Only ever an improvement on what the page opened with. A manifest that
             // could not be fetched answers null — unreachable, not empty — and taking
@@ -116,25 +139,19 @@ export default function PersonPage() {
         return () => {
             cancelled = true;
         };
-    }, [songs.manifest, slug]);
+    }, [songs.manifest, exercises.manifest, store, slug]);
 
     return (
-        <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
-            <header className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
-                    {m.person_eyebrow()}
-                </p>
-                <h1 className="text-3xl font-bold tracking-tight">
-                    {person?.name ?? nameFromSlug(slug ?? "")}
-                </h1>
-                {person && (person.pieces.length > 0 || known) && (
-                    <p className="text-sm text-muted">
-                        {m.person_pieces({
-                            count: person.pieces.length || (known?.pieces ?? 0),
-                        })}
-                    </p>
-                )}
-            </header>
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <PageHeader
+                eyebrow={m.person_eyebrow()}
+                title={person?.name ?? nameFromSlug(slug ?? "")}
+                hint={
+                    person && (person.pieces.length > 0 || known)
+                        ? m.person_pieces({ count: person.pieces.length || (known?.pieces ?? 0) })
+                        : undefined
+                }
+            />
 
             {person ? (
                 <ul className="space-y-1.5">
@@ -144,14 +161,32 @@ export default function PersonPage() {
                                 to={`/play/${piece.id}`}
                                 className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30"
                             >
-                                <span className="min-w-0 truncate font-medium">{piece.title}</span>
+                                {/* A catalogue of one composer's works is exactly where
+                                    an opening bar earns its place: the titles rhyme with
+                                    each other, and the music does not. */}
+                                <BakedIncipit
+                                    mark={piece.incipit}
+                                    label={piece.title}
+                                    colored={prefs.colorNotes}
+                                    className="shrink-0 text-faint"
+                                />
+                                {/* flex-1, so the titles start in one column right after
+                                    the marks: justify-between alone floats each one
+                                    somewhere different, and a list is read down its left
+                                    edge. */}
+                                <span className="min-w-0 flex-1 truncate font-medium">
+                                    {piece.title}
+                                </span>
+                                {/* The grade as the app draws it everywhere else, and the
+                                    licence only where there is room: on a phone the title
+                                    is what a reader is scanning for, and a licence code on
+                                    every row of sixty takes the width the titles need. It
+                                    is on the piece's own page in full. */}
                                 <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
-                                    {piece.grade !== undefined && (
-                                        <span className="rounded bg-subtle px-1.5 py-0.5 font-medium tabular-nums">
-                                            G{piece.grade}
-                                        </span>
+                                    {piece.grade !== undefined && <GradeChip grade={piece.grade} />}
+                                    {piece.license && (
+                                        <span className="hidden sm:inline">{piece.license}</span>
                                     )}
-                                    {piece.license && <span>{piece.license}</span>}
                                 </span>
                             </Link>
                         </li>
@@ -161,8 +196,11 @@ export default function PersonPage() {
                 !loading && (
                     <p className="text-sm text-muted">
                         {m.person_empty()}{" "}
-                        <Link to="/library" className="font-medium text-accent hover:underline">
-                            {m.nav_library()}
+                        <Link
+                            to="/music"
+                            className="font-medium text-accent-strong hover:underline"
+                        >
+                            {m.music_title()}
                         </Link>
                     </p>
                 )

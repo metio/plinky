@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Articulation } from "../../core/expression";
-import type { DynamicPoint } from "../../core/dynamics";
-import type { PedalSpan } from "../../core/pedal";
+import type { OrnamentKind } from "../../core/ornament";
 import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
 
 // Reads the expression marks OSMD parsed from the MusicXML — articulations, slurs,
@@ -30,7 +29,6 @@ const ART = {
 type NoteShape = {
     Length?: { RealValue?: number };
     ParentVoiceEntry?: { Articulations?: { articulationEnum?: number }[] };
-    NoteSlurs?: { StartNote?: unknown; EndNote?: unknown }[];
     NoteTie?: { StartNote?: unknown; Notes?: unknown[]; Duration?: { RealValue?: number } } | null;
 };
 
@@ -45,7 +43,6 @@ export type ScoreExpression = {
     articulation: Articulation;
     accent: boolean;
     marcato: boolean;
-    slurred: boolean;
     // The note is held beyond its written length at the performer's discretion. The
     // score says to wait, not how long, so a fixed stretch stands in for the judgement
     // a performer makes.
@@ -83,10 +80,6 @@ export function readScoreExpression(note: unknown): ScoreExpression {
     const marcato =
         codes.has(ART.strongaccent) || codes.has(ART.marcatoup) || codes.has(ART.marcatodown);
 
-    // A note is slurred-forward when it starts or lies within a slur — any slur whose
-    // end note is a different note. The slur's last note doesn't connect onward.
-    const slurred = (shape.NoteSlurs ?? []).some((slur) => slur?.EndNote !== note);
-
     // A tie's first note sounds the whole tie's combined length; its later notes are
     // held, not re-struck. A note with no tie strikes at its own written length.
     const tie = shape.NoteTie ?? null;
@@ -108,7 +101,6 @@ export function readScoreExpression(note: unknown): ScoreExpression {
         articulation: articulationOf(codes),
         accent,
         marcato,
-        slurred,
         fermata: codes.has(ART.fermata),
     };
 }
@@ -161,15 +153,62 @@ export function playOrder<T>(items: readonly T[], noteOf: (item: T) => unknown):
 
 // Where the score asks for the sustain pedal, as whole-note spans. A pedal the engraving
 // never lifts runs to the end of the piece, which is what a reader would do with it.
-export function readPedalSpans(osmd: unknown): PedalSpan[] {
-    const spans: PedalSpan[] = [];
+// OSMD's ornament enum, as numbers because the bundle is minified and the enum object it
+// came from is not exported in a form worth importing. Confirmed against a live engraving
+// by the browser test beside this file — the values are the whole contract.
+const ORNAMENT: Record<number, OrnamentKind> = {
+    0: "trill",
+    1: "turn",
+    2: "inverted-turn",
+    // A delayed turn is a turn that waits; the wait is a nuance this does not model, and
+    // playing it as a turn is much closer than not playing it at all.
+    3: "turn",
+    4: "inverted-turn",
+    5: "mordent",
+    6: "inverted-mordent",
+};
+
+// Which little sign, if any, is written over a note.
+export function readOrnament(note: unknown): OrnamentKind | null {
+    const container = (note as OrnamentNoteShape | null)?.ParentVoiceEntry?.OrnamentContainer;
+    const code = container?.ornament;
+    return typeof code === "number" ? (ORNAMENT[code] ?? null) : null;
+}
+
+type OrnamentNoteShape = {
+    ParentVoiceEntry?: { OrnamentContainer?: { ornament?: unknown } | null };
+};
+
+// Whether the chord this note belongs to is rolled — the wavy line down the left of a
+// chord, which asks for its notes one after another rather than together.
+export function readArpeggio(note: unknown): boolean {
+    return (note as ArpeggioNoteShape | null)?.ParentVoiceEntry?.Arpeggio != null;
+}
+
+type ArpeggioNoteShape = { ParentVoiceEntry?: { Arpeggio?: unknown } };
+
+// The two markings the engraving reports the same way — the sustain pedal and the octave
+// line — as spans, from a single walk of the measures' expressions.
+//
+// Both are printed as a start and an end hung on a measure rather than on a note, so what
+// differs between them is only which property opens a span and which closes it, and what
+// the span carries. Everything else — where a measure begins, how far the music runs, what
+// to do with a marking the engraving opens and never closes — is the same problem twice.
+//
+// A marking left open runs to the end of the music. Dropping it would silently un-pedal (or
+// un-shift) the rest of the piece, which is the failure mode nobody notices.
+function _readSpans<T>(
+    osmd: unknown,
+    opens: (entry: ExpressionEntryShape) => T | null,
+    closes: (entry: ExpressionEntryShape) => boolean,
+): { from: number; to: number; value: T }[] {
+    const spans: { from: number; to: number; value: T }[] = [];
     try {
         const measures =
             (osmd as { sheet?: { SourceMeasures?: SourceMeasureShape[] } } | null)?.sheet
                 ?.SourceMeasures ?? [];
-        // Where the music stops, for a pedal the engraving never lifts.
         let end = 0;
-        let open: number | null = null;
+        let open: { at: number; value: T } | null = null;
         for (const measure of measures) {
             const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
             end = Math.max(end, measureStart + (measure?.Duration?.RealValue ?? 0));
@@ -177,27 +216,37 @@ export function readPedalSpans(osmd: unknown): PedalSpan[] {
                 for (const entry of staff ?? []) {
                     const at = measureStart + (entry?.timestamp?.RealValue ?? 0);
                     end = Math.max(end, at);
-                    // A second start without a lift between them is a re-pedal on the
-                    // spot: the sound carries on either way, so the span simply runs on.
-                    if (entry?.PedalStart != null && open === null) {
-                        open = at;
-                    } else if (entry?.PedalEnd != null && open !== null) {
-                        spans.push({ from: open, to: at });
+                    const value = entry ? opens(entry) : null;
+                    // A second start with no end between them carries on the span already
+                    // open: a re-pedal on the spot sounds the same either way, and two
+                    // octave lines cannot both apply.
+                    if (value !== null && open === null) {
+                        open = { at, value };
+                    } else if (entry && closes(entry) && open !== null) {
+                        spans.push({ from: open.at, to: at, value: open.value });
                         open = null;
                     }
                 }
             }
         }
         if (open !== null) {
-            spans.push({ from: open, to: Math.max(open, end) });
+            spans.push({ from: open.at, to: Math.max(open.at, end), value: open.value });
         }
     } catch {
-        // A shape OSMD changed falls back to an unpedalled score rather than breaking
-        // playback: no pedal is what every score without markings already reports.
+        // A shape OSMD changed falls back to a score without the marking rather than
+        // breaking playback — which is what every score that never writes one reports.
         return [];
     }
     return spans;
 }
+
+type ExpressionEntryShape = {
+    timestamp?: { RealValue?: number };
+    PedalStart?: unknown;
+    PedalEnd?: unknown;
+    octaveShiftStart?: { octaveValue?: unknown } | null;
+    octaveShiftEnd?: unknown;
+};
 
 type MeasureShape = { CurrentMeasure?: { TempoInBPM?: number } };
 
@@ -246,41 +295,6 @@ type SourceMeasureShape = {
     Duration?: { RealValue?: number };
     staffLinkedExpressions?: (MultiExpressionShape[] | undefined)[];
 };
-
-// Every dynamic the score writes, in printed order, as whole-note positions with the
-// loudness they ask for. A hairpin starting at a mark makes it a ramp toward the next.
-//
-// Read across all staves together: a piano score marks its dynamic once, under whichever
-// staff the engraver chose, and means it for both hands.
-export function readDynamics(osmd: unknown): DynamicPoint[] {
-    const points: DynamicPoint[] = [];
-    try {
-        const measures =
-            (osmd as { sheet?: { SourceMeasures?: SourceMeasureShape[] } } | null)?.sheet
-                ?.SourceMeasures ?? [];
-        for (const measure of measures) {
-            const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
-            for (const staff of measure?.staffLinkedExpressions ?? []) {
-                for (const entry of staff ?? []) {
-                    const volume = entry?.instantaneousDynamic?.MidiVolume;
-                    if (typeof volume !== "number" || !Number.isFinite(volume)) {
-                        continue;
-                    }
-                    points.push({
-                        whole: measureStart + (entry.timestamp?.RealValue ?? 0),
-                        volume,
-                        ramp: entry.startingContinuousDynamic != null,
-                    });
-                }
-            }
-        }
-    } catch {
-        // A shape OSMD changed falls back to an unmarked score rather than breaking
-        // playback: no dynamics is what every score without them already reports.
-        return [];
-    }
-    return points.sort((a, b) => a.whole - b.whole);
-}
 
 // How the engraved sheet lays its instruments out, as staff counts in score order —
 // what partsOf needs to work out which staves are the piano.

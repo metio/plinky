@@ -22,6 +22,7 @@ import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
 import { applyTheme } from "./lib/theme";
+import { returningBootstrapScript } from "./stores/historyStore";
 import { createThemeStore, themeBootstrapScript } from "./stores/themeStore";
 import { ogLocale, SITE_URL } from "../core/site";
 import { m } from "./paraglide/messages.js";
@@ -38,6 +39,8 @@ import {
 // the render-blocking Google Fonts request.
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import "@fontsource-variable/inter/wght.css";
+// The display face, for the wordmark and page titles only (see --font-display).
+import "@fontsource-variable/literata/wght.css";
 import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
 
@@ -59,9 +62,16 @@ const themeStore = createThemeStore(browserStore);
 // class-free HTML paint light first and flash for dark-mode users. It mutates
 // the class outside React, which React's hydration leaves untouched.
 const THEME_INIT_SCRIPT = themeBootstrapScript();
+// Stamps a device that has played before, so Today opens on the practice rather than
+// on the introduction. Runs before paint for the same reason the theme does.
+const RETURNING_INIT_SCRIPT = returningBootstrapScript();
 
 export const links: Route.LinksFunction = () => [
-    { rel: "icon", href: "/icon-192.png", type: "image/png" },
+    // The tab takes the letter alone — it sits on the browser's chrome, where a tile would
+    // only wedge a coloured box between the mark and whatever the browser paints. The SVG
+    // answers the browser's theme; the ICO is the fallback for those that cannot read it.
+    { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+    { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     { rel: "manifest", href: "/manifest.webmanifest" },
     { rel: "apple-touch-icon", href: "/icon-180.png" },
     // Preload the Latin variable font so text paints in Inter without a swap;
@@ -90,16 +100,31 @@ function Header() {
                     {/* The wordmark is text (it follows the theme for free); its i is the
                         dotless ı with a pink dot drawn above, echoing the app icon's
                         accent. Decorative only — the link carries the accessible name. */}
-                    <Link to="/" aria-label="Plinky home" className="flex items-center gap-2">
-                        <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-md" />
+                    <Link
+                        to="/"
+                        aria-label="Plinky home"
+                        className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
+                    >
+                        {/* The mark is drawn square to the edges of its own file, the way a
+                            launcher wants it, so the rounding here is the only rounding it
+                            gets — and it matches the radius everything else pressable in the
+                            header carries. */}
+                        <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-lg" />
                         <span
                             aria-hidden="true"
-                            className="text-xl font-bold tracking-tight text-ink"
+                            className="font-display text-xl font-semibold tracking-tight text-ink"
                         >
                             Pl
                             <span className="relative">
                                 ı
-                                <span className="absolute left-1/2 top-[0.16em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-ghost" />
+                                {/* Sits where Literata's own tittle sits: rasterised beside a
+                                    real i at this size, the dot lands within a device pixel
+                                    of the glyph's, leaving the same gap over the x-height.
+                                    The offset is relative to the inline box, which is the
+                                    ascent — not the line box — so it holds only at this font
+                                    size, and the browser snaps it to whole pixels. Measure
+                                    again rather than carrying the number anywhere else. */}
+                                <span className="absolute left-1/2 top-[0.43em] h-[0.15em] w-[0.15em] -translate-x-1/2 rounded-full bg-plink" />
                             </span>
                             nky
                         </span>
@@ -114,7 +139,7 @@ function Header() {
                     <Link
                         to="/settings"
                         aria-label={m.nav_settings()}
-                        className="text-muted hover:text-ink"
+                        className="rounded-md p-1 text-muted hover:text-ink focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -256,7 +281,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained theme bootstrap that must run before paint */}
                 <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-                <meta name="theme-color" content="#4f46e5" />
+                {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained returning-visitor bootstrap that must run before paint */}
+                <script dangerouslySetInnerHTML={{ __html: RETURNING_INIT_SCRIPT }} />
+                <meta name="theme-color" content="#2b4374" />
                 <link rel="canonical" href={pageUrl} />
                 {/* One alternate per language so search engines serve the right
                     locale and share ranking signals across the cluster. */}
@@ -363,8 +390,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const reportUrl = issueUrl(REPO_ISSUES, report, where, userAgent);
 
     return (
-        <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-            <h1 className="text-2xl font-semibold">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <h1 className="font-display text-3xl font-semibold tracking-tight">
                 {notFound ? "We couldn't find that" : "Something went wrong"}
             </h1>
             <p className="text-muted">

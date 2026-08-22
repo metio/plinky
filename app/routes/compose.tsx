@@ -7,6 +7,7 @@ import { ComposeControls } from "../components/features/composeControls";
 import { ComposeExportBar } from "../components/features/composeExportBar";
 import { ComposeSettings } from "../components/features/composeSettings";
 import { ComposeStage } from "../components/features/composeStage";
+import { StepEntry } from "../components/features/stepEntry";
 import { useOnboardingStore, useServices } from "../contexts/services";
 import { useFullscreen } from "../hooks/useFullscreen";
 import { useComposeFile } from "../hooks/useComposeFile";
@@ -17,6 +18,7 @@ import { useMetronome } from "../hooks/useMetronome";
 import { useStaffSketch } from "../hooks/useStaffSketch";
 import { type Composition, decodeComposition } from "../../core/composition";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
+import { stepDurationMs, type StepValue } from "../../core/stepInput";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/compose";
@@ -34,7 +36,7 @@ const COMPOSE_REACH: Span = { from: 21, to: 108 };
 const KEYBOARD_SPAN = 24;
 
 export default function Compose() {
-    const onboarding = useOnboardingStore();
+    const _onboarding = useOnboardingStore();
     const [searchParams] = useSearchParams();
     const [title, setTitle] = useState("Improvisation");
     const [tempo, setTempo] = useState(120);
@@ -46,9 +48,22 @@ export default function Compose() {
         followKeyboardWindow(null, 60, KEYBOARD_SPAN, COMPOSE_REACH),
     );
 
+    // Writing the piece down rather than playing it. Off by default: compose is a place
+    // to improvise first, and a mode that changed what the keys do without being asked
+    // would be a surprise mid-take.
+    const [stepping, setStepping] = useState(false);
+    const [stepValue, setStepValue] = useState<StepValue>("quarter");
+    const [stepDotted, setStepDotted] = useState(false);
+    // A dotted sixteenth is one and a half of the engraving's finest cell, so the staff
+    // cannot draw it whatever it is told. The dot is dropped rather than written and then
+    // silently rounded to something the player did not ask for.
+    const dottable = stepValue !== "sixteenth";
+    const dotted = stepDotted && dottable;
+    const stepMs = stepping ? stepDurationMs(stepValue, tempo, dotted) : null;
+
     const recorder = useCompositionRecorder({
+        stepMs,
         // The first recorded note means the player has tried composing.
-        onFirstNote: () => onboarding.markDiscovered("composed"),
         // Slide the on-screen keyboard to keep what's being played in view.
         onPitch: (note) =>
             setKeyWindow((prev) => followKeyboardWindow(prev, note, KEYBOARD_SPAN, COMPOSE_REACH)),
@@ -60,12 +75,17 @@ export default function Compose() {
     // underneath it would take the composition with it, and unlike a practice run there
     // is nothing on disk to fall back to.
     const { activity } = useServices();
+    // Keyed on whether there is work at all, not on how much of it. Depending on the count
+    // ended and re-began the signal on every note — and in the instant between the two the
+    // app reads as idle, which is exactly when a waiting update is free to reload the page
+    // and take the take with it.
+    const hasWork = notes.length > 0;
     useEffect(() => {
-        if (notes.length === 0) {
+        if (!hasWork) {
             return;
         }
         return activity.begin();
-    }, [notes.length, activity]);
+    }, [hasWork, activity]);
 
     const transport = useCompositionTransport({
         notes,
@@ -85,11 +105,20 @@ export default function Compose() {
 
     // A shared composition arrives as ?c=<code>; load it once so it can be viewed,
     // played, extended, re-exported and re-shared.
+    //
+    // Once per code, tracked here rather than left to the effect running once. The
+    // dependency is the whole search-param object, so it re-runs whenever anything in the
+    // address changes — and every re-run applied the shared notes again, over whatever
+    // the player had done to them since. Nothing on this page writes a parameter today,
+    // which is the only reason it has never happened; the guard is what makes that a fact
+    // about the code rather than a fact about the current URL.
+    const loadedCodeRef = useRef<string | null>(null);
     useEffect(() => {
         const code = searchParams.get("c");
-        if (!code) {
+        if (!code || loadedCodeRef.current === code) {
             return;
         }
+        loadedCodeRef.current = code;
         const loaded = decodeComposition(code);
         if (loaded) {
             recorder.load(loaded.notes);
@@ -104,7 +133,11 @@ export default function Compose() {
         [notes, tempo, beatsPerBar],
     );
 
-    const staffXml = useStaffSketch(composition, title, quantizeOn);
+    // Stepped notes are already exact multiples of the beat, so there is no played timing
+    // to tidy — and the tidying grid is eighths, which would round a written sixteenth up
+    // to an eighth and a dotted eighth to something that is neither. While step entry is
+    // on, the staff is drawn on the engraving grid itself.
+    const staffXml = useStaffSketch(composition, title, quantizeOn && !stepping);
     const exporter = useCompositionExport(composition, title);
 
     // Swap the canvas over to a loaded composition.
@@ -145,7 +178,9 @@ export default function Compose() {
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h1 className="text-3xl font-bold tracking-tight">{m.compose_heading()}</h1>
+                    <h1 className="font-display text-3xl font-semibold tracking-tight">
+                        {m.compose_heading()}
+                    </h1>
                     {/* Capture is always on, so a live indicator makes that legible —
                         otherwise a first-timer can't tell their playing is being kept. */}
                     <span className="flex items-center gap-2 text-sm font-medium text-body">
@@ -171,6 +206,7 @@ export default function Compose() {
                 onExitFullscreen={exitFullscreen}
                 controls={
                     <ComposeControls
+                        stepping={stepping}
                         empty={empty}
                         playing={transport.playing}
                         countingIn={transport.countingIn}
@@ -194,6 +230,19 @@ export default function Compose() {
                 }
             />
 
+            <StepEntry
+                on={stepping}
+                onOn={setStepping}
+                value={stepValue}
+                onValue={setStepValue}
+                dotted={dotted}
+                onDotted={setStepDotted}
+                canDot={dottable}
+                onRest={recorder.rest}
+                onBack={recorder.back}
+                canGoBack={notes.length > 0}
+            />
+
             <ComposeSettings
                 title={title}
                 onTitle={setTitle}
@@ -203,6 +252,7 @@ export default function Compose() {
                 onBeatsPerBar={setBeatsPerBar}
                 quantizeOn={quantizeOn}
                 onQuantize={setQuantizeOn}
+                quantizeLocked={stepping}
                 metronomeOn={metronomeOn}
                 onMetronome={setMetronomeOn}
             />

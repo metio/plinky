@@ -16,10 +16,15 @@ import { beamsVisible } from "../../../core/beams";
 import { tempoScale } from "../../../core/runOutcome";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
+import { type InstrumentRange, pitchRange } from "../../../core/instrumentRange";
+import { useInstrumentFit } from "../../hooks/useInstrumentFit";
+import { useInstrumentRange } from "../../hooks/useInstrumentRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import type { Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
+import { readScoreMarks } from "../../../core/musicxmlMarks";
+import { transposeFifths } from "../../../core/ornament";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
@@ -56,6 +61,7 @@ import {
     type Hand,
     useScoreMatcher,
 } from "../../hooks/useScoreMatcher";
+import { useSamplePrefetch } from "../../hooks/useSamplePrefetch";
 import { useHiddenNotes } from "../../hooks/useHiddenNotes";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSightRead } from "../../hooks/useSightRead";
@@ -230,7 +236,7 @@ function usePlaySessionValue({
     // How the score is laid out and read — bars per row, bar numbers, treadmill, on-staff
     // fingering and follow-the-note scrolling — the toggles that feed the OSMD render.
     const reading = useReadingMode();
-    const { barsPerRow, barNumbers, treadmill, showFingerings, scrollFollow } = reading;
+    const { barsPerRow, barNumbers, treadmill, scrollFollow } = reading;
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
     const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
     const savedNoteLabels = useNoteLabels();
@@ -248,6 +254,7 @@ function usePlaySessionValue({
         noteLabels: savedNoteLabels,
         noteHints,
         colorNotes: reading.colorNotes,
+        showFingerings: reading.showFingerings,
         forgiving,
         highway: reading.highway,
     });
@@ -284,7 +291,6 @@ function usePlaySessionValue({
     // the function ran twice, against a value from this render rather than the live one.
     const setFingerStrip = (open: boolean) => {
         if (open) {
-            onboarding.markDiscovered("fingeringTried");
         }
         setFingerStripState(open);
     };
@@ -307,6 +313,31 @@ function usePlaySessionValue({
         () => (transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose)),
         [xml, transpose, xmlCodec],
     );
+    // What the score writes, read from the file rather than off the engraver: the
+    // dynamics, the arches, the pedal, the octave lines and the key. Parsed once per piece
+    // — the parse is the cost, and every surface asking separately would pay it again.
+    //
+    // From the untransposed document, because that is what the file says; the key is then
+    // moved to wherever the transposition put the music, so an ornament in a transposed
+    // piece reaches into the key actually being played.
+    const marks = useMemo(() => {
+        const read = readScoreMarks(xmlCodec.parse(xml));
+        if (transpose === 0) {
+            return read;
+        }
+        // Every key the piece passes through moves, not only the one it opens in — a piece
+        // that changes key is still in a different key after being transposed, and an
+        // ornament there spells its auxiliary note from that one.
+        return {
+            ...read,
+            fifths: transposeFifths(read.fifths, transpose),
+            keys: read.keys.map((point) => ({
+                ...point,
+                fifths: transposeFifths(point.fifths, transpose),
+            })),
+        };
+    }, [xml, transpose, xmlCodec]);
+
     // Which hand to practice — the hands-separate selector only appears for the
     // grand-staff (two-staff) scores it applies to (the staff count comes from the score).
     const [hand, setHand] = useState<Hand>("both");
@@ -338,12 +369,14 @@ function usePlaySessionValue({
         showAccompaniment: reading.showAccompaniment,
         colorNotes: aids.colorNotes,
         focus: focusRange,
-        showFingerings,
+        showFingerings: aids.showFingerings,
         scrollFollow,
         onReload: () => {
             listenPlayback.stop();
             keepUp.stop();
             matcher.stop();
+            // The engraving the lookahead was read from is gone.
+            matcher.resetPreview();
             // A run already on its way — a sight-read counting down before it begins —
             // must not arrive after the player has stopped. Dropping the claim stops the
             // start; cancelling the countdown stops the timer and clears it off screen,
@@ -370,8 +403,16 @@ function usePlaySessionValue({
             vanishing.rearm();
         },
     });
-    const { getOsmd, ready, staffCount, measureCount, measureBoxes, centerCursor, markPainted } =
-        score;
+    const {
+        getOsmd,
+        ready,
+        renderVersion,
+        staffCount,
+        measureCount,
+        measureBoxes,
+        centerCursor,
+        markPainted,
+    } = score;
 
     // The hand the run drills. A single-staff piece has no hand to choose — the selector
     // never shows for one — so it is always both. Derived once: the matcher, the ghost,
@@ -385,32 +426,45 @@ function usePlaySessionValue({
     // transposition — never on a layout relayout or a mid-run repaint, so reading
     // the steps (which walks and resets the cursor) can't disturb a live run.
     const [keyRange, setKeyRange] = useState<{ from: number; to: number }>(DEFAULT_KEY_RANGE);
-    // xml/transpose/staffCount aren't read in the body — they are the triggers:
-    // the sounding pitches change only when the piece or its key does, and gating
-    // on them keeps collectSteps (which walks the cursor) off the mid-run repaint
+    // The raw span of what the engraving sounds, before any padding — the keyboard framing
+    // above rounds outward to whole keys, and fitting the piece to an instrument needs the
+    // notes themselves. Read in the same pass, so the cursor is walked once.
+    const [sounding, setSounding] = useState<InstrumentRange | null>(null);
+    // renderVersion/staffCount aren't read in the body — they are the triggers, and
+    // gating on them keeps collectSteps (which walks the cursor) off the mid-run repaint
     // path. The osmd is read imperatively through the stable getOsmd.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: xml/transpose/staffCount are content-change triggers
+    //
+    // The trigger is the counter the score hook raises when a render completes, rather
+    // than the inputs that asked for one. Those inputs change in the commit that STARTS a
+    // reload, when the sheet on screen is still the old one — and `ready` cannot stand in
+    // for the finish, because a reload quick enough to set it false and true again inside
+    // one commit leaves the dependency list unchanged and the stale reading in place. That
+    // is not hypothetical: it is what happens on Firefox when a piece is transposed to fit
+    // a small keyboard, and it left the keybed framed around the notes the piece used to
+    // have.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: renderVersion/staffCount are render-completed triggers
     useEffect(() => {
         const osmd = getOsmd();
         if (!ready || !osmd) {
             return;
         }
         // Both hands, so switching the practised hand never resizes the keyboard.
-        setKeyRange(songKeyRange(collectSteps(osmd, "both").flat()));
-    }, [ready, xml, transpose, staffCount, getOsmd]);
+        const pitches = collectSteps(osmd, "both").flat();
+        setKeyRange(songKeyRange(pitches));
+        setSounding(pitchRange(pitches));
+    }, [ready, renderVersion, staffCount, getOsmd]);
 
-    // A song_opened event per piece put on the stand. This session is the single funnel
-    // every surface loads a piece through — the play route, the daily challenge, a review
-    // step, a warm-up — so one effect here covers them all. It waits for `ready` so the
-    // staff count is the engraved truth, and keys on the content id, so moving to another
-    // piece reports again while a re-render never does. Only the piece's shape travels:
-    // an imported score's title is the player's own.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: id is the piece-change trigger; grade/staffCount are read at that moment
-    useEffect(() => {
-        if (!ready) {
-            return;
-        }
-    }, [ready, id]);
+    // Move the piece into the octave the player's instrument can reach, when it does not
+    // already sit there. Nothing happens on a full piano, which is what the scores are
+    // written for and what every player without a connected controller is assumed to have.
+    const instrument = useInstrumentRange();
+    const instrumentFit = useInstrumentFit({
+        sounding,
+        xml,
+        instrument,
+        transpose,
+        setTranspose,
+    });
 
     // The cursor's current position in whole notes — the shared place Listen and Practice
     // hand off at, so switching between them (or leaving and re-entering the play surface)
@@ -419,12 +473,22 @@ function usePlaySessionValue({
 
     // Tempo-locked play-along ("keep up"): the clock advances the cursor and scores each
     // beat; finishing drops out of full screen so the result comes into view.
+    // Filled in once the matcher exists; see the play-along's onPosition below.
+    const previewRef = useRef<(whole: number) => void>(() => {});
+
     const keepUp = useKeepUp({
         getOsmd,
         synth,
         tempo: readTempo,
         beatsPerBar: beatsPerBar ?? 4,
         centerCursor,
+        // So the notes highway follows a tempo-locked run too. It reads the matcher's
+        // lookahead, and a play-along stands the matcher down — which left the highway with
+        // nothing to draw and no reason to appear.
+        //
+        // Through a ref because the matcher is built below this: the call only ever happens
+        // while a run is under way, which is long after both exist.
+        onPosition: (whole: number) => previewRef.current(whole),
         markPainted,
         onFinish: exitFullscreen,
     });
@@ -443,13 +507,12 @@ function usePlaySessionValue({
 
     // Hidden-notes (ear) practice: noteheads start blank and reveal green as they are
     // found, red once the tries budget is spent. Persisted like the other play prefs.
-    const onboarding = useOnboardingStore();
+    const _onboarding = useOnboardingStore();
     const [hiddenNotes, setHiddenNotesPref] = usePref(prefsStore, "hiddenNotes");
     // Turning the ear drill on ticks its discovery step — the toggle IS the
     // feature now that the Ear tab is gone.
     const setHiddenNotes = (value: boolean) => {
         if (value) {
-            onboarding.markDiscovered("earTried");
         }
         setHiddenNotesPref(value);
     };
@@ -498,9 +561,14 @@ function usePlaySessionValue({
         hand: activeHand,
     });
 
+    // The recordings this piece will ask for, fetched while it is being read. Nothing
+    // waits on them: a note whose recording has not landed is played by the synth.
+    useSamplePrefetch({ getOsmd, ready, renderVersion });
+
     const matcher = useScoreMatcher(getOsmd, {
         tempo,
         hand,
+        marks,
         forgiving: aids.forgiving,
         onCorrect: (info: CorrectInfo) => {
             // Skip the note-echo under mic input — you hear your own piano.
@@ -540,7 +608,14 @@ function usePlaySessionValue({
             // — the same beginner crutch the pre-highlight belongs to. A sight-reader
             // who dialled hints down gets no afterglow.
             if (aids.noteHints === "always") {
-                holdIndicator.begin(info.pitches, info.holdMs);
+                holdIndicator.begin(
+                    info.pitches.map((note, index) => ({
+                        note,
+                        // Its own written length, falling back to the position's when
+                        // the step had no expectation for this key.
+                        durationMs: info.writtenHoldsMs[index] ?? info.holdMs,
+                    })),
+                );
             }
             // Record the cleared note — its timing, a hold per pitch for the release
             // to close — and ease the adaptive metronome toward the player's own pace.
@@ -641,6 +716,10 @@ function usePlaySessionValue({
         loop: loop.read,
         onLap: bumpTempo,
         centerCursor,
+        marks,
+        // The notes highway follows Listen too, so choosing that reading mode does not
+        // mean losing it the moment the computer takes over the music.
+        onPosition: matcher.preview,
         markPainted,
         isPracticing,
         // Light the notes on a connected instrument as Listen plays them, and let
@@ -648,6 +727,23 @@ function usePlaySessionValue({
         echoNote,
         silenceEcho,
     });
+
+    // The play-along above reports its position through this; the matcher it feeds is only
+    // built here.
+    previewRef.current = matcher.preview;
+
+    // Leaving the playing surface stops what the surface was playing.
+    //
+    // Closing full screen used only to close full screen: Listen and the play-along carried
+    // on underneath, sounding the piece with nothing on screen to stop them, and re-opening
+    // full screen dropped you back into a performance already in progress. A self-paced run
+    // is left alone — it makes no sound of its own and waits indefinitely, so there is
+    // nothing to interrupt.
+    const leavePlaySurface = useCallback(() => {
+        listenPlayback.stop();
+        keepUp.stop();
+        exitFullscreen();
+    }, [listenPlayback, keepUp, exitFullscreen]);
 
     // Re-centre the treadmill as the matcher advances through the piece — the cursor
     // position isn't a value centerCursor reads, so depend on done/practicing to fire it.
@@ -788,16 +884,29 @@ function usePlaySessionValue({
     // transport walks the cursor from wherever it sits — the note Practice was on when
     // handing over, or where a paused run left off — instead of rewinding, so play can pass
     // back and forth without losing the place.
-    const listen = () => {
+    // `onStage` says whether this came from the full-screen transport or from the resting
+    // page. Listening from the page is "what does this sound like?" — a question asked
+    // BEFORE committing to the playing surface, so answering it by throwing the reader into
+    // full screen would be answering a different question.
+    const listen = (onStage = true) => {
         if (listenPlayback.active() || keepUp.active()) {
             return;
         }
         const from = resumePoint();
-        enterPlayFullscreen();
+        if (onStage) {
+            enterPlayFullscreen();
+        }
         matcher.stop();
-        // With hidden notes on, Listen is the "hear it first" half of ear practice:
-        // the phrase sounds over a blanked staff, ready to be played back.
-        hidden.conceal();
+        // Before Listen touches the cursor: collecting the lookahead walks it, and a walk
+        // afterwards would drag Listen's own position back to the top of the piece.
+        matcher.preview(from);
+        // With hidden notes on, Listen is the "hear it first" half of ear practice: the
+        // phrase sounds over a blanked staff, ready to be played back. Only on the playing
+        // surface, though — blanking the staff on the reading page would take the music
+        // away from somebody who came to read it.
+        if (onStage) {
+            hidden.conceal();
+        }
         listenPlayback.start(from);
     };
 
@@ -828,11 +937,18 @@ function usePlaySessionValue({
     // scoring only the practised hand, exactly as self-paced practice does.
     const playAlong = () => {
         const osmd = getOsmd();
-        if (!osmd || listenPlayback.active() || keepUp.active()) {
+        if (!osmd || keepUp.active()) {
             return;
         }
+        // Take over from Listen rather than refusing while it plays, exactly as the
+        // self-paced run does. Refusing made the button dead: press Listen, press Practice,
+        // and nothing at all happened — no run, no full screen, no reason given.
+        listenPlayback.stop();
         enterPlayFullscreen();
         matcher.stop();
+        // Before the play-along takes the cursor over: collecting the lookahead walks it,
+        // and a walk afterwards would drag the run's own position back to the top.
+        matcher.preview(0);
         // Keep-up is read-at-tempo: a blanked staff would be unreadable, so the
         // hidden-notes game stays a self-paced feature, and the read-ahead drill
         // likewise gives the whole score back for the run.
@@ -982,6 +1098,7 @@ function usePlaySessionValue({
         credit: credit ?? "",
         daily,
         ephemeral,
+        assessment,
         lockTempo,
         // The layout shell + full-screen state.
         containerRef,
@@ -990,6 +1107,7 @@ function usePlaySessionValue({
         fullscreen,
         compact,
         exitFullscreen,
+        leavePlaySurface,
         hideKeyboard,
         setHideKeyboard,
         fingerStrip,
@@ -1009,6 +1127,9 @@ function usePlaySessionValue({
         // Reading + keyboard framing.
         reading,
         keyRange,
+        // The same reading unrounded: the notes the engraving sounds, which is what
+        // deciding whether they fit an instrument needs.
+        sounding,
         hintNotes,
         holdFractions: holdIndicator.holdFractions,
         noteHints,
@@ -1051,6 +1172,9 @@ function usePlaySessionValue({
         setRevealTries,
         transpose,
         setTranspose,
+        // Whether the piece had to be moved to fit the instrument in the room, so the
+        // transpose control can say why it is not on zero.
+        instrumentFit,
         showMine,
         setShowMine,
         hasSaved,
