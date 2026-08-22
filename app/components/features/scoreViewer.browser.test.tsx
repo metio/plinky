@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { choose, reveal } from "../../testing/controls";
+import { choose, reveal, switchOn, toggle } from "../../testing/controls";
 import { testPrefsStore } from "../../testing/stores";
 import { m } from "../../paraglide/messages.js";
 import { useState } from "react";
@@ -1358,6 +1358,41 @@ describe("ScoreViewer", () => {
             // The read-ahead drill needs your own progress through the score, so it is
             // offered only while the run waits for you.
             expect(screen.getByRole("switch", { name: m.sight_read_vanish() })).toBeTruthy();
+        });
+
+        it("shows every reading aid off while the mode is on, from one decision", async () => {
+            // Sight-reading is defined as the top rung of the skill ladder — no aids at
+            // all — and `sightRead.aids` is where that is decided, once, for the run AND
+            // for what the panel shows. Each switch used to override itself, so an aid
+            // added to the ladder and forgotten in the panel would read as on while the
+            // run read without it. Asserted over the whole set, so a new aid that misses
+            // this fails here rather than silently.
+            const phrase = generateDrill(
+                { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+                () => 0.5,
+            );
+            mount(phrase, { beatsPerBar: 4 });
+            await awaitReady();
+
+            reveal(m.run_group_practice_title);
+            reveal(m.run_group_sheet_title);
+            const aidSwitches = [m.forgiving_toggle, m.color_notes_toggle, m.highway_toggle];
+            // Every one of them on first, or the assertion below would pass over a panel
+            // that had them off anyway.
+            for (const label of aidSwitches) {
+                if (!switchOn(label)) {
+                    toggle(label);
+                }
+                expect(switchOn(label)).toBe(true);
+            }
+
+            fireEvent.click(screen.getByRole("switch", { name: m.sight_read() }));
+            for (const label of aidSwitches) {
+                expect(switchOn(label)).toBe(false);
+                expect(screen.getByRole("switch", { name: label() }).hasAttribute("disabled")).toBe(
+                    true,
+                );
+            }
         });
 
         it("studies the piece before the run rather than starting one", async () => {
