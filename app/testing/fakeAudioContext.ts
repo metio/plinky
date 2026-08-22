@@ -17,10 +17,47 @@ export type FakeAudioContext = {
     // Oscillators started and never stopped — a voice still sounding.
     live(): number;
     started(): number;
+    // Which channels of the room's impulse response were written. Both, or the room has no
+    // width; none, and nothing was ever routed through it.
+    impulseChannels(): number[];
+    // Whether audio leaving a node of this kind can arrive at the room, following the graph
+    // however far it goes. A voice must; a metronome click must not.
+    reachesConvolver(label: string): boolean;
+    // How many recordings were played — struck notes and extras alike. Zero means nothing
+    // came from the pack, whatever else sounded.
+    recordingsPlayed(): number;
 };
+
+// Whether `from` reaches `to` through the recorded edges. Breadth-first over labels, with a
+// seen-set: the graph has a cycle by construction, since the room's output and its wet
+// return both land on the limiter.
+function reaches(edges: readonly [string, string][], from: string, to: string): boolean {
+    const seen = new Set<string>();
+    const queue = [from];
+    while (queue.length > 0) {
+        const at = queue.shift() as string;
+        if (at === to) {
+            return true;
+        }
+        if (seen.has(at)) {
+            continue;
+        }
+        seen.add(at);
+        for (const [source, target] of edges) {
+            if (source === at) {
+                queue.push(target);
+            }
+        }
+    }
+    return false;
+}
 
 export function fakeAudioContext(): FakeAudioContext {
     const oscillators: FakeOscillator[] = [];
+    const impulseChannels = new Set<number>();
+    // Buffer sources alone — a recording being played, as opposed to a note synthesised
+    // from oscillators. What separates "the pack answered" from "the synth covered for it".
+    const recordings: FakeOscillator[] = [];
     const now = 0;
 
     const param = () => ({
@@ -31,20 +68,41 @@ export function fakeAudioContext(): FakeAudioContext {
         cancelScheduledValues: () => param(),
         setTargetAtTime: () => param(),
     });
-    const node = () => ({ connect: () => node(), disconnect: () => {}, gain: param() });
+    // Every node carries a label, and connecting records the pair, so a test can ask what
+    // reaches the room and what goes straight to the speakers. Routing is the one thing
+    // about the graph that a smoke test cannot see and that silently matters: a metronome
+    // click routed through the reverb still plays, and still ruins the beat.
+    const edges: [string, string][] = [];
+    const node = (label = "node") => {
+        const self = {
+            label,
+            connect: (to: { label?: string }) => {
+                edges.push([label, to?.label ?? "?"]);
+                return self;
+            },
+            disconnect: () => {},
+            gain: param(),
+        };
+        return self;
+    };
 
     const context = {
         get currentTime() {
             return now;
         },
         sampleRate: 48_000,
-        destination: node(),
+        destination: node("destination"),
         resume: () => Promise.resolve(),
         close: () => Promise.resolve(),
-        createGain: () => ({ ...node(), gain: param() }),
-        createBiquadFilter: () => ({ ...node(), frequency: param(), Q: param(), type: "lowpass" }),
+        createGain: () => ({ ...node("gain"), gain: param() }),
+        createBiquadFilter: () => ({
+            ...node("filter"),
+            frequency: param(),
+            Q: param(),
+            type: "lowpass",
+        }),
         createDynamicsCompressor: () => ({
-            ...node(),
+            ...node("limiter"),
             threshold: param(),
             knee: param(),
             ratio: param(),
@@ -56,14 +114,29 @@ export function fakeAudioContext(): FakeAudioContext {
             length,
             numberOfChannels: channels,
             getChannelData: () => new Float32Array(length),
+            // The room writes its impulse in a channel at a time. Recorded rather than
+            // stored: what a test can usefully ask is that both ears were filled, since the
+            // response itself is core's business and tested there.
+            copyToChannel: (_data: Float32Array, channel: number) => {
+                impulseChannels.add(channel);
+            },
         }),
+        // The room. Its response is convolved into the wet path; the node itself only has
+        // to accept a buffer and pass audio on.
+        createConvolver: () => ({ ...node("convolver"), buffer: null, normalize: true }),
         createBufferSource: () => {
             const source = { started: false, stopped: false };
             oscillators.push(source);
+            recordings.push(source);
             return {
-                ...node(),
+                ...node("source"),
                 buffer: null,
                 playbackRate: param(),
+                // The engine listens for "ended" to reap a strike that has finished
+                // ringing. Nothing ever ends here, which is the point: an oscillator this
+                // fake still counts as live is a voice the engine never stopped.
+                addEventListener: () => {},
+                removeEventListener: () => {},
                 start: () => {
                     source.started = true;
                 },
@@ -76,10 +149,12 @@ export function fakeAudioContext(): FakeAudioContext {
             const osc = { started: false, stopped: false };
             oscillators.push(osc);
             return {
-                ...node(),
+                ...node("oscillator"),
                 type: "sine",
                 frequency: param(),
                 detune: param(),
+                addEventListener: () => {},
+                removeEventListener: () => {},
                 start: () => {
                     osc.started = true;
                 },
@@ -94,5 +169,8 @@ export function fakeAudioContext(): FakeAudioContext {
         context,
         live: () => oscillators.filter((one) => one.started && !one.stopped).length,
         started: () => oscillators.filter((one) => one.started).length,
+        impulseChannels: () => [...impulseChannels].sort((one, other) => one - other),
+        reachesConvolver: (label: string) => reaches(edges, label, "convolver"),
+        recordingsPlayed: () => recordings.filter((one) => one.started).length,
     };
 }

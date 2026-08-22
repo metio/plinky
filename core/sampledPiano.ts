@@ -14,9 +14,27 @@
 // which note to sound is here, where it can be tested against every key and every velocity
 // at once.
 
+// What a recording that is not a struck note is a recording OF.
+//
+// A piano makes two sounds a struck string does not. `knock` is the key-off noise — the
+// damper landing and the mechanism returning — which is a large part of why a real piano
+// sounds like an object somebody is operating rather than a tone generator. `resonance` is
+// the sympathetic ring of the other strings, which is what the sustain pedal actually
+// sounds like beyond "notes last longer".
+export type ExtraKind = "knock" | "resonance";
+export const EXTRA_KINDS: ExtraKind[] = ["knock", "resonance"];
+
 export type SampleRegion = {
     // The recording, by name within the pack.
     file: string;
+    // Absent on a struck note; present on everything in `releases`, saying which of the two
+    // sounds this is. Absent is also how an older pack reads, and an extra whose kind cannot
+    // be told apart from another's is one nothing should play — see extrasFor.
+    kind?: ExtraKind;
+    // How long the recording rings, in seconds, where the pack measured it. Advisory: the
+    // buffer's own duration is the truth, and this is only carried so a caller can budget
+    // without decoding.
+    decay?: number;
     // The key it was actually played at, which is what a shift is measured from.
     keyCentre: number;
     lowKey: number;
@@ -78,13 +96,33 @@ export function playbackRateFor(pitch: number, keyCentre: number): number {
 // Every recording a run of notes will ask for. A score is the whole list of notes before
 // one of them sounds, so this is what the app fetches when a piece opens rather than
 // discovering it a note at a time with the player waiting.
+// The extra recordings of one kind that answer this key at this force. Filtered before the
+// nearest-match walk rather than after, so a knock can never be answered by a resonance
+// that happened to sit closer — they are different sounds, and the closest recording of the
+// wrong one is worse than none.
+export function extrasFor(
+    regions: readonly SampleRegion[],
+    pitch: number,
+    velocity: number,
+    kind: ExtraKind,
+): SampleRegion | null {
+    return regionFor(
+        regions.filter((region) => region.kind === kind),
+        pitch,
+        velocity,
+    );
+}
+
 export function regionsNeeded(
     regions: readonly SampleRegion[],
     notes: readonly { pitch: number; velocity: number }[],
+    kind?: ExtraKind,
 ): SampleRegion[] {
     const wanted = new Map<string, SampleRegion>();
     for (const note of notes) {
-        const region = regionFor(regions, note.pitch, note.velocity);
+        const region = kind
+            ? extrasFor(regions, note.pitch, note.velocity, kind)
+            : regionFor(regions, note.pitch, note.velocity);
         if (region) {
             wanted.set(region.file, region);
         }

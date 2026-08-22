@@ -3,6 +3,8 @@
 
 import { midiToFrequency } from "../../core/pitch";
 import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
+import { roomImpulse, ROOM_SECONDS } from "../../core/room";
+import type { ExtraKind } from "../../core/sampledPiano";
 import type { SampleLookup, SampleVoice } from "../ports/sampleSource";
 
 // The Web Audio implementation of the sound seam: one shared AudioContext (a
@@ -177,6 +179,57 @@ function master(ctx: BaseAudioContext): AudioNode {
     return limiter;
 }
 
+// How much of the room is heard under the dry piano. Subtle on purpose: enough that the
+// instrument stops sounding like it is in a vacuum, well short of the point where a run of
+// quavers smears into the next one. The impulse carries unit energy, so the convolved
+// signal comes back at about the level that went in and this reads as a straight mix.
+const WET = 0.22;
+
+// Where a NOTE goes: into the dry path and the room at once. Everything audible from the
+// instrument passes through here.
+//
+// The metronome does not. A click is a piece of timekeeping equipment sitting outside the
+// music, and putting it in the room smears the very edge a player is listening for — the
+// one thing the click exists to give them. So clicks connect to `master` directly and stay
+// dry, which is also how a real metronome sounds standing next to the piano.
+const rooms = new WeakMap<BaseAudioContext, AudioNode>();
+function room(ctx: BaseAudioContext): AudioNode {
+    const existing = rooms.get(ctx);
+    if (existing) {
+        return existing;
+    }
+    const out = ctx.createGain();
+    out.gain.value = 1;
+    out.connect(master(ctx));
+
+    const convolver = ctx.createConvolver();
+    // The response is already scaled to unit energy in core, and the node's own
+    // normalisation would undo that — leaving the wet level at the mercy of the tail's
+    // length and the context's sample rate, which is exactly what unit energy is for.
+    convolver.normalize = false;
+    const impulse = ctx.createBuffer(
+        2,
+        Math.max(1, Math.round(ctx.sampleRate * ROOM_SECONDS)),
+        ctx.sampleRate,
+    );
+    // A seed per channel, so the two ears hear uncorrelated noise and the room has width.
+    impulse.copyToChannel(roomImpulse(ctx.sampleRate, LEFT_SEED), 0);
+    impulse.copyToChannel(roomImpulse(ctx.sampleRate, RIGHT_SEED), 1);
+    convolver.buffer = impulse;
+
+    const wet = ctx.createGain();
+    wet.gain.value = WET;
+    out.connect(convolver);
+    convolver.connect(wet);
+    wet.connect(master(ctx));
+
+    rooms.set(ctx, out);
+    return out;
+}
+
+const LEFT_SEED = 0x5eed;
+const RIGHT_SEED = 0xf00d;
+
 // The voice is written against BaseAudioContext so the same synthesis renders
 // live (AudioContext) and into a file (OfflineAudioContext, for video export) —
 // one recipe, so an exported take sounds exactly like its in-app replay.
@@ -217,7 +270,7 @@ export function renderStrike(
     filter.type = "lowpass";
     filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), now);
     filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), releaseEnd);
-    filter.connect(master(ctx));
+    filter.connect(room(ctx));
 
     const envelope = ctx.createGain();
     // Exponential ramps cannot reach zero, so the envelope rides just above it.
@@ -294,7 +347,7 @@ function renderSampledStrike(
     const damperFrom = now + Math.max(0.05, duration);
     envelope.gain.setValueAtTime(level, damperFrom);
     envelope.gain.exponentialRampToValueAtTime(0.0001, damperFrom + DAMPER_S);
-    envelope.connect(master(ctx));
+    envelope.connect(room(ctx));
 
     source.connect(envelope);
     source.start(now);
@@ -318,6 +371,11 @@ type Voice = {
     // A recording rings the way the string did; there is no synthesised tail to model, so
     // the ending is a damper falling and nothing else.
     sampled?: boolean;
+    // The loudness this voice was played at, with the volume preference already in it. The
+    // key-off knock and the pedal's resonance are scaled off it, so they follow the note
+    // they belong to — and a muted session, whose notes never sound, makes no mechanism
+    // noise either, without either of them having to know what muted means.
+    level: number;
 };
 const voices = new Map<number, Voice>();
 // Notes whose key is physically down right now. A voice ends only once nothing holds it:
@@ -362,13 +420,20 @@ function buildSampledVoice(
 
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(sampledLevel(gain, velocity), now);
-    envelope.connect(master(ctx));
+    envelope.connect(room(ctx));
     source.connect(envelope);
     source.start(now);
     // Long enough that a held key never runs out of recording before the player lifts it;
     // the buffer simply ends if they hold it longer than the string rang.
     source.stop(now + sample.buffer.duration);
-    return { envelope, oscillators: [source], frequency, startedAt: now, sampled: true };
+    return {
+        envelope,
+        oscillators: [source],
+        frequency,
+        startedAt: now,
+        sampled: true,
+        level: sampledLevel(gain, velocity),
+    };
 }
 
 // A held voice: the same partials, attack and darkening filter as a struck note, but with
@@ -379,7 +444,7 @@ function buildVoice(ctx: AudioContext, frequency: number, gain: number): Voice {
     filter.type = "lowpass";
     filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), now);
     filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), now + 0.6);
-    filter.connect(master(ctx));
+    filter.connect(room(ctx));
 
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(0.0001, now);
@@ -399,7 +464,7 @@ function buildVoice(ctx: AudioContext, frequency: number, gain: number): Voice {
         oscillator.start(now);
         return oscillator;
     });
-    return { envelope, oscillators, frequency, startedAt: now };
+    return { envelope, oscillators, frequency, startedAt: now, level: gain };
 }
 
 // The most extra body a generous release adds, so a lengthened tap sings without droning
@@ -428,10 +493,51 @@ function fadeVoice(ctx: AudioContext, voice: Voice, tail: number, hold = 0): voi
 // Release a note's voice, ringing it out over a tail scaled to how long it was held.
 // holdScale > 1 lets a short imprecise-input tap ring as if held that many times longer —
 // a little extra body (capped) plus the correspondingly longer tail.
+// A piano is an object somebody is operating, and the key coming up is audible: the damper
+// lands on the string and the mechanism returns. The pack records that as its `knock`, and
+// it is a large part of why a sampled piano sounds like a room with a piano in it rather
+// than a tone generator with good tone.
+//
+// Quiet, because it is mechanism rather than music, and scaled by the volume preference like
+// everything else. Not by velocity: how hard the key went DOWN says nothing about the noise
+// it makes coming UP.
+const KNOCK_LEVEL = 0.22;
+
+// The other strings answering a struck one, which is what the sustain pedal actually sounds
+// like beyond "notes last longer". Quieter still — it is a wash under the note, and at any
+// audible level it turns a pedalled passage to fog.
+const RESONANCE_LEVEL = 0.11;
+
+// One of the pack's extra recordings, played once and left to ring out on its own. It opens
+// no voice and is never tracked: there is nothing to release, nothing to pedal, and
+// allNotesOff has nothing to silence — it is over in a fraction of a second either way.
+function playExtra(ctx: AudioContext, note: number, kind: ExtraKind, level: number): void {
+    const sample = samples?.().source?.extraFor(note, 90, kind) ?? null;
+    if (!sample) {
+        return;
+    }
+    const now = ctx.currentTime;
+    const source = ctx.createBufferSource();
+    source.buffer = sample.buffer;
+    source.playbackRate.value = sample.rate;
+    const envelope = ctx.createGain();
+    envelope.gain.setValueAtTime(level, now);
+    envelope.connect(room(ctx));
+    source.connect(envelope);
+    source.start(now);
+    source.stop(now + sample.buffer.duration);
+}
+
 function endVoice(ctx: AudioContext, note: number, holdScale = 1): void {
     const voice = voices.get(note);
     if (!voice) {
         return;
+    }
+    // Only for a recorded instrument, and only where the damper genuinely lands — this is
+    // reached through maybeEnd, which stands down while a key or a pedal still holds the
+    // note. A knock under the sustain pedal would be a sound no piano makes.
+    if (voice.sampled) {
+        playExtra(ctx, note, "knock", voice.level * KNOCK_LEVEL);
     }
     const held = ctx.currentTime - voice.startedAt;
     const effective = held * holdScale;
@@ -453,6 +559,7 @@ function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): 
     envelope.gain.exponentialRampToValueAtTime(gain, time + 0.001);
     envelope.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
     osc.connect(envelope);
+    // Dry, deliberately: see room(). A click in the room smears the edge it exists to give.
     envelope.connect(master(ctx));
     osc.start(time);
     osc.stop(time + 0.06);
@@ -553,7 +660,19 @@ export const webAudioEngine: AudioEngine = {
     strike(note) {
         const ctx = context();
         if (ctx && note.gain > 0) {
-            const strike = renderStrike(ctx, note, voiceFor(note.note, note.velocity));
+            const sample = voiceFor(note.note, note.velocity);
+            const strike = renderStrike(ctx, note, sample);
+            // The other strings answering this one. Only for a recorded instrument: the
+            // synthesised voice has no strings to answer with, and faking it would be a
+            // second synthesised note rather than a resonance.
+            if (sample && note.pedalled) {
+                playExtra(
+                    ctx,
+                    note.note,
+                    "resonance",
+                    sampledLevel(note.gain, note.velocity) * RESONANCE_LEVEL,
+                );
+            }
             scheduledStrikes.add(strike);
             // Drop it from the tracked set once it has finished ringing, so the set holds
             // only strikes that are still (or not yet) sounding.
@@ -587,6 +706,12 @@ export const webAudioEngine: AudioEngine = {
                 ? buildSampledVoice(ctx, midiToFrequency(note), level, velocity, sample)
                 : buildVoice(ctx, midiToFrequency(note), level),
         );
+        // Struck with the dampers off, so the rest of the instrument answers. The live
+        // counterpart of the `pedalled` flag a Listen strike carries: here the player is
+        // genuinely holding the pedal, so the engine's own state is the truth.
+        if (sample && sustainDown) {
+            playExtra(ctx, note, "resonance", sampledLevel(level, velocity) * RESONANCE_LEVEL);
+        }
         // The voice rings for at least ~1.5s; enough of a window for the mic echo probe,
         // which mic input skips anyway (a mic player hears their own piano, not this).
         struckUntil.set(note, performance.now() + 1500);

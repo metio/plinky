@@ -12,7 +12,7 @@ import { octaveShiftAt } from "../../core/octaveShift";
 import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
 import { slurredOnwardAt } from "../../core/slur";
 import { volumeAt } from "../../core/dynamics";
-import { ringUntil } from "../../core/pedal";
+import { pedalledAt, ringUntil } from "../../core/pedal";
 import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
@@ -38,7 +38,10 @@ import { useTimerChain } from "./useTimerChain";
 // The synth slice playback needs: Listen scales sustain by tempo, a replay
 // replays the recorded velocity and hold.
 type NoteSink = {
-    playNote(note: number, options?: { duration?: number; velocity?: number }): void;
+    playNote(
+        note: number,
+        options?: { duration?: number; velocity?: number; pedalled?: boolean },
+    ): void;
 };
 
 // One striking note at a position, with the marks `performNote` turns into how
@@ -47,6 +50,11 @@ type NoteSink = {
 type ListenNote = {
     pitch: number;
     soundQuarters: number;
+    // Whether the score asks for the sustain pedal here. The LENGTH already accounts for it
+    // — soundQuarters rings to the end of the pedal span — so this is not about how long the
+    // note lasts. It is the other half of what a pedal does: the dampers are off the rest of
+    // the strings, and a recorded piano has that resonance to play.
+    pedalled: boolean;
     articulation: Articulation;
     accent: boolean;
     marcato: boolean;
@@ -143,6 +151,7 @@ export function collectListenSteps(
                         // Under the pedal the damper holds the note, so it rings on
                         // whether or not the written value is up.
                         soundQuarters: ringUntil(pedals, whole, expression.soundQuarters / 4) * 4,
+                        pedalled: pedalledAt(pedals, whole),
                         articulation: expression.articulation,
                         accent: expression.accent,
                         marcato: expression.marcato,
@@ -464,7 +473,11 @@ export function useListenPlayback({
                     // metronome with pitches.
                     current.interpretation,
                 );
-                synth.playNote(note.pitch, { duration: durationSeconds, velocity });
+                synth.playNote(note.pitch, {
+                    duration: durationSeconds,
+                    velocity,
+                    pedalled: note.pedalled,
+                });
                 // …and light the same note on a connected instrument, so the piece
                 // can be watched as well as heard. Inert unless asked for.
                 echoNote(note.pitch, velocity, durationSeconds * 1000);

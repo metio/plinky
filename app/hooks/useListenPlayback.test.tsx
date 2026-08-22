@@ -130,6 +130,7 @@ describe("collectListenSteps", () => {
                     accent: false,
                     marcato: false,
                     slurred: false,
+                    pedalled: false,
                     hand: "right",
                 },
             ],
@@ -142,6 +143,23 @@ describe("collectListenSteps", () => {
             advancesCursor: true,
             interpretation: 1,
         });
+    });
+
+    it("reports the pedal as well as ringing under it", () => {
+        // Two separate facts about a pedalled note, and only one of them is its length.
+        // `soundQuarters` rings to the end of the span, which is what the ear hears as
+        // "held". `pedalled` is that the dampers are off the OTHER strings, which is the
+        // rest of what a pedal does and which no amount of lengthening conveys — a recorded
+        // piano has a resonance to play for it.
+        const pedalled = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            pedals: [{ from: 0, to: 4 }],
+        });
+        expect(pedalled[0]?.notes[0]?.pedalled).toBe(true);
+        expect(pedalled[0]?.notes[0]?.soundQuarters).toBeGreaterThan(1);
+
+        const dry = collectListenSteps(fakeOsmd(2));
+        expect(dry[0]?.notes[0]?.pedalled).toBe(false);
     });
 
     it("drops a rest from the sounding notes but keeps its length for the beat", () => {
@@ -162,7 +180,11 @@ describe("useListenPlayback", () => {
         expect(result.current.playing).toBe(true);
         // The first entry sounds immediately, sustained per the 120 BPM tempo, at the
         // default velocity since the score marks no dynamic.
-        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 90 });
+        expect(playNote).toHaveBeenCalledWith(60, {
+            duration: 0.5,
+            velocity: 90,
+            pedalled: false,
+        });
 
         // Each quarter at 120 BPM is 500ms; after both entries the walk ends.
         act(() => void vi.advanceTimersByTime(500));
@@ -247,7 +269,11 @@ describe("useListenPlayback", () => {
             fakeOsmd(1, { ParentVoiceEntry: { Articulations: [{ articulationEnum: 6 }] } }),
         );
         act(() => staccato.result.current.start(0));
-        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.25, velocity: 90 });
+        expect(playNote).toHaveBeenCalledWith(60, {
+            duration: 0.25,
+            velocity: 90,
+            pedalled: false,
+        });
         act(() => staccato.result.current.stop());
         playNote.mockClear();
 
@@ -267,7 +293,11 @@ describe("useListenPlayback", () => {
             dynamics: [{ whole: 0, volume: 40, ramp: false }],
         });
         act(() => soft.result.current.start(0));
-        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 40 });
+        expect(playNote).toHaveBeenCalledWith(60, {
+            duration: 0.5,
+            velocity: 40,
+            pedalled: false,
+        });
         act(() => soft.result.current.stop());
     });
 

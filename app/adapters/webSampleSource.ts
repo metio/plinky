@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
-import { regionsNeeded } from "../../core/sampledPiano";
+import { EXTRA_KINDS, regionsNeeded } from "../../core/sampledPiano";
 import type { PlayedNote, SampleSource, SampleState } from "../ports/sampleSource";
 import { NO_SAMPLES } from "../ports/sampleSource";
 
@@ -194,8 +194,20 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             }
             settle({ loading: true });
             try {
+                // The struck notes first and on their own, because they are the ones a
+                // player is waiting for: a note with no recording is played by the synth,
+                // and a note whose recording arrives after the knock behind it is a piano
+                // that clicks before it sounds. The extras follow once the notes are in.
                 await Promise.all(
                     regionsNeeded(found.notes, notes).map((region) => decode(region)),
+                );
+                // The key-off knock has to be decoded before the key comes up — at most a
+                // second after it went down — so it is fetched with the passage rather than
+                // at the moment of release, which would always be too late.
+                await Promise.all(
+                    EXTRA_KINDS.flatMap((kind) =>
+                        regionsNeeded(found.releases, notes, kind).map((region) => decode(region)),
+                    ),
                 );
                 await countHeld();
             } finally {

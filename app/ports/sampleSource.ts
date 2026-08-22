@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
+import type { ExtraKind, SampleManifest, SampleRegion } from "../../core/sampledPiano";
 
 // A note a piece will play: enough to choose its recording, and nothing else.
 export type PlayedNote = { pitch: number; velocity: number };
@@ -15,6 +15,11 @@ export type SampleVoice = { buffer: AudioBuffer; rate: number };
 // the question can be asked inside the key press that prompted it.
 export type SampleLookup = {
     voiceFor(pitch: number, velocity: number): SampleVoice | null;
+    // The key-off knock or the sympathetic resonance for this key, if the pack has one
+    // decoded. Same contract as voiceFor: answers from what is ready this instant, null
+    // otherwise — a piano that is missing its key-off noise still sounds like a piano, and
+    // one that stalls waiting for it does not.
+    extraFor(pitch: number, velocity: number, kind: ExtraKind): SampleVoice | null;
 };
 
 // Where recordings of a real piano come from.
