@@ -333,7 +333,7 @@ function sampledLevel(gain: number, velocity: number): number {
 
 function renderSampledStrike(
     ctx: BaseAudioContext,
-    { gain, velocity, duration, delay }: NoteStrike,
+    { note, gain, velocity, duration, delay, pedalled }: NoteStrike,
     sample: SampleVoice,
 ): StruckStrike {
     const now = ctx.currentTime + Math.max(0, delay);
@@ -348,6 +348,15 @@ function renderSampledStrike(
     envelope.gain.setValueAtTime(level, damperFrom);
     envelope.gain.exponentialRampToValueAtTime(0.0001, damperFrom + DAMPER_S);
     envelope.connect(room(ctx));
+    // A fixed-length note's damper lands at a time known when it is scheduled, so its knock
+    // is scheduled with it. Listen is where most notes in this app end, and a recorded piano
+    // that knocks under the hands but not under the computer's is two instruments.
+    scheduleExtra(ctx, note, "knock", level * KNOCK_LEVEL, damperFrom);
+    // Struck with the dampers off, so the rest of the instrument answers. Same instant as
+    // the note, not the damper.
+    if (pedalled) {
+        scheduleExtra(ctx, note, "resonance", level * RESONANCE_LEVEL, now);
+    }
 
     source.connect(envelope);
     source.start(now);
@@ -511,21 +520,34 @@ const RESONANCE_LEVEL = 0.11;
 // One of the pack's extra recordings, played once and left to ring out on its own. It opens
 // no voice and is never tracked: there is nothing to release, nothing to pedal, and
 // allNotesOff has nothing to silence — it is over in a fraction of a second either way.
-function playExtra(ctx: AudioContext, note: number, kind: ExtraKind, level: number): void {
+function scheduleExtra(
+    ctx: BaseAudioContext,
+    note: number,
+    kind: ExtraKind,
+    level: number,
+    at: number,
+): void {
+    // Velocity is not how hard the key came UP, and a knock is the same sound however hard
+    // the note was struck — so the lookup asks at a middling force and takes whatever
+    // recording covers the key.
     const sample = samples?.().source?.extraFor(note, 90, kind) ?? null;
-    if (!sample) {
+    if (!sample || level <= 0) {
         return;
     }
-    const now = ctx.currentTime;
     const source = ctx.createBufferSource();
     source.buffer = sample.buffer;
     source.playbackRate.value = sample.rate;
     const envelope = ctx.createGain();
-    envelope.gain.setValueAtTime(level, now);
+    envelope.gain.setValueAtTime(level, at);
     envelope.connect(room(ctx));
     source.connect(envelope);
-    source.start(now);
-    source.stop(now + sample.buffer.duration);
+    source.start(at);
+    source.stop(at + sample.buffer.duration);
+}
+
+// The live case: right now, on the shared context.
+function playExtra(ctx: AudioContext, note: number, kind: ExtraKind, level: number): void {
+    scheduleExtra(ctx, note, kind, level, ctx.currentTime);
 }
 
 function endVoice(ctx: AudioContext, note: number, holdScale = 1): void {
@@ -660,19 +682,10 @@ export const webAudioEngine: AudioEngine = {
     strike(note) {
         const ctx = context();
         if (ctx && note.gain > 0) {
-            const sample = voiceFor(note.note, note.velocity);
-            const strike = renderStrike(ctx, note, sample);
-            // The other strings answering this one. Only for a recorded instrument: the
-            // synthesised voice has no strings to answer with, and faking it would be a
-            // second synthesised note rather than a resonance.
-            if (sample && note.pedalled) {
-                playExtra(
-                    ctx,
-                    note.note,
-                    "resonance",
-                    sampledLevel(note.gain, note.velocity) * RESONANCE_LEVEL,
-                );
-            }
+            // The knock and, where the score pedals it, the resonance are scheduled by
+            // renderStrike alongside the note — one place, so an exported video carries
+            // them exactly as the speakers just did.
+            const strike = renderStrike(ctx, note, voiceFor(note.note, note.velocity));
             scheduledStrikes.add(strike);
             // Drop it from the tracked set once it has finished ringing, so the set holds
             // only strikes that are still (or not yet) sounding.
