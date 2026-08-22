@@ -20,6 +20,10 @@ export type PlayNoteOptions = {
     // hovers down a list arriving as one chord, minutes later. A note the player asked
     // for is worth hearing late; decoration is not.
     decorative?: boolean;
+    // The score asks for the sustain pedal at this note. Listen models pedalling by
+    // lengthening notes rather than by pressing the engine's pedal, so this is how the
+    // engine learns that the dampers are off and the rest of the instrument is ringing.
+    pedalled?: boolean;
 };
 
 export type UseSynthResult = {
@@ -69,6 +73,7 @@ export function useSynth(): UseSynthResult {
             audio.resume();
             audio.strike({
                 note,
+                pedalled: options.pedalled ?? false,
                 gain,
                 // The force, before the volume preference was folded into the gain: a
                 // recorded piano picks its recording by this, and scaling that recording by

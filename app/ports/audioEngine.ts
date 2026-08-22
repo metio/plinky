@@ -20,6 +20,15 @@ export type NoteStrike = {
     velocity: number;
     duration: number; // seconds
     delay: number; // seconds from now on the audio clock
+    // Whether this note sounds with the dampers off — the score asks for the sustain pedal
+    // here, or a player is holding it. The other strings answer a struck one, which is what
+    // the pedal actually sounds like beyond "notes last longer".
+    //
+    // Carried on the strike rather than read from the engine's own pedal state, because
+    // Listen never presses the pedal: it models pedalling by lengthening each note, so the
+    // engine would see a piece with a pedal marking on every bar as one played with the
+    // pedal up. Live play sets the pedal for real and answers the same question from it.
+    pedalled?: boolean;
 };
 
 // A metronome tick: the accented downbeat, a plain beat, or a subdivision.
