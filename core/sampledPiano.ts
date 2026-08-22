@@ -136,3 +136,20 @@ export function regionsNeeded(
 export function sampleCredit(manifest: SampleManifest): string {
     return `${manifest.instrument} by ${manifest.author} · ${manifest.license}`;
 }
+
+// Whether the recorded piano is on, from whatever the device has stored for it.
+//
+// On unless the player has turned it off — a recorded concert grand is simply what this
+// instrument sounds like, and while it was off by default almost nobody ever heard it. A
+// setting nobody finds is a feature nobody has.
+//
+// So the stored value is read for "off" rather than for "on": an absent key — a new device,
+// a cleared store, a player who has never touched the setting — means on, and only an
+// explicit "0" means off. Read the other way round, every new device would be silent again,
+// which is the state this is trying to leave.
+//
+// Nothing is downloaded up front by saying yes here. The recordings arrive a piece at a
+// time, so a player who never opens one fetches nothing at all.
+export function samplesEnabled(stored: string | null): boolean {
+    return stored !== "0";
+}
