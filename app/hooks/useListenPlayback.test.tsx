@@ -27,6 +27,43 @@ vi.mock("../lib/scoreCursor", () => ({
 // fields (articulations, ties, slurs) can be injected to drive the expressive reader, and
 // `volume` writes a dynamic onto the sheet the way OSMD parses one — on the measure, at
 // the top of the piece, standing over every position.
+
+// A walk whose pitch changes from position to position, for the shaping that depends on the
+// notes rather than on the clock. Each position is one quarter, as in fakeOsmd.
+function lineOsmd(halfTones: readonly (number | number[])[]) {
+    let position = 0;
+    const cursor = {
+        reset: vi.fn(() => {
+            position = 0;
+        }),
+        show: vi.fn(),
+        hide: vi.fn(),
+        next: vi.fn(() => {
+            position++;
+        }),
+        iterator: {
+            get EndReached() {
+                return position >= halfTones.length;
+            },
+            get CurrentMeasureIndex() {
+                return position;
+            },
+            get currentTimeStamp() {
+                return { RealValue: position * 0.25 };
+            },
+        },
+        NotesUnderCursor: () => {
+            const here = halfTones[position] ?? 60;
+            return (Array.isArray(here) ? here : [here]).map((halfTone) => ({
+                Length: { RealValue: 0.25 },
+                isRest: () => false,
+                halfTone,
+            }));
+        },
+    };
+    return { cursor, Sheet: { SourceMeasures: [] } } as unknown as OpenSheetMusicDisplay;
+}
+
 function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, volume?: number) {
     let position = 0;
     const cursor = {
@@ -139,6 +176,7 @@ describe("collectListenSteps", () => {
             whole: 0,
             measureIndex: 0,
             soft: false,
+            contour: 1,
             bpm: NOMINAL_BPM,
             stretch: 1,
             advancesCursor: true,
@@ -219,6 +257,21 @@ describe("collectListenSteps", () => {
         });
         expect(softly[0]?.soft).toBe(true);
         expect(collectListenSteps(fakeOsmd(1))[0]?.soft).toBe(false);
+    });
+
+    it("leans into the top of a rising line", () => {
+        // The four-bar arch knows nothing about the notes, so it plays every group of four
+        // bars identically. This is the half of the shaping that follows the actual line.
+        const steps = collectListenSteps(lineOsmd([48, 52, 55, 60, 64, 67, 72]));
+        const weights = steps.map((step) => step.contour);
+        expect(weights.at(-1)).toBeGreaterThan(weights[0] as number);
+        // Never above what the page asked for.
+        expect(Math.max(...weights)).toBeLessThanOrEqual(1);
+    });
+
+    it("leaves a line that goes nowhere unshaped", () => {
+        const steps = collectListenSteps(lineOsmd([60, 60, 60, 60]));
+        expect(steps.every((step) => step.contour === 1)).toBe(true);
     });
 
     it("drops a rest from the sounding notes but keeps its length for the beat", () => {
@@ -321,6 +374,30 @@ describe("useListenPlayback", () => {
         act(() => void vi.advanceTimersByTime(500));
         expect(result.current.playing).toBe(false);
         expect(result.current.activeReplayId).toBeNull();
+    });
+
+    it("brings the tune out of the chord under it", () => {
+        // A chord is not one sound: the top of the texture is the tune and the notes under
+        // it are accompaniment. Struck at one level a four-part texture is a block with the
+        // melody buried in the middle of it.
+        const { result } = mount(lineOsmd([[48, 60, 64, 72]]));
+        act(() => result.current.start(0));
+        const struck = new Map(
+            playNote.mock.calls.map(([pitch, options]) => [
+                pitch as number,
+                options?.velocity ?? 0,
+            ]),
+        );
+        act(() => result.current.stop());
+
+        // The walk reports half-tones and the sounding pitch is twelve above them.
+        const top = struck.get(84) as number;
+        expect(struck.get(76)).toBeLessThan(top);
+        expect(struck.get(72)).toBeLessThan(top);
+        // The bass holds the harmony up, so it sits under the tune but above the inner
+        // voices rather than being buried with them.
+        expect(struck.get(60)).toBeGreaterThan(struck.get(72) as number);
+        expect(struck.get(60)).toBeLessThan(top);
     });
 
     it("plays the score's expression — staccato clips, accent strikes harder, dynamics set loudness", () => {
