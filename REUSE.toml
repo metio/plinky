@@ -87,6 +87,14 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
+# The same manifest cut into slices, so opening one piece reads about ten kilobytes
+# instead of six hundred. Written by `npm run songs:bake` from the manifest above.
+[[annotations]]
+path = ["public/songs/index/*.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
 # The finger-exercise catalogue. Scales/arpeggios are generated client-side (no
 # shipped files); the metadata manifest plus the curated studies are stored — the
 # latter public-domain études (Hanon, Czerny, Burgmüller, …) sourced from PDMX (CC0),

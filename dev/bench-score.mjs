@@ -58,16 +58,36 @@ const median = (values) => {
 // One cold load: how long until the engraved score is actually on screen, and what the
 // browser spent that time on.
 async function measure(browser, rate) {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const context = await browser.newContext({
+        viewport: { width: 1280, height: 900 },
+        // The service worker is blocked, and that is the whole reason any byte-level figure
+        // here means anything. Plinky's worker intercepts every same-origin GET, and the
+        // DevTools network throttling applied below governs the PAGE's network stack, not the
+        // worker's — so with it running, a 1.27 MB chunk arrives in 28 ms over a link
+        // emulated at 200 KB/s, reporting a transferSize of zero because a worker answered.
+        // Every byte saved is invisible, and the measurement quietly describes a different
+        // machine from the one it claims to.
+        //
+        // What this measures, then, is a first-time visitor: nothing cached, nothing
+        // installed, every byte crossing the emulated link. That is the load worth being
+        // fast, and the one an optimisation has to be judged against.
+        serviceWorkers: "block",
+    });
     const page = await context.newPage();
     const client = await context.newCDPSession(page);
     await client.send("Emulation.setCPUThrottlingRate", { rate });
+    await client.send("Network.enable");
+    // A fresh browser CONTEXT is not a fresh cache: Chromium's HTTP cache is shared across
+    // contexts of one browser, so without this the first run measures a cold load and every
+    // run after it measures a warm one — and the median of five is mostly the wrong number.
+    // Found by noticing that a 1.27 MB chunk was arriving in 29 ms over a throttled link,
+    // with a transferSize of zero.
+    await client.send("Network.setCacheDisabled", { cacheDisabled: !WARM });
     const shape = NETWORKS[NET];
     if (shape === undefined) {
         throw new Error(`unknown --net=${NET}; pick one of ${Object.keys(NETWORKS).join(", ")}`);
     }
     if (shape) {
-        await client.send("Network.enable");
         await client.send("Network.emulateNetworkConditions", { offline: false, ...shape });
     }
 

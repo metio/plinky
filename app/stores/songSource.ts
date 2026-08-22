@@ -3,6 +3,7 @@
 
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
 import type { Fetcher } from "../ports/fetcher";
+import { shardName } from "../../core/catalogShard";
 import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 
 // The curated song catalogue. Unlike the bundled exercises (inlined into the
@@ -39,6 +40,8 @@ export type SongMeta = {
 };
 
 const MANIFEST_URL = "/songs/manifest.json";
+// Where the per-piece slices of that manifest live, written by `npm run songs:bake`.
+const SLICE_DIR = "/songs/index";
 
 export type SongSource = {
     // The browsable catalogue (metadata only). A completed fetch is cached for
@@ -59,6 +62,26 @@ export type SongSource = {
 
 export function createSongSource(fetchUrl: Fetcher): SongSource {
     const manifest = cachedManifest<SongMeta>(fetchUrl, MANIFEST_URL);
+    // One piece's row, from the slice of the catalogue its id falls in — about ten
+    // kilobytes rather than the six hundred the whole manifest costs. This is what a
+    // piece's page waits on before it can engrave a note, and it used to wait on the entire
+    // catalogue to read one row of it.
+    //
+    // The full manifest is the fallback, not the path: a slice that cannot be fetched
+    // leaves the question genuinely unanswered, and a deploy mid-session can leave a cached
+    // page asking for a slice that has moved. Falling back keeps a real piece from ever
+    // reading as nonexistent — the distinction ResolvedScore exists to make.
+    const metaFor = async (id: string): Promise<SongMeta | null | "unavailable"> => {
+        const slice = await cachedManifest<SongMeta>(
+            fetchUrl,
+            `${SLICE_DIR}/${shardName(id)}.json`,
+        )();
+        if (slice !== null) {
+            return slice.find((song) => song.id === id) ?? null;
+        }
+        const list = await manifest();
+        return list === null ? "unavailable" : (list.find((song) => song.id === id) ?? null);
+    };
 
     const fetchXml = (id: string, license?: string): Promise<string | null> =>
         fetchMxlXml(fetchUrl, `/songs/${licenseDir(license)}/${id}.mxl`);
@@ -67,11 +90,10 @@ export function createSongSource(fetchUrl: Fetcher): SongSource {
         manifest,
         fetchXml,
         async resolve(id) {
-            const list = await manifest();
-            if (list === null) {
+            const meta = await metaFor(id);
+            if (meta === "unavailable") {
                 return "unavailable";
             }
-            const meta = list.find((song) => song.id === id);
             if (!meta) {
                 return null;
             }
