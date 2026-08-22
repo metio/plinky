@@ -80,8 +80,8 @@ function RunSetupPanel() {
         setShowMine,
         metronomeOn,
         setMetronomeOn,
-        forgiving,
         setForgiving,
+        aids,
         reading,
         score,
         sightRead,
@@ -168,7 +168,7 @@ function RunSetupPanel() {
                         {!enforceTempo && (
                             <SwitchField
                                 label={m.forgiving_toggle()}
-                                checked={sightRead.on ? false : forgiving}
+                                checked={aids.forgiving}
                                 onChange={setForgiving}
                                 help={m.forgiving_hint()}
                                 disabled={sightRead.on}
@@ -338,16 +338,21 @@ function RunSetupPanel() {
                                 help={m.reveal_tries_caption()}
                             />
                         )}
+                        {/* Every one of these reads `aids`, which is where "what this run
+                        actually reads with" is decided — the sight-reader rung while that
+                        mode is on, the player's own settings otherwise. A switch that
+                        worked its own override out would drift from the run the moment an
+                        aid was added to the ladder and forgotten here. */}
                         <SwitchField
                             label={m.color_notes_toggle()}
-                            checked={sightRead.on ? false : reading.colorNotes}
+                            checked={aids.colorNotes}
                             onChange={reading.setColorNotes}
                             help={m.color_notes_hint()}
                             disabled={sightRead.on}
                         />
                         <SwitchField
                             label={m.highway_toggle()}
-                            checked={sightRead.on ? false : reading.highway}
+                            checked={aids.highway}
                             onChange={reading.setHighway}
                             help={m.highway_hint()}
                             disabled={sightRead.on}
@@ -364,12 +369,12 @@ function RunSetupPanel() {
                                     </Show>
                                 </span>
                             }
-                            checked={sightRead.on ? false : reading.showFingerings}
+                            checked={aids.showFingerings}
                             onChange={(on) => reading.setShowFingerings(on)}
                             disabled={sightRead.on}
                             help={m.finger_numbers_hint()}
                         />
-                        {hasSaved && reading.showFingerings && (
+                        {hasSaved && aids.showFingerings && (
                             <SwitchField
                                 label={m.fingering_show_mine()}
                                 checked={showMine}
