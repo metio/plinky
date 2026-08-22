@@ -14,9 +14,28 @@ const plain: NoteMarks = {
 };
 
 describe("performNote length", () => {
-    it("sounds a plain note its full written length at the tempo", () => {
-        // One quarter at 120 BPM is half a second, unchanged from flat playback.
-        expect(performNote(plain, 120).durationSeconds).toBeCloseTo(0.5);
+    it("leaves a hair of air after a note the score neither slurs nor articulates", () => {
+        // One quarter at 120 BPM is written as half a second, and a note held for exactly
+        // that never stops sounding before the next one starts: a run of them is one
+        // continuous band of tone rather than a series of notes. A finger lifts.
+        //
+        // Nearly all of the length, though — this is a lift, not an articulation, and the
+        // score has a staccato for when it means one.
+        const played = performNote(plain, 120).durationSeconds;
+        expect(played).toBeLessThan(0.5);
+        expect(played).toBeGreaterThan(0.45);
+    });
+
+    it("holds a note the score does mark for exactly as long as it says", () => {
+        // The lift is only for notes with nothing written on them. Tenuto means hold it,
+        // and a slur means join to the next — inventing a gap in either would be playing
+        // against the page.
+        expect(performNote({ ...plain, articulation: "tenuto" }, 120).durationSeconds).toBeCloseTo(
+            0.5,
+        );
+        expect(
+            performNote({ ...plain, slurred: true }, 120).durationSeconds,
+        ).toBeGreaterThanOrEqual(0.5);
     });
 
     it("clips staccato short and staccatissimo shorter", () => {
@@ -80,7 +99,8 @@ describe("performNote length", () => {
     });
 
     it("scales the whole tie's length for a held tie start", () => {
-        expect(performNote({ ...plain, quarters: 3 }, 120).durationSeconds).toBeCloseTo(1.5);
+        // Three quarters at 120 BPM is 1.5 s written, less the lift a plain note gets.
+        expect(performNote({ ...plain, quarters: 3 }, 120).durationSeconds).toBeCloseTo(1.5 * 0.94);
     });
 });
 

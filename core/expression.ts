@@ -110,9 +110,32 @@ export function performNote(
     const beatSeconds = 60 / Math.max(1, tempo);
     const fullSeconds = Math.max(0, marks.quarters) * beatSeconds;
     return {
-        durationSeconds: fullSeconds * lengthScaleOf(marks) + legatoOverlap(marks, tempo),
+        durationSeconds:
+            fullSeconds * lengthScaleOf(marks) * detachment(marks) + legatoOverlap(marks, tempo),
         velocity: Math.max(1, Math.round(velocityOf(marks) * interpretation)),
     };
+}
+
+// How much of its written length a note actually keeps.
+//
+// A note the score neither slurs nor articulates is written to last exactly until the next
+// one begins, and played that way it does: the sound never stops, and a run of them is one
+// continuous band of tone rather than a series of notes. No pianist plays like that — a
+// finger lifts, and the hair of air is most of what makes a line audible as notes at all.
+// On the 38% of the catalogue that marks nothing, that band of tone is a large part of why
+// the playback sounds mechanical.
+//
+// Deliberately not part of lengthScaleOf, for the same reason legatoOverlap is not: that one
+// is the shape of the written intention, which is what a run is graded against, and a player
+// is not required to detach their notes to be judged as having held them. This is the
+// performance, not the expectation.
+//
+// Only for a note with nothing written on it. A slur asks for the opposite, and every
+// articulation already says exactly how long to hold.
+const DETACH = 0.94;
+
+export function detachment(marks: Pick<NoteMarks, "articulation" | "slurred">): number {
+    return marks.slurred || marks.articulation !== "none" ? 1 : DETACH;
 }
 
 // How far a slurred note rings past its written end, in seconds. Zero for every note the
