@@ -72,6 +72,11 @@ export function sceneKeys(from: number, to: number): SceneKey[] {
 // the drawable region.
 export type HighwayBlock = {
     pitch: number;
+    // When the note sounds, on whatever clock the caller handed in. Carried so a painter
+    // that keeps its blocks between frames — the DOM one, whose blocks are elements that
+    // move — can tell one from another across a shift of the origin. A canvas painter,
+    // which redraws everything every frame, has no use for it.
+    startMs: number;
     // The finger the note is played with, where the performance knows it.
     finger?: number;
     // The hand that plays it, where the score says. Carried alongside the finger because
@@ -115,6 +120,7 @@ export function highwayBlocks(
         }
         blocks.push({
             pitch: note.pitch,
+            startMs: note.startMs,
             finger: note.finger,
             hand: note.hand,
             x: key.x,
