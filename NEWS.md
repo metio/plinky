@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Eighty-five pieces have left the catalogue, and they were the ones that sounded
+wrong.** Some of what was harvested had been converted from a recording rather than
+engraved by a person, which reads fine on the page and plays as something no pianist
+would — the reported *Für Elise* was one. Three copies of that piece were listed as
+three different songs, too; there is one now, and it is a good one.
+
 **Picking a symbol in the glossary no longer nudges the page.** On a wide screen the
 list and the explanation sit side by side, so nothing needs to move — but every choice
 made after you had scrolled pulled the page back by however far you had gone.

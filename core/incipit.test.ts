@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
-import { INCIPIT_NOTES, layoutIncipit, readIncipit } from "./incipit";
+import { INCIPIT_NOTES, layoutIncipit, readIncipit, sameOpening } from "./incipit";
 
 const codec = domXmlCodec;
 
@@ -184,5 +184,41 @@ describe("layoutIncipit", () => {
             notes: [{ diatonic: 4 * 7 + 6, alter: 1, quarters: 1 }],
         });
         expect(glyphs[0]?.letter).toBe(6);
+    });
+});
+
+describe("sameOpening", () => {
+    // The catalogue's own three Für Elise marks. Two spell the second note D sharp, one
+    // spells it B flat — the same key under the same finger.
+    const BROKEN = "G37sb37s37sb37s37s34s36s35s";
+    const GOOD_A = "G37s#36s37s#36s37s34s36s35s";
+    const GOOD_B = "G37s#36s37s#36s37s34s36s35s";
+
+    it("hears through an enharmonic spelling", () => {
+        // Compared as WRITTEN these disagree on a quarter of the opening; compared as sound
+        // they are the same music, which is the question being asked.
+        expect(sameOpening(BROKEN, GOOD_A)).toBe(true);
+        expect(sameOpening(GOOD_A, GOOD_B)).toBe(true);
+    });
+
+    it("keeps two different pieces of one name apart", () => {
+        // Bach wrote many things called Menuet, Schubert more than one Ständchen. Title and
+        // composer alone would merge them; the opening does not.
+        const menuetOne = "G35q36s37s38e37q38s37s36s";
+        const menuetTwo = "Gb41q40q39q40q36q36q39q32e";
+        expect(sameOpening(menuetOne, menuetTwo)).toBe(false);
+    });
+
+    it("says no when there is too little mark to tell", () => {
+        // The safe answer: it keeps two rows that might be one piece, where the opposite
+        // deletes a piece that is not a duplicate.
+        expect(sameOpening("G37s36s", "G37s36s")).toBe(false);
+        expect(sameOpening("", "")).toBe(false);
+        expect(sameOpening("nonsense", GOOD_A)).toBe(false);
+    });
+
+    it("allows the odd disagreement without demanding every note", () => {
+        const nearly = "G37s#36s37s#36s37s34s36s40s";
+        expect(sameOpening(GOOD_A, nearly)).toBe(true);
     });
 });
