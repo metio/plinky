@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { keybedMaxWidthPx, keyLane } from "../../../core/keyboardGeometry";
+import { keybedMaxWidthPx } from "../../../core/keyboardGeometry";
+import { highwayBlocks, sceneKeys } from "../../../core/videoScene";
 import type { UpcomingStep } from "../../../core/matcher";
 import { m } from "../../paraglide/messages.js";
 
@@ -103,6 +104,24 @@ export function NotesHighway({
     const origin = upcoming[0]?.atMs ?? 0;
     const span = Math.max(1, windowMs);
     const maxWidth = keybedMaxWidthPx(from, to);
+    // What is on the highway and where, decided by the one function the exported video
+    // reads too. The two pictures differ in what they hand it as "now" — a video hands it
+    // the clock, practice hands it the position the player is on, which is what keeps the
+    // stack still until a note is cleared — and in what they paint it onto. They no longer
+    // differ in where a block goes or how tall it is, which they used to work out twice.
+    const blocks = highwayBlocks(
+        upcoming.flatMap((step) =>
+            step.pitches.map((pitch, note) => ({
+                pitch,
+                startMs: step.atMs,
+                durationMs: step.pitchHoldsMs[note] ?? 0,
+                hand: step.pitchHands[note],
+            })),
+        ),
+        sceneKeys(from, to),
+        origin,
+        span,
+    );
 
     return (
         // Fills its container's height and caps + centres to the keybed width, so a tall
@@ -114,41 +133,31 @@ export function NotesHighway({
             style={{ maxWidth }}
         >
             <div className="relative h-full w-full overflow-hidden rounded-md bg-subtle">
-                {upcoming.flatMap((step, row) => {
-                    const bottom = ((step.atMs - origin) / span) * 100;
-                    // Past the top of the panel there is nothing to draw. The look-ahead
-                    // is counted in positions and the panel measured in time, so how many
-                    // of them fit depends on the music — a run of semiquavers puts far
-                    // more of itself on screen than a line of minims.
-                    if (bottom >= 100) {
-                        return [];
-                    }
-                    return step.pitches.map((pitch, note) => {
-                        const lane = keyLane(pitch, from, to);
-                        if (!lane) {
-                            return null;
-                        }
-                        const length = ((step.pitchHoldsMs[note] ?? 0) / span) * 100;
-                        return (
-                            <span
-                                key={`${step.index}-${pitch}`}
-                                aria-hidden="true"
-                                className={`absolute rounded-sm shadow-sm transition-[bottom] motion-reduce:transition-none ${blockClass(step.pitchHands[note], row === 0)}`}
-                                style={{
-                                    left: `${lane.leftPct}%`,
-                                    width: `${lane.widthPct}%`,
-                                    bottom: `${bottom}%`,
-                                    height: `${Math.max(MIN_BLOCK_PCT, length - GAP_PCT)}%`,
-                                    // On a clock the descent lasts exactly as long as the
-                                    // note does, and at a constant rate — anything eased
-                                    // would hurry and then dawdle against a steady pulse.
-                                    // Off it, a short ease is a settle rather than a fall.
-                                    transitionDuration: `${advanceMs ?? SETTLE_MS}ms`,
-                                    transitionTimingFunction: advanceMs ? "linear" : "ease-out",
-                                }}
-                            />
-                        );
-                    });
+                {blocks.map((block) => {
+                    // 0 at the strike line, 1 at the top of the panel — the same
+                    // fractions the exported video's painter reads, turned into the
+                    // percentages CSS wants instead of the pixels a canvas wants.
+                    const bottom = Math.max(0, block.onsetFrac) * 100;
+                    const length = (block.endFrac - Math.max(0, block.onsetFrac)) * 100;
+                    return (
+                        <span
+                            key={`${block.pitch}-${block.startMs}`}
+                            aria-hidden="true"
+                            className={`absolute rounded-sm shadow-sm transition-[bottom] motion-reduce:transition-none ${blockClass(block.hand, block.onsetFrac <= 0)}`}
+                            style={{
+                                left: `${block.x * 100}%`,
+                                width: `${block.width * 100}%`,
+                                bottom: `${bottom}%`,
+                                height: `${Math.max(MIN_BLOCK_PCT, length - GAP_PCT)}%`,
+                                // On a clock the descent lasts exactly as long as the
+                                // note does, and at a constant rate — anything eased
+                                // would hurry and then dawdle against a steady pulse.
+                                // Off it, a short ease is a settle rather than a fall.
+                                transitionDuration: `${advanceMs ?? SETTLE_MS}ms`,
+                                transitionTimingFunction: advanceMs ? "linear" : "ease-out",
+                            }}
+                        />
+                    );
                 })}
                 {/* The strike line: where a block meets its key. */}
                 <span
