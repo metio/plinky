@@ -379,7 +379,12 @@ const BUDGET_VENDOR_KB = 324;
 // 6.30 s at four-times CPU over Fast 4G, measured cold with dev/bench-score.mjs, ranges not
 // overlapping. It also takes 600 KB off what opening a piece downloads at all, which is the
 // part that matters on a metered connection.
-const BUDGET_APP_KB = 369;
+// 370. What the page says, reaching the sound at last. A rit. or an accel. now gives in the
+// pulse instead of doing nothing — 660 pieces in the catalogue print one — and a piece that
+// changes key part way through spells its ornaments from the key it is actually in, which
+// 383 of them need. Both are timelines the file reader already had the walk for, so the cost
+// is the interpolation and the vocabulary of words engravings use for "slower".
+const BUDGET_APP_KB = 370;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

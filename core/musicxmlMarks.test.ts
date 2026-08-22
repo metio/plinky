@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    fifthsAt,
     readDirections,
     readFifths,
     readTempoPoints,
@@ -234,5 +235,38 @@ describe("where the piece changes speed", () => {
     it("says nothing for a piece that has stated no tempo yet", () => {
         expect(tempoAt([], 0)).toBeNull();
         expect(tempoAt([{ whole: 1, bpm: 90 }], 0)).toBeNull();
+    });
+});
+
+describe("fifthsAt", () => {
+    const keys = [
+        { whole: 0, fifths: 0 },
+        { whole: 4, fifths: 3 },
+        { whole: 12, fifths: -2 },
+    ];
+
+    it("answers the key in force, not the one the piece opened in", () => {
+        expect(fifthsAt(keys, 0)).toBe(0);
+        expect(fifthsAt(keys, 3.9)).toBe(0);
+        expect(fifthsAt(keys, 4)).toBe(3);
+        expect(fifthsAt(keys, 11)).toBe(3);
+        expect(fifthsAt(keys, 12)).toBe(-2);
+        expect(fifthsAt(keys, 100)).toBe(-2);
+    });
+
+    it("takes effect at the barline, not a hair after it", () => {
+        // Onsets are summed in whole notes and land on a barline by arithmetic that can
+        // leave a floating-point crumb behind. A change that missed its own downbeat would
+        // spell the first ornament of the new key out of the old one.
+        //
+        // A crumb, and only a crumb: the tolerance is 1e-9, the same one the dynamics and
+        // the tempo use. Anything larger is a real offset — a note genuinely before the
+        // barline — and it belongs to the key that is still in force there.
+        expect(fifthsAt(keys, 4 - 1e-12)).toBe(3);
+        expect(fifthsAt(keys, 4 - 1 / 4096)).toBe(0);
+    });
+
+    it("is C major where the piece states no key at all", () => {
+        expect(fifthsAt([], 7)).toBe(0);
     });
 });

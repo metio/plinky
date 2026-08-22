@@ -17,6 +17,7 @@ import type { SlurSpan } from "./slur";
 import {
     readTimeline,
     type XmlBar,
+    type XmlKeyPoint,
     type XmlNote,
     type XmlTimeline,
 } from "./musicxmlTimeline";
@@ -216,17 +217,59 @@ const BEAT_UNIT_QUARTERS: Record<string, number> = {
 // a tempo arrived early by up to a bar.
 export function readTempoPoints(timeline: XmlTimeline): TempoPoint[] {
     const points: TempoPoint[] = [];
+    // The tempo a resume ("a tempo") goes back to: the last one the score actually STATED,
+    // which is not the last point recorded — a ramp's own opening point holds the tempo it
+    // is leaving, and going back to that would restore nothing.
+    let stated: number | null = null;
+    // An open rit. or accel., and where it would land if the score never says. A ramp is
+    // closed by the next thing that states a tempo, and only then is its landing point
+    // known.
+    let ramp: { drift: number } | null = null;
+
+    // A tempo the score states outright. It closes any open ramp simply by being the next
+    // point after it, which is what the ramp interpolates toward.
+    const state = (whole: number, bpm: number) => {
+        points.push({ whole, bpm });
+        stated = bpm;
+        ramp = null;
+    };
+
     for (const { element, whole } of timeline.directions) {
         // `<sound tempo>` is the sounding instruction and is always in crotchets; a
         // `<metronome>` is the printed one and says which note it is counting.
         const sound = element.tagName === "sound" ? element : child(element, "sound");
-        const stated = Number(sound?.getAttribute("tempo") ?? Number.NaN);
-        if (Number.isFinite(stated) && stated > 0) {
-            points.push({ whole, bpm: stated });
+        const marked = Number(sound?.getAttribute("tempo") ?? Number.NaN);
+        if (Number.isFinite(marked) && marked > 0) {
+            state(whole, marked);
             continue;
         }
         const metronome = child(element, "metronome");
         if (!metronome) {
+            // No number here, so this is where a written instruction can be: rit., accel.,
+            // a tempo. Only meaningful once the piece has stated a tempo to move away from —
+            // a ramp from a guessed starting tempo would be inventing the piece's speed.
+            const words = wordsOf(element);
+            const from = stated;
+            if (words && from !== null) {
+                if (RESUME.test(words)) {
+                    // The ramp has to land somewhere before the tempo comes back, or it
+                    // never happened: a rit. straight into "a tempo" would interpolate from
+                    // the old tempo to the same old tempo. So the drift is placed at this
+                    // instant and the restored tempo immediately after it — the ramp slides
+                    // into the resume, and from here the tempo is the stated one again.
+                    if (ramp) {
+                        points.push({ whole, bpm: ramp.drift });
+                    }
+                    state(whole, from);
+                } else if (!ramp && (SLOWER.test(words) || FASTER.test(words))) {
+                    // Opens a ramp FROM the tempo in force. Engravings write "rit." and then
+                    // "poco rit." a bar later, meaning one give in the pulse — a second ramp
+                    // inside the first would compound into a halt.
+                    const slower = SLOWER.test(words);
+                    points.push({ whole, bpm: from, ramp: true });
+                    ramp = { drift: from * (slower ? 1 - DRIFT : 1 + DRIFT) };
+                }
+            }
             continue;
         }
         const perMinute = Number(text(child(metronome, "per-minute")));
@@ -234,8 +277,13 @@ export function readTempoPoints(timeline: XmlTimeline): TempoPoint[] {
         // A dot on the beat unit makes it half as long again — a dotted crotchet in 6/8.
         const dotted = metronome.getElementsByTagName("beat-unit-dot").length > 0 ? 1.5 : 1;
         if (Number.isFinite(perMinute) && perMinute > 0) {
-            points.push({ whole, bpm: perMinute * unit * dotted });
+            state(whole, perMinute * unit * dotted);
         }
+    }
+    // A ramp the score never resolves — a rit. into a repeat, or into the final barline —
+    // still has to go somewhere, or the mark does nothing at all. It slides to the end.
+    if (ramp) {
+        points.push({ whole: timeline.end, bpm: (ramp as { drift: number }).drift });
     }
     return points;
 }
@@ -244,19 +292,95 @@ export type TempoPoint = {
     whole: number;
     // Crotchets per minute, whatever note the mark was written against.
     bpm: number;
+    // Whether the tempo SLIDES from here to whatever is stated next, rather than holding.
+    //
+    // The same shape a hairpin takes in the dynamics, and for the same reason: a rit. says
+    // "get slower" without saying how slow, and what it is heading for is whatever the score
+    // states next — an "a tempo", a new metronome mark, or nothing at all. So the mark opens
+    // a ramp and the following point closes it, and tempoAt interpolates between them.
+    ramp?: boolean;
 };
+
+// How far a rit. or an accel. moves the tempo when the score never says where it lands.
+//
+// Most of the time it does not say: a rit. before a repeat, an accel. into a phrase. The
+// value is a judgement, not a reading — a fifth either way is enough to hear as a genuine
+// give in the pulse without turning a bar into a different tempo. A score that DOES state
+// its target overrides this entirely, because then it is a reading.
+const DRIFT = 0.2;
+
+// The words a score uses for "get slower", "get faster", and "stop doing that". Matched on
+// the opening so the ordinary abbreviations are covered — rit., ritard., ritardando — since
+// engravings write whichever they like.
+//
+// `rit(?!en)` on purpose: ritenuto is a sudden drop to a new tempo rather than a slide
+// toward one, so spreading it over the following bars would give the score something it does
+// not ask for. ritard./ritardando still match.
+const SLOWER = /^(rit(?!en)|rall|allarg|slow)/i;
+const FASTER = /^(accel|string|stretto|piu mosso|più mosso)/i;
+const RESUME = /^(a tempo|tempo (i|1|prim))/i;
+
+// The text of a written instruction — rit., a tempo — trimmed, since one score writes
+// "rit." and the next "Rit ".
+function wordsOf(element: Element): string | null {
+    const words = Array.from(element.getElementsByTagName("words"))
+        .map((one) => text(one))
+        .join(" ")
+        .trim();
+    return words.length > 0 ? words : null;
+}
 
 // The tempo in force at a printed position, or null where the piece has stated none yet.
 export function tempoAt(points: readonly TempoPoint[], whole: number): number | null {
-    let found: number | null = null;
-    for (const point of points) {
-        if (point.whole <= whole + 1e-9) {
-            found = point.bpm;
+    let index = -1;
+    for (const [at, point] of points.entries()) {
+        if (point.whole <= whole + TEMPO_EPSILON) {
+            index = at;
         }
     }
-    return found;
+    const current = points[index];
+    if (!current) {
+        return null;
+    }
+    const next = points[index + 1];
+    // A stated tempo holds until the next one. A ramp — a rit. or an accel. — slides toward
+    // whatever is stated next, so the pulse actually gives rather than stepping down at the
+    // barline after the word.
+    if (!current.ramp || !next) {
+        return current.bpm;
+    }
+    const span = next.whole - current.whole;
+    if (span <= 0) {
+        return current.bpm;
+    }
+    const travelled = Math.min(1, Math.max(0, (whole - current.whole) / span));
+    return current.bpm + (next.bpm - current.bpm) * travelled;
 }
 
+// Printed onsets are exact binary fractions in every ordinary metre, but a triplet is a
+// third, so a mark written at one needs room for a rounded value.
+const TEMPO_EPSILON = 1e-9;
+
+
+// The key in force at a point in the piece.
+//
+// A piece can change key part way through — 13% of the catalogue does — and the key is what
+// spells an ornament's auxiliary note: a trill in the new key spelled from the old one
+// sounds a note the score does not contain. Before this, the first signature stood for the
+// whole piece.
+//
+// Zero for a piece with no signature at all, and for anything before the first one, which is
+// C major either way.
+export function fifthsAt(keys: readonly XmlKeyPoint[], whole: number): number {
+    let current = 0;
+    for (const point of keys) {
+        if (point.whole > whole + TEMPO_EPSILON) {
+            break;
+        }
+        current = point.fifths;
+    }
+    return current;
+}
 
 // The key signature the piece opens in, as its count of sharps (positive) or flats.
 export function readFifths(doc: Document): number {
@@ -278,7 +402,11 @@ export type ScoreMarks = {
     tempi: TempoPoint[];
     // Each bar's start and metre, for the weighting a bar gives its own beats.
     bars: XmlBar[];
+    // The opening key, for anything that shows one key for the whole piece.
     fifths: number;
+    // Every key the piece is in, with where each takes effect — what an ornament reads to
+    // spell its auxiliary note. See fifthsAt.
+    keys: XmlKeyPoint[];
 };
 
 // A score with nothing written on it — which is also the honest answer for a caller that
@@ -291,6 +419,7 @@ export const NO_SCORE_MARKS: ScoreMarks = {
     tempi: [],
     bars: [],
     fifths: 0,
+    keys: [],
 };
 
 export function readScoreMarks(doc: Document | null): ScoreMarks {
@@ -307,5 +436,6 @@ export function readScoreMarks(doc: Document | null): ScoreMarks {
         tempi: readTempoPoints(timeline),
         bars: timeline.bars,
         fifths: readFifths(doc),
+        keys: timeline.keys,
     };
 }
