@@ -295,3 +295,50 @@ export function decodeIncipit(text: string): Incipit | null {
     }
     return { clef: clefLetter === "F" ? "bass" : "treble", notes };
 }
+
+// The opening as SOUNDING pitches, in semitones, for asking whether two rows are the same
+// piece.
+//
+// The mark itself records where a notehead sits on the staff plus its accidental, which is
+// what drawing it needs — but two transcribers spell the same sound differently, and the
+// catalogue's own Für Elise copies prove it: one writes the second note B flat and another
+// writes D sharp, the same key under the same finger. Compared as written they disagree on a
+// quarter of the opening; compared as sound they are identical.
+export function openingSemitones(text: string): number[] {
+    const incipit = decodeIncipit(text);
+    if (!incipit) {
+        return [];
+    }
+    return incipit.notes.map((note) => {
+        const octave = Math.floor(note.diatonic / 7);
+        const letter = ((note.diatonic % 7) + 7) % 7;
+        return octave * 12 + (STEP_SEMITONES[letter] ?? 0) + note.alter;
+    });
+}
+
+// Semitones above the octave's C for each letter of the diatonic ladder, C through B.
+const STEP_SEMITONES = [0, 2, 4, 5, 7, 9, 11];
+
+// Whether two marks open with the same music.
+//
+// A share of the opening rather than all of it: two transcriptions of one piece differ in
+// where they think the first bar ends, so they can carry a different NUMBER of notes, and the
+// later ones drift out of step. The first few decide it — which is exactly how a thematic
+// catalogue has identified works for two centuries.
+export function sameOpening(one: string, other: string, share = 0.75): boolean {
+    const a = openingSemitones(one);
+    const b = openingSemitones(other);
+    const length = Math.min(a.length, b.length);
+    if (length < 4) {
+        // Too little to tell. Saying "different" is the safe answer: it keeps two rows that
+        // might be one piece, where the opposite deletes a piece that is not.
+        return false;
+    }
+    let alike = 0;
+    for (let index = 0; index < length; index++) {
+        if (a[index] === b[index]) {
+            alike += 1;
+        }
+    }
+    return alike / length >= share;
+}
