@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Your saved runs show every score, not three of them.** The Runs tab listed accuracy,
+timing and flow while the results panel showed dynamics and expression too — on the
+very same run, which had been storing all five the whole time. Both now read from one
+list, so they cannot drift apart again.
+
 **The recorded grand piano is on by default.** It has been there for a while behind a
 switch in Settings, which meant almost nobody ever heard it. Nothing is downloaded
 before you play: the recordings still arrive a piece at a time, a few hundred

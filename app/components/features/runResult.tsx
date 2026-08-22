@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { Grade } from "../../../core/grade";
+import { type Grade, isOptionalReading, scoreReadings } from "../../../core/grade";
+import { readingExplanation, readingLabel } from "../../lib/scoreReadingLabels";
+import { Fragment } from "react";
 import type { TempoCurve } from "../../../core/runOutcome";
 import { laggingHand, type RunNote } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
@@ -59,28 +61,20 @@ export function RunResult({
             <div className="flex items-center gap-4 rounded-md border border-line p-3">
                 <GradeLetter letter={grade.letter} />
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
-                    <dt className="text-muted">{m.scores_accuracy()}</dt>
-                    <dd className="text-right font-mono tabular-nums">{grade.accuracy}%</dd>
-                    <dt className="text-muted">{m.scores_timing()}</dt>
-                    <dd className="text-right font-mono tabular-nums">{grade.timing}%</dd>
-                    <dt className="text-muted">{m.scores_flow()}</dt>
-                    <dd className="text-right font-mono tabular-nums">{grade.flow}%</dd>
-                    {grade.dynamics !== null && (
-                        <>
-                            <dt className="text-faint">{m.scores_dynamics()}</dt>
-                            <dd className="text-right font-mono tabular-nums text-muted">
-                                {grade.dynamics}%
+                    {scoreReadings(grade).map(({ id, value }) => (
+                        <Fragment key={id}>
+                            <dt className={isOptionalReading(id) ? "text-faint" : "text-muted"}>
+                                {readingLabel[id]()}
+                            </dt>
+                            <dd
+                                className={`text-right font-mono tabular-nums ${
+                                    isOptionalReading(id) ? "text-muted" : ""
+                                }`}
+                            >
+                                {value}%
                             </dd>
-                        </>
-                    )}
-                    {grade.expression !== null && (
-                        <>
-                            <dt className="text-faint">{m.scores_expression()}</dt>
-                            <dd className="text-right font-mono tabular-nums text-muted">
-                                {grade.expression}%
-                            </dd>
-                        </>
-                    )}
+                        </Fragment>
+                    ))}
                 </dl>
             </div>
             {/* The numbers are meaningless until somebody says what they measure, and a
@@ -89,24 +83,12 @@ export function RunResult({
                 this panel is for. */}
             <Disclosure summary={m.scores_explain_toggle()}>
                 <dl className="space-y-1 text-xs text-muted">
-                    <dt className="font-medium text-body">{m.scores_accuracy()}</dt>
-                    <dd>{m.scores_explain_accuracy()}</dd>
-                    <dt className="font-medium text-body">{m.scores_timing()}</dt>
-                    <dd>{m.scores_explain_timing()}</dd>
-                    <dt className="font-medium text-body">{m.scores_flow()}</dt>
-                    <dd>{m.scores_explain_flow()}</dd>
-                    {grade.dynamics !== null && (
-                        <>
-                            <dt className="font-medium text-body">{m.scores_dynamics()}</dt>
-                            <dd>{m.scores_explain_dynamics()}</dd>
-                        </>
-                    )}
-                    {grade.expression !== null && (
-                        <>
-                            <dt className="font-medium text-body">{m.scores_expression()}</dt>
-                            <dd>{m.scores_explain_expression()}</dd>
-                        </>
-                    )}
+                    {scoreReadings(grade).map(({ id }) => (
+                        <Fragment key={id}>
+                            <dt className="font-medium text-body">{readingLabel[id]()}</dt>
+                            <dd>{readingExplanation[id]()}</dd>
+                        </Fragment>
+                    ))}
                 </dl>
                 <p className="text-xs text-muted">{m.scores_explain_letter()}</p>
             </Disclosure>

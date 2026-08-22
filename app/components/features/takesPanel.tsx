@@ -5,7 +5,9 @@ import { toMidiNotes, toMusicXml } from "../../../core/composition";
 import { downloadBlob } from "../../lib/download";
 import { buildMidiFile } from "../../../core/midiFile";
 import { takeFileStem } from "../../lib/takeFile";
+import { scoreReadings } from "../../../core/grade";
 import { ghostOnsets, type Take } from "../../../core/takes";
+import { readingLabel } from "../../lib/scoreReadingLabels";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
@@ -109,17 +111,17 @@ export function TakesPanel({
                                         </IconButton>
                                     </span>
                                 </div>
+                                {/* The same readings the panel at the end of a run shows,
+                                from the same list — this used to name three of them by
+                                hand and silently drop the dynamics and expression the very
+                                same take had stored. */}
                                 {take.metrics && (
                                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 px-2 pb-2 text-xs text-muted tabular-nums">
-                                        <span>
-                                            {m.scores_accuracy()} {take.metrics.accuracy}%
-                                        </span>
-                                        <span>
-                                            {m.scores_timing()} {take.metrics.timing}%
-                                        </span>
-                                        <span>
-                                            {m.scores_flow()} {take.metrics.flow}%
-                                        </span>
+                                        {scoreReadings(take.metrics).map(({ id, value }) => (
+                                            <span key={id}>
+                                                {readingLabel[id]()} {value}%
+                                            </span>
+                                        ))}
                                     </div>
                                 )}
                                 <div className="flex flex-wrap items-center gap-x-1 border-t border-line px-1 py-1">
