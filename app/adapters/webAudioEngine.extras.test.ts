@@ -54,6 +54,18 @@ const engineWith = async (
 };
 
 describe("the key-off knock", () => {
+    it("is scheduled with a fixed-length note, at its damper", async () => {
+        // Listen and a replay strike fixed-length notes rather than pressing and releasing,
+        // and the damper lands at a time known when the note is scheduled. Without this a
+        // recorded piano knocked under the player's hands and not under the computer's,
+        // which is two instruments.
+        const fake = fakeAudioContext();
+        const samples = pack();
+        const engine = await engineWith(fake, samples.lookup);
+        engine.strike({ note: 72, gain: 0.3, velocity: 90, duration: 0.5, delay: 0 });
+        expect(samples.extras()).toEqual([{ kind: "knock", pitch: 72 }]);
+    });
+
     it("sounds when the damper lands", async () => {
         const fake = fakeAudioContext();
         const samples = pack();
@@ -93,6 +105,24 @@ describe("the key-off knock", () => {
     });
 });
 
+describe("a panic", () => {
+    it("silences without knocking once per voice", async () => {
+        // allNotesOff is a play surface tearing down or a run ending — not fifty dampers
+        // landing. It rings the voices out directly rather than through endVoice, and this
+        // is what says so: routing it through endVoice would fire a knock per held note,
+        // which is a sound no piano makes and one nothing else would catch.
+        const fake = fakeAudioContext();
+        const samples = pack();
+        const engine = await engineWith(fake, samples.lookup);
+        for (const note of [60, 64, 67]) {
+            engine.press(note, 0.3, 90);
+        }
+        samples.asked.length = 0;
+        engine.allNotesOff();
+        expect(samples.extras()).toHaveLength(0);
+    });
+});
+
 describe("sympathetic resonance", () => {
     it("answers a note struck with the pedal down", async () => {
         const fake = fakeAudioContext();
@@ -119,7 +149,7 @@ describe("sympathetic resonance", () => {
         const samples = pack();
         const engine = await engineWith(fake, samples.lookup);
         engine.strike({ note: 67, gain: 0.3, velocity: 90, duration: 1, delay: 0, pedalled: true });
-        expect(samples.extras()).toEqual([{ kind: "resonance", pitch: 67 }]);
+        expect(samples.extras()).toContainEqual({ kind: "resonance", pitch: 67 });
     });
 
     it("leaves an unpedalled Listen strike alone", async () => {
@@ -127,6 +157,6 @@ describe("sympathetic resonance", () => {
         const samples = pack();
         const engine = await engineWith(fake, samples.lookup);
         engine.strike({ note: 67, gain: 0.3, velocity: 90, duration: 1, delay: 0 });
-        expect(samples.extras()).toHaveLength(0);
+        expect(samples.extras().filter((one) => one.kind === "resonance")).toHaveLength(0);
     });
 });
