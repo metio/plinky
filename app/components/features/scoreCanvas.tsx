@@ -3,11 +3,13 @@
 
 import { usePrefsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
+import { ScoreSkeleton } from "../ui/scoreSkeleton";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
 import { NotesHighway } from "./notesHighway";
 import { usePlaySession } from "./playSession";
 
-// The score itself: the bordered scroll box OSMD renders into, plus the load-error notice.
+// The score itself: the bordered scroll box OSMD renders into, the staff that stands in
+// while it fills, plus the load-error notice.
 // It attaches the session's container ref (OSMD renders here) and forwards a click to the
 // loop's bar picker; everything about what's drawn lives in the session's render surface.
 // In full screen the keyboard's quick controls ride this box's corner rather than taking
@@ -175,6 +177,16 @@ export function ScoreCanvas() {
                           } ${slotSize}`
                 }
             />
+            {/* Engraving a piece takes a second or two on a slow device, and the box it
+            renders into stands empty for all of it. The staff stands in over that box —
+            over, not in it, because the container belongs to the engraver and anything put
+            inside it is swept away on the next render. Nothing here takes a press: the
+            score underneath is still the thing being pointed at. */}
+            {!ready && !loadError && !highwayActive && (
+                <div className="pointer-events-none absolute inset-3">
+                    <ScoreSkeleton engraving />
+                </div>
+            )}
             {loadError && <p className="p-2 text-sm text-danger">{m.score_load_error()}</p>}
         </div>
     );

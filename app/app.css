@@ -359,6 +359,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --animate-kiss: kiss-float 1.2s ease-out;
     --animate-lean: lean-in 1s ease-in-out;
     --animate-smooch: smooch 1s ease-in-out;
+    /* The staff standing in for a piece that is still arriving: a soft band travels
+       along it the way a reader's eye would. Opacity and position only — the staff
+       occupies the score's own slot, so nothing moves when the real notation lands. */
+    --animate-sight-read: sight-read 1.8s ease-in-out infinite;
+}
+
+@keyframes sight-read {
+    0% {
+        transform: translateX(-40%);
+    }
+    100% {
+        transform: translateX(240%);
+    }
 }
 
 @keyframes blush {

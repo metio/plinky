@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "악보의 기호를 얼마나 따랐는지 — 스타카토, 강세, 세게와 여리게.",
     "scores_explain_letter": "글자는 정확도·박자·흐름의 평균입니다. 셈여림과 표현은 읽으라고 있는 것이지 점수가 아닙니다.",
     "perf_legend_dots": "점 색 = 박자: 초록은 박 위, 호박색은 가깝게, 빨강은 벗어남",
-    "score_redrawing": "악보를 다시 그리는 중"
+    "score_redrawing": "악보를 다시 그리는 중",
+    "score_loading_fetching": "악보를 찾는 중",
+    "score_loading_engraving": "음표를 놓는 중"
 }

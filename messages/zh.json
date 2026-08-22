@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "你有多贴近谱面上的记号——断音、重音、强和弱。",
     "scores_explain_letter": "等级是准确、节奏和流畅的平均。力度和表情是给你看的，不参与评分。",
     "perf_legend_dots": "点的颜色＝节奏：绿色在拍上，琥珀色接近，红色偏了",
-    "score_redrawing": "正在重绘乐谱"
+    "score_redrawing": "正在重绘乐谱",
+    "score_loading_fetching": "正在查找乐谱",
+    "score_loading_engraving": "正在排版音符"
 }

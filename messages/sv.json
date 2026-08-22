@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Hur noga du följde notbildens tecken — staccatona, accenterna, det starka och det svaga.",
     "scores_explain_letter": "Bokstaven är snittet av träffsäkerhet, timing och flyt. Dynamik och uttryck finns för att läsas, inte för att betygsätta.",
     "perf_legend_dots": "Punktfärg = timing: grön på slaget, bärnsten nära, röd bredvid",
-    "score_redrawing": "Notbladet ritas om"
+    "score_redrawing": "Notbladet ritas om",
+    "score_loading_fetching": "Hämtar musiken",
+    "score_loading_engraving": "Sätter noterna"
 }

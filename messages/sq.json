@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Sa nga afër i ndoqe shenjat e partiturës — stakatot, thekset, të fortat dhe të butat.",
     "scores_explain_letter": "Shkronja është mesatarja e saktësisë, ritmit dhe rrjedhshmërisë. Dinamika dhe shprehja janë për t’u lexuar, jo për t’u vlerësuar.",
     "perf_legend_dots": "Ngjyra e pikës = ritmi: e gjelbër mbi goditje, qelibar afër, e kuqe jashtë",
-    "score_redrawing": "Partitura po rivizatohet"
+    "score_redrawing": "Partitura po rivizatohet",
+    "score_loading_fetching": "Po kërkohet partitura",
+    "score_loading_engraving": "Po vendosen notat"
 }

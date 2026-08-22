@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Qué tan de cerca seguiste lo que marca la partitura: los staccatos, los acentos, los fuertes y los suaves.",
     "scores_explain_letter": "La letra promedia precisión, tiempo y fluidez. Dinámica y expresión están para leerse, no para calificar.",
     "perf_legend_dots": "Color del punto = tiempo: verde en el pulso, ámbar cerca, rojo fuera",
-    "score_redrawing": "Redibujando la partitura"
+    "score_redrawing": "Redibujando la partitura",
+    "score_loading_fetching": "Buscando la música",
+    "score_loading_engraving": "Colocando las notas"
 }

@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Hvor nøje du fulgte nodernes tegn — staccatoerne, accenterne, det stærke og det svage.",
     "scores_explain_letter": "Bogstavet er gennemsnittet af præcision, timing og flow. Dynamik og udtryk er til at læse, ikke til at bedømme.",
     "perf_legend_dots": "Prikkens farve = timing: grøn på slaget, ravgul tæt på, rød ved siden af",
-    "score_redrawing": "Noderne tegnes om"
+    "score_redrawing": "Noderne tegnes om",
+    "score_loading_fetching": "Henter musikken",
+    "score_loading_engraving": "Sætter noderne"
 }

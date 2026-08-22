@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**A piece now shows you it is on its way.** Opening one takes a few seconds on a slow
+phone — there is a lot to fetch, and setting the notes on the staff is real work. The
+page used to sit empty for all of it. Now the staff a piece is about to appear on
+stands there in the meantime, and says whether it is still finding the music or
+already setting the notes.
+
 **The finger-numbers switch moves the moment you press it.** It used to wait for the
 whole sheet to be redrawn before it looked pressed, which on a long piece was long
 enough to think the press had missed — and pressing again put it straight back. It now

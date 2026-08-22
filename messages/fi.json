@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Kuinka tarkasti seurasit nuottien merkkejä — staccatot, aksentit, voimakkaat ja hiljaiset.",
     "scores_explain_letter": "Kirjain on tarkkuuden, ajoituksen ja sujuvuuden keskiarvo. Dynamiikka ja ilmaisu ovat luettavaksi, eivät arvosteltavaksi.",
     "perf_legend_dots": "Pisteen väri = ajoitus: vihreä iskulla, meripihka lähellä, punainen ohi",
-    "score_redrawing": "Nuottia piirretään uudelleen"
+    "score_redrawing": "Nuottia piirretään uudelleen",
+    "score_loading_fetching": "Haetaan nuotteja",
+    "score_loading_engraving": "Asetellaan nuotteja"
 }

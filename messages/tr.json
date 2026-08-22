@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Notadaki işaretlere ne kadar uydun — stakatolar, vurgular, kuvvetli ve hafif.",
     "scores_explain_letter": "Harf; isabet, zamanlama ve akışın ortalamasıdır. Nüans ve ifade okunmak için burada, not vermek için değil.",
     "perf_legend_dots": "Nokta rengi = zamanlama: vuruşta yeşil, yakında kehribar, dışarıda kırmızı",
-    "score_redrawing": "Nota yeniden çiziliyor"
+    "score_redrawing": "Nota yeniden çiziliyor",
+    "score_loading_fetching": "Nota aranıyor",
+    "score_loading_engraving": "Notalar diziliyor"
 }
