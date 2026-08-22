@@ -7,6 +7,7 @@ import { buildMidiFile } from "../../../core/midiFile";
 import { parseMusicXml } from "../../../core/musicxmlParse";
 import { transposeMusicXml } from "../../../core/transpose";
 import { usePrefsStore, useXmlCodec } from "../../contexts/services";
+import { useDismissable } from "../../hooks/useDismissable";
 import { downloadBlob } from "../../lib/download";
 import { annotateFingerings } from "../../lib/fingerScore";
 import { buildPrintDocument, fileStem, printViaIframe } from "../../lib/printScore";
@@ -31,6 +32,7 @@ export function ExportMenu({
     defaultOpen?: boolean;
 }) {
     const [open, setOpen] = useState(defaultOpen);
+    const enclosing = useDismissable<HTMLSpanElement>(open, () => setOpen(false));
     const prefsStore = usePrefsStore();
     const xmlCodec = useXmlCodec();
     const transpose = useTranspose()?.transpose ?? 0;
@@ -116,7 +118,9 @@ export function ExportMenu({
     };
 
     return (
-        <span className="relative">
+        // The ref encloses the trigger as well as the panel — a press on the trigger must
+        // not read as "somewhere else", or the menu would close before it opened.
+        <span className="relative" ref={enclosing}>
             <Button
                 variant="ghost"
                 onClick={() => setOpen((value) => !value)}

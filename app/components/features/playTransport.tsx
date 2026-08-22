@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { tempoTerm } from "../../../core/tempoTerm";
+import { useDismissable } from "../../hooks/useDismissable";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { BumpValue } from "../ui/stepper";
@@ -170,8 +171,12 @@ export function PlayTransport() {
 // instead of a full-width row.
 function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: number) => void }) {
     const [open, setOpen] = useState(false);
+    // Closes on a press elsewhere or on Escape, like the export menu — a popover opened
+    // mid-play and then thought better of is one a player should be able to dismiss without
+    // hunting for the control that opened it.
+    const enclosing = useDismissable<HTMLSpanElement>(open, () => setOpen(false));
     return (
-        <span className="relative">
+        <span className="relative" ref={enclosing}>
             <button
                 type="button"
                 onClick={() => setOpen((value) => !value)}
