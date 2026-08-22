@@ -3,6 +3,7 @@
 
 import { useEffect, useRef } from "react";
 import { grooveAccents } from "../../core/groove";
+import { audibleGain } from "../../core/loudness";
 import { useAudioEngine, usePrefsStore, useScheduler } from "../contexts/services";
 
 // Plays an audible click while `enabled`: an accented downbeat, a plainer click on
@@ -73,8 +74,10 @@ export function useMetronome(
                       ? "accent"
                       : "beat";
                 const level = kind === "accent" ? 0.3 : kind === "beat" ? 0.18 : 0.08;
-                const gain = prefs.sound ? level * (prefs.volume / 100) : 0;
-                audio.click(next, kind, gain);
+                // A muted tick is still queued, at zero gain, so the pulse keeps its place
+                // on the audio clock and unmuting resumes on the beat rather than starting
+                // a fresh grid wherever the toggle happened to land.
+                audio.click(next, kind, audibleGain(prefs, level) ?? 0);
                 tick += 1;
                 next += 60 / Math.max(1, bpmRef.current) / subs;
             }

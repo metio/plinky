@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { audibleGain } from "../../../core/loudness";
 import { isPreciseInput } from "../../../core/midi";
 import { LENIENT_TOLERANCE, PRECISE_TOLERANCE } from "../../../core/rhythm";
 import {
@@ -108,8 +109,10 @@ export function RhythmTrainer({
         // pulse must not depend on a polling loop surviving a backgrounded tab: this is
         // two bars, and queueing it whole is both simpler and steadier.
         if (audioNow !== null) {
-            const prefs = prefsStore.load();
-            const gain = prefs.sound ? 0.18 * (prefs.volume / 100) : 0;
+            // Queued at zero gain when muted, like the metronome's own pulse: the whole
+            // count-in and run go onto the audio clock in one go, so the grid has to exist
+            // whether or not it can be heard.
+            const gain = audibleGain(prefsStore.load(), 0.18) ?? 0;
             const beats = pattern.beatsPerBar * (pattern.bars + 1);
             const audioStart = audioNow + LEAD_MS / 1000;
             for (let beat = 0; beat < beats; beat++) {
