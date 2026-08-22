@@ -322,9 +322,20 @@ function usePlaySessionValue({
     // piece reaches into the key actually being played.
     const marks = useMemo(() => {
         const read = readScoreMarks(xmlCodec.parse(xml));
-        return transpose === 0
-            ? read
-            : { ...read, fifths: transposeFifths(read.fifths, transpose) };
+        if (transpose === 0) {
+            return read;
+        }
+        // Every key the piece passes through moves, not only the one it opens in — a piece
+        // that changes key is still in a different key after being transposed, and an
+        // ornament there spells its auxiliary note from that one.
+        return {
+            ...read,
+            fifths: transposeFifths(read.fifths, transpose),
+            keys: read.keys.map((point) => ({
+                ...point,
+                fifths: transposeFifths(point.fifths, transpose),
+            })),
+        };
     }, [xml, transpose, xmlCodec]);
 
     // Which hand to practice — the hands-separate selector only appears for the

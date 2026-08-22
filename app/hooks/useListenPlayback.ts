@@ -5,7 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
-import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { type Hand2, handOfStaff } from "../../core/matcher";
 import { interpretedWeight } from "../../core/interpretation";
 import { octaveShiftAt } from "../../core/octaveShift";
@@ -114,8 +114,10 @@ export function collectListenSteps(
     // keeps sounding past its written length until the pedal comes up.
     const pedals = marks.pedals;
     const slurs = marks.slurs;
-    // Which notes an ornament reaches for depends on the key it is written in.
-    const fifths = marks.fifths;
+    // Which notes an ornament reaches for depends on the key it is written in — the key at
+    // that point, not the one the piece opened in. A trill after a change of key spelled
+    // from the opening signature sounds a note the score does not contain.
+    const keys = marks.keys;
     // Which staves belong to the practised instrument — on an art song the piano is staves
     // 1 and 2 and the singer is staff 0, so a hand cannot be read off the raw staff index.
     const parts = readParts(osmd);
@@ -185,7 +187,7 @@ export function collectListenSteps(
             // learning to recognise the sign hears nothing happen where it is written.
             const ornament = group.length === 1 ? readOrnament(group[0]) : null;
             if (ornament) {
-                steps.push(...spellOutOrnament(step, ornament, fifths));
+                steps.push(...spellOutOrnament(step, ornament, fifthsAt(keys, whole)));
             } else if (group.some((note) => readArpeggio(note))) {
                 steps.push(...rollChord(step));
             } else {

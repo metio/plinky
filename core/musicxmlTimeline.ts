@@ -135,7 +135,15 @@ export type XmlTimeline = {
     // Each printed bar: where it starts and what metre it is in. What a note's place in
     // the bar is measured against — a downbeat is only a downbeat relative to a barline.
     bars: XmlBar[];
+    // Every key signature in the piece, with where it takes effect. A timeline rather than
+    // one value because a piece may change key part way through — 13% of the catalogue
+    // does — and an ornament after the change spells its auxiliary note from the key it is
+    // actually in. Stamped during this walk for the same reason the directions are: the
+    // onset arithmetic has exactly one implementation.
+    keys: XmlKeyPoint[];
 };
+
+export type XmlKeyPoint = { whole: number; fifths: number };
 
 export type XmlBar = {
     from: number;
@@ -209,9 +217,10 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
     const measureStarts: number[] = [];
     const directions: { element: Element; whole: number }[] = [];
     const bars: XmlBar[] = [];
+    const keys: XmlKeyPoint[] = [];
     let end = 0;
     if (!root) {
-        return { notes, measureStarts, directions, end, bars };
+        return { notes, measureStarts, directions, end, bars, keys };
     }
 
     for (const part of partsOf(root, wanted)) {
@@ -230,8 +239,22 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
         const measures = Array.from(part.getElementsByTagName("measure"));
 
         measures.forEach((measure, index) => {
-            if (measureStarts[index] === undefined) {
+            // The first part to reach a measure fixes where it starts, and is also the one
+            // whose key signature is taken: every part of a score carries the same key, and
+            // reading them all would report each change once per part.
+            const leading = measureStarts[index] === undefined;
+            if (leading) {
                 measureStarts[index] = partStart;
+            }
+            const signature = child(measure, "fifths");
+            if (leading && signature) {
+                const fifths = Number(text(signature));
+                // A key repeated unchanged — which engravings do after a repeat or a system
+                // break — is not a change, and recording it would put a redundant point in
+                // the timeline for a reader to step over.
+                if (Number.isFinite(fifths) && keys.at(-1)?.fifths !== fifths) {
+                    keys.push({ whole: partStart, fifths });
+                }
             }
             const declared = child(measure, "divisions");
             if (declared) {
@@ -348,5 +371,5 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
     // anything.
     notes.sort((one, other) => one.whole - other.whole || one.staff - other.staff);
     directions.sort((one, other) => one.whole - other.whole);
-    return { notes, measureStarts, directions, end, bars: bars.filter(Boolean) };
+    return { notes, measureStarts, directions, end, bars: bars.filter(Boolean), keys };
 }

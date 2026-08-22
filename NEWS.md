@@ -10,6 +10,16 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Pieces slow down and speed up where they say to.** A *rit.* or an *accel.* printed in
+the score used to do nothing at all — the music went on at the same speed straight
+through it. Now the pulse gives, and comes back at *a tempo*. Around 660 pieces in the
+catalogue ask for one.
+
+**A piece that changes key sounds right after the change.** Ornaments — trills, turns,
+mordents — reach for a neighbouring note, and which note that is depends on the key.
+Plinky used to read only the key a piece opened in, so a trill after a change played a
+note that was not in the music.
+
 **Your saved runs show every score, not three of them.** The Runs tab listed accuracy,
 timing and flow while the results panel showed dynamics and expression too — on the
 very same run, which had been storing all five the whole time. Both now read from one

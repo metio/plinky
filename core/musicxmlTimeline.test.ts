@@ -144,6 +144,7 @@ describe("reading the timeline out of the file", () => {
             directions: [],
             end: 0,
             bars: [],
+            keys: [],
         });
     });
 });
@@ -235,5 +236,57 @@ describe("how far a bar carries the music on", () => {
                 `<measure number="3">${note("E", 4, 8)}</measure>`,
         );
         expect(measureStarts).toEqual([0, 1, 1.5]);
+    });
+});
+
+describe("key signatures on the timeline", () => {
+    it("records a change of key where it takes effect", () => {
+        // 13% of the catalogue changes key part way through, and the key is what spells an
+        // ornament's auxiliary note — a trill after the change spelled from the opening
+        // signature sounds a note the score does not contain.
+        const doc = parse(`<score-partwise><part id="P1">
+            <measure number="1"><attributes><divisions>1</divisions>
+              <key><fifths>0</fifths></key>
+              <time><beats>4</beats><beat-type>4</beat-type></time></attributes>
+              <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note>
+            </measure>
+            <measure number="2"><attributes><key><fifths>3</fifths></key></attributes>
+              <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note>
+            </measure>
+        </part></score-partwise>`);
+        expect(readTimeline(doc).keys).toEqual([
+            { whole: 0, fifths: 0 },
+            { whole: 1, fifths: 3 },
+        ]);
+    });
+
+    it("ignores a signature restated unchanged", () => {
+        // Engravings repeat the key after a repeat or a system break. That is not a change,
+        // and a redundant point is one more thing every reader has to step over.
+        const doc = parse(`<score-partwise><part id="P1">
+            <measure number="1"><attributes><divisions>1</divisions>
+              <key><fifths>2</fifths></key>
+              <time><beats>4</beats><beat-type>4</beat-type></time></attributes>
+              <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note>
+            </measure>
+            <measure number="2"><attributes><key><fifths>2</fifths></key></attributes>
+              <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note>
+            </measure>
+        </part></score-partwise>`);
+        expect(readTimeline(doc).keys).toEqual([{ whole: 0, fifths: 2 }]);
+    });
+
+    it("reads the key once, not once per part", () => {
+        // Every part of a score carries the same key signature. Reading them all would
+        // report each change as many times as the score has staves.
+        const part = (id: string) => `<part id="${id}">
+            <measure number="1"><attributes><divisions>1</divisions>
+              <key><fifths>-2</fifths></key>
+              <time><beats>4</beats><beat-type>4</beat-type></time></attributes>
+              <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note>
+            </measure>
+        </part>`;
+        const doc = parse(`<score-partwise>${part("P1")}${part("P2")}</score-partwise>`);
+        expect(readTimeline(doc).keys).toEqual([{ whole: 0, fifths: -2 }]);
     });
 });
