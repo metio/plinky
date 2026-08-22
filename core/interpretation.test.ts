@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { interpretedWeight, metricalWeight, phraseWeight, placeInBar } from "./interpretation";
+import { assumedPhraseWeight, interpretedWeight, metricalWeight, phraseWeight, placeInBar } from "./interpretation";
 import type { XmlBar } from "./musicxmlTimeline";
 
 const fourFour: XmlBar[] = [
@@ -14,21 +14,21 @@ const sixEight: XmlBar[] = [{ from: 0, beats: 6, beatType: 8 }];
 
 describe("where a note sits in its bar", () => {
     it("counts beats from the barline", () => {
-        expect(placeInBar(fourFour, 0)).toEqual({ beat: 0, beats: 4 });
-        expect(placeInBar(fourFour, 0.25)).toEqual({ beat: 1, beats: 4 });
-        expect(placeInBar(fourFour, 0.75)).toEqual({ beat: 3, beats: 4 });
+        expect(placeInBar(fourFour, 0)).toMatchObject({ beat: 0, beats: 4 });
+        expect(placeInBar(fourFour, 0.25)).toMatchObject({ beat: 1, beats: 4 });
+        expect(placeInBar(fourFour, 0.75)).toMatchObject({ beat: 3, beats: 4 });
     });
 
     it("counts from the bar the note is actually in", () => {
-        expect(placeInBar(fourFour, 1)).toEqual({ beat: 0, beats: 4 });
-        expect(placeInBar(fourFour, 1.5)).toEqual({ beat: 2, beats: 4 });
+        expect(placeInBar(fourFour, 1)).toMatchObject({ beat: 0, beats: 4 });
+        expect(placeInBar(fourFour, 1.5)).toMatchObject({ beat: 2, beats: 4 });
     });
 
     it("keeps counting past the last bar the file declares", () => {
         // A metre stands until another is written, and a repeat brings the walk back over
         // bars it has already passed — neither should stop the beat being knowable.
-        expect(placeInBar(threeFour, 0.75)).toEqual({ beat: 0, beats: 3 });
-        expect(placeInBar(threeFour, 1.0)).toEqual({ beat: 1, beats: 3 });
+        expect(placeInBar(threeFour, 0.75)).toMatchObject({ beat: 0, beats: 3 });
+        expect(placeInBar(threeFour, 1.0)).toMatchObject({ beat: 1, beats: 3 });
     });
 
     it("says nothing for a score that states no metre", () => {
@@ -37,8 +37,8 @@ describe("where a note sits in its bar", () => {
     });
 
     it("counts a compound metre in its own beats", () => {
-        expect(placeInBar(sixEight, 0)).toEqual({ beat: 0, beats: 6 });
-        expect(placeInBar(sixEight, 0.375)).toEqual({ beat: 3, beats: 6 });
+        expect(placeInBar(sixEight, 0)).toMatchObject({ beat: 0, beats: 6 });
+        expect(placeInBar(sixEight, 0.375)).toMatchObject({ beat: 3, beats: 6 });
     });
 });
 
@@ -131,5 +131,89 @@ describe("what a note is actually played at", () => {
             interpretedWeight(fourFour, [], at),
         );
         expect(new Set(weights).size).toBeGreaterThan(2);
+    });
+});
+
+describe("a phrase nobody wrote down", () => {
+    // Four bars of common time, which is what 38% of the catalogue looks like: bars, notes,
+    // and not one other mark.
+    const bars = Array.from({ length: 8 }, (_, index) => ({
+        from: index,
+        beats: 4,
+        beatType: 4,
+    }));
+
+    it("arches across a group of bars instead of holding one level", () => {
+        // Played at one level, four bars are identical to the last four and the result is
+        // unmistakably a machine. The arch is what gives the line somewhere to go.
+        const start = assumedPhraseWeight(bars, 0);
+        const middle = assumedPhraseWeight(bars, 2);
+        const end = assumedPhraseWeight(bars, 3.9);
+        expect(middle).toBeGreaterThan(start);
+        expect(middle).toBeGreaterThan(end);
+    });
+
+    it("starts each group afresh", () => {
+        // A phrase is a sentence, not a slope across the whole piece.
+        expect(assumedPhraseWeight(bars, 4)).toBeCloseTo(assumedPhraseWeight(bars, 0));
+        expect(assumedPhraseWeight(bars, 6)).toBeCloseTo(assumedPhraseWeight(bars, 2));
+    });
+
+    it("stays a suggestion rather than an announcement", () => {
+        // It is a guess about the music, where a written slur is a reading of it. An arch
+        // that announced itself would impose a shape the composer did not write.
+        const swing = assumedPhraseWeight(bars, 2) - assumedPhraseWeight(bars, 0);
+        expect(swing).toBeGreaterThan(0.02);
+        expect(swing).toBeLessThan(0.12);
+    });
+
+    it("turns smoothly at the top, so the peak is not heard as an accent", () => {
+        const near = assumedPhraseWeight(bars, 2);
+        const either = [assumedPhraseWeight(bars, 1.8), assumedPhraseWeight(bars, 2.2)];
+        for (const side of either) {
+            expect(Math.abs(near - side)).toBeLessThan(0.01);
+        }
+    });
+
+    it("says nothing where the piece has no bars to count", () => {
+        expect(assumedPhraseWeight([], 3)).toBe(1);
+    });
+});
+
+describe("interpretedWeight over an unmarked score", () => {
+    const bars = Array.from({ length: 8 }, (_, index) => ({
+        from: index,
+        beats: 4,
+        beatType: 4,
+    }));
+
+    it("gives a written slur the last word", () => {
+        // A piece that phrases itself is played the way it asks; the assumed arch is only
+        // for where the score is silent.
+        const slur = [{ from: 0, to: 4 }];
+        const slurred = interpretedWeight(bars, slur, 3.9);
+        const bare = interpretedWeight(bars, [], 3.9);
+        expect(slurred).not.toBeCloseTo(bare);
+    });
+
+    it("varies more than the bar's own stresses alone could", () => {
+        // The whole complaint: with only metrical stress an unmarked piece moved by a sixth
+        // in loudness and by nothing else at all, so every four bars were identical to the
+        // last four. Sampled at every beat of the group — sampling only downbeats would
+        // miss most of the range, since the arch's own low point sits on the first of them.
+        // Measured against the bar's own stresses over the SAME moments, which is the only
+        // comparison that means anything: the two are different shapes, and sampling one at
+        // points that flatter it proves nothing.
+        const at: number[] = [];
+        for (let step = 0; step < 4; step += 0.125) {
+            at.push(step);
+        }
+        const spread = (of: (whole: number) => number) => {
+            const readings = at.map(of);
+            return Math.max(...readings) - Math.min(...readings);
+        };
+        const shaped = spread((whole) => interpretedWeight(bars, [], whole));
+        const stresses = spread((whole) => metricalWeight(bars, whole));
+        expect(shaped).toBeGreaterThan(stresses);
     });
 });

@@ -239,8 +239,9 @@ describe("useListenPlayback", () => {
         expect(result.current.playing).toBe(true);
         // The first entry sounds immediately, sustained per the 120 BPM tempo, at the
         // default velocity since the score marks no dynamic.
+        // 0.5 s written, less the small lift an unmarked note is played with.
         expect(playNote).toHaveBeenCalledWith(60, {
-            duration: 0.5,
+            duration: 0.5 * 0.94,
             velocity: 90,
             pedalled: false,
         });
@@ -353,7 +354,7 @@ describe("useListenPlayback", () => {
         });
         act(() => soft.result.current.start(0));
         expect(playNote).toHaveBeenCalledWith(60, {
-            duration: 0.5,
+            duration: 0.5 * 0.94,
             velocity: 40,
             pedalled: false,
         });
@@ -401,7 +402,8 @@ describe("useListenPlayback", () => {
 
         // The first note sounds for half a second at 120 BPM; the echo says the same
         // in milliseconds.
-        expect(echoed[0]).toEqual([60, 90, 500]);
+        // Milliseconds, and the same small lift the sounded note gets.
+        expect(echoed[0]).toEqual([60, 90, 470]);
     });
 
     it("plays perfectly well with no echo wired at all", () => {

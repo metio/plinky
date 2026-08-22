@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Pieces that print no markings at all are no longer played flat.** More than a third
+of the catalogue is a bare transcription — no dynamics, no slurs, no articulation —
+and those were coming out as a metronome with pitches: every note the same loudness,
+every note running straight into the next. They now breathe in four-bar phrases, and
+a note with nothing written on it gets the small lift a pianist's finger gives it.
+
 **Tremolos shake, glissandos sweep, and the two quiet pedals do something.** All four
 were printed on the page and silent: a tremolo held one long note where the score asks
 for a shimmer, a glissando played its two ends with a gap in between, the middle pedal

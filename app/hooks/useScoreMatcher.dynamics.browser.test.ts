@@ -135,10 +135,15 @@ describe("a score that marks no dynamics at all", () => {
             expect(weights).toHaveLength(4);
             // The downbeat carries most, the third beat next, two and four least — which is
             // what makes a four-four bar sound unlike any other.
-            expect(weights[0]).toBe(1);
+            //
+            // Relative, not absolute. The bar also sits somewhere in a phrase, and the
+            // phrase moves it as a whole — a first bar begins gently and a middle one is
+            // the top of the arch, which is what an unmarked piece needs to stop repeating
+            // itself every four bars. What the METRE decides is the shape WITHIN the bar,
+            // and that is what this is about.
             expect(weights[2]).toBeLessThan(weights[0] as number);
             expect(weights[1]).toBeLessThan(weights[2] as number);
-            expect(weights[1]).toBe(weights[3]);
+            expect(weights[3]).toBeLessThan(weights[2] as number);
         });
     });
 

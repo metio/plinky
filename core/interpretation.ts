@@ -29,11 +29,15 @@ import type { SlurSpan } from "./slur";
 export function placeInBar(
     bars: readonly XmlBar[],
     whole: number,
-): { beat: number; beats: number } | null {
+): { beat: number; beats: number; index: number } | null {
     let found: XmlBar | null = null;
-    for (const bar of bars) {
+    // Which bar it is, not only what bar it is like — a phrase is a run of bars, so
+    // something has to be able to count them.
+    let index = -1;
+    for (const [at, bar] of bars.entries()) {
         if (bar.from <= whole + EPSILON) {
             found = bar;
+            index = at;
         }
     }
     if (!found || found.beats <= 0 || found.beatType <= 0) {
@@ -46,7 +50,15 @@ export function placeInBar(
     // Where in the bar, allowing for a position past the bar's own end — a repeat brings
     // the walk back over earlier bars, and the last bar declared stands until the next.
     const into = (whole - found.from) % barWholes;
-    return { beat: (into < 0 ? into + barWholes : into) * found.beatType, beats: found.beats };
+    // A position past the last declared bar belongs to a later bar of the same metre, so the
+    // count carries on rather than sticking — otherwise every bar after the last time
+    // signature would sit at the same place in its phrase.
+    const beyond = Math.floor((whole - found.from) / barWholes);
+    return {
+        beat: (into < 0 ? into + barWholes : into) * found.beatType,
+        beats: found.beats,
+        index: index + Math.max(0, beyond),
+    };
 }
 
 // How much of its written loudness a note keeps, for where it sits in the bar.
@@ -97,6 +109,48 @@ export function phraseWeight(spans: readonly SlurSpan[], whole: number): number 
     return 1;
 }
 
+// How long a phrase is assumed to be where the score draws none, in bars. Four is the
+// classic period, and the length a listener hears as a sentence in almost anything a
+// beginner plays.
+const ASSUMED_BARS = 4;
+
+// How far the invented arch swings. Smaller than the taper a written slur gets, because
+// this is a guess about the music and that is a reading of it — an arch that announced
+// itself would be imposing a shape the composer did not write.
+const ARCH = 0.07;
+
+// The shape of a phrase nobody wrote down.
+//
+// 38% of the catalogue marks NOTHING — no dynamics, hairpins, slurs, articulation or pedal.
+// A bare transcription of Handel is the ordinary case, not the exception. Played with only
+// the bar's own stresses those pieces vary by a sixth in loudness and by nothing else at
+// all, and the result is unmistakably a machine: every four bars identical to the last four.
+//
+// So where the score draws no arch, one is assumed over each group of bars: rising into the
+// middle and settling at the end, which is what a player does without being asked. This
+// deliberately reverses an earlier decision to invent nothing where the score wrote nothing.
+// That was the right instinct about MARKS — inventing an accent the composer did not write
+// changes what the piece says. A phrase is different: playing four bars at one level is not
+// neutral, it is a choice, and it is the one choice no musician would make.
+//
+// Only where the score is silent. A written slur still wins, and a piece that phrases itself
+// is played the way it asks.
+export function assumedPhraseWeight(bars: readonly XmlBar[], whole: number): number {
+    const place = placeInBar(bars, whole);
+    if (!place) {
+        return 1;
+    }
+    const { index, beat, beats } = place;
+    if (beats <= 0) {
+        return 1;
+    }
+    // Where this moment falls in its group of bars, 0..1.
+    const through = ((index % ASSUMED_BARS) + beat / beats) / ASSUMED_BARS;
+    // A single arch: nothing at the ends, most in the middle. Sine rather than a triangle so
+    // the turn at the top is smooth — a peak with a corner in it reads as an accent.
+    return 1 - ARCH + ARCH * Math.sin(Math.PI * through);
+}
+
 // Everything together: what fraction of its written loudness this note is actually played
 // at. Never above 1 — the page sets the ceiling — and never so low that a note disappears
 // under the one before it.
@@ -107,7 +161,11 @@ export function interpretedWeight(
     slurs: readonly SlurSpan[],
     whole: number,
 ): number {
-    const weight = metricalWeight(bars, whole) * phraseWeight(slurs, whole);
+    // A written arch is a reading of the piece and wins outright. Where there is none, the
+    // assumed one gives the line somewhere to go.
+    const written = phraseWeight(slurs, whole);
+    const phrase = written === 1 ? assumedPhraseWeight(bars, whole) : written;
+    const weight = metricalWeight(bars, whole) * phrase;
     return Math.min(1, Math.max(FLOOR, weight));
 }
 
