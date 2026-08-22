@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**You can set how much room you hear.** The piano stands in a small room, and there is
+now a *Room* slider in Settings beside the volume — turn it down if the sound feels
+smeared on a phone speaker, or all the way off for a dry piano. The test note plays at
+whatever you have chosen.
+
 **Menus close when you press somewhere else, or hit Escape.** The Export menu and the
 tempo popover could only be dismissed by pressing the button that opened them, so
 changing your mind meant hunting for that one control while every other press landed on

@@ -3,6 +3,7 @@
 
 import { useCallback, useMemo } from "react";
 import { noteGain } from "../../core/loudness";
+import { wetFor } from "../../core/room";
 import type { PedalKind } from "../../core/pedals";
 import { useAudioEngine, usePrefsStore } from "../contexts/services";
 
@@ -55,8 +56,18 @@ export function useSynth(): UseSynthResult {
     // The final loudness for a velocity, after the volume preference — or null when muted
     // or silent, so a silent note never reaches the engine's exponential ramps.
     const gainFor = useCallback(
-        (velocity: number): number | null => noteGain(prefsStore.load(), velocity),
-        [prefsStore],
+        (velocity: number): number | null => {
+            const prefs = prefsStore.load();
+            // The room is a property of the graph rather than of a note, so it is set here
+            // rather than folded into the gain. Applied on the way to every strike instead
+            // of watched from an effect: the room is only audible when something sounds, so
+            // the moment before a note is exactly when the setting has to be right — and
+            // there is no subscription to mount, unmount or forget. Idempotent, and the
+            // engine ramps rather than jumps.
+            audio.setRoom(wetFor(prefs.reverb));
+            return noteGain(prefs, velocity);
+        },
+        [prefsStore, audio],
     );
 
     const playNote = useCallback(

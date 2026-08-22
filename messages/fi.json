@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Pisteen väri = ajoitus: vihreä iskulla, meripihka lähellä, punainen ohi",
     "score_redrawing": "Nuottia piirretään uudelleen",
     "score_loading_fetching": "Haetaan nuotteja",
-    "score_loading_engraving": "Asetellaan nuotteja"
+    "score_loading_engraving": "Asetellaan nuotteja",
+    "settings_reverb": "Tila",
+    "settings_reverb_hint": "Kuinka paljon tilaa kuulet pianon ympärillä. Vähennä, jos ääni puuroutuu puhelimen kaiuttimessa."
 }

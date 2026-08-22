@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { PedalKind } from "../../core/pedals";
+import { ROOM_WET } from "../../core/room";
 import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
 
 // An AudioEngine for tests: strikes and clicks are recorded instead of played,
@@ -25,6 +26,8 @@ export type FakeAudioEngine = AudioEngine & {
     // How many times the panic (allNotesOff) fired — a test asserts a play surface
     // silences everything on teardown.
     silenced: number;
+    // The wet level the room was last set to.
+    room: number;
     // The fake audio clock, advanced by the test.
     time: number;
 };
@@ -39,6 +42,7 @@ export function fakeAudioEngine(): FakeAudioEngine {
         asleep: false,
         unlocked: 0,
         silenced: 0,
+        room: ROOM_WET,
         time: 0,
         now() {
             return engine.time;
@@ -71,6 +75,9 @@ export function fakeAudioEngine(): FakeAudioEngine {
         },
         click(time, kind, gain) {
             engine.clicks.push({ time, kind, gain });
+        },
+        setRoom(wet) {
+            engine.room = wet;
         },
     };
     return engine;

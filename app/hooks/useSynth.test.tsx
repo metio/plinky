@@ -6,6 +6,7 @@ import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import type { Prefs } from "../../core/prefs";
+import { ROOM_WET } from "../../core/room";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { memoryStore } from "../adapters/memoryStore";
 import { ServicesProvider } from "../contexts/services";
@@ -27,6 +28,22 @@ function harness(prefsPatch: Partial<Prefs> = {}, asleep = false) {
 }
 
 describe("useSynth", () => {
+    it("sets the room from the player's own setting before it strikes", () => {
+        // The room is a property of the graph, not of a note, so it cannot ride in on the
+        // gain the way the volume preference does. Applied on the way to every strike rather
+        // than watched from an effect — the room is only audible when something sounds, so
+        // the moment before a note is exactly when it has to be right.
+        const { audio, synth } = harness({ reverb: 50 });
+        synth.playNote(60);
+        expect(audio.room).toBeCloseTo(ROOM_WET / 2);
+    });
+
+    it("goes dry when the player asks for no room", () => {
+        const { audio, synth } = harness({ reverb: 0 });
+        synth.playNote(60);
+        expect(audio.room).toBe(0);
+    });
+
     it("strikes the engine when sound is on", () => {
         const { audio, playNote } = harness();
         playNote(60);

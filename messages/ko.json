@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "점 색 = 박자: 초록은 박 위, 호박색은 가깝게, 빨강은 벗어남",
     "score_redrawing": "악보를 다시 그리는 중",
     "score_loading_fetching": "악보를 찾는 중",
-    "score_loading_engraving": "음표를 놓는 중"
+    "score_loading_engraving": "음표를 놓는 중",
+    "settings_reverb": "공간감",
+    "settings_reverb_hint": "피아노 주변에서 들리는 공간감의 양입니다. 휴대폰 스피커에서 소리가 번지면 낮춰 보세요."
 }

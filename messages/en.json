@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Dot colour = timing: green on the beat, amber close, red out",
     "score_redrawing": "Redrawing the sheet",
     "score_loading_fetching": "Finding the music",
-    "score_loading_engraving": "Setting the notes"
+    "score_loading_engraving": "Setting the notes",
+    "settings_reverb": "Room",
+    "settings_reverb_hint": "How much of the room you hear around the piano. Turn it down if the sound feels smeared on a phone speaker."
 }

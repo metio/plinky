@@ -3,7 +3,7 @@
 
 import { midiToFrequency } from "../../core/pitch";
 import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
-import { roomImpulse, ROOM_SECONDS } from "../../core/room";
+import { ROOM_SECONDS, ROOM_WET, roomImpulse } from "../../core/room";
 import type { ExtraKind } from "../../core/sampledPiano";
 import type { SampleLookup, SampleVoice } from "../ports/sampleSource";
 
@@ -179,12 +179,6 @@ function master(ctx: BaseAudioContext): AudioNode {
     return limiter;
 }
 
-// How much of the room is heard under the dry piano. Subtle on purpose: enough that the
-// instrument stops sounding like it is in a vacuum, well short of the point where a run of
-// quavers smears into the next one. The impulse carries unit energy, so the convolved
-// signal comes back at about the level that went in and this reads as a straight mix.
-const WET = 0.22;
-
 // Where a NOTE goes: into the dry path and the room at once. Everything audible from the
 // instrument passes through here.
 //
@@ -193,6 +187,12 @@ const WET = 0.22;
 // one thing the click exists to give them. So clicks connect to `master` directly and stay
 // dry, which is also how a real metronome sounds standing next to the piano.
 const rooms = new WeakMap<BaseAudioContext, AudioNode>();
+// The wet-mix node of each context's room, so the player's setting can move it. Kept beside
+// the room rather than inside it because the setting can change while the room is standing.
+const wets = new WeakMap<BaseAudioContext, GainNode>();
+// The level a room is built at, and the one setRoom writes. Module-level because the room is
+// built lazily on the first note and the setting is usually made before that.
+let wetLevel = ROOM_WET;
 function room(ctx: BaseAudioContext): AudioNode {
     const existing = rooms.get(ctx);
     if (existing) {
@@ -218,7 +218,8 @@ function room(ctx: BaseAudioContext): AudioNode {
     convolver.buffer = impulse;
 
     const wet = ctx.createGain();
-    wet.gain.value = WET;
+    wet.gain.value = wetLevel;
+    wets.set(ctx, wet);
     out.connect(convolver);
     convolver.connect(wet);
     wet.connect(master(ctx));
@@ -808,6 +809,17 @@ export const webAudioEngine: AudioEngine = {
         sustainDown = false;
         softDown = false;
         sostenutoHeld = new Set();
+    },
+    setRoom(wet) {
+        wetLevel = Math.max(0, wet);
+        // The context already open, never a new one: a setting changed before the first
+        // gesture must not be what opens audio, and there is no room to move yet anyway.
+        const ctx = sharedContext;
+        const node = ctx ? wets.get(ctx) : undefined;
+        // Ramped rather than set: a jump in the wet mix while notes are ringing is an
+        // audible step in the tail. Nothing to move if no room has been built yet — the
+        // level above is what the next one is built at.
+        node?.gain.setTargetAtTime(wetLevel, ctx?.currentTime ?? 0, 0.02);
     },
     click(time, kind, gain) {
         const ctx = context();

@@ -77,6 +77,12 @@ export interface AudioEngine {
     // state is a process-lifetime singleton, so nothing else guarantees this on unmount or
     // route change. Idempotent; safe with no audio context.
     allNotesOff(): void;
+    // How much of the room is heard around the instrument, as a final wet gain (0 = dry).
+    //
+    // A graph-level property rather than a per-note one, which is why it is a method here
+    // where the volume preference is folded into each strike's `gain` instead: there is one
+    // room, and every voice already in it is in the same one.
+    setRoom(wet: number): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted.
     click(time: number, kind: ClickKind, gain: number): void;
     // Whether the engine synthesized this pitch recently enough that a

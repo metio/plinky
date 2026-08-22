@@ -165,10 +165,30 @@ export default function Settings() {
                         onChange={(event) => update({ volume: Number(event.target.value) })}
                     />
                     <span className="w-8 font-mono text-sm tabular-nums">{prefs.volume}</span>
-                    <Button variant="secondary" onClick={() => synth.playNote(72)}>
-                        {m.settings_test()}
-                    </Button>
                 </div>
+                <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <span className="text-sm text-body">{m.settings_reverb()}</span>
+                        <input
+                            type="range"
+                            className="min-w-24 flex-1"
+                            aria-label={m.settings_reverb()}
+                            min={0}
+                            max={100}
+                            value={prefs.reverb}
+                            disabled={!prefs.sound}
+                            onChange={(event) => update({ reverb: Number(event.target.value) })}
+                        />
+                        <span className="w-8 font-mono text-sm tabular-nums">{prefs.reverb}</span>
+                    </div>
+                    <p className="text-xs text-muted">{m.settings_reverb_hint()}</p>
+                </div>
+                {/* Below both sliders rather than beside one of them: a test note sounds at
+                    the volume AND in the room, so it belongs to the pair. It also lets the
+                    two readings line up, which they cannot when one row carries a button. */}
+                <Button variant="secondary" onClick={() => synth.playNote(72)}>
+                    {m.settings_test()}
+                </Button>
             </SettingsSection>
 
             {/* Reading: the level preset up top sets the aids together, then every

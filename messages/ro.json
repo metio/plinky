@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Culoarea punctului = ritm: verde pe timp, chihlimbar aproape, roșu alături",
     "score_redrawing": "Se redesenează partitura",
     "score_loading_fetching": "Se caută partitura",
-    "score_loading_engraving": "Se așază notele"
+    "score_loading_engraving": "Se așază notele",
+    "settings_reverb": "Sală",
+    "settings_reverb_hint": "Cât din sală auzi în jurul pianului. Dă-l mai încet dacă sunetul pare încețoșat în difuzorul telefonului."
 }

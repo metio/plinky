@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { ROOM_SECONDS, roomImpulse } from "./room";
+import { ROOM_SECONDS, ROOM_WET, roomImpulse, wetFor } from "./room";
 
 const energyOf = (samples: Float32Array): number =>
     samples.reduce((sum, sample) => sum + sample * sample, 0);
@@ -79,5 +79,33 @@ describe("roomImpulse", () => {
     it("never asks a converter to swallow a sample past full scale", () => {
         const impulse = roomImpulse(48000, 1);
         expect(peakBetween(impulse, 0, impulse.length)).toBeLessThanOrEqual(1);
+    });
+});
+
+describe("wetFor", () => {
+    it("gives the room as designed at the top of the scale, and nothing at the bottom", () => {
+        expect(wetFor(100)).toBe(ROOM_WET);
+        expect(wetFor(0)).toBe(0);
+    });
+
+    it("scales in between", () => {
+        expect(wetFor(50)).toBeCloseTo(ROOM_WET / 2);
+    });
+
+    it("never lets the room be louder than the piano standing in it", () => {
+        // A stored setting can be anything — an older shape, something written by hand —
+        // and that is the one failure that would actually hurt.
+        for (const stored of [400, Number.POSITIVE_INFINITY, Number.NaN, -20]) {
+            const wet = wetFor(stored);
+            expect(Number.isFinite(wet)).toBe(true);
+            expect(wet).toBeGreaterThanOrEqual(0);
+            expect(wet).toBeLessThanOrEqual(ROOM_WET);
+        }
+    });
+
+    it("treats an unreadable setting as the room as designed, not as silence", () => {
+        // Dry is a deliberate choice somebody makes, so it should not be what a corrupt
+        // value falls back to.
+        expect(wetFor(Number.NaN)).toBe(ROOM_WET);
     });
 });

@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "点的颜色＝节奏：绿色在拍上，琥珀色接近，红色偏了",
     "score_redrawing": "正在重绘乐谱",
     "score_loading_fetching": "正在查找乐谱",
-    "score_loading_engraving": "正在排版音符"
+    "score_loading_engraving": "正在排版音符",
+    "settings_reverb": "空间感",
+    "settings_reverb_hint": "你在钢琴周围听到的空间感多少。手机扬声器上声音发糊时可以调小。"
 }

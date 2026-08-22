@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Punktfärg = timing: grön på slaget, bärnsten nära, röd bredvid",
     "score_redrawing": "Notbladet ritas om",
     "score_loading_fetching": "Hämtar musiken",
-    "score_loading_engraving": "Sätter noterna"
+    "score_loading_engraving": "Sätter noterna",
+    "settings_reverb": "Rum",
+    "settings_reverb_hint": "Hur mycket rum du hör runt pianot. Skruva ner om ljudet blir grumligt i en telefonhögtalare."
 }

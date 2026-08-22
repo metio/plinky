@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Barva tečky = rytmus: zelená na dobu, jantarová blízko, červená mimo",
     "score_redrawing": "Překreslování not",
     "score_loading_fetching": "Hledání not",
-    "score_loading_engraving": "Sazba not"
+    "score_loading_engraving": "Sazba not",
+    "settings_reverb": "Prostor",
+    "settings_reverb_hint": "Kolik prostoru kolem klavíru slyšíš. Uber, pokud zvuk na reproduktoru telefonu splývá."
 }

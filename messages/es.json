@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Color del punto = tiempo: verde en el pulso, ámbar cerca, rojo fuera",
     "score_redrawing": "Redibujando la partitura",
     "score_loading_fetching": "Buscando la música",
-    "score_loading_engraving": "Colocando las notas"
+    "score_loading_engraving": "Colocando las notas",
+    "settings_reverb": "Sala",
+    "settings_reverb_hint": "Cuánta sala oyes alrededor del piano. Bájala si el sonido se emborrona en el altavoz del móvil."
 }
