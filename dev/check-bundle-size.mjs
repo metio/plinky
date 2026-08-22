@@ -372,7 +372,14 @@ const BUDGET_VENDOR_KB = 324;
 // five seconds before a single mark appeared, of which about half is the engraver's own
 // work and cannot be given back. So it is spent on making the wait legible rather than on
 // pretending it is shorter.
-const BUDGET_APP_KB = 368;
+// 369. Reading one piece's row out of a slice of the catalogue rather than the whole
+// manifest, and asking for the engraver from the route module instead of waiting for the
+// score component to mount. A third of a kilobyte of shard arithmetic and a one-line warm-up,
+// against 1.45 s off the time a piece takes to appear on a throttled phone — 7.75 s to
+// 6.30 s at four-times CPU over Fast 4G, measured cold with dev/bench-score.mjs, ranges not
+// overlapping. It also takes 600 KB off what opening a piece downloads at all, which is the
+// part that matters on a metered connection.
+const BUDGET_APP_KB = 369;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Pieces open noticeably faster, especially on a phone.** Opening one used to download
+the whole catalogue to read a single line of it, and only asked for the engraving
+machinery once everything else on the page had finished. Both are fixed: a piece now
+reads just its own slice of the catalogue, and the engraver is fetched from the moment
+the page starts. On a mid-range phone over 4G that is about a second and a half off the
+wait, and six hundred kilobytes less to download.
+
 **A piece now shows you it is on its way.** Opening one takes a few seconds on a slow
 phone — there is a lot to fetch, and setting the notes on the staff is real work. The
 page used to sit empty for all of it. Now the staff a piece is about to appear on

@@ -26,9 +26,15 @@ import { useScore } from "../hooks/useScore";
 // the same way the composition root wires its defaults.
 import { browserStore } from "../adapters/browserStore";
 import { resolveScore } from "../lib/catalog";
+import { warmEngraver } from "../lib/warmEngraver";
 import { parseExerciseId } from "../../core/exerciseGen";
 
 import { breadcrumbData, musicCompositionData, routeMeta } from "../../core/site";
+
+// Reaching this module means a piece is being opened, and a piece always needs engraving.
+// Starting the fetch here overlaps it with the rest of the page's startup instead of
+// queueing it behind the whole tree rendering first.
+warmEngraver();
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
