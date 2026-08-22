@@ -7,6 +7,7 @@ import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
 import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { type GlissandoSpan, glissandoNotes } from "../../core/glissando";
+import { contourWeights, voicingWeight } from "../../core/contour";
 import { type TremoloSpan, tremoloNotes } from "../../core/tremolo";
 import { type Hand2, handOfStaff } from "../../core/matcher";
 import { interpretedWeight } from "../../core/interpretation";
@@ -92,6 +93,10 @@ export type ListenStep = {
     stretch: number;
     // Whether the soft pedal is down here.
     soft: boolean;
+    // How high this position's top note sits among the notes around it. The four-bar arch
+    // knows nothing about the notes, so it repeats identically every four bars; this is the
+    // half of the shaping that follows the actual line.
+    contour: number;
     // Whether sounding this step moves the visual cursor on. False for an ornament,
     // which is printed on the very note it decorates.
     advancesCursor: boolean;
@@ -189,6 +194,9 @@ export function collectListenSteps(
                 // its phrase — this is a thing the player's foot is doing, and it applies on
                 // top of whatever the music was already asking for.
                 soft: softAt(marks.softs, whole),
+                // Filled in below, once the whole line is known — a note's height only means
+                // something next to its neighbours, and half of them are still ahead.
+                contour: 1,
             };
             // A trill, mordent or turn is not a decoration on the note — it is an
             // instruction to play a short figure in its place. Printed but not played, the
@@ -217,7 +225,21 @@ export function collectListenSteps(
         cursor.next();
     }
     cursor.reset();
-    return steps;
+    return shapedByContour(steps);
+}
+
+// The contour pass. Done over the finished walk rather than during it, because how high a
+// note sits is a question about its neighbours and half of them are still ahead when it is
+// collected.
+//
+// The line is the top sounding pitch of each position — the tune, in nearly all keyboard
+// writing — with a rest left as a hole rather than a note at the bottom of the range.
+function shapedByContour(steps: readonly ListenStep[]): ListenStep[] {
+    const line = steps.map((step) =>
+        step.notes.length === 0 ? null : Math.max(...step.notes.map((note) => note.pitch)),
+    );
+    const weights = contourWeights(line);
+    return steps.map((step, index) => ({ ...step, contour: weights[index] ?? 1 }));
 }
 
 // One position carrying an ornament, spelled out as the notes it actually sounds.
@@ -545,6 +567,9 @@ export function useListenPlayback({
             trailNotes(highlightRef.current, LISTENED_COLOR);
             markPainted();
             highlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
+            // Every pitch sounding here, so each note knows whether it is the tune or under
+            // it.
+            const sounding = current.notes.map((one) => one.pitch);
             for (const note of current.notes) {
                 // performNote turns the note's marks into how long and how loud it
                 // sounds — staccato clips it, an accent strikes it harder, the marked
@@ -564,13 +589,18 @@ export function useListenPlayback({
                     // metronome with pitches.
                     current.interpretation,
                 );
+                // Everything that is about this NOTE rather than about the moment: where it
+                // sits in the texture (the tune on top, the accompaniment under it), how
+                // high its line has climbed, and the foot on the soft pedal. All of them
+                // reduce and none of them lift, so the page keeps the ceiling.
+                const voiced =
+                    velocity *
+                    voicingWeight(sounding, note.pitch) *
+                    current.contour *
+                    (current.soft ? SOFT_SCALE : 1);
                 synth.playNote(note.pitch, {
                     duration: durationSeconds,
-                    // Gentled where the score asks for the soft pedal, on top of everything
-                    // the music already asked for.
-                    velocity: current.soft
-                        ? Math.max(1, Math.round(velocity * SOFT_SCALE))
-                        : velocity,
+                    velocity: Math.max(1, Math.round(voiced)),
                     pedalled: note.pedalled,
                 });
                 // …and light the same note on a connected instrument, so the piece

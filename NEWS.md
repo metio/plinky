@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**The tune comes out of the chord, and a rising line leans into its top.** Chords used
+to be struck at one level, which buries the melody in the middle of the texture, and
+every four bars were shaped identically because nothing was reading the notes. The top
+of each chord is now the tune with the accompaniment under it, the bass still holding
+the harmony up, and a line that climbs is played like it is going somewhere.
+
 **Pieces that print no markings at all are no longer played flat.** More than a third
 of the catalogue is a bare transcription — no dynamics, no slurs, no articulation —
 and those were coming out as a metronome with pitches: every note the same loudness,
