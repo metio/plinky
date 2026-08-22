@@ -26,6 +26,37 @@ const step = (elapsedMs: number, pitches: number[], holdMs = 500, holds?: number
     expected: holds?.map((h) => ({ velocity: null, holdMs: h, writtenHoldMs: h })),
 });
 
+// A position the score marks: a written dynamic per pitch, and a weight for where the
+// position falls in its bar and its phrase.
+const marked = (velocities: (number | null)[], interpretation?: number): MatchStep => ({
+    ...step(0, velocities.map((_, index) => 60 + index)),
+    expected: velocities.map((velocity) => ({ velocity, holdMs: 500, writtenHoldMs: 500 })),
+    ...(interpretation === undefined ? {} : { interpretation }),
+});
+
+describe("performanceOf velocity", () => {
+    it("strikes each key at what the page asks of it, not at one touch for the chord", () => {
+        // A chord is not one note: an accent on the top and not the rest is a thing scores
+        // write, and playing the position at a single loudness silently drops it.
+        const notes = performanceOf([marked([64, 110])]);
+        expect(notes.map((note) => note.velocity)).toEqual([64, 110]);
+    });
+
+    it("weights a struck note for where it sits", () => {
+        // An offbeat is played lighter than the downbeat it follows. Rounded, and never
+        // past what a MIDI velocity can carry.
+        expect(performanceOf([marked([100], 0.84)])[0]?.velocity).toBe(84);
+        expect(performanceOf([marked([127], 1)])[0]?.velocity).toBe(127);
+    });
+
+    it("falls back to an even touch where the page marks nothing", () => {
+        // A step model collected without the score's marks — the sample prefetch, the
+        // duet's other hand — knows nothing about loudness and must not invent any.
+        expect(performanceOf([marked([null])])[0]?.velocity).toBe(EVEN_VELOCITY);
+        expect(performanceOf([step(0, [60])])[0]?.velocity).toBe(EVEN_VELOCITY);
+    });
+});
+
 describe("performanceOf", () => {
     it("plays every note of every position, on time and held as written", () => {
         const notes = performanceOf([step(0, [60]), step(500, [62, 64])]);

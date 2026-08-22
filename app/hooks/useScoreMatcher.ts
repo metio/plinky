@@ -32,6 +32,7 @@ function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreP
     return playable;
 }
 import { lengthScaleOf, velocityOf } from "../../core/expression";
+import { interpretedWeight } from "../../core/interpretation";
 import { octaveShiftAt } from "../../core/octaveShift";
 import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { slurredOnwardAt } from "../../core/slur";
@@ -355,6 +356,10 @@ export function collectMatchSteps(
                 // placed ahead of the beat; on the note it decorates, the half of its own
                 // length an appoggiatura would take.
                 pedalled: pedalledAt(pedals, position.whole),
+                // How the position is weighted for where it sits — read from the printed
+                // onset, not the elapsed one, because a bar's stresses are a property of
+                // the page and a repeat revisits the same bar.
+                interpretation: interpretedWeight(marks.bars, marks.slurs, position.whole),
                 slackMs:
                     ornament.length === 0
                         ? 0

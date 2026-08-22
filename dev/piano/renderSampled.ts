@@ -14,6 +14,7 @@
 
 import { decompressMxl } from "../../core/musicxmlFile";
 import { performanceLengthMs, performanceOf } from "../../core/scorePerformance";
+import { readScoreMarks } from "../../core/musicxmlMarks";
 import { collectMatchSteps } from "../../app/hooks/useScoreMatcher";
 import { renderTakeAudio } from "../../app/adapters/offlineAudio";
 import { LEAD_IN_MS } from "../../core/videoFrames";
@@ -77,7 +78,14 @@ async function notesOf(request: SampledRequest) {
     const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
     await osmd.load(xml);
     osmd.render();
-    const steps = collectMatchSteps(osmd, "both");
+    // The marks come from the file, not the engraving: without them every note is struck
+    // at the same even touch, which is the one thing that makes a rendered piece sound
+    // like a machine playing it.
+    const steps = collectMatchSteps(
+        osmd,
+        "both",
+        readScoreMarks(new DOMParser().parseFromString(xml, "application/xml")),
+    );
     host.remove();
     return performanceOf(
         steps,
