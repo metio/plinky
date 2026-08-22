@@ -127,6 +127,20 @@ export type MatchStep = {
     // other hand, a fingering walk — which needs the pitches and nothing about how they
     // are meant to sound.
     expected?: { velocity: number | null; holdMs: number; writtenHoldMs: number }[];
+    // What fraction of its written loudness this position is actually played at, for where
+    // it sits in its bar and its phrase — a downbeat at full weight, an offbeat lighter, a
+    // slurred arch settling as it resolves.
+    //
+    // Kept beside `expected` rather than folded into it, because the two answer different
+    // questions and only one of them is a fact about the page. `expected[].velocity` is what
+    // the score asks for, and it is what a run is graded against; a player is never marked
+    // down for weighting a bar the way a metronome would not. This is how it is played, and
+    // only something turning the score into a sounding performance reads it.
+    //
+    // Absent where nothing is known — a step model collected without the score's marks
+    // weights nothing, and reads as 1, so a caller that only wanted the pitches gets the
+    // same notes it always did.
+    interpretation?: number;
 };
 
 // A pitch of the current position that has sounded, and when. The time comes from the
