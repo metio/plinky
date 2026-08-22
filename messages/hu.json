@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "A pont színe = időzítés: zöld az ütésen, borostyán közel, piros mellette",
     "score_redrawing": "A kotta újrarajzolása",
     "score_loading_fetching": "A kotta keresése",
-    "score_loading_engraving": "A hangjegyek elhelyezése"
+    "score_loading_engraving": "A hangjegyek elhelyezése",
+    "settings_reverb": "Tér",
+    "settings_reverb_hint": "Mennyi teret hallasz a zongora körül. Vedd lejjebb, ha a hang elmosódik a telefon hangszóróján."
 }

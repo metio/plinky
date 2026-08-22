@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Farba bodky = rytmus: zelená na dobu, jantárová blízko, červená mimo",
     "score_redrawing": "Prekresľovanie nôt",
     "score_loading_fetching": "Hľadanie nôt",
-    "score_loading_engraving": "Sadzba nôt"
+    "score_loading_engraving": "Sadzba nôt",
+    "settings_reverb": "Priestor",
+    "settings_reverb_hint": "Koľko priestoru okolo klavíra počuješ. Uber, ak sa zvuk na reproduktore telefónu zlieva."
 }

@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Colore del punto = tempo: verde sul battito, ambra vicino, rosso fuori",
     "score_redrawing": "Ridisegno dello spartito",
     "score_loading_fetching": "Ricerca della musica",
-    "score_loading_engraving": "Disposizione delle note"
+    "score_loading_engraving": "Disposizione delle note",
+    "settings_reverb": "Sala",
+    "settings_reverb_hint": "Quanta sala senti intorno al pianoforte. Abbassala se il suono risulta impastato sull'altoparlante del telefono."
 }

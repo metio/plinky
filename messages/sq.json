@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Ngjyra e pikës = ritmi: e gjelbër mbi goditje, qelibar afër, e kuqe jashtë",
     "score_redrawing": "Partitura po rivizatohet",
     "score_loading_fetching": "Po kërkohet partitura",
-    "score_loading_engraving": "Po vendosen notat"
+    "score_loading_engraving": "Po vendosen notat",
+    "settings_reverb": "Ambienti",
+    "settings_reverb_hint": "Sa ambient dëgjon rreth pianos. Ule nëse tingulli duket i turbullt në altoparlantin e telefonit."
 }

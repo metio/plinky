@@ -8,6 +8,7 @@ import { unaidedPrefs, DEFAULT_PREFS, parsePrefs, type Prefs } from "./prefs";
 const BASE: Prefs = {
     sound: true,
     volume: 80,
+    reverb: 100,
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
     showFingerings: true,

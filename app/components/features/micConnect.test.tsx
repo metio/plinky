@@ -74,6 +74,7 @@ describe("MicConnect", () => {
             setPedal: () => {},
             allNotesOff: () => {},
             click: () => {},
+            setRoom: () => {},
             recentlyStruck: (note: number) => note === 60,
         };
         renderWithServices(

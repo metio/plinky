@@ -104,3 +104,18 @@ function normalized(samples: Float32Array<ArrayBuffer>): Float32Array<ArrayBuffe
     }
     return samples;
 }
+
+// How much of the room is heard under the dry piano, at the player's own setting.
+//
+// The impulse carries unit energy, so the convolved signal comes back at about the level
+// that went in and this reads as a straight mix. Subtle at the top of the scale on purpose:
+// enough that the instrument stops sounding like it is in a vacuum, well short of the point
+// where a run of quavers smears into the next one.
+export const ROOM_WET = 0.22;
+
+export function wetFor(reverb: number): number {
+    // A stored setting can be anything; the one failure that matters is a room louder than
+    // the piano in it.
+    const share = Number.isFinite(reverb) ? Math.max(0, Math.min(100, reverb)) : 100;
+    return ROOM_WET * (share / 100);
+}

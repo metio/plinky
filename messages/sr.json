@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Боја тачке = ритам: зелена на доби, ћилибарна близу, црвена поред",
     "score_redrawing": "Ноте се поново исцртавају",
     "score_loading_fetching": "Тражимо ноте",
-    "score_loading_engraving": "Ноте се постављају"
+    "score_loading_engraving": "Ноте се постављају",
+    "settings_reverb": "Простор",
+    "settings_reverb_hint": "Колико простора чујеш око клавира. Смањи ако се звук размазује на звучнику телефона."
 }

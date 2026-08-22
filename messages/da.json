@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Prikkens farve = timing: grøn på slaget, ravgul tæt på, rød ved siden af",
     "score_redrawing": "Noderne tegnes om",
     "score_loading_fetching": "Henter musikken",
-    "score_loading_engraving": "Sætter noderne"
+    "score_loading_engraving": "Sætter noderne",
+    "settings_reverb": "Rum",
+    "settings_reverb_hint": "Hvor meget rum du hører omkring klaveret. Skru ned, hvis lyden bliver grødet i en telefonhøjttaler."
 }

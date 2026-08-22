@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Prikkfarge = timing: grønn på slaget, ravgul nær, rød ved siden av",
     "score_redrawing": "Notene tegnes på nytt",
     "score_loading_fetching": "Henter musikken",
-    "score_loading_engraving": "Setter notene"
+    "score_loading_engraving": "Setter notene",
+    "settings_reverb": "Rom",
+    "settings_reverb_hint": "Hvor mye rom du hører rundt pianoet. Skru ned hvis lyden blir grøtete i en telefonhøyttaler."
 }

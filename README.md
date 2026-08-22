@@ -47,8 +47,13 @@ a wide desktop alike.
 There you'll also find **Listen**, which plays the piece back so you hear it first,
 lighting up each note as it sounds so your eye can follow along. Listen plays it the way
 it's written — **staccato** notes clipped short, **slurs** flowing legato, **accents**
-struck harder, and the **dynamics** (soft to loud) shaping each note — with tied notes
-held rather than re-struck. Listen and Practice
+struck harder, the **dynamics** (soft to loud) shaping each note, **tremolos** shaking,
+**glissandos** sweeping, and a ***rit.*** or an ***accel.*** giving in the pulse where the
+score asks for one — with tied notes held rather than re-struck. Pieces that print no
+markings at all still breathe in phrases, with the tune brought out of the chord under it.
+The piano stands in a small **room** you can turn up or down in Settings, and a **recorded
+grand** is what you hear by default — its recordings arrive a piece at a time, so nothing is
+downloaded before you play. Listen and Practice
 **hand off to each other** — let the computer play a tricky passage then take over
 mid-phrase, or play a while and hand it back — and your place is kept, even if you
 step out of full screen and come back to it; the **restart** control (or finishing

@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "点の色＝タイミング：緑は拍の上、琥珀は惜しい、赤は外れ",
     "score_redrawing": "楽譜を描き直しています",
     "score_loading_fetching": "楽譜を探しています",
-    "score_loading_engraving": "音符を並べています"
+    "score_loading_engraving": "音符を並べています",
+    "settings_reverb": "残響",
+    "settings_reverb_hint": "ピアノのまわりに聞こえる残響の量です。スマホのスピーカーで音がにじむようなら下げてください。"
 }

@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Nokta rengi = zamanlama: vuruşta yeşil, yakında kehribar, dışarıda kırmızı",
     "score_redrawing": "Nota yeniden çiziliyor",
     "score_loading_fetching": "Nota aranıyor",
-    "score_loading_engraving": "Notalar diziliyor"
+    "score_loading_engraving": "Notalar diziliyor",
+    "settings_reverb": "Mekân",
+    "settings_reverb_hint": "Piyanonun çevresinde ne kadar mekân duyduğun. Telefon hoparlöründe ses bulanıklaşıyorsa kıs."
 }

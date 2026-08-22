@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Цвет точки = ритм: зелёный в долю, янтарный рядом, красный мимо",
     "score_redrawing": "Ноты перерисовываются",
     "score_loading_fetching": "Поиск нот",
-    "score_loading_engraving": "Ноты расставляются"
+    "score_loading_engraving": "Ноты расставляются",
+    "settings_reverb": "Помещение",
+    "settings_reverb_hint": "Сколько помещения слышно вокруг фортепиано. Убавь, если на динамике телефона звук расплывается."
 }

@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Kolor kropki = rytm: zielony na miarę, bursztynowy blisko, czerwony obok",
     "score_redrawing": "Przerysowywanie nut",
     "score_loading_fetching": "Szukanie nut",
-    "score_loading_engraving": "Układanie nut"
+    "score_loading_engraving": "Układanie nut",
+    "settings_reverb": "Pomieszczenie",
+    "settings_reverb_hint": "Ile pomieszczenia słychać wokół fortepianu. Zmniejsz, jeśli dźwięk się zlewa na głośniku telefonu."
 }

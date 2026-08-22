@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Boja točke = ritam: zelena na dobi, jantarna blizu, crvena pokraj",
     "score_redrawing": "Ponovno crtanje nota",
     "score_loading_fetching": "Traženje nota",
-    "score_loading_engraving": "Postavljanje nota"
+    "score_loading_engraving": "Postavljanje nota",
+    "settings_reverb": "Prostor",
+    "settings_reverb_hint": "Koliko prostora čuješ oko klavira. Smanji ako se zvuk razmazuje na zvučniku telefona."
 }

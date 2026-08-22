@@ -34,6 +34,10 @@ export type NoteLabels = "all" | "c" | "solfege" | "off";
 export type Prefs = {
     sound: boolean;
     volume: number; // 0..100
+    // How much of the room is heard around the piano, 0..100 — 0 is dry, 100 the room as
+    // designed. A phone speaker in a hard room genuinely wants less of it than headphones
+    // do, and a player who finds reverb muddy should be able to say so.
+    reverb: number;
     masteryThreshold: Letter; // grade a score must reach to count as learned
     handSpan: HandSpan;
     // Print the suggested fingering numbers on the staff. One of the reading aids, so it
@@ -166,6 +170,8 @@ export const NOTE_HINT_CYCLE: NoteHints[] = ["always", "miss", "never"];
 export const NOTE_LABEL_CYCLE: NoteLabels[] = ["all", "c", "solfege", "off"];
 const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
+// Shared by volume and reverb: both are a whole percentage a slider produces, and both have
+// exactly one bad value to guard against — one outside the scale.
 export function clampVolume(value: number): number {
     return Math.max(0, Math.min(100, Math.round(value)));
 }
@@ -207,6 +213,7 @@ function defaults(): Prefs {
     return {
         sound: true,
         volume: 80,
+        reverb: 100,
         masteryThreshold: "A",
         handSpan: { left: null, right: null },
         showFingerings: true,
@@ -320,6 +327,7 @@ export function parsePrefs(raw: string | null): Prefs {
             lightLeftChannel: cleanChannel(parsed.lightLeftChannel, base.lightLeftChannel),
             lightRightChannel: cleanChannel(parsed.lightRightChannel, base.lightRightChannel),
             volume: num(parsed.volume, clampVolume, base.volume),
+            reverb: num(parsed.reverb, clampVolume, base.reverb),
             masteryThreshold: oneOf(parsed.masteryThreshold, LETTERS, base.masteryThreshold),
             handSpan: cleanHandSpan(parsed.handSpan),
             showFingerings: bool(parsed.showFingerings, base.showFingerings),

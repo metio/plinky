@@ -1268,5 +1268,7 @@
     "perf_legend_dots": "Puntkleur = timing: groen op de tel, amber dichtbij, rood ernaast",
     "score_redrawing": "Bladmuziek wordt opnieuw getekend",
     "score_loading_fetching": "De muziek wordt opgehaald",
-    "score_loading_engraving": "De noten worden gezet"
+    "score_loading_engraving": "De noten worden gezet",
+    "settings_reverb": "Ruimte",
+    "settings_reverb_hint": "Hoeveel ruimte je om de piano heen hoort. Zet hem lager als het geluid op een telefoonspeaker vaag wordt."
 }
