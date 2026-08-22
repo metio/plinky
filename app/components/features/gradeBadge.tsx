@@ -90,7 +90,7 @@ export function GradeBadgeView({
                 competitive ? m.grade_label_competitive({ level }) : m.grade_label({ level })
             }
             className={`flex items-center gap-1 text-sm font-semibold ${
-                earned ? "text-accent" : "text-muted"
+                earned ? "text-white" : "text-white/60"
             }`}
         >
             <span aria-hidden="true" className={earned ? "" : "grayscale"}>
@@ -98,7 +98,7 @@ export function GradeBadgeView({
             </span>
             <span className="tabular-nums">{level}</span>
             {competitive && <span aria-hidden="true">⚔️</span>}
-            <span aria-hidden="true" className="ml-0.5 text-xs font-medium text-muted">
+            <span aria-hidden="true" className="ml-0.5 text-xs font-medium text-white/70">
                 ⚡{skill}
             </span>
         </Link>

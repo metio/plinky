@@ -40,7 +40,12 @@ import {
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import "@fontsource-variable/inter/wght.css";
 // The display face, for the wordmark and page titles only (see --font-display).
-import "@fontsource-variable/literata/wght.css";
+// Fredoka carries the wordmark's own letterforms and covers Latin only. Comfortaa sits
+// behind it in the stack for Greek and Cyrillic, which Fredoka has no glyphs for at all —
+// and because every subset is its own @font-face with a unicode-range, a Latin reader never
+// downloads a byte of it. Each locale fetches the one face its script actually needs.
+import "@fontsource-variable/fredoka/wght.css";
+import "@fontsource-variable/comfortaa/wght.css";
 import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
 
@@ -67,11 +72,11 @@ const THEME_INIT_SCRIPT = themeBootstrapScript();
 const RETURNING_INIT_SCRIPT = returningBootstrapScript();
 
 export const links: Route.LinksFunction = () => [
-    // The tab takes the letter alone — it sits on the browser's chrome, where a tile would
-    // only wedge a coloured box between the mark and whatever the browser paints. The SVG
-    // answers the browser's theme; the ICO is the fallback for those that cannot read it.
+    // The tab wears the mark itself. It is a raster lockup, so there is no theme-answering
+    // SVG beside it any more and nothing to keep in step with one: the ICO and the PNG are
+    // two encodings of the same render, for browsers that read one or the other.
     { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
-    { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+    { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
     { rel: "manifest", href: "/manifest.webmanifest" },
     { rel: "apple-touch-icon", href: "/icon-180.png" },
     // Preload the Latin variable font so text paints in Inter without a swap;
@@ -94,7 +99,15 @@ export const links: Route.LinksFunction = () => [
 // screen, including the error page, giving a way back from anywhere.
 function Header() {
     return (
-        <header className="border-b border-line px-6 py-3 font-sans">
+        // The brand band. This is the logo's own composition applied to the app's anatomy:
+        // saturated violet where you steer, and the white keys — the page, the paper, the
+        // score — underneath it. It is what makes a screenshot unmistakably Plinky rather
+        // than a light app that happens to have violet buttons.
+        //
+        // accent-solid rather than the accent token, because this is a filled surface and
+        // needs the value that stays dark enough for white type in BOTH themes; `accent`
+        // lightens in the dark theme, for text on a dark ground, and would wash out here.
+        <header className="bg-accent-solid px-6 py-3 font-sans text-white">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
                     {/* The wordmark is text (it follows the theme for free); its i is the
@@ -105,26 +118,22 @@ function Header() {
                         aria-label="Plinky home"
                         className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
-                        {/* The mark is drawn square to the edges of its own file, the way a
-                            launcher wants it, so the rounding here is the only rounding it
-                            gets — and it matches the radius everything else pressable in the
-                            header carries. */}
-                        <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-lg" />
                         <span
                             aria-hidden="true"
-                            className="font-display text-xl font-semibold tracking-tight text-ink"
+                            className="font-display text-xl font-semibold tracking-tight text-white"
                         >
                             Pl
                             <span className="relative">
                                 ı
-                                {/* Sits where Literata's own tittle sits: rasterised beside a
-                                    real i at this size, the dot lands within a device pixel
-                                    of the glyph's, leaving the same gap over the x-height.
-                                    The offset is relative to the inline box, which is the
-                                    ascent — not the line box — so it holds only at this font
-                                    size, and the browser snaps it to whole pixels. Measure
-                                    again rather than carrying the number anywhere else. */}
-                                <span className="absolute left-1/2 top-[0.43em] h-[0.15em] w-[0.15em] -translate-x-1/2 rounded-full bg-plink" />
+                                {/* Sits where Fredoka's own tittle sits, measured rather than
+                                    guessed: rendering "i" against dotless "ı" and diffing the
+                                    two isolates the dot, which is 0.16em across with its
+                                    underside 0.55em above the baseline, centred on the stem.
+                                    The offset here is from the inline box top, which is the
+                                    ascent (0.89em) — hence 0.89 − 0.69 = 0.2em. It holds only
+                                    for this face at this weight; measure again rather than
+                                    carrying the number anywhere else. */}
+                                <span className="absolute left-1/2 top-[0.2em] h-[0.16em] w-[0.16em] -translate-x-1/2 rounded-full bg-plink" />
                             </span>
                             nky
                         </span>
@@ -139,7 +148,7 @@ function Header() {
                     <Link
                         to="/settings"
                         aria-label={m.nav_settings()}
-                        className="rounded-md p-1 text-muted hover:text-ink focus-visible:ring-2 focus-visible:ring-accent-ring"
+                        className="rounded-md p-1 text-white/70 hover:text-white focus-visible:ring-2 focus-visible:ring-white"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -283,7 +292,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
                 {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained returning-visitor bootstrap that must run before paint */}
                 <script dangerouslySetInnerHTML={{ __html: RETURNING_INIT_SCRIPT }} />
-                <meta name="theme-color" content="#2b4374" />
+                {/* The browser paints its own chrome with this — the address bar on Android,
+                    the title bar of an installed window. It names the header band's colour,
+                    accent-solid, so the chrome above the band continues it rather than
+                    drawing a seam across the top of the app. */}
+                <meta name="theme-color" content="#4915d2" />
                 <link rel="canonical" href={pageUrl} />
                 {/* One alternate per language so search engines serve the right
                     locale and share ranking signals across the cluster. */}

@@ -46,39 +46,39 @@ SPDX-License-Identifier: AGPL-3.0-or-later
    noteheads — colour belongs to the music, never to the furniture. */
 @theme {
     /* Surfaces, back to front. */
-    --color-surface: #fcf7ea; /* the page itself — the score's own paper */
-    --color-raised: #fffdf7; /* cards and popovers over it, a shade lighter */
-    --color-sunken: #f5eeda; /* inset panels */
-    --color-subtle: #efe6cf; /* quiet fills, chips, hovers */
-    --color-subtle-strong: #e6dbc4;
+    --color-surface: #f9f8fc; /* the page itself — the score's own paper */
+    --color-raised: #ffffff; /* cards and popovers over it, a shade lighter */
+    --color-sunken: #f2effa; /* inset panels */
+    --color-subtle: #ede9f9; /* quiet fills, chips, hovers */
+    --color-subtle-strong: #ded7f3;
 
     /* Hairlines, at the weight a staff line is printed. */
-    --color-line-faint: #efe6cf;
-    --color-line: #e6dbc4; /* the default border */
-    --color-line-strong: #d2c3a4; /* inputs and controls */
+    --color-line-faint: #ede9f9;
+    --color-line: #e0daf4; /* the default border */
+    --color-line-strong: #c7bce8; /* inputs and controls */
 
     /* Text, strongest to quietest. Printing ink is brown-black, not blue-black. */
-    --color-ink: #241c14; /* headings, primary text */
-    --color-ink-soft: #382e22;
-    --color-body: #4a3f31; /* running copy */
-    --color-muted: #6e6154; /* secondary and helper text — the pencil */
-    --color-faint: #8b7f70; /* receded, decorative glyphs */
-    --color-ink-disabled: #b9ae9c; /* quieter still than faint */
+    --color-ink: #191545; /* headings, primary text */
+    --color-ink-soft: #241f5c;
+    --color-body: #3a3568; /* running copy */
+    --color-muted: #6f6a9c; /* secondary and helper text — the pencil */
+    --color-faint: #8c88b4; /* receded, decorative glyphs */
+    --color-ink-disabled: #b6b2d2; /* quieter still than faint */
 
     /* Ink blue carries the brand: links, selection, the primary action. */
-    --color-accent: #2b4374;
-    --color-accent-strong: #23375f; /* link text */
-    --color-accent-deep: #1b2b4a;
-    --color-accent-ink: #1b2b4a; /* text on accent-surface */
-    --color-accent-solid: #2b4374; /* filled button */
-    --color-accent-solid-hover: #1f3159;
-    --color-accent-surface: #edf0f7; /* tinted panel */
-    --color-accent-fill: #dde4f0; /* tinted hover */
-    --color-accent-line: #c9d4e7;
-    --color-accent-line-strong: #a9bad8;
-    --color-accent-ring: #2b4374; /* focus ring */
+    --color-accent: #4915d2;
+    --color-accent-strong: #3a0fa8; /* link text */
+    --color-accent-deep: #2c0b80;
+    --color-accent-ink: #2c0b80; /* text on accent-surface */
+    --color-accent-solid: #4915d2; /* filled button */
+    --color-accent-solid-hover: #3a0fa8;
+    --color-accent-surface: #f0eafe; /* tinted panel */
+    --color-accent-fill: #e2d7fd; /* tinted hover */
+    --color-accent-line: #cbbaf9;
+    --color-accent-line-strong: #a98cf3;
+    --color-accent-ring: #4915d2; /* focus ring */
     /* A lighter accent fill: progress bars, the race track, a decorative mark. */
-    --color-accent-soft: #7e97c4;
+    --color-accent-soft: #9b7cf0;
 
     /* Correct, saved, on target. Green only — `emerald` said the same thing. */
     --color-success: var(--color-green-700);
@@ -119,9 +119,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        the accent. */
     /* The score sheet. The page carries the same value, so a staff sits on the
        page rather than in a card on it. */
-    --color-paper: #fcf7ea;
-    --color-paper-line: #d2c3a4;
-    --color-paper-ink: #8b7f70;
+    --color-paper: #f9f8fc;
+    --color-paper-line: #c7bce8;
+    --color-paper-ink: #8c88b4;
     /* Piano keys are a physical object: a white key stays white in dark mode,
        the same way the score sheet stays paper. Inverting them would be a
        different instrument. */
@@ -134,7 +134,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-black-ink: var(--color-gray-300);
     --color-key-spent: var(--color-gray-400); /* a key the round is done with */
     --color-key-spent-ink: var(--color-gray-200);
-    --color-key-hover: #edf0f7;
+    --color-key-hover: #f0eafe;
     --color-key-held: var(--color-green-500); /* a key you are holding down */
     /* What the score asks of a key — which one comes next, and the hold bar
        draining down it for as long as the note is written to last. */
@@ -185,7 +185,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        It had been borrowing the ghost's fuchsia, so the wordmark and the "race your own
        recording" colour were one variable: moving either moved the other, and they mean
        entirely different things. */
-    --color-plink: #d81b7a;
+    --color-plink: #aa36fc;
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-600);
@@ -196,9 +196,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-hand-right-soft: var(--color-indigo-300);
     --color-hand-left: var(--color-teal-500);
     --color-hand-left-soft: var(--color-teal-300);
-    /* Brass partners the ink blue in the hero's gradients and free-play keys —
-       the pedals, the hinges, the gilt on a fallboard. It is also the only warm
-       colour the chrome is allowed, and it goes on things you earned. */
+    /* Gold against violet: the pedals, the hinges, the gilt on a fallboard. It is the
+       only warm colour the chrome is allowed, and it goes on things you earned. It stays
+       at this value rather than brightening into a livelier gold, because it is drawn as
+       a border and a brighter one measures under 3:1 against the page — 3.58:1 here. */
     --color-spark: #a67c2e;
     /* Dark enough to carry text on every warm surface it is printed on: at #8a6520 it
        measured 4.39:1 against spark-surface, under the 4.5 a caption or a chip label
@@ -206,7 +207,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        screen in daylight. */
     --color-spark-strong: #7d5b1c;
     --color-spark-soft: #c09a4e;
-    --color-spark-surface: #f4e9cf;
+    /* A gold tint, not the page: a hair lighter and less yellow than a cream would be,
+       so a chip reads as gilt on the near-white page rather than as a patch of some
+       other paper. spark-strong measures 5.49:1 on it, spark's border 3.35:1. */
+    --color-spark-surface: #faf0dd;
     /* The footer's heart, on hover. */
     --color-love: var(--color-rose-500);
     --color-love-ring: var(--color-rose-400);
@@ -216,35 +220,35 @@ SPDX-License-Identifier: AGPL-3.0-or-later
    `@layer theme` defaults; `.dark` sits on <html>, which is also `:root`. */
 /* The same album under a lamp. */
 .dark {
-    --color-surface: #14110c;
-    --color-raised: #1c1710;
-    --color-sunken: #1c1710;
-    --color-subtle: #272117;
-    --color-subtle-strong: #322a1e;
+    --color-surface: #120c2b;
+    --color-raised: #1b1442;
+    --color-sunken: #0d0820;
+    --color-subtle: #241b52;
+    --color-subtle-strong: #2f2466;
 
-    --color-line-faint: #1c1710;
-    --color-line: #302a21;
-    --color-line-strong: #493f31;
+    --color-line-faint: #1b1442;
+    --color-line: #2a2059;
+    --color-line-strong: #3d3080;
 
-    --color-ink: #f0e8d9;
-    --color-ink-soft: #e4dac8;
-    --color-body: #d2c7b2;
-    --color-muted: #a09480;
-    --color-faint: #857a68;
-    --color-ink-disabled: #4a4234;
+    --color-ink: #f2ecff;
+    --color-ink-soft: #e4daff;
+    --color-body: #cdc2ee;
+    --color-muted: #a196cc;
+    --color-faint: #8279ad;
+    --color-ink-disabled: #4a4180;
 
-    --color-accent: #93b3e0;
-    --color-accent-strong: #b3cbec;
-    --color-accent-deep: #cbdcf4;
-    --color-accent-ink: #cbdcf4;
-    --color-accent-solid: #3a5a93;
-    --color-accent-solid-hover: #4a6eaf;
-    --color-accent-surface: #17203a;
-    --color-accent-fill: #1f2c4c;
-    --color-accent-line: #26365c;
-    --color-accent-line-strong: #3a5183;
-    --color-accent-ring: #6d8cc0;
-    --color-accent-soft: #4a6eaf;
+    --color-accent: #c3a8ff;
+    --color-accent-strong: #d6c4ff;
+    --color-accent-deep: #e6dbff;
+    --color-accent-ink: #e6dbff;
+    --color-accent-solid: #5b21e8;
+    --color-accent-solid-hover: #6f39f0;
+    --color-accent-surface: #241064;
+    --color-accent-fill: #2f1580;
+    --color-accent-line: #3b1d99;
+    --color-accent-line-strong: #5b21e8;
+    --color-accent-ring: #9b7cf0;
+    --color-accent-soft: #6f39f0;
 
     --color-success: var(--color-green-300);
     --color-success-solid: var(--color-green-700);
@@ -273,9 +277,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
     /* The score sheet keeps its light paper in both themes — a staff is read as
        ink on paper, and inverting it costs legibility for no gain. */
-    --color-paper: #fcf7ea;
-    --color-paper-line: #d2c3a4;
-    --color-paper-ink: #8b7f70;
+    --color-paper: #f9f8fc;
+    --color-paper-line: #c7bce8;
+    --color-paper-ink: #8c88b4;
 
     --color-key-white: var(--color-gray-100);
     --color-key-ink: var(--color-gray-900);
@@ -283,7 +287,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-black-ink: var(--color-gray-300);
     --color-key-spent: var(--color-gray-700);
     --color-key-spent-ink: var(--color-gray-500);
-    --color-key-hover: #dde4f0;
+    --color-key-hover: #e2d7fd;
     --color-key-held: var(--color-green-500);
     --color-key-next: var(--color-indigo-400);
     --color-key-label: var(--color-gray-600);
@@ -312,7 +316,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-strong: var(--color-indigo-500);
     --color-heat-deep: var(--color-indigo-300);
 
-    --color-plink: #f04d9b;
+    --color-plink: #c56bff;
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-400);
@@ -339,14 +343,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     /* The display face, used with restraint: the wordmark and a page's own title, and
-       nothing else. Literata is a schoolbook roman — drawn for long reading, warm, and
-       unfashionable in the way a piano album is — and it carries Latin, Greek and
-       Cyrillic. Chinese, Japanese and Korean fall through to the system serif, which is
-       the right answer rather than a compromise: a garalde has nothing to say about
-       them. Everything operable stays Inter, because an interface face should
-       disappear. */
-    --font-display: "Literata Variable", "Iowan Old Style", "Palatino Linotype", Palatino,
-        Georgia, ui-serif, serif;
+       nothing else. Fredoka carries the letterforms the mark is drawn in — a rounded sans,
+       friendly at a glance — and it covers Latin only. Comfortaa sits behind it for Greek
+       and Cyrillic, close enough in build to read as the same voice; every subset is its
+       own @font-face with a unicode-range, so a Latin reader never downloads a byte of it,
+       and each locale fetches the one face its script needs. Chinese, Japanese and Korean
+       fall through to the platform's own rounded UI face, which is the right answer rather
+       than a compromise: a Latin display cut has nothing to say about them. Everything
+       operable stays Inter, because an interface face should disappear. */
+    --font-display:
+        "Fredoka Variable", "Comfortaa Variable", ui-rounded, "SF Pro Rounded", system-ui,
+        sans-serif;
     /* The landing keyboard's keys rise in on load, left to right via a per-key
        delay. Transform/opacity only, so it never shifts layout. */
     --animate-key-rise: key-rise 0.5s ease-out both;
@@ -362,15 +369,91 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     /* The staff standing in for a piece that is still arriving: a soft band travels
        along it the way a reader's eye would. Opacity and position only — the staff
        occupies the score's own slot, so nothing moves when the real notation lands. */
-    --animate-sight-read: sight-read 1.8s ease-in-out infinite;
+    /* The plink: the app's one loading gesture, and the same event the mark draws — a
+       note falls, lands on a key, and rings. All three parts share one duration so the
+       trail, the impact and the ring stay one motion rather than three loops drifting
+       apart. The easing lives in the keyframes, per step, because a fall and a rebound
+       are opposite curves and no single function can be both. */
+    --animate-plink-fall: plink-fall 1.6s infinite;
+    --animate-plink-trail: plink-trail 1.6s linear infinite;
+    --animate-plink-ring: plink-ring 1.6s linear infinite;
 }
 
-@keyframes sight-read {
+@keyframes plink-fall {
     0% {
-        transform: translateX(-40%);
+        transform: translateY(-240%) scale(1);
+        opacity: 0;
+        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    8% {
+        transform: translateY(-200%) scale(1);
+        opacity: 1;
+        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    42% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        animation-timing-function: linear;
+    }
+    /* The squash. A dot that stops dead reads as a dot that was switched off; the width
+       it gains on impact is what makes it read as landing on something. */
+    48% {
+        transform: translateY(0) scale(1.35, 0.65);
+        opacity: 1;
+        animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+    }
+    68% {
+        transform: translateY(-45%) scale(1);
+        opacity: 1;
+        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    86% {
+        transform: translateY(0) scale(1.12, 0.88);
+        opacity: 1;
+    }
+    94% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
     }
     100% {
-        transform: translateX(240%);
+        transform: translateY(0) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Drawn from the top down, at the speed the note is falling, so it is the path already
+   travelled rather than a line the note happens to be near. */
+@keyframes plink-trail {
+    0% {
+        transform: scaleY(0);
+        opacity: 0.8;
+    }
+    42% {
+        transform: scaleY(1);
+        opacity: 0.8;
+    }
+    72%,
+    100% {
+        transform: scaleY(1);
+        opacity: 0;
+    }
+}
+
+/* Leaves at the moment of impact, not before it. */
+@keyframes plink-ring {
+    0%,
+    42% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(0.7);
+        opacity: 0.6;
+    }
+    80%,
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
     }
 }
 

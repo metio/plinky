@@ -6,15 +6,18 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 # The Plinky kit
 
 Everything here is generated. `npm run brand` rebuilds it from `app/app.css` and
-`public/icon.svg`, so the colours in a poster are the colours in the app by construction —
-there is no second copy to keep in step. Edit the app; rerun the script.
+`brand/plinky-mark.png`, so the colours in a poster are the colours in the app by
+construction — there is no second copy to keep in step. Edit the app; rerun the script.
+It reads resolved token values out of the built stylesheet, so a build has to exist
+first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 
 | File | What it is |
 | --- | --- |
-| `icon/plinky.svg` | The mark. Prefer it wherever vectors are accepted. |
-| `icon/plinky-*.png` | The mark at 32 · 64 · 180 · 192 · 512 · 1024. |
-| `icon/lockup-paper.png` | Mark and wordmark on paper, for light surfaces. |
-| `icon/lockup-ink-blue.png` | The same on ink blue, for dark ones. |
+| `plinky-mark.png` | The master: 1024×1024 RGBA, transparent outside the tile's own rounded silhouette. Everything else is rendered from it. |
+| `source/plinky-mark.png` | The artwork as its author supplied it, flattened onto white. `npm run mark` keys it and writes the master. |
+| `icon/plinky-*.png` | The mark at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
+| `icon/lockup-paper.png` | The mark beside the tagline on paper, 960×320 at 2×, for light surfaces. |
+| `icon/lockup-violet.png` | The same on violet, the mark on a paper plate so it keeps its edge. |
 | `palette.png` | Every colour with its role, as a sheet. |
 | `palette.json` | The same, for tools. Hex plus the token each comes from. |
 | `type.png` | The two faces, set as the app sets them. |
@@ -24,9 +27,9 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 | `social/instagram-portrait-1080x1350.png` | Instagram's tallest feed size — a square crops out of it without loss, and not the other way round. |
 | `social/story-1080x1920.png` | A story or a reel. |
 | `social/facebook-cover-1640x624.png` | A Facebook page cover, at twice its shown size. |
-| `social/reddit-banner-*.png` | Reddit's community banner, desktop and mobile. |
+| `social/reddit-banner-*.png` | Reddit's community banner, desktop 1072×128 and mobile 1080×128. |
 | `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
-| `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the letter and nothing else. |
+| `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the mark and nothing else. |
 
 ## Where each one goes
 
@@ -43,20 +46,16 @@ first time somebody edited only one.
 It is a **square**, not a circle, even though every platform shows it as one. Drawing the
 circle here put white in the corners — a screenshot paints white where nothing is drawn —
 and YouTube's crop is a hair wider than the circle, so those corners showed as pale arcs
-along the top edge. A square has no edge to reveal, and the letter sits well inside the
-inscribed circle, so nothing is ever clipped.
+along the top edge. A square has no edge to reveal. Its ground is the mark's own violet, so
+the tile's rounded corners meet it invisibly however tightly the crop lands.
 
-The letter is placed by its centre of **gravity**, not its bounding box. A capital P
-carries its mass in the stem and the bowl and leaves a void at the lower right, so a
-box-centred P reads as sitting high and left: measured on the 800px render, its ink sat
-1.5% left and 4.2% above the middle. It is nudged back by exactly that, which is the only
-kind of centred anybody sees. The covers differ because the crops do —
-Facebook takes a wide strip and narrows it on a phone, Reddit takes a thin one and lays the
-community's own icon and name over the left of it. Both keep everything that matters in the
-middle for that reason, and nothing but ground at the edges.
+The covers differ because the crops do — Facebook takes a wide strip and narrows it on a
+phone, Reddit takes a thin one and lays the community's own icon and name over the left of
+it. Both keep everything that matters in the middle for that reason, and nothing but ground
+at the edges.
 
-Reddit's community colours, from the palette: **base** `#2b4374` (ink blue), **key**
-`#d81b7a` (plink), **pinned post** `#a67c2e` (brass).
+Reddit's community colours, from the palette: **base** `#4915d2` (violet), **key**
+`#aa36fc` (plink), **pinned post** `#a67c2e` (brass).
 
 YouTube crops its banner four ways — a TV shows the whole 2048×1152, a desktop a wide
 strip, a phone the middle — so only the 1235×338 box at the centre is on every device. That
@@ -123,30 +122,37 @@ lines and it is the licence's one condition.
 
 ## The mark
 
-The capital **P** of Literata — the face every title in the app is set in, and the letter
-the name begins with — with the counter of its bowl inked pink. That pink is the plink, and
-it is the only pink in Plinky: in the counter of the mark, and on the i of the wordmark.
-Spending it anywhere else would make it decoration rather than a signature.
+A full lockup on one rounded violet tile: three white keys with two black ones between
+them, a violet plink falling onto the middle key down a glowing trail, and the word
+**Plinky** set below in rounded letterforms. The plink is the only place that light violet
+appears — spending it anywhere else would make it decoration rather than a signature.
 
-The outline is a derivative of Literata (SIL Open Font License 1.1) at weight 700, optical
-size 24. The optical size is the whole tuning: it is where the counter is fullest and
-roundest while the serifs are still sturdy enough to hold at a favicon's size. Below it the
-counter narrows to a sliver; above 40 the strokes thin and the bowl starts to part from the
-stem.
+**The mark carries the name, so nothing sets the name beside it.** A wordmark next to this
+tile prints "Plinky" twice. Every sheet in the kit pairs it with the *tagline* — "Practise
+piano in your browser" — which is the one thing the artwork does not already say.
 
-The mark comes two ways. On a tile — ink blue, paper letter — it is the app icon, and the
-letter sits inside the middle 80% of the square so a launcher can round or crop it without
-biting in. On nothing, as `public/favicon.svg`, it is the browser tab's: the letter alone,
-ink blue on a light browser and paper on a dark one, because a tab is the browser's
-furniture and a tile there only wedges a coloured box between the mark and the chrome.
+**Never clip it with a border-radius.** The tile's rounded silhouette lives in the master's
+alpha channel: it is scaled and composited, never cropped. A radius is a guess at the
+artwork's own curve, and a guess even slightly tight leaves a sliver of ground showing all
+the way round. Where the mark needs an edge against a violet ground it gets a paper plate
+behind it, and the radius there is the plate's own.
+
+`brand/plinky-mark.png` is written by `npm run mark` (`dev/key-mark.mjs`) from
+`brand/source/plinky-mark.png`, the artwork as supplied — a flattened export with white
+corner wedges and no alpha. `core/matte.ts` floods inward from the four corners across
+near-white and stops at anything enclosed, which is why the keys and the wordmark survive
+while the corners come out transparent. `npm run mark -- --check` fails if the master is
+missing or stale.
 
 ## The colours
 
 Read `palette.png` — every entry says what its colour is *for*. Two rules matter more than
 the hexes:
 
-**Warmth comes from the ground and the type, never from the accent.** Ivory paper, ink,
-brass on the things a player earned. The accent is a deep ink blue and stays cool.
+**The identity is violet, and it is the pressable colour.** Accent violet `#4915d2` carries
+links, buttons and the cursor; the plink `#aa36fc` is the falling note in the mark and
+nothing else; type is `#191545` and the ground is `#f9f8fc`. Brass `#a67c2e` is reserved
+for what a player earned.
 
 **Three colours are spoken for.** Green means the note you found, red the one you missed,
 amber means caution and the top grade — and the share grid runs green through amber to red
@@ -155,12 +161,17 @@ lie. Never borrow them.
 
 ## The type
 
-Literata for anything titular — it is the genre of type children learn to read from, which
-is exactly the register Plinky wants. Inter for anything operable: controls, tables,
-labels, numbers. Numbers that line up in a column are set tabular.
+**Fredoka** for anything titular — a rounded sans, friendly at a glance and legible at a
+thumbnail's size, which is the register Plinky wants. **Inter** for anything operable:
+controls, tables, labels, numbers. Numbers that line up in a column are set tabular.
 
-Chinese, Japanese and Korean fall through to the system serif. That is the right answer
-rather than a compromise: no display face we can ship covers them well.
+Fredoka covers Latin; the app pairs it with Comfortaa for Greek and Cyrillic. Chinese,
+Japanese and Korean fall through to the platform's own rounded or UI face — the right
+answer rather than a compromise, since no display face we can ship covers them well. The
+sheets in this kit are never translated, so they embed the Latin subsets alone.
+
+Both faces are under the SIL Open Font License 1.1. Anything published from this kit that
+ships or embeds them carries that licence with it; a rendered picture of type does not.
 
 ## The voice
 
@@ -171,6 +182,9 @@ mistakes are: say what the reader gets, not what the product does, and never pro
 something the app cannot deliver in one tap.
 
 ## Using it
+
+Every file here is the Plinky Authors' own work under AGPL-3.0-or-later, declared by the
+`brand/**` entry in `REUSE.toml` — the master and the supplied source included.
 
 Anything made from this kit is about Plinky, so it inherits Plinky's own claims: free, no
 account, nothing to install, and a catalogue that is Creative Commons throughout with

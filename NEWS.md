@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Plinky looks like its name now.** The app wears its own logo — the violet tile with
+the white keys and the note falling onto one — and the colour and the lettering follow
+it the rest of the way down: a violet band across the top of every screen, rounded
+letterforms for every title, and the page under it kept near-white so a score still
+reads as ink on paper. While anything is loading you get the plink itself: a note
+falls, lands, and rings.
+
 **A handful of pieces had notes below the bottom of a piano.** No key reaches them, so a
 run waiting for one waited forever. Thirty notes across eight pieces have been moved up
 an octave, which is where they were meant to be. One more piece left the catalogue: its

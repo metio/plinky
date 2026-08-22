@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { m } from "../../paraglide/messages.js";
+import { Plink } from "./plink";
 
 // The staff a piece is about to appear on, drawn while it is still being fetched and set.
 //
@@ -9,7 +10,7 @@ import { m } from "../../paraglide/messages.js";
 // then the engraving itself — and on a slow device that is several seconds. What stood here
 // before was nothing at all: a blank page, then a blank box, with no sign that anything was
 // happening. So the wait is drawn as the thing being waited for. Five hairlines in the
-// score's own slot, a band travelling along them, and a word for which part of the wait this
+// score's own slot, a note falling onto them, and a word for which part of the wait this
 // is — because "still fetching" and "nearly drawn" are different news to somebody deciding
 // whether to give up.
 //
@@ -25,9 +26,12 @@ export function ScoreSkeleton({ engraving = false }: { engraving?: boolean }) {
                         <div key={line} className="h-px w-full bg-line" />
                     ))}
                 </div>
-                {/* The travelling band. Placed over the staff rather than tinting it, so the
-                lines keep their weight and the movement reads as light passing across. */}
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 animate-sight-read bg-gradient-to-r from-transparent via-accent-surface to-transparent motion-reduce:animate-none" />
+                {/* The plink lands on the middle line. Placed over the staff rather than
+                tinting it, so the lines keep their weight, and centred on the slot so the
+                note falls onto the staff rather than past it. */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <Plink className="h-full w-6" />
+                </div>
             </div>
             <p role="status" className="text-sm text-muted">
                 {engraving ? m.score_loading_engraving() : m.score_loading_fetching()}

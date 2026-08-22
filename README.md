@@ -680,7 +680,7 @@ play — the same engine behind every mode.
 
 `brand/` holds the mark, the palette with each colour's role, a type specimen and
 ready-made social images — everything somebody needs to make something *about* Plinky. It
-is generated: `npm run brand` rebuilds it from `app/app.css` and `public/icon.svg`, so a
+is generated: `npm run brand` rebuilds it from `app/app.css` and `brand/plinky-mark.png`, so a
 poster cannot end up in a palette the app has moved on from. `brand/README.md` carries the
 rules, including the three colours that mean something and must never be borrowed for
 decoration.

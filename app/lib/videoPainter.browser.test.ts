@@ -31,7 +31,18 @@ function paintAt(timeMs: number): OffscreenCanvasRenderingContext2D {
 }
 
 // The accent the painter lights sounding keys with, as raw RGB.
-const ACCENT = [0x63, 0x66, 0xf1];
+const ACCENT = [0xaa, 0x36, 0xfc];
+// The flat stage fill. Regions are measured as "anything that is not the ground",
+// which stays true however light or dark the brand's stage colour is — a brightness
+// cutoff only worked while the ground happened to be near-black.
+const GROUND = [0x3a, 0x0f, 0xa8];
+function isGround(data: Uint8ClampedArray, i: number, tolerance = 8): boolean {
+    return (
+        Math.abs(data[i]! - GROUND[0]!) <= tolerance &&
+        Math.abs(data[i + 1]! - GROUND[1]!) <= tolerance &&
+        Math.abs(data[i + 2]! - GROUND[2]!) <= tolerance
+    );
+}
 
 // Pixels close to the accent — a lit key decays away from the pure accent
 // while held, so closeness (not equality) is what "lit" means.
@@ -120,8 +131,8 @@ describe("takeScenePainter title and watermark toggles", () => {
         const { data } = context.getImageData(x, y, w, h);
         let painted = 0;
         for (let i = 0; i < data.length; i += 4) {
-            // Anything meaningfully lighter than the #0b0f1a background is ink.
-            if (data[i]! > 0x40 || data[i + 1]! > 0x40 || data[i + 2]! > 0x40) {
+            // Anything that is not the flat background fill is ink.
+            if (!isGround(data, i)) {
                 painted++;
             }
         }
@@ -331,7 +342,7 @@ describe("takeHighwayPainter", () => {
         const { data } = context.getImageData(0, top, WIDTH, Math.round(HEIGHT * 0.36));
         let painted = 0;
         for (let i = 0; i < data.length; i += 4) {
-            if (data[i]! > 0x40 || data[i + 1]! > 0x40 || data[i + 2]! > 0x40) {
+            if (!isGround(data, i)) {
                 painted++;
             }
         }

@@ -26,17 +26,19 @@ function argValue(flag) {
     return index > 0 ? process.argv[index + 1] : undefined;
 }
 
-const INK_BLUE = "#2b4374";
-const PAPER = "#fcf7ea";
-const PLINK = "#d81b7a";
-// Measured against a real i at this weight; see dev/build-icons.mjs.
-const TITTLE = "bottom:.845em;width:.1525em;height:.1525em";
+const INK = "#191545";
+const PAPER = "#f9f8fc";
+const PLINK = "#aa36fc";
+// Fredoka puts its tittle 0.55em above the baseline at a diameter of 0.16em, centred on the
+// stem; the inline box drops 0.22em below the baseline, so anchoring from its bottom is
+// 0.55 + 0.22 = 0.77em. See dev/build-icons.mjs.
+const TITTLE = "bottom:.77em;width:.16em;height:.16em";
 
-const literata = await read(
-    "node_modules/@fontsource-variable/literata/files/literata-latin-wght-normal.woff2",
+const fredoka = await read(
+    "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
 );
 const inter = await read("node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2");
-const FACES = `@font-face{font-family:Literata;src:url(data:font/woff2;base64,${literata.toString("base64")}) format("woff2-variations");font-weight:200 900;font-display:block}
+const FACES = `@font-face{font-family:'Fredoka Variable';src:url(data:font/woff2;base64,${fredoka.toString("base64")}) format("woff2-variations");font-weight:300 700;font-display:block}
 @font-face{font-family:Inter;src:url(data:font/woff2;base64,${inter.toString("base64")}) format("woff2-variations");font-weight:100 900;font-display:block}`;
 
 // A long title has to shrink or it wraps into four lines and stops being readable small.
@@ -58,7 +60,7 @@ for (const piece of PIECES) {
     }
     await page.setContent(
         `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
-         <div style="width:1280px;height:720px;background:${INK_BLUE};display:flex;flex-direction:column;justify-content:space-between;padding:72px 88px;font-family:Literata,Georgia,serif">
+         <div style="width:1280px;height:720px;background:${INK};display:flex;flex-direction:column;justify-content:space-between;padding:72px 88px;font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif">
            <div>
              <div style="font-size:${titleSize(piece.title)}px;font-weight:600;color:${PAPER};line-height:1.08;letter-spacing:-0.015em;text-wrap:balance">${piece.title}</div>
              <div style="font-family:Inter,system-ui,sans-serif;font-size:36px;color:${PAPER};opacity:.72;margin-top:20px">${piece.composer}</div>

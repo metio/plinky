@@ -43,13 +43,18 @@ function mixHex(from: string, to: string, amount: number): string {
     return out;
 }
 
-const BACKGROUND = "#0b0f1a";
-const INK = "#f9fafb";
-const MUTED = "#9ca3af";
-const ACCENT = "#6366f1";
+// The stage palette, taken from the logo so an exported file looks like the app.
+// Contrast against the BACKGROUND ground (relative luminance 0.041): INK 11.0:1 and
+// MUTED 6.8:1, both past 4.5:1 for the title, wordmark and credit line.
+const BACKGROUND = "#3A0FA8";
+const INK = "#F9F8FC";
+const MUTED = "#EDB2FD";
+const ACCENT = "#AA36FC";
 
-const WHITE_KEY = "#f3f4f6";
-const BLACK_KEY = "#111827";
+// WHITE_KEY stays a near-white the eye reads as an ivory key; BLACK_KEY is the
+// logo's violet-black rather than a neutral, so the keyboard sits in the same world.
+const WHITE_KEY = "#F9F8FC";
+const BLACK_KEY = "#191545";
 
 // The exact family the app registers (see the fontsource import in root.tsx and
 // --font-sans in app.css). A canvas resolves font strings against the loaded
@@ -173,7 +178,9 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
         context.fillText("plinky.fun", width - margin, height * 0.09);
     }
     const railY = height * 0.26;
-    context.fillStyle = "#1f2937";
+    // The rail's unfilled track: the violet-black, a step down from the ground
+    // (1.5:1) so it reads as a groove, with the accent-filled part at 3.8:1 on it.
+    context.fillStyle = "#191545";
     context.fillRect(margin, railY, width - margin * 2, 4);
     context.fillStyle = ACCENT;
     context.fillRect(margin, railY, (width - margin * 2) * (timeMs / durationMs), 4);
@@ -418,7 +425,7 @@ function paintHex(
 // A deep-to-accent block colour so a note reads as descending "into" the strike line,
 // brightening as it lands. The far end is the note colour darkened toward black rather
 // than a second constant, so a caller that sets its own accent gets the same descent.
-const HIGHWAY_FAR = "#3730a3";
+const HIGHWAY_FAR = "#191545";
 function farOf(accent: string): string {
     return accent === ACCENT ? HIGHWAY_FAR : mixHex("#000000", accent, 0.45);
 }
@@ -525,7 +532,8 @@ export function takeHighwayPainter({
         }
 
         // The strike line where blocks meet the keys.
-        context.fillStyle = "#334155";
+        // Pale plink, 6.8:1 on the ground, so the landing line stays crisp.
+        context.fillStyle = "#EDB2FD";
         context.fillRect(margin, keyboardTop - 2, width - margin * 2, 2);
 
         // The keyboard, sounding keys lit by their freshest press.

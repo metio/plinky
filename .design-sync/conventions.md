@@ -6,9 +6,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 ## Building with Plinky
 
 Plinky is a piano practice app: a player reads notation on screen and plays along on a
-MIDI keyboard, the computer keyboard, or an on-screen one. It is touch-first, warm rather
-than clinical, and it never pressures anybody — there are no streaks and no leaderboards,
-so never design one.
+MIDI keyboard, the computer keyboard, or an on-screen one. It is touch-first and playful —
+saturated violet, rounded letterforms, a bounce where something lands — and it never
+pressures anybody: there are no streaks and no leaderboards, so never design one.
+
+The identity comes from the mark: a violet tile, white piano keys, and a note falling onto
+one of them. Violet is the app's own colour and carries the chrome — the header is a solid
+violet band on every screen, with white type on it. Under the band the page is near-white,
+because a score is read as ink on paper and paper is what it sits on. Between the two, the
+thing that is being played is the bright one.
 
 ### Wrapping
 
@@ -54,9 +60,18 @@ baked into an exported image; `hand-left` / `hand-right` distinguish the two han
 staff; `grade-s` through `grade-f` are the grade letters. A decorative green on a screen
 where colour is the information is a lie.
 
-Two type tokens: `font-display` is Literata, for anything titular; `font-sans` is Inter,
-for anything operable — controls, tables, labels, numbers. Numbers that line up in a
-column are set `tabular-nums`.
+Two type tokens: `font-display` is Fredoka — a rounded sans, the wordmark's own
+letterforms — for anything titular; `font-sans` is Inter, for anything operable: controls,
+tables, labels, numbers. Numbers that line up in a column are set `tabular-nums`.
+(Comfortaa sits behind Fredoka in the display stack for Greek and Cyrillic, which Fredoka
+has no glyphs for; nothing about a design has to account for that.)
+
+Shape follows what a thing is. Anything touched is generously rounded — buttons, pills,
+cards. Anything *printed* — a staff, a table, a score — keeps its square corners and
+hairline rules, because rounding a staff makes it a widget instead of a page.
+
+While something is loading, the app draws the plink: a note falls, lands, and rings. It is
+the one loading gesture, at every size; there is no spinner to reach for.
 
 ### The primitives
 

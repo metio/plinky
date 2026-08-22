@@ -301,6 +301,15 @@ export function clampHeading(heading: string): string {
     return `${points.slice(0, MAX_HEADING_CHARS - 1).join("").trimEnd()}…`;
 }
 
+// The card's own furniture, in the brand palette so an exported card reads as the app:
+// the deep violet ground, near-white heading, pale-plink footer. Deliberately separate
+// from FILL above — the bands are pinned to the emoji and must not follow the chrome.
+// Contrast checked against the ground (relative luminance 0.041): heading 11.0:1 and
+// footer 6.8:1, both comfortably past 4.5:1 for normal text.
+const CARD_GROUND = "#3A0FA8";
+const CARD_HEADING = "#F9F8FC";
+const CARD_FOOTER = "#EDB2FD";
+
 // A 1080×1350 dark portrait card — the shape sized for a social feed. Pure markup
 // so it can be tested and rasterised to PNG in the browser without a DOM.
 export function svgCard(grid: Grid, heading: string): string {
@@ -324,10 +333,10 @@ export function svgCard(grid: Grid, heading: string): string {
         )
         .join("");
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\
-<rect width="${width}" height="${height}" fill="#0f172a"/>\
-<text x="${width / 2}" y="${top - 64}" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="64" font-weight="700" text-anchor="middle">${escapeXml(clampHeading(heading))}</text>\
+<rect width="${width}" height="${height}" fill="${CARD_GROUND}"/>\
+<text x="${width / 2}" y="${top - 64}" fill="${CARD_HEADING}" font-family="system-ui,sans-serif" font-size="64" font-weight="700" text-anchor="middle">${escapeXml(clampHeading(heading))}</text>\
 ${cells}\
-<text x="${width / 2}" y="${top + gridH + 96}" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
+<text x="${width / 2}" y="${top + gridH + 96}" fill="${CARD_FOOTER}" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
 </svg>`;
 }
 

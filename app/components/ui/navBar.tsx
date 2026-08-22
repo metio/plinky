@@ -77,7 +77,11 @@ export function BottomNav() {
     );
 }
 
-// Wide screens: the same destinations as inline header links.
+// Wide screens: the same destinations as inline header links. Unlike BottomNav, which
+// sits on the page surface, this one lives on the header's violet band — so it is written
+// against that ground: white type, and the current section marked in plink rather than in
+// spark. The two are separate components already, which is why neither needs to know
+// which ground it is on.
 export function HeaderNav({ className = "" }: { className?: string }) {
     const isActive = useIsActive();
     return (
@@ -91,8 +95,8 @@ export function HeaderNav({ className = "" }: { className?: string }) {
                         aria-current={active ? "page" : undefined}
                         className={`border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
                             active
-                                ? "border-spark text-ink"
-                                : "border-transparent text-muted hover:text-ink"
+                                ? "border-plink text-white"
+                                : "border-transparent text-white/70 hover:text-white"
                         }`}
                     >
                         {label()}
