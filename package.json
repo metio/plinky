@@ -63,7 +63,8 @@
         "typecheck": "npm run messages && npm run news && react-router typegen && tsc",
         "widths": "node dev/check-widths.mjs",
         "songs:prune": "tsx dev/prune-songs.mts",
-        "songs:repair": "tsx dev/repair-songs.mts"
+        "songs:repair": "tsx dev/repair-songs.mts",
+        "mark": "tsx dev/key-mark.mjs"
     },
     "dependencies": {
         "@fontsource-variable/inter": "^5.2.8",

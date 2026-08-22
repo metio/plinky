@@ -73,6 +73,7 @@
             (pkgs.writeShellScriptBin "ci-bake-check" ''exec npm run songs:bake -- --check "$@"'')
             (pkgs.writeShellScriptBin "ci-prune-check" ''exec npm run songs:prune -- --check "$@"'')
             (pkgs.writeShellScriptBin "ci-repair-check" ''exec npm run songs:repair -- --check "$@"'')
+            (pkgs.writeShellScriptBin "ci-mark-check" ''exec npm run mark -- --check "$@"'')
             (pkgs.writeShellScriptBin "ci-news-check" ''exec npm run news:check "$@"'')
             (pkgs.writeShellScriptBin "ci-twip" ''exec npm run twip -- "$@"'')
             # The locale lives in package.json's build:single, which the a11y sweeps and

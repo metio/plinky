@@ -129,6 +129,10 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 # The brand kit: every file in it is rendered by dev/build-brand.mjs from the app's own
 # tokens and the icon, so they are our own art and carry the project's licence. The
 # JSON and the images cannot hold a comment; the README does and is left alone.
+#
+# Two exceptions are not rendered: brand/source/plinky-mark.png is the mark as its author
+# supplied it, and brand/plinky-mark.png is that file with its background keyed out by
+# dev/key-mark.mjs. Both are ours and carry the same licence.
 [[annotations]]
 path = ["brand/**/*.png", "brand/**/*.svg", "brand/palette.json"]
 precedence = "override"

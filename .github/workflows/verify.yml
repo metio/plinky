@@ -72,6 +72,10 @@ jobs:
       # And no note below the bottom of the keyboard, which is a note no player can reach —
       # a run waiting for one waits forever.
       - run: nix develop --command ci-repair-check
+      # The mark keeps its transparency. The artwork arrives flattened onto white, and every
+      # icon rendered from it would carry those corners — a halo on any dark launcher, tab
+      # strip or social card.
+      - run: nix develop --command ci-mark-check
   news:
     name: news
     runs-on: ubuntu-latest
