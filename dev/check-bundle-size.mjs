@@ -388,7 +388,10 @@ const BUDGET_VENDOR_KB = 324;
 // pieces, and the alternating form is two thirds of them), the glissando (12), the middle
 // pedal, and the soft pedal (59). Each is a figure or a foot that has to be spelled out to
 // be heard, and each was printed and silent.
-const BUDGET_APP_KB = 371;
+// 372. Menus that close the way every other menu closes — a press elsewhere, or Escape.
+// A fifth of a kilobyte for a hook two of them share, against a reported bug where the only
+// way out of the Export menu was the button that opened it.
+const BUDGET_APP_KB = 372;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
