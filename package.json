@@ -62,7 +62,8 @@
         "twip:dry": "tsx dev/twip.mts --dry-run",
         "typecheck": "npm run messages && npm run news && react-router typegen && tsc",
         "widths": "node dev/check-widths.mjs",
-        "songs:prune": "tsx dev/prune-songs.mts"
+        "songs:prune": "tsx dev/prune-songs.mts",
+        "songs:repair": "tsx dev/repair-songs.mts"
     },
     "dependencies": {
         "@fontsource-variable/inter": "^5.2.8",

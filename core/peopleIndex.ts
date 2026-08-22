@@ -84,7 +84,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "george-butterworth": {"name":"George Butterworth","pieces":12},
     "george-frideric-handel": {"name":"George Frideric Handel","pieces":29},
     "georges-bizet": {"name":"Georges Bizet","pieces":28},
-    "giovanni-maria-nanino": {"name":"Giovanni Maria Nanino","pieces":5},
+    "giovanni-maria-nanino": {"name":"Giovanni Maria Nanino","pieces":4},
     "giovanni-pierluigi-da-palestrina": {"name":"Giovanni Pierluigi da Palestrina","pieces":8},
     "giuseppe-verdi": {"name":"Giuseppe Verdi","pieces":3},
     "granville-bantock": {"name":"Granville Bantock","pieces":5},

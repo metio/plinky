@@ -327,5 +327,10 @@
         "title": "Old Folks at Home",
         "composer": "Stephen Foster",
         "why": "Typed entirely in capitals by whoever uploaded it. Set in the catalogue's own case, which no rule can do for a title in another language. The credit led with the roles rather than the name."
+    },
+    {
+        "id": "TxOvCpQggcHi",
+        "title": "War hinaus gezogen, lustig singend, wälderwärts",
+        "why": "The harvested title wrapped the song's first line in quotation marks and appended the corpus's own '[untitled]' marker — the transcriber's note that the source gave no title, not part of the name. A song known by its opening line is named by that line."
     }
 ]

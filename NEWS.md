@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**A handful of pieces had notes below the bottom of a piano.** No key reaches them, so a
+run waiting for one waited forever. Thirty notes across eight pieces have been moved up
+an octave, which is where they were meant to be. One more piece left the catalogue: its
+chords had a phantom voice several octaves above the music, which is not something that
+can be repaired.
+
 **The rhythm trainer now shows where your pulse went.** After a run there is a speed
 line under the notes, drawn against the tempo you set: above it you were rushing,
 below it dragging, and each dot carries the same colour its note does. The counts

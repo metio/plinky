@@ -69,6 +69,9 @@ jobs:
       # of a work already here. Both were found by ear before they were found by anything
       # else, and neither shows up in a grade or a bar count.
       - run: nix develop --command ci-prune-check
+      # And no note below the bottom of the keyboard, which is a note no player can reach —
+      # a run waiting for one waits forever.
+      - run: nix develop --command ci-repair-check
   news:
     name: news
     runs-on: ubuntu-latest

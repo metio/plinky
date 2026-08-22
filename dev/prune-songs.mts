@@ -33,6 +33,7 @@ import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { sameOpening } from "../core/incipit.ts";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { canonicalComposer } from "../core/person.ts";
+import { BEYOND_REPAIR, beyondThePiano } from "../core/pianoRange.ts";
 import { quantiserMarks } from "../core/transcriptionQuality.ts";
 import { sameWork, workTitle } from "../core/workTitle.ts";
 
@@ -58,6 +59,27 @@ async function locate(): Promise<Map<string, string>> {
     return at;
 }
 
+// Whether the score carries notes so far outside the keyboard that they are not a
+// part of the music written in the wrong octave but something stapled onto it.
+//
+// One score in the catalogue puts F9 — seventeen semitones above the top of the piano, near
+// the top of hearing — inside ordinary four-part chords, in the same voice as the music.
+// There is nothing there to repair, where a bass written an octave low can simply be moved.
+function phantomVoice(xml: string): boolean {
+    for (const [, step, alterText, octave] of xml.matchAll(
+        /<pitch>\s*<step>([A-G])<\/step>\s*(?:<alter>(-?\d+)<\/alter>\s*)?<octave>(-?\d+)<\/octave>/g,
+    )) {
+        const midi =
+            (Number(octave) + 1) * 12 +
+            ([0, 2, 4, 5, 7, 9, 11][("CDEFGAB".indexOf(step as string))] as number) +
+            Number(alterText ?? 0);
+        if (beyondThePiano(midi) > BEYOND_REPAIR) {
+            return true;
+        }
+    }
+    return false;
+}
+
 async function main() {
     const check = process.argv.includes("--check");
     const manifest: Song[] = JSON.parse(await readFile(`${OUT}/manifest.json`, "utf8"));
@@ -70,7 +92,7 @@ async function main() {
             continue;
         }
         const xml = await decompressMxl(new Uint8Array(await readFile(path)));
-        if (xml && quantiserMarks(xml) > 0) {
+        if (xml && (quantiserMarks(xml) > 0 || phantomVoice(xml))) {
             machine.push(song);
         }
     }
@@ -110,7 +132,7 @@ async function main() {
     }
 
     const goneIds = new Set([...machineIds, ...extra.map((song) => song.id)]);
-    console.log(`machine transcriptions : ${machine.length}`);
+    console.log(`beyond repair          : ${machine.length}`);
     console.log(`duplicate copies       : ${extra.length}`);
     console.log(`catalogue              : ${manifest.length} → ${manifest.length - goneIds.size}`);
     for (const song of extra) {
