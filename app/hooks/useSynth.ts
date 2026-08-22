@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useMemo } from "react";
+import { noteGain } from "../../core/loudness";
 import type { PedalKind } from "../../core/pedals";
 import { useAudioEngine, usePrefsStore } from "../contexts/services";
 
@@ -50,14 +51,7 @@ export function useSynth(): UseSynthResult {
     // The final loudness for a velocity, after the volume preference — or null when muted
     // or silent, so a silent note never reaches the engine's exponential ramps.
     const gainFor = useCallback(
-        (velocity: number): number | null => {
-            const prefs = prefsStore.load();
-            if (!prefs.sound) {
-                return null;
-            }
-            const gain = (velocity / 127) * 0.32 * (prefs.volume / 100);
-            return gain > 0 ? gain : null;
-        },
+        (velocity: number): number | null => noteGain(prefsStore.load(), velocity),
         [prefsStore],
     );
 
