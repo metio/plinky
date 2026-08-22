@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
     extrasFor,
+    samplesEnabled,
     playbackRateFor,
     regionFor,
     regionsNeeded,
@@ -189,5 +190,30 @@ describe("regionsNeeded for extras", () => {
         const files = regionsNeeded(REGIONS, [{ pitch: 60, velocity: 90 }]).map((r) => r.file);
         expect(files.length).toBe(1);
         expect(files[0]).toMatch(/^C4v/);
+    });
+});
+
+describe("samplesEnabled", () => {
+    it("is on for a device that has never been asked", () => {
+        // The whole point of the default. A new device, a cleared store, or a player who has
+        // never opened Settings all read as null here, and all of them should hear the
+        // recorded piano — while this answered false, almost nobody ever did.
+        expect(samplesEnabled(null)).toBe(true);
+    });
+
+    it("stays off for a player who turned it off", () => {
+        expect(samplesEnabled("0")).toBe(false);
+    });
+
+    it("is on for a player who turned it on", () => {
+        expect(samplesEnabled("1")).toBe(true);
+    });
+
+    it("treats a value it does not recognise as on rather than off", () => {
+        // A store can hold anything — an older shape, something written by hand. Read the
+        // other way round, an unrecognised value would silence the instrument, which is the
+        // state this default exists to leave.
+        expect(samplesEnabled("")).toBe(true);
+        expect(samplesEnabled("yes")).toBe(true);
     });
 });

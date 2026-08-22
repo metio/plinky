@@ -15,6 +15,7 @@ import type { MidiAccessPort } from "../ports/midiAccess";
 import type { PitchInput } from "../ports/pitchInput";
 import type { Scheduler } from "../ports/scheduler";
 import type { AudioEngine } from "../ports/audioEngine";
+import { samplesEnabled } from "../../core/sampledPiano";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
@@ -123,7 +124,7 @@ function defaultSamples(overrides: Partial<AppServices>): SampleSource {
     const store = overrides.store ?? browserStore;
     const source = webSampleSource({
         baseUrl: SAMPLES_BASE,
-        enabled: store.get(SAMPLES_ENABLED) === "1",
+        enabled: samplesEnabled(store.get(SAMPLES_ENABLED)),
         remember: (enabled) => {
             store.set(SAMPLES_ENABLED, enabled ? "1" : "0");
         },
