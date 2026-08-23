@@ -1,0 +1,7 @@
+[
+    {
+        "keep": "FTQcHjbIhXXr",
+        "drop": "niSBP6nRco4D",
+        "why": "Handel's Passacaglia, twice: 74 bars each and the same opening note for note. The automatic test cannot see it, because one copy is titled for the movement ('Passacaglia') and the other for the suite it closes ('Suite No. 7 g minor HWV 432'), and sameWork holds different works apart by exactly that name. The kept copy carries six sustain-pedal marks and a rit. al fine; the dropped one carries no marking of any kind, which is why it was reported as sounding mechanical."
+    }
+]

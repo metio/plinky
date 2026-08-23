@@ -38,6 +38,14 @@ import { quantiserMarks } from "../core/transcriptionQuality.ts";
 import { sameWork, workTitle } from "../core/workTitle.ts";
 
 const OUT = "public/songs";
+// Duplicates a person found that the automatic test cannot: two copies of one work whose
+// TITLES name different things — a movement against the suite it belongs to, say — which
+// `sameWork` holds apart on purpose, because that is also what keeps Bach's two Menuets and
+// Schubert's three Ständchen separate.
+//
+// Kept as data rather than done by hand, because the manifest is rewritten from the
+// harvested corpora on every import: a deletion made once would come back with the next one.
+const PAIRS = "dev/catalog-duplicates.json";
 
 type Song = { id: string; title: string; composer: string; incipit?: string; bars: number };
 
@@ -131,9 +139,29 @@ async function main() {
         }
     }
 
-    const goneIds = new Set([...machineIds, ...extra.map((song) => song.id)]);
+    // The hand-found pairs, checked against the catalogue as it stands so a stale entry
+    // says so rather than passing silently — an id that is already gone, or a `keep` that
+    // is not there, means the list has drifted from the corpus and needs looking at.
+    const pairs: { keep: string; drop: string; why: string }[] = JSON.parse(
+        await readFile(PAIRS, "utf8"),
+    );
+    const present = new Set(manifest.map((song) => song.id));
+    const byHand: string[] = [];
+    for (const pair of pairs) {
+        if (!present.has(pair.drop)) {
+            continue;
+        }
+        if (!present.has(pair.keep)) {
+            console.error(`${PAIRS}: ${pair.keep} is not in the catalogue, so ${pair.drop} stays.`);
+            process.exit(1);
+        }
+        byHand.push(pair.drop);
+    }
+
+    const goneIds = new Set([...machineIds, ...extra.map((song) => song.id), ...byHand]);
     console.log(`beyond repair          : ${machine.length}`);
     console.log(`duplicate copies       : ${extra.length}`);
+    console.log(`duplicates found by ear: ${byHand.length}`);
     console.log(`catalogue              : ${manifest.length} → ${manifest.length - goneIds.size}`);
     for (const song of extra) {
         console.log(`   duplicate: ${song.id}  ${song.title} (${song.composer})`);
