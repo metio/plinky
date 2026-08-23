@@ -48,3 +48,20 @@ export const WithDue: Story = { args: { showDue: true, dueOnly: true } };
 export const AllToggles: Story = {
     args: { showDue: true, dueOnly: true, freshOnly: true, favoritesOnly: true },
 };
+
+// A phone. Every other story is 2xl wide, where nothing overflows and each group renders
+// as one comfortable row — which is to say none of them can see the state this component
+// was built for. At 390px the chips run past the edge of their track and the last one is
+// cut mid-word, and that clipped chip IS the affordance: it is what says there is more to
+// the right. Without this baseline a change that broke the strips would pass every
+// screenshot the component has.
+export const Narrow: Story = {
+    args: { showDue: true },
+    decorators: [
+        (Story) => (
+            <div className="w-[390px] space-y-2">
+                <Story />
+            </div>
+        ),
+    ],
+};
