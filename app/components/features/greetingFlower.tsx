@@ -31,6 +31,12 @@ import type { PartOfDay } from "../../../core/greeting";
 //
 // Everything is CSS. Nothing is fetched, nothing schedules a frame, and under
 // `motion-reduce` the plant simply stands there fully grown.
+// How long the stalk takes to draw itself, in seconds. The petals wait it out, so this
+// has to agree with `--animate-stem-draw` in app.css — the two are one gesture split
+// across a stylesheet and a component, and a petal opening on a half-grown stem is what
+// disagreement looks like.
+const STEM_SECONDS = 1.15;
+
 const PETALS = ["bg-spark", "bg-bloom-leaf", "bg-bloom-sky", "bg-plink", "bg-bloom-rose"];
 
 export function GreetingFlower({ when }: { when: PartOfDay }) {
@@ -73,12 +79,13 @@ export function GreetingFlower({ when }: { when: PartOfDay }) {
                                 key={colour}
                                 className={`absolute -left-2 -top-4 size-4 h-5 origin-[50%_100%] rounded-full ${colour} animate-petal-in motion-reduce:animate-none`}
                                 style={{
-                                    // Each petal takes its turn around the centre, and its turn in
-                                    // time: a negative delay starts the cycle already under way, so
-                                    // the first frame is a flower rather than a bare stem.
+                                    // Each petal takes its turn around the centre, and its
+                                    // turn in time. The wait is the stalk's own 1.15s plus
+                                    // the petal's place in the queue, so nothing opens on a
+                                    // stem that has not finished growing.
                                     ["--turn" as string]: `${at * 72}deg`,
                                     transform: `rotate(${at * 72}deg) translateY(-22%)`,
-                                    animationDelay: `-${at * 0.45}s`,
+                                    animationDelay: `${STEM_SECONDS + at * 0.13}s`,
                                 }}
                             />
                         ))}
