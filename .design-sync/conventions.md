@@ -50,15 +50,21 @@ outside the system.
 | Line | `line` `line-faint` `line-strong` | Hairlines, dividers, input borders |
 | Accent | `accent` `accent-strong` `accent-solid` `accent-surface` `accent-fill` `accent-line` | Anything pressable. A deep ink blue that stays cool |
 | Earned | `spark` `spark-strong` `spark-soft` `spark-surface` | Stars, grades, the day's own thing. Brass |
-| State | `success` `warn` `danger` `info` (each with `-surface`, `-line`, `-solid`) | Feedback |
+| State | `success` `warn` `danger` (each with `-surface`, `-line`, `-solid`) | Feedback |
 | Signature | `plink` | The dot on the i, and the note in the icon. Nowhere else |
 
 **Four families carry meaning and must never be borrowed for decoration.** `success` is
 the note the player found and `danger` the one they missed; `band-best` through
 `band-none` are the five bands of the daily share grid, matched to emoji and to hexes
 baked into an exported image; `hand-left` / `hand-right` distinguish the two hands on a
-staff; `grade-s` through `grade-f` are the grade letters. A decorative green on a screen
-where colour is the information is a lie.
+staff. A decorative green on a screen where colour is the information is a lie.
+
+Five colours are the exception, and they exist BECAUSE of that rule: `spark`, `plink`,
+`bloom-leaf`, `bloom-sky` and `bloom-rose` mean nothing anywhere in the app, which is what
+frees them to be brand furniture — the rule under the header and the petals of the front
+page's flower. Use them for decoration and never to say anything. A grade letter takes
+`spark` for the top tier and then the three state colours, because a grade IS a verdict;
+there is no separate palette for it.
 
 Two type tokens: `font-display` is Fredoka — a rounded sans, the wordmark's own
 letterforms — for anything titular; `font-sans` is Inter, for anything operable: controls,

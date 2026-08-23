@@ -121,3 +121,20 @@ missing an entry — which is what happened when the hand-made cards were replac
 - The reference storybook is not built by any repo gate, so nothing else would catch it
   breaking. Rebuild it whenever `.storybook/` or a story changes:
   `nix develop --command npx storybook build -c .storybook -o "$PWD/.design-sync/sb-reference"`.
+
+## Findings from the 2026-08-23 re-sync
+
+- **`info`, `love` and the seven `grade-*` colours were removed from the app** — grades take
+  `spark` plus the three state colours, `info` folded into `accent`, `love` into `plink`.
+  The conventions header named `info`, `grade-s` and `grade-f`; those three claims were
+  corrected. Anything naming a token has to be re-checked against `app/app.css` on each
+  sync — a header that names a colour which no longer resolves is worse than one that says
+  nothing, because the design agent will trust it and ship unstyled output.
+- **Three `[RENDER_THIN]` warnings are expected and benign**: `BacklogButton`,
+  `FavoriteButton`, `HelpLink` and `IncipitMark` are icon-only controls with no text, so
+  "mounts have no text" is what they are, not a fault. `Disclosure` reports 0px because it
+  is collapsed by default. Alongside the already-recorded `BottomNav` `[RENDER_BLANK]`,
+  that is the full known list — anything else in that family is new and worth looking at.
+- **`[FONT_MISSING] "SF Pro Rounded"` is expected.** It sits in `--font-display` as a
+  platform fallback behind Fredoka and Comfortaa; it is Apple's and we neither ship nor
+  want to ship it. The pane renders the two we do ship.
