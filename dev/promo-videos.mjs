@@ -8,7 +8,8 @@
 // asks it to run the app's own painter and encoder (dev/promo/renderPromo.ts). Nothing is
 // reimplemented here: a clip that does not look like Plinky is not worth posting.
 //
-// Usage: npm run promo:videos [-- --out dir] [--seconds 20] [--size 1080] [--youtube]
+// Usage: npm run promo:videos [-- --out dir] [--seconds 20] [--size 1080] [--fps 60]
+//                             [--youtube] [--only text] [--resume] [--synth]
 //
 // Everything lands under promo/<composer>/<piece>/: reel.mp4 from a plain run, youtube.mp4
 // from --youtube, and thumb.png from npm run promo:thumbs.
@@ -38,7 +39,13 @@ const SIZE = Number(argValue("--size") ?? 1080);
 const YOUTUBE = process.argv.includes("--youtube");
 const WIDTH = YOUTUBE ? 1920 : SIZE;
 const HEIGHT = YOUTUBE ? 1080 : SIZE;
-const FPS = 30;
+// The falling-notes highway is continuous motion, so frames are where its quality lives.
+// 60 is the ceiling rather than a preference: core/videoEncoding.ts tops out at H.264
+// level 4.2, which covers 1080p60 exactly and nothing beyond it — a limit chosen so an
+// exported video hardware-decodes wherever it is shared, which is not a trade worth
+// reversing for a clip. The bitrate follows the pixel rate on its own, so asking for more
+// frames asks for more bits without a second dial.
+const FPS = Number(argValue("--fps") ?? 60);
 // The looks these clips use, named from core/videoLook — the same choices the export
 // panel offers a player, so nothing here is a palette of its own. Colouring by finger is
 // fixed across every clip: a viewer who watches two of them learns that the red notes are
@@ -181,10 +188,14 @@ try {
 
     let failed = 0;
     let skipped = 0;
+    // Pieces --only asked not to render. Counted apart from the ones already on disk,
+    // because both are "not attempted" and only one of them means the batch is done.
+    let filtered = 0;
     // A piece that fails to render is reported and skipped, so one bad score does not cost
     // the whole run.
     for (const piece of PIECES) {
         if (ONLY && !piece.title.toLowerCase().includes(ONLY.toLowerCase())) {
+            filtered += 1;
             continue;
         }
         if (RESUME && existsSync(fileFor(piece, OUT))) {
@@ -252,10 +263,11 @@ try {
     }
     // Named rather than folded into the total: a run that quietly reports "55/55" after
     // rendering eight of them reads as complete coverage when it is not.
-    const attempted = PIECES.length - skipped;
+    const attempted = PIECES.length - skipped - filtered;
     console.log(
         `${attempted - failed}/${attempted} rendered into ${OUT}/` +
-            (skipped > 0 ? `, ${skipped} already there` : ""),
+            (skipped > 0 ? `, ${skipped} already there` : "") +
+            (filtered > 0 ? `, ${filtered} not asked for` : ""),
     );
     await browser.close();
 } finally {
