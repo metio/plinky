@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Koľko priestoru okolo klavíra počuješ. Uber, ak sa zvuk na reproduktore telefónu zlieva.",
     "rhythm_speed_heading": "Tvoje tempo",
     "rhythm_speed_hint": "Čiarkovaná čiara je tempo, ktoré si nastavil. Nad ňou si sa ponáhľal, pod ňou spomaľoval — a každý bod má farbu svojej noty hore.",
-    "rhythm_speed_target": "tvoje tempo: {bpm}"
+    "rhythm_speed_target": "tvoje tempo: {bpm}",
+    "music_filters_none": "Všetky skladby",
+    "music_filters_grades": "Stupne {list}"
 }

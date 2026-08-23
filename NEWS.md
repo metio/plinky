@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Filtering the library is one line now.** Kind, grade and what to show used to be
+three rows of chips that ran off the side of a phone screen, so grades 5 to 8 and the
+"due now" filter were there but out of sight. In their place is a single line that
+says what you are looking at — "Songs · Grades 3, 4 · ★ Favourites" — and opens to the
+full set when you tap it, with every option on screen at once. Closed, it hands the
+page back to the music: four pieces are in view where none used to be.
+
 **The front page grows a flower, and it knows what time it is.** Beside the greeting a
 small plant now grows itself as you arrive: the stalk draws up from the ground, then
 the petals open on it one after another, each a different colour. It opens in the

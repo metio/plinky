@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Hoeveel ruimte je om de piano heen hoort. Zet hem lager als het geluid op een telefoonspeaker vaag wordt.",
     "rhythm_speed_heading": "Je tempo",
     "rhythm_speed_hint": "De stippellijn is het tempo dat je koos. Erboven ging je te snel, eronder te traag — en elke stip heeft de kleur van zijn noot hierboven.",
-    "rhythm_speed_target": "jouw tempo: {bpm}"
+    "rhythm_speed_target": "jouw tempo: {bpm}",
+    "music_filters_none": "Alle stukken",
+    "music_filters_grades": "Niveaus {list}"
 }

@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Cuánta sala oyes alrededor del piano. Bájala si el sonido se emborrona en el altavoz del móvil.",
     "rhythm_speed_heading": "Tu velocidad",
     "rhythm_speed_hint": "La línea discontinua es el tempo que fijaste. Por encima ibas deprisa, por debajo despacio — y cada punto lleva el color de su nota de arriba.",
-    "rhythm_speed_target": "tu tempo: {bpm}"
+    "rhythm_speed_target": "tu tempo: {bpm}",
+    "music_filters_none": "Todas las piezas",
+    "music_filters_grades": "Grados {list}"
 }

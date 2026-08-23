@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Hvor mye rom du hører rundt pianoet. Skru ned hvis lyden blir grøtete i en telefonhøyttaler.",
     "rhythm_speed_heading": "Tempoet ditt",
     "rhythm_speed_hint": "Den stiplede linjen er tempoet du valgte. Over den hastet du, under den slepte du — og hver prikk har fargen til noten sin over.",
-    "rhythm_speed_target": "tempoet ditt: {bpm}"
+    "rhythm_speed_target": "tempoet ditt: {bpm}",
+    "music_filters_none": "Alle stykker",
+    "music_filters_grades": "Trinn {list}"
 }

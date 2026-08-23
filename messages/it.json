@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Quanta sala senti intorno al pianoforte. Abbassala se il suono risulta impastato sull'altoparlante del telefono.",
     "rhythm_speed_heading": "La tua velocità",
     "rhythm_speed_hint": "La linea tratteggiata è il tempo che hai impostato. Sopra correvi, sotto trascinavi — e ogni punto ha il colore della sua nota qui sopra.",
-    "rhythm_speed_target": "il tuo tempo: {bpm}"
+    "rhythm_speed_target": "il tuo tempo: {bpm}",
+    "music_filters_none": "Tutti i brani",
+    "music_filters_grades": "Livelli {list}"
 }

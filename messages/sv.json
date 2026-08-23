@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Hur mycket rum du hör runt pianot. Skruva ner om ljudet blir grumligt i en telefonhögtalare.",
     "rhythm_speed_heading": "Ditt tempo",
     "rhythm_speed_hint": "Den streckade linjen är tempot du valde. Ovanför skyndade du, under släpade du — och varje punkt har färgen från sin not ovanför.",
-    "rhythm_speed_target": "ditt tempo: {bpm}"
+    "rhythm_speed_target": "ditt tempo: {bpm}",
+    "music_filters_none": "Alla stycken",
+    "music_filters_grades": "Nivåer {list}"
 }

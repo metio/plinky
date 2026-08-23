@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Ile pomieszczenia słychać wokół fortepianu. Zmniejsz, jeśli dźwięk się zlewa na głośniku telefonu.",
     "rhythm_speed_heading": "Twoje tempo",
     "rhythm_speed_hint": "Linia przerywana to tempo, które ustawiłeś. Powyżej śpieszyłeś, poniżej zwalniałeś — a każda kropka ma kolor swojej nuty powyżej.",
-    "rhythm_speed_target": "twoje tempo: {bpm}"
+    "rhythm_speed_target": "twoje tempo: {bpm}",
+    "music_filters_none": "Wszystkie utwory",
+    "music_filters_grades": "Stopnie {list}"
 }

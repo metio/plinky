@@ -79,4 +79,43 @@ describe("MusicFilters", () => {
         fireEvent.click(chip);
         expect(onToggle).toHaveBeenCalledTimes(1);
     });
+
+    it("says so in one word when nothing is filtering the list", () => {
+        mount();
+        // The summary is the one control that expands, so that is how it is found — its
+        // label is the thing under test and must not also be the selector.
+        expect(screen.getByRole("button", { expanded: false }).textContent).toContain(
+            m.music_filters_none(),
+        );
+    });
+
+    it("reads the live filters back in the summary line", () => {
+        mount({
+            kind: "song",
+            grades: new Set([4, 2]),
+            favoritesOnly: true,
+        });
+        const summary = screen.getByRole("button", { expanded: false });
+        expect(summary.textContent).toContain(
+            `${m.music_kind_songs()} · ${m.music_filters_grades({ list: "2, 4" })} · ${m.scores_filter_favorites()}`,
+        );
+        // Four narrowings: the kind, each of the two grades, and the favourites toggle.
+        expect(summary.textContent).toContain("4");
+    });
+
+    it("names a lone grade in the singular rather than as a list of one", () => {
+        mount({ grades: new Set([6]) });
+        expect(screen.getByRole("button", { expanded: false }).textContent).toContain(
+            m.score_grade({ grade: 6 }),
+        );
+    });
+
+    it("opens the groups when the summary is pressed", () => {
+        mount();
+        const summary = screen.getByRole("button", { expanded: false });
+        fireEvent.click(summary);
+        expect(summary.getAttribute("aria-expanded")).toBe("true");
+        const panel = document.getElementById(summary.getAttribute("aria-controls") as string);
+        expect(panel?.className).not.toContain("hidden");
+    });
 });

@@ -1273,5 +1273,7 @@
     "settings_reverb_hint": "Kuinka paljon tilaa kuulet pianon ympärillä. Vähennä, jos ääni puuroutuu puhelimen kaiuttimessa.",
     "rhythm_speed_heading": "Vauhtisi",
     "rhythm_speed_hint": "Katkoviiva on asettamasi tempo. Sen yläpuolella kiirehdit, alapuolella laahasit — ja jokainen piste on saman värinen kuin nuottinsa yllä.",
-    "rhythm_speed_target": "tempo: {bpm}"
+    "rhythm_speed_target": "tempo: {bpm}",
+    "music_filters_none": "Kaikki kappaleet",
+    "music_filters_grades": "Tasot {list}"
 }
