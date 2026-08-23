@@ -92,7 +92,9 @@ export function assertPages() {
     const pages = readPages();
 
     if (pages.length < 2) {
-        throw new Error(`${ROUTES}: parsed ${pages.length} pages — the route table cannot be that small`);
+        throw new Error(
+            `${ROUTES}: parsed ${pages.length} pages — the route table cannot be that small`,
+        );
     }
     // Every call in the block must have produced an entry, so a shape the regex cannot
     // read is caught rather than skipped.
@@ -107,7 +109,9 @@ export function assertPages() {
     // argument, which would otherwise surface as a mystery 404 much later.
     for (const page of pages) {
         if (page.module && !existsSync(`app/${page.module}`)) {
-            throw new Error(`${ROUTES}: parsed module app/${page.module} for ${page.path}, which does not exist`);
+            throw new Error(
+                `${ROUTES}: parsed module app/${page.module} for ${page.path}, which does not exist`,
+            );
         }
     }
     // noindexPaths() matches one exact call, so renaming or reformatting it would leave the

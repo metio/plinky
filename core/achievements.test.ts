@@ -54,9 +54,7 @@ describe("collectAchievements", () => {
             flawless: true,
             stars: new Set(["bronze", "gold"]),
         });
-        const earned = new Set(
-            badges.filter((badge) => badge.earned).map((badge) => badge.id),
-        );
+        const earned = new Set(badges.filter((badge) => badge.earned).map((badge) => badge.id));
         expect(earned).toEqual(new Set(["first-s", "flawless", "star-bronze", "star-gold"]));
     });
 

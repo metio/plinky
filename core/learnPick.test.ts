@@ -8,14 +8,20 @@ const settled = { keyboardMet: true, placementTaken: true, courseDone: false };
 
 describe("learnPick", () => {
     it("offers the keyboard before anything else to someone who has never found middle C", () => {
-        expect(learnPick({ keyboardMet: false, placementTaken: false, courseDone: false, day: 3 })).toBe("basics");
+        expect(
+            learnPick({ keyboardMet: false, placementTaken: false, courseDone: false, day: 3 }),
+        ).toBe("basics");
         // Still first even for a reader the test has already placed: the tour is the
         // one step that assumes nothing at all.
-        expect(learnPick({ keyboardMet: false, placementTaken: true, courseDone: false, day: 3 })).toBe("basics");
+        expect(
+            learnPick({ keyboardMet: false, placementTaken: true, courseDone: false, day: 3 }),
+        ).toBe("basics");
     });
 
     it("offers the level test once the keyboard is met", () => {
-        expect(learnPick({ keyboardMet: true, placementTaken: false, courseDone: false, day: 3 })).toBe("placement");
+        expect(
+            learnPick({ keyboardMet: true, placementTaken: false, courseDone: false, day: 3 }),
+        ).toBe("placement");
     });
 
     it("rotates the four references once both one-off steps are behind you", () => {
@@ -24,9 +30,7 @@ describe("learnPick", () => {
     });
 
     it("stops offering the course once there is nothing left of it", () => {
-        const week = [0, 1, 2, 3].map((day) =>
-            learnPick({ ...settled, courseDone: true, day }),
-        );
+        const week = [0, 1, 2, 3].map((day) => learnPick({ ...settled, courseDone: true, day }));
         expect(week).toEqual(["glossary", "methods", "tools", "glossary"]);
         expect(week).not.toContain("theory");
     });
@@ -44,7 +48,14 @@ describe("learnPick", () => {
     });
 
     it("gives every pick somewhere to go", () => {
-        const ids: LearnPickId[] = ["basics", "placement", "theory", "glossary", "methods", "tools"];
+        const ids: LearnPickId[] = [
+            "basics",
+            "placement",
+            "theory",
+            "glossary",
+            "methods",
+            "tools",
+        ];
         for (const id of ids) {
             expect(LEARN_PICK_HREF[id]).toMatch(/^\/[a-z]+$/);
         }

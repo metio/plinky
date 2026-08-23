@@ -5,13 +5,7 @@ import { summarizeDynamics } from "./dynamics";
 import { type ExpressionNote, summarizeExpression } from "./expressionGrade";
 import { computeFlow } from "./flow";
 import { computeGrade, type Grade } from "./grade";
-import {
-    LENIENT_TOLERANCE,
-    makeHit,
-    PRECISE_TOLERANCE,
-    summarize,
-    timingDeltas,
-} from "./rhythm";
+import { LENIENT_TOLERANCE, makeHit, PRECISE_TOLERANCE, summarize, timingDeltas } from "./rhythm";
 import { type Grid, handGrid, type RunNote } from "./shareCard";
 import { findHotspots, type Hotspot, median, type TempoPoint, tempoSeries } from "./tempo";
 

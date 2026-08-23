@@ -115,7 +115,15 @@ export type PerfectPitchConfig = {
 export const CHORD_LEVELS: ChordQuality[][] = [
     ["major", "minor"],
     ["major", "minor", "diminished", "augmented"],
-    ["major", "minor", "diminished", "augmented", "dominant-seventh", "minor-seventh", "major-seventh"],
+    [
+        "major",
+        "minor",
+        "diminished",
+        "augmented",
+        "dominant-seventh",
+        "minor-seventh",
+        "major-seventh",
+    ],
     [
         "major",
         "minor",
@@ -134,7 +142,16 @@ export const CHORD_LEVELS: ChordQuality[][] = [
 export const SCALE_LEVELS: ScaleId[][] = [
     ["major", "natural-minor"],
     ["major", "natural-minor", "harmonic-minor", "melodic-minor"],
-    ["major", "natural-minor", "harmonic-minor", "melodic-minor", "dorian", "phrygian", "lydian", "mixolydian"],
+    [
+        "major",
+        "natural-minor",
+        "harmonic-minor",
+        "melodic-minor",
+        "dorian",
+        "phrygian",
+        "lydian",
+        "mixolydian",
+    ],
     [
         "major",
         "natural-minor",
@@ -514,7 +531,12 @@ export function generateIntervalContext(
     const start = cadence.endsAt + AFTER_CADENCE_GAP;
     const notes: EarNote[] = [
         { note: root, at: start, velocity: VELOCITY, duration: NOTE_SECONDS },
-        { note: root + semitones, at: start + MELODIC_GAP, velocity: VELOCITY, duration: NOTE_SECONDS },
+        {
+            note: root + semitones,
+            at: start + MELODIC_GAP,
+            velocity: VELOCITY,
+            duration: NOTE_SECONDS,
+        },
     ];
     return {
         kind: "intervals-context",
@@ -564,9 +586,15 @@ export function generateQuestion(
         case "perfect-pitch":
             return generatePerfectPitch({ naturalsOnly: true, ...range }, rng);
         case "chords":
-            return generateChord({ qualities: CHORD_LEVELS[level] ?? CHORD_LEVELS[0]!, ...range }, rng);
+            return generateChord(
+                { qualities: CHORD_LEVELS[level] ?? CHORD_LEVELS[0]!, ...range },
+                rng,
+            );
         case "scales":
-            return generateScale({ scales: SCALE_LEVELS[level] ?? SCALE_LEVELS[0]!, ...range }, rng);
+            return generateScale(
+                { scales: SCALE_LEVELS[level] ?? SCALE_LEVELS[0]!, ...range },
+                rng,
+            );
         case "progressions":
             return generateProgression(
                 {

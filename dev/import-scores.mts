@@ -27,7 +27,6 @@ import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
 import { songId } from "../core/songId.ts";
 import { licenseDir, licenseInfo } from "../core/attribution.ts";
 
-
 const OUT = "public/songs";
 const SOURCES_DIR = "sources";
 
@@ -334,7 +333,9 @@ async function main() {
     for (const song of merged) {
         histogram[song.grade] = (histogram[song.grade] ?? 0) + 1;
     }
-    console.log(`\nCatalogue now ${merged.length} songs (${kept.length} kept + ${added.length} ${key}).`);
+    console.log(
+        `\nCatalogue now ${merged.length} songs (${kept.length} kept + ${added.length} ${key}).`,
+    );
     console.log(`Grades: ${histogram.slice(1).join(" / ")}`);
     console.log("→ Run `npm run songs:bake` to finalise grade boundaries + seed.");
 }

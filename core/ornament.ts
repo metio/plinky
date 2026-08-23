@@ -28,7 +28,8 @@ export type OrnamentNote = {
 // which is all a neighbour needs.
 export function keyPitchClasses(fifths: number): Set<number> {
     // Each sharp moves the tonic up a fifth; each flat down one. Seven semitones per fifth.
-    const tonic = (((fifths * 7) % SEMITONES_PER_OCTAVE) + SEMITONES_PER_OCTAVE) % SEMITONES_PER_OCTAVE;
+    const tonic =
+        (((fifths * 7) % SEMITONES_PER_OCTAVE) + SEMITONES_PER_OCTAVE) % SEMITONES_PER_OCTAVE;
     const major = [0, 2, 4, 5, 7, 9, 11];
     return new Set(major.map((step) => (tonic + step) % SEMITONES_PER_OCTAVE));
 }
@@ -103,10 +104,7 @@ export function ornamentNotes(
                 : [below, pitch, above];
     const leadEach = Math.min(FIGURE_NOTE_QUARTERS, (quarters * 0.5) / lead.length);
     const rest = quarters - leadEach * lead.length;
-    return [
-        ...lead.map((one) => ({ pitch: one, quarters: leadEach })),
-        { pitch, quarters: rest },
-    ];
+    return [...lead.map((one) => ({ pitch: one, quarters: leadEach })), { pitch, quarters: rest }];
 }
 
 // The key signature a piece lands in when it is transposed.

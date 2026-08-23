@@ -91,7 +91,10 @@ describe("ghost codec", () => {
 
         it.each([
             ["a partial run starts mid-piece", { partial: true, raceGhost: true }],
-            ["an ephemeral piece keeps no ghost", { partial: false, ephemeral: true, raceGhost: true }],
+            [
+                "an ephemeral piece keeps no ghost",
+                { partial: false, ephemeral: true, raceGhost: true },
+            ],
             ["the player declined the race", { partial: false, raceGhost: false }],
         ])("races nothing when %s", (_reason, options) => {
             expect(ghostToRace({ ...options, ...candidates })).toBeNull();

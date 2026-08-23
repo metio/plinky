@@ -150,12 +150,7 @@ type OpenSpans = {
     volume: number;
 };
 
-function readDirection(
-    direction: Element,
-    at: number,
-    out: XmlDirections,
-    open: OpenSpans,
-): void {
+function readDirection(direction: Element, at: number, out: XmlDirections, open: OpenSpans): void {
     // The soft pedal has no element of its own in MusicXML: it is written in words, the way
     // rit. is, and released by "tre corde". 59 pieces in the catalogue ask for it. Under it
     // the hammers strike fewer strings, so notes are gentler and slightly veiled — the
@@ -402,7 +397,6 @@ export function tempoAt(points: readonly TempoPoint[], whole: number): number | 
 // Printed onsets are exact binary fractions in every ordinary metre, but a triplet is a
 // third, so a mark written at one needs room for a rounded value.
 const TEMPO_EPSILON = 1e-9;
-
 
 // The key in force at a point in the piece.
 //

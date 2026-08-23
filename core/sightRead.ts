@@ -38,10 +38,7 @@ export type SightReadRecord = {
 // The first read is the one that counts, so a stored record is never replaced. A
 // later read of the same piece is a re-read, not a sight-read, and silently
 // overwriting would quietly turn a true first-sight number into a practised one.
-export function firstRead(
-    current: SightReadRecord | null,
-    next: SightReadRecord,
-): SightReadRecord {
+export function firstRead(current: SightReadRecord | null, next: SightReadRecord): SightReadRecord {
     return current ?? next;
 }
 

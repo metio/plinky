@@ -116,4 +116,3 @@ describe("the copyrighted-works denylist beats the traditional label", () => {
         expect(isPublicDomain("Traditional", "Greensleeves")).toBe(true);
     });
 });
-

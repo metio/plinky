@@ -117,7 +117,10 @@ describe("symbolsInScore", () => {
     it("only counts a tie that is drawn", () => {
         // <tie> is the sounding instruction; <tied> is the curve a reader can see and
         // ask about. A piece with only the former has nothing on the page to explain.
-        const soundingOnly = PLAIN.replace("<type>whole</type>", '<tie type="start"/><type>whole</type>');
+        const soundingOnly = PLAIN.replace(
+            "<type>whole</type>",
+            '<tie type="start"/><type>whole</type>',
+        );
 
         expect(ids(soundingOnly)).not.toContain("tie");
     });

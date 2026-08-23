@@ -35,4 +35,3 @@ export function regionFor(regions, pitch, velocity) {
     }
     return best;
 }
-

@@ -139,11 +139,7 @@ describe("positions with no notes", () => {
     it("charges nothing for the empty position itself", () => {
         // The silence contributes neither a chord shape nor a move, so the total is
         // exactly what the two sounding chords cost on their own.
-        const fingers = [
-            [1, 3],
-            [],
-            [1, 5],
-        ];
+        const fingers = [[1, 3], [], [1, 5]];
         expect(positionsCost(withGap, fingers, "right")).toBe(
             positionsCost([[60, 64]], [[1, 3]], "right") +
                 positionsCost([[67, 72]], [[1, 5]], "right"),

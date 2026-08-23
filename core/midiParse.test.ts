@@ -71,11 +71,8 @@ describe("parseMidiFile", () => {
         // pair, end-of-track. A zero tempo would otherwise drive tempo to Infinity.
         const bytes = new Uint8Array([
             0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x01, 0xe0,
-            0x4d, 0x54, 0x72, 0x6b, 0x00, 0x00, 0x00, 0x13,
-            0x00, 0xff, 0x51, 0x03, 0x00, 0x00, 0x00,
-            0x00, 0x90, 0x3c, 0x40,
-            0x60, 0x80, 0x3c, 0x00,
-            0x00, 0xff, 0x2f, 0x00,
+            0x4d, 0x54, 0x72, 0x6b, 0x00, 0x00, 0x00, 0x13, 0x00, 0xff, 0x51, 0x03, 0x00, 0x00,
+            0x00, 0x00, 0x90, 0x3c, 0x40, 0x60, 0x80, 0x3c, 0x00, 0x00, 0xff, 0x2f, 0x00,
         ]);
         const parsed = parseMidiFile(bytes);
         expect(parsed).not.toBeNull();
@@ -139,7 +136,12 @@ describe("parseMidiFile", () => {
         // length prefix is what says where it ends — misreading it would desynchronize
         // the stream and turn every following event into garbage.
         const events = [
-            0x00, 0xf0, 0x03, 0x7e, 0x7f, 0x09, // sysex, three bytes
+            0x00,
+            0xf0,
+            0x03,
+            0x7e,
+            0x7f,
+            0x09, // sysex, three bytes
             ...ONE_NOTE,
         ];
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
@@ -150,8 +152,12 @@ describe("parseMidiFile", () => {
         // Program change (0xC0) and channel pressure (0xD0) each carry a single data
         // byte. Consuming two would swallow the next event's delta time.
         const events = [
-            0x00, 0xc0, 0x05, // program change
-            0x00, 0xd0, 0x40, // channel pressure
+            0x00,
+            0xc0,
+            0x05, // program change
+            0x00,
+            0xd0,
+            0x40, // channel pressure
             ...ONE_NOTE,
         ];
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
@@ -163,8 +169,14 @@ describe("parseMidiFile", () => {
         // two. A DAW export is full of them, so a wrong step here corrupts every note
         // that follows rather than failing loudly.
         const events = [
-            0x00, 0xb0, 0x40, 0x7f, // control change: sustain down
-            0x00, 0xe0, 0x00, 0x40, // pitch bend: centre
+            0x00,
+            0xb0,
+            0x40,
+            0x7f, // control change: sustain down
+            0x00,
+            0xe0,
+            0x00,
+            0x40, // pitch bend: centre
             ...ONE_NOTE,
         ];
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
@@ -175,11 +187,26 @@ describe("parseMidiFile", () => {
         // The same key struck twice before either release: the first note-off closes the
         // first note, so a held repeat cannot borrow the later onset's start.
         const events = [
-            0x00, 0x90, 0x3c, 0x40, //       note-on C4
-            0x30, 0x90, 0x3c, 0x50, //       note-on C4 again, 48 ticks later
-            0x30, 0x80, 0x3c, 0x00, //       note-off C4 closes the first
-            0x30, 0x80, 0x3c, 0x00, //       note-off C4 closes the second
-            0x00, 0xff, 0x2f, 0x00,
+            0x00,
+            0x90,
+            0x3c,
+            0x40, //       note-on C4
+            0x30,
+            0x90,
+            0x3c,
+            0x50, //       note-on C4 again, 48 ticks later
+            0x30,
+            0x80,
+            0x3c,
+            0x00, //       note-off C4 closes the first
+            0x30,
+            0x80,
+            0x3c,
+            0x00, //       note-off C4 closes the second
+            0x00,
+            0xff,
+            0x2f,
+            0x00,
         ];
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
         expect(parsed!.notes.map((n) => n.velocity)).toEqual([0x40, 0x50]);
@@ -190,10 +217,22 @@ describe("parseMidiFile", () => {
     it("drops a note-on that is never released", () => {
         // A stuck note has no duration to give it, so it cannot be rendered.
         const events = [
-            0x00, 0x90, 0x3c, 0x40, // note-on C4, never released
-            0x00, 0x90, 0x40, 0x40, // note-on E4
-            0x60, 0x80, 0x40, 0x00, // note-off E4
-            0x00, 0xff, 0x2f, 0x00,
+            0x00,
+            0x90,
+            0x3c,
+            0x40, // note-on C4, never released
+            0x00,
+            0x90,
+            0x40,
+            0x40, // note-on E4
+            0x60,
+            0x80,
+            0x40,
+            0x00, // note-off E4
+            0x00,
+            0xff,
+            0x2f,
+            0x00,
         ];
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
         expect(parsed!.notes.map((n) => n.pitch)).toEqual([64]);
@@ -208,9 +247,18 @@ describe("parseMidiFile", () => {
         // Note-on and note-off at the same tick: a real capture of the shortest possible
         // tap. A zero duration would make it silent (and unrenderable) instead.
         const events = [
-            0x00, 0x90, 0x3c, 0x40,
-            0x00, 0x80, 0x3c, 0x00, // note-off at the same tick
-            0x00, 0xff, 0x2f, 0x00,
+            0x00,
+            0x90,
+            0x3c,
+            0x40,
+            0x00,
+            0x80,
+            0x3c,
+            0x00, // note-off at the same tick
+            0x00,
+            0xff,
+            0x2f,
+            0x00,
         ];
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
         expect(parsed!.notes).toHaveLength(1);
@@ -221,11 +269,24 @@ describe("parseMidiFile", () => {
         // Two note-ons then two note-offs, each second event omitting its status byte and
         // inheriting the previous one — what any DAW writes to save space.
         const events = [
-            0x00, 0x90, 0x3c, 0x40, // note-on C4
-            0x00, 0x40, 0x40, //       running status: note-on E4
-            0x60, 0x80, 0x3c, 0x00, // note-off C4
-            0x00, 0x40, 0x00, //       running status: note-off E4
-            0x00, 0xff, 0x2f, 0x00, // end of track
+            0x00,
+            0x90,
+            0x3c,
+            0x40, // note-on C4
+            0x00,
+            0x40,
+            0x40, //       running status: note-on E4
+            0x60,
+            0x80,
+            0x3c,
+            0x00, // note-off C4
+            0x00,
+            0x40,
+            0x00, //       running status: note-off E4
+            0x00,
+            0xff,
+            0x2f,
+            0x00, // end of track
         ];
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
         expect(parsed!.notes.map((n) => n.pitch).sort()).toEqual([60, 64]);
@@ -251,11 +312,7 @@ describe("parseMidiFile", () => {
         });
 
         it("keeps onsets forward when a delta time overflows", () => {
-            const events = [
-                ...ONE_NOTE,
-                ...OVERFLOW_VLQ,
-                0x90, 0x3e, 0x40, 0x60, 0x80, 0x3e, 0x00,
-            ];
+            const events = [...ONE_NOTE, ...OVERFLOW_VLQ, 0x90, 0x3e, 0x40, 0x60, 0x80, 0x3e, 0x00];
             const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
             expect(parsed?.notes.every((n) => Number.isFinite(n.startMs) && n.startMs >= 0)).toBe(
                 true,

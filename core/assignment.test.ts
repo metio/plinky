@@ -122,9 +122,8 @@ describe("nextAssignmentStep", () => {
 
     it("points at the first unlearned step of the first open assignment", () => {
         const learned = new Set(["a1", "a2"]);
-        const next = nextAssignmentStep(
-            [set("First steps", ["a1", "a2", "a3", "a4"])],
-            (id) => learned.has(id),
+        const next = nextAssignmentStep([set("First steps", ["a1", "a2", "a3", "a4"])], (id) =>
+            learned.has(id),
         );
         expect(next).toEqual({ name: "First steps", step: 3, total: 4, scoreId: "a3" });
     });
@@ -132,9 +131,8 @@ describe("nextAssignmentStep", () => {
     it("skips finished assignments and reports null when everything is done", () => {
         const learned = new Set(["a1", "b1"]);
         expect(
-            nextAssignmentStep(
-                [set("done", ["a1"]), set("open", ["b1", "b2"])],
-                (id) => learned.has(id),
+            nextAssignmentStep([set("done", ["a1"]), set("open", ["b1", "b2"])], (id) =>
+                learned.has(id),
             ),
         ).toEqual({ name: "open", step: 2, total: 2, scoreId: "b2" });
         expect(nextAssignmentStep([set("done", ["a1"])], (id) => learned.has(id))).toBeNull();
@@ -210,8 +208,10 @@ describe("nextAssignmentStep with missing pieces", () => {
     it("yields no pointer when every remaining step is missing", () => {
         const missing = new Set(["dead", "gone"]);
         expect(
-            nextAssignmentStep([set("Set", ["dead", "gone"])], () => false, (id) =>
-                missing.has(id),
+            nextAssignmentStep(
+                [set("Set", ["dead", "gone"])],
+                () => false,
+                (id) => missing.has(id),
             ),
         ).toBeNull();
     });
@@ -410,21 +410,30 @@ describe("withItemTempo rejects what a save would discard", () => {
 
 describe("a set worked toward a date", () => {
     it("keeps a real calendar date and drops one that is not", () => {
-        expect(makeAssignment({ name: "Recital", dueOn: "2026-07-04", items: [{ id: "a" }] }).dueOn).toBe(
-            "2026-07-04",
-        );
-        expect(makeAssignment({ name: "Recital", dueOn: "2026-02-31", items: [{ id: "a" }] }).dueOn)
-            .toBeUndefined();
+        expect(
+            makeAssignment({ name: "Recital", dueOn: "2026-07-04", items: [{ id: "a" }] }).dueOn,
+        ).toBe("2026-07-04");
+        expect(
+            makeAssignment({ name: "Recital", dueOn: "2026-02-31", items: [{ id: "a" }] }).dueOn,
+        ).toBeUndefined();
         expect(makeAssignment({ name: "Recital", items: [{ id: "a" }] }).dueOn).toBeUndefined();
     });
 
     it("travels with a shared set — a handed-out programme carries its date", () => {
-        const assignment = makeAssignment({ name: "Exam", dueOn: "2026-07-04", items: [{ id: "a" }, { id: "b" }] });
+        const assignment = makeAssignment({
+            name: "Exam",
+            dueOn: "2026-07-04",
+            items: [{ id: "a" }, { id: "b" }],
+        });
         expect(decodeAssignmentLink(encodeAssignmentLink(assignment))?.dueOn).toBe("2026-07-04");
     });
 
     it("survives the file round trip", () => {
-        const assignment = makeAssignment({ name: "Exam", dueOn: "2026-07-04", items: [{ id: "a" }] });
+        const assignment = makeAssignment({
+            name: "Exam",
+            dueOn: "2026-07-04",
+            items: [{ id: "a" }],
+        });
         expect(parseAssignment(serializeAssignment(assignment)).dueOn).toBe("2026-07-04");
     });
 

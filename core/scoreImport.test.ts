@@ -18,9 +18,9 @@ describe("hasPitchedNotes", () => {
     });
 
     it("rejects a score of nothing but rests", () => {
-        expect(hasPitchedNotes(domXmlCodec, score("<note><rest/><duration>4</duration></note>"))).toBe(
-            false,
-        );
+        expect(
+            hasPitchedNotes(domXmlCodec, score("<note><rest/><duration>4</duration></note>")),
+        ).toBe(false);
     });
 
     it("rejects what is not a score at all", () => {

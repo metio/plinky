@@ -232,19 +232,17 @@ export type UpcomingStep = {
 };
 
 export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[] {
-    return state.steps
-        .slice(state.index, state.index + count)
-        .map((step, offset) => ({
-            index: state.index + offset,
-            pitches: step.pitches,
-            pitchStaves: step.pitchStaves,
-            pitchHands: step.pitchHands,
-            staves: step.staves,
-            atMs: step.elapsedMs,
-            pitchHoldsMs: step.pitches.map(
-                (_, note) => step.expected?.[note]?.writtenHoldMs ?? step.holdMs,
-            ),
-        }));
+    return state.steps.slice(state.index, state.index + count).map((step, offset) => ({
+        index: state.index + offset,
+        pitches: step.pitches,
+        pitchStaves: step.pitchStaves,
+        pitchHands: step.pitchHands,
+        staves: step.staves,
+        atMs: step.elapsedMs,
+        pitchHoldsMs: step.pitches.map(
+            (_, note) => step.expected?.[note]?.writtenHoldMs ?? step.holdMs,
+        ),
+    }));
 }
 
 // The 0-based bar the current position sits in; the final bar once complete.
@@ -340,7 +338,12 @@ export function matchNote(
     }
 
     if (forgiving && state.steps[state.index + 1]?.pitches.includes(note)) {
-        let next = clear(state, state.hit.map((arrival) => arrival.note), events, at);
+        let next = clear(
+            state,
+            state.hit.map((arrival) => arrival.note),
+            events,
+            at,
+        );
         if (!next.complete) {
             const nextExpected = expectedPitches(next);
             if (nextExpected.includes(note)) {

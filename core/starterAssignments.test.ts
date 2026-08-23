@@ -31,7 +31,11 @@ describe("starterAssignment", () => {
     });
 
     it("still builds from the demos alone when no study qualifies", () => {
-        const assignment = starterAssignment({ ...base, demos: [{ id: "twinkle" }], exercises: [] });
+        const assignment = starterAssignment({
+            ...base,
+            demos: [{ id: "twinkle" }],
+            exercises: [],
+        });
         expect(assignment?.items).toEqual([{ id: "twinkle" }]);
     });
 

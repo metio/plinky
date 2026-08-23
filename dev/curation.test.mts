@@ -52,7 +52,10 @@ describe("parseCuration", () => {
     });
 
     it("keeps one entry per piece, so two lines cannot disagree", () => {
-        const { curations, problems } = parseCuration([entry(), entry({ title: "Something else" })]);
+        const { curations, problems } = parseCuration([
+            entry(),
+            entry({ title: "Something else" }),
+        ]);
         expect(curations).toHaveLength(1);
         expect(problems[0]).toContain("repeats aaa");
     });
@@ -97,7 +100,9 @@ describe("curate", () => {
     it("counts a correction applied by another catalogue as applied", () => {
         // Corrections are written against one file but there are two manifests, songs and
         // exercises. An entry for a study must not read as missing to the songs pass.
-        const study: Curation[] = [{ id: "study-1", composer: "Ferdinand Beyer", why: "uncredited" }];
+        const study: Curation[] = [
+            { id: "study-1", composer: "Ferdinand Beyer", why: "uncredited" },
+        ];
         const songs = curate(PIECES, study);
         const exercises = curate([{ id: "study-1", title: "Beyer No. 8" }], study);
         expect(unapplied(study, new Set([...songs.applied, ...exercises.applied]))).toEqual([]);

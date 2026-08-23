@@ -52,7 +52,9 @@ function section(from, to) {
     return css.slice(start, end);
 }
 const declared = (src) =>
-    new Map([...src.matchAll(/--color-([\w-]+):\s*var\(--color-([\w-]+)\)/g)].map((m) => [m[1], m[2]]));
+    new Map(
+        [...src.matchAll(/--color-([\w-]+):\s*var\(--color-([\w-]+)\)/g)].map((m) => [m[1], m[2]]),
+    );
 
 const light = declared(section("/* ── The colour tokens", "/* The dark half"));
 const dark = declared(section("/* The dark half", "/* Use self-hosted Inter"));
@@ -68,9 +70,7 @@ for (const name of light.keys()) {
 }
 for (const name of dark.keys()) {
     if (!light.has(name)) {
-        failures.push(
-            `app/app.css  \`${name}\` is set under .dark but never declared in @theme`,
-        );
+        failures.push(`app/app.css  \`${name}\` is set under .dark but never declared in @theme`);
     }
 }
 
@@ -198,6 +198,4 @@ if (failures.length > 0) {
     );
     process.exit(1);
 }
-console.log(
-    `check-design-tokens: ${light.size} tokens, both themes each; no raw palette colours.`,
-);
+console.log(`check-design-tokens: ${light.size} tokens, both themes each; no raw palette colours.`);

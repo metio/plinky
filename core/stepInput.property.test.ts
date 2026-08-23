@@ -30,7 +30,11 @@ type Op =
     | { kind: "back" };
 
 const op: fc.Arbitrary<Op> = fc.oneof(
-    fc.record({ kind: fc.constant("down" as const), pitch, ms: value.map((v) => stepDurationMs(v, 120)) }),
+    fc.record({
+        kind: fc.constant("down" as const),
+        pitch,
+        ms: value.map((v) => stepDurationMs(v, 120)),
+    }),
     fc.record({ kind: fc.constant("up" as const) }),
     fc.record({ kind: fc.constant("rest" as const), ms: value.map((v) => stepDurationMs(v, 120)) }),
     fc.record({ kind: fc.constant("back" as const) }),
@@ -85,7 +89,13 @@ describe("step entry, driven any which way", () => {
                 fc.array(pitch, { minLength: 1, maxLength: 4 }),
                 value,
                 (before, chord, v) => {
-                    const settled = run([...before, { kind: "up" }, { kind: "up" }, { kind: "up" }, { kind: "up" }]);
+                    const settled = run([
+                        ...before,
+                        { kind: "up" },
+                        { kind: "up" },
+                        { kind: "up" },
+                        { kind: "up" },
+                    ]);
                     fc.pre(settled.holding === 0);
                     const ms = stepDurationMs(v, 120);
                     let entered = settled;

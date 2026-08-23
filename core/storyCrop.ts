@@ -15,7 +15,6 @@
 
 export type Box = { left: number; top: number; right: number; bottom: number };
 
-
 export function union(one: Box, other: Box): Box {
     return {
         left: Math.min(one.left, other.left),

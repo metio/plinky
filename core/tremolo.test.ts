@@ -4,8 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { readTremolos, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
 
-const total = (notes: { quarters: number }[]) =>
-    notes.reduce((sum, one) => sum + one.quarters, 0);
+const total = (notes: { quarters: number }[]) => notes.reduce((sum, one) => sum + one.quarters, 0);
 
 describe("tremoloUnitQuarters", () => {
     it("halves the repetition for each slash through the stem", () => {
@@ -134,8 +133,8 @@ describe("readTremolos", () => {
     });
 
     it("ignores an unmarked note and a rest", () => {
-        expect(readTremolos([note(0, 60, null), note(1, null, { beams: 2, part: "single" })])).toEqual(
-            [],
-        );
+        expect(
+            readTremolos([note(0, 60, null), note(1, null, { beams: 2, part: "single" })]),
+        ).toEqual([]);
     });
 });

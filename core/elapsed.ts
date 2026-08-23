@@ -72,7 +72,10 @@ export function writtenOnsetsMs(positions: readonly Position[]): number[] {
         if (previous !== undefined) {
             // The stretch belongs to the position being left: a fermata delays what
             // follows it, and nothing before it.
-            running += quartersMs(gapWholes(previous, position) * 4 * previous.stretch, previous.bpm);
+            running += quartersMs(
+                gapWholes(previous, position) * 4 * previous.stretch,
+                previous.bpm,
+            );
         }
         onsets.push(running);
         previous = position;

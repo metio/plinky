@@ -12,7 +12,14 @@
 
 import { isWhite } from "./keyboardGeometry";
 import type { DiagramOptions } from "./keyboardDiagram";
-import { CHORD_DEGREES, type ChordDegree, degreePitches, NOTE_TEXT, noteNameOf, type Spelling } from "./theory";
+import {
+    CHORD_DEGREES,
+    type ChordDegree,
+    degreePitches,
+    NOTE_TEXT,
+    noteNameOf,
+    type Spelling,
+} from "./theory";
 
 // Two octaves hold every triad the key builds, the seventh degree's included.
 const SPAN = 24;

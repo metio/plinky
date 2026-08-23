@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { beyondThePiano, BEYOND_REPAIR, HIGHEST, LOWEST, onThePiano, ontoThePiano } from "./pianoRange";
+import {
+    beyondThePiano,
+    BEYOND_REPAIR,
+    HIGHEST,
+    LOWEST,
+    onThePiano,
+    ontoThePiano,
+} from "./pianoRange";
 
 describe("onThePiano", () => {
     it("knows the ends of the keyboard", () => {

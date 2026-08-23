@@ -113,7 +113,9 @@ function octaveOf(midi: number, letter: string, alter: number): number {
 export function pitchPool(options: DrillOptions): number[] {
     const { low, high, fifths, chromatic } = options;
     const inKey = new Set(
-        LETTERS.map((letter) => (((SEMITONE[letter] ?? 0) + alterFor(letter, fifths)) % 12 + 12) % 12),
+        LETTERS.map(
+            (letter) => ((((SEMITONE[letter] ?? 0) + alterFor(letter, fifths)) % 12) + 12) % 12,
+        ),
     );
     const pool: number[] = [];
     for (let midi = Math.max(LOWEST_MIDI, low); midi <= Math.min(HIGHEST_MIDI, high); midi++) {
@@ -125,11 +127,7 @@ export function pitchPool(options: DrillOptions): number[] {
 }
 
 // The rhythm of one bar, as note values summing to exactly a barful.
-function barRhythm(
-    rhythm: DrillRhythm,
-    beatsPerBar: number,
-    rng: () => number,
-): RhythmValue[] {
+function barRhythm(rhythm: DrillRhythm, beatsPerBar: number, rng: () => number): RhythmValue[] {
     const target = beatsPerBar * RHYTHM.quarter.divisions;
     if (rhythm === "quarters") {
         return Array.from({ length: beatsPerBar }, () => "quarter" as const);
@@ -202,9 +200,7 @@ function nextColumn(
         }
     }
     if (maxLeap > 0 && distance(previous, best) > maxLeap) {
-        const near = pool.filter(
-            (midi) => Math.abs(midi - (previous?.[0] ?? midi)) <= maxLeap,
-        );
+        const near = pool.filter((midi) => Math.abs(midi - (previous?.[0] ?? midi)) <= maxLeap);
         if (near.length > 0) {
             best = drawColumn(near, notesPerColumn, rng);
         }

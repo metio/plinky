@@ -117,7 +117,11 @@ const runArb = fc
         let target = 0;
         return steps.map(({ gap, drift, velocity }) => {
             target += gap;
-            return { targetMs: target, playedMs: Math.max(0, target + drift), velocity } as OutcomeNote;
+            return {
+                targetMs: target,
+                playedMs: Math.max(0, target + drift),
+                velocity,
+            } as OutcomeNote;
         });
     });
 

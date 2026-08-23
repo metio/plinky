@@ -63,7 +63,9 @@ if (!BUCKET) {
 }
 for (const name of ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]) {
     if (!process.env[name]) {
-        console.error(`${name} is not set. Both are needed, and neither belongs on a command line.`);
+        console.error(
+            `${name} is not set. Both are needed, and neither belongs on a command line.`,
+        );
         process.exit(1);
     }
 }
@@ -75,9 +77,7 @@ if (!existsSync(join(dir, "manifest.json"))) {
 }
 
 const log = join(PACK, `.uploaded-${PREFIX}`);
-const done = new Set(
-    existsSync(log) ? readFileSync(log, "utf8").split("\n").filter(Boolean) : [],
-);
+const done = new Set(existsSync(log) ? readFileSync(log, "utf8").split("\n").filter(Boolean) : []);
 // The manifest goes last: while it is absent the app has no pack at all, which is a
 // better half-uploaded state than a manifest naming recordings that are not there yet.
 const files = readdirSync(dir)

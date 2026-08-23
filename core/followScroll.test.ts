@@ -17,9 +17,9 @@ describe("atEnd", () => {
 
     it("forgives a few pixels short of the bottom", () => {
         // A rendered staff rarely lands on an exact boundary.
-        expect(atEnd({ scrollTop: 600 - FOLLOW_SLACK_PX, clientHeight: 400, scrollHeight: 1000 })).toBe(
-            true,
-        );
+        expect(
+            atEnd({ scrollTop: 600 - FOLLOW_SLACK_PX, clientHeight: 400, scrollHeight: 1000 }),
+        ).toBe(true);
     });
 
     it("is false once the reader has scrolled back to look at something", () => {

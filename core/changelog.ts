@@ -78,12 +78,15 @@ function parseEntry(raw: unknown, at: string, problems: string[]): ChangelogEntr
     // A bare string is the ordinary entry: one a player would notice, so the round-up
     // carries it and there is nothing else to say.
     if (typeof raw === "string") {
-        return raw.trim() === ""
-            ? (problems.push(`${at} is empty`), null)
-            : { body: raw.trimEnd(), twip: true };
+        if (raw.trim() === "") {
+            problems.push(`${at} is empty`);
+            return null;
+        }
+        return { body: raw.trimEnd(), twip: true };
     }
     if (!raw || typeof raw !== "object") {
-        return (problems.push(`${at} is neither text nor an entry`), null);
+        problems.push(`${at} is neither text nor an entry`);
+        return null;
     }
     const record = raw as Record<string, unknown>;
     const unknown = Object.keys(record).filter((key) => !ALLOWED_ENTRY.has(key));
@@ -92,10 +95,12 @@ function parseEntry(raw: unknown, at: string, problems: string[]): ChangelogEntr
         return null;
     }
     if (typeof record.body !== "string" || record.body.trim() === "") {
-        return (problems.push(`${at} has no body`), null);
+        problems.push(`${at} has no body`);
+        return null;
     }
     if (record.twip !== undefined && typeof record.twip !== "boolean") {
-        return (problems.push(`${at} sets twip to something that is not true or false`), null);
+        problems.push(`${at} sets twip to something that is not true or false`);
+        return null;
     }
     return { body: record.body.trimEnd(), twip: record.twip ?? true };
 }
@@ -124,12 +129,18 @@ export function parseChangelog(raw: unknown): { releases: Release[]; problems: s
             problems.push(`${at} has no date, or one that is not a real day`);
             continue;
         }
-        if (record.label !== undefined && record.label !== null && typeof record.label !== "string") {
+        if (
+            record.label !== undefined &&
+            record.label !== null &&
+            typeof record.label !== "string"
+        ) {
             problems.push(`${record.date} has a label that is not text`);
             continue;
         }
         if (!Array.isArray(record.entries) || record.entries.length === 0) {
-            problems.push(`${record.date} has no entries — a release nobody would notice is no release`);
+            problems.push(
+                `${record.date} has no entries — a release nobody would notice is no release`,
+            );
             continue;
         }
         const entries = record.entries

@@ -157,7 +157,11 @@ describe("roundUp", () => {
         const posted: string[] = [];
         for (let day = 8; day <= 36; day += 7) {
             const on = `2026-08-${String(day - 31).padStart(2, "0")}`;
-            for (const one of roundUp(daily, day <= 31 ? `2026-07-${String(day).padStart(2, "0")}` : on, 7)) {
+            for (const one of roundUp(
+                daily,
+                day <= 31 ? `2026-07-${String(day).padStart(2, "0")}` : on,
+                7,
+            )) {
                 posted.push(one.date);
             }
         }
@@ -248,7 +252,11 @@ describe("roundUpBody", () => {
         expect(body).toMatch(/…and \d+ more changes this week/);
         // The sign-off survives the trim: the budget is measured against the finished
         // post, not against the entries alone.
-        expect(body.endsWith("Play at https://plinky.fun — free, in your browser, nothing to install.")).toBe(true);
+        expect(
+            body.endsWith(
+                "Play at https://plinky.fun — free, in your browser, nothing to install.",
+            ),
+        ).toBe(true);
     });
 
     it("counts one left-out change in the singular", () => {

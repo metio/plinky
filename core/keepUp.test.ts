@@ -13,7 +13,11 @@ import {
 } from "./keepUp";
 
 // Run a sequence of strikes through an open step and close it.
-function playStep(state: KeepUpState, expected: number[], strikes: number[]): ReturnType<typeof closeKeepUpStep> {
+function playStep(
+    state: KeepUpState,
+    expected: number[],
+    strikes: number[],
+): ReturnType<typeof closeKeepUpStep> {
     let current = openKeepUpStep(state, expected);
     for (const note of strikes) {
         current = strikeKeepUp(current, note).state;
@@ -41,7 +45,7 @@ describe("keep-up reducer", () => {
     });
 
     it("flags the strike that completes the chord so the step can turn green early", () => {
-        let state = openKeepUpStep(startKeepUp(), [60, 64]);
+        const state = openKeepUpStep(startKeepUp(), [60, 64]);
         const first = strikeKeepUp(state, 60);
         expect(first.expected).toBe(true);
         expect(first.caught).toBe(false);
@@ -126,8 +130,11 @@ describe("keep-up reducer properties", () => {
                 (steps) => {
                     let state = startKeepUp();
                     for (const step of steps) {
-                        state = playStep(state, step.expected, step.catchIt ? step.expected : [])
-                            .state;
+                        state = playStep(
+                            state,
+                            step.expected,
+                            step.catchIt ? step.expected : [],
+                        ).state;
                     }
                     const { inTime, done } = keepUpProgress(state);
                     return (

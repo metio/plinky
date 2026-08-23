@@ -2,14 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import {
-    DEFAULT_KEYBOARD_SPAN,
-    followKeyboardWindow,
-    type Span,
-} from "./keyboardWindow";
+import { DEFAULT_KEYBOARD_SPAN, followKeyboardWindow, type Span } from "./keyboardWindow";
 
 const SPAN = DEFAULT_KEYBOARD_SPAN;
-
 
 describe("followKeyboardWindow", () => {
     const REACH: Span = { from: 21, to: 108 }; // full 88-key piano

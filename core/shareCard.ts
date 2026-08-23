@@ -298,7 +298,10 @@ export function clampHeading(heading: string): string {
     if (points.length <= MAX_HEADING_CHARS) {
         return heading;
     }
-    return `${points.slice(0, MAX_HEADING_CHARS - 1).join("").trimEnd()}…`;
+    return `${points
+        .slice(0, MAX_HEADING_CHARS - 1)
+        .join("")
+        .trimEnd()}…`;
 }
 
 // The card's own furniture, in the brand palette so an exported card reads as the app:

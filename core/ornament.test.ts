@@ -21,9 +21,13 @@ describe("the key an ornament reaches into", () => {
     it("reads the seven notes a signature admits", () => {
         expect([...keyPitchClasses(C_MAJOR)].sort((a, b) => a - b)).toEqual([0, 2, 4, 5, 7, 9, 11]);
         // Three sharps: A major — F sharp, C sharp, G sharp.
-        expect([...keyPitchClasses(A_MAJOR)].sort((a, b) => a - b)).toEqual([1, 4, 6, 8, 9, 11, 2].sort((a, b) => a - b));
+        expect([...keyPitchClasses(A_MAJOR)].sort((a, b) => a - b)).toEqual(
+            [1, 4, 6, 8, 9, 11, 2].sort((a, b) => a - b),
+        );
         // Three flats: E flat major — B flat, E flat, A flat.
-        expect([...keyPitchClasses(E_FLAT)].sort((a, b) => a - b)).toEqual([3, 5, 7, 8, 10, 0, 2].sort((a, b) => a - b));
+        expect([...keyPitchClasses(E_FLAT)].sort((a, b) => a - b)).toEqual(
+            [3, 5, 7, 8, 10, 0, 2].sort((a, b) => a - b),
+        );
     });
 
     it("steps to the next note of the key, not a fixed distance", () => {

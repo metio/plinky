@@ -464,10 +464,7 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
         .filter((note) => note.startMs >= 0 && note.startMs < maxCells * gridMs)
         .map((note) => ({
             ...note,
-            durationMs: Math.max(
-                0,
-                Math.min(note.durationMs, maxCells * gridMs - note.startMs),
-            ),
+            durationMs: Math.max(0, Math.min(note.durationMs, maxCells * gridMs - note.startMs)),
         }));
     // Folded rather than spread: a long take holds more notes than an argument list
     // can carry, and Math.max(...notes) would overflow the stack on exactly the

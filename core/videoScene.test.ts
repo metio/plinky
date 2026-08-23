@@ -124,9 +124,10 @@ describe("scorePanelRect", () => {
     it("shrinks to a short sheet and centres it in the band", () => {
         // 1000×200 sheet at panel width 500 scales to 100 tall — the card hugs
         // the single system instead of trailing blank space.
-        expect(scorePanelRect({ y: 100, height: 300 }, 500, { width: 1000, height: 200 })).toEqual(
-            { y: 200, height: 100 },
-        );
+        expect(scorePanelRect({ y: 100, height: 300 }, 500, { width: 1000, height: 200 })).toEqual({
+            y: 200,
+            height: 100,
+        });
     });
 });
 

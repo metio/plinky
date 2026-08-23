@@ -24,7 +24,14 @@ const REGIONS: SampleRegion[] = [
         lowVelocity: 65,
         highVelocity: 127,
     },
-    { file: "Ds4v4.opus", keyCentre: 63, lowKey: 62, highKey: 64, lowVelocity: 1, highVelocity: 64 },
+    {
+        file: "Ds4v4.opus",
+        keyCentre: 63,
+        lowKey: 62,
+        highKey: 64,
+        lowVelocity: 1,
+        highVelocity: 64,
+    },
     {
         file: "Ds4v12.opus",
         keyCentre: 63,
@@ -85,10 +92,11 @@ describe("regionsNeeded", () => {
             { pitch: 60, velocity: 100 },
         ];
         // Two files: C4 soft covers both 60 and 61, and C4 loud is the third note.
-        expect(regionsNeeded(REGIONS, notes).map((region) => region.file).sort()).toEqual([
-            "C4v4.opus",
-            "C4v12.opus",
-        ].sort());
+        expect(
+            regionsNeeded(REGIONS, notes)
+                .map((region) => region.file)
+                .sort(),
+        ).toEqual(["C4v4.opus", "C4v12.opus"].sort());
     });
 
     it("asks for nothing when there is nothing to play", () => {

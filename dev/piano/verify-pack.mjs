@@ -11,7 +11,7 @@
 //
 // Usage: node dev/piano/verify-pack.mjs [--base https://samples.plinky.fun/v1] [--pack piano-pack/v1]
 
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const BASE = argValue("--base") ?? "https://samples.plinky.fun/v1";
@@ -132,7 +132,9 @@ if (!/audio|ogg|opus/.test(type)) {
     note(`served as ${type || "no content-type"} rather than audio/ogg`);
 }
 if (!/max-age=\d{6,}/.test(sample.headers.get("cache-control") ?? "")) {
-    note(`cache-control is "${sample.headers.get("cache-control") ?? "unset"}" — these never change`);
+    note(
+        `cache-control is "${sample.headers.get("cache-control") ?? "unset"}" — these never change`,
+    );
 }
 
 console.log(

@@ -115,21 +115,93 @@ type GradeProfile = {
 
 const PROFILES: GradeProfile[] = [
     // A five-finger position, stepwise, one hand — the first week of reading.
-    { fifths: 0, low: 72, high: 79, hands: 1, notesPerColumn: 1, rhythm: "quarters", maxLeap: 2, smoothness: 5 },
+    {
+        fifths: 0,
+        low: 72,
+        high: 79,
+        hands: 1,
+        notesPerColumn: 1,
+        rhythm: "quarters",
+        maxLeap: 2,
+        smoothness: 5,
+    },
     // The octave opens up and the hand starts to move.
-    { fifths: 0, low: 67, high: 81, hands: 1, notesPerColumn: 1, rhythm: "quarters", maxLeap: 4, smoothness: 4 },
+    {
+        fifths: 0,
+        low: 67,
+        high: 81,
+        hands: 1,
+        notesPerColumn: 1,
+        rhythm: "quarters",
+        maxLeap: 4,
+        smoothness: 4,
+    },
     // One sharp, and the left hand joins.
-    { fifths: 1, low: 55, high: 81, hands: 2, notesPerColumn: 1, rhythm: "quarters", maxLeap: 5, smoothness: 3 },
+    {
+        fifths: 1,
+        low: 55,
+        high: 81,
+        hands: 2,
+        notesPerColumn: 1,
+        rhythm: "quarters",
+        maxLeap: 5,
+        smoothness: 3,
+    },
     // Flats, and the rhythm stops sitting on every beat.
-    { fifths: -1, low: 52, high: 84, hands: 2, notesPerColumn: 1, rhythm: "varied", maxLeap: 7, smoothness: 2 },
+    {
+        fifths: -1,
+        low: 52,
+        high: 84,
+        hands: 2,
+        notesPerColumn: 1,
+        rhythm: "varied",
+        maxLeap: 7,
+        smoothness: 2,
+    },
     // Two accidentals in the signature, and notes to read down as well as along.
-    { fifths: 2, low: 48, high: 84, hands: 2, notesPerColumn: 2, rhythm: "varied", maxLeap: 9, smoothness: 1 },
+    {
+        fifths: 2,
+        low: 48,
+        high: 84,
+        hands: 2,
+        notesPerColumn: 2,
+        rhythm: "varied",
+        maxLeap: 9,
+        smoothness: 1,
+    },
     // Three flats, wider still, and eighths that keep coming.
-    { fifths: -3, low: 45, high: 88, hands: 2, notesPerColumn: 2, rhythm: "eighths", maxLeap: 12, smoothness: 1 },
+    {
+        fifths: -3,
+        low: 45,
+        high: 88,
+        hands: 2,
+        notesPerColumn: 2,
+        rhythm: "eighths",
+        maxLeap: 12,
+        smoothness: 1,
+    },
     // Four sharps, three-note chords, and the leap limit lifted.
-    { fifths: 4, low: 41, high: 91, hands: 2, notesPerColumn: 3, rhythm: "varied", maxLeap: 0, smoothness: 0 },
+    {
+        fifths: 4,
+        low: 41,
+        high: 91,
+        hands: 2,
+        notesPerColumn: 3,
+        rhythm: "varied",
+        maxLeap: 0,
+        smoothness: 0,
+    },
     // Every note in the octave, most of the keyboard, nothing held back.
-    { fifths: -5, low: 36, high: 96, hands: 2, notesPerColumn: 3, rhythm: "eighths", maxLeap: 0, smoothness: 0 },
+    {
+        fifths: -5,
+        low: 36,
+        high: 96,
+        hands: 2,
+        notesPerColumn: 3,
+        rhythm: "eighths",
+        maxLeap: 0,
+        smoothness: 0,
+    },
 ];
 
 // The drill a rung asks for. Within a grade the three steps lengthen the drill

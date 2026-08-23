@@ -110,4 +110,3 @@ if (APPLY && flagged.length > 0) {
     writeFileSync(`${DIR}/manifest.json`, JSON.stringify(kept));
     console.log(`APPLIED: removed ${flagged.length} scores; manifest now ${kept.length}.`);
 }
-

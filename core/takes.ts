@@ -124,7 +124,8 @@ export function compositionFromRun(
         if (notatedGapMs !== undefined && notatedGapMs > 0) {
             gapMs = Math.min(gapMs, notatedGapMs);
         }
-        const held = imprecise && step.heldMs !== undefined ? Math.min(step.heldMs, gapMs) : step.heldMs;
+        const held =
+            imprecise && step.heldMs !== undefined ? Math.min(step.heldMs, gapMs) : step.heldMs;
         const durationMs = Math.max(MIN_DURATION_MS, held ?? gapMs);
         for (const pitch of step.pitches) {
             notes.push({ pitch, startMs: step.startMs, durationMs, velocity: step.velocity });

@@ -17,7 +17,6 @@ function clampFrom(from: number, span: number, range: Span): number {
     return Math.max(range.from, Math.min(from, range.to - span));
 }
 
-
 // Free play (Compose) has no upcoming notes to frame the window around, so it follows
 // the note you just played instead: it holds while that note sits in the comfortable
 // middle and re-centres when you play near an edge — so tapping the end key climbs you

@@ -23,11 +23,7 @@ const DEATH_CUTOFF = 1955;
 // PDMX composer fields carry accents inconsistently ("Fauré" / "Faure", "Händel" /
 // "Handel", "Dvořák" / "Dvorak"), so fold diacritics away before matching and write the
 // patterns in their plain-ASCII form.
-const fold = (value: string): string =>
-    value
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .toLowerCase();
+const fold = (value: string): string => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 const TRADITIONAL =
     /\btrad\b|tradition|anonym|anonimo|\bfolk\b|spiritual|kinderlied|volkslied|\bhymn\b|\bcarol\b|nursery|children'?s song|public[ -]?domain|\bsacred\b|gregorian|plainchant|\bchant\b|shanty|wiegenlied|weihnacht|\bnoel\b/;

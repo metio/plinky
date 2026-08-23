@@ -39,9 +39,7 @@ describe("the repertoire balance", () => {
         const log: PracticeLog = [
             session({ activeMs: 90_000, pieces: ["bach", "satie", "grieg"] }),
         ];
-        expect(repertoireBalance(log).map((one) => one.activeMs)).toEqual([
-            30_000, 30_000, 30_000,
-        ]);
+        expect(repertoireBalance(log).map((one) => one.activeMs)).toEqual([30_000, 30_000, 30_000]);
     });
 
     it("counts a session once per piece, and keeps the latest touch", () => {

@@ -27,9 +27,7 @@ describe("legibleTitle", () => {
     it("drops a run whose bytes are gone, keeping the part that still reads", () => {
         // The real case from the corpus: Arabic whose continuation bytes were lost on
         // the way in, so no round trip can bring it back.
-        expect(legibleTitle("Beethoven SilenceÙØ¹ ØªØÙØØª ÙØÙØ ØÙØºÙØÙ")).toBe(
-            "Beethoven Silence",
-        );
+        expect(legibleTitle("Beethoven SilenceÙØ¹ ØªØÙØØª ÙØÙØ ØÙØºÙØÙ")).toBe("Beethoven Silence");
     });
 
     it("returns nothing when nothing legible is left", () => {

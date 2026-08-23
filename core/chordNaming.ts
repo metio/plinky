@@ -87,10 +87,17 @@ export function nameHeldNotes(pitches: readonly number[]): HeldSound | null {
             .sort((a, b) => a - b);
         for (const quality of CHORD_QUALITIES) {
             const stack = stackClasses(quality);
-            if (!sameSet(relative, [...stack].sort((a, b) => a - b))) {
+            if (
+                !sameSet(
+                    relative,
+                    [...stack].sort((a, b) => a - b),
+                )
+            ) {
                 continue;
             }
-            const inversion = stack.indexOf(bass >= root ? bass - root : bass - root + SEMITONES_PER_OCTAVE);
+            const inversion = stack.indexOf(
+                bass >= root ? bass - root : bass - root + SEMITONES_PER_OCTAVE,
+            );
             matches.push({ root, quality, inversion: inversion < 0 ? 0 : inversion });
         }
     }

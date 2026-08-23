@@ -20,7 +20,9 @@ import { type PitchClass, pitchClassOf, SEMITONES_PER_OCTAVE } from "./theory";
 // and a player holding it does not move a finger either way.
 export function commonTones(one: readonly number[], other: readonly number[]): PitchClass[] {
     const held = new Set(other.map(pitchClassOf));
-    return [...new Set(one.map(pitchClassOf))].filter((value) => held.has(value)).sort((a, b) => a - b);
+    return [...new Set(one.map(pitchClassOf))]
+        .filter((value) => held.has(value))
+        .sort((a, b) => a - b);
 }
 
 // How far one note has to move to become another, in semitones, by the shorter way round.

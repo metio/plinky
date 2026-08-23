@@ -34,7 +34,10 @@ function midiOf(note: Element): number | null {
 // Split a score's notes into the two hands' position sequences (a position is a
 // chord, or a single note). Staff 1 is the right hand, staff 2 the left; a note
 // with <chord/> joins the hand's current position instead of starting a new one.
-export function parsePositions(codec: XmlCodec, xml: string): { right: number[][]; left: number[][] } {
+export function parsePositions(
+    codec: XmlCodec,
+    xml: string,
+): { right: number[][]; left: number[][] } {
     const right: number[][] = [];
     const left: number[][] = [];
     const doc = codec.parse(xml);
@@ -153,7 +156,8 @@ function readPace(doc: Document): { notesPerSecond: number; voices: number } {
     let notesPerSecond = 0;
     if (beats.length > 0) {
         const sorted = [...beats].sort((a, b) => a - b);
-        const quick = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * SPEED_PERCENTILE))]!;
+        const quick =
+            sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * SPEED_PERCENTILE))]!;
         notesPerSecond = quick > 0 ? played / 60 / quick : 0;
     }
     const voices = Math.max(1, ...[...voicesByStaff.values()].map((set) => set.size));

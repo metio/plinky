@@ -21,7 +21,6 @@
 // edge of a shape is antialiased against its background and those blend pixels are the halo.
 const NEAR = 226;
 
-
 export type Mask = Uint8Array;
 
 export type MatteOptions = {
@@ -103,7 +102,3 @@ export function maskedShare(mask: Mask): number {
     }
     return flagged / mask.length;
 }
-
-
-
-

@@ -75,11 +75,7 @@ describe("filterMusic", () => {
             item({ id: "study", kind: "study" }),
         ];
         expect(filterMusic(items, EMPTY_MUSIC_FILTER, emptyContext)).toHaveLength(3);
-        const studies = filterMusic(
-            items,
-            { ...EMPTY_MUSIC_FILTER, kind: "study" },
-            emptyContext,
-        );
+        const studies = filterMusic(items, { ...EMPTY_MUSIC_FILTER, kind: "study" }, emptyContext);
         expect(studies.map((entry) => entry.id)).toEqual(["study"]);
     });
 
@@ -196,7 +192,9 @@ describe("foldForSearch", () => {
     it("leaves a script whose marks are not accents exactly as it is", () => {
         // The dakuten is what tells \u30cf from \u30d0 from \u30d1: stripping it would fold three
         // syllables into one and match a title nobody typed.
-        expect(foldForSearch("\u30a2\u30eb\u30da\u30b8\u30aa")).toBe("\u30a2\u30eb\u30da\u30b8\u30aa");
+        expect(foldForSearch("\u30a2\u30eb\u30da\u30b8\u30aa")).toBe(
+            "\u30a2\u30eb\u30da\u30b8\u30aa",
+        );
         expect(foldForSearch("Прелюдия")).toBe("прелюдия");
     });
 });
@@ -245,7 +243,10 @@ describe("musicOrder", () => {
     it("sorts an unmeasured piece last within its grade rather than first", () => {
         // A missing cost is "we never measured this", not "this is the gentlest thing
         // here" — which is what a zero would have claimed.
-        const shelf = [item({ id: "unknown", grade: 1 }), item({ id: "measured", grade: 1, cost: 4 })];
+        const shelf = [
+            item({ id: "unknown", grade: 1 }),
+            item({ id: "measured", grade: 1, cost: 4 }),
+        ];
         expect(musicOrder(shelf).map((one) => one.id)).toEqual(["measured", "unknown"]);
     });
 
@@ -273,17 +274,18 @@ describe("the fresh filter", () => {
     };
 
     it("keeps only the pieces with no history at all", () => {
-        const fresh = filterMusic(
-            shelf,
-            { ...EMPTY_MUSIC_FILTER, freshOnly: true },
-            context,
-        ).map((one) => one.id);
+        const fresh = filterMusic(shelf, { ...EMPTY_MUSIC_FILTER, freshOnly: true }, context).map(
+            (one) => one.id,
+        );
         expect(fresh).toEqual(["never"]);
     });
 
     it("counts a piece as played the moment it has a record, however bad the run", () => {
         // A stumbled-through attempt is still an answer to "have I tried this?".
-        const stumbled = { ...context, mastery: { played: mastery({ learned: false, bestScore: 10 }) } };
+        const stumbled = {
+            ...context,
+            mastery: { played: mastery({ learned: false, bestScore: 10 }) },
+        };
         expect(
             filterMusic(shelf, { ...EMPTY_MUSIC_FILTER, freshOnly: true }, stumbled).map(
                 (one) => one.id,

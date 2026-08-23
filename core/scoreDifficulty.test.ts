@@ -24,7 +24,10 @@ const note = (step: string, octave: number, staff?: number, chord = false) =>
 
 describe("parsePositions", () => {
     it("reads a single-staff line into right-hand positions", () => {
-        const { right, left } = parsePositions(domXmlCodec, score(note("C", 4) + note("E", 4) + note("G", 4)));
+        const { right, left } = parsePositions(
+            domXmlCodec,
+            score(note("C", 4) + note("E", 4) + note("G", 4)),
+        );
         expect(right).toEqual([[60], [64], [67]]);
         expect(left).toEqual([]);
     });
@@ -54,7 +57,9 @@ describe("rawDifficulty", () => {
     it("costs a comfortable five-finger line less than a wide, leaping one", () => {
         const inHand = score([60, 62, 64, 65, 67].map((p) => noteFor(p)).join(""));
         const leaping = score([60, 72, 64, 76, 67].map((p) => noteFor(p)).join(""));
-        expect(rawDifficulty(domXmlCodec, inHand)).toBeLessThan(rawDifficulty(domXmlCodec, leaping));
+        expect(rawDifficulty(domXmlCodec, inHand)).toBeLessThan(
+            rawDifficulty(domXmlCodec, leaping),
+        );
     });
 
     it("averages effort per note rather than summing it, so length alone doesn't inflate", () => {
@@ -99,7 +104,9 @@ describe("gradeOf", () => {
     it("grades a harder line at least as high as an easier one in the same category", () => {
         const easy = score([60, 62, 64].map((p) => noteFor(p)).join(""));
         const hard = score([60, 76, 62, 79].map((p) => noteFor(p)).join(""));
-        expect(gradeOf(domXmlCodec, "easy-piece", easy)).toBeLessThanOrEqual(gradeOf(domXmlCodec, "hard-piece", hard));
+        expect(gradeOf(domXmlCodec, "easy-piece", easy)).toBeLessThanOrEqual(
+            gradeOf(domXmlCodec, "hard-piece", hard),
+        );
     });
 
     it("grades an unmeasurable score at the top, not as the easiest piece", () => {
@@ -131,8 +138,10 @@ describe("gradeOf", () => {
 
 describe("midiOf reads pitch, accidental and defaults", () => {
     const one = (pitch: string) =>
-        parsePositions(domXmlCodec, score(`<note><pitch>${pitch}</pitch><duration>2</duration></note>`))
-            .right;
+        parsePositions(
+            domXmlCodec,
+            score(`<note><pitch>${pitch}</pitch><duration>2</duration></note>`),
+        ).right;
 
     it("raises a sharp and lowers a flat by a semitone", () => {
         expect(one("<step>C</step><alter>1</alter><octave>4</octave>")).toEqual([[61]]);
@@ -150,7 +159,9 @@ describe("midiOf reads pitch, accidental and defaults", () => {
     it("skips a pitch with no step, and one whose step names no class, without throwing", () => {
         const noStep = `<note><pitch><octave>4</octave></pitch><duration>2</duration></note>`;
         expect(parsePositions(domXmlCodec, score(noStep + note("E", 4))).right).toEqual([[64]]);
-        expect(parsePositions(domXmlCodec, score(note("H", 4) + note("E", 4))).right).toEqual([[64]]);
+        expect(parsePositions(domXmlCodec, score(note("H", 4) + note("E", 4))).right).toEqual([
+            [64],
+        ]);
     });
 });
 
@@ -183,9 +194,7 @@ describe("gradeOf caches and averages", () => {
     });
 
     it("does not bucket a non-empty balanced two-hand score at the ceiling", () => {
-        const xml = score(
-            note("C", 4, 1) + note("E", 4, 1) + note("C", 2, 2) + note("E", 2, 2),
-        );
+        const xml = score(note("C", 4, 1) + note("E", 4, 1) + note("C", 2, 2) + note("E", 2, 2));
         expect(gradeOf(domXmlCodec, "balanced", xml)).toBeLessThan(MAX_GRADE);
     });
 
@@ -234,8 +243,12 @@ describe("paceCost", () => {
     });
 
     it("charges for speed above the comfortable floor", () => {
-        expect(paceCost({ notesPerSecond: SPEED_FLOOR_NPS + 1, voices: 1 })).toBeCloseTo(SPEED_WEIGHT);
-        expect(paceCost({ notesPerSecond: 8, voices: 1 })).toBeCloseTo((8 - SPEED_FLOOR_NPS) * SPEED_WEIGHT);
+        expect(paceCost({ notesPerSecond: SPEED_FLOOR_NPS + 1, voices: 1 })).toBeCloseTo(
+            SPEED_WEIGHT,
+        );
+        expect(paceCost({ notesPerSecond: 8, voices: 1 })).toBeCloseTo(
+            (8 - SPEED_FLOOR_NPS) * SPEED_WEIGHT,
+        );
     });
 
     it("charges for each line beyond the first in one hand", () => {
@@ -262,7 +275,9 @@ describe("rawDifficulty reads speed and texture", () => {
     it("rates two voices in one hand above one", () => {
         const single = paced(80, 4, 4, 8, 1);
         const double = paced(80, 4, 4, 8, 2);
-        expect(rawDifficulty(domXmlCodec, double)).toBeGreaterThan(rawDifficulty(domXmlCodec, single));
+        expect(rawDifficulty(domXmlCodec, double)).toBeGreaterThan(
+            rawDifficulty(domXmlCodec, single),
+        );
     });
 
     it("reads an unstated tempo as moderate rather than as motionless", () => {
@@ -273,7 +288,9 @@ describe("rawDifficulty reads speed and texture", () => {
     it("leaves a score with nothing fingerable at zero", () => {
         // Zero means "nothing to measure", and a pace term added to it would dress an
         // unreadable import up as a plausible score.
-        expect(rawDifficulty(domXmlCodec, score("<note><rest/><duration>4</duration></note>"))).toBe(0);
+        expect(
+            rawDifficulty(domXmlCodec, score("<note><rest/><duration>4</duration></note>")),
+        ).toBe(0);
     });
 
     it("ignores grace notes and chord members when reading speed", () => {

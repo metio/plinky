@@ -48,14 +48,14 @@ const SPOKEN_FOR = [
 // A token's light-theme value. app.css is the source; the three meaning-carrying colours
 // resolve to Tailwind's own palette, which only exists once the stylesheet is built — so
 // those are read out of the build, where they are already resolved.
-function valueOf(css, built, name) {
+function tokenValue(css, built, name) {
     const from = (text) => text.match(new RegExp(`${name}:\\s*([^;]+)`));
     const match = from(css) ?? from(built);
     if (!match) {
         throw new Error(`${name} is defined in neither ${CSS} nor the build`);
     }
     const raw = match[1].trim();
-    return raw.startsWith("var(") ? valueOf(css, built, raw.slice(4, -1).trim()) : raw;
+    return raw.startsWith("var(") ? tokenValue(css, built, raw.slice(4, -1).trim()) : raw;
 }
 
 const css = await readFile(CSS, "utf8");
@@ -78,7 +78,7 @@ if (!builtName) {
 }
 const built = await readFile(`build/client/assets/${builtName}`, "utf8");
 const colour = Object.fromEntries(
-    [...PALETTE, ...SPOKEN_FOR].map(([name, token]) => [name, valueOf(css, built, token)]),
+    [...PALETTE, ...SPOKEN_FOR].map(([name, token]) => [name, tokenValue(css, built, token)]),
 );
 
 await mkdir(`${OUT}/icon`, { recursive: true });
@@ -91,10 +91,13 @@ await mkdir(`${OUT}/social`, { recursive: true });
 const fredoka = await readFile(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
 );
-const inter = await readFile("node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2");
+const inter = await readFile(
+    "node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
+);
 const FACES = `@font-face{font-family:"Fredoka Variable";src:url(data:font/woff2;base64,${fredoka.toString("base64")}) format("woff2-variations");font-weight:300 700;font-display:block}
 @font-face{font-family:Inter;src:url(data:font/woff2;base64,${inter.toString("base64")}) format("woff2-variations");font-weight:100 900;font-display:block}`;
-const DISPLAY = "font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif;font-weight:600";
+const DISPLAY =
+    "font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif;font-weight:600";
 const UI = "font-family:Inter,system-ui,sans-serif";
 
 const browser = await chromium.launch();
@@ -200,12 +203,28 @@ const social = (width, height, titleSize) => `
   <div style="${DISPLAY};font-size:${titleSize}px;color:${colour.paper};line-height:1.1;letter-spacing:-0.01em">Practise piano in your browser</div>
   <div style="${UI};font-size:${Math.round(titleSize / 2.6)}px;color:${colour.paper};opacity:.82">Free · no account · nothing to install</div>
 </div>`;
-await shoot(social(1200, 630, 62), { width: 1200, height: 630, path: `${OUT}/social/open-graph-1200x630.png` });
-await shoot(social(1080, 1080, 74), { width: 1080, height: 1080, path: `${OUT}/social/square-1080.png` });
-await shoot(social(1080, 1920, 86), { width: 1080, height: 1920, path: `${OUT}/social/story-1080x1920.png` });
+await shoot(social(1200, 630, 62), {
+    width: 1200,
+    height: 630,
+    path: `${OUT}/social/open-graph-1200x630.png`,
+});
+await shoot(social(1080, 1080, 74), {
+    width: 1080,
+    height: 1080,
+    path: `${OUT}/social/square-1080.png`,
+});
+await shoot(social(1080, 1920, 86), {
+    width: 1080,
+    height: 1920,
+    path: `${OUT}/social/story-1080x1920.png`,
+});
 // Instagram's tallest feed size. A square post is cropped from this without losing
 // anything; the reverse is not true, so a portrait is the one worth making.
-await shoot(social(1080, 1350, 78), { width: 1080, height: 1350, path: `${OUT}/social/instagram-portrait-1080x1350.png` });
+await shoot(social(1080, 1350, 78), {
+    width: 1080,
+    height: 1350,
+    path: `${OUT}/social/instagram-portrait-1080x1350.png`,
+});
 
 // The profile picture. Every platform crops one to a circle — Reddit, Facebook, Instagram,
 // YouTube — so this is a full-bleed square of ground with the mark well inside the
@@ -278,8 +297,16 @@ const banner = (width) => `
     <div style="${UI};font-size:18px;color:${colour.paper};opacity:.8;line-height:1.3;margin-top:4px">Free · no account · nothing to install</div>
   </div>
 </div>`;
-await shoot(banner(1072), { width: 1072, height: 128, path: `${OUT}/social/reddit-banner-desktop-1072x128.png` });
-await shoot(banner(1080), { width: 1080, height: 128, path: `${OUT}/social/reddit-banner-mobile-1080x128.png` });
+await shoot(banner(1072), {
+    width: 1072,
+    height: 128,
+    path: `${OUT}/social/reddit-banner-desktop-1072x128.png`,
+});
+await shoot(banner(1080), {
+    width: 1080,
+    height: 128,
+    path: `${OUT}/social/reddit-banner-mobile-1080x128.png`,
+});
 
 // The watermark YouTube overlays on a playing video. Transparent, so it is the mark and
 // nothing else.

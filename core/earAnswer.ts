@@ -11,11 +11,7 @@ export type OptionVerdict = "correct" | "wrong" | null;
 // the rest. The last part is the one worth pinning: an unanswered round marks nothing,
 // and a settled one never reddens an option nobody picked — a wall of red for every
 // wrong answer would tell the player things they did not get wrong.
-export function optionVerdict<Id>(
-    option: Id,
-    answer: Id | null,
-    given: Id | null,
-): OptionVerdict {
+export function optionVerdict<Id>(option: Id, answer: Id | null, given: Id | null): OptionVerdict {
     if (answer === null) {
         return null;
     }

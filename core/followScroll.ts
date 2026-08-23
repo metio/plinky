@@ -30,7 +30,6 @@ export function atEnd(box: ScrollBox, slack = FOLLOW_SLACK_PX): boolean {
     return box.scrollHeight - box.scrollTop - box.clientHeight <= slack;
 }
 
-
 // Whether a panel the reader has just chosen is somewhere they can see.
 //
 // The glossary stacks into one column on a phone: a list of marks the height of the

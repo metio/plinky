@@ -27,7 +27,7 @@
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { readSfz, readSfzExtras } from "./salamander.mjs";
 
@@ -126,7 +126,9 @@ for (let pitch = KEYS.low; pitch <= KEYS.high; pitch++) {
     }
 }
 if (gaps.length > 0) {
-    console.error(`${gaps.length} key/velocity pairs no recording covers: ${gaps.slice(0, 12).join(", ")}…`);
+    console.error(
+        `${gaps.length} key/velocity pairs no recording covers: ${gaps.slice(0, 12).join(", ")}…`,
+    );
     process.exit(1);
 }
 // And nothing that a key cannot trigger may masquerade as a note: the key-off knocks, the
@@ -134,7 +136,9 @@ if (gaps.length > 0) {
 // never speaks.
 const strays = notes.filter((region) => /\/(harm|rel\d|pedal)/.test(region.file));
 if (strays.length > 0) {
-    console.error(`${strays.length} release samples ended up among the notes, e.g. ${strays[0].file}`);
+    console.error(
+        `${strays.length} release samples ended up among the notes, e.g. ${strays[0].file}`,
+    );
     process.exit(1);
 }
 

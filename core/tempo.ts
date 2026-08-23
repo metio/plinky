@@ -56,7 +56,6 @@ export function tempoSeries(
     return points;
 }
 
-
 export type HotspotOptions = {
     // A point is "slow" below `ratio` of the baseline tempo.
     ratio?: number;

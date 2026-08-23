@@ -32,7 +32,8 @@ export type WorkTitle = {
 // A catalogue mark: a known prefix, then a number that may be arabic (BWV 1068), roman
 // (Hob. XVI:34), or both (Op. 27 No. 2 — only the opus is taken, the movement being part of
 // the name).
-const CATALOGUE = /\b(woo|opus|op|bwv|kv|hob|hwv|rv|wwv|anh|k|d|s|b|l|cd)\b\.?\s*([ivxlc]+[:.]?\s*)?(\d+)\s*([a-z]\b)?/i;
+const CATALOGUE =
+    /\b(woo|opus|op|bwv|kv|hob|hwv|rv|wwv|anh|k|d|s|b|l|cd)\b\.?\s*([ivxlc]+[:.]?\s*)?(\d+)\s*([a-z]\b)?/i;
 
 export function workTitle(title: string): WorkTitle {
     const folded = (title || "")

@@ -11,16 +11,18 @@ const parse = (xml: string): Document =>
 
 // A part of `bars` whole-note bars, each carrying whatever directions are handed in for it.
 const score = (bars: string[]): Document =>
-    parse(`<score-partwise><part id="P1">${bars
-        .map(
-            (content, index) =>
-                `<measure number="${index + 1}">${
-                    index === 0
-                        ? "<attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time></attributes>"
-                        : ""
-                }${content}<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note></measure>`,
-        )
-        .join("")}</part></score-partwise>`);
+    parse(
+        `<score-partwise><part id="P1">${bars
+            .map(
+                (content, index) =>
+                    `<measure number="${index + 1}">${
+                        index === 0
+                            ? "<attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time></attributes>"
+                            : ""
+                    }${content}<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note></measure>`,
+            )
+            .join("")}</part></score-partwise>`,
+    );
 
 const words = (text: string) =>
     `<direction><direction-type><words>${text}</words></direction-type></direction>`;

@@ -37,9 +37,9 @@ describe("musicFilterParams", () => {
     });
 
     it("writes grades in reading order", () => {
-        expect(
-            musicFilterParams({ ...EMPTY_MUSIC_FILTER, grades: new Set([5, 1, 3]) }).grade,
-        ).toBe("1,3,5");
+        expect(musicFilterParams({ ...EMPTY_MUSIC_FILTER, grades: new Set([5, 1, 3]) }).grade).toBe(
+            "1,3,5",
+        );
     });
 
     it("survives the round trip", () => {

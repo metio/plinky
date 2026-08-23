@@ -130,7 +130,9 @@ describe("readIncipit", () => {
 
     it("returns nothing rather than an empty mark when there is nothing to draw", () => {
         expect(readIncipit(codec, "not xml at all")).toBeNull();
-        expect(readIncipit(codec, score(bar("<note><rest/><duration>16</duration></note>")))).toBeNull();
+        expect(
+            readIncipit(codec, score(bar("<note><rest/><duration>16</duration></note>"))),
+        ).toBeNull();
         expect(readIncipit(codec, "<score-partwise></score-partwise>")).toBeNull();
     });
 });

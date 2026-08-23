@@ -124,7 +124,7 @@ if (!recent.ok) {
     process.exit(1);
 }
 const listing = (await recent.json()) as {
-    data?: { children?: { data?: Partial<PostedRoundUp> }[] }
+    data?: { children?: { data?: Partial<PostedRoundUp> }[] };
 };
 const posts: PostedRoundUp[] = (listing.data?.children ?? []).map((child) => ({
     name: child.data?.name ?? "",

@@ -31,4 +31,3 @@ describe("optionVerdict", () => {
         expect(optionVerdict(3, 7, 3)).toBe("wrong");
     });
 });
-

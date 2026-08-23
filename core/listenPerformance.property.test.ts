@@ -30,7 +30,10 @@ const listenNote: fc.Arbitrary<ListenNote> = fc.record({
 const listenStep: fc.Arbitrary<ListenStep> = fc.record({
     notes: fc.uniqueArray(listenNote, { maxLength: 5, selector: (one) => one.pitch }),
     dynamicVolume: fc.option(fc.integer({ min: 1, max: 127 }), { nil: null }),
-    lengths: fc.array(fc.double({ min: 0.05, max: 8, noNaN: true }), { minLength: 1, maxLength: 4 }),
+    lengths: fc.array(fc.double({ min: 0.05, max: 8, noNaN: true }), {
+        minLength: 1,
+        maxLength: 4,
+    }),
     whole: fc.double({ min: 0, max: 100, noNaN: true }),
     measureIndex: fc.nat({ max: 200 }),
     bpm: fc.integer({ min: 20, max: 300 }),

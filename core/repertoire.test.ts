@@ -10,7 +10,12 @@ const NOW = new Date(2026, 5, 23, 12, 0).getTime();
 const TODAY = "2026-06-23";
 
 function mastery(overrides: Partial<Mastery> = {}): Mastery {
-    return normalizeMastery({ learned: true, intervalDays: 1, reviewAt: NOW + DAY_MS, ...overrides });
+    return normalizeMastery({
+        learned: true,
+        intervalDays: 1,
+        reviewAt: NOW + DAY_MS,
+        ...overrides,
+    });
 }
 
 describe("stageOf", () => {

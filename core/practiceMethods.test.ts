@@ -15,5 +15,4 @@ describe("practiceMethods", () => {
     it("has no duplicate ids, so the label lookups stay total", () => {
         expect(new Set(METHODS.map((method) => method.id)).size).toBe(METHODS.length);
     });
-
 });

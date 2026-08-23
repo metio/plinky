@@ -27,7 +27,9 @@ describe("svgKeyboardDiagram", () => {
     it("marks the notes it is given and nothing else", () => {
         expect(marks(svgKeyboardDiagram({ from: 60, to: 72, keys: [] }))).toBe(0);
         expect(
-            marks(svgKeyboardDiagram({ from: 60, to: 72, keys: C_MAJOR.map((note) => ({ note })) })),
+            marks(
+                svgKeyboardDiagram({ from: 60, to: 72, keys: C_MAJOR.map((note) => ({ note })) }),
+            ),
         ).toBe(3);
     });
 
@@ -79,7 +81,8 @@ describe("svgKeyboardDiagram", () => {
     it("shrinks a long caption rather than letting it run off both edges", () => {
         // A centred caption too wide for the picture loses BOTH its ends, and the
         // languages that happens in are the ones this was added for.
-        const sizeOf = (svg: string) => Number(/font-size="([\d.]+)" font-weight="600"/.exec(svg)?.[1]);
+        const sizeOf = (svg: string) =>
+            Number(/font-size="([\d.]+)" font-weight="600"/.exec(svg)?.[1]);
         const short = svgKeyboardDiagram({ from: 60, to: 72, keys: [], caption: "C major" });
         const long = svgKeyboardDiagram({
             from: 60,

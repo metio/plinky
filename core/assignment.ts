@@ -270,9 +270,8 @@ export function pruneAssignment(
 // How many assignments reference a piece id — a delete confirmation can then
 // name the blast radius before an imported score is removed.
 export function assignmentsReferencing(assignments: Assignment[], id: string): number {
-    return assignments.filter((assignment) =>
-        assignment.items.some((item) => item.id === id),
-    ).length;
+    return assignments.filter((assignment) => assignment.items.some((item) => item.id === id))
+        .length;
 }
 
 // The "continue where you left off" pointer for the home page: walk the

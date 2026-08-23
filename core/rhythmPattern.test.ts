@@ -45,9 +45,7 @@ describe("the rhythm ladder", () => {
                 pattern.cells.forEach((cell, index) => {
                     const start = starts[index] as number;
                     const barOfStart = Math.floor(start / pattern.beatsPerBar + 1e-9);
-                    const barOfEnd = Math.floor(
-                        (start + cell.beats - 1e-9) / pattern.beatsPerBar,
-                    );
+                    const barOfEnd = Math.floor((start + cell.beats - 1e-9) / pattern.beatsPerBar);
                     expect(barOfEnd).toBe(barOfStart);
                 });
             }

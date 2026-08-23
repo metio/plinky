@@ -131,9 +131,7 @@ describe("breadcrumbData", () => {
         expect(data["@type"]).toBe("BreadcrumbList");
         expect(data.itemListElement.map((crumb) => crumb.position)).toEqual([1, 2, 3]);
         expect(data.itemListElement[0]?.item).toBe("https://plinky.fun/en/");
-        expect(data.itemListElement[2]?.item).toBe(
-            "https://plinky.fun/en/person/frederic-chopin/",
-        );
+        expect(data.itemListElement[2]?.item).toBe("https://plinky.fun/en/person/frederic-chopin/");
     });
 });
 

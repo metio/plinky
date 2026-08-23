@@ -39,8 +39,16 @@ const PIECE = arg("piece", "/en/play/47xd2XDpYFCy/");
 // Chrome's own published profiles, so the figures are comparable with anyone else's.
 const NETWORKS = {
     none: null,
-    fast4g: { downloadThroughput: (9 * 1024 * 1024) / 8, uploadThroughput: (1.5 * 1024 * 1024) / 8, latency: 85 },
-    slow4g: { downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8, latency: 300 },
+    fast4g: {
+        downloadThroughput: (9 * 1024 * 1024) / 8,
+        uploadThroughput: (1.5 * 1024 * 1024) / 8,
+        latency: 85,
+    },
+    slow4g: {
+        downloadThroughput: (1.6 * 1024 * 1024) / 8,
+        uploadThroughput: (750 * 1024) / 8,
+        latency: 300,
+    },
 };
 const NET = arg("net", "fast4g");
 // A returning player arrives with the shell already cached, so the download stops dominating
@@ -95,7 +103,8 @@ async function measure(browser, rate) {
         await page.goto(`${BASE}${PIECE}`, { waitUntil: "load" });
         await page
             .waitForFunction(
-                () => (document.querySelector("svg#osmdSvgPage1, #osmdCanvasPage1") ?? null) !== null,
+                () =>
+                    (document.querySelector("svg#osmdSvgPage1, #osmdCanvasPage1") ?? null) !== null,
                 undefined,
                 { timeout: 120_000 },
             )
@@ -183,7 +192,9 @@ for (const rate of RATES) {
         `          domInteractive ${first.domInteractive}ms · asked for at: engraver ${first.engraverStartMs}ms · music ${first.musicStartMs}ms`,
     );
     for (const chunk of first.chunks) {
-        console.log(`          ${String(chunk.ms).padStart(5)}ms ${String(chunk.kb).padStart(4)}KB  ${chunk.name}`);
+        console.log(
+            `          ${String(chunk.ms).padStart(5)}ms ${String(chunk.kb).padStart(4)}KB  ${chunk.name}`,
+        );
     }
 }
 await browser.close();

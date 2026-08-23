@@ -144,9 +144,7 @@ export function creditLine(title: string, attribution: Attribution): string {
         parts.push(attribution.source.label);
     }
     if (attribution.license) {
-        parts.push(
-            attribution.license.publicDomain ? "Public domain" : attribution.license.label,
-        );
+        parts.push(attribution.license.publicDomain ? "Public domain" : attribution.license.label);
     }
     return parts.join(" · ");
 }

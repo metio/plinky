@@ -115,7 +115,13 @@ export function normalizeNoteStats(raw: unknown): NoteStats {
     const out: NoteStats = {};
     for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
         const note = Number(key);
-        if (!Number.isInteger(note) || note < 0 || note > 127 || !value || typeof value !== "object") {
+        if (
+            !Number.isInteger(note) ||
+            note < 0 ||
+            note > 127 ||
+            !value ||
+            typeof value !== "object"
+        ) {
             continue;
         }
         const stat = value as Record<string, unknown>;

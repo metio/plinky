@@ -174,7 +174,10 @@ describe("performListenNote", () => {
         const plain = step([60]);
         const softly = step([60], { soft: true });
         expect(performListenNote(softly, softly.notes[0]!, 120).voiced).toBe(
-            Math.max(1, Math.round(performListenNote(plain, plain.notes[0]!, 120).voiced * SOFT_SCALE)),
+            Math.max(
+                1,
+                Math.round(performListenNote(plain, plain.notes[0]!, 120).voiced * SOFT_SCALE),
+            ),
         );
     });
 

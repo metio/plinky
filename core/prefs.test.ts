@@ -156,8 +156,12 @@ describe("parsePrefs", () => {
         expect(parsePrefs(stored({ metronomeSubdivision: 9 })).metronomeSubdivision).toBe(1);
         expect(parsePrefs(stored({ metronomeAccent: false })).metronomeAccent).toBe(false);
         expect(parsePrefs(stored({ metronomeAdaptive: "yes" })).metronomeAdaptive).toBe(false);
-        expect(parsePrefs(stored({ metronomeGroove: "backbeat" })).metronomeGroove).toBe("backbeat");
-        expect(parsePrefs(stored({ metronomeGroove: "nonsense" })).metronomeGroove).toBe("straight");
+        expect(parsePrefs(stored({ metronomeGroove: "backbeat" })).metronomeGroove).toBe(
+            "backbeat",
+        );
+        expect(parsePrefs(stored({ metronomeGroove: "nonsense" })).metronomeGroove).toBe(
+            "straight",
+        );
         expect(parsePrefs(stored({ keyboardTheme: "sunset" })).keyboardTheme).toBe("sunset");
         expect(parsePrefs(stored({ keyboardTheme: 5 })).keyboardTheme).toBe("classic");
     });
@@ -196,9 +200,15 @@ describe("mic calibration prefs", () => {
     it("drops an instrument range that no piece could be played on", () => {
         // Backwards, and under an octave wide: both would leave every piece unplayable
         // while looking like a deliberate setting.
-        expect(parsePrefs(stored({ instrumentRange: { from: 96, to: 36 } })).instrumentRange).toBeNull();
-        expect(parsePrefs(stored({ instrumentRange: { from: 60, to: 64 } })).instrumentRange).toBeNull();
-        expect(parsePrefs(stored({ instrumentRange: { from: 21.5, to: 108 } })).instrumentRange).toBeNull();
+        expect(
+            parsePrefs(stored({ instrumentRange: { from: 96, to: 36 } })).instrumentRange,
+        ).toBeNull();
+        expect(
+            parsePrefs(stored({ instrumentRange: { from: 60, to: 64 } })).instrumentRange,
+        ).toBeNull();
+        expect(
+            parsePrefs(stored({ instrumentRange: { from: 21.5, to: 108 } })).instrumentRange,
+        ).toBeNull();
         expect(parsePrefs(stored({ instrumentRange: { from: 21 } })).instrumentRange).toBeNull();
     });
 
@@ -219,7 +229,9 @@ describe("mic calibration prefs", () => {
     });
 
     it("drops a calibration missing fields or carrying a NaN", () => {
-        expect(parsePrefs(stored({ micCalibration: { noiseFloor: 0.02 } })).micCalibration).toBeNull();
+        expect(
+            parsePrefs(stored({ micCalibration: { noiseFloor: 0.02 } })).micCalibration,
+        ).toBeNull();
         expect(
             parsePrefs(stored({ micCalibration: { ...CALIBRATION, noiseFloor: Number.NaN } }))
                 .micCalibration,

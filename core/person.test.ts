@@ -2,13 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import {
-    canonicalComposer,
-    nameFromSlug,
-    peopleFrom,
-    personFor,
-    personSlug,
-} from "./person";
+import { canonicalComposer, nameFromSlug, peopleFrom, personFor, personSlug } from "./person";
 
 // Spellings lifted verbatim from the shipped manifest — the whole point of the
 // canonicalization is that these real variants land on one name.
@@ -165,9 +159,9 @@ describe("credits the catalogue actually carries", () => {
     });
 
     it("decodes an entity a credit picked up from an HTML pipeline", () => {
-        expect(canonicalComposer('Charlotte Alington Barnard [published as &quot;Claribel&quot;]')).toBe(
-            "Charlotte Alington Barnard",
-        );
+        expect(
+            canonicalComposer("Charlotte Alington Barnard [published as &quot;Claribel&quot;]"),
+        ).toBe("Charlotte Alington Barnard");
     });
 
     it("gives a tradition no page of its own", () => {

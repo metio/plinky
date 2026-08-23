@@ -39,11 +39,18 @@ describe("buildScore", () => {
             beatsPerBar: 4,
             treble: [q("C", 4), q("D", 4), q("E", 4), q("F", 4)],
         });
-        expect(parseMusicXml(domXmlCodec, xml)!.notes.map((n) => n.pitch)).toEqual([60, 62, 64, 65]);
+        expect(parseMusicXml(domXmlCodec, xml)!.notes.map((n) => n.pitch)).toEqual([
+            60, 62, 64, 65,
+        ]);
     });
 
     it("escapes XML-special characters in the title yet stays well-formed", () => {
-        const xml = buildScore({ title: "A & B <C>", fifths: 0, beatsPerBar: 4, treble: [q("C", 4)] });
+        const xml = buildScore({
+            title: "A & B <C>",
+            fifths: 0,
+            beatsPerBar: 4,
+            treble: [q("C", 4)],
+        });
         expect(xml).toContain("A &amp; B &lt;C&gt;");
         expect(domXmlCodec.parse(xml)).not.toBeNull();
     });
@@ -52,8 +59,14 @@ describe("buildScore", () => {
         // One treble bar, two bass bars: the second bass bar must survive.
         const treble = [q("C", 4), q("C", 4), q("C", 4), q("C", 4)];
         const bass = [
-            q("C", 3), q("C", 3), q("C", 3), q("C", 3),
-            q("G", 2), q("G", 2), q("G", 2), q("G", 2),
+            q("C", 3),
+            q("C", 3),
+            q("C", 3),
+            q("C", 3),
+            q("G", 2),
+            q("G", 2),
+            q("G", 2),
+            q("G", 2),
         ];
         const xml = buildScore({ title: "Grand", fifths: 0, beatsPerBar: 4, treble, bass });
         const bassBars = scoreToBars(domXmlCodec, xml, staffFor("left"));

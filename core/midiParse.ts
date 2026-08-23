@@ -140,9 +140,7 @@ export function parseMidiFile(bytes: Uint8Array): Composition | null {
                         // value would drive tempo to Infinity and collapse every note
                         // to a zero-length onset; keep the default in both cases.
                         const value =
-                            data.length === 3
-                                ? (data[0]! << 16) | (data[1]! << 8) | data[2]!
-                                : 0;
+                            data.length === 3 ? (data[0]! << 16) | (data[1]! << 8) | data[2]! : 0;
                         if (value > 0) {
                             microsecondsPerQuarter = value;
                             tempoSeen = true;

@@ -106,7 +106,9 @@ export function readTremolos(
 ): TremoloSpan[] {
     const spans: TremoloSpan[] = [];
     const chordAt = (whole: number) =>
-        notes.filter((one) => one.whole === whole && one.midi !== null).map((one) => one.midi as number);
+        notes
+            .filter((one) => one.whole === whole && one.midi !== null)
+            .map((one) => one.midi as number);
     // A tremolo opened and waiting for the note it rocks against. Held rather than paired by
     // position, because every note of a chord carries the mark and only one figure is meant.
     let open: { at: number; wholes: number; beams: number } | null = null;

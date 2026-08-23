@@ -29,9 +29,7 @@ describe("assignment missing-piece properties", () => {
             fc.property(items, knownSet, (list, known) => {
                 const pruned = pruneAssignment(assignmentOf(list), (id) => known.has(id));
                 expect(pruned.items.every((item) => known.has(item.id))).toBe(true);
-                expect(pruned.items.length).toBe(
-                    list.filter((item) => known.has(item.id)).length,
-                );
+                expect(pruned.items.length).toBe(list.filter((item) => known.has(item.id)).length);
             }),
         );
     });
@@ -77,8 +75,7 @@ describe("assignment missing-piece properties", () => {
                 const isKnown = (id: string) => known.has(id);
                 const assignment = assignmentOf(list);
                 const untouched =
-                    pruneAssignment(assignment, isKnown).items.length ===
-                    assignment.items.length;
+                    pruneAssignment(assignment, isKnown).items.length === assignment.items.length;
                 expect(missingAssignmentIds(assignment.items, isKnown).length === 0).toBe(
                     untouched,
                 );

@@ -335,9 +335,9 @@ describe("clampHeading with astral characters", () => {
     });
 
     it("keeps the card's SVG well-formed for an emoji title", () => {
-        expect(svgCard([["best", "good"]], `${"a".repeat(26)}🎹 and more besides`).isWellFormed()).toBe(
-            true,
-        );
+        expect(
+            svgCard([["best", "good"]], `${"a".repeat(26)}🎹 and more besides`).isWellFormed(),
+        ).toBe(true);
     });
 
     it("measures the budget in code points, so emoji are not counted twice", () => {

@@ -5,10 +5,12 @@
 import { describe, expect, it } from "vitest";
 import { readTimeline } from "./musicxmlTimeline";
 
-const parse = (xml: string): Document =>
-    new DOMParser().parseFromString(xml, "application/xml");
+const parse = (xml: string): Document => new DOMParser().parseFromString(xml, "application/xml");
 
-const score = (measures: string, parts = `<score-part id="P1"><part-name>P</part-name></score-part>`) =>
+const score = (
+    measures: string,
+    parts = `<score-part id="P1"><part-name>P</part-name></score-part>`,
+) =>
     parse(`<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1"><part-list>${parts}</part-list><part id="P1">${measures}</part></score-partwise>`);
 

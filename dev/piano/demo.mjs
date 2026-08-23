@@ -14,7 +14,14 @@
 // because the dev server serves the repository and this is not part of it.
 
 import { spawn, spawnSync } from "node:child_process";
-import { createReadStream, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+    createReadStream,
+    existsSync,
+    mkdirSync,
+    readFileSync,
+    statSync,
+    writeFileSync,
+} from "node:fs";
 import { createServer } from "node:http";
 import { join, normalize } from "node:path";
 import { chromium } from "playwright";
@@ -78,7 +85,11 @@ function serveSamples(root) {
         // Every answer carries the header, a miss included: without it the browser reports
         // a CORS failure for what is really a 404, which hides the actual mistake.
         const cors = { "access-control-allow-origin": "*" };
-        if (!file.startsWith(normalize(root)) || !existsSync(file) || statSync(file).isDirectory()) {
+        if (
+            !file.startsWith(normalize(root)) ||
+            !existsSync(file) ||
+            statSync(file).isDirectory()
+        ) {
             response.writeHead(404, cors);
             response.end();
             return;
@@ -135,14 +146,27 @@ function withSampledAudio(video, wav) {
     const run = spawnSync(
         "ffmpeg",
         [
-            "-y", "-loglevel", "error",
-            "-i", video,
-            "-i", wav,
-            "-map", "0:v:0", "-map", "1:a:0",
-            "-c:v", "copy",
-            "-af", "loudnorm=I=-18:TP=-1.5:LRA=11",
-            "-ar", "48000",
-            "-c:a", "aac", "-b:a", "256k",
+            "-y",
+            "-loglevel",
+            "error",
+            "-i",
+            video,
+            "-i",
+            wav,
+            "-map",
+            "0:v:0",
+            "-map",
+            "1:a:0",
+            "-c:v",
+            "copy",
+            "-af",
+            "loudnorm=I=-18:TP=-1.5:LRA=11",
+            "-ar",
+            "48000",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "256k",
             "-shortest",
             out,
         ],

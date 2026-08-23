@@ -118,7 +118,9 @@ for (const file of [...walk(join(root, "app")), ...walk(join(root, "core"))]) {
         const classList = inAttribute || (tokens.length >= 2 && majorityKnown);
         if (classList && unknown.length > 0) {
             const line = src.slice(0, offset).split("\n").length;
-            failures.push(`${file.slice(root.length + 1)}:${line} unknown class ${unknown.join(", ")}`);
+            failures.push(
+                `${file.slice(root.length + 1)}:${line} unknown class ${unknown.join(", ")}`,
+            );
         }
     }
 }

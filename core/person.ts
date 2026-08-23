@@ -54,7 +54,7 @@ const ALIASES: Record<string, string> = {
     "m. ravel": "Maurice Ravel",
     ravel: "Maurice Ravel",
     "n. rimsky-korsakov": "Nikolai Rimsky-Korsakov",
-    "chopinff": "Frédéric Chopin",
+    chopinff: "Frédéric Chopin",
     // Misspellings, each carried by a single score. Mechanical cleanup cannot reach these
     // — nothing in the string says it is wrong — so a page held one piece under a name a
     // letter away from the composer's, invisible from his own page and too thin to be
@@ -79,8 +79,8 @@ const ALIASES: Record<string, string> = {
     "frédérick chopin": "Frédéric Chopin",
     "g. f. händel": "George Frideric Handel",
     "georg friedrich händel": "George Frideric Handel",
-    "haendel": "George Frideric Handel",
-    "händel": "George Frideric Handel",
+    haendel: "George Frideric Handel",
+    händel: "George Frideric Handel",
     "a. vivaldi": "Antonio Vivaldi",
     "antónio vivaldi": "Antonio Vivaldi",
     vivaldi: "Antonio Vivaldi",
@@ -112,10 +112,7 @@ function spaceInitials(name: string): string {
 function cleaned(raw: string): string {
     // Corpora that SHOUT a surname ("Johann Sebastian BACH") fold back to
     // title case; short all-caps runs stay, so initials survive.
-    let name = raw.replace(
-        /\b\p{Lu}{4,}\b/gu,
-        (word) => word[0] + word.slice(1).toLowerCase(),
-    );
+    let name = raw.replace(/\b\p{Lu}{4,}\b/gu, (word) => word[0] + word.slice(1).toLowerCase());
     // Corpora that passed their credits through an HTML pipeline leak entities into
     // the name — a page reading `Claribel&quot;` is the credit failing in public.
     name = name
@@ -150,7 +147,10 @@ function cleaned(raw: string): string {
         name = `${name.slice(comma + 1)} ${name.slice(0, comma)}`;
     }
     // A trailing full stop is punctuation from the credit line, never part of a name.
-    return name.replace(/\s+/g, " ").replace(/[.,;:]+$/, "").trim();
+    return name
+        .replace(/\s+/g, " ")
+        .replace(/[.,;:]+$/, "")
+        .trim();
 }
 
 // The display name a person page carries: the cleaned spelling, routed through

@@ -203,7 +203,11 @@ describe("scoreRounds properties", () => {
         fc.assert(
             fc.property(fc.array(fc.boolean(), { maxLength: 50 }), (results) => {
                 const score = scoreRounds(
-                    results.map((correct) => ({ answer: "a", given: correct ? "a" : "b", correct })),
+                    results.map((correct) => ({
+                        answer: "a",
+                        given: correct ? "a" : "b",
+                        correct,
+                    })),
                 );
                 expect(score.accuracy).toBeGreaterThanOrEqual(0);
                 expect(score.accuracy).toBeLessThanOrEqual(1);
@@ -226,7 +230,10 @@ describe("chord question properties", () => {
     it("sounds exactly the chord's notes, all at once", () => {
         fc.assert(
             fc.property(rolls, chordLevels, (values, level) => {
-                const q = generateChord({ qualities: CHORD_LEVELS[level]!, ...RANGE }, rngOf(values));
+                const q = generateChord(
+                    { qualities: CHORD_LEVELS[level]!, ...RANGE },
+                    rngOf(values),
+                );
                 // Every note starts together — a chord is heard as one sound.
                 expect(q.notes.every((note) => note.at === 0)).toBe(true);
                 const root = Math.min(...q.notes.map((note) => note.note));
@@ -240,7 +247,10 @@ describe("chord question properties", () => {
     it("keeps every note in range and always offers the answer", () => {
         fc.assert(
             fc.property(rolls, chordLevels, (values, level) => {
-                const q = generateChord({ qualities: CHORD_LEVELS[level]!, ...RANGE }, rngOf(values));
+                const q = generateChord(
+                    { qualities: CHORD_LEVELS[level]!, ...RANGE },
+                    rngOf(values),
+                );
                 for (const note of q.notes) {
                     expect(note.note).toBeGreaterThanOrEqual(DEFAULT_LOWEST);
                     expect(note.note).toBeLessThanOrEqual(DEFAULT_HIGHEST);
@@ -292,8 +302,12 @@ describe("generateQuestion dispatch", () => {
                 expect(generateQuestion("scales", 0, rng).kind).toBe("scales");
                 expect(generateQuestion("progressions", 0, rng).kind).toBe("progressions");
                 expect(generateQuestion("scale-degrees", 0, rng).kind).toBe("scale-degrees");
-                expect(generateQuestion("intervals-context", 0, rng).kind).toBe("intervals-context");
-                expect(generateQuestion("melodic-dictation", 0, rng).kind).toBe("melodic-dictation");
+                expect(generateQuestion("intervals-context", 0, rng).kind).toBe(
+                    "intervals-context",
+                );
+                expect(generateQuestion("melodic-dictation", 0, rng).kind).toBe(
+                    "melodic-dictation",
+                );
             }),
         );
     });
@@ -376,7 +390,10 @@ describe("functional exercise properties (a cadence sets the key)", () => {
     it("scale degrees: names the note it sounds after the cadence", () => {
         fc.assert(
             fc.property(rolls, sdLevels, (values, level) => {
-                const q = generateScaleDegree({ degrees: SCALE_DEGREE_LEVELS[level]! }, rngOf(values));
+                const q = generateScaleDegree(
+                    { degrees: SCALE_DEGREE_LEVELS[level]! },
+                    rngOf(values),
+                );
                 expect(q.choices).toContain(q.answer);
                 // The cadence sounds first (I = the lowest chord's root is the tonic), then
                 // exactly one question note, the highest and last thing heard.
@@ -395,7 +412,10 @@ describe("functional exercise properties (a cadence sets the key)", () => {
     it("intervals in context: two question notes the answer's distance apart, after a cadence", () => {
         fc.assert(
             fc.property(rolls, levels, (values, level) => {
-                const q = generateIntervalContext({ intervals: INTERVAL_LEVELS[level]! }, rngOf(values));
+                const q = generateIntervalContext(
+                    { intervals: INTERVAL_LEVELS[level]! },
+                    rngOf(values),
+                );
                 expect(q.choices).toContain(q.answer);
                 // The last two onsets are the interval pair; they differ by the answer.
                 const onsets = [...new Set(q.notes.map((n) => n.at))].sort((a, b) => a - b);
@@ -415,7 +435,9 @@ describe("functional exercise properties (a cadence sets the key)", () => {
                 expect(q.answer).toBe(q.sequence.join("-"));
                 const tonic = Math.min(...q.notes.map((n) => n.note));
                 // Each melody note reads back as its degree in the key it was drawn from.
-                const melody = [...q.notes].sort((a, b) => a.at - b.at).slice(-MELODIC_LEVELS[level]!);
+                const melody = [...q.notes]
+                    .sort((a, b) => a.at - b.at)
+                    .slice(-MELODIC_LEVELS[level]!);
                 melody.forEach((note, index) => {
                     expect(degreeOf(tonic, note.note)).toBe(q.sequence[index]);
                 });

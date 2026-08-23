@@ -61,71 +61,96 @@ function play(
 describe("matcher properties", () => {
     it("moves the index forward only, one step per cleared event", () => {
         fc.assert(
-            fc.property(stepsArb, fc.array(pitch, { maxLength: 40 }), fc.boolean(), (steps, notes, forgiving) => {
-                let state = startMatch(steps);
-                for (const note of notes) {
-                    const before = state.index;
-                    const result = matchNote(state, note, 0, forgiving);
-                    const cleared = result.events.filter((e) => e.kind === "cleared").length;
-                    expect(result.state.index).toBe(before + cleared);
-                    expect(result.state.index).toBeGreaterThanOrEqual(before);
-                    state = result.state;
-                }
-            }),
+            fc.property(
+                stepsArb,
+                fc.array(pitch, { maxLength: 40 }),
+                fc.boolean(),
+                (steps, notes, forgiving) => {
+                    let state = startMatch(steps);
+                    for (const note of notes) {
+                        const before = state.index;
+                        const result = matchNote(state, note, 0, forgiving);
+                        const cleared = result.events.filter((e) => e.kind === "cleared").length;
+                        expect(result.state.index).toBe(before + cleared);
+                        expect(result.state.index).toBeGreaterThanOrEqual(before);
+                        state = result.state;
+                    }
+                },
+            ),
         );
     });
 
     it("clears at most every position, and is complete exactly when all are cleared", () => {
         fc.assert(
-            fc.property(stepsArb, fc.array(pitch, { maxLength: 40 }), fc.boolean(), (steps, notes, forgiving) => {
-                const { state, events } = play(steps, notes, forgiving);
-                const cleared = events.filter((e) => e.kind === "cleared");
-                expect(cleared.length).toBeLessThanOrEqual(steps.length);
-                expect(state.complete).toBe(cleared.length === steps.length);
-                // Each position is cleared once, in order.
-                expect(cleared.map((e) => (e.kind === "cleared" ? e.ordinal : -1))).toEqual(
-                    cleared.map((_, i) => i),
-                );
-            }),
+            fc.property(
+                stepsArb,
+                fc.array(pitch, { maxLength: 40 }),
+                fc.boolean(),
+                (steps, notes, forgiving) => {
+                    const { state, events } = play(steps, notes, forgiving);
+                    const cleared = events.filter((e) => e.kind === "cleared");
+                    expect(cleared.length).toBeLessThanOrEqual(steps.length);
+                    expect(state.complete).toBe(cleared.length === steps.length);
+                    // Each position is cleared once, in order.
+                    expect(cleared.map((e) => (e.kind === "cleared" ? e.ordinal : -1))).toEqual(
+                        cleared.map((_, i) => i),
+                    );
+                },
+            ),
         );
     });
 
     it("counts exactly one wrong per wrong event", () => {
         fc.assert(
-            fc.property(stepsArb, fc.array(pitch, { maxLength: 40 }), fc.boolean(), (steps, notes, forgiving) => {
-                const { state, events } = play(steps, notes, forgiving);
-                expect(state.wrong).toBe(events.filter((e) => e.kind === "wrong").length);
-            }),
+            fc.property(
+                stepsArb,
+                fc.array(pitch, { maxLength: 40 }),
+                fc.boolean(),
+                (steps, notes, forgiving) => {
+                    const { state, events } = play(steps, notes, forgiving);
+                    expect(state.wrong).toBe(events.filter((e) => e.kind === "wrong").length);
+                },
+            ),
         );
     });
 
     it("never freezes: playing what is expected always finishes, noise or not", () => {
         fc.assert(
-            fc.property(stepsArb, fc.array(pitch, { maxLength: 10 }), fc.boolean(), (steps, noise, forgiving) => {
-                let state = startMatch(steps);
-                const totalPitches = steps.reduce((sum, step) => sum + step.pitches.length, 0);
-                let plays = 0;
-                let noiseAt = 0;
-                while (!state.complete) {
-                    // Interleave arbitrary noise, then play the next expected pitch;
-                    // the run must still advance to the end.
-                    if (noiseAt < noise.length) {
-                        state = matchNote(state, noise[noiseAt++] as number, 0, forgiving).state;
+            fc.property(
+                stepsArb,
+                fc.array(pitch, { maxLength: 10 }),
+                fc.boolean(),
+                (steps, noise, forgiving) => {
+                    let state = startMatch(steps);
+                    const totalPitches = steps.reduce((sum, step) => sum + step.pitches.length, 0);
+                    let plays = 0;
+                    let noiseAt = 0;
+                    while (!state.complete) {
+                        // Interleave arbitrary noise, then play the next expected pitch;
+                        // the run must still advance to the end.
+                        if (noiseAt < noise.length) {
+                            state = matchNote(
+                                state,
+                                noise[noiseAt++] as number,
+                                0,
+                                forgiving,
+                            ).state;
+                        }
+                        // The first pitch of the position not yet sounded — replaying an
+                        // already-hit chord note would not advance the run.
+                        const next = expectedPitches(state).find(
+                            (p) => !state.hit.some((arrival) => arrival.note === p),
+                        );
+                        if (next === undefined) {
+                            break; // the noise itself completed the run (forgiving skip)
+                        }
+                        state = matchNote(state, next, 0, forgiving).state;
+                        plays++;
+                        expect(plays).toBeLessThanOrEqual(totalPitches + noise.length + 1);
                     }
-                    // The first pitch of the position not yet sounded — replaying an
-                    // already-hit chord note would not advance the run.
-                    const next = expectedPitches(state).find(
-                        (p) => !state.hit.some((arrival) => arrival.note === p),
-                    );
-                    if (next === undefined) {
-                        break; // the noise itself completed the run (forgiving skip)
-                    }
-                    state = matchNote(state, next, 0, forgiving).state;
-                    plays++;
-                    expect(plays).toBeLessThanOrEqual(totalPitches + noise.length + 1);
-                }
-                expect(state.complete).toBe(true);
-            }),
+                    expect(state.complete).toBe(true);
+                },
+            ),
         );
     });
 
@@ -134,8 +159,34 @@ describe("matcher properties", () => {
         // position 0 only — the match branch wins over the forgiving skip, so the
         // run does not jump two positions on one keypress.
         const steps: MatchStep[] = [
-            { pitches: [60], pitchStaves: [0], pitchHands: ["right"], staves: [0], whole: 0, elapsedMs: 0, holdMs: 1000, bar: 0, holdQuarters: 1, advancesCursor: true, slackMs: 0, pedalled: false },
-            { pitches: [60], pitchStaves: [0], pitchHands: ["right"], staves: [0], whole: 1, elapsedMs: 1000, holdMs: 1000, bar: 0, holdQuarters: 1, advancesCursor: true, slackMs: 0, pedalled: false },
+            {
+                pitches: [60],
+                pitchStaves: [0],
+                pitchHands: ["right"],
+                staves: [0],
+                whole: 0,
+                elapsedMs: 0,
+                holdMs: 1000,
+                bar: 0,
+                holdQuarters: 1,
+                advancesCursor: true,
+                slackMs: 0,
+                pedalled: false,
+            },
+            {
+                pitches: [60],
+                pitchStaves: [0],
+                pitchHands: ["right"],
+                staves: [0],
+                whole: 1,
+                elapsedMs: 1000,
+                holdMs: 1000,
+                bar: 0,
+                holdQuarters: 1,
+                advancesCursor: true,
+                slackMs: 0,
+                pedalled: false,
+            },
         ];
         const first = matchNote(startMatch(steps), 60, 0, true);
         expect(first.events.map((e) => e.kind)).toEqual(["cleared"]);

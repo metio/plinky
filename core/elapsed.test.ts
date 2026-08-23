@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { FERMATA_STRETCH, NOMINAL_BPM, type Position, quartersMs, writtenOnsetsMs } from "./elapsed";
+import {
+    FERMATA_STRETCH,
+    NOMINAL_BPM,
+    type Position,
+    quartersMs,
+    writtenOnsetsMs,
+} from "./elapsed";
 
 // A position lasting a whole bar of 4/4 at the given printed onset. At 60 bpm a quarter
 // note is a second, so a bar is 4000 ms.

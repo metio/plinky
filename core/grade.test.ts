@@ -116,7 +116,8 @@ describe("computeGrade timing weighting", () => {
             rhythm: rhythm(2, 2, 2),
             flow: 100,
             dynamics: null,
-            expression: null,        });
+            expression: null,
+        });
         expect(grade.timing).toBe(53);
     });
 
@@ -127,7 +128,8 @@ describe("computeGrade timing weighting", () => {
             rhythm: rhythm(0, 0, 0),
             flow: 100,
             dynamics: null,
-            expression: null,        });
+            expression: null,
+        });
         expect(grade.timing).toBe(100);
     });
 });
@@ -151,7 +153,8 @@ describe("grade", () => {
             rhythm: PERFECT_RHYTHM,
             flow: 100,
             dynamics: { mean: 80, evenness: 100, label: "even" },
-            expression: null,        });
+            expression: null,
+        });
         expect(grade.accuracy).toBe(100);
         expect(grade.timing).toBe(100);
         expect(grade.flow).toBe(100);
@@ -166,7 +169,8 @@ describe("grade", () => {
             rhythm: PERFECT_RHYTHM,
             flow: 40,
             dynamics: null,
-            expression: null,        });
+            expression: null,
+        });
         // mean(100, 100, 40) = 80 → B
         expect(grade.flow).toBe(40);
         expect(grade.score).toBe(80);
@@ -180,7 +184,8 @@ describe("grade", () => {
             rhythm: { perfect: 5, good: 0, off: 0, total: 5, averageAbsMs: 0 },
             flow: 100,
             dynamics: null,
-            expression: null,        });
+            expression: null,
+        });
         expect(grade.accuracy).toBe(50);
     });
 
@@ -189,11 +194,13 @@ describe("grade", () => {
         const great = computeGrade({
             ...base,
             dynamics: { mean: 80, evenness: 100, label: "even" },
-            expression: null,        });
+            expression: null,
+        });
         const poor = computeGrade({
             ...base,
             dynamics: { mean: 80, evenness: 10, label: "uneven" },
-            expression: null,        });
+            expression: null,
+        });
         expect(great.score).toBe(poor.score);
         expect(great.letter).toBe(poor.letter);
         expect(poor.dynamics).toBe(10);
@@ -206,7 +213,8 @@ describe("grade", () => {
             rhythm: { perfect: 0, good: 0, off: 0, total: 0, averageAbsMs: 0 },
             flow: 100,
             dynamics: null,
-            expression: null,        });
+            expression: null,
+        });
         expect(grade).toMatchObject({ accuracy: 0, timing: 0, flow: 0, score: 0, letter: "F" });
     });
 
@@ -217,7 +225,8 @@ describe("grade", () => {
             rhythm: PERFECT_RHYTHM,
             flow: 100,
             dynamics: null,
-            expression: null,        });
+            expression: null,
+        });
         expect(grade.dynamics).toBeNull();
         expect(grade.score).toBe(100);
     });

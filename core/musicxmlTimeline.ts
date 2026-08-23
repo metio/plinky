@@ -107,9 +107,8 @@ function marksOf(note: Element): XmlNoteMarks {
     }
     const has = (name: string) => note.getElementsByTagName(name).length > 0;
     const articulation =
-        ARTICULATION_ORDER.find((one) =>
-            has(one === "detachedLegato" ? "detached-legato" : one),
-        ) ?? "none";
+        ARTICULATION_ORDER.find((one) => has(one === "detachedLegato" ? "detached-legato" : one)) ??
+        "none";
     const ornamentTag = Object.keys(ORNAMENT_TAGS).find((tag) => has(tag));
     const slurs = Array.from(note.getElementsByTagName("slur"));
     return {
@@ -117,7 +116,7 @@ function marksOf(note: Element): XmlNoteMarks {
         accent: has("accent"),
         marcato: has("strong-accent"),
         fermata: has("fermata"),
-        ornament: ornamentTag ? ORNAMENT_TAGS[ornamentTag] ?? null : null,
+        ornament: ornamentTag ? (ORNAMENT_TAGS[ornamentTag] ?? null) : null,
         arpeggiate: has("arpeggiate"),
         tremolo: tremoloOf(note),
         glissando: glissandoOf(note),

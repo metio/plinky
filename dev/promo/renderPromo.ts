@@ -13,7 +13,6 @@ import { decompressMxl } from "../../core/musicxmlFile";
 import { performanceLengthMs } from "../../core/scorePerformance";
 import { listenPerformanceOf } from "../../core/listenPerformance";
 import {
-    BY_FINGER,
     DEFAULT_KEYBOARD_DEPTH,
     DEFAULT_NOTE_COLOR,
     keyboardDepthFraction,

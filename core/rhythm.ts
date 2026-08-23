@@ -39,11 +39,7 @@ export type RhythmSummary = {
 // to span the pair rather than picking a side.
 //
 // Zero everywhere else, which leaves every other note scored exactly as before.
-export function rate(
-    absDeltaMs: number,
-    tolerance = PRECISE_TOLERANCE,
-    slackMs = 0,
-): Rating {
+export function rate(absDeltaMs: number, tolerance = PRECISE_TOLERANCE, slackMs = 0): Rating {
     const slack = Math.max(0, slackMs);
     if (absDeltaMs <= PERFECT_MS * tolerance + slack) {
         return "perfect";

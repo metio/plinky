@@ -76,7 +76,7 @@ describe("a file that is not plain UTF-8", () => {
         // Finale and other older tools write UTF-16. Decoded as UTF-8 the bytes come out
         // interleaved with NULs, the parser finds no notes, and a perfectly valid file
         // was refused for a reason nobody could see.
-        const xml = "<score-partwise><part id=\"P1\"/></score-partwise>";
+        const xml = '<score-partwise><part id="P1"/></score-partwise>';
         const utf16 = new Uint8Array(2 + xml.length * 2);
         utf16[0] = 0xff;
         utf16[1] = 0xfe;
@@ -99,7 +99,9 @@ describe("a zip that unpacks to far more than a score", () => {
         // hundred kilobytes. Without a ceiling a one-megabyte file expands to gigabytes
         // and takes the tab with it.
         const huge = zipSync({
-            "META-INF/container.xml": strToU8('<container><rootfiles><rootfile full-path="s.xml"/></rootfiles></container>'),
+            "META-INF/container.xml": strToU8(
+                '<container><rootfiles><rootfile full-path="s.xml"/></rootfiles></container>',
+            ),
             "s.xml": new Uint8Array(64 * 1024 * 1024),
         });
         expect(decompressMxl(huge)).toBeNull();
@@ -107,7 +109,9 @@ describe("a zip that unpacks to far more than a score", () => {
 
     it("still reads one of an ordinary size", () => {
         const ordinary = zipSync({
-            "META-INF/container.xml": strToU8('<container><rootfiles><rootfile full-path="s.xml"/></rootfiles></container>'),
+            "META-INF/container.xml": strToU8(
+                '<container><rootfiles><rootfile full-path="s.xml"/></rootfiles></container>',
+            ),
             "s.xml": strToU8("<score-partwise/>"),
         });
         expect(decompressMxl(ordinary)).toBe("<score-partwise/>");

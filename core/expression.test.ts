@@ -133,6 +133,8 @@ describe("performNote velocity", () => {
     });
 
     it("clamps a boosted loud dynamic to the MIDI ceiling", () => {
-        expect(performNote({ ...plain, dynamicVolume: 120, marcato: true }, 120).velocity).toBe(127);
+        expect(performNote({ ...plain, dynamicVolume: 120, marcato: true }, 120).velocity).toBe(
+            127,
+        );
     });
 });

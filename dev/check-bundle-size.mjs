@@ -14,7 +14,7 @@
 // is budgeted apart from our own code — that keeps an app-code regression visible
 // instead of lost behind OSMD's bulk.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { requireSingleLocaleBuild } from "./single-locale-build.mjs";
 

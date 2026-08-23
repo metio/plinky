@@ -87,14 +87,23 @@ function toAac(file) {
     const run = spawnSync(
         "ffmpeg",
         [
-            "-y", "-loglevel", "error",
-            "-i", file,
-            "-c:v", "copy",
+            "-y",
+            "-loglevel",
+            "error",
+            "-i",
+            file,
+            "-c:v",
+            "copy",
             // Instagram plays at about -14 LUFS; anything quieter is turned up by the
             // platform anyway, and unevenly.
-            "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
-            "-ar", "48000",
-            "-c:a", "aac", "-b:a", "256k",
+            "-af",
+            "loudnorm=I=-14:TP=-1.5:LRA=11",
+            "-ar",
+            "48000",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "256k",
             temp,
         ],
         { stdio: "inherit" },
@@ -225,50 +234,50 @@ try {
         }
         process.stdout.write(`${piece.title} … `);
         try {
-        const { url, song } = scoreUrl(piece.id, manifest);
-        const started = Date.now();
-        const file = fileFor(piece, OUT);
-        sink = createWriteStream(file);
-        const size = await page.evaluate(
-            async (request) => {
-                const module = await import("/dev/promo/renderPromo.ts");
-                const data = await module.renderPromo(request);
-                // A megabyte per message, and base64 built in small runs — spreading a
-                // whole megabyte into String.fromCharCode overflows the argument stack.
-                const CHUNK = 1 << 20;
-                const RUN = 0x8000;
-                for (let at = 0; at < data.length; at += CHUNK) {
-                    const slice = data.subarray(at, at + CHUNK);
-                    let binary = "";
-                    for (let index = 0; index < slice.length; index += RUN) {
-                        binary += String.fromCharCode(...slice.subarray(index, index + RUN));
+            const { url, song } = scoreUrl(piece.id, manifest);
+            const started = Date.now();
+            const file = fileFor(piece, OUT);
+            sink = createWriteStream(file);
+            const size = await page.evaluate(
+                async (request) => {
+                    const module = await import("/dev/promo/renderPromo.ts");
+                    const data = await module.renderPromo(request);
+                    // A megabyte per message, and base64 built in small runs — spreading a
+                    // whole megabyte into String.fromCharCode overflows the argument stack.
+                    const CHUNK = 1 << 20;
+                    const RUN = 0x8000;
+                    for (let at = 0; at < data.length; at += CHUNK) {
+                        const slice = data.subarray(at, at + CHUNK);
+                        let binary = "";
+                        for (let index = 0; index < slice.length; index += RUN) {
+                            binary += String.fromCharCode(...slice.subarray(index, index + RUN));
+                        }
+                        await window.__promoChunk(btoa(binary));
                     }
-                    await window.__promoChunk(btoa(binary));
-                }
-                return data.length;
-            },
-            {
-                scoreUrl: url,
-                title: piece.title,
-                // No plinky.fun here: the wordmark already rides the top-right corner, and
-                // the credit line is for what the catalogue owes the source.
-                credit: `${piece.composer} · CC0`,
-                width: WIDTH,
-                height: HEIGHT,
-                fps: FPS,
-                // A whole piece for YouTube; a feed gets the opening.
-                clipMs: YOUTUBE ? 0 : SECONDS * 1000,
-                noteColor: NOTE_COLOR,
-                keyboardDepth: KEYBOARD_DEPTH,
-                samplesBase: SAMPLES,
-            },
-        );
-        await new Promise((done) => sink.end(done));
-        sink = null;
-        toAac(file);
-        const seconds = ((Date.now() - started) / 1000).toFixed(1);
-        console.log(`${(size / 1_000_000).toFixed(1)} MB in ${seconds}s → ${file}`);
-        void song;
+                    return data.length;
+                },
+                {
+                    scoreUrl: url,
+                    title: piece.title,
+                    // No plinky.fun here: the wordmark already rides the top-right corner, and
+                    // the credit line is for what the catalogue owes the source.
+                    credit: `${piece.composer} · CC0`,
+                    width: WIDTH,
+                    height: HEIGHT,
+                    fps: FPS,
+                    // A whole piece for YouTube; a feed gets the opening.
+                    clipMs: YOUTUBE ? 0 : SECONDS * 1000,
+                    noteColor: NOTE_COLOR,
+                    keyboardDepth: KEYBOARD_DEPTH,
+                    samplesBase: SAMPLES,
+                },
+            );
+            await new Promise((done) => sink.end(done));
+            sink = null;
+            toAac(file);
+            const seconds = ((Date.now() - started) / 1000).toFixed(1);
+            console.log(`${(size / 1_000_000).toFixed(1)} MB in ${seconds}s → ${file}`);
+            void song;
         } catch (error) {
             failed += 1;
             // A piece that failed partway has a half-written file open on it; close it and

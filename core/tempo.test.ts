@@ -109,4 +109,4 @@ describe("rampedTempo", () => {
         // player back down mid-practice.
         expect(rampedTempo(current, target)).toBe(current);
     });
-})
+});

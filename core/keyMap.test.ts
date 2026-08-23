@@ -30,7 +30,11 @@ describe("keyForSlot", () => {
     });
 
     it("returns null when nothing is bound to the slot", () => {
-        const map: KeyMap = { left: {}, right: {}, pedals: { sustain: null, sostenuto: null, soft: null } };
+        const map: KeyMap = {
+            left: {},
+            right: {},
+            pedals: { sustain: null, sostenuto: null, soft: null },
+        };
         expect(keyForSlot(map, "left", 0)).toBeNull();
     });
 });

@@ -56,7 +56,11 @@ describe("flattenedBackground", () => {
     it("swallows the antialiased edge, which is what the halo is made of", () => {
         // A shape's edge is blended against its old background, so those pixels are nearly
         // that background. Left behind they read as a bright fringe on any other ground.
-        const mask = flattenedBackground(image(4, 1, (x) => (x < 2 ? WHITE : [238, 236, 246])), 4, 1);
+        const mask = flattenedBackground(
+            image(4, 1, (x) => (x < 2 ? WHITE : [238, 236, 246])),
+            4,
+            1,
+        );
         expect(at(mask, 4, 0, 0)).toBe(1);
         expect(at(mask, 4, 2, 0)).toBe(1);
     });
@@ -64,7 +68,11 @@ describe("flattenedBackground", () => {
     it("takes nothing from artwork that already bleeds to every edge", () => {
         // A full-bleed image has no background to find, and inventing one would punch a hole
         // in the picture.
-        const mask = flattenedBackground(image(6, 6, () => VIOLET), 6, 6);
+        const mask = flattenedBackground(
+            image(6, 6, () => VIOLET),
+            6,
+            6,
+        );
         expect(maskedShare(mask)).toBe(0);
     });
 
@@ -95,7 +103,7 @@ describe("flattenedBackground", () => {
     });
 
     it("can be told where to start when the artwork bleeds off one edge", () => {
-        const rgba = image(4, 2, (x, y) => (y === 0 ? VIOLET : WHITE));
+        const rgba = image(4, 2, (_x, y) => (y === 0 ? VIOLET : WHITE));
         expect(maskedShare(flattenedBackground(rgba, 4, 2, { seeds: [4] }))).toBeCloseTo(0.5);
     });
 
@@ -120,5 +128,3 @@ describe("the seeds a caller supplies", () => {
         expect(second).toEqual(first);
     });
 });
-
-

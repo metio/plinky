@@ -27,7 +27,10 @@ describe("runCapture", () => {
     it("counts both clocks from the first cleared note", () => {
         const capture = startCapture();
         captureCleared(capture, cleared({ ordinal: 0, timestamp: 5000, timeMs: 2000 }));
-        captureCleared(capture, cleared({ ordinal: 1, timestamp: 5480, timeMs: 2500, pitches: [62] }));
+        captureCleared(
+            capture,
+            cleared({ ordinal: 1, timestamp: 5480, timeMs: 2500, pitches: [62] }),
+        );
         expect(capture.startedAt).toBe(5000);
         expect(capture.notes[0]).toMatchObject({ targetMs: 0, playedMs: 0 });
         expect(capture.notes[1]).toMatchObject({ targetMs: 500, playedMs: 480 });
@@ -111,7 +114,10 @@ describe("runCapture", () => {
         const capture = startCapture();
         // Notated 500ms apart at 100 BPM, played 250ms apart — twice the pace.
         captureCleared(capture, cleared({ ordinal: 0, timestamp: 0, timeMs: 0 }));
-        captureCleared(capture, cleared({ ordinal: 1, timestamp: 250, timeMs: 500, pitches: [62] }));
+        captureCleared(
+            capture,
+            cleared({ ordinal: 1, timestamp: 250, timeMs: 500, pitches: [62] }),
+        );
         const next = liveTempo(capture, 100, 100);
         expect(next).toBeGreaterThan(100);
         expect(next).toBeLessThanOrEqual(180);

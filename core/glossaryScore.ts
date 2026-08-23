@@ -165,7 +165,9 @@ function directionXml(note: SnippetNote): string {
 }
 
 function clefXml(clef: Snippet["clef"]): string {
-    return clef === "bass" ? "<clef><sign>F</sign><line>4</line></clef>" : "<clef><sign>G</sign><line>2</line></clef>";
+    return clef === "bass"
+        ? "<clef><sign>F</sign><line>4</line></clef>"
+        : "<clef><sign>G</sign><line>2</line></clef>";
 }
 
 // Split the note stream into bars. Examples are written to fill their bars exactly,

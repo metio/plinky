@@ -26,11 +26,19 @@ describe("nameHeldNotes", () => {
     it("names two notes as an interval rather than a chord with something missing", () => {
         // Calling C+G "C major without its third" would tell a beginner something false
         // about what they are hearing.
-        expect(nameHeldNotes([C4, G4])).toEqual({ kind: "interval", interval: "perfect-fifth", lower: 0 });
+        expect(nameHeldNotes([C4, G4])).toEqual({
+            kind: "interval",
+            interval: "perfect-fifth",
+            lower: 0,
+        });
     });
 
     it("measures the interval up from the lowest note", () => {
-        expect(nameHeldNotes([G4, C5])).toEqual({ kind: "interval", interval: "perfect-fourth", lower: 7 });
+        expect(nameHeldNotes([G4, C5])).toEqual({
+            kind: "interval",
+            interval: "perfect-fourth",
+            lower: 7,
+        });
     });
 
     it("names a triad", () => {

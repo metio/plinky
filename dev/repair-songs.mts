@@ -31,10 +31,11 @@ import { onThePiano, ontoThePiano } from "../core/pianoRange.ts";
 
 const OUT = "public/songs";
 const STEPS: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-const LETTERS = ["C", "C", "D", "D", "E", "F", "F", "G", "G", "A", "A", "B"];
+const _LETTERS = ["C", "C", "D", "D", "E", "F", "F", "G", "G", "A", "A", "B"];
 
 // The one `<pitch>` shape, matched whole so a rewrite can put the octave back where it was.
-const PITCH = /<pitch>(\s*<step>)([A-G])(<\/step>\s*)(?:<alter>(-?\d+)<\/alter>(\s*))?(<octave>)(-?\d+)(<\/octave>)/g;
+const PITCH =
+    /<pitch>(\s*<step>)([A-G])(<\/step>\s*)(?:<alter>(-?\d+)<\/alter>(\s*))?(<octave>)(-?\d+)(<\/octave>)/g;
 
 function midiOf(step: string, alter: number, octave: number): number {
     return (octave + 1) * 12 + (STEPS[step] ?? 0) + alter;

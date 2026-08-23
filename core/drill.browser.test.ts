@@ -37,7 +37,10 @@ describe("generated drills render on OSMD", () => {
     });
 
     it("renders a two-hand grand-staff drill", async () => {
-        const xml = generateDrill({ ...DEFAULT_DRILL, bars: 1, hands: 2, low: 48, high: 84 }, () => 0);
+        const xml = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, hands: 2, low: 48, high: 84 },
+            () => 0,
+        );
         expect(await renders(xml)).toBe(true);
     });
 

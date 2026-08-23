@@ -92,7 +92,9 @@ for (const { locale, missing, orphan } of problems) {
         console.error(`✗ ${locale}: missing ${missing.length} — ${missing.join(", ")}`);
     }
     if (orphan.length > 0) {
-        console.error(`✗ ${locale}: orphan ${orphan.length} (not in ${baseLocale}) — ${orphan.join(", ")}`);
+        console.error(
+            `✗ ${locale}: orphan ${orphan.length} (not in ${baseLocale}) — ${orphan.join(", ")}`,
+        );
     }
 }
 console.error(

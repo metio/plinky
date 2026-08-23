@@ -45,8 +45,7 @@ const parser = new new JSDOM().window.DOMParser();
 
 type Problem = { path: string; kind: string; detail: string };
 const problems: Problem[] = [];
-const note = (path: string, kind: string, detail = "") =>
-    problems.push({ path, kind, detail });
+const note = (path: string, kind: string, detail = "") => problems.push({ path, kind, detail });
 
 let read = 0;
 let notes = 0;

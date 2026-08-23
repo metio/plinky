@@ -28,7 +28,6 @@ export const RHYTHM: Record<RhythmValue, { divisions: number; type: string }> = 
 // spells as following notes marked <chord/>.
 export type BuiltNote = { pitch: BuiltPitch; value: RhythmValue; with?: BuiltPitch[] };
 
-
 function escapeXml(text: string): string {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

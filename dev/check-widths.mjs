@@ -83,11 +83,16 @@ try {
                 const culprits = [...document.querySelectorAll("body *")]
                     .filter((node) => node.getBoundingClientRect().right > doc.clientWidth + 1)
                     .slice(0, 3)
-                    .map((node) => `${node.tagName.toLowerCase()}.${String(node.className).split(" ")[0]}`);
+                    .map(
+                        (node) =>
+                            `${node.tagName.toLowerCase()}.${String(node.className).split(" ")[0]}`,
+                    );
                 return { spill, culprits };
             });
             if (over) {
-                problems.push(`${width}px ${path}: ${over.spill}px past the screen — ${over.culprits.join(", ")}`);
+                problems.push(
+                    `${width}px ${path}: ${over.spill}px past the screen — ${over.culprits.join(", ")}`,
+                );
             }
         }
         await page.close();

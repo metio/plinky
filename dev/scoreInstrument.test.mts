@@ -9,7 +9,9 @@ import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
 const score = (...names: string[]): string =>
     `<score-partwise><part-list>${names
         .map((name, i) => `<score-part id="P${i}"><part-name>${name}</part-name></score-part>`)
-        .join("")}</part-list>${names.map((_, i) => `<part id="P${i}"></part>`).join("")}</score-partwise>`;
+        .join(
+            "",
+        )}</part-list>${names.map((_, i) => `<part id="P${i}"></part>`).join("")}</score-partwise>`;
 
 describe("nonPianoVocalReason", () => {
     it("keeps voice + piano art song", () => {
@@ -68,16 +70,20 @@ describe("staves a pianist cannot read", () => {
 
     it("rejects a six-line staff even where the clef says nothing", () => {
         // Tab files carry both; either alone is enough to disqualify the score.
-        expect(nonSoloPianoReason(withStaff("<staff-details><staff-lines>6</staff-lines></staff-details>"))).toBe(
-            "non-standard-staff",
-        );
+        expect(
+            nonSoloPianoReason(
+                withStaff("<staff-details><staff-lines>6</staff-lines></staff-details>"),
+            ),
+        ).toBe("non-standard-staff");
     });
 
     it("rejects a staff with no lines at all", () => {
         // An invisible staff: the notes are there and unreadable.
-        expect(nonSoloPianoReason(withStaff("<staff-details><staff-lines>0</staff-lines></staff-details>"))).toBe(
-            "non-standard-staff",
-        );
+        expect(
+            nonSoloPianoReason(
+                withStaff("<staff-details><staff-lines>0</staff-lines></staff-details>"),
+            ),
+        ).toBe("non-standard-staff");
     });
 
     it("keeps an ordinary five-line staff", () => {
@@ -100,7 +106,10 @@ describe("staves a pianist cannot read", () => {
 // staff really looks, rather than one part per label.
 const pianoWithStaffLabels = (...labels: string[]): string =>
     `<score-partwise><part-list><score-part id="P0"><part-name>Piano</part-name>${labels
-        .map((l) => `<score-instrument id="I"><instrument-name>${l}</instrument-name></score-instrument>`)
+        .map(
+            (l) =>
+                `<score-instrument id="I"><instrument-name>${l}</instrument-name></score-instrument>`,
+        )
         .join("")}</score-part></part-list><part id="P0"></part></score-partwise>`;
 
 describe("staff labels are not instruments", () => {

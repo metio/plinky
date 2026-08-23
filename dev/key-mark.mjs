@@ -61,7 +61,9 @@ const page = await browser.newPage();
 let stale = false;
 for (const { source, out, what } of SOURCES) {
     const bytes = await readFile(source);
-    await page.setContent(`<img id="mark" src="data:image/png;base64,${bytes.toString("base64")}">`);
+    await page.setContent(
+        `<img id="mark" src="data:image/png;base64,${bytes.toString("base64")}">`,
+    );
 
     const size = await page.evaluate(async () => {
         const img = document.getElementById("mark");
@@ -140,7 +142,7 @@ for (const { source, out, what } of SOURCES) {
     const png = Buffer.from(keyed, "base64");
     const existing = await readFile(out).catch(() => null);
     if (check) {
-        if (!existing || !existing.equals(png)) {
+        if (!existing?.equals(png)) {
             console.error(`${out} is ${existing ? "stale" : "missing"}.`);
             stale = true;
         } else {

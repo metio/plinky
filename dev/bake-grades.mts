@@ -72,7 +72,10 @@ async function main() {
     const correctedExercises = curate(exercises.map(tidy), curation.curations);
     const curationProblems = [
         ...curation.problems,
-        ...unapplied(curation.curations, new Set([...correctedSongs.applied, ...correctedExercises.applied])),
+        ...unapplied(
+            curation.curations,
+            new Set([...correctedSongs.applied, ...correctedExercises.applied]),
+        ),
     ];
     if (curationProblems.length > 0) {
         console.error("Catalogue curation cannot be applied:");

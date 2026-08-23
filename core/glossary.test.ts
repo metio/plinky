@@ -124,7 +124,9 @@ describe("the glossary catalogue", () => {
 
     it("sounds something for every example", () => {
         for (const entry of GLOSSARY) {
-            expect(`${entry.id}: ${performSnippet(entry.shown).length > 0}`).toBe(`${entry.id}: true`);
+            expect(`${entry.id}: ${performSnippet(entry.shown).length > 0}`).toBe(
+                `${entry.id}: true`,
+            );
         }
     });
 
@@ -132,7 +134,7 @@ describe("the glossary catalogue", () => {
         for (const entry of GLOSSARY) {
             const xml = buildSnippet(entry.shown);
             expect(xml).toContain("<score-partwise");
-            expect(xml).toContain("<measure number=\"1\">");
+            expect(xml).toContain('<measure number="1">');
         }
     });
 

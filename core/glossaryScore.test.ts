@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { buildSnippet, DIVISIONS, noteDivisions, noteQuarters, type Snippet, snippetMidi } from "./glossaryScore";
+import {
+    buildSnippet,
+    DIVISIONS,
+    noteDivisions,
+    noteQuarters,
+    type Snippet,
+    snippetMidi,
+} from "./glossaryScore";
 
 const bar = (notes: Snippet["notes"], over: Partial<Snippet> = {}): Snippet => ({
     clef: "treble",
@@ -22,7 +29,9 @@ describe("noteDivisions", () => {
         // The reason DIVISIONS is 4 rather than 2: a dotted quarter is 3 eighths, and
         // MusicXML durations must be integers.
         expect(noteDivisions({ step: "C", value: "quarter", dotted: true })).toBe(6);
-        expect(Number.isInteger(noteDivisions({ step: "C", value: "quarter", dotted: true }))).toBe(true);
+        expect(Number.isInteger(noteDivisions({ step: "C", value: "quarter", dotted: true }))).toBe(
+            true,
+        );
     });
 
     it("measures a note's written length in quarter notes", () => {
@@ -59,7 +68,9 @@ describe("buildSnippet", () => {
 
     it("draws a staccato dot and an accent inside one articulations block", () => {
         const xml = buildSnippet(
-            bar([{ step: "C", octave: 5, value: "quarter", articulation: "staccato", accent: true }]),
+            bar([
+                { step: "C", octave: 5, value: "quarter", articulation: "staccato", accent: true },
+            ]),
         );
 
         expect(xml).toContain("<articulations><staccato/><accent/></articulations>");

@@ -18,7 +18,9 @@ const options = (over: Partial<DrillOptions> = {}): DrillOptions => ({
 });
 
 function pitchesIn(xml: string): string[] {
-    return [...xml.matchAll(/<step>(\w)<\/step>(?:<alter>(-?\d)<\/alter>)?<octave>(\d)<\/octave>/g)].map(
+    return [
+        ...xml.matchAll(/<step>(\w)<\/step>(?:<alter>(-?\d)<\/alter>)?<octave>(\d)<\/octave>/g),
+    ].map(
         (match) => `${match[1]}${match[2] === "1" ? "#" : match[2] === "-1" ? "b" : ""}${match[3]}`,
     );
 }
@@ -126,7 +128,9 @@ describe("generateDrill", () => {
         // Two beats of three-note chords: six notes, four of them marked <chord/>,
         // and the bar still lasts two beats.
         expect((xml.match(/<chord\/>/g) ?? []).length).toBe(4);
-        const durations = [...xml.matchAll(/<duration>(\d+)<\/duration>/g)].map((m) => Number(m[1]));
+        const durations = [...xml.matchAll(/<duration>(\d+)<\/duration>/g)].map((m) =>
+            Number(m[1]),
+        );
         expect(durations).toHaveLength(6);
     });
 
@@ -135,9 +139,7 @@ describe("generateDrill", () => {
 
         expect(xml).toContain("<staff>2</staff>");
         const staves = [...xml.matchAll(/<octave>(\d)<\/octave>[\s\S]*?<staff>(\d)<\/staff>/g)];
-        const trebleLow = Math.min(
-            ...staves.filter((s) => s[2] === "1").map((s) => Number(s[1])),
-        );
+        const trebleLow = Math.min(...staves.filter((s) => s[2] === "1").map((s) => Number(s[1])));
         const bassHigh = Math.max(...staves.filter((s) => s[2] === "2").map((s) => Number(s[1])));
         // The hands read their own halves rather than crossing over each other.
         expect(trebleLow).toBeGreaterThanOrEqual(bassHigh);

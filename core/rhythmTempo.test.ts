@@ -23,7 +23,11 @@ describe("rhythmTempoPoints", () => {
     it("reads a rushed gap as faster and a dragged one as slower", () => {
         // The point of the picture: a count of perfect/good/off cannot say WHERE the pulse
         // went, and a steady tap slightly late scores like one that falls apart.
-        const rushed = rhythmTempoPoints(ONSETS, [hit(0, 0), hit(1, -300), hit(2, 0), hit(3, 0)], TEMPO);
+        const rushed = rhythmTempoPoints(
+            ONSETS,
+            [hit(0, 0), hit(1, -300), hit(2, 0), hit(3, 0)],
+            TEMPO,
+        );
         expect(rushed[0]?.bpm).toBeGreaterThan(TEMPO);
         // …and the gap after it is correspondingly long, so the line comes back down.
         expect(rushed[1]?.bpm).toBeLessThan(TEMPO);

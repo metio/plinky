@@ -3,12 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { rhythmLayout, rhythmSvg } from "./rhythmNotation";
-import {
-    expectedOnsets,
-    generateRhythm,
-    RHYTHM_LEVELS,
-    type RhythmPattern,
-} from "./rhythmPattern";
+import { expectedOnsets, generateRhythm, RHYTHM_LEVELS, type RhythmPattern } from "./rhythmPattern";
 
 const seeded = (start: number) => {
     let state = start;
@@ -24,9 +19,7 @@ describe("drawing a rhythm", () => {
         // differently from the grader would colour the wrong ones.
         for (let level = 0; level < RHYTHM_LEVELS.length; level++) {
             const pattern = generateRhythm(level, seeded(level + 7));
-            expect(rhythmLayout(pattern).noteXs).toHaveLength(
-                expectedOnsets(pattern, 90).length,
-            );
+            expect(rhythmLayout(pattern).noteXs).toHaveLength(expectedOnsets(pattern, 90).length);
         }
     });
 

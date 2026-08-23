@@ -10,7 +10,18 @@ const tuplet = (actual: number, normal: number) =>
 describe("isEngravableTuplet", () => {
     it("accepts the ratios engraved music uses", () => {
         // The catalogue's own top ten, in order of how often they appear.
-        for (const [a, b] of [[3, 2], [6, 4], [2, 1], [5, 4], [2, 3], [6, 5], [7, 4], [9, 8], [9, 4], [7, 6]]) {
+        for (const [a, b] of [
+            [3, 2],
+            [6, 4],
+            [2, 1],
+            [5, 4],
+            [2, 3],
+            [6, 5],
+            [7, 4],
+            [9, 8],
+            [9, 4],
+            [7, 6],
+        ]) {
             expect(isEngravableTuplet(a as number, b as number)).toBe(true);
         }
     });
@@ -18,7 +29,14 @@ describe("isEngravableTuplet", () => {
     it("rejects a ratio only a quantiser would write", () => {
         // Twelve in the time of seven is what the reported Für Elise carried, on a half rest
         // in a 3/8 bar. Nobody has printed that.
-        for (const [a, b] of [[12, 7], [12, 11], [24, 17], [24, 23], [13, 12], [11, 2]]) {
+        for (const [a, b] of [
+            [12, 7],
+            [12, 11],
+            [24, 17],
+            [24, 23],
+            [13, 12],
+            [11, 2],
+        ]) {
             expect(isEngravableTuplet(a as number, b as number)).toBe(false);
         }
     });
@@ -43,7 +61,10 @@ describe("isEngravableTuplet", () => {
 
 describe("tupletRatios", () => {
     it("reads every ratio the document writes, in order", () => {
-        expect(tupletRatios(`<note/>${tuplet(3, 2)}<note/>${tuplet(12, 7)}`)).toEqual(["3:2", "12:7"]);
+        expect(tupletRatios(`<note/>${tuplet(3, 2)}<note/>${tuplet(12, 7)}`)).toEqual([
+            "3:2",
+            "12:7",
+        ]);
     });
 
     it("finds nothing in a document with no tuplets", () => {
@@ -53,7 +74,9 @@ describe("tupletRatios", () => {
 
     it("ignores a block missing half of the ratio", () => {
         // A truncated or malformed file says nothing about the transcriber's tools.
-        expect(tupletRatios("<time-modification><actual-notes>3</actual-notes></time-modification>")).toEqual([]);
+        expect(
+            tupletRatios("<time-modification><actual-notes>3</actual-notes></time-modification>"),
+        ).toEqual([]);
     });
 
     it("survives whitespace an exporter puts where it likes", () => {

@@ -79,7 +79,7 @@ function phantomVoice(xml: string): boolean {
     )) {
         const midi =
             (Number(octave) + 1) * 12 +
-            ([0, 2, 4, 5, 7, 9, 11][("CDEFGAB".indexOf(step as string))] as number) +
+            ([0, 2, 4, 5, 7, 9, 11]["CDEFGAB".indexOf(step as string)] as number) +
             Number(alterText ?? 0);
         if (beyondThePiano(midi) > BEYOND_REPAIR) {
             return true;

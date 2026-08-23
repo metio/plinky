@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { assumedPhraseWeight, interpretedWeight, metricalWeight, phraseWeight, placeInBar } from "./interpretation";
+import {
+    assumedPhraseWeight,
+    interpretedWeight,
+    metricalWeight,
+    phraseWeight,
+    placeInBar,
+} from "./interpretation";
 import type { XmlBar } from "./musicxmlTimeline";
 
 const fourFour: XmlBar[] = [
@@ -112,9 +118,9 @@ describe("what a note is actually played at", () => {
 
     it("never lets a note vanish under the one before it", () => {
         for (const at of [0.125, 0.375, 0.875]) {
-            expect(
-                interpretedWeight(fourFour, [{ from: 0, to: 2 }], at),
-            ).toBeGreaterThanOrEqual(0.7);
+            expect(interpretedWeight(fourFour, [{ from: 0, to: 2 }], at)).toBeGreaterThanOrEqual(
+                0.7,
+            );
         }
     });
 

@@ -39,7 +39,9 @@ for (const entry of readdirSync(ARTIFACTS)) {
     const locale = entry.slice("site-".length);
     const dir = `${ARTIFACTS}/${entry}`;
     if (!existsSync(`${dir}/${locale}`)) {
-        throw new Error(`merge-locale-artifacts: artifact ${entry} is missing its ${locale}/ pages.`);
+        throw new Error(
+            `merge-locale-artifacts: artifact ${entry} is missing its ${locale}/ pages.`,
+        );
     }
     cpSync(`${dir}/${locale}`, `${CLIENT}/${locale}`, { recursive: true });
     cpSync(`${dir}/assets`, `${CLIENT}/assets`, { recursive: true });

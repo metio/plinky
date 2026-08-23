@@ -5,8 +5,7 @@ import { describe, expect, it } from "vitest";
 import { glissandoNotes, readGlissandos } from "./glissando";
 
 const pitches = (notes: { pitch: number }[]) => notes.map((one) => one.pitch);
-const total = (notes: { quarters: number }[]) =>
-    notes.reduce((sum, one) => sum + one.quarters, 0);
+const total = (notes: { quarters: number }[]) => notes.reduce((sum, one) => sum + one.quarters, 0);
 
 describe("glissandoNotes", () => {
     it("sweeps the keys under the hand, not every semitone", () => {
@@ -73,7 +72,12 @@ describe("glissandoNotes", () => {
     });
 });
 
-const note = (whole: number, midi: number | null, glissando: "start" | "stop" | null, wholes = 0.5) => ({
+const note = (
+    whole: number,
+    midi: number | null,
+    glissando: "start" | "stop" | null,
+    wholes = 0.5,
+) => ({
     whole,
     wholes,
     midi,

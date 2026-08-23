@@ -83,9 +83,7 @@ for (const path of PAGES) {
         .catch(() => {});
     await page.addScriptTag({ content: axeSrc });
     const result = await page.evaluate(
-        async () =>
-            // biome-ignore lint/suspicious/noExplicitAny: axe is injected at runtime
-            await /** @type {any} */ (window).axe.run(document),
+        async () => await /** @type {any} */ (window).axe.run(document),
     );
     const count = result.violations.reduce((sum, v) => sum + v.nodes.length, 0);
     total += count;

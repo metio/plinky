@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { combinedScore, computeSegments, type RunNote, SEGMENTS, type ShareOptions } from "./shareCard";
+import {
+    combinedScore,
+    computeSegments,
+    type RunNote,
+    SEGMENTS,
+    type ShareOptions,
+} from "./shareCard";
 
 // Your best reading of a piece, assembled section by section.
 //

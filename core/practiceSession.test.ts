@@ -21,7 +21,6 @@ const MINUTE = 60_000;
 // Local-time noon so the derived day key is 2026-06-23 in any runner zone.
 const NOON = new Date(2026, 5, 23, 12, 0).getTime();
 
-
 // The log's first session, or a failure. Indexing is checked in this project, and a
 // test that quietly skipped its assertions on an empty log would pass for the wrong
 // reason.
@@ -72,7 +71,11 @@ describe("foldSession", () => {
 
     it("never absorbs a run into a hand-logged sitting", () => {
         const manual = addManualSession([], { date: "2026-06-23", minutes: 20 });
-        const log = foldSession(manual, { at: only(manual).end + MINUTE, activeMs: MINUTE, notes: 5 });
+        const log = foldSession(manual, {
+            at: only(manual).end + MINUTE,
+            activeMs: MINUTE,
+            notes: 5,
+        });
         expect(log).toHaveLength(2);
         expect(nth(log, 1).manual).toBe(false);
     });
@@ -106,10 +109,10 @@ describe("addManualSession", () => {
     });
 
     it("keeps the log in date order when back-logging an older day", () => {
-        const log = addManualSession(
-            addManualSession([], { date: "2026-06-23", minutes: 30 }),
-            { date: "2026-06-20", minutes: 15 },
-        );
+        const log = addManualSession(addManualSession([], { date: "2026-06-23", minutes: 30 }), {
+            date: "2026-06-20",
+            minutes: 15,
+        });
         expect(log.map(sessionDate)).toEqual(["2026-06-20", "2026-06-23"]);
     });
 
@@ -231,7 +234,7 @@ describe("practiceLogToCsv", () => {
         const log = addManualSession([], {
             date: "2026-06-23",
             minutes: 10,
-            label: "=HYPERLINK(\"http://evil\")",
+            label: '=HYPERLINK("http://evil")',
         });
         expect(practiceLogToCsv(log, title, formatTime)).toContain("\"'=HYPERLINK");
     });
@@ -249,10 +252,10 @@ describe("a hand-logged sitting is anchored where the player is", () => {
     it("gives two entries on one day distinct identities", () => {
         // `start` is how remove() and setMood() find a row; sharing one meant deleting
         // either deleted both.
-        const twice = addManualSession(
-            addManualSession([], { date: "2026-06-23", minutes: 30 }),
-            { date: "2026-06-23", minutes: 45 },
-        );
+        const twice = addManualSession(addManualSession([], { date: "2026-06-23", minutes: 30 }), {
+            date: "2026-06-23",
+            minutes: 45,
+        });
         expect(twice).toHaveLength(2);
         expect(nth(twice, 0).start).not.toBe(nth(twice, 1).start);
         expect(twice.map(sessionDate)).toEqual(["2026-06-23", "2026-06-23"]);

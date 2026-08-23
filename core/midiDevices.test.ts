@@ -8,10 +8,10 @@ const connected = (id: string, name: string): ConnectedInput => ({ id, name, sta
 
 describe("diffConnectedInputs", () => {
     it("reports the currently-connected inputs keyed by id", () => {
-        const { nowConnected } = diffConnectedInputs(
-            new Map(),
-            [connected("a", "Piano"), connected("b", "Pad")],
-        );
+        const { nowConnected } = diffConnectedInputs(new Map(), [
+            connected("a", "Piano"),
+            connected("b", "Pad"),
+        ]);
         expect([...nowConnected]).toEqual([
             ["a", "Piano"],
             ["b", "Pad"],
@@ -38,7 +38,9 @@ describe("diffConnectedInputs", () => {
             ["a", "Piano"],
             ["b", "Pad"],
         ]);
-        const { nowConnected, droppedNames } = diffConnectedInputs(previous, [connected("a", "Piano")]);
+        const { nowConnected, droppedNames } = diffConnectedInputs(previous, [
+            connected("a", "Piano"),
+        ]);
         expect(nowConnected.has("a")).toBe(true);
         expect([...droppedNames]).toEqual(["Pad"]);
     });

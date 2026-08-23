@@ -68,7 +68,7 @@ export function roomImpulse(sampleRate: number, seed: number): Float32Array<Arra
     const out = new Float32Array(length);
     const noise = seeded(seed);
     // exp(decay * t) reaching END_DB at the end of the tail.
-    const decay = (END_DB / 20) * Math.LN10 / ROOM_SECONDS;
+    const decay = ((END_DB / 20) * Math.LN10) / ROOM_SECONDS;
     for (let index = 0; index < length; index++) {
         const seconds = index / sampleRate;
         // Noise in -1..1, shaped by the decaying envelope, and held back until the room has

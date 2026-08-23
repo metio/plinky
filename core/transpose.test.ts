@@ -50,7 +50,9 @@ describe("transposeMusicXml", () => {
     });
 
     it("raises every pitch by the exact semitone count", () => {
-        const result = pitches(transposeMusicXml(domXmlCodec, score(note("C", 4) + note("G", 4)), 7));
+        const result = pitches(
+            transposeMusicXml(domXmlCodec, score(note("C", 4) + note("G", 4)), 7),
+        );
         expect(result.map((p) => p.midi)).toEqual([67, 74]);
     });
 

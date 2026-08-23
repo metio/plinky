@@ -260,9 +260,9 @@ describe("an id names the exercise, not the route taken to it", () => {
 
     it("keeps the dials that do apply", () => {
         expect(buildExerciseId({ ...scale, interval: "thirds" })).toBe("scale-c-major.1rt");
-        expect(
-            buildExerciseId({ ...scale, type: "major-arpeggio", inversion: 2 }),
-        ).toBe("arpeggio-c-major.1ri2");
+        expect(buildExerciseId({ ...scale, type: "major-arpeggio", inversion: 2 })).toBe(
+            "arpeggio-c-major.1ri2",
+        );
         expect(buildExerciseId({ ...scale, hands: "contrary" })).toBe("scale-c-major.1c");
     });
 

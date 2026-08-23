@@ -11,8 +11,12 @@
 // and a build that fails is better than a sitemap that is silently ignored.
 const MAX_URLS_PER_SITEMAP = 50_000;
 
-const escape = (value) =>
-    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const escapeXml = (value) =>
+    value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 
 // A page's absolute URL. Every page prerenders to `<path>/index.html`, so the
 // trailing-slash form is what the static host serves and what the document's own canonical
@@ -23,7 +27,7 @@ export function pageUrl(siteUrl, locale, path) {
 }
 
 const alternate = (hreflang, href) =>
-    `    <xhtml:link rel="alternate" hreflang="${escape(hreflang)}" href="${escape(href)}"/>`;
+    `    <xhtml:link rel="alternate" hreflang="${escapeXml(hreflang)}" href="${escapeXml(href)}"/>`;
 
 // One `<urlset>` per locale, plus the `<sitemapindex>` pointing at them.
 //
@@ -56,7 +60,9 @@ export function buildSitemaps({ entries, siteUrl, baseLocale, lastmod, noindex =
     const byLocale = new Map();
     for (const path of [...groups.keys()].sort()) {
         const localesHere = [...groups.get(path)].sort();
-        const links = localesHere.map((locale) => alternate(locale, pageUrl(siteUrl, locale, path)));
+        const links = localesHere.map((locale) =>
+            alternate(locale, pageUrl(siteUrl, locale, path)),
+        );
         // x-default names the base locale's copy. A page that somehow exists in other
         // languages but not the base one still needs the tag, so the first stands in.
         const fallback = localesHere.includes(baseLocale) ? baseLocale : localesHere[0];
@@ -70,7 +76,7 @@ export function buildSitemaps({ entries, siteUrl, baseLocale, lastmod, noindex =
             byLocale
                 .get(locale)
                 .push(
-                    `  <url>\n    <loc>${escape(pageUrl(siteUrl, locale, path))}</loc>\n    <lastmod>${escape(lastmod)}</lastmod>\n${cluster}\n  </url>\n`,
+                    `  <url>\n    <loc>${escapeXml(pageUrl(siteUrl, locale, path))}</loc>\n    <lastmod>${escapeXml(lastmod)}</lastmod>\n${cluster}\n  </url>\n`,
                 );
         }
     }
@@ -95,7 +101,7 @@ export function buildSitemaps({ entries, siteUrl, baseLocale, lastmod, noindex =
     const body = [...children.keys()]
         .map(
             (locale) =>
-                `  <sitemap>\n    <loc>${escape(`${siteUrl}/sitemap-${locale}.xml`)}</loc>\n    <lastmod>${escape(lastmod)}</lastmod>\n  </sitemap>\n`,
+                `  <sitemap>\n    <loc>${escapeXml(`${siteUrl}/sitemap-${locale}.xml`)}</loc>\n    <lastmod>${escapeXml(lastmod)}</lastmod>\n  </sitemap>\n`,
         )
         .join("");
 

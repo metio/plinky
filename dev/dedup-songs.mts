@@ -66,7 +66,8 @@ async function main() {
             .on("error", reject);
     });
 
-    const q = (song: Song): Quality => quality.get(song.id) ?? { rating: 0, favorites: 0, views: 0 };
+    const q = (song: Song): Quality =>
+        quality.get(song.id) ?? { rating: 0, favorites: 0, views: 0 };
     // Positive when `a` is the better representative to keep.
     const better = (a: Song, b: Song): number => {
         const qa = q(a);
@@ -121,7 +122,9 @@ async function main() {
     for (let g = 1; g <= MAX_GRADE; g++) {
         console.log(`  grade ${g}: ${histogram[g]}`);
     }
-    console.log("→ Bake the boundaries above into GRADE_THRESHOLDS.piece, then `npm run exercises`.");
+    console.log(
+        "→ Bake the boundaries above into GRADE_THRESHOLDS.piece, then `npm run exercises`.",
+    );
 }
 
 main().catch((error) => {

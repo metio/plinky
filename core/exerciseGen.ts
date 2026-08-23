@@ -35,7 +35,6 @@ export type ExerciseConfig = {
 
 type Note = { letter: string; octave: number; alter: number };
 
-
 // slug -> [tonic letter, key-signature fifths] for the major and minor contexts.
 const MAJOR_KEYS: Record<string, [string, number]> = {
     c: ["C", 0],
@@ -201,12 +200,7 @@ function scaleLine(type: ExerciseType, tonic: string, fifths: number, octaves: n
 //
 // `raise` works by scale degree rather than by position, so the alteration rules carry
 // over to a descending line unchanged.
-function scaleLineDown(
-    type: ExerciseType,
-    tonic: string,
-    fifths: number,
-    octaves: number,
-): Note[] {
+function scaleLineDown(type: ExerciseType, tonic: string, fifths: number, octaves: number): Note[] {
     if (type === "chromatic-scale") {
         const root = midiOf({ letter: tonic, octave: 4, alter: alterFor(tonic, fifths) });
         const down: Note[] = [];

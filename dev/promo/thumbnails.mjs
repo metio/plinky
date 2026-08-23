@@ -46,7 +46,9 @@ const keys = `data:image/png;base64,${(await read("brand/plinky-keys.png")).toSt
 const fredoka = await read(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
 );
-const inter = await read("node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2");
+const inter = await read(
+    "node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
+);
 const FACES = `@font-face{font-family:'Fredoka Variable';src:url(data:font/woff2;base64,${fredoka.toString("base64")}) format("woff2-variations");font-weight:300 700;font-display:block}
 @font-face{font-family:Inter;src:url(data:font/woff2;base64,${inter.toString("base64")}) format("woff2-variations");font-weight:100 900;font-display:block}`;
 

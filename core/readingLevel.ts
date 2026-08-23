@@ -74,7 +74,9 @@ export function levelOf(prefs: AidPrefs): ReadingLevel | "custom" {
     return (
         READING_LEVELS.find((level) => {
             const aids = AIDS[level];
-            return (Object.keys(aids) as (keyof AidPrefs)[]).every((key) => aids[key] === prefs[key]);
+            return (Object.keys(aids) as (keyof AidPrefs)[]).every(
+                (key) => aids[key] === prefs[key],
+            );
         }) ?? "custom"
     );
 }

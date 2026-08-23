@@ -322,7 +322,10 @@ export function levelToVelocity(level: number, cal?: MicCalibration): number {
     const span = Math.log10(loud / soft);
     const position = Math.log10(level / soft) / span;
     return Math.round(
-        Math.min(VELOCITY_CEIL, Math.max(VELOCITY_FLOOR, VELOCITY_FLOOR + (VELOCITY_CEIL - VELOCITY_FLOOR) * position)),
+        Math.min(
+            VELOCITY_CEIL,
+            Math.max(VELOCITY_FLOOR, VELOCITY_FLOOR + (VELOCITY_CEIL - VELOCITY_FLOOR) * position),
+        ),
     );
 }
 

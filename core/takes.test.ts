@@ -45,7 +45,6 @@ const grade = (
     ...overrides,
 });
 
-
 describe("ghostOnsets", () => {
     it("normalises a take's note onsets to start at zero", () => {
         expect(ghostOnsets(take("1", { composition: comp([200, 600, 1000]) }))).toEqual([

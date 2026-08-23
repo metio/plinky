@@ -126,7 +126,10 @@ export function filterMusic(
 // study, and no piece of music appears until the third screen.
 export function musicOrder(items: readonly MusicItem[]): MusicItem[] {
     return [...items].sort(
-        (a, b) => a.grade - b.grade || (a.cost ?? Number.POSITIVE_INFINITY) - (b.cost ?? Number.POSITIVE_INFINITY) || a.title.localeCompare(b.title),
+        (a, b) =>
+            a.grade - b.grade ||
+            (a.cost ?? Number.POSITIVE_INFINITY) - (b.cost ?? Number.POSITIVE_INFINITY) ||
+            a.title.localeCompare(b.title),
     );
 }
 

@@ -197,16 +197,19 @@ for (const [locale, fingerprint] of wanted) {
         const png = await page.screenshot({ type: "png" });
 
         // Chromium encodes the webp itself, from the shot it just took.
-        const webp = await page.evaluate(async ({ dataUrl, quality }) => {
-            const image = new Image();
-            image.src = dataUrl;
-            await image.decode();
-            const canvas = document.createElement("canvas");
-            canvas.width = image.width;
-            canvas.height = image.height;
-            canvas.getContext("2d").drawImage(image, 0, 0);
-            return canvas.toDataURL("image/webp", quality);
-        }, { dataUrl: `data:image/png;base64,${png.toString("base64")}`, quality: QUALITY });
+        const webp = await page.evaluate(
+            async ({ dataUrl, quality }) => {
+                const image = new Image();
+                image.src = dataUrl;
+                await image.decode();
+                const canvas = document.createElement("canvas");
+                canvas.width = image.width;
+                canvas.height = image.height;
+                canvas.getContext("2d").drawImage(image, 0, 0);
+                return canvas.toDataURL("image/webp", quality);
+            },
+            { dataUrl: `data:image/png;base64,${png.toString("base64")}`, quality: QUALITY },
+        );
         if (!webp.startsWith("data:image/webp")) {
             throw new Error(`${name}: the browser would not encode webp`);
         }

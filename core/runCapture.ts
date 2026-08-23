@@ -96,10 +96,7 @@ export type ClearedNote = {
     pedalled?: boolean;
 };
 
-function staffOffsets(
-    info: ClearedNote,
-    startedAt: number,
-): Record<number, number> | undefined {
+function staffOffsets(info: ClearedNote, startedAt: number): Record<number, number> | undefined {
     if (!info.staffTimes) {
         return undefined;
     }

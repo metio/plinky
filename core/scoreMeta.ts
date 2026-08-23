@@ -33,9 +33,10 @@ function decodeXmlEntities(text: string): string {
             if (hex !== undefined || dec !== undefined) {
                 // An out-of-range reference (&#x110000;…) must not throw out of a
                 // metadata read; it renders as the replacement character instead.
-                const code = hex !== undefined
-                    ? Number.parseInt(hex, 16)
-                    : Number.parseInt(dec as string, 10);
+                const code =
+                    hex !== undefined
+                        ? Number.parseInt(hex, 16)
+                        : Number.parseInt(dec as string, 10);
                 return code <= 0x10ffff ? String.fromCodePoint(code) : "\ufffd";
             }
             return XML_ENTITIES[named] ?? _match;
@@ -86,4 +87,3 @@ export function readScoreMeta(codec: XmlCodec, xml: string): ScoreMeta {
         beatsPerBar: positiveOr(beats, 4),
     };
 }
-

@@ -348,7 +348,7 @@ describe("toMusicXml note values", () => {
         [250, 2, "eighth", ""],
         [125, 1, "16th", ""],
     ])("renders %ims as a %s of %i cells", (durationMs, cells, type, dot) => {
-        const xml = toMusicXml(composition([note({ pitch: 60, startMs: 0, durationMs }, )]));
+        const xml = toMusicXml(composition([note({ pitch: 60, startMs: 0, durationMs })]));
         expect(xml).toContain(
             `<note><pitch><step>C</step><octave>4</octave></pitch><duration>${cells}</duration><type>${type}</type>${dot}<staff>1</staff></note>`,
         );
@@ -529,9 +529,9 @@ describe("toMusicXml document scaffold", () => {
 describe("toMidiNotes scales by the beat length", () => {
     it("measures onset and length in quarter notes at the given tempo", () => {
         // At 60bpm a quarter is 1000ms, so 2000ms is beat 2 and 500ms is half a beat.
-        expect(toMidiNotes(composition([note({ startMs: 2000, durationMs: 500, pitch: 60 })], 60))).toEqual([
-            { midi: 60, startQuarters: 2, durationQuarters: 0.5, velocity: 90 },
-        ]);
+        expect(
+            toMidiNotes(composition([note({ startMs: 2000, durationMs: 500, pitch: 60 })], 60)),
+        ).toEqual([{ midi: 60, startQuarters: 2, durationQuarters: 0.5, velocity: 90 }]);
     });
 });
 
@@ -711,9 +711,7 @@ describe("bounded engraving", () => {
 
 describe("shared compositions are bounded", () => {
     it("refuses a link claiming an absurd span", () => {
-        const code = encodeComposition(
-            composition([note({ startMs: 0 }), note({ startMs: 1e9 })]),
-        );
+        const code = encodeComposition(composition([note({ startMs: 0 }), note({ startMs: 1e9 })]));
         expect(decodeComposition(code)).toBeNull();
     });
 
@@ -726,7 +724,9 @@ describe("shared compositions are bounded", () => {
         // The codec carries a take's notes as given, sorted or not, so a backwards
         // gap is ordinary — it is the distance travelled, not the direction, that
         // the bound is about.
-        const decoded = decodeComposition(packToCode([120, 4, [0, -50], [10, 10], [60, 62], [90, 90]]));
+        const decoded = decodeComposition(
+            packToCode([120, 4, [0, -50], [10, 10], [60, 62], [90, 90]]),
+        );
         expect(decoded?.notes.map((n) => n.startMs)).toEqual([0, -50]);
     });
 
@@ -739,7 +739,9 @@ describe("shared compositions are bounded", () => {
     it("refuses a link carrying more notes than a player could strike", () => {
         const many = Array.from({ length: 20_001 }, () => 1);
         expect(
-            decodeComposition(packToCode([120, 4, many, many, many.map(() => 60), many.map(() => 90)])),
+            decodeComposition(
+                packToCode([120, 4, many, many, many.map(() => 60), many.map(() => 90)]),
+            ),
         ).toBeNull();
     });
 
@@ -769,9 +771,7 @@ describe("meters the engraver can spell", () => {
     });
 
     it("refuses a share link carrying an unspellable meter", () => {
-        expect(
-            decodeComposition(packToCode([120, 0.001, [0], [100], [60], [90]])),
-        ).toBeNull();
+        expect(decodeComposition(packToCode([120, 0.001, [0], [100], [60], [90]]))).toBeNull();
         expect(decodeComposition(packToCode([120, 1e9, [0], [100], [60], [90]]))).toBeNull();
     });
 

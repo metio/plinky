@@ -173,7 +173,10 @@ export function collectReports(text: string): AssignmentReport[] {
 // The collected reports as a spreadsheet: one row per student, one column per
 // piece of the assignment they answered, so it opens in whatever the teacher
 // already uses to record marks.
-export function reportsToCsv(reports: AssignmentReport[], pieceTitle: (id: string) => string): string {
+export function reportsToCsv(
+    reports: AssignmentReport[],
+    pieceTitle: (id: string) => string,
+): string {
     if (reports.length === 0) {
         return "";
     }

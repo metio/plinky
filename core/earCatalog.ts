@@ -50,17 +50,52 @@ export type EarItem = {
 // touch harder than the matching interval level, so they start a grade higher.
 const LADDERS: { exercise: EarExerciseId; levels: unknown[]; grades: number[]; costs: number[] }[] =
     [
-        { exercise: "intervals", levels: INTERVAL_LEVELS, grades: [1, 2, 3, 4], costs: [1.3, 2.0, 2.6, 3.2] },
-        { exercise: "chords", levels: CHORD_LEVELS, grades: [2, 3, 4, 5], costs: [1.8, 2.4, 3.0, 3.6] },
-        { exercise: "scales", levels: SCALE_LEVELS, grades: [2, 4, 5, 6], costs: [1.8, 3.0, 3.6, 4.2] },
+        {
+            exercise: "intervals",
+            levels: INTERVAL_LEVELS,
+            grades: [1, 2, 3, 4],
+            costs: [1.3, 2.0, 2.6, 3.2],
+        },
+        {
+            exercise: "chords",
+            levels: CHORD_LEVELS,
+            grades: [2, 3, 4, 5],
+            costs: [1.8, 2.4, 3.0, 3.6],
+        },
+        {
+            exercise: "scales",
+            levels: SCALE_LEVELS,
+            grades: [2, 4, 5, 6],
+            costs: [1.8, 3.0, 3.6, 4.2],
+        },
         // Holding a whole progression in the ear and naming each chord is the hardest of
         // these, so it starts higher and climbs furthest.
-        { exercise: "progressions", levels: PROGRESSION_LEVELS, grades: [3, 4, 5, 6], costs: [2.2, 2.8, 3.4, 4.0] },
+        {
+            exercise: "progressions",
+            levels: PROGRESSION_LEVELS,
+            grades: [3, 4, 5, 6],
+            costs: [2.2, 2.8, 3.4, 4.0],
+        },
         // The functional exercises — hearing notes against a key the cadence sets — are the
         // deep end: naming a degree, then an interval in context, then a whole melody.
-        { exercise: "scale-degrees", levels: SCALE_DEGREE_LEVELS, grades: [3, 5, 7], costs: [2.4, 3.6, 5.0] },
-        { exercise: "intervals-context", levels: INTERVAL_LEVELS, grades: [3, 4, 5, 6], costs: [2.4, 3.0, 3.6, 4.2] },
-        { exercise: "melodic-dictation", levels: MELODIC_LEVELS, grades: [5, 6, 7], costs: [3.6, 4.4, 5.2] },
+        {
+            exercise: "scale-degrees",
+            levels: SCALE_DEGREE_LEVELS,
+            grades: [3, 5, 7],
+            costs: [2.4, 3.6, 5.0],
+        },
+        {
+            exercise: "intervals-context",
+            levels: INTERVAL_LEVELS,
+            grades: [3, 4, 5, 6],
+            costs: [2.4, 3.0, 3.6, 4.2],
+        },
+        {
+            exercise: "melodic-dictation",
+            levels: MELODIC_LEVELS,
+            grades: [5, 6, 7],
+            costs: [3.6, 4.4, 5.2],
+        },
     ];
 
 export const EAR_ITEMS: EarItem[] = [

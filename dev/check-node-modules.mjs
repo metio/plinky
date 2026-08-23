@@ -55,4 +55,6 @@ if (drift.length > 0) {
     // The first few name the problem; the count keeps a big drift readable.
     fail([...drift.slice(0, 10), ...(drift.length > 10 ? [`…and ${drift.length - 10} more`] : [])]);
 }
-console.log(`check-node-modules: installed tree matches package-lock.json (${wanted.size} packages).`);
+console.log(
+    `check-node-modules: installed tree matches package-lock.json (${wanted.size} packages).`,
+);

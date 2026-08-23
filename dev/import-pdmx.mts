@@ -24,7 +24,6 @@ import { songId } from "../core/songId.ts";
 import { licenseDir } from "../core/attribution.ts";
 import { legibleTitle } from "./legibleTitle.mts";
 
-
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
 const OUT = "public/songs";
 
@@ -182,7 +181,14 @@ async function main() {
         }
         // The id is a content fingerprint, not the source CID — stable across re-imports
         // and identical for identical music (which then collapses to one entry).
-        scored.push({ ...candidate, id: songId(xml), cost, tempo: tempoOf(xml), beatsPerBar: beatsOf(xml), src });
+        scored.push({
+            ...candidate,
+            id: songId(xml),
+            cost,
+            tempo: tempoOf(xml),
+            beatsPerBar: beatsOf(xml),
+            src,
+        });
         if (scored.length % 500 === 0) {
             console.log(`  graded ${scored.length} …`);
         }
@@ -193,7 +199,9 @@ async function main() {
     // Collapse by title, then by content fingerprint — two different-titled rows with the
     // same notes share an id, so keep the first to avoid a duplicate id in the manifest.
     const idSeen = new Set<string>();
-    const unique = dedupeByTitle(scored).filter((song) => !idSeen.has(song.id) && idSeen.add(song.id));
+    const unique = dedupeByTitle(scored).filter(
+        (song) => !idSeen.has(song.id) && idSeen.add(song.id),
+    );
     console.log(`${unique.length} unique titles after collapsing ${scored.length} scored.`);
 
     // Even grades by construction: split the costs into MAX_GRADE equal octile bins.
@@ -211,7 +219,9 @@ async function main() {
     for (const song of songs) {
         histogram[song.grade] = (histogram[song.grade] ?? 0) + 1;
     }
-    console.log(`\nGraded ${songs.length} songs. Octile cost boundaries: [${boundaries.join(", ")}]`);
+    console.log(
+        `\nGraded ${songs.length} songs. Octile cost boundaries: [${boundaries.join(", ")}]`,
+    );
     console.log("Grade histogram:");
     for (let g = 1; g <= MAX_GRADE; g++) {
         console.log(`  grade ${g}: ${histogram[g]}`);
@@ -244,7 +254,9 @@ async function main() {
     await writeFile(`${OUT}/manifest.json`, JSON.stringify(manifest));
 
     console.log(`\nWrote ${songs.length} scores + manifest.json to ${OUT}/.`);
-    console.log("→ Bake the boundaries above into GRADE_THRESHOLDS.piece in core/scoreDifficulty.ts.");
+    console.log(
+        "→ Bake the boundaries above into GRADE_THRESHOLDS.piece in core/scoreDifficulty.ts.",
+    );
 }
 
 main().catch((error) => {

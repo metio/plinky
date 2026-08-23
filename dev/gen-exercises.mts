@@ -68,7 +68,8 @@ function readMusicXml(path: string): string {
 }
 
 // The classic public-domain study composers (Hanon, Czerny, Burgmüller, …).
-const STUDY_RE = /czerny|burgm|lemoine|duvernoy|cramer|beyer|schmitt|gurlit|k[öo]hler|heller|bertini|streabbog|hanon|virtuoso pianist/i;
+const STUDY_RE =
+    /czerny|burgm|lemoine|duvernoy|cramer|beyer|schmitt|gurlit|k[öo]hler|heller|bertini|streabbog|hanon|virtuoso pianist/i;
 
 // Strip the date noise the PDMX composer/title fields carry — parenthetical lifespans,
 // bare years — so a name reads as a name.
@@ -145,7 +146,10 @@ function sourceStudies(): void {
                 cid: id,
                 src: `${ROOT}/${mxl}`,
                 // PDMX crowd-quality, to pick the representative when collapsing by title.
-                quality: (Number(row.rating) || 0) * 1e9 + (Number(row.n_favorites) || 0) * 1e4 + (Number(row.n_views) || 0),
+                quality:
+                    (Number(row.rating) || 0) * 1e9 +
+                    (Number(row.n_favorites) || 0) * 1e4 +
+                    (Number(row.n_views) || 0),
             });
         } catch {
             // Skip an unreadable transcription.
@@ -166,7 +170,9 @@ function sourceStudies(): void {
         entries.push(study.entry);
         studyFiles.push({ id: study.cid, src: study.src });
     }
-    console.log(`Sourced ${best.size} studies from PDMX (collapsed from ${sourced.length} by title).`);
+    console.log(
+        `Sourced ${best.size} studies from PDMX (collapsed from ${sourced.length} by title).`,
+    );
 }
 
 sourceStudies();
@@ -204,7 +210,9 @@ const histogram = Array.from({ length: 9 }, () => 0);
 for (const entry of entries) {
     histogram[entry.grade] = (histogram[entry.grade] ?? 0) + 1;
 }
-console.log(`Wrote ${entries.length} exercises (${EXERCISE_TILES.length} tiles + ${studyFiles.length} studies) to ${OUT}/.`);
+console.log(
+    `Wrote ${entries.length} exercises (${EXERCISE_TILES.length} tiles + ${studyFiles.length} studies) to ${OUT}/.`,
+);
 console.log("Grade histogram:");
 for (let g = 1; g <= 8; g++) {
     console.log(`  grade ${g}: ${histogram[g]}`);

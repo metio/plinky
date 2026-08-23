@@ -51,7 +51,13 @@ describe("litKeys", () => {
 
     it("sorts and deduplicates, so the same keys compare equal however they arrived", () => {
         const once = litKeys([{ pitches: [64, 60], pitchStaves: [0, 0] }], 1);
-        const twice = litKeys([{ pitches: [60], pitchStaves: [0] }, { pitches: [64, 60], pitchStaves: [0, 0] }], 2);
+        const twice = litKeys(
+            [
+                { pitches: [60], pitchStaves: [0] },
+                { pitches: [64, 60], pitchStaves: [0, 0] },
+            ],
+            2,
+        );
         expect(once).toEqual(twice);
     });
 });

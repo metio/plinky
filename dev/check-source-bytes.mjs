@@ -37,7 +37,11 @@ const BINARY = new Set([
     "zip",
 ]);
 
-const FORBIDDEN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/
+// Naming control characters IS the job here. This gate exists to find them in tracked
+// source, so the rule's usual advice — you probably did not mean to match these — is
+// exactly backwards for this one line.
+// biome-ignore lint/suspicious/noControlCharactersInRegex: finding these is the point
+const FORBIDDEN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
 // What the byte is called, so the report names it rather than printing it.
 function nameOf(code) {

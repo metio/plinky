@@ -25,7 +25,9 @@ describe("videoFrames properties", () => {
                     const now = frameAt(notes, timeMs);
                     const later = frameAt(notes, timeMs + aheadMs);
                     expect(later.done).toBeGreaterThanOrEqual(now.done);
-                    expect(later.currentOnsetMs ?? -1).toBeGreaterThanOrEqual(now.currentOnsetMs ?? -1);
+                    expect(later.currentOnsetMs ?? -1).toBeGreaterThanOrEqual(
+                        now.currentOnsetMs ?? -1,
+                    );
                 },
             ),
         );

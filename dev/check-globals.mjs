@@ -111,7 +111,11 @@ const REMEDIES = {
 // Date arithmetic is not a clock read: `new Date(dateKey)` derives a date from an
 // explicit argument and stays deterministic, so only the zero-argument form is banned.
 const CORE_BANNED = [
-    { name: "Math.random", pattern: /\bMath\.random\b/, hint: "take an `rng: () => number` parameter" },
+    {
+        name: "Math.random",
+        pattern: /\bMath\.random\b/,
+        hint: "take an `rng: () => number` parameter",
+    },
     { name: "Date.now", pattern: /\bDate\.now\b/, hint: "take a `now: number` parameter" },
     { name: "new Date()", pattern: /\bnew Date\(\s*\)/, hint: "take a `now: Date` parameter" },
 ];
@@ -198,7 +202,7 @@ for (const [file, source] of stripped) {
 }
 
 if (violations.length > 0) {
-    console.error("Confined-global violations:\n" + violations.map((v) => `  ${v}`).join("\n"));
+    console.error(`Confined-global violations:\n${violations.map((v) => `  ${v}`).join("\n")}`);
     process.exit(1);
 }
 console.log(`check-globals: ${Object.keys(CONFINED).join(", ")} confined to their adapters.`);

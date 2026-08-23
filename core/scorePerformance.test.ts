@@ -29,7 +29,10 @@ const step = (elapsedMs: number, pitches: number[], holdMs = 500, holds?: number
 // A position the score marks: a written dynamic per pitch, and a weight for where the
 // position falls in its bar and its phrase.
 const marked = (velocities: (number | null)[], interpretation?: number): MatchStep => ({
-    ...step(0, velocities.map((_, index) => 60 + index)),
+    ...step(
+        0,
+        velocities.map((_, index) => 60 + index),
+    ),
     expected: velocities.map((velocity) => ({ velocity, holdMs: 500, writtenHoldMs: 500 })),
     ...(interpretation === undefined ? {} : { interpretation }),
 });
@@ -61,12 +64,14 @@ describe("performanceOf", () => {
     it("plays every note of every position, on time and held as written", () => {
         const notes = performanceOf([step(0, [60]), step(500, [62, 64])]);
         // Fingering rides along on every note; the timing is what this pins.
-        expect(notes.map(({ pitch, startMs, durationMs, velocity }) => ({
-            pitch,
-            startMs,
-            durationMs,
-            velocity,
-        }))).toEqual([
+        expect(
+            notes.map(({ pitch, startMs, durationMs, velocity }) => ({
+                pitch,
+                startMs,
+                durationMs,
+                velocity,
+            })),
+        ).toEqual([
             { pitch: 60, startMs: 0, durationMs: 500, velocity: EVEN_VELOCITY },
             { pitch: 62, startMs: 500, durationMs: 500, velocity: EVEN_VELOCITY },
             { pitch: 64, startMs: 500, durationMs: 500, velocity: EVEN_VELOCITY },
@@ -127,11 +132,7 @@ describe("performanceLengthMs", () => {
 
 describe("fingering", () => {
     it("gives every note of a score-derived performance a finger and a hand", () => {
-        const notes = performanceOf([
-            step(0, [60]),
-            step(500, [62]),
-            step(1000, [64]),
-        ]);
+        const notes = performanceOf([step(0, [60]), step(500, [62]), step(1000, [64])]);
         for (const note of notes) {
             expect(note.finger).toBeGreaterThanOrEqual(1);
             expect(note.finger).toBeLessThanOrEqual(5);

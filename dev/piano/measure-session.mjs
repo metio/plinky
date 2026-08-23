@@ -57,7 +57,9 @@ const songs = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
 // so the answer covers a beginner's first study and a Chopin nocturne alike.
 const pieces = [];
 for (let grade = 1; grade <= 8; grade++) {
-    for (const song of songs.filter((entry) => entry.grade === grade && entry.license === "CC0-1.0").slice(0, Math.ceil(COUNT / 8))) {
+    for (const song of songs
+        .filter((entry) => entry.grade === grade && entry.license === "CC0-1.0")
+        .slice(0, Math.ceil(COUNT / 8))) {
         pieces.push(song);
     }
 }

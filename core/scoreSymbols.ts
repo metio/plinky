@@ -40,7 +40,9 @@ const STAVE = {
 
 function needsLedger(xml: string): boolean {
     const lines = /<sign>F<\/sign>/.test(xml) ? STAVE.bass : STAVE.treble;
-    const pitches = xml.matchAll(/<step>\s*([A-G])\s*<\/step>[\s\S]*?<octave>\s*(-?\d+)\s*<\/octave>/g);
+    const pitches = xml.matchAll(
+        /<step>\s*([A-G])\s*<\/step>[\s\S]*?<octave>\s*(-?\d+)\s*<\/octave>/g,
+    );
     for (const [, step, octave] of pitches) {
         const index = Number(octave) * 7 + STEPS.indexOf(step ?? "C");
         if (index <= lines.low - 2 || index >= lines.high + 2) {

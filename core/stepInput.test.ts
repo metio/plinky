@@ -43,9 +43,7 @@ describe("stepDurationMs", () => {
 describe("entering notes one at a time", () => {
     it("places a note where the cursor stands and moves on by its length", () => {
         const one = step(EMPTY_STEP, 60);
-        expect(one.notes).toEqual([
-            { pitch: 60, startMs: 0, durationMs: 500, velocity: 80 },
-        ]);
+        expect(one.notes).toEqual([{ pitch: 60, startMs: 0, durationMs: 500, velocity: 80 }]);
         expect(one.atMs).toBe(500);
 
         const two = step(one, 62);

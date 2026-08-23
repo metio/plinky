@@ -81,7 +81,10 @@ describe("pitchRange", () => {
 
 describe("fitToInstrument", () => {
     it("leaves a piece that already fits alone", () => {
-        expect(fitToInstrument({ from: 60, to: 72 }, SIXTY_ONE)).toEqual({ kind: "fits", shift: 0 });
+        expect(fitToInstrument({ from: 60, to: 72 }, SIXTY_ONE)).toEqual({
+            kind: "fits",
+            shift: 0,
+        });
     });
 
     it("has nothing to do before a piece has been read", () => {

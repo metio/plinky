@@ -57,7 +57,9 @@ describe("keyboard depth", () => {
     });
 
     it("falls back to the default for an unknown depth", () => {
-        expect(keyboardDepthFraction("colossal")).toBe(keyboardDepthFraction(DEFAULT_KEYBOARD_DEPTH));
+        expect(keyboardDepthFraction("colossal")).toBe(
+            keyboardDepthFraction(DEFAULT_KEYBOARD_DEPTH),
+        );
     });
 });
 

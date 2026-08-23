@@ -34,7 +34,9 @@ describe("barHeat properties", () => {
             fc.property(score, (bars) => {
                 const heat = barHeat(bars, "right");
                 const floor = absoluteHeat(barCosts(bars, "right"));
-                heat.forEach((h, i) => expect(h).toBeGreaterThanOrEqual(floor[i]! - 1e-9));
+                for (const [i, h] of heat.entries()) {
+                    expect(h).toBeGreaterThanOrEqual(floor[i]! - 1e-9);
+                }
             }),
         );
     });

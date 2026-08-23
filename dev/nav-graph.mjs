@@ -197,11 +197,11 @@ const durableFromHome = (() => {
     }
     return dist;
 })();
-const checklistOnly = pages.filter(
-    (p) => fromHome.has(p.path) && !durableFromHome.has(p.path),
-);
+const checklistOnly = pages.filter((p) => fromHome.has(p.path) && !durableFromHome.has(p.path));
 const unreachable = pages.filter((p) => !fromHome.has(p.path));
-const eccentricity = Math.max(...pages.map((p) => fromHome.get(p.path) ?? Number.POSITIVE_INFINITY));
+const eccentricity = Math.max(
+    ...pages.map((p) => fromHome.get(p.path) ?? Number.POSITIVE_INFINITY),
+);
 
 let diameter = 0;
 for (const p of pages) {
@@ -216,7 +216,9 @@ for (const p of pages) {
 // --- Report ------------------------------------------------------------------------
 
 console.log("Navigation depth (taps from home):");
-for (const p of [...pages].sort((a, b) => (fromHome.get(b.path) ?? 99) - (fromHome.get(a.path) ?? 99))) {
+for (const p of [...pages].sort(
+    (a, b) => (fromHome.get(b.path) ?? 99) - (fromHome.get(a.path) ?? 99),
+)) {
     const d = fromHome.get(p.path);
     console.log(`  ${d === undefined ? "∞" : d}  ${p.path}`);
 }
@@ -236,7 +238,9 @@ if (checklistOnly.length > 0) {
     );
 }
 if (Number.isFinite(eccentricity) && eccentricity > BUDGET_FROM_HOME) {
-    problems.push(`a feature is ${eccentricity} taps from home, over the ${BUDGET_FROM_HOME} budget`);
+    problems.push(
+        `a feature is ${eccentricity} taps from home, over the ${BUDGET_FROM_HOME} budget`,
+    );
 }
 if (problems.length > 0) {
     console.error(

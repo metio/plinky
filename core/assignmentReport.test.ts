@@ -131,7 +131,11 @@ describe("collectReports", () => {
     it("takes a whole class pasted in at once", () => {
         const text = `${code("Ada", 1)}\n${code("Grace", 2)}\n\n${code("Alan", 3)}`;
 
-        expect(collectReports(text).map((r) => r.who).sort()).toEqual(["Ada", "Alan", "Grace"]);
+        expect(
+            collectReports(text)
+                .map((r) => r.who)
+                .sort(),
+        ).toEqual(["Ada", "Alan", "Grace"]);
     });
 
     it("ignores anything in the paste that is not a code", () => {
