@@ -151,6 +151,27 @@ async function waitForServer(url, attempts = 120) {
 const manifest = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
 mkdirSync(OUT, { recursive: true });
 
+// Every piece is looked up before anything renders, and what cannot be found is named
+// together, up front. The ids are content fingerprints: a re-import that changes a score's
+// notes changes its id, and one pruned from the catalogue takes its id with it — so this
+// list going stale is expected, and it is meant to show as a missing piece rather than a
+// silently different one. What it must not do is show forty minutes in, one line at a
+// time, buried under the clips that did work.
+const unresolved = PIECES.map((piece) => {
+    try {
+        scoreUrl(piece.id, manifest);
+        return null;
+    } catch (error) {
+        return `  ${piece.title} (${piece.id}): ${error instanceof Error ? error.message : error}`;
+    }
+}).filter(Boolean);
+if (unresolved.length > 0) {
+    console.warn(
+        `${unresolved.length} of ${PIECES.length} pieces cannot be rendered:\n${unresolved.join("\n")}\n` +
+            "Fix dev/promo/pieces.mjs — a pruned piece needs removing, a re-imported one needs its new id.",
+    );
+}
+
 // The dev server is here only to compile modules for the browser; nothing is being edited
 // while a render runs, and a watcher would reload the page mid-frame the moment anything in
 // the tree changed. An hour-long batch should not be hostage to a stray save.
