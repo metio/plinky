@@ -70,11 +70,8 @@ Shape follows what a thing is. Anything touched is generously rounded — button
 cards. Anything *printed* — a staff, a table, a score — keeps its square corners and
 hairline rules, because rounding a staff makes it a widget instead of a page.
 
-While something is loading, the app runs the treadmill: notes descending a lane onto a
-strike line — the picture a player watches while they play, running with no score behind
-it. It is the one loading gesture, at every size; there is no spinner to reach for. Beside
-a line of text it runs `compact`, which is the same picture with three lanes instead of
-six, because six in sixteen pixels is a smudge.
+While something is loading, the app draws the plink: a note falls, lands, and rings. It is
+the one loading gesture, at every size; there is no spinner to reach for.
 
 ### The primitives
 
