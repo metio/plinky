@@ -201,33 +201,44 @@ SPDX-License-Identifier: AGPL-3.0-or-later
    `@layer theme` defaults; `.dark` sits on <html>, which is also `:root`. */
 /* The same album under a lamp. */
 .dark {
-    --color-surface: #120c2b;
-    --color-raised: #1b1442;
-    --color-sunken: #0d0820;
-    --color-subtle: #241b52;
-    --color-subtle-strong: #2f2466;
+    /* Ebony and rosewood, not more violet.
+       The dark theme used to put the brand hue on every ground — page, cards, hairlines and
+       body text were all a saturated violet — which left violet meaning nothing: the mark
+       sat on its own colour and the primary action read as one more shade of wall. These
+       grounds are a brown-black at hue 35°, the colour of the instrument and the far side
+       of the wheel from the accent, so the one violet thing on a screen is the thing you
+       are meant to press. It is the light theme's own rule inverted: ink is brown-black,
+       never blue-black. */
+    --color-surface: #15120e;
+    --color-raised: #201c16;
+    --color-sunken: #0f0d09;
+    --color-subtle: #2a251d;
+    --color-subtle-strong: #372f25;
 
-    --color-line-faint: #1b1442;
-    --color-line: #2a2059;
-    --color-line-strong: #3d3080;
+    --color-line-faint: #201c16;
+    --color-line: #2e2820;
+    --color-line-strong: #453c30;
 
-    --color-ink: #f2ecff;
-    --color-ink-soft: #e4daff;
-    --color-body: #cdc2ee;
-    --color-muted: #a196cc;
-    --color-faint: #8279ad;
-    --color-ink-disabled: #4a4180;
+    --color-ink: #f8f4ec;
+    --color-ink-soft: #ece5d9;
+    --color-body: #d5cdbf;
+    --color-muted: #9d9484;
+    --color-faint: #837b6d;
+    --color-ink-disabled: #57503f;
 
+    /* Brighter than the light theme's fill: against a warm ground a violet has to carry
+       the whole of the page's saturation, and the old #5b21e8 read as dim rather than
+       primary once the walls around it stopped sharing its hue. */
     --color-accent: #c3a8ff;
     --color-accent-strong: #d6c4ff;
     --color-accent-deep: #e6dbff;
     --color-accent-ink: #e6dbff;
-    --color-accent-solid: #5b21e8;
-    --color-accent-solid-hover: #6f39f0;
-    --color-accent-surface: #241064;
-    --color-accent-fill: #2f1580;
-    --color-accent-line: #3b1d99;
-    --color-accent-line-strong: #5b21e8;
+    --color-accent-solid: #7c3aed;
+    --color-accent-solid-hover: #8b46ff;
+    --color-accent-surface: #251a44;
+    --color-accent-fill: #331c6b;
+    --color-accent-line: #43248c;
+    --color-accent-line-strong: #6b34d9;
     --color-accent-ring: #9b7cf0;
     --color-accent-soft: #6f39f0;
 
@@ -258,6 +269,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-paper-line: #c7bce8;
     --color-paper-ink: #8c88b4;
 
+    /* Gray, not stone, even though the grounds are warm: the on-screen keyboard's resting
+       colours come from the skins in core/keyboardTheme.ts, whose hexes are also baked
+       into the video export, so warming these would leave the two keyboards disagreeing
+       with each other for the sake of agreeing with the wall. */
     --color-key-white: var(--color-gray-100);
     --color-key-ink: var(--color-gray-900);
     --color-key-black: var(--color-gray-800);
