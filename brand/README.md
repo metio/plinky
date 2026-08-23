@@ -144,6 +144,11 @@ corner wedges and no alpha. `core/matte.ts` floods inward from the four corners 
 near-white and stops at anything enclosed, which is why the keys and the wordmark survive
 while the corners come out transparent.
 
+`brand/plinky-keys.png` is the same mark again without the tile, for setting on a ground
+that is already violet. It arrives drawn with a real alpha channel, so nothing is keyed out
+of it at all — which is why the request for artwork asks for transparency: a drawing that
+carries its own says what the artist meant, and nothing downstream has to infer it.
+
 `brand/plinky-icon.png` is keyed the same way from its own artwork,
 `brand/source/plinky-icon.png` — the mark drawn without the name rather than cut out of the
 lockup. Deriving one from the other means repainting the ground where the name was and
