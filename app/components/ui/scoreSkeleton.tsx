@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { m } from "../../paraglide/messages.js";
-import { Plink } from "./plink";
+import { Treadmill } from "./treadmill";
 
 // The staff a piece is about to appear on, drawn while it is still being fetched and set.
 //
@@ -10,7 +10,7 @@ import { Plink } from "./plink";
 // then the engraving itself — and on a slow device that is several seconds. What stood here
 // before was nothing at all: a blank page, then a blank box, with no sign that anything was
 // happening. So the wait is drawn as the thing being waited for. Five hairlines in the
-// score's own slot, a note falling onto them, and a word for which part of the wait this
+// score's own slot, notes descending onto them, and a word for which part of the wait this
 // is — because "still fetching" and "nearly drawn" are different news to somebody deciding
 // whether to give up.
 //
@@ -26,11 +26,12 @@ export function ScoreSkeleton({ engraving = false }: { engraving?: boolean }) {
                         <div key={line} className="h-px w-full bg-line" />
                     ))}
                 </div>
-                {/* The plink lands on the middle line. Placed over the staff rather than
-                tinting it, so the lines keep their weight, and centred on the slot so the
-                note falls onto the staff rather than past it. */}
+                {/* The treadmill runs in the staff's own slot: the picture a player watches
+                while they play, running with no score behind it, so the wait looks like the
+                thing being waited for. Over the staff rather than tinting it, so the lines
+                keep their weight. */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <Plink className="h-full w-6" />
+                    <Treadmill className="h-full w-full" />
                 </div>
             </div>
             <p role="status" className="text-sm text-muted">

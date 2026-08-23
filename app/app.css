@@ -369,93 +369,37 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     /* The staff standing in for a piece that is still arriving: a soft band travels
        along it the way a reader's eye would. Opacity and position only — the staff
        occupies the score's own slot, so nothing moves when the real notation lands. */
-    /* The plink: the app's one loading gesture, and the same event the mark draws — a
-       note falls, lands on a key, and rings. All three parts share one duration so the
-       trail, the impact and the ring stay one motion rather than three loops drifting
-       apart. The easing lives in the keyframes, per step, because a fall and a rebound
-       are opposite curves and no single function can be both. */
-    --animate-plink-fall: plink-fall 1.6s infinite;
-    --animate-plink-trail: plink-trail 1.6s linear infinite;
-    --animate-plink-ring: plink-ring 1.6s linear infinite;
+    /* The treadmill: what the app does while it is busy. It is the notes highway — the
+       picture a player watches while they play — running on its own with no score behind
+       it, so a wait looks like the thing being waited for rather than like a widget. The
+       lanes set off at different moments and fall at different speeds, which is what keeps
+       it reading as music rather than as a machine. */
+    --animate-treadmill: treadmill 2.2s linear infinite;
+
 }
 
-@keyframes plink-fall {
+@keyframes treadmill {
     0% {
-        transform: translateY(-240%) scale(1);
+        bottom: 100%;
         opacity: 0;
-        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
     }
-    8% {
-        transform: translateY(-200%) scale(1);
-        opacity: 1;
-        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-    }
-    42% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-        animation-timing-function: linear;
-    }
-    /* The squash. A dot that stops dead reads as a dot that was switched off; the width
-       it gains on impact is what makes it read as landing on something. */
-    48% {
-        transform: translateY(0) scale(1.35, 0.65);
-        opacity: 1;
-        animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
-    }
-    68% {
-        transform: translateY(-45%) scale(1);
-        opacity: 1;
-        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-    }
-    86% {
-        transform: translateY(0) scale(1.12, 0.88);
+    6% {
         opacity: 1;
     }
-    94% {
-        transform: translateY(0) scale(1);
+    /* Reaches the strike line, and goes out just past it — a block that stops dead at the
+       line reads as a thing parked there rather than a note that has been played. */
+    92% {
+        bottom: 0%;
         opacity: 1;
     }
     100% {
-        transform: translateY(0) scale(1);
+        bottom: -6%;
         opacity: 0;
     }
 }
 
-/* Drawn from the top down, at the speed the note is falling, so it is the path already
-   travelled rather than a line the note happens to be near. */
-@keyframes plink-trail {
-    0% {
-        transform: scaleY(0);
-        opacity: 0.8;
-    }
-    42% {
-        transform: scaleY(1);
-        opacity: 0.8;
-    }
-    72%,
-    100% {
-        transform: scaleY(1);
-        opacity: 0;
-    }
-}
 
-/* Leaves at the moment of impact, not before it. */
-@keyframes plink-ring {
-    0%,
-    42% {
-        transform: scale(0.3);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(0.7);
-        opacity: 0.6;
-    }
-    80%,
-    100% {
-        transform: scale(2.2);
-        opacity: 0;
-    }
-}
+
 
 @keyframes blush {
     0%,
