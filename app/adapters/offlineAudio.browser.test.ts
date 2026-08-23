@@ -81,4 +81,3 @@ describe("renderTakeAudio", () => {
         expect(peak(staccato, ...after)).toBeLessThan(peak(held, ...after) / 2);
     });
 });
-

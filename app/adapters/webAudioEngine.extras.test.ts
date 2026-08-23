@@ -203,7 +203,14 @@ describe("everything a rendered piece asks the instrument for", () => {
         for (const note of [64, 67, 71]) {
             engine.strike({ note, gain: 0.3, velocity: 90, duration: 0.4, delay: 1 });
         }
-        engine.strike({ note: 72, gain: 0.3, velocity: 90, duration: 0.6, delay: 1.5, pedalled: true });
+        engine.strike({
+            note: 72,
+            gain: 0.3,
+            velocity: 90,
+            duration: 0.6,
+            delay: 1.5,
+            pedalled: true,
+        });
 
         const tally = samples.asked.reduce<Record<string, number>>((count, one) => {
             count[one.kind] = (count[one.kind] ?? 0) + 1;
