@@ -349,17 +349,16 @@ function renderSampledStrike(
     envelope.gain.setValueAtTime(level, damperFrom);
     envelope.gain.exponentialRampToValueAtTime(0.0001, damperFrom + DAMPER_S);
     envelope.connect(room(ctx));
-    // A fixed-length note's damper lands at a time known when it is scheduled, so its knock
-    // is scheduled with it. Listen is where most notes in this app end, and a recorded piano
-    // that knocks under the hands but not under the computer's is two instruments.
+    // NO key-off knock here, and the reason is worth keeping. A knock is the damper landing,
+    // and on a real instrument it is a sparse sound: it needs a key to come up with nothing
+    // else holding it, which under hands happens far less often than notes are played. A
+    // scheduled note has no such test — every one of them ends at a known time — so knocking
+    // with each produced one broadband click per note, several at once under a chord, and a
+    // continuous click train through anything fast. It measured as a wash of transients
+    // across the whole top of the spectrum, over the music.
     //
-    // Not under the pedal, though: the dampers are off the strings, so nothing lands and
-    // there is no knock to make. The live path has always held to that; this one did not,
-    // and knocked on every note it played — which on a pedalled piece is a mechanical thump
-    // per note, several at once under a chord, that no piano can produce.
-    if (!pedalled) {
-        scheduleExtra(ctx, note, "knock", level * KNOCK_LEVEL, damperFrom);
-    }
+    // The live press-and-release path keeps its knock, where the damper genuinely lands and
+    // the player's own hands set the rate.
     // Struck with the dampers off, so the rest of the instrument answers. Same instant as
     // the note, not the damper.
     if (pedalled) {
