@@ -4,7 +4,7 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { NO_SCORE_MARKS, readScoreMarks, type ScoreMarks } from "../../core/musicxmlMarks";
-import { collectListenSteps } from "./useListenPlayback";
+import { collectListenSteps } from "../lib/listenSteps";
 import { collectMatchSteps } from "./useScoreMatcher";
 import { readArpeggio, readOrnament } from "../lib/scoreExpression";
 

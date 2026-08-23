@@ -4,7 +4,7 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { NO_SCORE_MARKS, readScoreMarks, type ScoreMarks } from "../../core/musicxmlMarks";
-import { collectListenSteps } from "./useListenPlayback";
+import { collectListenSteps } from "../lib/listenSteps";
 import { collectMatchSteps } from "./useScoreMatcher";
 
 // OSMD hangs the pedal on the same measure expressions as the dynamics, so only a real

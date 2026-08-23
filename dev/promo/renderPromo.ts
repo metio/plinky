@@ -10,7 +10,8 @@
 // Nothing here is shipped. It is dev tooling that happens to run in a browser.
 
 import { decompressMxl } from "../../core/musicxmlFile";
-import { performanceLengthMs, performanceOf } from "../../core/scorePerformance";
+import { performanceLengthMs } from "../../core/scorePerformance";
+import { listenPerformanceOf } from "../../core/listenPerformance";
 import {
     BY_FINGER,
     DEFAULT_KEYBOARD_DEPTH,
@@ -23,8 +24,10 @@ import { webSampleSource } from "../../app/adapters/webSampleSource";
 import { playFromSamples } from "../../app/adapters/webAudioEngine";
 import { sampleLookup } from "../../app/lib/sampleVoices";
 import { takeHighwayPainter } from "../../app/lib/videoPainter";
-import { readScoreMarks } from "../../core/musicxmlMarks";
-import { collectMatchSteps } from "../../app/hooks/useScoreMatcher";
+import { readScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { NOMINAL_BPM } from "../../core/elapsed";
+import { collectListenSteps } from "../../app/lib/listenSteps";
+import { readStartTempo } from "../../app/lib/scoreExpression";
 
 export type PromoRequest = {
     // The .mxl path under public/, e.g. "/songs/cc0-1.0/TOBNVaraGATl.mxl".
@@ -95,20 +98,24 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
     // The marks come from the file, not the engraving: without them every note is struck
     // at the same even touch, which is the one thing that makes a rendered piece sound
     // like a machine playing it.
-    const steps = collectMatchSteps(
-        osmd,
-        "both",
-        readScoreMarks(new DOMParser().parseFromString(xml, "application/xml")),
-    );
+    const marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
+    // Read the way LISTEN reads, not the way a run is graded. The graded reading asks for
+    // the written note where the page prints an ornament, a tremolo or a glissando —
+    // deliberately, because nobody can be graded on a trill note by note — and plays every
+    // rolled chord as a block. A clip is the shop window: it should sound like the app
+    // sounds, so it comes off the same model Listen sounds.
+    const steps = collectListenSteps(osmd, marks);
+    // Every position is counted in the same proportion to the opening tempo that its own
+    // mark stands in, which is what the transport does with the dial at the written tempo.
+    const startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
     host.remove();
 
-    const notes = performanceOf(
-        steps,
+    const notes = listenPerformanceOf(steps, {
+        startBpm,
+        speed: request.speed,
         // No window means the whole piece, which is what a full-length upload is.
-        request.clipMs > 0
-            ? { speed: request.speed, withinMs: request.clipMs }
-            : { speed: request.speed },
-    );
+        ...(request.clipMs > 0 ? { withinMs: request.clipMs } : {}),
+    });
     if (notes.length === 0) {
         throw new Error(`${request.scoreUrl}: nothing to play`);
     }

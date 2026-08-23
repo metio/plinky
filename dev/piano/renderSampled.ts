@@ -8,14 +8,17 @@
 //
 // It runs in a browser because that is where an OfflineAudioContext is, and it reads the
 // piece exactly the way the promo renderer does — engraved by the same engine, performed
-// by the same cost model — so the two recordings differ in nothing but the voice.
+// by the same reading of the page — so the two recordings differ in nothing but the voice.
 //
 // Nothing here is shipped. It is dev tooling that happens to run in a browser.
 
 import { decompressMxl } from "../../core/musicxmlFile";
-import { performanceLengthMs, performanceOf } from "../../core/scorePerformance";
-import { readScoreMarks } from "../../core/musicxmlMarks";
-import { collectMatchSteps } from "../../app/hooks/useScoreMatcher";
+import { performanceLengthMs } from "../../core/scorePerformance";
+import { listenPerformanceOf } from "../../core/listenPerformance";
+import { readScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { NOMINAL_BPM } from "../../core/elapsed";
+import { collectListenSteps } from "../../app/lib/listenSteps";
+import { readStartTempo } from "../../app/lib/scoreExpression";
 import { renderTakeAudio } from "../../app/adapters/offlineAudio";
 import { LEAD_IN_MS } from "../../core/videoFrames";
 // @ts-expect-error — dev tooling, shared with the Node side as plain JavaScript.
@@ -81,17 +84,20 @@ async function notesOf(request: SampledRequest) {
     // The marks come from the file, not the engraving: without them every note is struck
     // at the same even touch, which is the one thing that makes a rendered piece sound
     // like a machine playing it.
-    const steps = collectMatchSteps(
-        osmd,
-        "both",
-        readScoreMarks(new DOMParser().parseFromString(xml, "application/xml")),
-    );
+    const marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
+    // The listening reading, the same one the promo renderer uses: the question here is how
+    // the app sounds through a real piano, and the app plays the figures an ornament and a
+    // tremolo stand for. Those figures reach pitches the written note never does, so the
+    // graded reading would also under-count the recordings a session has to fetch.
+    const steps = collectListenSteps(osmd, marks);
+    const startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
     host.remove();
-    return performanceOf(
-        steps,
+    return listenPerformanceOf(steps, {
+        startBpm,
+        speed: request.speed,
         // No window means the whole piece, which is what a session plays.
-        request.clipMs > 0 ? { speed: request.speed, withinMs: request.clipMs } : {},
-    );
+        ...(request.clipMs > 0 ? { withinMs: request.clipMs } : {}),
+    });
 }
 
 // The (pitch, velocity) pairs a whole piece plays, for measuring what a session would have

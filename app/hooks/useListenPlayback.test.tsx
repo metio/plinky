@@ -8,7 +8,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
 import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import type { Take } from "../../core/takes";
-import { collectListenSteps, useListenPlayback } from "./useListenPlayback";
+import { collectListenSteps } from "../lib/listenSteps";
+import { useListenPlayback } from "./useListenPlayback";
 
 // The colour helpers walk real OSMD graphics; stub them so the fake score
 // below only has to model the cursor walk itself.
@@ -30,7 +31,10 @@ vi.mock("../lib/scoreCursor", () => ({
 
 // A walk whose pitch changes from position to position, for the shaping that depends on the
 // notes rather than on the clock. Each position is one quarter, as in fakeOsmd.
-function lineOsmd(halfTones: readonly (number | number[])[]) {
+function lineOsmd(
+    halfTones: readonly (number | number[])[],
+    noteOver: Record<string, unknown> = {},
+) {
     let position = 0;
     const cursor = {
         reset: vi.fn(() => {
@@ -58,6 +62,7 @@ function lineOsmd(halfTones: readonly (number | number[])[]) {
                 Length: { RealValue: 0.25 },
                 isRest: () => false,
                 halfTone,
+                ...noteOver,
             }));
         },
     };
@@ -512,5 +517,127 @@ describe("useListenPlayback", () => {
         // never having lit it.
         act(() => result.current.stop());
         expect(result.current.sounding.size).toBe(0);
+    });
+});
+
+// The whole listening performance, as a sequence: when each note is struck, at what pitch,
+// how loud, how long, and whether the pedal is down under it. Every expressive reading the
+// transport makes lands in exactly one of those five numbers, so pinning the sequence pins
+// the performance — the ornament figures, the roll of a chord, the tempo the clock counts
+// at, the voicing of a chord and the weight the phrase puts on it, all at once.
+//
+// The scores below are fakes, but the sound model they drive is the shipped one. The real
+// engravings go through the same walk in the browser suites.
+function heard(osmd: OpenSheetMusicDisplay, marks: ScoreMarks = NO_SCORE_MARKS) {
+    const struck: Array<[number, number, number, number, boolean]> = [];
+    const started = Date.now();
+    const { result } = renderHook(() =>
+        useListenPlayback({
+            getOsmd: () => osmd,
+            synth: {
+                playNote: (pitch, options) => {
+                    struck.push([
+                        Date.now() - started,
+                        pitch,
+                        options?.velocity ?? 0,
+                        Math.round((options?.duration ?? 0) * 1000),
+                        options?.pedalled ?? false,
+                    ]);
+                },
+            },
+            tempo: () => 120,
+            loop: () => loopState,
+            onLap,
+            centerCursor: () => {},
+            marks,
+            markPainted: () => {},
+            isPracticing: () => false,
+        }),
+    );
+    act(() => result.current.start(0));
+    act(() => void vi.advanceTimersByTime(30_000));
+    act(() => result.current.stop());
+    return struck;
+}
+
+describe("the listening performance", () => {
+    it("plays a marked line exactly as pinned", () => {
+        expect(
+            heard(lineOsmd([48, 52, 55, [60, 64, 67]]), {
+                ...NO_SCORE_MARKS,
+                dynamics: [{ whole: 0, volume: 70, ramp: false }],
+                pedals: [{ from: 0.25, to: 0.75 }],
+                softs: [{ from: 0.5, to: 1 }],
+            }),
+        ).toEqual([
+            [0, 60, 64, 470, false],
+            [500, 64, 65, 940, true],
+            [1000, 67, 48, 470, true],
+            [1500, 72, 48, 470, false],
+            [1500, 76, 45, 470, false],
+            [1500, 79, 50, 470, false],
+        ]);
+    });
+
+    it("shakes and sweeps at the score's own tempo exactly as pinned", () => {
+        expect(
+            heard(fakeOsmd(3), {
+                ...NO_SCORE_MARKS,
+                tremolos: [{ from: 0, to: 0.25, beams: 2, pair: null }],
+                glissandos: [{ from: 0.25, to: 0.5, arrivesAt: 72 }],
+                tempi: [{ whole: 0, bpm: 90 }],
+            }),
+        ).toEqual([
+            [0, 60, 82, 118, false],
+            [125, 60, 82, 118, false],
+            [250, 60, 82, 118, false],
+            [375, 60, 82, 118, false],
+            [500, 60, 82, 34, false],
+            [540, 62, 83, 34, false],
+            [580, 64, 84, 34, false],
+            [620, 65, 84, 34, false],
+            [660, 67, 85, 34, false],
+            [700, 69, 86, 34, false],
+            [740, 71, 86, 34, false],
+            [780, 72, 86, 34, false],
+            [820, 74, 87, 34, false],
+            [860, 76, 88, 34, false],
+            [900, 77, 88, 34, false],
+            [940, 79, 89, 34, false],
+            [980, 81, 89, 34, false],
+            [1020, 83, 90, 34, false],
+            [1060, 60, 82, 470, false],
+        ]);
+    });
+
+    it("trills exactly as pinned", () => {
+        expect(
+            heard(fakeOsmd(2, { ParentVoiceEntry: { OrnamentContainer: { ornament: 0 } } })),
+        ).toEqual([
+            [0, 60, 82, 59, false],
+            [62, 62, 90, 59, false],
+            [124, 60, 82, 59, false],
+            [186, 62, 90, 59, false],
+            [248, 60, 82, 59, false],
+            [310, 62, 90, 59, false],
+            [372, 60, 82, 59, false],
+            [434, 62, 90, 59, false],
+            [496, 60, 82, 59, false],
+            [558, 62, 90, 59, false],
+            [620, 60, 82, 59, false],
+            [682, 62, 90, 59, false],
+            [744, 60, 82, 59, false],
+            [806, 62, 90, 59, false],
+            [868, 60, 82, 59, false],
+            [930, 62, 90, 59, false],
+        ]);
+    });
+
+    it("rolls a chord exactly as pinned", () => {
+        expect(heard(lineOsmd([[48, 52, 55]], { ParentVoiceEntry: { Arpeggio: {} } }))).toEqual([
+            [0, 60, 82, 470, false],
+            [40, 64, 87, 470, false],
+            [80, 67, 90, 470, false],
+        ]);
     });
 });

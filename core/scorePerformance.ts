@@ -33,26 +33,36 @@ export type PerformanceOptions = {
     withinMs?: number;
 };
 
-// The fingering the piece would be played with, per hand, as a lookup from
+// The fingering a set of positions would be played with, per hand, as a lookup from
 // (hand, position index) to that position's fingers. Each hand's line is fingered as one
 // sequence — the cost model reads a hand's own previous position to decide where the hand
 // travels, so the two hands must not be interleaved into one call.
-function fingeringOf(steps: readonly MatchStep[]): Map<Hand2, number[][]> {
-    const positions: Record<Hand2, number[][]> = { left: [], right: [] };
-    for (const step of steps) {
+//
+// Every position contributes to both hands, empty where that hand is silent, so a note is
+// looked up by the index of the position it belongs to.
+export function fingeringOfHands(
+    positions: readonly { pitches: readonly number[]; hands: readonly Hand2[] }[],
+): Map<Hand2, number[][]> {
+    const lines: Record<Hand2, number[][]> = { left: [], right: [] };
+    for (const position of positions) {
         const byHand: Record<Hand2, number[]> = { left: [], right: [] };
-        for (const [index, pitch] of step.pitches.entries()) {
-            byHand[step.pitchHands[index] ?? "right"].push(pitch);
+        for (const [index, pitch] of position.pitches.entries()) {
+            byHand[position.hands[index] ?? "right"].push(pitch);
         }
-        // Every step contributes a position to both hands, empty where that hand is
-        // silent, so the index a note is looked up by is the step's own index.
-        positions.left.push(byHand.left);
-        positions.right.push(byHand.right);
+        lines.left.push(byHand.left);
+        lines.right.push(byHand.right);
     }
     return new Map([
-        ["left", fingerPositions(positions.left, "left")],
-        ["right", fingerPositions(positions.right, "right")],
+        ["left", fingerPositions(lines.left, "left")],
+        ["right", fingerPositions(lines.right, "right")],
     ]);
+}
+
+// The fingering the piece would be played with, read off the graded step model.
+function fingeringOf(steps: readonly MatchStep[]): Map<Hand2, number[][]> {
+    return fingeringOfHands(
+        steps.map((step) => ({ pitches: step.pitches, hands: step.pitchHands })),
+    );
 }
 
 // How hard this key is struck. The score's own dynamic where it writes one — with that
