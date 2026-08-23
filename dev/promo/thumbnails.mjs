@@ -11,14 +11,16 @@
 // The pieces come from the same list the clips are rendered from, so a thumbnail can never
 // be of a different piece than the video it sits on.
 //
-// Usage: npm run promo:thumbs [-- --out promo-thumbs]
+// Usage: npm run promo:thumbs [-- --out promo]
+//
+// One thumbnail per piece, written beside that piece's clips in promo/<composer>/<piece>/.
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { readFile as read } from "node:fs/promises";
 import { chromium } from "playwright";
-import { fileNameFor, PIECES } from "./pieces.mjs";
+import { folderFor, PIECES } from "./pieces.mjs";
 
-const OUT = argValue("--out") ?? "promo-thumbs";
+const OUT = argValue("--out") ?? "promo";
 const ONLY = argValue("--only");
 
 function argValue(flag) {
@@ -75,10 +77,12 @@ for (const piece of PIECES) {
     );
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(80);
-    const file = `${OUT}/${fileNameFor(piece)}.png`;
+    const dir = `${OUT}/${folderFor(piece)}`;
+    mkdirSync(dir, { recursive: true });
+    const file = `${dir}/thumb.png`;
     writeFileSync(file, await page.screenshot());
     made += 1;
 }
 
 await browser.close();
-console.log(`${made} thumbnails in ${OUT}/ — 1280×720, one per clip, named to match.`);
+console.log(`${made} thumbnails — 1280×720, one per piece, beside its clips in ${OUT}/.`);

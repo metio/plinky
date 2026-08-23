@@ -73,16 +73,37 @@ export const PIECES = [
     { id: "pwhwiOvdnR0K", title: "Danny Boy", composer: "Traditional" },
 ];
 
-// A filename somebody can pick out of a folder: the piece, not its fingerprint. Accents
-// and punctuation go — "Gymnopédie No. 1" becomes gymnopedie-no-1. Two pieces can share a
-// title (a Schubert Ave Maria and a Bach/Gounod one), and a bare title slug would have the
-// second silently overwrite the first, so a repeated title takes its composer along.
-export function fileNameFor(piece) {
-    const shares = PIECES.filter((other) => other.title === piece.title).length > 1;
-    return shares ? `${slug(piece.title)}-${slug(piece.composer)}` : slug(piece.title);
+// Everything a piece produces lives in one folder, under its composer: promo/erik-satie/
+// gymnopedie-no-1/ holds the reel, the full-length cut and the thumbnail together. A post
+// is assembled from one piece at a time, so the folder is the unit somebody actually
+// works with — where three parallel directories meant matching a name across all of them
+// and noticing when one was missing.
+//
+// Accents and punctuation go: "Gymnopédie No. 1" becomes gymnopedie-no-1. Two pieces can
+// share a title — a Schubert Ave Maria and a Bach/Gounod one — but not under the same
+// composer, so the composer segment settles what a flat name could not.
+export function folderFor(piece) {
+    return `${slug(piece.composer)}/${slug(piece.title)}`;
 }
 
-export function slug(title) {
+// Two pieces landing on one path would have the second overwrite the first, and a folder
+// short of a clip reads as a render that failed rather than a list that collides. Checked
+// at import, because the list is edited by hand and there is no other moment that would
+// catch it.
+{
+    const seen = new Set();
+    for (const piece of PIECES) {
+        const path = folderFor(piece);
+        if (seen.has(path)) {
+            throw new Error(`two pieces both want promo/${path} — give one a distinct title`);
+        }
+        seen.add(path);
+    }
+}
+
+// Internal to the naming above: every path a piece owns is built here, so nothing
+// outside needs to make one.
+function slug(title) {
     return title
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")

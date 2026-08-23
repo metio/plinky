@@ -46,10 +46,11 @@ What a run of `/design-sync` needs to know about this repo. The durable settings
   `app/lib/catalog.ts` called Vite's glob at module scope, so the whole catalogue module
   took down anything importing it under a non-Vite bundler → the read is deferred and
   guarded, and an empty catalogue is the fallback.
-- Stories rendered headings in a system serif: `.storybook/preview.tsx` loaded Inter but
-  not Literata, which every `--font-display` heading resolves to. Adding the import makes
-  the story screenshots — and the design system built from them — show the face the app
-  actually ships.
+- **`.storybook/preview.tsx` must import every face `app/app.css` names**, not just
+  Inter: a `--font-display` heading with no display face loaded falls back to a system
+  one, and the story screenshots — and the design system built from them — then show a
+  face the app never ships. The display stack is Fredoka with Comfortaa behind it for
+  Greek and Cyrillic, so both imports have to be there.
 
 - `[GENERAL]` Reference storybook build failed with "The React Router Vite plugin
   requires the use of a Vite config file" → `.storybook/main.ts` filtered

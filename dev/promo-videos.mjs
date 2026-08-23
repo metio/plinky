@@ -8,7 +8,10 @@
 // asks it to run the app's own painter and encoder (dev/promo/renderPromo.ts). Nothing is
 // reimplemented here: a clip that does not look like Plinky is not worth posting.
 //
-// Usage: npm run promo:videos [-- --out dir] [--seconds 20] [--size 1080]
+// Usage: npm run promo:videos [-- --out dir] [--seconds 20] [--size 1080] [--youtube]
+//
+// Everything lands under promo/<composer>/<piece>/: reel.mp4 from a plain run, youtube.mp4
+// from --youtube, and thumb.png from npm run promo:thumbs.
 //
 // Only CC0 pieces are eligible. The catalogue's CC-BY and CC-BY-SA scores carry
 // obligations that a social post strips: the credit line is burnt into every frame, but
@@ -24,7 +27,7 @@ import {
     rmSync,
 } from "node:fs";
 import { chromium } from "playwright";
-import { fileNameFor, PIECES } from "./promo/pieces.mjs";
+import { folderFor, PIECES } from "./promo/pieces.mjs";
 
 const OUT = argValue("--out") ?? "promo";
 const SECONDS = Number(argValue("--seconds") ?? 20);
@@ -96,12 +99,13 @@ function toAac(file) {
     }
 }
 
-// A filename somebody can pick out of a folder: the piece, not its fingerprint. Accents
-// and punctuation go, spaces become dashes — "Gymnopédie No. 1" becomes gymnopedie-no-1.
-// The file a piece is written to, named by the shared helper so a clip and the thumbnail
-// made for it cannot end up under different names.
+// Both cuts of a piece sit in its own folder, named for what they are rather than for the
+// piece — the folder already says which piece it is. The shape and the length are the only
+// difference between them, so the names are the only place that distinction is recorded.
 function fileFor(piece, out) {
-    return `${out}/${fileNameFor(piece)}.mp4`;
+    const dir = `${out}/${folderFor(piece)}`;
+    mkdirSync(dir, { recursive: true });
+    return `${dir}/${YOUTUBE ? "youtube" : "reel"}.mp4`;
 }
 
 function argValue(flag) {
