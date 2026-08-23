@@ -31,10 +31,15 @@ function argValue(flag) {
 const INK = "#191545";
 const PAPER = "#f9f8fc";
 const PLINK = "#aa36fc";
+const VIOLET = "#4915d2";
 // Fredoka puts its tittle 0.55em above the baseline at a diameter of 0.16em, centred on the
 // stem; the inline box drops 0.22em below the baseline, so anchoring from its bottom is
 // 0.55 + 0.22 = 0.77em. See dev/build-icons.mjs.
 const TITTLE = "bottom:.77em;width:.16em;height:.16em";
+
+// The mark, wordless: the thumbnail sets the name itself, so the lockup would print it
+// twice. It fills the right of the frame, where a title never reaches.
+const mark = `data:image/png;base64,${(await read("brand/plinky-icon.png")).toString("base64")}`;
 
 const fredoka = await read(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
@@ -62,12 +67,18 @@ for (const piece of PIECES) {
     }
     await page.setContent(
         `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
-         <div style="width:1280px;height:720px;background:${INK};display:flex;flex-direction:column;justify-content:space-between;padding:72px 88px;font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif">
-           <div>
+         <div style="position:relative;overflow:hidden;width:1280px;height:720px;background:radial-gradient(120% 140% at 18% 8%, ${VIOLET} 0%, ${INK} 78%);display:flex;flex-direction:column;justify-content:space-between;padding:72px 88px;font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif">
+           <!-- The mark, bled off the bottom-right corner. A thumbnail is picked out of a
+                grid of a dozen others at a fifth of this size, where a title is a grey smear
+                and the only thing still legible is a shape and a colour — so the shape is
+                the app's own, big enough to survive the shrink, and set where the longest
+                title still clears it. -->
+           <img src="${mark}" alt="" style="position:absolute;right:-72px;bottom:-96px;width:520px;height:520px;opacity:.92">
+           <div style="position:relative;max-width:820px">
              <div style="font-size:${titleSize(piece.title)}px;font-weight:600;color:${PAPER};line-height:1.08;letter-spacing:-0.015em;text-wrap:balance">${piece.title}</div>
              <div style="font-family:Inter,system-ui,sans-serif;font-size:36px;color:${PAPER};opacity:.72;margin-top:20px">${piece.composer}</div>
            </div>
-           <div style="display:flex;align-items:baseline;gap:20px">
+           <div style="position:relative;display:flex;align-items:baseline;gap:20px">
              <div style="font-size:56px;font-weight:600;letter-spacing:-0.01em;color:${PAPER};line-height:1">
                Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>nky
              </div>
