@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Vija me pika është tempoja që zgjodhe. Mbi të nxitoje, nën të zvarritje — dhe çdo pikë ka ngjyrën e notës së saj sipër.",
     "rhythm_speed_target": "tempoja jote: {bpm}",
     "music_filters_none": "Të gjitha pjesët",
-    "music_filters_grades": "Nivelet {list}"
+    "music_filters_grades": "Nivelet {list}",
+    "methods_try": "Provoje në një pjesë të nivelit {grade}",
+    "methods_review": "Nis një seancë përsëritjeje",
+    "methods_in_plinky": "Në Plinky"
 }

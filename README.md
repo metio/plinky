@@ -553,10 +553,17 @@ schedule rather than from anything you set. Give a piece a date you're working t
 — an exam, a recital, a lesson — and it moves to the top with the days counted down.
 
 **[Ways to practise](https://plinky.fun/en/methods/)** names six things a teacher
-would suggest, says what each is for, and hands you straight to the Plinky control
+would suggest, says why each one works, and hands you straight to the Plinky control
 that does it: looping the two bars that keep going wrong, dropping the tempo until
 the notes land, taking one hand at a time, hearing a phrase before playing it, mixing
 pieces up in a review session, and letting a piece go quiet before coming back to it.
+Each one carries a button that opens a piece at your own grade with the method already
+set up — slowed down, one hand, or looping the opening phrase.
+
+A piece can also be opened that way by hand, which is useful for a teacher: adding
+`?speed=0.6&hands=left&loop=5-8` to a `/play/` address opens it at sixty per cent of
+its marked tempo, left hand only, looping bars 5 to 8. `transpose` takes semitones.
+Every one of them is a starting value you can change the moment the piece is open.
 
 ## Taking your progress with you
 

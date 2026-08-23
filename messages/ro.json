@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Linia punctată este tempoul pe care l-ai ales. Deasupra grăbeai, dedesubt trăgeai — și fiecare punct are culoarea notei sale de sus.",
     "rhythm_speed_target": "tempoul tău: {bpm}",
     "music_filters_none": "Toate piesele",
-    "music_filters_grades": "Nivelurile {list}"
+    "music_filters_grades": "Nivelurile {list}",
+    "methods_try": "Încearcă pe o piesă de nivelul {grade}",
+    "methods_review": "Începe o sesiune de recapitulare",
+    "methods_in_plinky": "În Plinky"
 }

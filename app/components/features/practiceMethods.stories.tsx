@@ -19,7 +19,8 @@ export default meta;
 
 type Story = StoryObj<typeof PracticeMethods>;
 
-// Six ways to practise: what each is, how long a go takes, and why it works.
-// Nothing here carries an action — the reading is the point, and the practice is
-// wherever the player already was.
+// Six ways to practise: why each one works, what Plinky gives you to do it with, and a
+// button that opens a piece with the method already set up on it. The reason leads,
+// because somebody who does not know why looping two bars beats replaying the piece will
+// not reach for the loop.
 export const All: Story = {};

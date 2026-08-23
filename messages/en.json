@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "The dashed line is the tempo you set. Above it you were rushing, below it dragging — and each dot is coloured like its note above.",
     "rhythm_speed_target": "your tempo: {bpm}",
     "music_filters_none": "All pieces",
-    "music_filters_grades": "Grades {list}"
+    "music_filters_grades": "Grades {list}",
+    "methods_try": "Try this on a Grade {grade} piece",
+    "methods_review": "Start a review session",
+    "methods_in_plinky": "In Plinky"
 }

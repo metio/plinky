@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Η διακεκομμένη γραμμή είναι το τέμπο που όρισες. Από πάνω βιαζόσουν, από κάτω καθυστερούσες — και κάθε κουκκίδα έχει το χρώμα της νότας της πιο πάνω.",
     "rhythm_speed_target": "το τέμπο σου: {bpm}",
     "music_filters_none": "Όλα τα κομμάτια",
-    "music_filters_grades": "Επίπεδα {list}"
+    "music_filters_grades": "Επίπεδα {list}",
+    "methods_try": "Δοκίμασέ το σε κομμάτι επιπέδου {grade}",
+    "methods_review": "Ξεκίνα μια επανάληψη",
+    "methods_in_plinky": "Στο Plinky"
 }

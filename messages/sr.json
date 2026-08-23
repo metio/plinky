@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Испрекидана линија је темпо који си поставио. Изнад ње си журио, испод ње вукао — а свака тачка има боју своје ноте изнад.",
     "rhythm_speed_target": "твој темпо: {bpm}",
     "music_filters_none": "Све композиције",
-    "music_filters_grades": "Степени {list}"
+    "music_filters_grades": "Степени {list}",
+    "methods_try": "Пробај на композицији степена {grade}",
+    "methods_review": "Покрени понављање",
+    "methods_in_plinky": "У Plinky-ју"
 }

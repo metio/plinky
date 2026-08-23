@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Die gestrichelte Linie ist das Tempo, das du eingestellt hast. Darüber warst du zu schnell, darunter zu langsam — und jeder Punkt hat die Farbe seiner Note darüber.",
     "rhythm_speed_target": "dein Tempo: {bpm}",
     "music_filters_none": "Alle Stücke",
-    "music_filters_grades": "Stufen {list}"
+    "music_filters_grades": "Stufen {list}",
+    "methods_try": "Auf einem Stück der Stufe {grade} ausprobieren",
+    "methods_review": "Wiederholungsrunde starten",
+    "methods_in_plinky": "In Plinky"
 }

@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "A szaggatott vonal a beállított tempó. Fölötte siettél, alatta húztad — és minden pont a fenti hangjegye színét viseli.",
     "rhythm_speed_target": "a tempód: {bpm}",
     "music_filters_none": "Minden darab",
-    "music_filters_grades": "{list}. fokozat"
+    "music_filters_grades": "{list}. fokozat",
+    "methods_try": "Próbáld ki egy {grade}. fokozatú darabon",
+    "methods_review": "Ismétlő kör indítása",
+    "methods_in_plinky": "A Plinkyben"
 }

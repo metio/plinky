@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "La línea discontinua es el tempo que fijaste. Por encima ibas deprisa, por debajo despacio — y cada punto lleva el color de su nota de arriba.",
     "rhythm_speed_target": "tu tempo: {bpm}",
     "music_filters_none": "Todas las piezas",
-    "music_filters_grades": "Grados {list}"
+    "music_filters_grades": "Grados {list}",
+    "methods_try": "Pruébalo con una pieza de grado {grade}",
+    "methods_review": "Empezar una sesión de repaso",
+    "methods_in_plinky": "En Plinky"
 }

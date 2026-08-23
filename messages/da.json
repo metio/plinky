@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Den stiplede linje er det tempo, du valgte. Over den skyndte du dig, under den slæbte du — og hver prik har farven fra sin node ovenfor.",
     "rhythm_speed_target": "dit tempo: {bpm}",
     "music_filters_none": "Alle stykker",
-    "music_filters_grades": "Trin {list}"
+    "music_filters_grades": "Trin {list}",
+    "methods_try": "Prøv det på et stykke på trin {grade}",
+    "methods_review": "Start en repetitionsrunde",
+    "methods_in_plinky": "I Plinky"
 }

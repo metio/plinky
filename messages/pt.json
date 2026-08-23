@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "A linha tracejada é o andamento que escolheste. Acima ias depressa, abaixo devagar — e cada ponto tem a cor da sua nota acima.",
     "rhythm_speed_target": "o teu andamento: {bpm}",
     "music_filters_none": "Todas as peças",
-    "music_filters_grades": "Graus {list}"
+    "music_filters_grades": "Graus {list}",
+    "methods_try": "Experimenta numa peça de grau {grade}",
+    "methods_review": "Começar uma sessão de revisão",
+    "methods_in_plinky": "No Plinky"
 }

@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "La linea tratteggiata è il tempo che hai impostato. Sopra correvi, sotto trascinavi — e ogni punto ha il colore della sua nota qui sopra.",
     "rhythm_speed_target": "il tuo tempo: {bpm}",
     "music_filters_none": "Tutti i brani",
-    "music_filters_grades": "Livelli {list}"
+    "music_filters_grades": "Livelli {list}",
+    "methods_try": "Provalo su un brano di livello {grade}",
+    "methods_review": "Inizia una sessione di ripasso",
+    "methods_in_plinky": "In Plinky"
 }

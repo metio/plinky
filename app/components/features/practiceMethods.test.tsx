@@ -2,28 +2,83 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { METHODS } from "../../../core/practiceMethods";
 import { m } from "../../paraglide/messages.js";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { PracticeMethods } from "./practiceMethods";
+
+const mount = () =>
+    renderWithServices(
+        <MemoryRouter>
+            <PracticeMethods />
+        </MemoryRouter>,
+    );
 
 afterEach(cleanup);
 
 describe("PracticeMethods", () => {
     it("names every method with its dose", () => {
-        render(<PracticeMethods />);
+        mount();
         expect(screen.getByRole("heading", { name: m.methods_title() })).toBeTruthy();
         expect(screen.getAllByRole("listitem")).toHaveLength(METHODS.length);
         expect(screen.getByText(m.method_chunking_name())).toBeTruthy();
         expect(screen.getByText(m.methods_dose({ count: 15 }))).toBeTruthy();
     });
 
-    it("offers nothing to press", () => {
-        render(<PracticeMethods />);
-        // Three of the six are done with a control inside a run, so a button could only
-        // land on a catalogue — the reading is the whole of it.
-        expect(screen.queryAllByRole("link")).toHaveLength(0);
-        expect(screen.queryAllByRole("button")).toHaveLength(0);
+    it("leads with the reason and follows with what Plinky gives you", () => {
+        mount();
+        // Somebody who does not know why looping two bars beats replaying the piece will
+        // not reach for the loop, so the reason comes first and is not labelled.
+        expect(screen.getByText(m.method_chunking_why())).toBeTruthy();
+        expect(screen.getAllByText(`${m.methods_in_plinky()}:`).length).toBe(METHODS.length);
+    });
+
+    it("sends the two methods that are not about one piece to the review queue", async () => {
+        mount();
+        await waitFor(() => {
+            const review = screen.getAllByRole("link", { name: m.methods_review() });
+            expect(review).toHaveLength(2);
+            for (const link of review) {
+                expect(link.getAttribute("href")).toContain("/review");
+            }
+        });
+    });
+
+    it("opens a piece with the method already set up on it", async () => {
+        mount();
+        // The four methods that are about one piece each offer a piece, and the address
+        // carries the method: the button IS the control, not a signpost to it.
+        await waitFor(() => {
+            const hrefs = screen
+                .getAllByRole("link")
+                .map((link) => link.getAttribute("href") ?? "")
+                .filter((href) => href.startsWith("/play/"));
+            expect(hrefs).toHaveLength(4);
+            expect(hrefs.some((href) => href.includes("speed=0.6"))).toBe(true);
+            expect(hrefs.some((href) => href.includes("hands=left"))).toBe(true);
+            expect(hrefs.some((href) => href.includes("loop=1-4"))).toBe(true);
+            // Hearing it first needs no set-up in the address — the switch is on the
+            // surface the link opens.
+            expect(hrefs.some((href) => !href.includes("?"))).toBe(true);
+        });
+    });
+
+    it("offers each method its own piece rather than the same one six times", async () => {
+        mount();
+        await waitFor(() => {
+            const pieces = screen
+                .getAllByRole("link")
+                .map((link) => link.getAttribute("href") ?? "")
+                .filter((href) => href.startsWith("/play/"))
+                .map((href) => href.split("?")[0]);
+            expect(pieces).toHaveLength(4);
+            // Seeded by method id, so which piece each one offers is stable but they are
+            // not all the same piece — on a shelf with only the bundled demos on it, at
+            // least two of the four differ.
+            expect(new Set(pieces).size).toBeGreaterThan(1);
+        });
     });
 });

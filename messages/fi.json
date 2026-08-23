@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Katkoviiva on asettamasi tempo. Sen yläpuolella kiirehdit, alapuolella laahasit — ja jokainen piste on saman värinen kuin nuottinsa yllä.",
     "rhythm_speed_target": "tempo: {bpm}",
     "music_filters_none": "Kaikki kappaleet",
-    "music_filters_grades": "Tasot {list}"
+    "music_filters_grades": "Tasot {list}",
+    "methods_try": "Kokeile tason {grade} kappaleeseen",
+    "methods_review": "Aloita kertausrupeama",
+    "methods_in_plinky": "Plinkyssä"
 }

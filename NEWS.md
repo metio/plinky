@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Ways to practise now hands you the piece, not just the advice.** Each of the six
+methods leads with why it works, says what in Plinky does it, and carries a button
+that opens a piece at your own grade with the method already set up — slowed down,
+one hand only, or looping the opening phrase. You can write one of these links
+yourself too, which is handy for a teacher: adding `?speed=0.6&hands=left` to a
+piece's address opens it at sixty per cent with the left hand alone. Everything a
+link sets is a starting point you can change straight away.
+
 **Dark mode is the colour of the instrument now.** It used to be violet everywhere —
 the page, the cards, the hairlines, even the text — so the violet that means "press
 this" had nothing to stand out from. The walls are ebony and rosewood instead, a warm

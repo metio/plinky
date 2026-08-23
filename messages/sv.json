@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Den streckade linjen är tempot du valde. Ovanför skyndade du, under släpade du — och varje punkt har färgen från sin not ovanför.",
     "rhythm_speed_target": "ditt tempo: {bpm}",
     "music_filters_none": "Alla stycken",
-    "music_filters_grades": "Nivåer {list}"
+    "music_filters_grades": "Nivåer {list}",
+    "methods_try": "Prova på ett stycke på nivå {grade}",
+    "methods_review": "Starta en repetitionsrunda",
+    "methods_in_plinky": "I Plinky"
 }

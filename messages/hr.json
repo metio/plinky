@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Isprekidana linija je tempo koji si postavio. Iznad nje si žurio, ispod nje vukao — a svaka točka ima boju svoje note iznad.",
     "rhythm_speed_target": "tvoj tempo: {bpm}",
     "music_filters_none": "Sve skladbe",
-    "music_filters_grades": "Stupnjevi {list}"
+    "music_filters_grades": "Stupnjevi {list}",
+    "methods_try": "Isprobaj na skladbi stupnja {grade}",
+    "methods_review": "Pokreni ponavljanje",
+    "methods_in_plinky": "U Plinkyju"
 }

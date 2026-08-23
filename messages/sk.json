@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Čiarkovaná čiara je tempo, ktoré si nastavil. Nad ňou si sa ponáhľal, pod ňou spomaľoval — a každý bod má farbu svojej noty hore.",
     "rhythm_speed_target": "tvoje tempo: {bpm}",
     "music_filters_none": "Všetky skladby",
-    "music_filters_grades": "Stupne {list}"
+    "music_filters_grades": "Stupne {list}",
+    "methods_try": "Vyskúšaj na skladbe stupňa {grade}",
+    "methods_review": "Začať opakovacie sedenie",
+    "methods_in_plinky": "V Plinky"
 }

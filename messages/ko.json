@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "점선이 설정한 템포입니다. 위쪽이면 빨랐고 아래쪽이면 느렸어요. 각 점의 색은 위 음표와 같습니다.",
     "rhythm_speed_target": "당신의 템포: {bpm}",
     "music_filters_none": "모든 곡",
-    "music_filters_grades": "등급 {list}"
+    "music_filters_grades": "등급 {list}",
+    "methods_try": "{grade}등급 곡으로 해보기",
+    "methods_review": "복습 세션 시작",
+    "methods_in_plinky": "Plinky에서는"
 }

@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "虚线是你设定的速度。在上面表示赶拍，在下面表示拖拍，每个点的颜色与上方音符一致。",
     "rhythm_speed_target": "你的速度：{bpm}",
     "music_filters_none": "全部曲目",
-    "music_filters_grades": "等级 {list}"
+    "music_filters_grades": "等级 {list}",
+    "methods_try": "在等级 {grade} 的曲子上试试",
+    "methods_review": "开始一轮复习",
+    "methods_in_plinky": "在 Plinky 中"
 }

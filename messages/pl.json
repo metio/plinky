@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Linia przerywana to tempo, które ustawiłeś. Powyżej śpieszyłeś, poniżej zwalniałeś — a każda kropka ma kolor swojej nuty powyżej.",
     "rhythm_speed_target": "twoje tempo: {bpm}",
     "music_filters_none": "Wszystkie utwory",
-    "music_filters_grades": "Stopnie {list}"
+    "music_filters_grades": "Stopnie {list}",
+    "methods_try": "Wypróbuj na utworze stopnia {grade}",
+    "methods_review": "Zacznij sesję powtórek",
+    "methods_in_plinky": "W Plinky"
 }

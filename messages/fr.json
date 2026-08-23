@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "La ligne pointillée est le tempo que tu as choisi. Au-dessus tu pressais, en dessous tu traînais — et chaque point a la couleur de sa note plus haut.",
     "rhythm_speed_target": "ton tempo : {bpm}",
     "music_filters_none": "Tous les morceaux",
-    "music_filters_grades": "Niveaux {list}"
+    "music_filters_grades": "Niveaux {list}",
+    "methods_try": "Essayer sur un morceau de niveau {grade}",
+    "methods_review": "Lancer une séance de révision",
+    "methods_in_plinky": "Dans Plinky"
 }

@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Пунктирная линия — заданный тобой темп. Выше — ты спешил, ниже — тянул, и каждая точка окрашена как её нота выше.",
     "rhythm_speed_target": "твой темп: {bpm}",
     "music_filters_none": "Все пьесы",
-    "music_filters_grades": "Ступени {list}"
+    "music_filters_grades": "Ступени {list}",
+    "methods_try": "Попробуйте на пьесе ступени {grade}",
+    "methods_review": "Начать повторение",
+    "methods_in_plinky": "В Plinky"
 }

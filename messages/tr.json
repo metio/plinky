@@ -1275,5 +1275,8 @@
     "rhythm_speed_hint": "Kesikli çizgi belirlediğin tempo. Üstünde acele ettin, altında ağırdan aldın — ve her nokta yukarıdaki notasının rengini taşır.",
     "rhythm_speed_target": "tempon: {bpm}",
     "music_filters_none": "Tüm parçalar",
-    "music_filters_grades": "Seviye {list}"
+    "music_filters_grades": "Seviye {list}",
+    "methods_try": "Seviye {grade} bir parçada dene",
+    "methods_review": "Tekrar oturumu başlat",
+    "methods_in_plinky": "Plinky'de"
 }

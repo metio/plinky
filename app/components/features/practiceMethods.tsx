@@ -1,7 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { type MethodId, METHODS } from "../../../core/practiceMethods";
+import { Link } from "react-router";
+import { pickForGrade } from "../../../core/pickForGrade";
+import { playOptionsQuery } from "../../../core/playOptions";
+import { type MethodId, METHODS, type PracticeMethod } from "../../../core/practiceMethods";
+import { useMusicItems } from "../../hooks/useMusicItems";
+import { useServices } from "../../contexts/services";
 import { Card } from "../ui/card";
 import { sectionHeadingClasses } from "../ui/classes";
 import { m } from "../../paraglide/messages.js";
@@ -33,14 +38,55 @@ const WHY: Record<MethodId, () => string> = {
     spacing: () => m.method_spacing_why(),
 };
 
-// Six ways to practise: what each one is, how long a go at it takes, and why it works.
+// One method's own button. It opens a piece at the player's grade with the method already
+// set up — slowed down, one hand, looping the opening phrase — because a suggestion that
+// ends at "go and find something" is advice rather than practice, and a library of three
+// thousand pieces is a wall to the beginner this page is written for.
 //
-// Nothing here carries an action. Three of the six are done with a control inside a run's
-// set-up panel, so a button could only ever land on the catalogue and leave the reader to
-// find the control — and four of them pointed at the library, which made a page of advice
-// read as a row of ways to go somewhere else. The reading is the point; the practice is
-// wherever the player already was.
+// The two methods that are not about a single piece point at the review queue instead.
+// Handing somebody a random piece would be the exact opposite of "mix them up" and "come
+// back to it later": the queue's whole job is choosing which piece and when.
+//
+// No button at all when the grade holds nothing to offer — a dead button that says "try
+// this" and lands nowhere is worse than the reading alone.
+function MethodAction({ method, grade }: { method: PracticeMethod; grade: number }) {
+    const { items } = useMusicItems();
+
+    if (method.route) {
+        return (
+            <Link
+                to={method.route}
+                className="inline-block text-sm font-semibold text-accent-strong hover:underline"
+            >
+                {m.methods_review()}
+            </Link>
+        );
+    }
+    // Seeded by the method, so each suggestion offers its own piece and none of them
+    // changes under the reader on a re-render.
+    const piece = pickForGrade(items, grade, method.id);
+    if (!piece || !method.opens) return null;
+    return (
+        <Link
+            to={`/play/${piece.id}${playOptionsQuery(method.opens)}`}
+            className="inline-block text-sm font-semibold text-accent-strong hover:underline"
+        >
+            {m.methods_try({ grade })}
+        </Link>
+    );
+}
+
+// Six ways to practise: why each one works, what Plinky gives you to do it with, and a
+// button that opens a piece with it already set up.
+//
+// The reason leads and the instruction follows, because somebody who does not yet know why
+// looping two bars beats playing the piece again will not reach for the loop. The button is
+// last: read, then do.
 export function PracticeMethods() {
+    const services = useServices();
+    // Read every render rather than memoised — a grade reached while the page is open
+    // should change what the buttons offer.
+    const grade = Math.max(1, services.milestones.reachedGrade());
     return (
         <section className="space-y-4">
             <h2 className={sectionHeadingClasses}>{m.methods_title()}</h2>
@@ -58,8 +104,17 @@ export function PracticeMethods() {
                                     {m.methods_dose({ count: method.minutes })}
                                 </span>
                             </div>
-                            <p className="text-sm text-body">{HOW[method.id]()}</p>
-                            <p className="text-sm text-muted">{WHY[method.id]()}</p>
+                            {/* The reason first: it is what makes the instruction worth
+                                following, and it is the half a beginner has never been
+                                told. */}
+                            <p className="text-sm text-body">{WHY[method.id]()}</p>
+                            <p className="text-sm text-muted">
+                                <span className="font-semibold text-body">
+                                    {m.methods_in_plinky()}:
+                                </span>{" "}
+                                {HOW[method.id]()}
+                            </p>
+                            <MethodAction method={method} grade={grade} />
                         </Card>
                     </li>
                 ))}
