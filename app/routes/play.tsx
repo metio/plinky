@@ -39,6 +39,7 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
 import { useSearchParams } from "react-router";
+import { readPlayOptions } from "../../core/playOptions";
 
 export function meta({ params }: Route.MetaArgs) {
     // Bundled scores resolve at prerender (no localStorage), so each one gets its
@@ -82,9 +83,16 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     const [mode, setMode] = useState<PlayMode>(
         searchParams.get("tab") === "runs" ? "runs" : "play",
     );
+    // The rest of the address says how the piece should OPEN — slower, one hand, a loop
+    // over a few bars, a friendlier key. That is what lets a practice suggestion hand over
+    // the control that does it instead of pointing at the library and wishing you luck, and
+    // what lets a teacher send "this piece, at sixty per cent, left hand". Read once: these
+    // seed the controls, and the player owns them from the first frame onward, so a later
+    // address change must not reach in and undo what they have since chosen.
+    const [options] = useState(() => readPlayOptions((key) => searchParams.get(key)));
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.
-    const [transpose, setTranspose] = useState(0);
+    const [transpose, setTranspose] = useState(options.transpose ?? 0);
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
@@ -156,6 +164,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 source: score.source,
                             }),
                         )}
+                        options={options}
                         initialTempo={score.tempo}
                         beatsPerBar={score.beatsPerBar}
                         canShareGhost

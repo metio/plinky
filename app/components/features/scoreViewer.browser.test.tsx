@@ -27,6 +27,7 @@ import {
     PLAYED_COLOR,
     WINDOW_COLOR,
 } from "../../../core/scoreCanvas";
+import type { PlayOptions } from "../../../core/playOptions";
 import { ScoreViewer } from "./scoreViewer";
 
 // The browser context arrives with MIDI pre-granted; without a fake seam the
@@ -56,7 +57,10 @@ function Harness({ xml, ...props }: { xml: string; beatsPerBar?: number }) {
     );
 }
 
-const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
+const mount = (
+    xml: string,
+    props: Partial<{ beatsPerBar: number; options: PlayOptions; initialTempo: number }> = {},
+) =>
     render(
         <MemoryRouter>
             <ServicesProvider services={midiFake}>
@@ -1612,5 +1616,54 @@ describe("lighted keyboard", () => {
             .poll(() => screen.queryAllByRole("button", { name: "Restart" }).length)
             .toBeGreaterThan(0);
         expect(litNotes(midi)).toEqual([]);
+    });
+});
+
+describe("what a link asks for", () => {
+    // The suggestions on Ways to practise hand over the control that does the thing rather
+    // than describing it, which only works if the address actually reaches the controls.
+    const grandStaff = () =>
+        generateDrill(
+            { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, hands: 2, low: 60, high: 79 },
+            () => 0.5,
+        );
+
+    it("opens the piece on the hand the link named", async () => {
+        mount(grandStaff(), { beatsPerBar: 4, options: { hands: "left" } });
+        const left = await screen.findByRole("tab", { name: "Left" }, { timeout: 30000 });
+        expect(left.getAttribute("aria-selected")).toBe("true");
+    });
+
+    it("opens on both hands when the link says nothing", async () => {
+        mount(grandStaff(), { beatsPerBar: 4 });
+        const both = await screen.findByRole("tab", { name: "Both" }, { timeout: 30000 });
+        expect(both.getAttribute("aria-selected")).toBe("true");
+    });
+
+    it("scales the piece's own marking rather than replacing it", async () => {
+        // Marked 120, asked for half speed. A link says "slowly"; what that is worth in
+        // beats per minute is the piece's own business.
+        mount(grandStaff(), { beatsPerBar: 4, initialTempo: 120, options: { speed: 0.5 } });
+        // The tempo readout belongs to the transport, which only exists once a run is under
+        // way — so the run is started to read what the piece opened at.
+        const practice = await awaitReady();
+        fireEvent.click(practice);
+        // Read the readout's own element: page text runs a neighbouring bar number straight
+        // into it, so "60 BPM" arrives as "860 BPM" when scraped from the body.
+        await expect
+            .poll(
+                () =>
+                    screen.getAllByRole("button", { name: m.scores_tempo() })[0]?.textContent ??
+                    "none",
+                { timeout: 20000 },
+            )
+            .toBe(m.home_bpm({ tempo: 60 }));
+    });
+
+    it("leaves the player free to change what the link chose", async () => {
+        mount(grandStaff(), { beatsPerBar: 4, options: { hands: "left" } });
+        const right = await screen.findByRole("tab", { name: "Right" }, { timeout: 30000 });
+        fireEvent.click(right);
+        await expect.poll(() => right.getAttribute("aria-selected")).toBe("true");
     });
 });

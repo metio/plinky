@@ -391,7 +391,7 @@ const BUDGET_VENDOR_KB = 324;
 // 372. Menus that close the way every other menu closes — a press elsewhere, or Escape.
 // A fifth of a kilobyte for a hook two of them share, against a reported bug where the only
 // way out of the Export menu was the button that opened it.
-const BUDGET_APP_KB = 374;
+const BUDGET_APP_KB = 375;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -13,6 +13,7 @@ import {
     useSyncExternalStore,
 } from "react";
 import { beamsVisible } from "../../../core/beams";
+import type { PlayOptions } from "../../../core/playOptions";
 import { tempoScale } from "../../../core/runOutcome";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
@@ -93,6 +94,9 @@ export type PlaySessionProps = {
     // of a drill it deliberately does not keep, which onRunComplete (skipped for an
     // ephemeral piece) cannot report.
     onGraded?: (grade: Grade) => void;
+    // What a link asked for. Starting values only: everything here is a control the player
+    // can move the moment the page is open, and nothing writes back to the address.
+    options?: PlayOptions;
     initialTempo?: number;
     beatsPerBar?: number;
     lockTempo?: boolean;
@@ -121,6 +125,7 @@ function usePlaySessionValue({
     credit,
     onRunComplete,
     onGraded,
+    options,
     initialTempo,
     beatsPerBar,
     lockTempo,
@@ -165,6 +170,10 @@ function usePlaySessionValue({
     // after the score does — the reader of this value comes first in the file, and the
     // source of it comes later. Synced below, once both exist.
     const [focusRange, setFocusRange] = useState<{ from: number; to: number } | null>(null);
+    // A link asks for a SPEED, not a tempo: "slowly" has to mean the same thing on a piece
+    // marked 60 and one marked 160, so it scales the piece's own marking rather than
+    // replacing it. The floor of 20 is the slowest the tempo control itself goes.
+    const openingTempo = Math.max(20, Math.round((initialTempo ?? 100) * (options?.speed ?? 1)));
     // The tempo settings — the slider, the adaptive live pace, the metronome toggles and
     // the tempo trainer — held together. The metronome *effect* stays at its call site
     // below: it reads keepUp.running, which is created after this.
@@ -184,7 +193,7 @@ function usePlaySessionValue({
         trainerTarget,
         setTrainerTarget,
         bumpTempo,
-    } = useTempoControls({ initialTempo: initialTempo ?? 100 });
+    } = useTempoControls({ initialTempo: openingTempo });
     // Transposition shifts the whole piece into a more comfortable key, ±12
     // semitones. It rewrites the MusicXML before OSMD loads it, so playback, the
     // printed key and the matcher all follow — the reload effect depends on it.
@@ -263,7 +272,7 @@ function usePlaySessionValue({
     // it. Six callers that never meet share this one capture — the matcher's cleared
     // callback, the MIDI release and pedal handlers, the run starter, the grader and the
     // take save — so it is owned in one place with a named method per reason.
-    const recorder = useRunRecorder(initialTempo ?? 100, easeToward);
+    const recorder = useRunRecorder(openingTempo, easeToward);
     const aids = sightRead.aids;
     // The piece's 1–8 difficulty grade, so "auto" beam mode can hide beam groups on the
     // easy grades a beginner reads note-by-note. gradeOf is memoised by the content id, so
@@ -340,7 +349,10 @@ function usePlaySessionValue({
 
     // Which hand to practice — the hands-separate selector only appears for the
     // grand-staff (two-staff) scores it applies to (the staff count comes from the score).
-    const [hand, setHand] = useState<Hand>("both");
+    // A link may open the piece with one hand already switched off — the "one hand at a
+    // time" suggestion hands you the control rather than describing it. A single-staff
+    // piece ignores it below, where activeHand is settled.
+    const [hand, setHand] = useState<Hand>(options?.hands ?? "both");
 
     // The finished self-paced run's result — the grade and every surface derived from
     // it (per-note strip, share grid, tempo curve) plus the save verdict — owned as one
@@ -389,11 +401,24 @@ function usePlaySessionValue({
             loop.cancelSelection();
             // The hand selection and the bar range belong to the piece, not the layout: a
             // relayout keeps the same staves and bars, so a chosen hand and loop survive it,
-            // reseeding only when the piece itself changes. A fresh piece seeds the hand to
-            // both and the loop to the whole song.
+            // reseeding only when the piece itself changes. A fresh piece seeds the hand and
+            // the loop to whatever the link asked for, and to both hands and the whole song
+            // when it asked for nothing — this runs after mount, so seeding the state alone
+            // would be undone here the moment the score finished rendering.
             if (freshPiece) {
-                setHand("both");
+                setHand(options?.hands ?? "both");
                 loop.reseedWholeSong(bars);
+                const asked = options?.loop;
+                if (asked && asked.from <= bars) {
+                    // Switch the loop on FIRST: turning it on reseeds the range to the whole
+                    // song, so setting the bars before that would be overwritten by the very
+                    // call meant to reveal them. Held to the bars the piece actually has, so
+                    // a link written against a longer arrangement loops what exists rather
+                    // than nothing.
+                    loop.toggle(true);
+                    loop.setFrom(asked.from);
+                    loop.setTo(Math.min(asked.to, bars));
+                }
             }
         },
         // The in-place fingering redraw rebuilt the noteheads mid-run: re-apply the ear-mode
