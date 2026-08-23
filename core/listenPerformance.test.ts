@@ -264,3 +264,19 @@ describe("listenPerformanceOf", () => {
         expect(listenPerformanceOf([], { startBpm: 120 })).toEqual([]);
     });
 });
+
+describe("what a rendered performance carries", () => {
+    it("keeps the pedal on every note struck under it", () => {
+        // The pedal is not a loudness: it decides whether the rest of the instrument
+        // answers the note, and whether a damper lands when it ends. A performance that
+        // drops it plays a key-off knock on notes a real piano cannot knock on — which is
+        // exactly what every exported video did, because RecordedNote had nowhere to put
+        // this and the flag died on the way to the engine.
+        // One position, two notes: one struck under the pedal and one not.
+        const both = step([60, 64]);
+        both.notes = [note(60, { pedalled: true }), note(64, { pedalled: false })];
+        const [under, open] = listenPerformanceOf([both], { startBpm: 120 });
+        expect(under?.pedalled).toBe(true);
+        expect(open?.pedalled).toBe(false);
+    });
+});

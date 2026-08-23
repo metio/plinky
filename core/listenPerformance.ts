@@ -334,6 +334,11 @@ export function listenPerformanceOf(
                 durationMs: Math.max(1, durationSeconds * 1000),
                 velocity: voiced,
                 hand: note.hand,
+                // Carried, not derived: under the pedal the rest of the instrument answers
+                // the note and no damper lands when it ends. A renderer that loses this
+                // plays a key-off knock on every note, including the ones a real piano
+                // could not knock on at all.
+                pedalled: note.pedalled,
                 ...(finger === undefined ? {} : { finger }),
             });
         }

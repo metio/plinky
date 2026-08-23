@@ -22,6 +22,11 @@ export type RecordedNote = {
     // renderer that colours by finger falls back to one colour where this is missing.
     finger?: number;
     hand?: "left" | "right";
+    // Whether the sustain pedal is down as this note is struck. It changes what the
+    // instrument does, not how loud it is: the dampers are off the strings, so the rest of
+    // the piano answers the note — and no damper lands when it ends, so there is no key-off
+    // knock. Absent where nobody was pedalling, or where a performance does not know.
+    pedalled?: boolean;
 };
 
 export type Composition = {

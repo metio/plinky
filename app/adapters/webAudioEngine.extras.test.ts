@@ -66,6 +66,25 @@ describe("the key-off knock", () => {
         expect(samples.extras()).toEqual([{ kind: "knock", pitch: 72 }]);
     });
 
+    it("is not scheduled with a note struck under the pedal", async () => {
+        // The same rule as the pressed-and-released case below, on the path Listen and
+        // every video export actually use. It held for a player's hands and not for a
+        // scheduled note, so an exported piece knocked once per note — several at once
+        // under a chord — through every pedalled bar.
+        const fake = fakeAudioContext();
+        const samples = pack();
+        const engine = await engineWith(fake, samples.lookup);
+        engine.strike({
+            note: 72,
+            gain: 0.3,
+            velocity: 90,
+            duration: 0.5,
+            delay: 0,
+            pedalled: true,
+        });
+        expect(samples.extras().filter((one) => one.kind === "knock")).toHaveLength(0);
+    });
+
     it("sounds when the damper lands", async () => {
         const fake = fakeAudioContext();
         const samples = pack();

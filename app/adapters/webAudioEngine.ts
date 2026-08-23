@@ -352,7 +352,14 @@ function renderSampledStrike(
     // A fixed-length note's damper lands at a time known when it is scheduled, so its knock
     // is scheduled with it. Listen is where most notes in this app end, and a recorded piano
     // that knocks under the hands but not under the computer's is two instruments.
-    scheduleExtra(ctx, note, "knock", level * KNOCK_LEVEL, damperFrom);
+    //
+    // Not under the pedal, though: the dampers are off the strings, so nothing lands and
+    // there is no knock to make. The live path has always held to that; this one did not,
+    // and knocked on every note it played — which on a pedalled piece is a mechanical thump
+    // per note, several at once under a chord, that no piano can produce.
+    if (!pedalled) {
+        scheduleExtra(ctx, note, "knock", level * KNOCK_LEVEL, damperFrom);
+    }
     // Struck with the dampers off, so the rest of the instrument answers. Same instant as
     // the note, not the damper.
     if (pedalled) {

@@ -35,6 +35,7 @@ export function renderTakeAudio(
                 velocity: note.velocity,
                 duration: note.durationMs / 1000,
                 delay: (LEAD_IN_MS + note.startMs) / 1000,
+                pedalled: note.pedalled ?? false,
             },
             // Whatever the speakers would use for this note. A recording that never
             // arrived is played by the synth here exactly as it was in the room, so an
