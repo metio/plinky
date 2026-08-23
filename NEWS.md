@@ -10,6 +10,17 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**The front page grows a flower, and it knows what time it is.** Beside the greeting
+there is now a small plant that opens in the morning, turns toward the light through
+the afternoon, folds in the evening, and at night stays shut while a note falls to it.
+Its petals arrive one at a time, each a different colour.
+
+**More colour, and less violet.** The band across the top was the same violet as the
+logo, which left the logo nothing to stand against. The top of every screen is paper
+now, with a five-colour stripe under it — the flower's petals, laid flat — and violet
+kept for the mark and for whichever button matters most on the screen you are looking
+at.
+
 **Plinky looks like its name now.** The app wears its own logo — the violet tile with
 the white keys and the note falling onto one — and the colour and the lettering follow
 it the rest of the way down: a violet band across the top of every screen, rounded

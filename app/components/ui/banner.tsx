@@ -19,9 +19,9 @@ const tones = {
         dismiss: "text-accent-ink hover:text-accent-strong",
     },
     sky: {
-        shell: "border-info-line bg-info-surface",
-        text: "text-info-ink",
-        dismiss: "text-info-ink hover:text-info",
+        shell: "border-accent-line bg-accent-surface",
+        text: "text-accent-ink",
+        dismiss: "text-accent-ink hover:text-accent",
     },
 } as const;
 

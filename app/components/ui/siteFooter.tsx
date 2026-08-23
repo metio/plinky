@@ -37,11 +37,11 @@ export function SiteFooter() {
                         thing a curious visitor had to guess at. */}
                     <Link
                         to={localizedHref("/about")}
-                        className="group flex items-center gap-1.5 rounded-md p-1 hover:text-love focus-visible:ring-2 focus-visible:ring-love-ring"
+                        className="group flex items-center gap-1.5 rounded-md p-1 hover:text-plink focus-visible:ring-2 focus-visible:ring-plink"
                     >
                         <HeartIcon
                             filled
-                            className="h-5 w-5 text-faint opacity-70 transition group-hover:text-love group-hover:opacity-100"
+                            className="h-5 w-5 text-faint opacity-70 transition group-hover:text-plink group-hover:opacity-100"
                         />
                         {m.nav_about()}
                     </Link>

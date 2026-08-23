@@ -30,20 +30,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
    Tailwind tracks `var(--color-*)` references across the whole stylesheet.
 
    Opacity modifiers work as usual: `bg-accent-surface/50`. */
-/* ── The Album ───────────────────────────────────────────────────────────────
-   The chrome is a piano album: warm ivory paper, soft brown-black ink, a hairline
-   the weight of a staff line, ink blue for anything you act on, and brass for
-   anything you earned. Timeless without austere — a scholarly urtext edition is
-   beautiful and has never once been pleased to see anybody.
-
-   The page is the same paper the staff is printed on (`surface` and `paper` are
-   one value), so the music is not an object sitting inside a product.
-
-   Warmth cannot come from the accent, because every warm hue is already spoken
-   for by the grading: green means you found the note, red means you did not,
-   amber is caution and the S grade, and the share grid runs green through to red.
-   So the accent stays cool and the joy lives in the ground, in brass, and in the
-   noteheads — colour belongs to the music, never to the furniture. */
 @theme {
     /* Surfaces, back to front. */
     --color-surface: #f9f8fc; /* the page itself — the score's own paper */
@@ -108,11 +94,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-warn-line: var(--color-amber-300);
     --color-warn-solid: var(--color-amber-500);
 
-    /* Neutral news — the sky banner, distinct from a warning and from the brand. */
-    --color-info: var(--color-sky-700); /* the dismiss control's hover */
-    --color-info-ink: var(--color-sky-900);
-    --color-info-surface: var(--color-sky-50);
-    --color-info-line: var(--color-sky-300);
+    /* Neutral news — the sky banner, distinct from a warning and from the brand. */ /* the dismiss control's hover */
 
     /* Domain colours. These are not chrome — each one means something on
        screen, so they stay separate hues on purpose rather than folding into
@@ -155,16 +137,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-band-weak: var(--color-red-500);
     --color-band-none: var(--color-gray-300);
 
-    /* The grade letters, S down to F. Another scale rather than a set of states:
-       E and F are both red, but they are a grade, not an error, so they move
-       when the scale is retuned and not when `danger` is. */
-    --color-grade-s: var(--color-amber-500);
-    --color-grade-a: var(--color-green-600);
-    --color-grade-b: var(--color-lime-600);
-    --color-grade-c: var(--color-yellow-600);
-    --color-grade-d: var(--color-orange-600);
-    --color-grade-e: var(--color-red-600);
-    --color-grade-f: var(--color-red-800);
 
     /* The two bars in the practice charts: the run's peak, and the track the
        other readings sit on. */
@@ -179,6 +151,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-strong: var(--color-indigo-600);
     --color-heat-deep: var(--color-indigo-800);
     /* A race has two runners: you in indigo, the ghost in fuchsia. */
+    /* The bloom. Three colours that mean nothing — which is the point, and why they were
+       hard to find: nearly every hue in this app is already saying something, and a
+       decorative green beside a green that means "you played it right" would be a lie.
+       These sit in the gaps left when the grade letters stopped restating themselves in
+       seven hues. With `spark` and `plink`, which the brand owns and which never carry
+       data, they are the five petals of the greeting's flower.
+       Each is the lightest value that still reads at 4.5:1 on its own theme. */
+    --color-bloom-leaf: #4c7d21;
+    --color-bloom-sky: #2275b4;
+    --color-bloom-rose: #cf2a88;
+
     /* The plink: one note, played. It is the dot on the i, and the dot in the app icon,
        and nothing else — the brand's whole spark, spent in one place.
 
@@ -212,8 +195,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        other paper. spark-strong measures 5.49:1 on it, spark's border 3.35:1. */
     --color-spark-surface: #faf0dd;
     /* The footer's heart, on hover. */
-    --color-love: var(--color-rose-500);
-    --color-love-ring: var(--color-rose-400);
 }
 
 /* The dark half of every token above. Unlayered on purpose, so it outranks the
@@ -270,10 +251,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-warn-line: var(--color-amber-800);
     --color-warn-solid: var(--color-amber-400);
 
-    --color-info: var(--color-sky-100);
-    --color-info-ink: var(--color-sky-200);
-    --color-info-surface: var(--color-sky-950);
-    --color-info-line: var(--color-sky-800);
 
     /* The score sheet keeps its light paper in both themes — a staff is read as
        ink on paper, and inverting it costs legibility for no gain. */
@@ -300,13 +277,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-band-weak: var(--color-red-500);
     --color-band-none: var(--color-gray-300);
 
-    --color-grade-s: var(--color-amber-300);
-    --color-grade-a: var(--color-green-400);
-    --color-grade-b: var(--color-lime-400);
-    --color-grade-c: var(--color-yellow-400);
-    --color-grade-d: var(--color-orange-400);
-    --color-grade-e: var(--color-red-400);
-    --color-grade-f: var(--color-red-500);
 
     --color-chart-peak: var(--color-indigo-500);
     --color-chart-track: var(--color-indigo-800);
@@ -317,6 +287,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-deep: var(--color-indigo-300);
 
     --color-plink: #c56bff;
+    --color-bloom-leaf: #568d25;
+    --color-bloom-sky: #2683c9;
+    --color-bloom-rose: #d84196;
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-400);
@@ -333,8 +306,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-spark-soft: #c79b45;
     --color-spark-surface: #261e10;
 
-    --color-love: var(--color-rose-400);
-    --color-love-ring: var(--color-rose-400);
 }
 
 /* Use self-hosted Inter for the sans utility and the document default, keeping
@@ -374,9 +345,77 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        trail, the impact and the ring stay one motion rather than three loops drifting
        apart. The easing lives in the keyframes, per step, because a fall and a rebound
        are opposite curves and no single function can be both. */
+    /* The greeting's flower. One plant through a day: it opens in the morning, turns
+       toward the light through the afternoon, folds in the evening, and at night a note
+       falls to it. The petals arrive one at a time, which is what makes it an event on
+       arrival rather than a picture that was always there. */
+    --animate-petal-in: petal-in 4.6s cubic-bezier(0.2, 0.9, 0.3, 1.4) infinite;
+    --animate-stem-grow: stem-grow 4.6s ease-out infinite;
+    --animate-bloom-sway: bloom-sway 6s ease-in-out infinite;
+    --animate-bloom-fold: bloom-fold 6s ease-in-out infinite;
+    --animate-note-fall: note-fall 3.4s cubic-bezier(0.5, 0, 0.75, 0) infinite;
     --animate-plink-fall: plink-fall 1.6s infinite;
     --animate-plink-trail: plink-trail 1.6s linear infinite;
     --animate-plink-ring: plink-ring 1.6s linear infinite;
+}
+
+@keyframes petal-in {
+    0% {
+        transform: rotate(var(--turn)) translateY(-22%) scale(0);
+    }
+    /* Past its size and back, so a petal arrives rather than appears. */
+    60% {
+        transform: rotate(var(--turn)) translateY(-22%) scale(1.15);
+    }
+    100% {
+        transform: rotate(var(--turn)) translateY(-22%) scale(1);
+    }
+}
+
+@keyframes stem-grow {
+    0% {
+        transform: scaleY(0.15);
+    }
+    30%,
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes bloom-sway {
+    0%,
+    100% {
+        transform: rotate(-7deg);
+    }
+    50% {
+        transform: rotate(7deg);
+    }
+}
+
+@keyframes bloom-fold {
+    0%,
+    40% {
+        transform: scale(1);
+    }
+    85%,
+    100% {
+        transform: scale(0.66);
+    }
+}
+
+@keyframes note-fall {
+    0% {
+        top: 0;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    62%,
+    100% {
+        top: 52%;
+        opacity: 0;
+    }
 }
 
 @keyframes plink-fall {

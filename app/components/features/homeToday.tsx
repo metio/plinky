@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
 import { partOfDay } from "../../../core/greeting";
+import { GreetingFlower } from "./greetingFlower";
 import { buildExerciseId, keyName } from "../../../core/exerciseGen";
 import { type Letter, letterFor } from "../../../core/grade";
 import { summarizePractice } from "../../../core/history";
@@ -467,19 +468,25 @@ export function HomeToday() {
         : m.today_heading();
 
     const header = (
-        <header className="space-y-1">
-            {/* Most languages hand back a lowercase weekday — "mardi", "вторник",
-                "tiistai" — which is correct for the word and wrong for the start of a
-                heading. Lifting the first letter in CSS fixes every language at once,
-                and does nothing at all to a script that has no capitals. */}
-            <h1 className="font-display text-4xl font-semibold tracking-tight first-letter:uppercase sm:text-5xl">
-                {heading}
-            </h1>
-            {/* Holds its line before the standing resolves, so the day's practice does
-                not arrive by shoving the page down. */}
-            <p className="min-h-5 text-sm text-muted">
-                {session ? standingLine(session.standing) : ""}
-            </p>
+        <header className="flex items-center gap-4">
+            {/* Only once the clock has been read: the flower says which part of the day it
+                is, and drawn before `arrived` resolves it would say the wrong one and then
+                change its mind. */}
+            {arrived ? <GreetingFlower when={partOfDay(arrived.getHours())} /> : null}
+            <div className="min-w-0 space-y-1">
+                {/* Most languages hand back a lowercase weekday — "mardi", "вторник",
+                    "tiistai" — which is correct for the word and wrong for the start of a
+                    heading. Lifting the first letter in CSS fixes every language at once,
+                    and does nothing at all to a script that has no capitals. */}
+                <h1 className="font-display text-4xl font-semibold tracking-tight first-letter:uppercase sm:text-5xl">
+                    {heading}
+                </h1>
+                {/* Holds its line before the standing resolves, so the day's practice does
+                    not arrive by shoving the page down. */}
+                <p className="min-h-5 text-sm text-muted">
+                    {session ? standingLine(session.standing) : ""}
+                </p>
+            </div>
         </header>
     );
 

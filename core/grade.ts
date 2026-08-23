@@ -72,16 +72,24 @@ export function isOptionalReading(id: ScoreReading): boolean {
     return id === "dynamics" || id === "expression";
 }
 
-// A gold "S" tier above an A–F gradient that runs green → red. Contrast-safe
-// text colours (light / dark) at the large size the grade letter is shown.
+// What the colour behind a grade letter is for.
+//
+// The letter already says the value — S through F is the whole scale, read before colour
+// says anything — so seven hues to restate it was colour doing a job that was already done,
+// and it cost seven positions on a wheel where nearly every hue means something.
+//
+// Four suffice, and they are four the app already has: gold for a top tier, because spark
+// is the colour of what you earned; then the three verdicts, which is what a grade IS. A
+// grade sharing a hue with `success` is not colour lying — it is the same judgement said
+// twice.
 export const GRADE_COLOR: Record<Letter, string> = {
-    S: "text-grade-s",
-    A: "text-grade-a",
-    B: "text-grade-b",
-    C: "text-grade-c",
-    D: "text-grade-d",
-    E: "text-grade-e",
-    F: "text-grade-f",
+    S: "text-spark",
+    A: "text-success",
+    B: "text-warn",
+    C: "text-warn",
+    D: "text-warn",
+    E: "text-danger",
+    F: "text-danger",
 };
 
 const LETTERS: readonly Letter[] = ["S", "A", "B", "C", "D", "E", "F"];

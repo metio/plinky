@@ -81,21 +81,31 @@ describe("parseGrade", () => {
 });
 
 describe("GRADE_COLOR", () => {
-    it("gives every letter its own token, and no two letters the same one", () => {
+    it("colours every letter, from what the app already means by good and bad", () => {
         expect(GRADE_COLOR).toEqual({
-            S: "text-grade-s",
-            A: "text-grade-a",
-            B: "text-grade-b",
-            C: "text-grade-c",
-            D: "text-grade-d",
-            E: "text-grade-e",
-            F: "text-grade-f",
+            S: "text-spark",
+            A: "text-success",
+            B: "text-warn",
+            C: "text-warn",
+            D: "text-warn",
+            E: "text-danger",
+            F: "text-danger",
         });
-        // The letters are an ordinal scale, so two of them sharing a colour
-        // would silently merge two ranks. Each token's light and dark values
-        // live in app/app.css, where the token gate holds them to both themes.
-        const colours = Object.values(GRADE_COLOR);
-        expect(new Set(colours).size).toBe(colours.length);
+    });
+
+    it("never brightens as the grade falls", () => {
+        // Letters MAY share a colour — the letter itself is the rank, and seven hues to
+        // restate it was colour doing a job already done, at the cost of seven positions on
+        // a wheel where nearly everything means something. What must hold is the direction:
+        // read S to F, the verdict never improves.
+        const rank = ["text-spark", "text-success", "text-warn", "text-danger"];
+        const walked = (["S", "A", "B", "C", "D", "E", "F"] as const).map((letter) =>
+            rank.indexOf(GRADE_COLOR[letter]),
+        );
+        expect(walked.every((step, at) => at === 0 || step >= (walked[at - 1] as number))).toBe(
+            true,
+        );
+        expect(walked).not.toContain(-1);
     });
 });
 

@@ -99,15 +99,17 @@ export const links: Route.LinksFunction = () => [
 // screen, including the error page, giving a way back from anywhere.
 function Header() {
     return (
-        // The brand band. This is the logo's own composition applied to the app's anatomy:
-        // saturated violet where you steer, and the white keys — the page, the paper, the
-        // score — underneath it. It is what makes a screenshot unmistakably Plinky rather
-        // than a light app that happens to have violet buttons.
+        // Paper, not a violet slab.
         //
-        // accent-solid rather than the accent token, because this is a filled surface and
-        // needs the value that stays dark enough for white type in BOTH themes; `accent`
-        // lightens in the dark theme, for text on a dark ground, and would wash out here.
-        <header className="bg-accent-solid px-6 py-3 font-sans text-white">
+        // The band was the logo's own colour applied to the whole of the app's chrome, and
+        // that is what stopped the logo being a logo: when the header, the buttons, the
+        // chips and the selected state are all one violet, the mark has nothing to stand
+        // against. Violet now does two jobs and no others — it is the mark, and it is the
+        // single most important action on a screen.
+        //
+        // What carries the brand here instead is the rule below: five colours that mean
+        // nothing, which is exactly why they are free to be the flower's petals as well.
+        <header className="bg-raised px-6 py-3 font-sans">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
                     {/* The wordmark is text (it follows the theme for free); its i is the
@@ -116,7 +118,7 @@ function Header() {
                     <Link
                         to="/"
                         aria-label="Plinky home"
-                        className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-white"
+                        className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         {/* The wordless form of the mark: the tile, the keys and the falling
                             plink, with the name taken out. The name is set beside it here,
@@ -128,7 +130,7 @@ function Header() {
                         <img src="/icon-192.png" alt="" className="h-8 w-8 shrink-0" />
                         <span
                             aria-hidden="true"
-                            className="font-display text-xl font-semibold tracking-tight text-white"
+                            className="font-display text-xl font-semibold tracking-tight text-ink"
                         >
                             Pl
                             <span className="relative">
@@ -156,7 +158,7 @@ function Header() {
                     <Link
                         to="/settings"
                         aria-label={m.nav_settings()}
-                        className="rounded-md p-1 text-white/70 hover:text-white focus-visible:ring-2 focus-visible:ring-white"
+                        className="rounded-md p-1 text-muted hover:text-ink focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -181,6 +183,17 @@ function Header() {
                     </Link>
                 </div>
             </div>
+            {/* The bouquet, laid flat. Five colours that carry no meaning anywhere else in
+                the app — which is what lets them be purely the brand's own furniture here
+                and the flower's petals on the front page. It is a graphic, not text, so it
+                only needs 3:1, and every one of the five clears that on both themes. */}
+            <span aria-hidden="true" className="-mx-6 -mb-3 mt-3 flex h-[3px]">
+                <span className="flex-1 bg-spark" />
+                <span className="flex-1 bg-bloom-leaf" />
+                <span className="flex-1 bg-bloom-sky" />
+                <span className="flex-1 bg-plink" />
+                <span className="flex-1 bg-bloom-rose" />
+            </span>
         </header>
     );
 }
@@ -301,10 +314,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained returning-visitor bootstrap that must run before paint */}
                 <script dangerouslySetInnerHTML={{ __html: RETURNING_INIT_SCRIPT }} />
                 {/* The browser paints its own chrome with this — the address bar on Android,
-                    the title bar of an installed window. It names the header band's colour,
-                    accent-solid, so the chrome above the band continues it rather than
-                    drawing a seam across the top of the app. */}
-                <meta name="theme-color" content="#4915d2" />
+                    the title bar of an installed window. It names the header's colour, so
+                    the chrome above continues the page rather than drawing a seam across
+                    the top of the app. */}
+                <meta name="theme-color" content="#ffffff" />
                 <link rel="canonical" href={pageUrl} />
                 {/* One alternate per language so search engines serve the right
                     locale and share ranking signals across the cluster. */}
