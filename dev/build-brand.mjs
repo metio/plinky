@@ -20,6 +20,11 @@ import { chromium } from "playwright";
 const OUT = "brand";
 const CSS = "app/app.css";
 const MARK = "brand/plinky-mark.png";
+// The same mark with its wordmark removed. A profile picture is cropped to a CIRCLE by
+// every platform that asks for one, and it is read at 56px in a comment thread — two facts
+// that rule the lockup out: the circle cuts through the name, and at that size the name is
+// a smear over the keys it is stealing room from. See core/iconMark.ts.
+const ICON = "brand/plinky-icon.png";
 
 // The colours worth handing to somebody outside the codebase, with what each one MEANS —
 // a hex without its role is how a brand ends up with red used for decoration.
@@ -57,6 +62,7 @@ const css = await readFile(CSS, "utf8");
 // Carried into the page as a data URI rather than a file:// URL, so the render does not
 // depend on where the browser thinks its document lives.
 const mark = `data:image/png;base64,${(await readFile(MARK)).toString("base64")}`;
+const icon = `data:image/png;base64,${(await readFile(ICON)).toString("base64")}`;
 // The mark carries its own rounded silhouette in its alpha, so it is scaled and never
 // clipped: a border-radius applied here is a guess at the artwork's own curve, and one
 // slightly tight leaves a sliver of ground showing all the way round.
@@ -209,13 +215,22 @@ await shoot(social(1080, 1350, 78), { width: 1080, height: 1350, path: `${OUT}/s
 // where nothing is drawn) and YouTube's crop is a hair wider than the circle, so the
 // corners showed as pale arcs along the top. A square has no edge to reveal.
 //
-// The ground is the mark's own violet, so the tile's rounded corners meet it invisibly and
-// the picture reads as one shape however tightly it is cropped.
+// The profile picture, from the WORDLESS icon: every platform crops this one to a circle,
+// which cuts straight through a wordmark set under the keys, and shows it at about 56px
+// beside a comment, where that word is a smear. The keys and the falling note are centred,
+// so a circle takes only the tile's corners — nothing that carries meaning.
+//
+// The ground is INK rather than the mark's own violet. Violet on violet loses the tile's
+// edge entirely: the silhouette that makes the mark read as an icon disappears into the
+// background, which is exactly what a profile picture cannot afford at 56px. Ink is the
+// same near-black violet the app's dark theme stands on, so the tile separates from it
+// while staying inside the palette.
+//
 // 800 is what YouTube asks for; 512 covers Facebook and Instagram; 256 is Reddit's.
 for (const size of [256, 512, 800]) {
     await shoot(
-        `<div style="width:${size}px;height:${size}px;background:${colour.violet};display:flex;align-items:center;justify-content:center">
-           ${tile(Math.round(size * 0.94))}
+        `<div style="width:${size}px;height:${size}px;background:${colour.ink};display:flex;align-items:center;justify-content:center">
+           <img src="${icon}" alt="" style="width:${Math.round(size * 0.94)}px;height:${Math.round(size * 0.94)}px;display:block">
          </div>`,
         { width: size, height: size, path: `${OUT}/social/profile-square-${size}.png` },
     );
