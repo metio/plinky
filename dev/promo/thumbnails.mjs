@@ -37,9 +37,11 @@ const VIOLET = "#4915d2";
 // 0.55 + 0.22 = 0.77em. See dev/build-icons.mjs.
 const TITTLE = "bottom:.77em;width:.16em;height:.16em";
 
-// The mark, wordless: the thumbnail sets the name itself, so the lockup would print it
-// twice. It fills the right of the frame, where a title never reaches.
-const mark = `data:image/png;base64,${(await read("brand/plinky-icon.png")).toString("base64")}`;
+// The keys alone — no tile. The thumbnail's own ground is violet, so a violet tile has no
+// edge to show against it and reads as a smudge behind the keys; without it the keys, the
+// black keys and the falling note sit directly on the gradient. The thumbnail sets the name
+// itself, which is why neither this nor the lockup belongs here.
+const keys = `data:image/png;base64,${(await read("brand/plinky-keys.png")).toString("base64")}`;
 
 const fredoka = await read(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
@@ -68,12 +70,12 @@ for (const piece of PIECES) {
     await page.setContent(
         `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
          <div style="position:relative;overflow:hidden;width:1280px;height:720px;background:radial-gradient(120% 140% at 18% 8%, ${VIOLET} 0%, ${INK} 78%);display:flex;flex-direction:column;justify-content:space-between;padding:72px 88px;font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif">
-           <!-- The mark, bled off the bottom-right corner. A thumbnail is picked out of a
-                grid of a dozen others at a fifth of this size, where a title is a grey smear
-                and the only thing still legible is a shape and a colour — so the shape is
-                the app's own, big enough to survive the shrink, and set where the longest
-                title still clears it. -->
-           <img src="${mark}" alt="" style="position:absolute;right:-72px;bottom:-96px;width:520px;height:520px;opacity:.92">
+           <!-- The keys, in the bottom-right corner. A thumbnail is picked out of a grid of
+                a dozen others at a fifth of this size, where a title is a grey smear and the
+                only thing still legible is a shape and a colour — so the shape is the app's
+                own, big enough to survive the shrink, and set where the longest title still
+                clears it. -->
+           <img src="${keys}" alt="" style="position:absolute;right:36px;bottom:-40px;width:440px;height:440px">
            <div style="position:relative;max-width:820px">
              <div style="font-size:${titleSize(piece.title)}px;font-weight:600;color:${PAPER};line-height:1.08;letter-spacing:-0.015em;text-wrap:balance">${piece.title}</div>
              <div style="font-family:Inter,system-ui,sans-serif;font-size:36px;color:${PAPER};opacity:.72;margin-top:20px">${piece.composer}</div>
