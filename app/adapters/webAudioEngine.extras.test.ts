@@ -173,3 +173,47 @@ describe("sympathetic resonance", () => {
         expect(samples.extras().filter((one) => one.kind === "resonance")).toHaveLength(0);
     });
 });
+
+describe("everything a rendered piece asks the instrument for", () => {
+    it("is one recording per note, plus the pedal's own resonance", async () => {
+        // The guard, and the reason it is a LIST rather than a measurement.
+        //
+        // A key-off knock was once scheduled with every note on this path — including under
+        // the pedal, where a real piano cannot make that sound at all. In a fast passage
+        // that is a click per note, several at once under a chord, and every exported video
+        // carried it while the app sounded right.
+        //
+        // Nothing caught it. The unit tests around it asked which recordings were requested
+        // and were content to assert the wrong answer. Measuring the finished audio does
+        // not work either: a click carries almost no energy beside a sustained note, so
+        // loudness, attack counts and high-frequency share were all tried and none of them
+        // can tell a clean render from a knocking one. The fault was musical, not numerical.
+        //
+        // What a machine CAN hold onto is the tally. Pin every sound a performance asks for
+        // and any new one — a knock, a resonance, anything scheduled per note by a future
+        // change — moves these numbers and has to be argued for in review rather than
+        // discovered by listening to a finished clip.
+        const fake = fakeAudioContext();
+        const samples = pack();
+        const engine = await engineWith(fake, samples.lookup);
+        // A short passage with the shapes that matter: a plain note, a short one, a chord,
+        // and one held under the pedal.
+        engine.strike({ note: 60, gain: 0.3, velocity: 90, duration: 0.5, delay: 0 });
+        engine.strike({ note: 62, gain: 0.3, velocity: 90, duration: 0.08, delay: 0.5 });
+        for (const note of [64, 67, 71]) {
+            engine.strike({ note, gain: 0.3, velocity: 90, duration: 0.4, delay: 1 });
+        }
+        engine.strike({ note: 72, gain: 0.3, velocity: 90, duration: 0.6, delay: 1.5, pedalled: true });
+
+        const tally = samples.asked.reduce<Record<string, number>>((count, one) => {
+            count[one.kind] = (count[one.kind] ?? 0) + 1;
+            return count;
+        }, {});
+        // Six notes, six recordings. The one extra is the sympathetic resonance under the
+        // pedalled note — the rest of the instrument answering a note struck with the
+        // dampers off — and it is deliberate, which is why it is written here rather than
+        // waved through by a looser assertion. No knocks: nothing on this path ends with a
+        // damper landing, because nothing on this path is a key coming up.
+        expect(tally).toEqual({ note: 6, resonance: 1 });
+    });
+});
