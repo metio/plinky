@@ -130,9 +130,10 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 # tokens and the icon, so they are our own art and carry the project's licence. The
 # JSON and the images cannot hold a comment; the README does and is left alone.
 #
-# Two exceptions are not rendered: brand/source/plinky-mark.png is the mark as its author
-# supplied it, and brand/plinky-mark.png is that file with its background keyed out by
-# dev/key-mark.mjs. Both are ours and carry the same licence.
+# Three exceptions are not rendered by that script: brand/source/plinky-mark.png is the mark
+# as its author supplied it, brand/plinky-mark.png is that file with its background keyed
+# out, and brand/plinky-icon.png is the same mark with its wordmark removed — the last two
+# both written by dev/key-mark.mjs. All three are ours and carry the same licence.
 [[annotations]]
 path = ["brand/**/*.png", "brand/**/*.svg", "brand/palette.json"]
 precedence = "override"

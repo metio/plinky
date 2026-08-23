@@ -17,15 +17,21 @@
 // Run through the browser because that is the only PNG codec here. The pixels come out, the
 // decision is made by the tested function in core, and the alpha goes back in.
 //
-//   npm run mark            write brand/plinky-mark.png
-//   npm run mark -- --check fail if it is missing or stale
+//   npm run mark            write brand/plinky-mark.png and brand/plinky-icon.png
+//   npm run mark -- --check fail if either is missing or stale
 
 import { readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
 import { flattenedBackground, maskedShare } from "../core/matte.ts";
+import { wordlessMark } from "../core/iconMark.ts";
 
 const SOURCE = "brand/source/plinky-mark.png";
 const OUT = "brand/plinky-mark.png";
+// The same mark with its wordmark taken out and the keys recentred. Two files because they
+// are for two jobs: the lockup is read at poster and social-card size, where the name has
+// room; the icon is worn at 32px in the header and on a launcher, where the name is a
+// smudge and the keys need the space it was taking. See core/iconMark.ts.
+const ICON_OUT = "brand/plinky-icon.png";
 // The keyed master is emitted at the largest size anything is rendered from — the brand
 // kit's 1024 icon. Keeping it at the source's own 1254 would commit a third more bytes that
 // nothing ever reads at that size, and the source itself is here for anyone who wants them.
@@ -100,16 +106,77 @@ const keyed = await page.evaluate(async ({ flags, master }) => {
 }, { flags: Buffer.from(mask).toString("base64"), master: MASTER });
 
 const png = Buffer.from(keyed, "base64");
-const existing = await readFile(OUT).catch(() => null);
-if (check) {
-    if (!existing || !existing.equals(png)) {
-        console.error(`${OUT} is ${existing ? "stale" : "missing"}. Run \`npm run mark\` and commit it.`);
-        await browser.close();
-        process.exit(1);
+
+// The icon is derived from the KEYED master rather than from the source, so it inherits the
+// silhouette the flood found instead of keying the same corners a second time.
+const master = await pixelsOf(page, png);
+const icon = wordlessMark(master.rgba, master.width, master.height);
+const iconPng = Buffer.from(await pngOf(page, icon, master.width, master.height), "base64");
+
+let stale = false;
+for (const [path, bytes, what] of [
+    [OUT, png, "with its corners transparent"],
+    [ICON_OUT, iconPng, "with its wordmark removed and the keys centred"],
+]) {
+    const existing = await readFile(path).catch(() => null);
+    if (check) {
+        if (!existing || !existing.equals(bytes)) {
+            console.error(`${path} is ${existing ? "stale" : "missing"}.`);
+            stale = true;
+        } else {
+            console.log(`${path} is up to date.`);
+        }
+    } else {
+        await writeFile(path, bytes);
+        console.log(`Wrote ${path} (${(bytes.length / 1024).toFixed(0)} KB) ${what}.`);
     }
-    console.log(`${OUT} is up to date.`);
-} else {
-    await writeFile(OUT, png);
-    console.log(`Wrote ${OUT} (${(png.length / 1024).toFixed(0)} KB) with its corners transparent.`);
+}
+if (stale) {
+    console.error("Run `npm run mark` and commit the result.");
+    await browser.close();
+    process.exit(1);
 }
 await browser.close();
+
+// The browser is the only PNG codec here, so pixels cross the bridge as base64 rather than
+// as a million-element array — which is minutes of serialising either way it goes.
+async function pixelsOf(target, buffer) {
+    return await target.evaluate(async (data) => {
+        const img = new Image();
+        img.src = `data:image/png;base64,${data}`;
+        await img.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        const raw = canvas
+            .getContext("2d")
+            .getImageData(0, 0, canvas.width, canvas.height).data;
+        let binary = "";
+        for (let at = 0; at < raw.length; at += 4096) {
+            binary += String.fromCharCode.apply(null, raw.subarray(at, at + 4096));
+        }
+        return { width: canvas.width, height: canvas.height, base64: btoa(binary) };
+    }, buffer.toString("base64")).then((out) => ({
+        width: out.width,
+        height: out.height,
+        rgba: new Uint8ClampedArray(Buffer.from(out.base64, "base64")),
+    }));
+}
+
+async function pngOf(target, rgba, width, height) {
+    return await target.evaluate(
+        ({ data, width, height }) => {
+            const bytes = Uint8Array.from(atob(data), (one) => one.charCodeAt(0));
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext("2d");
+            const image = context.createImageData(width, height);
+            image.data.set(bytes);
+            context.putImageData(image, 0, 0);
+            return canvas.toDataURL("image/png").split(",")[1];
+        },
+        { data: Buffer.from(rgba.buffer).toString("base64"), width, height },
+    );
+}

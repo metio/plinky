@@ -13,7 +13,8 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 
 | File | What it is |
 | --- | --- |
-| `plinky-mark.png` | The master: 1024×1024 RGBA, transparent outside the tile's own rounded silhouette. Everything else is rendered from it. |
+| `plinky-mark.png` | The lockup, and the master: 1024×1024 RGBA, transparent outside the tile's own rounded silhouette. Use it where the name has room to be read. |
+| `plinky-icon.png` | The same mark with the wordmark taken out and the keys recentred, 1024×1024 RGBA. Use it wherever the mark is worn small — a tab, a launcher, an app header — where the lockup's own lettering is a smudge. |
 | `source/plinky-mark.png` | The artwork as its author supplied it, flattened onto white. `npm run mark` keys it and writes the master. |
 | `icon/plinky-*.png` | The mark at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
 | `icon/lockup-paper.png` | The mark beside the tagline on paper, 960×320 at 2×, for light surfaces. |
@@ -141,8 +142,17 @@ behind it, and the radius there is the plate's own.
 `brand/source/plinky-mark.png`, the artwork as supplied — a flattened export with white
 corner wedges and no alpha. `core/matte.ts` floods inward from the four corners across
 near-white and stops at anything enclosed, which is why the keys and the wordmark survive
-while the corners come out transparent. `npm run mark -- --check` fails if the master is
-missing or stale.
+while the corners come out transparent.
+
+The same command writes `brand/plinky-icon.png` from the keyed master — so the icon
+inherits the silhouette the flood found rather than keying the same corners twice.
+`core/iconMark.ts` reads the rows of white artwork as bands, takes the bottom one as the
+word, repaints it in the tile's own ground sampled from each row's edges, and slides what
+is left onto the tile's centre line. The word is found rather than assumed: where it sits
+is a fact about one revision of one file, and a hard-coded band would go on erasing those
+rows of a redrawn mark whatever they turned out to hold, while every gate stayed green.
+
+`npm run mark -- --check` fails if either is missing or stale.
 
 ## The colours
 

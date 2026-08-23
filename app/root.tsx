@@ -116,8 +116,16 @@ function Header() {
                     <Link
                         to="/"
                         aria-label="Plinky home"
-                        className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
+                        className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-white"
                     >
+                        {/* The wordless form of the mark: the tile, the keys and the falling
+                            plink, with the name taken out. The name is set beside it here,
+                            and at 32px the lockup's own lettering would be a smudge under a
+                            legible copy of the same word. It carries its rounded silhouette
+                            in its alpha, so it is NOT clipped — a radius is a guess at the
+                            artwork's own curve, and one slightly tight leaves a sliver of
+                            ground showing all the way round. */}
+                        <img src="/icon-192.png" alt="" className="h-8 w-8 shrink-0" />
                         <span
                             aria-hidden="true"
                             className="font-display text-xl font-semibold tracking-tight text-white"

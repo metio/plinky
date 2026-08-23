@@ -16,7 +16,13 @@
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
 
+// Two forms of one mark, each used where it can be read. The lockup carries the name and
+// goes on the banner and the social card, which have room for it. The icon is the same
+// artwork with the name taken out and the keys recentred, and goes wherever the mark is
+// worn small — the tab, the launcher, the header — where the name would be a smudge and
+// the keys need the space it was taking. Both come from `npm run mark`.
 const MARK = "brand/plinky-mark.png";
+const ICON = "brand/plinky-icon.png";
 const PAPER = "#f9f8fc";
 const INK = "#191545";
 const ACCENT = "#4915d2";
@@ -24,6 +30,7 @@ const ACCENT = "#4915d2";
 // Carried into the page as a data URI rather than a file:// URL, so the render does not
 // depend on where the browser thinks its document lives.
 const mark = `data:image/png;base64,${(await readFile(MARK)).toString("base64")}`;
+const icon = `data:image/png;base64,${(await readFile(ICON)).toString("base64")}`;
 // The tagline is set in the app's own display face, so the render has to carry the font
 // with it — a headless browser has no Fredoka installed, and the fallback would not be
 // the face the app ships. Latin only: nothing rendered here is ever translated.
@@ -49,11 +56,11 @@ async function shoot(html, { width, height, path }) {
     return png;
 }
 
-// The launcher sizes. 180 is Apple's touch icon, 192 and 512 are the manifest's. The mark
-// carries its own rounded silhouette in its alpha, so it is scaled and never clipped: a
-// radius applied here is a guess at the artwork's own curve, and one slightly tight leaves
-// a sliver of ground showing all the way round.
-const tile = (size) => `<img src="${mark}" alt="" width="${size}" height="${size}">`;
+// The launcher sizes, from the wordless icon. 180 is Apple's touch icon, 192 and 512 are
+// the manifest's. It carries its own rounded silhouette in its alpha, so it is scaled and
+// never clipped: a radius applied here is a guess at the artwork's own curve, and one
+// slightly tight leaves a sliver of ground showing all the way round.
+const tile = (size) => `<img src="${icon}" alt="" width="${size}" height="${size}">`;
 for (const size of [512, 192, 180, 32]) {
     await shoot(tile(size), { width: size, height: size, path: `public/icon-${size}.png` });
 }
@@ -109,5 +116,6 @@ await browser.close();
 await unlink("public/icon-32.png");
 
 console.log(
-    "public/: icon-512, icon-192, icon-180, icon-banner-512, og.png, favicon.ico — all from brand/plinky-mark.png",
+    "public/: icon-512, icon-192, icon-180 and favicon.ico from brand/plinky-icon.png; " +
+        "icon-banner-512 and og.png from brand/plinky-mark.png",
 );
