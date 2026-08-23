@@ -101,6 +101,19 @@ function overrunsItsMetre(xml: string): boolean {
     return false;
 }
 
+// Whether the file writes a note the engraving does not print.
+//
+// `print-object="no"` hides a NOTEHEAD, not the note: the element still carries a pitch and
+// a duration, and the voice around it is written as if it sounds. Those files are excluded
+// because the two readers differ on them ON PURPOSE — the engraver drops such a note
+// altogether, so a voice that opens with one loses its first sound while every later note
+// of the same voice stays exactly where the file put it, which is what proves the timing was
+// never in question. Two shapes in the catalogue are written this way: an invisible pickup
+// note opening a hidden voice (`ND7ZZAi5ZX4v`, bar 23 — an invisible B3 opens voice 5, and
+// A3, B3, C#4, D4 after it land on the engraver's own onsets), and a tremolo spelled as a
+// hidden tied voice (`73zyXPKTyvZj`, bar 5). The file reader sounds what the file writes.
+const printsEveryNote = (xml: string) => !/<note\b[^>]*print-object="no"/.test(xml);
+
 let host: HTMLDivElement | null = null;
 
 afterEach(() => {
@@ -189,7 +202,7 @@ describe("the file reader on the real catalogue", () => {
         let compared = 0;
         for (const entry of chosen) {
             const xml = await xmlFor(entry);
-            if (!xml || !singlePart(xml) || overrunsItsMetre(xml)) {
+            if (!xml || !singlePart(xml) || overrunsItsMetre(xml) || !printsEveryNote(xml)) {
                 continue;
             }
             const osmd = await engrave(xml);
@@ -226,18 +239,14 @@ describe("the file reader on the real catalogue", () => {
         // worse rather than better and the real rule is not yet known. Until that is
         // understood the app stays on the engraver.
         //
+        // Named in the output before the ratchet is checked, so a run that trips it says
+        // WHICH scores parted company rather than only how many.
+        if (disagreements.length > 0) {
+            console.info(`file-vs-engraver, ${compared} scores:\n${disagreements.join("\n")}`);
+        }
+
         // The number may only go DOWN. Raising it to make a change fit would be turning
         // the one instrument that can see this problem into a rubber stamp.
         expect(disagreements.length).toBeLessThanOrEqual(KNOWN_DISAGREEMENTS);
-        if (disagreements.length > 0) {
-            // Named even when the ratchet holds, so what is left is visible rather than
-            // merely counted.
-            console.info(`file-vs-engraver, ${compared} scores:\n${disagreements.join("\n")}`);
-        }
-        if (disagreements.length > 0) {
-            // Named in the output even when the ratchet holds, so the work left is visible
-            // rather than merely counted.
-            console.info(`file-vs-engraver, ${compared} scores:\n${disagreements.join("\n")}`);
-        }
     }, 600_000);
 });

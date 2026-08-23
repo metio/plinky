@@ -14,8 +14,8 @@ const score = (measures: string, parts = `<score-part id="P1"><part-name>P</part
 
 const ATTR = `<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time></attributes>`;
 
-const note = (step: string, octave: number, ticks: number, extra = "") =>
-    `<note>${extra}<pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>${ticks}</duration><voice>1</voice></note>`;
+const note = (step: string, octave: number, ticks: number, extra = "", attributes = "") =>
+    `<note${attributes}>${extra}<pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>${ticks}</duration><voice>1</voice></note>`;
 
 const rest = (ticks: number) => `<note><rest/><duration>${ticks}</duration><voice>1</voice></note>`;
 
@@ -113,6 +113,19 @@ describe("reading the timeline out of the file", () => {
         expect(notes[0]).toMatchObject({ grace: true, wholes: 0, whole: 0 });
         // The note it decorates still begins on the beat.
         expect(notes[1]?.whole).toBe(0);
+    });
+
+    it("sounds a note whose notehead the engraving hides", () => {
+        // `print-object="no"` hides the notehead, not the note: the element still carries a
+        // pitch and a duration, and the voice around it is written as if it sounds. Dropping
+        // it would both silence a sound and pull every later note of the voice a beat early.
+        const { notes } = readTimeline(
+            score(
+                `<measure number="1">${ATTR}${note("B", 3, 4, "", ' print-object="no"')}${note("A", 3, 4)}${note("B", 3, 8)}</measure>`,
+            ),
+        );
+        expect(notes.map((one) => one.midi)).toEqual([59, 57, 59]);
+        expect(notes.map((one) => one.whole)).toEqual([0, 0.25, 0.5]);
     });
 
     it("reads a tie from either spelling the file uses", () => {
