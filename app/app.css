@@ -349,8 +349,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        toward the light through the afternoon, folds in the evening, and at night a note
        falls to it. The petals arrive one at a time, which is what makes it an event on
        arrival rather than a picture that was always there. */
-    --animate-petal-in: petal-in 4.6s cubic-bezier(0.2, 0.9, 0.3, 1.4) infinite;
-    --animate-stem-grow: stem-grow 4.6s ease-out infinite;
+    --animate-petal-in: petal-in 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+    --animate-stem-draw: stem-draw 1.15s ease-out both;
+    --animate-stem-bend: stem-bend 6.8s ease-in-out infinite;
+    --animate-head-rise: head-rise 1.15s ease-out both;
     --animate-bloom-sway: bloom-sway 6s ease-in-out infinite;
     --animate-bloom-fold: bloom-fold 6s ease-in-out infinite;
     --animate-note-fall: note-fall 3.4s cubic-bezier(0.5, 0, 0.75, 0) infinite;
@@ -364,7 +366,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         transform: rotate(var(--turn)) translateY(-22%) scale(0);
     }
     /* Past its size and back, so a petal arrives rather than appears. */
-    60% {
+    65% {
         transform: rotate(var(--turn)) translateY(-22%) scale(1.15);
     }
     100% {
@@ -372,13 +374,36 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     }
 }
 
-@keyframes stem-grow {
-    0% {
-        transform: scaleY(0.15);
+@keyframes stem-draw {
+    from {
+        stroke-dashoffset: 0.94;
     }
-    30%,
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* A degree either way about the base. Slower than the growth and out of step with it, so
+   the two never settle into one repeating beat. */
+@keyframes stem-bend {
+    0%,
     100% {
-        transform: scaleY(1);
+        transform: rotate(-1.2deg);
+    }
+    50% {
+        transform: rotate(1.2deg);
+    }
+}
+
+/* The head rides the tip of the stem and nothing more — the opening is the petals' own
+   business, and it waits until the stalk has finished. The 2.115rem is the 2.25rem stem
+   less the 0.06 of it already drawn at the start. */
+@keyframes head-rise {
+    from {
+        transform: translateY(2.115rem);
+    }
+    to {
+        transform: translateY(0);
     }
 }
 
