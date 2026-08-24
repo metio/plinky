@@ -25,15 +25,6 @@ const MARK = "brand/plinky-mark.png";
 // that rule the lockup out: the circle cuts through the name, and at that size the name is
 // a smear over the keys it is stealing room from. See core/iconMark.ts.
 const ICON = "brand/plinky-icon.png";
-// A newer lockup from the same hand, with the name set inside the tile rather than beside
-// it. It serves exactly one picture, the repository's social preview, because that is the
-// only one shown large and uncropped.
-//
-// It cannot serve a profile picture, and no scaling fixes that: the name is wide and sits
-// low in the tile, while a circle inscribed in a square is at its narrowest down there, so
-// the ends of it fall outside the crop. That is a fact about where the word is drawn, not
-// about how the picture is exported.
-const TILE = "brand/plinky-tile.png";
 
 // The colours worth handing to somebody outside the codebase, with what each one MEANS —
 // a hex without its role is how a brand ends up with red used for decoration.
@@ -71,7 +62,6 @@ const css = await readFile(CSS, "utf8");
 // Carried into the page as a data URI rather than a file:// URL, so the render does not
 // depend on where the browser thinks its document lives.
 const mark = `data:image/png;base64,${(await readFile(MARK)).toString("base64")}`;
-const tileArt = `data:image/png;base64,${(await readFile(TILE)).toString("base64")}`;
 const icon = `data:image/png;base64,${(await readFile(ICON)).toString("base64")}`;
 // The mark carries its own rounded silhouette in its alpha, so it is scaled and never
 // clipped: a border-radius applied here is a guess at the artwork's own curve, and one
@@ -123,8 +113,8 @@ const browser = await chromium.launch();
 // Every pixel inside the circle is then artwork, and the frame's corners — the only place
 // transparency survives — are outside the circle every platform crops to.
 //
-// The factor is measured, not guessed: the transparent margin the artwork carries differs
-// between the two pictures, and a bleed large enough for one clips the other's wordmark.
+// The factor is measured rather than fixed: the transparent margin is a property of the
+// artwork, so a constant here would need revisiting every time the artwork is redrawn.
 async function bleedOf(dataUrl) {
     const page = await browser.newPage();
     const scale = await page.evaluate(async (src) => {
@@ -374,15 +364,15 @@ await shoot(tile(150), {
 // to a circle, so this is the one place the name belongs INSIDE the picture: the tile can
 // carry it without competing with type set beside it.
 //
-// The ground is ink rather than the tile's own violet, for the same reason the profile
-// square uses ink — violet on violet loses the tile's edge, and the silhouette is what
-// makes it read as a mark. The tagline sits beside it saying the thing the name does not.
+// The ground is ink, which the mark's own violet tile stands clear of. Unlike the profile
+// picture this one is never cropped to a circle, so the tile keeps its silhouette and the
+// ground has an edge to give it. The tagline sits beside it saying what the name does not.
 //
 // Everything stays inside the middle three quarters: an unfurl is re-cropped by whoever is
 // doing the unfurling, and a preview designed edge to edge loses its ends.
 await shoot(
     `<div style="width:1280px;height:640px;background:${colour.ink};display:flex;align-items:center;justify-content:center;gap:56px;padding:0 120px;box-sizing:border-box">
-       <img src="${tileArt}" alt="" style="width:340px;height:340px;flex:none;display:block">
+       <img src="${mark}" alt="" style="width:340px;height:340px;flex:none;display:block">
        <div style="${DISPLAY};font-size:64px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
      </div>`,
     { width: 1280, height: 640, path: `${OUT}/social/github-social-1280x640.png` },

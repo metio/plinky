@@ -15,7 +15,6 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 | --- | --- |
 | `plinky-mark.png` | The lockup, and the master: 1024×1024 RGBA, transparent outside the tile's own rounded silhouette. Use it where the name has room to be read. |
 | `plinky-icon.png` | The same mark with the wordmark taken out and the keys recentred, 1024×1024 RGBA. Use it wherever the mark is worn small — a tab, a launcher, an app header — where the lockup's own lettering is a smudge. |
-| `plinky-tile.png` | A later lockup from the same hand, with the name set inside the tile rather than beside it, 1024×1024 RGBA. For the one picture shown large and uncropped — never for a profile picture, where a circle crop cuts the ends off a name drawn that wide and that low. |
 | `source/plinky-mark.png` | The artwork as its author supplied it, flattened onto white. `npm run mark` keys it and writes the master. |
 | `icon/plinky-*.png` | The mark at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
 | `icon/lockup-paper.png` | The mark beside the tagline on paper, 960×320 at 2×, for light surfaces. |
@@ -30,7 +29,7 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 | `social/story-1080x1920.png` | A story or a reel. |
 | `social/facebook-cover-1640x624.png` | A Facebook page cover, at twice its shown size. |
 | `social/reddit-banner-*.png` | Reddit's community banner, desktop 1072×128 and mobile 1080×128. |
-| `social/github-social-1280x640.png` | A repository's social preview: what GitHub, Slack and a chat client unfurl for a link to the code. The one picture shown large enough for the name to sit inside it. |
+| `social/github-social-1280x640.png` | A repository's social preview: what GitHub, Slack and a chat client unfurl for a link to the code. Never cropped to a circle, so the mark keeps its tile and the tagline sits beside it. |
 | `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
 | `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the mark and nothing else. |
 
