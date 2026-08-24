@@ -231,6 +231,38 @@ describe("MidiProvider", () => {
         expect(result.current.heldNotes).toEqual([]);
     });
 
+    it("losing focus releases the computer key's hold and leaves the piano's", async () => {
+        // Focus is the whole point: a keyup is delivered only to the focused window, so a
+        // computer key held when focus leaves would stick forever. A connected piano keeps
+        // streaming its own note-offs regardless, so ITS hold on the same pitch must
+        // survive — releasing every source on blur would cut a note the player is still
+        // holding down on the instrument in front of them.
+        const input = fakeMidiInput({ id: "in-1", name: "Test Piano", manufacturer: "Acme" });
+        const midi = fakeMidi({ inputs: [input] });
+        const offs: number[] = [];
+        const useProbe = () => {
+            const c = useMidiState();
+            useMidiInput({ onNoteOff: (e) => offs.push(e.note) });
+            return c;
+        };
+        const { result } = renderHook(useProbe, { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", code: "KeyZ" })));
+        act(() => input.emit([0x90, 60, 100]));
+        expect(result.current.heldNotes).toEqual([60]);
+
+        act(() => window.dispatchEvent(new Event("blur")));
+        expect(offs).toEqual([]);
+        expect(result.current.heldNotes).toEqual([60]);
+
+        // And the piano's own release still stops it, exactly once.
+        act(() => input.emit([0x80, 60, 0]));
+        expect(offs).toEqual([60]);
+        expect(result.current.heldNotes).toEqual([]);
+    });
+
     it("plays from the computer keyboard and shifts the octave", () => {
         const { result } = renderHook(() => useMidiState(), {
             wrapper: wrapperWith(fakeMidi()),
