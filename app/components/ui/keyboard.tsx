@@ -8,6 +8,7 @@ import { spokenPitch } from "../../../core/midi";
 import { keyLabelOf } from "../../../core/notes";
 import type { NoteLabels } from "../../../core/prefs";
 import { isWhite, keybedMaxWidthPx, whiteKeys } from "../../../core/keyboardGeometry";
+import { keyState } from "../../../core/keyState";
 import { m } from "../../paraglide/messages.js";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 
@@ -15,6 +16,20 @@ import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 // note is released by the source that sounded it: the two spelling it differently is the
 // shape of a key left sounding forever.
 const pointerSource = (pointerId: number) => `p${pointerId}`;
+
+// Where each navigation key takes the focus. A semitone either way, an octave up or down,
+// and the ends of the keybed — every one of them preventing the default AND halting the
+// bubble, which is why they are one table: the global computer-key listener on window also
+// reads ArrowUp/ArrowDown as octave shifts, so a key that forgot to stop propagating would
+// silently transpose the play octave while the player walked the keybed.
+const NAVIGATION: Record<string, (note: number, from: number, to: number) => number> = {
+    ArrowRight: (note) => note + 1,
+    ArrowLeft: (note) => note - 1,
+    ArrowUp: (note) => note + 12,
+    ArrowDown: (note) => note - 12,
+    Home: (_note, from) => from,
+    End: (_note, _from, to) => to,
+};
 
 // A tap's loudness from where the key is struck: near the pivot (top) is soft, near the
 // tip (bottom) is loud, like the leverage of a real key. Clamped to a musical range.
@@ -361,37 +376,14 @@ export function Keyboard({
         // Navigation keys stopPropagation as well as preventDefault: the global computer-key
         // listener on window also reads ArrowUp/ArrowDown as octave shifts, so without halting
         // the bubble, walking the keybed vertically would silently transpose the play octave.
+        const walk = NAVIGATION[event.key];
+        if (walk) {
+            event.preventDefault();
+            event.stopPropagation();
+            focusNote(walk(note, from, to));
+            return;
+        }
         switch (event.key) {
-            case "ArrowRight":
-                event.preventDefault();
-                event.stopPropagation();
-                focusNote(note + 1);
-                return;
-            case "ArrowLeft":
-                event.preventDefault();
-                event.stopPropagation();
-                focusNote(note - 1);
-                return;
-            case "ArrowUp":
-                event.preventDefault();
-                event.stopPropagation();
-                focusNote(note + 12);
-                return;
-            case "ArrowDown":
-                event.preventDefault();
-                event.stopPropagation();
-                focusNote(note - 12);
-                return;
-            case "Home":
-                event.preventDefault();
-                event.stopPropagation();
-                focusNote(from);
-                return;
-            case "End":
-                event.preventDefault();
-                event.stopPropagation();
-                focusNote(to);
-                return;
             case "Enter":
             case " ":
                 event.preventDefault();
@@ -438,48 +430,47 @@ export function Keyboard({
         clickTimers.current.add(id);
     };
 
+    // What each key is saying, asked once per key. The ORDER lives in core/keyState — it is
+    // a musical judgement (the player's own hands outrank the app's demonstration) rather
+    // than a styling one, and it was written out three times here before.
+    const stateOf = (note: number) =>
+        keyState(note, { flash: flash?.note ?? null, lit, sounding, expected });
     const whiteState = (note: number) =>
-        flash?.note === note
-            ? "bg-danger-fill"
-            : lit.has(note)
-              ? "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held"
-              : // A key the player is holding wins over one the app is sounding: their own
-                // hands are the more urgent fact on the instrument in front of them.
-                sounding.get(note) === "left"
-                ? "bg-hand-left-soft"
-                : sounding.get(note) === "right"
-                  ? "bg-hand-right-soft"
-                  : expected.includes(note)
-                    ? "bg-accent-surface"
-                    : theme.white;
+        ({
+            wrong: "bg-danger-fill",
+            held: "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held",
+            left: "bg-hand-left-soft",
+            right: "bg-hand-right-soft",
+            next: "bg-accent-surface",
+            rest: theme.white,
+        })[stateOf(note)];
     // An expected black key is ringed, not repainted. Filling it with the next-note colour
     // stops it being a black key — fine mid-piece, where the key is pointed at rather than
     // named, and wrong in the first lesson of all, which says "press any black key" over a
     // keyboard whose black keys have turned blue.
+    //
+    // A sounding black key IS filled, unlike an expected one: the reason an expected black
+    // key is only ringed is that "press any black key" must still read as black, and
+    // nothing is being asked for here.
     const blackState = (note: number) =>
-        flash?.note === note
-            ? "bg-danger"
-            : lit.has(note)
-              ? "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held"
-              : // A sounding black key IS filled, unlike an expected one: the reason an
-                // expected black key is only ringed is that "press any black key" must
-                // still read as black, and nothing is being asked for here.
-                sounding.get(note) === "left"
-                ? "bg-hand-left"
-                : sounding.get(note) === "right"
-                  ? "bg-hand-right"
-                  : expected.includes(note)
-                    ? `${theme.black} ring-2 ring-inset ring-key-next`
-                    : theme.black;
+        ({
+            wrong: "bg-danger",
+            held: "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held",
+            left: "bg-hand-left",
+            right: "bg-hand-right",
+            next: `${theme.black} ring-2 ring-inset ring-key-next`,
+            rest: theme.black,
+        })[stateOf(note)];
     // A black key's name is pale because the key is nearly black — but every state that
     // means something (wrong, held, play this) fills it with a bright colour, and pale
     // grey on those is well under the contrast floor. The name follows the fill.
+    //
+    // The expected key keeps its black fill, so its name keeps the pale ink that reads on
+    // black; only the states that flood the key with colour change it.
     const blackLabel = (note: number) =>
-        // The expected key keeps its black fill now, so its name keeps the pale ink that
-        // reads on black; only the states that flood the key with colour change it.
-        flash?.note === note || lit.has(note) || sounding.has(note)
-            ? "text-key-ink"
-            : "text-key-black-ink";
+        stateOf(note) === "next" || stateOf(note) === "rest"
+            ? "text-key-black-ink"
+            : "text-key-ink";
 
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.
