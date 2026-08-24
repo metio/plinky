@@ -319,9 +319,25 @@ const MELODIC_NOTE_GAP = 0.55;
 // The pause between the key-setting cadence and the question it frames.
 const AFTER_CADENCE_GAP = 0.5;
 
+// A note drawn uniformly from an inclusive range, and the level's own row of a ladder.
+//
+// Both are written once because both are drawn from the seeded rng in a fixed order: every
+// question a seed produces depends on how many times rng() has been called and on the
+// arithmetic each call feeds. Six near-copies of the same expression is six chances for one
+// of them to drift and change what a seed means.
+function pickBetween(low: number, high: number, rng: () => number): number {
+    const span = Math.max(0, high - low);
+    return low + Math.floor(rng() * (span + 1));
+}
+
+// A ladder's row for a level, falling back to the first — a level past the end of a ladder
+// is a level the player has not unlocked a new row for, not an error.
+function atLevel<T>(levels: readonly T[], level: number): T {
+    return levels[level] ?? levels[0]!;
+}
+
 function pickTonic(rng: () => number): number {
-    const span = FUNCTIONAL_TONIC_HIGH - FUNCTIONAL_TONIC_LOW;
-    return FUNCTIONAL_TONIC_LOW + Math.floor(rng() * (span + 1));
+    return pickBetween(FUNCTIONAL_TONIC_LOW, FUNCTIONAL_TONIC_HIGH, rng);
 }
 
 // A short I–IV–V–I cadence that plants a key in the ear before a functional question —
@@ -388,8 +404,7 @@ export function generateInterval(config: IntervalConfig, rng: () => number): Int
     const answer = pick(intervals, rng);
     const semitones = INTERVAL_IDS.indexOf(answer);
     const [low, high] = rootRange(config, semitones);
-    const span = Math.max(0, high - low);
-    const root = low + Math.floor(rng() * (span + 1));
+    const root = pickBetween(low, high, rng);
     const other = config.direction === "descending" ? root - semitones : root + semitones;
 
     // Heard together, the two notes start at once; heard in sequence, the second follows
@@ -419,8 +434,7 @@ export function generateChord(config: ChordConfig, rng: () => number): ChordQues
     const answer = pick(qualities, rng);
     // The root leaves room for the chord's top note inside the range.
     const high = config.highest - chordSpan(answer);
-    const span = Math.max(0, high - config.lowest);
-    const root = config.lowest + Math.floor(rng() * (span + 1));
+    const root = pickBetween(config.lowest, high, rng);
     // A chord is heard as one sound, so every note starts together and rings a while.
     const notes: EarNote[] = chordPitches(root, answer).map((note) => ({
         note,
@@ -436,8 +450,7 @@ export function generateScale(config: ScaleConfig, rng: () => number): ScaleQues
     const answer = pick(scales, rng);
     // The tonic leaves room for the closing octave inside the range.
     const high = config.highest - SEMITONES_PER_OCTAVE;
-    const span = Math.max(0, high - config.lowest);
-    const tonic = config.lowest + Math.floor(rng() * (span + 1));
+    const tonic = pickBetween(config.lowest, high, rng);
     // The scale climbs one note after another, each a step behind the last.
     const notes: EarNote[] = scalePitches(tonic, answer).map((note, index) => ({
         note,
@@ -456,8 +469,7 @@ export function generateProgression(
     // The tonic sits where every degree's triad fits the range: I's root is the lowest
     // note, and vii°'s stack the highest, seventeen semitones above the tonic.
     const high = config.highest - 17;
-    const span = Math.max(0, high - config.lowest);
-    const tonic = config.lowest + Math.floor(rng() * (span + 1));
+    const tonic = pickBetween(config.lowest, high, rng);
 
     // Always I to I, so the key is heard at the start and resolved at the end; the middle
     // chords are drawn from the level's vocabulary, never repeating one twice in a row —
@@ -526,8 +538,7 @@ export function generateIntervalContext(
     // The pair sits an octave above the tonic, with room for the interval below the top of
     // the range — heard in sequence, rising, after the cadence.
     const base = tonic + SEMITONES_PER_OCTAVE;
-    const room = Math.max(0, DEFAULT_HIGHEST - semitones - base);
-    const root = base + Math.floor(rng() * (room + 1));
+    const root = pickBetween(base, DEFAULT_HIGHEST - semitones, rng);
     const start = cadence.endsAt + AFTER_CADENCE_GAP;
     const notes: EarNote[] = [
         { note: root, at: start, velocity: VELOCITY, duration: NOTE_SECONDS },
@@ -586,40 +597,28 @@ export function generateQuestion(
         case "perfect-pitch":
             return generatePerfectPitch({ naturalsOnly: true, ...range }, rng);
         case "chords":
-            return generateChord(
-                { qualities: CHORD_LEVELS[level] ?? CHORD_LEVELS[0]!, ...range },
-                rng,
-            );
+            return generateChord({ qualities: atLevel(CHORD_LEVELS, level), ...range }, rng);
         case "scales":
-            return generateScale(
-                { scales: SCALE_LEVELS[level] ?? SCALE_LEVELS[0]!, ...range },
-                rng,
-            );
+            return generateScale({ scales: atLevel(SCALE_LEVELS, level), ...range }, rng);
         case "progressions":
             return generateProgression(
                 {
-                    degrees: PROGRESSION_LEVELS[level] ?? PROGRESSION_LEVELS[0]!,
+                    degrees: atLevel(PROGRESSION_LEVELS, level),
                     length: PROGRESSION_LENGTH,
                     ...range,
                 },
                 rng,
             );
         case "scale-degrees":
-            return generateScaleDegree(
-                { degrees: SCALE_DEGREE_LEVELS[level] ?? SCALE_DEGREE_LEVELS[0]! },
-                rng,
-            );
+            return generateScaleDegree({ degrees: atLevel(SCALE_DEGREE_LEVELS, level) }, rng);
         case "intervals-context":
-            return generateIntervalContext(
-                { intervals: INTERVAL_LEVELS[level] ?? INTERVAL_LEVELS[0]! },
-                rng,
-            );
+            return generateIntervalContext({ intervals: atLevel(INTERVAL_LEVELS, level) }, rng);
         case "melodic-dictation":
-            return generateMelodic({ length: MELODIC_LEVELS[level] ?? MELODIC_LEVELS[0]! }, rng);
+            return generateMelodic({ length: atLevel(MELODIC_LEVELS, level) }, rng);
         default:
             return generateInterval(
                 {
-                    intervals: INTERVAL_LEVELS[level] ?? INTERVAL_LEVELS[0]!,
+                    intervals: atLevel(INTERVAL_LEVELS, level),
                     direction: "ascending",
                     ...range,
                 },

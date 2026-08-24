@@ -9,6 +9,7 @@
 // single letters. Here they come off the document, where they are four instances of one
 // idea: something written at a position, standing until something else ends it.
 
+import { child, text } from "./musicxmlDom";
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
 import type { OctaveShiftSpan } from "./octaveShift";
@@ -47,10 +48,6 @@ const DYNAMIC_VELOCITY: Record<string, number> = {
     rfz: 96,
     fp: 96,
 };
-
-const text = (element: Element | null | undefined): string => element?.textContent?.trim() ?? "";
-const child = (parent: Element, name: string): Element | null =>
-    parent.getElementsByTagName(name)[0] ?? null;
 
 // The arches, paired by the number the file gives them.
 //

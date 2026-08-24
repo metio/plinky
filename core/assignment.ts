@@ -363,3 +363,15 @@ export function withItemNote(
         return value.trim() ? { ...rest, note: value } : rest;
     });
 }
+
+// A shared assignment, made safe to save beside what is already there.
+//
+// Two people can build assignments that collide on id — the id is derived from the name, so
+// "Week 3" from two teachers is the same id — and an import that saved straight through
+// would silently replace the one already on the device. Re-identifying the incoming one
+// keeps both; the name is unchanged, so the reader sees two "Week 3"s rather than losing one.
+export function withFreeId(assignment: Assignment, taken: readonly string[]): Assignment {
+    return taken.includes(assignment.id)
+        ? makeAssignment({ ...assignment, id: newAssignmentId(assignment.name, taken) })
+        : assignment;
+}

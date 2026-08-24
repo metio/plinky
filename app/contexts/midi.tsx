@@ -807,7 +807,13 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     );
 }
 
-function useMidiContext(): MidiContextValue {
+// Connection state and actions for UI (support, devices, octave, requestAccess,
+// and the event monitor used by the debug panel).
+//
+// The throw is the useful part: a MIDI hook outside the provider would otherwise read
+// undefined and fail somewhere further along, where the missing provider is no longer the
+// obvious cause.
+export function useMidiConnection(): MidiContextValue {
     const ctx = useContext(MidiContext);
     if (!ctx) {
         throw new Error("MIDI hooks must be used within a MidiProvider.");
@@ -815,17 +821,11 @@ function useMidiContext(): MidiContextValue {
     return ctx;
 }
 
-// Connection state and actions for UI (support, devices, octave, requestAccess,
-// and the event monitor used by the debug panel).
-export function useMidiConnection(): MidiContextValue {
-    return useMidiContext();
-}
-
 // Subscribe to note events for the lifetime of the calling component. Handlers
 // are read through a ref so the subscription is set up once and always calls
 // the latest callbacks.
 export function useMidiInput(handlers: NoteListener): void {
-    const { subscribe } = useMidiContext();
+    const { subscribe } = useMidiConnection();
     const handlersRef = useRef(handlers);
     handlersRef.current = handlers;
 

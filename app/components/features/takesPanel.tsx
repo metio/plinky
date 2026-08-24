@@ -8,6 +8,7 @@ import { takeFileStem } from "../../lib/takeFile";
 import { scoreReadings } from "../../../core/grade";
 import { ghostOnsets, type Take } from "../../../core/takes";
 import { readingLabel } from "../../lib/scoreReadingLabels";
+import { formatAgo } from "../../lib/relativeTime";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
@@ -15,26 +16,6 @@ import { PlayIcon, StopIcon, TrashIcon } from "../ui/icons";
 import { ExportVideoButton } from "./exportVideoButton";
 import type { OriginalScore } from "../../lib/scoreSnapshot";
 import { ShareGhostButton } from "./shareGhostButton";
-
-// A short "3 minutes ago" for when a take was saved, localised without a message
-// per unit by leaning on the platform's relative-time formatter.
-export function formatAgo(fromMs: number, nowMs: number, locale: string): string {
-    const seconds = Math.round((fromMs - nowMs) / 1000);
-    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-    const abs = Math.abs(seconds);
-    if (abs < 60) {
-        return rtf.format(seconds, "second");
-    }
-    const minutes = Math.round(seconds / 60);
-    if (Math.abs(minutes) < 60) {
-        return rtf.format(minutes, "minute");
-    }
-    const hours = Math.round(minutes / 60);
-    if (Math.abs(hours) < 24) {
-        return rtf.format(hours, "hour");
-    }
-    return rtf.format(Math.round(hours / 24), "day");
-}
 
 // The body of the Runs drawer: everything about your own performances of a piece in one
 // place — a top action to share your last run as a ghost (available the moment you've

@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
+import { formatAgo } from "../../lib/relativeTime";
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import type React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Composition } from "../../../core/composition";
 import type { Take } from "../../../core/takes";
 import { renderWithServices } from "../../testing/renderWithServices";
-import { formatAgo, TakesPanel } from "./takesPanel";
+import { TakesPanel } from "./takesPanel";
 
 // The panel probes the video exporter on mount; a fake keeps jsdom from pulling
 // the real encoder chunk, whose late dynamic import outlives the test teardown.

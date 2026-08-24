@@ -15,6 +15,7 @@
 // Pure: the XML codec arrives as a parameter, so this runs identically in the browser,
 // in the Node tooling that bakes the catalogue, and in tests.
 
+import { textOf } from "./musicxmlDom";
 import type { XmlCodec } from "./xml";
 
 // A letter's index within its octave, C through B — the diatonic ladder a staff draws.
@@ -56,10 +57,6 @@ export const INCIPIT_NOTES = 8;
 // recognises, so the mark runs on into the phrase — but it stops well short of the first
 // page, because an opening is what identifies a work and a page is what plays it.
 const INCIPIT_BARS = 4;
-
-function textOf(parent: Element, tag: string): string {
-    return parent.getElementsByTagName(tag)[0]?.textContent?.trim() ?? "";
-}
 
 // The clef of the part's first staff, defaulting to treble — a piano part that omits
 // its clef is being read at the top, which is where the melody lives.

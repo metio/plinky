@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { child, numberOf, text } from "./musicxmlDom";
 import { SEMITONE } from "./notes";
 
 // Reading the music out of a MusicXML document, rather than out of the engraver.
@@ -188,16 +189,6 @@ export type XmlBar = {
     beats: number;
     beatType: number;
 };
-
-const text = (element: Element | null | undefined): string => element?.textContent?.trim() ?? "";
-
-const numberOf = (element: Element | null | undefined, fallback: number): number => {
-    const value = Number(text(element));
-    return Number.isFinite(value) ? value : fallback;
-};
-
-const child = (parent: Element, name: string): Element | null =>
-    parent.getElementsByTagName(name)[0] ?? null;
 
 // A note's sounding pitch. MusicXML writes the letter, the octave and any alteration
 // separately, and octave 4 is the one middle C sits in.

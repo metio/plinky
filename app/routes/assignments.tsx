@@ -16,17 +16,16 @@ import {
 } from "../components/features/assignmentCard";
 import { AssignmentBuilder, type PoolItem } from "../components/features/assignmentBuilder";
 import {
-    type Assignment,
     availableItemCount,
     decodeAssignmentLink,
     encodeAssignmentLink,
-    makeAssignment,
     missingAssignmentIds,
-    newAssignmentId,
     parseAssignment,
     pruneAssignment,
     serializeAssignment,
     slugifyName,
+    type Assignment,
+    withFreeId,
 } from "../../core/assignment";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { useAssignmentDraft } from "../hooks/useAssignmentDraft";
@@ -229,10 +228,10 @@ export default function AssignmentsRoute() {
     // Re-id an imported assignment so it can't overwrite one already saved under the
     // same name, then store it and surface it in the list.
     const importAssignment = (assignment: Assignment) => {
-        const existing = assignmentsStore.list().map((entry) => entry.id);
-        const stored = existing.includes(assignment.id)
-            ? makeAssignment({ ...assignment, id: newAssignmentId(assignment.name, existing) })
-            : assignment;
+        const stored = withFreeId(
+            assignment,
+            assignmentsStore.list().map((entry) => entry.id),
+        );
         if (assignmentsStore.save(stored)) {
             refresh();
             // With the sources loaded, an import whose pieces don't all resolve says

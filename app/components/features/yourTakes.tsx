@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { formatAgo } from "../../lib/relativeTime";
 import { useEffect, useState } from "react";
 import { usePrefs } from "../../hooks/usePrefs";
 import type { Take } from "../../../core/takes";
@@ -11,7 +12,6 @@ import { getLocale } from "../../paraglide/runtime.js";
 import { linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
-import { formatAgo } from "./takesPanel";
 
 // Every piece you have recorded yourself playing, newest first.
 //

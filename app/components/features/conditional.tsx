@@ -92,9 +92,11 @@ export function Midi({
     children: Renderable;
     fallback?: Renderable;
 }) {
-    const { support, status, devices } = useMidiConnection();
-    const isConnected =
-        status === "ready" && devices.some((device) => device.state === "connected");
+    const { support } = useMidiConnection();
+    // The same question useMidiConnected answers, asked through it rather than restated:
+    // "an instrument is ready" is one rule, and a second copy of it here is a copy that can
+    // start disagreeing with the badge in the header.
+    const isConnected = useMidiConnected();
     const active =
         (connected && isConnected) ||
         (disconnected && !isConnected) ||

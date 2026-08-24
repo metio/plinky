@@ -3,17 +3,16 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    MAX_DESCRIPTION_LENGTH,
+    MAX_ITEMS,
+    MAX_TEMPO,
+    MIN_TEMPO,
     addItem,
-    type Assignment,
     assignmentsReferencing,
     availableItemCount,
     decodeAssignmentLink,
     encodeAssignmentLink,
     makeAssignment,
-    MAX_DESCRIPTION_LENGTH,
-    MAX_ITEMS,
-    MAX_TEMPO,
-    MIN_TEMPO,
     missingAssignmentIds,
     moveItem,
     newAssignmentId,
@@ -22,6 +21,8 @@ import {
     pruneAssignment,
     removeItem,
     serializeAssignment,
+    type Assignment,
+    withFreeId,
     withItemNote,
     withItemTempo,
 } from "./assignment";
@@ -446,5 +447,27 @@ describe("a set worked toward a date", () => {
             items: [{ id: "a" }],
         });
         expect(parseAssignment(legacy).dueOn).toBeUndefined();
+    });
+});
+
+describe("withFreeId", () => {
+    const week3 = makeAssignment({ name: "Week 3", items: [] });
+
+    it("leaves an assignment alone when its id is free", () => {
+        expect(withFreeId(week3, ["something-else"])).toBe(week3);
+    });
+
+    it("re-identifies rather than overwriting what is already saved", () => {
+        // Two teachers both call an assignment "Week 3", so both derive the same id. An
+        // import that saved straight through would replace the one already on the device.
+        const imported = withFreeId(week3, [week3.id]);
+        expect(imported.id).not.toBe(week3.id);
+        expect(imported.name).toBe("Week 3");
+    });
+
+    it("keeps re-identifying when the re-identified id is taken too", () => {
+        const once = withFreeId(week3, [week3.id]);
+        const twice = withFreeId(week3, [week3.id, once.id]);
+        expect(new Set([week3.id, once.id, twice.id]).size).toBe(3);
     });
 });
