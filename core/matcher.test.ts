@@ -4,15 +4,17 @@
 import type { Hand2 } from "./matcher";
 import { describe, expect, it } from "vitest";
 import {
-    type ClearedEvent,
+    askedFor,
     currentBar,
     expectedPitches,
-    type MatchStep,
-    matchNote,
     isPracticedHand,
+    matchNote,
+    staffArrivals,
     staffFor,
     startMatch,
     stepRange,
+    type ClearedEvent,
+    type MatchStep,
     upcomingSteps,
 } from "./matcher";
 import { GRAND_STAFF, partsOf } from "./parts";
@@ -390,5 +392,54 @@ describe("a score whose piano is not the first instrument", () => {
         expect(isPracticedHand(0, "both", song)).toBe(false);
         expect(isPracticedHand(1, "both", song)).toBe(true);
         expect(isPracticedHand(2, "both", song)).toBe(true);
+    });
+});
+
+describe("askedFor", () => {
+    // Index-aligned with the pitches the PLAYER struck, not with the step's own order —
+    // a chord is cleared in whatever order the hands find it.
+    const step = {
+        pitches: [60, 64, 67],
+        expected: [
+            { velocity: 80, holdMs: 400, writtenHoldMs: 500 },
+            { velocity: 90, holdMs: 200, writtenHoldMs: 250 },
+            null,
+        ],
+    } as unknown as MatchStep;
+
+    it("reads each struck pitch's own expectation, in the order it was struck", () => {
+        const read = askedFor({ step, playedPitches: [64, 60] }, 1);
+        expect(read.expectedVelocities).toEqual([90, 80]);
+        expect(read.expectedHoldsMs).toEqual([200, 400]);
+        expect(read.writtenHoldsMs).toEqual([250, 500]);
+    });
+
+    it("divides the holds by the tempo ratio, because a slower run holds longer", () => {
+        const read = askedFor({ step, playedPitches: [60] }, 2);
+        expect(read.expectedHoldsMs).toEqual([200]);
+        expect(read.writtenHoldsMs).toEqual([250]);
+    });
+
+    it("reports no expectation for a pitch the step never asked for", () => {
+        // Forgiving mode lets a pitch through with nothing matched to it; the expressive
+        // reading has to skip it rather than score it against a neighbour's mark.
+        const read = askedFor({ step, playedPitches: [67, 61] }, 1);
+        expect(read.expectedVelocities).toEqual([null, null]);
+        expect(read.expectedHoldsMs).toEqual([0, 0]);
+    });
+});
+
+describe("staffArrivals", () => {
+    const step = { pitches: [48, 52, 72], pitchStaves: [1, 1, 0] } as unknown as MatchStep;
+
+    it("gives each hand its EARLIEST arrival, not its last", () => {
+        // A rolled chord finishes late; the hand's moment is when it struck.
+        const times = staffArrivals({ step, playedPitches: [48, 52, 72], arrivals: [10, 45, 12] });
+        expect(times).toEqual({ 1: 10, 0: 12 });
+    });
+
+    it("skips a pitch with no arrival rather than counting it as zero", () => {
+        const times = staffArrivals({ step, playedPitches: [48, 52], arrivals: [] });
+        expect(times).toEqual({});
     });
 });

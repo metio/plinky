@@ -7,21 +7,14 @@ import { DEFAULT_THEME } from "../../../core/keyboardTheme";
 import { spokenPitch } from "../../../core/midi";
 import { keyLabelOf } from "../../../core/notes";
 import type { NoteLabels } from "../../../core/prefs";
+import { isWhite, keybedMaxWidthPx, whiteKeys } from "../../../core/keyboardGeometry";
 import { m } from "../../paraglide/messages.js";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 
-const WHITE_PITCH_CLASSES = [0, 2, 4, 5, 7, 9, 11];
-function isWhite(note: number): boolean {
-    return WHITE_PITCH_CLASSES.includes(((note % 12) + 12) % 12);
-}
-
-// The widest a white key is allowed to grow. The keys divide the container width
-// evenly (flex-1), so on a wide surface a few-key piece would otherwise stretch each
-// key squat and unpiano-like. Capping the keyboard to this per white key — and
-// centring it — keeps keys near the tall ~1:3 proportion of a real keyboard (the well
-// is ~144px tall) however few notes a piece spans, matching the exported video's look.
-// A narrow phone stays under the cap, so its keys fill the width as before.
-const MAX_WHITE_KEY_PX = 44;
+// What a pointer calls itself when it sounds and silences a note. One name, because a
+// note is released by the source that sounded it: the two spelling it differently is the
+// shape of a key left sounding forever.
+const pointerSource = (pointerId: number) => `p${pointerId}`;
 
 // A tap's loudness from where the key is struck: near the pivot (top) is soft, near the
 // tip (bottom) is loud, like the leverage of a real key. Clamped to a musical range.
@@ -158,7 +151,7 @@ export function Keyboard({
     for (let note = from; note <= to; note++) {
         notes.push(note);
     }
-    const whites = notes.filter(isWhite);
+    const whites = whiteKeys(from, to);
     const blacks = notes.filter((note) => !isWhite(note));
     // Guard against a range with no white keys (a degenerate single-black span):
     // dividing by zero would make every black key's left/width Infinity.
@@ -166,7 +159,7 @@ export function Keyboard({
     // Cap the keyboard so keys can't stretch past a tall proportion, then centre it. The
     // black keys are positioned as a percentage of this same container, so capping the
     // container (rather than the white keys alone) keeps white and black keys aligned.
-    const maxWidth = whites.length ? whites.length * MAX_WHITE_KEY_PX : undefined;
+    const maxWidth = whites.length ? keybedMaxWidthPx(from, to) : undefined;
 
     const keysRef = useRef<HTMLDivElement>(null);
     // The one key in the tab order (roving tabindex): Tab reaches the keybed once, then
@@ -269,7 +262,6 @@ export function Keyboard({
         return Math.round(MIN_TAP_VELOCITY + frac * (MAX_TAP_VELOCITY - MIN_TAP_VELOCITY));
     };
 
-    const pointerSource = (pointerId: number) => `p${pointerId}`;
     // Move a pointer onto a note: release the one it was sounding, sound the new one.
     // Same note (a hit-test that didn't cross a key boundary) is a no-op, so a plain
     // tap sounds exactly once and a glide sounds each key it crosses exactly once. A null
@@ -332,7 +324,7 @@ export function Keyboard({
         (pointerId: number) => {
             const prev = pointerNote.current.get(pointerId);
             if (prev !== undefined) {
-                silence(`p${pointerId}`, prev);
+                silence(pointerSource(pointerId), prev);
                 pointerNote.current.delete(pointerId);
             }
             activePointers.current.delete(pointerId);

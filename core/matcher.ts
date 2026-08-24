@@ -364,3 +364,55 @@ export function matchNote(
         events,
     };
 }
+
+// The two readings a finished position gives up, both pure functions of the step and the
+// pitches actually struck. They lived in the hook that calls them, where testing either one
+// meant standing up an engraver and a React tree; here a test is a step and two arrays.
+
+// What the score asked of each pitch the player actually struck, index-aligned with the
+// event's `playedPitches` rather than with the step's own order — the two differ, because
+// a chord is cleared in whatever order the hands find it.
+//
+// A pitch with no expectation of its own (nothing matched it in the step, which forgiving
+// mode can produce) reports none, and the expressive reading skips it rather than scoring
+// it against a neighbour's mark.
+export function askedFor(
+    event: { step: MatchStep; playedPitches: number[] },
+    ratio: number,
+): {
+    expectedVelocities: (number | null)[];
+    expectedHoldsMs: number[];
+    writtenHoldsMs: number[];
+} {
+    const expectedVelocities: (number | null)[] = [];
+    const expectedHoldsMs: number[] = [];
+    const writtenHoldsMs: number[] = [];
+    for (const pitch of event.playedPitches) {
+        const asked = event.step.expected?.[event.step.pitches.indexOf(pitch)];
+        expectedVelocities.push(asked?.velocity ?? null);
+        expectedHoldsMs.push(asked ? asked.holdMs / ratio : 0);
+        writtenHoldsMs.push(asked ? asked.writtenHoldMs / ratio : 0);
+    }
+    return { expectedVelocities, expectedHoldsMs, writtenHoldsMs };
+}
+
+// When each hand got to this position: the EARLIEST arrival among the pitches that
+// staff owns, because a hand's moment is when it struck rather than when it finished a
+// rolled chord.
+export function staffArrivals(event: {
+    step: MatchStep;
+    playedPitches: number[];
+    arrivals: number[];
+}): Record<number, number> {
+    const times: Record<number, number> = {};
+    for (const [index, pitch] of event.playedPitches.entries()) {
+        const at = event.arrivals[index];
+        if (at === undefined) {
+            continue;
+        }
+        const note = event.step.pitches.indexOf(pitch);
+        const staff = event.step.pitchStaves[note] ?? 0;
+        times[staff] = Math.min(times[staff] ?? at, at);
+    }
+    return times;
+}

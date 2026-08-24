@@ -55,8 +55,10 @@ import {
     type MatchStep,
     matchNote,
     isPracticedHand,
+    askedFor,
     startMatch,
     stepRange,
+    staffArrivals,
     type UpcomingStep,
     upcomingSteps,
 } from "../../core/matcher";
@@ -214,7 +216,7 @@ function stepsAtCursor(
             pitchStaves,
             pitchHands,
             staves: [...new Set(pitchStaves)].sort((a, b) => a - b),
-            whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+            whole,
             holdQuarters,
             expected,
             graceQuarters,
@@ -222,7 +224,7 @@ function stepsAtCursor(
     }
 
     return {
-        whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+        whole,
         // The SHORTEST written length here, rests included — the gap to the next onset,
         // the same measure playback advances the cursor by. Only the repeat arithmetic
         // reads it, and only where the printed onsets jump.
@@ -235,54 +237,6 @@ function stepsAtCursor(
         stretch: fermata ? FERMATA_STRETCH : 1,
         groups,
     };
-}
-
-// What the score asked of each pitch the player actually struck, index-aligned with the
-// event's `playedPitches` rather than with the step's own order — the two differ, because
-// a chord is cleared in whatever order the hands find it.
-//
-// A pitch with no expectation of its own (nothing matched it in the step, which forgiving
-// mode can produce) reports none, and the expressive reading skips it rather than scoring
-// it against a neighbour's mark.
-function askedFor(
-    event: { step: MatchStep; playedPitches: number[] },
-    ratio: number,
-): {
-    expectedVelocities: (number | null)[];
-    expectedHoldsMs: number[];
-    writtenHoldsMs: number[];
-} {
-    const expectedVelocities: (number | null)[] = [];
-    const expectedHoldsMs: number[] = [];
-    const writtenHoldsMs: number[] = [];
-    for (const pitch of event.playedPitches) {
-        const asked = event.step.expected?.[event.step.pitches.indexOf(pitch)];
-        expectedVelocities.push(asked?.velocity ?? null);
-        expectedHoldsMs.push(asked ? asked.holdMs / ratio : 0);
-        writtenHoldsMs.push(asked ? asked.writtenHoldMs / ratio : 0);
-    }
-    return { expectedVelocities, expectedHoldsMs, writtenHoldsMs };
-}
-
-// When each hand got to this position: the EARLIEST arrival among the pitches that
-// staff owns, because a hand's moment is when it struck rather than when it finished a
-// rolled chord.
-function staffArrivals(event: {
-    step: MatchStep;
-    playedPitches: number[];
-    arrivals: number[];
-}): Record<number, number> {
-    const times: Record<number, number> = {};
-    for (const [index, pitch] of event.playedPitches.entries()) {
-        const at = event.arrivals[index];
-        if (at === undefined) {
-            continue;
-        }
-        const note = event.step.pitches.indexOf(pitch);
-        const staff = event.step.pitchStaves[note] ?? 0;
-        times[staff] = Math.min(times[staff] ?? at, at);
-    }
-    return times;
 }
 
 // Walk the engraved score once and lift it into the pure step model: every

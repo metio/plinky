@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { Link } from "react-router";
 import { m } from "../../paraglide/messages.js";
 import { type Brand, BrandIcon } from "./brandIcons";
 import { HeartIcon } from "./icons";
-import { localizedHref } from "./href";
+import { LocalizedLink as Link } from "./localizedLink";
 
 const CHANNELS: { brand: Brand; label: string; href: string }[] = [
     { brand: "instagram", label: "Instagram", href: "https://www.instagram.com/plinky.piano" },
@@ -36,7 +35,7 @@ export function SiteFooter() {
                         own never did — it sat beside two labelled legal pages as the one
                         thing a curious visitor had to guess at. */}
                     <Link
-                        to={localizedHref("/about")}
+                        to="/about"
                         className="group flex items-center gap-1.5 rounded-md p-1 hover:text-plink focus-visible:ring-2 focus-visible:ring-plink"
                     >
                         <HeartIcon
@@ -50,13 +49,13 @@ export function SiteFooter() {
                 The labels are the German legal terms, kept as-is in every language. */}
                 <div className="flex items-center gap-3 text-sm text-muted">
                     <Link
-                        to={localizedHref("/impressum")}
+                        to="/impressum"
                         className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         Impressum
                     </Link>
                     <Link
-                        to={localizedHref("/datenschutz")}
+                        to="/datenschutz"
                         className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         Datenschutz

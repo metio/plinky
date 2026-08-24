@@ -12,9 +12,13 @@
 // pitch class (folded into 0..11) is one of these.
 export const WHITE_PITCH_CLASSES = [0, 2, 4, 5, 7, 9, 11];
 
-// The widest a white key is allowed to grow. The keybed centres and caps at this
-// per white key so keys keep a piano-like proportion however few notes a piece
-// spans; an overlay aligned to the keys must cap and centre to the same width.
+// The widest a white key is allowed to grow. The keys divide the container width evenly,
+// so on a wide surface a few-key piece would otherwise stretch each one squat and
+// unpiano-like. Capping the keybed to this per white key — and centring it — holds keys
+// near the tall ~1:3 proportion of a real keyboard (the well is ~144px tall) however few
+// notes a piece spans, and matches the exported video's look. A narrow phone stays under
+// the cap, so its keys fill the width. An overlay aligned to the keys must cap and centre
+// to the same width, which is why this is here rather than in the keyboard.
 const MAX_WHITE_KEY_PX = 44;
 
 export function isWhite(note: number): boolean {
