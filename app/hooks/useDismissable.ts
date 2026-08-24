@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import { type RefObject, useEffect, useRef } from "react";
 
 // A menu that closes the way every other menu on every other site closes: press somewhere
@@ -22,8 +23,7 @@ export function useDismissable<T extends HTMLElement>(
     const enclosing = useRef<T | null>(null);
     // Read through a ref so the listeners are attached once per opening rather than
     // re-attached on every render of whatever owns the menu.
-    const closeRef = useRef(close);
-    closeRef.current = close;
+    const closeRef = useLatest(close);
 
     useEffect(() => {
         if (!open) {

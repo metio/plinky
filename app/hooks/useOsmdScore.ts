@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { stripAccompaniment } from "../../core/accompaniment";
@@ -157,8 +158,7 @@ export function useOsmdScore(
     // Read live by the loader: colouring is no longer a reload input, so the value captured
     // when the reload was scheduled could be a toggle or two out of date by the time the
     // engraver arrives.
-    const colorNotesRef = useRef(colorNotes);
-    colorNotesRef.current = colorNotes;
+    const colorNotesRef = useLatest(colorNotes);
     const [ready, setReady] = useState(false);
     // Whether an in-place redraw is under way. A reading toggle changes what is drawn, and
     // redrawing a long piece takes long enough to notice — so the switch reports its new
@@ -178,24 +178,18 @@ export function useOsmdScore(
     // The fingering and follow-cursor toggles are applied to OSMD in place (no reload),
     // so a reload driven by another input must still honour the live value — carried into
     // the render's constructor through a ref.
-    const showFingeringsRef = useRef(showFingerings);
-    showFingeringsRef.current = showFingerings;
-    const scrollFollowRef = useRef(scrollFollow);
-    scrollFollowRef.current = scrollFollow;
+    const showFingeringsRef = useLatest(showFingerings);
+    const scrollFollowRef = useLatest(scrollFollow);
 
     // The coordination callbacks reference transports and state created after this hook;
     // held in refs so the render effects can call the latest without depending on them.
-    const onReloadRef = useRef(onReload);
-    onReloadRef.current = onReload;
-    const onRenderedRef = useRef(onRendered);
-    onRenderedRef.current = onRendered;
+    const onReloadRef = useLatest(onReload);
+    const onRenderedRef = useLatest(onRendered);
     // Read from a ref so asking for a frame never re-creates the redraw callback, which
     // every reading toggle depends on being stable.
     const scheduler = useScheduler();
-    const schedulerRef = useRef(scheduler);
-    schedulerRef.current = scheduler;
-    const onFingeringRedrawRef = useRef(onFingeringRedraw);
-    onFingeringRedrawRef.current = onFingeringRedraw;
+    const schedulerRef = useLatest(scheduler);
+    const onFingeringRedrawRef = useLatest(onFingeringRedraw);
 
     const getOsmd = useCallback(() => osmdRef.current, []);
     const measureBoxes = useCallback(() => measureBoxesRef.current, []);

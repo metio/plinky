@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
@@ -92,8 +93,7 @@ export function useListenPlayback({
     // Through a ref: the walk is set up inside a callback that must not be rebuilt every
     // time a new marks object arrives, and what it needs is whatever is current when a
     // playback actually starts.
-    const marksRef = useRef(marks);
-    marksRef.current = marks;
+    const marksRef = useLatest(marks);
     const [playing, setPlaying] = useState(false);
     // Which notes are sounding at this moment, and in which hand — the on-screen keyboard
     // lights them. Not derived from the step model by the surface, because "now" is a fact

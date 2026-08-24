@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "../hooks/useLatest";
 import {
     createContext,
     useCallback,
@@ -146,8 +147,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     const nextIdRef = useRef(0);
     const subscribersRef = useRef<Set<NoteListener>>(new Set());
     // The latest held notes, read by the window-blur handler to release them all.
-    const heldNotesRef = useRef(heldNotes);
-    heldNotesRef.current = heldNotes;
+    const heldNotesRef = useLatest(heldNotes);
     // The set of input devices currently sounding each held note. A single pitch can be
     // held from more than one source at once — a computer key and a connected piano, an
     // on-screen tap over a MIDI hold — so the funnel reference-counts by source: the note
@@ -418,8 +418,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     );
 
     // The bridge reads state through a ref so it needs no re-attachment per render.
-    const bridgeStateRef = useRef({ support, status, error, devices, heldNotes, octaveOffset });
-    bridgeStateRef.current = { support, status, error, devices, heldNotes, octaveOffset };
+    const bridgeStateRef = useLatest({ support, status, error, devices, heldNotes, octaveOffset });
 
     // Lets browser tests — and the console — inject notes as if from a MIDI
     // device, to drive trainers end to end. Never attached in a production build.
@@ -842,8 +841,7 @@ export function useMidiConnection(): MidiContextValue {
 // the latest callbacks.
 export function useMidiInput(handlers: NoteListener): void {
     const { subscribe } = useMidiConnection();
-    const handlersRef = useRef(handlers);
-    handlersRef.current = handlers;
+    const handlersRef = useLatest(handlers);
 
     useEffect(() => {
         return subscribe({

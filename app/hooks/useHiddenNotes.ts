@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef } from "react";
 import type { Hand } from "../../core/matcher";
@@ -27,8 +28,7 @@ export function useHiddenNotes(
     // — so a re-render that rebuilds the noteheads can restore the exact conceal state
     // rather than leaving every blanked answer exposed.
     const revealedRef = useRef<Map<number, string>>(new Map());
-    const optionsRef = useRef(options);
-    optionsRef.current = options;
+    const optionsRef = useLatest(options);
 
     // Blank the noteheads for a fresh run. A no-op when the mode is off, so the
     // call sites don't branch. Collecting walks (and resets) the cursor, so this

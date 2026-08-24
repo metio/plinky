@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RecordedNote } from "../../core/composition";
 import {
@@ -56,8 +57,7 @@ export function useCompositionRecorder({
     // A checkpoint marks a note count worth keeping; null until one is set.
     const [checkpoint, setCheckpoint] = useState<number | null>(null);
 
-    const callbacksRef = useRef({ onFirstNote, onPitch });
-    callbacksRef.current = { onFirstNote, onPitch };
+    const callbacksRef = useLatest({ onFirstNote, onPitch });
 
     const apply = useCallback((next: RecordingState) => {
         stateRef.current = next;
@@ -155,8 +155,7 @@ export function useCompositionRecorder({
 
     // Read through a ref so the callback stays stable; a state updater must stay
     // pure, and truncating inside one would double-apply under StrictMode.
-    const checkpointRef = useRef(checkpoint);
-    checkpointRef.current = checkpoint;
+    const checkpointRef = useLatest(checkpoint);
     const resetToCheckpoint = useCallback(() => {
         if (checkpointRef.current !== null) {
             apply(truncatedTo(stateRef.current, checkpointRef.current));

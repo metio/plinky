@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useRef } from "react";
 import { type AccompanyVoice, accompanimentForGap } from "../../core/duet";
@@ -44,10 +45,8 @@ export function useDuet({
     const pendingRef = useRef<SchedulerHandle[]>([]);
     // Read live inside the callbacks so a mid-render toggle or hand change takes
     // effect on the next primed run without re-creating them.
-    const enabledRef = useRef(enabled);
-    enabledRef.current = enabled;
-    const handRef = useRef(hand);
-    handRef.current = hand;
+    const enabledRef = useLatest(enabled);
+    const handRef = useLatest(hand);
 
     const cancel = useCallback(() => {
         for (const handle of pendingRef.current) {

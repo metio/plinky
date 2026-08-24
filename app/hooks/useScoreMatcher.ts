@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
 import {
@@ -469,8 +470,7 @@ export function useScoreMatcher(
     const stateRef = useRef<MatcherState | null>(null);
     const wrongSeq = useRef(0);
     const practicingRef = useRef(false);
-    const optionsRef = useRef(options);
-    optionsRef.current = options;
+    const optionsRef = useLatest(options);
     // The tempo is fixed for the duration of a run so that every note's notated
     // time uses one scale. Reading the live tempo instead would let a mid-run
     // slider change rebase later notes against the first note's old tempo and

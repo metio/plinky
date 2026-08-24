@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { beginHold, type Hold, holdFractionsByNote, pruneHolds } from "../../core/holds";
 import { useScheduler } from "../contexts/services";
@@ -21,8 +22,7 @@ export function useHoldIndicator(): {
     clear: () => void;
 } {
     const scheduler = useScheduler();
-    const schedulerRef = useRef(scheduler);
-    schedulerRef.current = scheduler;
+    const schedulerRef = useLatest(scheduler);
 
     const [holdFractions, setHoldFractions] = useState<ReadonlyMap<number, number>>(EMPTY);
     const holdsRef = useRef<Hold[]>([]);

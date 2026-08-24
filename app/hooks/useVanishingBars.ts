@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef } from "react";
 import type { Hand } from "../../core/matcher";
@@ -38,8 +39,7 @@ export function useVanishingBars(
     // noteheads can restore exactly the same vanished bars rather than bringing the
     // whole piece back into view mid-run.
     const goneRef = useRef<Set<number>>(new Set());
-    const optionsRef = useRef(options);
-    optionsRef.current = options;
+    const optionsRef = useLatest(options);
 
     // Take the score's step order for a fresh run. A no-op when the mode is off, so
     // call sites don't branch. Collecting walks (and resets) the cursor, so this runs

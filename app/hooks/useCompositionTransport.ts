@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RecordedNote } from "../../core/composition";
 import { tailMs } from "../../core/recording";
@@ -66,8 +67,7 @@ export function useCompositionTransport({
 
     // Click one bar of lead-in, then hand the downbeat to the recorder so what's
     // played next sits on the grid, appending after any existing tail.
-    const onDownbeatRef = useRef(onDownbeat);
-    onDownbeatRef.current = onDownbeat;
+    const onDownbeatRef = useLatest(onDownbeat);
     // Guarded through a ref, not a state updater — scheduling inside an updater
     // would double-arm under StrictMode.
     const countingInRef = useRef(false);

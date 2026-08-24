@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useRef, useState } from "react";
+import { useLatest } from "./useLatest";
+import { useCallback, useState } from "react";
 import type { Composition } from "../../core/composition";
 import { readScoreFile } from "../../core/musicxmlFile";
 import { parseMusicXml } from "../../core/musicxmlParse";
@@ -24,8 +25,7 @@ export function useComposeFile({ hasWork, onLoad }: ComposeFileOptions) {
     const [error, setError] = useState<string | null>(null);
     const [pendingReplace, setPendingReplace] = useState<Composition | null>(null);
 
-    const optionsRef = useRef({ hasWork, onLoad });
-    optionsRef.current = { hasWork, onLoad };
+    const optionsRef = useLatest({ hasWork, onLoad });
 
     const openFile = useCallback(
         async (file: File | undefined) => {
@@ -73,8 +73,7 @@ export function useComposeFile({ hasWork, onLoad }: ComposeFileOptions) {
 
     // Read through a ref — loading from inside a state updater would double-apply
     // under StrictMode.
-    const pendingRef = useRef(pendingReplace);
-    pendingRef.current = pendingReplace;
+    const pendingRef = useLatest(pendingReplace);
     const confirmReplace = useCallback(() => {
         if (pendingRef.current) {
             optionsRef.current.onLoad(pendingRef.current);

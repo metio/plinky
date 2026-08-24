@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useRef } from "react";
+import { useLatest } from "./useLatest";
+import { useEffect } from "react";
 import { grooveAccents } from "../../core/groove";
 import { audibleGain } from "../../core/loudness";
 import { useAudioEngine, usePrefsStore, useScheduler } from "../contexts/services";
@@ -24,8 +25,7 @@ export function useMetronome(
     // — the Settings-page voice control.
     accent = true,
 ): void {
-    const bpmRef = useRef(bpm);
-    bpmRef.current = bpm;
+    const bpmRef = useLatest(bpm);
     const prefsStore = usePrefsStore();
     const audio = useAudioEngine();
     const scheduler = useScheduler();

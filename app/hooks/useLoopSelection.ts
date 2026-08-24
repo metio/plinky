@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useLatest } from "./useLatest";
 import {
     type Dispatch,
     type RefObject,
@@ -87,10 +88,8 @@ export function useLoopSelection({
     // on-screen keyboard unmounts at a run's end — carries no such press, so it finds this
     // false and builds no loop.
     const armedRef = useRef(false);
-    const canSelectRef = useRef(canSelect);
-    canSelectRef.current = canSelect;
-    const onBareClickRef = useRef(onBareClick);
-    onBareClickRef.current = onBareClick;
+    const canSelectRef = useLatest(canSelect);
+    const onBareClickRef = useLatest(onBareClick);
 
     const read = useCallback(() => loopRef.current, []);
     const arm = useCallback(() => {

@@ -1,6 +1,10 @@
 {
     "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
-    "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
     "files": {
         "includes": [
             "app/**/*.ts",
@@ -24,9 +28,28 @@
             "preset": "recommended",
             "style": {
                 "noNonNullAssertion": "off"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": {
+                    "level": "error",
+                    "options": {
+                        "hooks": [
+                            {
+                                "name": "useLatest",
+                                "stableResult": true
+                            }
+                        ]
+                    }
+                }
             }
         }
     },
-    "javascript": { "formatter": { "quoteStyle": "double" } },
-    "assist": { "enabled": false }
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "double"
+        }
+    },
+    "assist": {
+        "enabled": false
+    }
 }
