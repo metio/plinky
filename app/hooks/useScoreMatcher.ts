@@ -559,6 +559,17 @@ export function useScoreMatcher(
     // cursor position rather than rewinding. The run is graded for what it covers:
     // total and progress count only the positions from here on. The default, 0, starts
     // at note one.
+    // The three views a matcher state has on screen: which bar the cursor is in, which
+    // pitches are expected now, and what the highway shows coming. They are read from the
+    // same state and were written out at each of the three places a state is adopted —
+    // where one of them could quietly be left behind, showing a bar from before the last
+    // note landed.
+    const publish = useCallback((state: MatcherState) => {
+        setBar(currentBar(state));
+        setExpected(expectedPitches(state));
+        setUpcoming(upcomingSteps(state, HIGHWAY_LOOKAHEAD));
+    }, []);
+
     const start = useCallback(
         // `loop` — a 1-based inclusive bar range — overrides the resume point: the run
         // plays only that section and laps it until stopped.
@@ -602,18 +613,16 @@ export function useScoreMatcher(
                 NOMINAL_BPM;
             runHandRef.current = hand;
             practicingRef.current = true;
-            setBar(currentBar(state));
+            publish(state);
             setTotal(steps.length);
             setDone(0);
             setWrong(0);
             setMissedHere(false);
             setComplete(false);
             setRange(stepRange(steps));
-            setExpected(expectedPitches(state));
-            setUpcoming(upcomingSteps(state, HIGHWAY_LOOKAHEAD));
             setPracticing(true);
         },
-        [getOsmd],
+        [getOsmd, publish],
     );
 
     const registerNote = useCallback(
@@ -687,14 +696,10 @@ export function useScoreMatcher(
                 seekCursorTo(osmd, runHandRef.current, runStepsRef.current[0]!.whole);
                 setDone(0);
                 setMissedHere(false);
-                setBar(currentBar(fresh));
-                setExpected(expectedPitches(fresh));
-                setUpcoming(upcomingSteps(fresh, HIGHWAY_LOOKAHEAD));
+                publish(fresh);
                 return;
             }
-            setBar(currentBar(next));
-            setExpected(expectedPitches(next));
-            setUpcoming(upcomingSteps(next, HIGHWAY_LOOKAHEAD));
+            publish(next);
             if (next.complete) {
                 osmd.cursor.hide();
                 practicingRef.current = false;
@@ -702,7 +707,7 @@ export function useScoreMatcher(
                 setPracticing(false);
             }
         },
-        [getOsmd, dialRatio],
+        [getOsmd, dialRatio, publish],
     );
 
     return {

@@ -52,14 +52,21 @@ export function useSightRead(saved: AidPrefs): SightRead {
     const tickRef = useRef<number | null>(null);
     const runRef = useRef(0);
 
-    const cancel = useCallback(() => {
-        runRef.current++;
+    // Stop the count and take it off screen. Both the caller cancelling and the count
+    // reaching zero end the same way; a copy of this that forgot to null the handle would
+    // leave a cancelled timer looking live.
+    const stopTicking = useCallback(() => {
         if (tickRef.current !== null) {
             scheduler.cancel(tickRef.current);
             tickRef.current = null;
         }
         setCountdown(null);
     }, [scheduler]);
+
+    const cancel = useCallback(() => {
+        runRef.current++;
+        stopTicking();
+    }, [stopTicking]);
 
     // Leaving the mode, or unmounting mid-countdown, must not strand a countdown on
     // screen or leave a timer running against a gone component.
@@ -85,16 +92,12 @@ export function useSightRead(saved: AidPrefs): SightRead {
                 const left = studyRemaining(scheduler.now() - startedAt, studySeconds);
                 setCountdown(left);
                 if (left <= 0) {
-                    if (tickRef.current !== null) {
-                        scheduler.cancel(tickRef.current);
-                        tickRef.current = null;
-                    }
-                    setCountdown(null);
+                    stopTicking();
                     resolve();
                 }
             });
         });
-    }, [on, studySeconds, scheduler]);
+    }, [on, studySeconds, scheduler, stopTicking]);
 
     return {
         on,
