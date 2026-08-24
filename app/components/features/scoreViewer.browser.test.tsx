@@ -1619,6 +1619,45 @@ describe("lighted keyboard", () => {
     });
 });
 
+describe("the overlay survives a resize", () => {
+    it("repaints the loop's bars when OSMD re-renders itself", async () => {
+        // OSMD is created with autoResize, so it re-renders on a window resize by ITSELF,
+        // replacing the whole <svg> and taking every overlay drawn on it. Nothing told the
+        // app that had happened, so the loop kept its state and silently lost its red bars.
+        //
+        // Invisible on a desktop — a mouse never resizes anything — and constant on a phone,
+        // where scrolling collapses the URL bar and that IS a resize.
+        const grand = generateDrill(
+            { ...DEFAULT_DRILL, bars: 4, beatsPerBar: 4, hands: 2, low: 60, high: 79 },
+            () => 0.5,
+        );
+        mount(grand, { beatsPerBar: 4, options: { loop: { from: 1, to: 2 } } });
+        await awaitReady();
+        const painted = () => document.querySelectorAll(".plinky-bar-selection").length;
+        await expect.poll(painted, { timeout: 30000 }).toBeGreaterThan(0);
+
+        // What OSMD's own resize render does to us, done by hand: the overlay is wiped and
+        // the container's children are replaced. A plain resize event is not enough to
+        // provoke it here — OSMD only re-renders when the container's width actually
+        // changed — and a test that fires one proves nothing, which is what the first
+        // version of this test did.
+        // The observed element is the score container itself — the one OSMD renders into,
+        // labelled with the piece's title.
+        const container = document.querySelector('[aria-label="T"]');
+        expect(container).toBeTruthy();
+        for (const rect of document.querySelectorAll(".plinky-bar-selection")) {
+            rect.remove();
+        }
+        expect(painted()).toBe(0);
+        // Replace a child, exactly the shape of mutation OSMD's render makes.
+        const throwaway = document.createElement("span");
+        container?.appendChild(throwaway);
+        throwaway.remove();
+
+        await expect.poll(painted, { timeout: 30000 }).toBeGreaterThan(0);
+    });
+});
+
 describe("what a link asks for", () => {
     // The suggestions on Ways to practise hand over the control that does the thing rather
     // than describing it, which only works if the address actually reaches the controls.

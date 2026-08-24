@@ -489,6 +489,39 @@ export function useOsmdScore(
     // reclaimed space when switching off. updateGraphic() rebuilds the graphic model from
     // the parsed sheet, so the labels are created afresh per the rule — all when on, none
     // when off.
+    // OSMD re-renders itself when the window resizes — `autoResize: true` above installs its
+    // own listener — and that render replaces the whole <svg>, taking every overlay Plinky
+    // has drawn on it with it: the loop's red bars, the difficulty heat map, the note paint.
+    //
+    // Nothing told us it had happened. renderVersion is bumped by OUR relayout path, so the
+    // overlays were repainted only when we were the ones who redrew. On a desktop that is
+    // invisible, because a mouse never resizes anything. On a phone it happens constantly:
+    // scrolling collapses the browser's URL bar, which IS a resize, so the loop somebody had
+    // set simply lost its red bars while staying on — the state was right and the picture
+    // was not.
+    //
+    // Watching the container for a replaced child is the narrow test for exactly that. The
+    // observer deliberately does NOT watch the subtree: painting an overlay adds children to
+    // the <svg>, which would otherwise wake it and repaint forever.
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!ready || !container || typeof MutationObserver !== "function") {
+            return;
+        }
+        const observer = new MutationObserver(() => {
+            const osmd = osmdRef.current;
+            const svg = scoreSvg(container);
+            if (!osmd || !svg) {
+                return;
+            }
+            // The bars have moved, so the boxes an overlay is drawn from are stale too.
+            measureBoxesRef.current = collectMeasureBoxes(osmd, svg);
+            setRenderVersion((version) => version + 1);
+        });
+        observer.observe(container, { childList: true });
+        return () => observer.disconnect();
+    }, [ready, containerRef]);
+
     useEffect(() => {
         const rules = (osmdRef.current as unknown as { rules?: { RenderFingerings: boolean } })
             ?.rules;

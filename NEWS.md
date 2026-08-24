@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Looped bars keep their red shading on a phone.** Scrolling a piece with a loop set
+would quietly take the red away — the loop was still on and still playing the right
+bars, but you could no longer see which ones. It stays put now, however much you
+scroll or turn the phone.
+
 **A link without a language in it now opens the page you asked for.** Every page in
 Plinky lives under a language — `/en/`, `/de/` — and an address typed or shared
 without one used to go astray: `/music` landed on the home page, and a link to a
