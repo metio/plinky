@@ -3,7 +3,7 @@
 
 import { Button } from "../components/ui/button";
 import { linkClasses } from "../components/ui/classes";
-import { ChoiceField, SwitchField } from "../components/ui/fields";
+import { ChoiceField, SliderField, SwitchField } from "../components/ui/fields";
 import {
     BookIcon,
     FingersIcon,
@@ -148,39 +148,19 @@ export default function Settings() {
                 <FeatureBoundary feature="GrandPianoSetting">
                     <GrandPianoSetting />
                 </FeatureBoundary>
-                {/* Wraps, and the slider gives up its width first: a label, a slider, a
-                    reading and a button do not fit across a 320px phone in one line, and
-                    the slider is the only one of the four that is still itself when it is
-                    narrower. */}
-                <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-sm text-body">{m.settings_volume()}</span>
-                    <input
-                        type="range"
-                        className="min-w-24 flex-1"
-                        aria-label={m.settings_volume()}
-                        min={0}
-                        max={100}
-                        value={prefs.volume}
-                        disabled={!prefs.sound}
-                        onChange={(event) => update({ volume: Number(event.target.value) })}
-                    />
-                    <span className="w-8 font-mono text-sm tabular-nums">{prefs.volume}</span>
-                </div>
+                <SliderField
+                    label={m.settings_volume()}
+                    value={prefs.volume}
+                    disabled={!prefs.sound}
+                    onChange={(volume) => update({ volume })}
+                />
                 <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-sm text-body">{m.settings_reverb()}</span>
-                        <input
-                            type="range"
-                            className="min-w-24 flex-1"
-                            aria-label={m.settings_reverb()}
-                            min={0}
-                            max={100}
-                            value={prefs.reverb}
-                            disabled={!prefs.sound}
-                            onChange={(event) => update({ reverb: Number(event.target.value) })}
-                        />
-                        <span className="w-8 font-mono text-sm tabular-nums">{prefs.reverb}</span>
-                    </div>
+                    <SliderField
+                        label={m.settings_reverb()}
+                        value={prefs.reverb}
+                        disabled={!prefs.sound}
+                        onChange={(reverb) => update({ reverb })}
+                    />
                     <p className="text-xs text-muted">{m.settings_reverb_hint()}</p>
                 </div>
                 {/* Below both sliders rather than beside one of them: a test note sounds at

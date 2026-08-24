@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type ReactNode, useState } from "react";
-import { toMidiNotes } from "../../../core/composition";
-import { buildMidiFile } from "../../../core/midiFile";
+import { midiFileFor } from "../../../core/composition";
 import { parseMusicXml } from "../../../core/musicxmlParse";
 import { transposeMusicXml } from "../../../core/transpose";
 import { usePrefsStore, useXmlCodec } from "../../contexts/services";
 import { useDismissable } from "../../hooks/useDismissable";
-import { downloadBlob } from "../../lib/download";
+import { downloadMidi, downloadMusicXml } from "../../lib/download";
 import { annotateFingerings } from "../../lib/fingerScore";
 import { buildPrintDocument, fileStem, printViaIframe } from "../../lib/printScore";
 import { m } from "../../paraglide/messages.js";
@@ -45,22 +44,11 @@ export function ExportMenu({
         if (!composition) {
             return;
         }
-        downloadBlob(
-            buildMidiFile(toMidiNotes(composition), {
-                tempo: composition.tempo,
-                beatsPerBar: composition.beatsPerBar,
-            }),
-            "audio/midi",
-            `${fileStem(title)}.mid`,
-        );
+        downloadMidi(midiFileFor(composition), fileStem(title));
     };
 
     const exportMusicXml = () => {
-        downloadBlob(
-            transposed(),
-            "application/vnd.recordare.musicxml+xml",
-            `${fileStem(title)}.musicxml`,
-        );
+        downloadMusicXml(transposed(), fileStem(title));
     };
 
     // Prints by rendering its own off-screen staff from the MusicXML — with

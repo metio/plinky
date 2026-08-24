@@ -14,3 +14,17 @@ export function downloadBlob(data: BlobPart, type: string, filename: string): vo
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 0);
 }
+
+// The two score formats an export can produce, each naming its media type and its extension
+// in one place.
+//
+// They travel together on purpose: a .mid written with the MusicXML media type, or a
+// .musicxml written as audio/midi, is a file the operating system hands to the wrong
+// application — and nothing in the app would notice, because the download itself succeeds.
+export function downloadMidi(data: BlobPart, stem: string): void {
+    downloadBlob(data, "audio/midi", `${stem}.mid`);
+}
+
+export function downloadMusicXml(xml: BlobPart, stem: string): void {
+    downloadBlob(xml, "application/vnd.recordare.musicxml+xml", `${stem}.musicxml`);
+}

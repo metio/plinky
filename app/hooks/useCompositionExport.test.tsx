@@ -9,9 +9,19 @@ import { parseMidiFile } from "../../core/midiParse";
 import { useCompositionExport } from "./useCompositionExport";
 
 const downloads: { mime: string; filename: string; data: Uint8Array | string }[] = [];
+// The mock keeps the real media types and extensions, so the assertions below still pin
+// what actually reaches the browser rather than what the hook meant to send.
 vi.mock("../lib/download", () => ({
     downloadBlob: (data: Uint8Array | string, mime: string, filename: string) =>
         downloads.push({ data, mime, filename }),
+    downloadMidi: (data: Uint8Array | string, stem: string) =>
+        downloads.push({ data, mime: "audio/midi", filename: `${stem}.mid` }),
+    downloadMusicXml: (data: Uint8Array | string, stem: string) =>
+        downloads.push({
+            data,
+            mime: "application/vnd.recordare.musicxml+xml",
+            filename: `${stem}.musicxml`,
+        }),
 }));
 
 const COMPOSITION: Composition = {

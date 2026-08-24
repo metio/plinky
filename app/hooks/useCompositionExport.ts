@@ -3,13 +3,12 @@
 
 import { useCallback } from "react";
 import {
-    type Composition,
     encodeComposition,
-    toMidiNotes,
+    midiFileFor,
     toMusicXml,
+    type Composition,
 } from "../../core/composition";
-import { buildMidiFile } from "../../core/midiFile";
-import { downloadBlob } from "../lib/download";
+import { downloadMidi as saveMidi, downloadMusicXml as saveMusicXml } from "../lib/download";
 import { fileStem } from "../lib/printScore";
 import { useCopied } from "./useCopied";
 import { localizedHref } from "../components/ui/href";
@@ -34,16 +33,11 @@ export function useCompositionExport(composition: Composition, title: string) {
     }, [composition, flashCopied]);
 
     const downloadMidi = useCallback(() => {
-        const data = buildMidiFile(toMidiNotes(composition), {
-            tempo: composition.tempo,
-            beatsPerBar: composition.beatsPerBar,
-        });
-        downloadBlob(data, "audio/midi", `${fileStem(title)}.mid`);
+        saveMidi(midiFileFor(composition), fileStem(title));
     }, [composition, title]);
 
     const downloadMusicXml = useCallback(() => {
-        const xml = toMusicXml(composition, { title });
-        downloadBlob(xml, "application/vnd.recordare.musicxml+xml", `${fileStem(title)}.musicxml`);
+        saveMusicXml(toMusicXml(composition, { title }), fileStem(title));
     }, [composition, title]);
 
     return { copied: copied !== null, share, downloadMidi, downloadMusicXml };

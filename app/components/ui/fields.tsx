@@ -64,3 +64,38 @@ export function SwitchField({
         </div>
     );
 }
+
+// A labelled 0–100 slider with its reading beside it.
+//
+// It wraps, and the slider gives up its width first: a label, a slider and a reading do not
+// fit across a 320px phone in one line, and the slider is the only one of the three that is
+// still itself when it is narrower. The reading has a fixed width and tabular figures so it
+// does not shuffle the row as the number changes.
+export function SliderField({
+    label,
+    value,
+    onChange,
+    disabled = false,
+}: {
+    label: string;
+    value: number;
+    onChange: (value: number) => void;
+    disabled?: boolean;
+}) {
+    return (
+        <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm text-body">{label}</span>
+            <input
+                type="range"
+                className="min-w-24 flex-1"
+                aria-label={label}
+                min={0}
+                max={100}
+                value={value}
+                disabled={disabled}
+                onChange={(event) => onChange(Number(event.target.value))}
+            />
+            <span className="w-8 font-mono text-sm tabular-nums">{value}</span>
+        </div>
+    );
+}

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { escapeXmlText } from "./xmlText";
-import type { MidiNote } from "./midiFile";
+import { buildMidiFile, type MidiNote } from "./midiFile";
 import { cleanBeatsPerBar } from "./meter";
 import { packToCode, unpackFromCode } from "./shareCode";
 
@@ -521,4 +521,13 @@ ${measures.join("\n")}
   </part>
 </score-partwise>
 `;
+}
+
+// A composition as a playable MIDI file. Two steps that are always taken together — the
+// notes, then the file around them, carrying the piece's own tempo and metre.
+export function midiFileFor(composition: Composition) {
+    return buildMidiFile(toMidiNotes(composition), {
+        tempo: composition.tempo,
+        beatsPerBar: composition.beatsPerBar,
+    });
 }
