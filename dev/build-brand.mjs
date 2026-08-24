@@ -108,6 +108,32 @@ const UI = "font-family:Inter,system-ui,sans-serif";
 
 const browser = await chromium.launch();
 
+// The violet the artwork is actually drawn on, read off the picture itself.
+//
+// The palette's own violet is close to it but not the same value, and "close" is exactly
+// what shows: the moment a platform crops a profile picture to a circle, a ground a shade
+// out from the tile reads as a ring around it. Sampling removes the question.
+async function groundOf(dataUrl) {
+    const page = await browser.newPage();
+    const hex = await page.evaluate(async (src) => {
+        const img = new Image();
+        img.src = src;
+        await img.decode();
+        const n = img.naturalWidth;
+        const canvas = document.createElement("canvas");
+        canvas.width = n;
+        canvas.height = n;
+        const context = canvas.getContext("2d");
+        context.drawImage(img, 0, 0);
+        // A twentieth of the way in, at half height: inside the tile's flat left side, clear
+        // of the rounded corners and of everything drawn on top of it.
+        const [r, g, b] = context.getImageData(Math.round(n * 0.06), Math.round(n / 2), 1, 1).data;
+        return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+    }, dataUrl);
+    await page.close();
+    return hex;
+}
+
 async function shoot(html, { width, height, path, scale = 1, full = false, transparent = false }) {
     const page = await browser.newPage({
         viewport: { width, height },
@@ -245,16 +271,17 @@ await shoot(social(1080, 1350, 78), {
 // beside a comment, where that word is a smear. The keys and the falling note are centred,
 // so a circle takes only the tile's corners — nothing that carries meaning.
 //
-// The ground is INK rather than the mark's own violet. Violet on violet loses the tile's
-// edge entirely: the silhouette that makes the mark read as an icon disappears into the
-// background, which is exactly what a profile picture cannot afford at 56px. Ink is the
-// same near-black violet the app's dark theme stands on, so the tile separates from it
-// while staying inside the palette.
+// The ground is the artwork's OWN violet, sampled from it. An earlier version used ink, to
+// keep the tile's rounded silhouette from dissolving into the background — but that reasoning
+// assumed the picture is shown as a square, and every platform in the table below crops it to
+// a circle. A circle destroys the silhouette regardless, so all the ink could ever do was show
+// as a dark ring at the left and right of the crop, which is what it did.
 //
 // 800 is what YouTube asks for; 512 covers Facebook and Instagram; 256 is Reddit's.
+const iconGround = await groundOf(icon);
 for (const size of [256, 512, 800]) {
     await shoot(
-        `<div style="width:${size}px;height:${size}px;background:${colour.ink};display:flex;align-items:center;justify-content:center">
+        `<div style="width:${size}px;height:${size}px;background:${iconGround};display:flex;align-items:center;justify-content:center">
            <img src="${icon}" alt="" style="width:${Math.round(size * 0.94)}px;height:${Math.round(size * 0.94)}px;display:block">
          </div>`,
         { width: size, height: size, path: `${OUT}/social/profile-square-${size}.png` },
@@ -348,7 +375,7 @@ await shoot(
 // smear over them — so the wordless one is still the recommendation. This exists because
 // the choice is worth being able to see rather than to take on trust.
 await shoot(
-    `<div style="width:256px;height:256px;background:${colour.ink};display:flex;align-items:center;justify-content:center">
+    `<div style="width:256px;height:256px;background:${await groundOf(tileArt)};display:flex;align-items:center;justify-content:center">
        <img src="${tileArt}" alt="" style="width:256px;height:256px;display:block">
      </div>`,
     { width: 256, height: 256, path: `${OUT}/social/reddit-icon-wordmark-256.png` },

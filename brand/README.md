@@ -23,14 +23,14 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 | `palette.png` | Every colour with its role, as a sheet. |
 | `palette.json` | The same, for tools. Hex plus the token each comes from. |
 | `type.png` | The two faces, set as the app sets them. |
-| `social/profile-square-*.png` | The profile picture, at 256 · 512 · 800. Built from the **wordless** icon on ink, because every platform crops this one to a circle and shows it at about 56px beside a comment: a circle cuts through a wordmark, and violet on violet loses the tile's edge. |
+| `social/profile-square-*.png` | The profile picture, at 256 · 512 · 800. Built from the **wordless** icon, because every platform crops this one to a circle and shows it at about 56px beside a comment, and a circle cuts through a wordmark. The ground is the artwork's own violet, sampled from it: a ground even a shade out shows as a ring once the crop is a circle. |
 | `social/open-graph-1200x630.png` | What a shared link unfurls as. |
 | `social/square-1080.png` | A square post. |
 | `social/instagram-portrait-1080x1350.png` | Instagram's tallest feed size — a square crops out of it without loss, and not the other way round. |
 | `social/story-1080x1920.png` | A story or a reel. |
 | `social/facebook-cover-1640x624.png` | A Facebook page cover, at twice its shown size. |
 | `social/reddit-banner-*.png` | Reddit's community banner, desktop 1072×128 and mobile 1080×128. |
-| `social/reddit-icon-wordmark-256.png` | The community icon from the tile that carries the name. It fills the circle where the wordless one leaves ink showing at the edges, and the name blurs below about 50px — pick by which of those matters more to you. |
+| `social/reddit-icon-wordmark-256.png` | The community icon from the tile that carries the name, for anywhere it is shown large enough to read. Below about 50px the name blurs into the keys, which is why `profile-square-256` is still the recommendation. |
 | `social/github-social-1280x640.png` | A repository's social preview: what GitHub, Slack and a chat client unfurl for a link to the code. The one picture shown large enough for the name to sit inside it. |
 | `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
 | `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the mark and nothing else. |
