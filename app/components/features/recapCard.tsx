@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { shareOrCopy } from "../../lib/shareOrCopy";
 import type { MonthlyRecap } from "../../../core/history";
 import { SITE_URL } from "../../../core/site";
 import { useCopied } from "../../hooks/useCopied";
@@ -25,16 +26,12 @@ export function RecapCard({ recap }: { recap: MonthlyRecap }) {
 
     const share = async () => {
         const text = `${heading} 🎹`;
-        try {
-            if (typeof navigator.share === "function") {
-                await navigator.share({ text, url: SITE_URL });
-            } else {
-                await navigator.clipboard?.writeText(`${text} ${SITE_URL}`);
-                flashCopied();
-            }
-        } catch {
-            // A cancelled share or blocked clipboard needs no message.
-        }
+        await shareOrCopy({
+            share: { text, url: SITE_URL },
+            // No page of its own to point at, so the sentence and the site travel together.
+            copy: `${text} ${SITE_URL}`,
+            onCopied: flashCopied,
+        });
     };
 
     return (

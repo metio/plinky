@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { shareOrCopy } from "../lib/shareOrCopy";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button } from "../components/ui/button";
@@ -190,22 +191,16 @@ export default function AssignmentsRoute() {
 
     const onShare = async (assignment: Assignment, buttonKey: string) => {
         const url = shareUrl(assignment);
-        try {
-            if (typeof navigator.share === "function") {
-                await navigator.share({
-                    url,
-                    text: m.assignments_share_boast({ name: assignment.name }),
-                });
-            } else {
-                await navigator.clipboard?.writeText(url);
-                // Confirm on the button itself, reverting after a moment; the status
-                // line repeats it for assistive tech.
+        await shareOrCopy({
+            share: { url, text: m.assignments_share_boast({ name: assignment.name }) },
+            copy: url,
+            // Confirm on the button itself, reverting after a moment; the status line
+            // repeats it for assistive tech.
+            onCopied: () => {
                 flashCopied(buttonKey);
                 setStatus(m.assignments_link_copied());
-            }
-        } catch {
-            // A cancelled share or blocked clipboard needs no message.
-        }
+            },
+        });
     };
 
     const onDelete = (assignment: Assignment) => {

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { shareOrCopy } from "../../lib/shareOrCopy";
 import { encodeGhost } from "../../../core/ghost";
 import { SITE_URL } from "../../../core/site";
 import { useCopied } from "../../hooks/useCopied";
@@ -39,17 +40,11 @@ export function ShareGhostButton({
     const [copied, flashCopied] = useCopied();
     const share = async () => {
         const url = `${SITE_URL}${localizedHref(`/play/${id}`)}?ghost=${encodeGhost(onsets)}`;
-        try {
-            if (typeof navigator.share === "function") {
-                await navigator.share({ url, text: m.ghost_share_boast({ title }) });
-            } else {
-                await navigator.clipboard?.writeText(url);
-                flashCopied();
-            }
-        } catch {
-            // A cancelled share or a blocked clipboard needs no message — and reports
-            // nothing either, so only a landed share counts.
-        }
+        await shareOrCopy({
+            share: { url, text: m.ghost_share_boast({ title }) },
+            copy: url,
+            onCopied: flashCopied,
+        });
     };
     const copiedNote = copied && (
         <span className="text-xs text-ghost-text">{m.takes_link_copied()}</span>
