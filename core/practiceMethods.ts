@@ -25,6 +25,11 @@ export type MethodId =
 
 export type PracticeMethod = {
     id: MethodId;
+    // The note this method sounds when a mouse crosses it. Six of them climb a scale, so
+    // running an eye down the page plays a phrase — the same idea the Learn hub uses, and
+    // the reason to keep the numbers here rather than in the component: they are a tune,
+    // and a tune belongs in one list where somebody can see its shape.
+    note: number;
     // Roughly how long one go at it takes, in minutes — the "dose" that turns a
     // method from an idea into something that fits in tonight's practice.
     minutes: number;
@@ -41,18 +46,18 @@ export const METHODS: PracticeMethod[] = [
     // Bars 1 to 4 rather than "the hard part": nothing here knows which bars are hard, and
     // opening the loop over the first phrase at least starts you inside the control, with
     // the bars adjustable from the bar itself.
-    { id: "chunking", minutes: 10, opens: { loop: { from: 1, to: 4 } } },
+    { id: "chunking", note: 60, minutes: 10, opens: { loop: { from: 1, to: 4 } } },
     // Sixty per cent: slow enough that the notes have time to be chosen, fast enough that
     // the piece is still a piece.
-    { id: "slow", minutes: 10, opens: { speed: 0.6 } },
-    { id: "handsApart", minutes: 10, opens: { hands: "left" } },
+    { id: "slow", note: 62, minutes: 10, opens: { speed: 0.6 } },
+    { id: "handsApart", note: 64, minutes: 10, opens: { hands: "left" } },
     // Its own words are "listen to the phrase, then turn the noteheads blank and find it
     // by ear" — which is the hidden-notes switch on a piece, not the interval drill. It
     // opens the piece plain; the switch is on the surface it opens.
-    { id: "hearingFirst", minutes: 5, opens: {} },
+    { id: "hearingFirst", note: 65, minutes: 5, opens: {} },
     // These two are not about one piece. Mixing them up IS the review session, and coming
     // back later is the queue deciding when — so both point at the page that does it
     // rather than at a piece chosen at random, which would be the opposite of the method.
-    { id: "interleaving", minutes: 15, route: "/review" },
-    { id: "spacing", minutes: 10, route: "/review" },
+    { id: "interleaving", note: 67, minutes: 15, route: "/review" },
+    { id: "spacing", note: 69, minutes: 10, route: "/review" },
 ];

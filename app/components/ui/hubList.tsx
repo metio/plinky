@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
+import { HubCard } from "./hubCard";
 import { LocalizedLink as Link } from "./localizedLink";
 
 export type HubEntry = {
@@ -30,16 +31,13 @@ export function HubList({
         <ul className="space-y-3">
             {entries.map((entry) => (
                 <li key={entry.to}>
-                    <Link
+                    <HubCard
+                        as={Link}
                         to={entry.to}
-                        onPointerEnter={(event) => {
-                            if (event.pointerType === "mouse" && entry.note !== undefined) {
-                                onEnter?.(entry.note);
-                            }
-                        }}
-                        className="group flex items-start gap-4 rounded-xl border border-line bg-raised p-5 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-md"
+                        Icon={entry.Icon}
+                        note={entry.note}
+                        onEnter={onEnter}
                     >
-                        <entry.Icon className="mt-0.5 h-8 w-8 shrink-0 text-accent group-hover:text-accent-strong" />
                         <span className="space-y-1">
                             <span className="block text-lg font-medium text-ink group-hover:text-accent-strong">
                                 {entry.label} →
@@ -48,7 +46,7 @@ export function HubList({
                                 {entry.blurb}
                             </span>
                         </span>
-                    </Link>
+                    </HubCard>
                 </li>
             ))}
         </ul>
