@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Ступені {list}",
     "methods_try": "Спробуйте на п'єсі ступеня {grade}",
     "methods_review": "Почати повторення",
-    "methods_in_plinky": "У Plinky"
+    "methods_in_plinky": "У Plinky",
+    "nav_home": "Головна"
 }

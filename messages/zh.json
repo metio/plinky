@@ -1278,5 +1278,6 @@
     "music_filters_grades": "等级 {list}",
     "methods_try": "在等级 {grade} 的曲子上试试",
     "methods_review": "开始一轮复习",
-    "methods_in_plinky": "在 Plinky 中"
+    "methods_in_plinky": "在 Plinky 中",
+    "nav_home": "首页"
 }

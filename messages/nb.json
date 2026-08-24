@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Trinn {list}",
     "methods_try": "Prøv det på et stykke på trinn {grade}",
     "methods_review": "Start en repetisjonsøkt",
-    "methods_in_plinky": "I Plinky"
+    "methods_in_plinky": "I Plinky",
+    "nav_home": "Start"
 }

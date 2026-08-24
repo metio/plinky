@@ -1278,5 +1278,6 @@
     "music_filters_grades": "등급 {list}",
     "methods_try": "{grade}등급 곡으로 해보기",
     "methods_review": "복습 세션 시작",
-    "methods_in_plinky": "Plinky에서는"
+    "methods_in_plinky": "Plinky에서는",
+    "nav_home": "홈"
 }

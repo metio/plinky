@@ -94,8 +94,13 @@ export function MusicRow({
                                 {canonicalComposer(item.composer)}
                             </Link>
                         ) : (
+                            // Canonicalised here too, not just on the person branch: a
+                            // credit that names a tradition rather than a person still goes
+                            // through the same cleaning, and one that skipped it printed a
+                            // harvested score's "Traditional I think" straight into the
+                            // library.
                             <span className="block truncate text-xs text-muted">
-                                {item.composer}
+                                {canonicalComposer(item.composer)}
                             </span>
                         ))}
                 </span>

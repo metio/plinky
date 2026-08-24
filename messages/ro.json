@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Nivelurile {list}",
     "methods_try": "Încearcă pe o piesă de nivelul {grade}",
     "methods_review": "Începe o sesiune de recapitulare",
-    "methods_in_plinky": "În Plinky"
+    "methods_in_plinky": "În Plinky",
+    "nav_home": "Acasă"
 }

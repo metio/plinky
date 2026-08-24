@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Grades {list}",
     "methods_try": "Try this on a Grade {grade} piece",
     "methods_review": "Start a review session",
-    "methods_in_plinky": "In Plinky"
+    "methods_in_plinky": "In Plinky",
+    "nav_home": "Home"
 }

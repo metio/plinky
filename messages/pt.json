@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Graus {list}",
     "methods_try": "Experimenta numa peça de grau {grade}",
     "methods_review": "Começar uma sessão de revisão",
-    "methods_in_plinky": "No Plinky"
+    "methods_in_plinky": "No Plinky",
+    "nav_home": "Início"
 }

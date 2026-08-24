@@ -147,3 +147,18 @@ describe("MusicRow", () => {
         ).toBe(true);
     });
 });
+
+describe("credits that name a tradition", () => {
+    it("cleans them like any other, rather than printing them raw", () => {
+        // The person branch canonicalised and this one did not, so a harvested score's
+        // "Traditional I think" reached the library list verbatim while the piece's own
+        // page showed it correctly.
+        mount(
+            <ul>
+                <MusicRow item={item({ composer: "Traditional I think" })} {...defaults} />
+            </ul>,
+        );
+        expect(screen.getByText("Traditional")).toBeTruthy();
+        expect(screen.queryByText("Traditional I think")).toBeNull();
+    });
+});

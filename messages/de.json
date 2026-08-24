@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Stufen {list}",
     "methods_try": "Auf einem Stück der Stufe {grade} ausprobieren",
     "methods_review": "Wiederholungsrunde starten",
-    "methods_in_plinky": "In Plinky"
+    "methods_in_plinky": "In Plinky",
+    "nav_home": "Start"
 }

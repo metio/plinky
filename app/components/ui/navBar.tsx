@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useLocation } from "react-router";
 import { withTrailingSlash } from "../../../core/site";
 import { m } from "../../paraglide/messages.js";
-import { BookIcon, GradCapIcon, MicIcon, NotesIcon } from "./icons";
+import { BookIcon, GradCapIcon, HomeIcon, MicIcon, NotesIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
 import { localizedHref } from "./href";
 
@@ -53,25 +53,30 @@ export function BottomNav() {
             className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden print:hidden"
         >
             <ul className="mx-auto flex max-w-3xl">
-                {DESTINATIONS.map(({ to, label, Icon }) => {
-                    const active = isActive(to);
-                    return (
-                        <li key={to} className="min-w-0 flex-1">
-                            <Link
-                                to={to}
-                                aria-current={active ? "page" : undefined}
-                                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 border-t-2 py-2 text-xs font-medium ${
-                                    active
-                                        ? "border-spark text-ink"
-                                        : "border-transparent text-muted"
-                                }`}
-                            >
-                                <Icon className="h-6 w-6" />
-                                <span className="max-w-full truncate">{label()}</span>
-                            </Link>
-                        </li>
-                    );
-                })}
+                {/* Home leads, and ONLY here. On a wide screen the logo is always in view and
+                    is the way back; on a phone the header scrolls away with the page, so
+                    somebody deep in a long score had no way home but to scroll all of it. */}
+                {[{ to: "/", label: m.nav_home, Icon: HomeIcon }, ...DESTINATIONS].map(
+                    ({ to, label, Icon }) => {
+                        const active = isActive(to);
+                        return (
+                            <li key={to} className="min-w-0 flex-1">
+                                <Link
+                                    to={to}
+                                    aria-current={active ? "page" : undefined}
+                                    className={`flex min-h-14 flex-col items-center justify-center gap-0.5 border-t-2 py-2 text-xs font-medium ${
+                                        active
+                                            ? "border-spark text-ink"
+                                            : "border-transparent text-muted"
+                                    }`}
+                                >
+                                    <Icon className="h-6 w-6" />
+                                    <span className="max-w-full truncate">{label()}</span>
+                                </Link>
+                            </li>
+                        );
+                    },
+                )}
             </ul>
         </nav>
     );

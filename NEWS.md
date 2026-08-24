@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Home is one tap away on a phone, and the menu stays put on a computer.** The bar at
+the bottom of the screen gains a Home button, so you can get back from deep inside a
+long piece without scrolling all the way up. On a wider screen the menu across the top
+now stays with you as you scroll instead.
+
 **A warmer Plinky in daylight.** The light theme was violet everywhere — the page, the
 cards, the hairlines, even the writing — which left violet nothing to mean. The paper
 is warm now and the ink is a true brown-black, with violet kept for the logo and for

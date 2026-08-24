@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Niveaux {list}",
     "methods_try": "Essayer sur un morceau de niveau {grade}",
     "methods_review": "Lancer une séance de révision",
-    "methods_in_plinky": "Dans Plinky"
+    "methods_in_plinky": "Dans Plinky",
+    "nav_home": "Accueil"
 }

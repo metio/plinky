@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Tasot {list}",
     "methods_try": "Kokeile tason {grade} kappaleeseen",
     "methods_review": "Aloita kertausrupeama",
-    "methods_in_plinky": "Plinkyssä"
+    "methods_in_plinky": "Plinkyssä",
+    "nav_home": "Etusivu"
 }

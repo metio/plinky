@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Stupnjevi {list}",
     "methods_try": "Isprobaj na skladbi stupnja {grade}",
     "methods_review": "Pokreni ponavljanje",
-    "methods_in_plinky": "U Plinkyju"
+    "methods_in_plinky": "U Plinkyju",
+    "nav_home": "Početna"
 }

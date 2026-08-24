@@ -1278,5 +1278,6 @@
     "music_filters_grades": "グレード {list}",
     "methods_try": "グレード {grade} の曲で試す",
     "methods_review": "復習セッションを始める",
-    "methods_in_plinky": "Plinky では"
+    "methods_in_plinky": "Plinky では",
+    "nav_home": "ホーム"
 }

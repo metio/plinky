@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Livelli {list}",
     "methods_try": "Provalo su un brano di livello {grade}",
     "methods_review": "Inizia una sessione di ripasso",
-    "methods_in_plinky": "In Plinky"
+    "methods_in_plinky": "In Plinky",
+    "nav_home": "Home"
 }

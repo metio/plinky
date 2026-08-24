@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Stopnie {list}",
     "methods_try": "Wypróbuj na utworze stopnia {grade}",
     "methods_review": "Zacznij sesję powtórek",
-    "methods_in_plinky": "W Plinky"
+    "methods_in_plinky": "W Plinky",
+    "nav_home": "Start"
 }

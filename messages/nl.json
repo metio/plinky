@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Niveaus {list}",
     "methods_try": "Probeer dit op een stuk van niveau {grade}",
     "methods_review": "Start een herhaalsessie",
-    "methods_in_plinky": "In Plinky"
+    "methods_in_plinky": "In Plinky",
+    "nav_home": "Start"
 }

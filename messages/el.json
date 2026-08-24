@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Επίπεδα {list}",
     "methods_try": "Δοκίμασέ το σε κομμάτι επιπέδου {grade}",
     "methods_review": "Ξεκίνα μια επανάληψη",
-    "methods_in_plinky": "Στο Plinky"
+    "methods_in_plinky": "Στο Plinky",
+    "nav_home": "Αρχική"
 }

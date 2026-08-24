@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Seviye {list}",
     "methods_try": "Seviye {grade} bir parçada dene",
     "methods_review": "Tekrar oturumu başlat",
-    "methods_in_plinky": "Plinky'de"
+    "methods_in_plinky": "Plinky'de",
+    "nav_home": "Ana sayfa"
 }

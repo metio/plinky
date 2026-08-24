@@ -28,9 +28,19 @@ const current = () =>
         ?.textContent;
 
 describe("BottomNav active section", () => {
-    it("lights nothing on the home page, which the mark leads to instead", () => {
+    it("lights Home on the home page", () => {
+        // Home is in the bottom bar and only there. On a wide screen the mark is always in
+        // view and leads home; on a phone the header scrolls away with the page, so
+        // somebody deep in a long score had no way back but to scroll all of it.
         at("/");
-        expect(current()).toBeUndefined();
+        expect(current()).toBe(m.nav_home());
+    });
+
+    it("matches Home exactly, so a section does not light it too", () => {
+        // Every other destination lights on its sub-pages as well, which for "/" would
+        // mean lighting on every page in the app.
+        at("/music");
+        expect(current()).not.toBe(m.nav_home());
     });
 
     it("lights the section that owns the current path", () => {

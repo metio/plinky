@@ -1278,5 +1278,6 @@
     "music_filters_grades": "{list}. fokozat",
     "methods_try": "Próbáld ki egy {grade}. fokozatú darabon",
     "methods_review": "Ismétlő kör indítása",
-    "methods_in_plinky": "A Plinkyben"
+    "methods_in_plinky": "A Plinkyben",
+    "nav_home": "Főoldal"
 }

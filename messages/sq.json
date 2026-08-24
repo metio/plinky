@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Nivelet {list}",
     "methods_try": "Provoje në një pjesë të nivelit {grade}",
     "methods_review": "Nis një seancë përsëritjeje",
-    "methods_in_plinky": "Në Plinky"
+    "methods_in_plinky": "Në Plinky",
+    "nav_home": "Kreu"
 }

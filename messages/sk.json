@@ -1278,5 +1278,6 @@
     "music_filters_grades": "Stupne {list}",
     "methods_try": "Vyskúšaj na skladbe stupňa {grade}",
     "methods_review": "Začať opakovacie sedenie",
-    "methods_in_plinky": "V Plinky"
+    "methods_in_plinky": "V Plinky",
+    "nav_home": "Domov"
 }

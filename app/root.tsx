@@ -109,7 +109,12 @@ function Header() {
         //
         // What carries the brand here instead is the rule below: five colours that mean
         // nothing, which is exactly why they are free to be the flower's petals as well.
-        <header className="bg-raised px-6 py-3 font-sans">
+        // Sticky on a wide screen only. There, somebody deep in a long score would otherwise
+        // scroll all the way back up to reach anything, and a slim bar costs a fraction of a
+        // desktop's height. On a phone it stays put: the bottom tab bar is already fixed, and
+        // a second fixed bar would eat a chunk of a screen that has none to spare — which is
+        // why Home joined the bottom bar instead.
+        <header className="bg-raised px-6 py-3 font-sans md:sticky md:top-0 md:z-40">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
                     {/* The wordmark is text (it follows the theme for free); its i is the

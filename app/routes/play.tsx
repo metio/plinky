@@ -132,7 +132,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                         {canonicalComposer(score.composer)}
                                     </Link>
                                 ) : (
-                                    score.composer
+                                    // Cleaned on this branch too: a credit naming a
+                                    // tradition rather than a person is still a credit.
+                                    canonicalComposer(score.composer)
                                 )}
                             </p>
                         )}
