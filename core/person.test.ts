@@ -232,3 +232,18 @@ describe("nameFromSlug", () => {
         expect(nameFromSlug(personSlug("Gabriel Faur\u00e9"))).toBe("Gabriel Faure");
     });
 });
+
+describe("credits that are notes to self", () => {
+    it("drops a hedge from a tradition marker", () => {
+        // One harvested score credits "Traditional I think" — a thought somebody typed into
+        // the composer field. Unlike the dated and catalogue-numbered credits around it,
+        // nothing reduced it, so it reached the piece's page verbatim.
+        expect(canonicalComposer("Traditional I think")).toBe("Traditional");
+        expect(personSlug("Traditional I think")).toBe("");
+    });
+
+    it("leaves a genuinely enriched attribution alone", () => {
+        // "Traditional — Irish" says something true about the piece. Only the hedge goes.
+        expect(canonicalComposer("Traditional — Irish, 1761")).toBe("Traditional — Irish");
+    });
+});

@@ -96,6 +96,11 @@ const ALIASES: Record<string, string> = {
     "frederik kuhlau": "Friedrich Kuhlau",
     "by scott joplin": "Scott Joplin",
     "john philip sousa": "John Philip Sousa",
+    // Not a person alias but a credit somebody typed a thought into. The harvested score
+    // carries "Traditional I think", which is a note to self rather than an attribution —
+    // and unlike the dated and catalogue-numbered credits around it, nothing else here
+    // reduces it, so it reached the page verbatim. A hedge is not part of a credit.
+    "traditional i think": "Traditional",
 };
 
 // Initials written tight spread to the spaced form, so every spelling of the same
