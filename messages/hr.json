@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — preostalo dana: {count}",
     "repertoire_date_passed": "{date} — taj je datum prošao",
     "methods_title": "Načini vježbanja",
-    "methods_intro": "Šest stvari koje bi učitelj predložio, i gdje u Plinkyju svaku od njih napraviti.",
+    "methods_intro": "Šest stvari koje bi predložio učitelj — zašto djeluju i na čemu ih isprobati.",
     "methods_dose": "oko {count} min",
     "method_chunking_name": "Jedan mali dio odjednom",
     "method_chunking_how": "Dodirni ona dva takta koja stalno idu krivo i postat će petlja koja se vrti dok više ne budu teško mjesto.",

@@ -1081,7 +1081,7 @@
     "repertoire_days_left": "{date} — {count} ditë larg",
     "repertoire_date_passed": "{date} — ajo datë ka kaluar",
     "methods_title": "Mënyra për të ushtruar",
-    "methods_intro": "Gjashtë gjëra që do t'i sugjeronte një mësues, dhe ku në Plinky bëhet secila.",
+    "methods_intro": "Gjashtë gjëra që do t'i sugjeronte një mësues — pse funksionojnë, dhe diçka ku t'i provosh.",
     "methods_dose": "rreth {count} minuta",
     "method_chunking_name": "Një copë e vogël në herë",
     "method_chunking_how": "Prek ato dy masa që të dalin gjithnjë keq dhe kthehen në një lak, që rrotullohet derisa të mos jenë më vendi i vështirë.",

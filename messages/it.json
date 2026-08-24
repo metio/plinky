@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — tra {count} giorni",
     "repertoire_date_passed": "{date} — quella data è passata",
     "methods_title": "Modi di esercitarsi",
-    "methods_intro": "Sei cose che un insegnante suggerirebbe, e dove farle dentro Plinky.",
+    "methods_intro": "Sei cose che suggerirebbe un insegnante: perché funzionano, e qualcosa su cui provarle.",
     "methods_dose": "circa {count} minuti",
     "method_chunking_name": "Un pezzetto alla volta",
     "method_chunking_how": "Tocca le due battute che continuano a sfuggirti e diventano un loop, che gira finché smettono di essere il punto difficile.",

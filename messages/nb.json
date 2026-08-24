@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — om {count} dager",
     "repertoire_date_passed": "{date} — den datoen er passert",
     "methods_title": "Måter å øve på",
-    "methods_intro": "Seks ting en lærer ville foreslått, og hvor i Plinky du gjør hver av dem.",
+    "methods_intro": "Seks ting en lærer ville foreslå — hvorfor de virker, og noe å prøve dem på.",
     "methods_dose": "omtrent {count} minutter",
     "method_chunking_name": "Én liten bit om gangen",
     "method_chunking_how": "Trykk på de to taktene som stadig glipper, så blir de en løkke som går rundt til de ikke lenger er det vanskelige stedet.",

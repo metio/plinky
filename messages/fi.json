@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — {count} päivän päässä",
     "repertoire_date_passed": "{date} — se päivä on jo mennyt",
     "methods_title": "Tapoja harjoitella",
-    "methods_intro": "Kuusi asiaa, joita opettaja ehdottaisi, ja mistä kohtaa Plinkyä kukin niistä löytyy.",
+    "methods_intro": "Kuusi asiaa, joita opettaja ehdottaisi — miksi kukin toimii, ja jotain, millä kokeilla.",
     "methods_dose": "noin {count} minuuttia",
     "method_chunking_name": "Pieni pala kerrallaan",
     "method_chunking_how": "Napauta niitä kahta tahtia, jotka menevät jatkuvasti pieleen, niin niistä tulee silmukka, joka pyörii kunnes ne eivät enää ole se vaikea kohta.",

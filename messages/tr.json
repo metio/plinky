@@ -1081,7 +1081,7 @@
     "repertoire_days_left": "{date} — {count} gün var",
     "repertoire_date_passed": "{date} — o tarih geçti",
     "methods_title": "Çalışma yolları",
-    "methods_intro": "Bir öğretmenin önereceği altı şey, ve her birini Plinky'de nerede yapacağın.",
+    "methods_intro": "Bir öğretmenin önereceği altı şey — neden işe yaradıkları ve üzerinde deneyecek bir şey.",
     "methods_dose": "yaklaşık {count} dakika",
     "method_chunking_name": "Bir seferde küçük bir bölüm",
     "method_chunking_how": "Sürekli ters giden o iki ölçüye dokun, döngüye dönüşsünler; zor yer olmaktan çıkana kadar dönüp dururlar.",

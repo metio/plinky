@@ -1081,7 +1081,7 @@
     "repertoire_days_left": "{date} — あと {count} 日",
     "repertoire_date_passed": "{date} — その日は過ぎました",
     "methods_title": "練習のしかた",
-    "methods_intro": "先生がすすめる六つのやり方と、Plinky のどこでできるか。",
+    "methods_intro": "先生ならすすめる六つのこと。なぜ効くのかと、試してみる相手つきで。",
     "methods_dose": "およそ {count} 分",
     "method_chunking_name": "小さく区切って",
     "method_chunking_how": "いつもつまずく二小節をタップするとループになり、そこが難所でなくなるまで何度でも回ります。",

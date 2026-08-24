@@ -1081,7 +1081,7 @@
     "repertoire_days_left": "{date} — {count} nap múlva",
     "repertoire_date_passed": "{date} — ez a nap elmúlt",
     "methods_title": "Gyakorlási módok",
-    "methods_intro": "Hat dolog, amit egy tanár javasolna, és hogy a Plinkyben hol csinálhatod meg mindegyiket.",
+    "methods_intro": "Hat dolog, amit egy tanár javasolna — miért működnek, és min próbáld ki őket.",
     "methods_dose": "körülbelül {count} perc",
     "method_chunking_name": "Egyszerre egy kis szakasz",
     "method_chunking_how": "Koppints arra a két ütemre, ami folyton félremegy, és hurokká válnak — körbejár, amíg meg nem szűnik a nehéz rész lenni.",

@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — za {count} dni",
     "repertoire_date_passed": "{date} — ten termin już minął",
     "methods_title": "Sposoby ćwiczenia",
-    "methods_intro": "Sześć rzeczy, które podpowiedziałby nauczyciel, i miejsce w Plinky, w którym zrobisz każdą z nich.",
+    "methods_intro": "Sześć rzeczy, które podpowiedziałby nauczyciel — dlaczego działają i na czym ich spróbować.",
     "methods_dose": "około {count} minut",
     "method_chunking_name": "Po małym fragmencie naraz",
     "method_chunking_how": "Dotknij tych dwóch taktów, które ciągle się sypią, a staną się pętlą, która krąży, aż przestaną być trudnym miejscem.",

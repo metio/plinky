@@ -1081,7 +1081,7 @@
     "repertoire_days_left": "{date} — za {count} dní",
     "repertoire_date_passed": "{date} — tenhle den už je za námi",
     "methods_title": "Jak cvičit",
-    "methods_intro": "Šest věcí, které by poradil učitel, a kde je v Plinky udělat.",
+    "methods_intro": "Šest věcí, které by poradil učitel — proč fungují a na čem si je vyzkoušet.",
     "methods_dose": "asi {count} minut",
     "method_chunking_name": "Po malých kouscích",
     "method_chunking_how": "Klepni na ty dva takty, které pořád nevycházejí, a stane se z nich smyčka, která běží dokola, dokud nepřestanou být tím těžkým místem.",

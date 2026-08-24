@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — dans {count} jours",
     "repertoire_date_passed": "{date} — cette date est passée",
     "methods_title": "Façons de travailler",
-    "methods_intro": "Six choses qu’un professeur te conseillerait, et où les faire dans Plinky.",
+    "methods_intro": "Six choses qu'un professeur suggérerait — pourquoi chacune marche, et de quoi l'essayer.",
     "methods_dose": "environ {count} minutes",
     "method_chunking_name": "Un petit passage à la fois",
     "method_chunking_how": "Touche les deux mesures qui coincent et elles deviennent une boucle, qui tourne jusqu'à ce qu'elles cessent d'être le passage difficile.",

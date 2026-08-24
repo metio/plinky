@@ -1081,7 +1081,7 @@
     "repertoire_days_left": "{date} — {count}일 남았어요",
     "repertoire_date_passed": "{date} — 그 날짜는 지났어요",
     "methods_title": "연습하는 방법",
-    "methods_intro": "선생님이 권할 만한 여섯 가지, 그리고 Plinky에서 각각을 해볼 수 있는 곳이에요.",
+    "methods_intro": "선생님이라면 권할 여섯 가지. 왜 통하는지와, 그걸 해볼 거리까지.",
     "methods_dose": "약 {count}분",
     "method_chunking_name": "한 번에 작은 한 조각",
     "method_chunking_how": "자꾸 어긋나는 두 마디를 누르면 반복 구간이 되어, 그곳이 더 이상 어려운 데가 아닐 때까지 계속 돕니다.",

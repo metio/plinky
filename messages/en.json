@@ -1089,7 +1089,7 @@
     "repertoire_days_left": "{date} — {count} days away",
     "repertoire_date_passed": "{date} — that date has gone by",
     "methods_title": "Ways to practise",
-    "methods_intro": "Six things a teacher would suggest, and where in Plinky to do each one.",
+    "methods_intro": "Six things a teacher would suggest — why each one works, and something to try it on.",
     "methods_dose": "about {count} minutes",
     "method_chunking_name": "One small piece at a time",
     "method_chunking_how": "Tap the two bars that keep going wrong and they become a loop, playing round and round until they stop being the hard part.",

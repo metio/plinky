@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — om {count} dagar",
     "repertoire_date_passed": "{date} — det datumet har passerat",
     "methods_title": "Sätt att öva",
-    "methods_intro": "Sex saker en lärare skulle föreslå, och var i Plinky du gör var och en.",
+    "methods_intro": "Sex saker en lärare skulle föreslå — varför de fungerar, och något att pröva dem på.",
     "methods_dose": "ungefär {count} minuter",
     "method_chunking_name": "En liten bit i taget",
     "method_chunking_how": "Tryck på de två takter som ständigt spricker, så blir de en slinga som går runt tills de inte längre är det svåra stället.",

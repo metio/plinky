@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — 还有 {count} 天",
     "repertoire_date_passed": "{date} — 这个日子已经过去了",
     "methods_title": "练琴的方法",
-    "methods_intro": "老师常说的六件事，以及在 Plinky 里各自去哪儿做。",
+    "methods_intro": "老师会建议的六件事——为什么管用，以及可以拿来试试的东西。",
     "methods_dose": "大约 {count} 分钟",
     "method_chunking_name": "一次只啃一小段",
     "method_chunking_how": "点一下老是出错的那两小节，它们就成了循环，一遍遍转下去，直到不再是难处。",

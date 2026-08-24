@@ -1081,7 +1081,7 @@
     "repertoire_days_left": "{date} — peste {count} zile",
     "repertoire_date_passed": "{date} — data aceea a trecut",
     "methods_title": "Feluri de a exersa",
-    "methods_intro": "Șase lucruri pe care ți le-ar sugera un profesor și unde le faci în Plinky.",
+    "methods_intro": "Șase lucruri pe care le-ar sugera un profesor — de ce funcționează și pe ce să le încerci.",
     "methods_dose": "cam {count} minute",
     "method_chunking_name": "Câte un fragment mic",
     "method_chunking_how": "Atinge cele două măsuri care tot ies prost și devin o buclă, care se învârte până când nu mai sunt partea grea.",

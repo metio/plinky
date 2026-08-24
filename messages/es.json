@@ -1082,7 +1082,7 @@
     "repertoire_days_left": "{date} — dentro de {count} días",
     "repertoire_date_passed": "{date} — esa fecha ya pasó",
     "methods_title": "Formas de practicar",
-    "methods_intro": "Seis cosas que te sugeriría un profesor, y dónde hacer cada una en Plinky.",
+    "methods_intro": "Seis cosas que sugeriría un profesor: por qué funciona cada una, y algo con lo que probarla.",
     "methods_dose": "unos {count} minutos",
     "method_chunking_name": "Un trocito cada vez",
     "method_chunking_how": "Toca los dos compases que siempre fallan y se convierten en un bucle, que gira hasta que dejan de ser la parte difícil.",
