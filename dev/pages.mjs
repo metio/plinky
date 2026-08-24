@@ -47,6 +47,11 @@ export function readPages() {
         if (first === ":locale") {
             continue;
         }
+        // The catch-all is not a page: it has no document to prerender, nothing to audit,
+        // and listing it would put a literal "/*" in the sitemap.
+        if (first === "*") {
+            continue;
+        }
         pages.push({
             path: `/${first}`,
             module: second ?? "",
@@ -97,8 +102,9 @@ export function assertPages() {
         );
     }
     // Every call in the block must have produced an entry, so a shape the regex cannot
-    // read is caught rather than skipped.
-    const calls = (localeBlock(source).match(/\b(index|route)\(/g) ?? []).length - 1;
+    // read is caught rather than skipped. Two calls are deliberately not pages: the
+    // ":locale" wrapper and the "*" catch-all, neither of which has a document.
+    const calls = (localeBlock(source).match(/\b(index|route)\(/g) ?? []).length - 2;
     if (calls !== pages.length) {
         throw new Error(
             `${ROUTES}: found ${calls} route calls but parsed ${pages.length} pages — ` +

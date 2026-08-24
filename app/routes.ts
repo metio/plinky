@@ -34,4 +34,7 @@ export default [
         route("datenschutz", "routes/datenschutz.tsx"),
         route("person/:slug", "routes/person.tsx"),
     ]),
+    // Anything with no language in the address, redirected to the visitor's own. Last, so
+    // it only ever sees what nothing else matched.
+    route("*", "routes/unlocalizedRedirect.tsx"),
 ] satisfies RouteConfig;

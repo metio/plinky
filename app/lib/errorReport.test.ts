@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { describeError, issueUrl } from "./errorReport";
+import { NotFoundError, describeError, issueUrl } from "./errorReport";
 
 // The shape the router throws for a failed route: isRouteErrorResponse
 // recognises it structurally (status, statusText, internal, data).
@@ -74,5 +74,16 @@ describe("issueUrl", () => {
         expect(url.searchParams.get("title")).toBe("Error: boom");
         // The multi-line stack stays in the body, not the title.
         expect(url.searchParams.get("body")).toContain("at ");
+    });
+});
+
+describe("a miss raised by the catch-all route", () => {
+    it("reads as a missing page, not a crash", () => {
+        // A Response thrown during render never becomes a route error response, so the
+        // catch-all raises its own type — and the boundary must still offer the gentle
+        // message rather than "something went wrong".
+        const report = describeError(new NotFoundError("/en/nowhere"));
+        expect(report.notFound).toBe(true);
+        expect(report.technical).toContain("/en/nowhere");
     });
 });

@@ -12,6 +12,20 @@ import { isRouteErrorResponse } from "react-router";
 // here, so the destination is stated once.
 export const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
 
+// A page that does not exist, raised from a component rather than from a loader.
+//
+// The router builds its own 404 when nothing matches, but the catch-all route matches
+// everything by design — so when it decides an address is a genuine miss it has to say so
+// itself. A Response thrown during render is not turned into a route error response the
+// way one thrown from a loader is, which is why this is its own class rather than a 404
+// Response: the error boundary would otherwise call a missing page a crash.
+export class NotFoundError extends Error {
+    constructor(pathname: string) {
+        super(`404 Not Found: ${pathname}`);
+        this.name = "NotFoundError";
+    }
+}
+
 export type ErrorReport = {
     // A missing page gets a gentler message and no reload button.
     notFound: boolean;
@@ -20,7 +34,8 @@ export type ErrorReport = {
 };
 
 export function describeError(error: unknown): ErrorReport {
-    const notFound = isRouteErrorResponse(error) && error.status === 404;
+    const notFound =
+        (isRouteErrorResponse(error) && error.status === 404) || error instanceof NotFoundError;
     let technical: string;
     if (isRouteErrorResponse(error)) {
         technical = `${error.status} ${error.statusText}`;
