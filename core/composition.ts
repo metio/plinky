@@ -461,28 +461,30 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
 
     const measures: string[] = [];
     const barCount = Math.max(trebleBars.length, bassBars.length, 1);
-    // A tie carries across the barline, so the holding state lives outside the bar loop.
-    let trebleHolding = false;
-    let bassHolding = false;
+    // A staff, rendered bar by bar, carrying its own tie state across the barlines.
+    //
+    // The holding flag lives in the closure rather than in the bar loop because a tie
+    // carries ACROSS a barline: a bar that opens still holding is the whole reason a note
+    // sounds through the bar it started in. Both staves need that, and each needs its own —
+    // one shared flag would have the bass ending a tie the treble started.
+    const staffRenderer = (bars: BarCell[][], staff: 1 | 2) => {
+        let holding = false;
+        return (index: number) =>
+            (bars[index] ?? [{ pitches: [], cells: cellsPerBar, tiedToNext: false }])
+                .map((cell) => {
+                    const { xml, holdingOut } = noteElements(cell, staff, holding);
+                    holding = holdingOut;
+                    return xml;
+                })
+                .join("\n");
+    };
+    const renderTreble = staffRenderer(trebleBars, 1);
+    const renderBass = staffRenderer(bassBars, 2);
     for (let i = 0; i < barCount; i++) {
         const number = i + 1;
         const head = number === 1 ? `      ${attributes}\n      ${tempoDirection}\n` : "";
-        const trebleXml = (
-            trebleBars[i] ?? [{ pitches: [], cells: cellsPerBar, tiedToNext: false }]
-        )
-            .map((cell) => {
-                const { xml, holdingOut } = noteElements(cell, 1, trebleHolding);
-                trebleHolding = holdingOut;
-                return xml;
-            })
-            .join("\n");
-        const bassXml = (bassBars[i] ?? [{ pitches: [], cells: cellsPerBar, tiedToNext: false }])
-            .map((cell) => {
-                const { xml, holdingOut } = noteElements(cell, 2, bassHolding);
-                bassHolding = holdingOut;
-                return xml;
-            })
-            .join("\n");
+        const trebleXml = renderTreble(i);
+        const bassXml = renderBass(i);
         const body = `${head}${trebleXml}\n      <backup><duration>${cellsPerBar}</duration></backup>\n${bassXml}`;
         measures.push(`    <measure number="${number}">\n${body}\n    </measure>`);
     }

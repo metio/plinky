@@ -472,6 +472,38 @@ export function Keyboard({
             ? "text-key-black-ink"
             : "text-key-ink";
 
+    // What every key carries, whichever colour it is: its name for a screen reader, whether
+    // it is sounding, its place in the roving tab order, and the four handlers. Written once
+    // so a key cannot be given to the pointer and withheld from the keyboard.
+    const keyProps = (note: number) => ({
+        type: "button" as const,
+        "aria-label": spokenPitch(note),
+        "aria-pressed": lit.has(note),
+        tabIndex: note === roved ? 0 : -1,
+        "data-note": note,
+        onClick: activate(note),
+        onKeyDown: keyDown(note),
+        onKeyUp: keyUp(note),
+        onBlur: blur(note),
+    });
+
+    // What sits ON a key: the shrinking hold fill, and the key's name where names are shown.
+    // The label is read ONCE — it was computed twice per key, once to decide whether to draw
+    // the span and once to fill it.
+    const keyFace = (note: number, labelClass: string) => {
+        const label = keyLabel(note, labels);
+        return (
+            <>
+                {holds.has(note) && <HoldFill fraction={holds.get(note)!} />}
+                {label && (
+                    <span aria-hidden="true" className={labelClass}>
+                        {label}
+                    </span>
+                )}
+            </>
+        );
+    };
+
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.
     const flashNote = flash?.note ?? null;
@@ -496,26 +528,13 @@ export function Keyboard({
                     {whites.map((note, index) => (
                         <button
                             key={note}
-                            type="button"
-                            aria-label={spokenPitch(note)}
-                            aria-pressed={lit.has(note)}
-                            tabIndex={note === roved ? 0 : -1}
-                            data-note={note}
-                            onClick={activate(note)}
-                            onKeyDown={keyDown(note)}
-                            onKeyUp={keyUp(note)}
-                            onBlur={blur(note)}
+                            {...keyProps(note)}
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
                             className={`${WHITE_KEY} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
                         >
-                            {holds.has(note) && <HoldFill fraction={holds.get(note)!} />}
-                            {keyLabel(note, labels) && (
-                                <span
-                                    aria-hidden="true"
-                                    className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium text-key-label"
-                                >
-                                    {keyLabel(note, labels)}
-                                </span>
+                            {keyFace(
+                                note,
+                                "pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium text-key-label",
                             )}
                         </button>
                     ))}
@@ -533,15 +552,7 @@ export function Keyboard({
                     return (
                         <button
                             key={note}
-                            type="button"
-                            aria-label={spokenPitch(note)}
-                            aria-pressed={lit.has(note)}
-                            tabIndex={note === roved ? 0 : -1}
-                            data-note={note}
-                            onClick={activate(note)}
-                            onKeyDown={keyDown(note)}
-                            onKeyUp={keyUp(note)}
-                            onBlur={blur(note)}
+                            {...keyProps(note)}
                             style={{
                                 left: `${left}%`,
                                 width: `${width}%`,
@@ -549,14 +560,9 @@ export function Keyboard({
                             }}
                             className={`${BLACK_KEY} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${blackState(note)}`}
                         >
-                            {holds.has(note) && <HoldFill fraction={holds.get(note)!} />}
-                            {keyLabel(note, labels) && (
-                                <span
-                                    aria-hidden="true"
-                                    className={`pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight ${blackLabel(note)}`}
-                                >
-                                    {keyLabel(note, labels)}
-                                </span>
+                            {keyFace(
+                                note,
+                                `pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight ${blackLabel(note)}`,
                             )}
                         </button>
                     );

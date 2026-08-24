@@ -72,7 +72,7 @@ export function collectStepNotes(osmd: OpenSheetMusicDisplay, hand: Hand): StepN
             let playable = false;
             for (const gNote of group) {
                 const note = gNote.sourceNote;
-                if (note.isRest() || note.halfTone <= 0) {
+                if (!isPitched(note)) {
                     continue;
                 }
                 if (!isPracticedHand(note.ParentStaff?.idInMusicSheet, hand, parts)) {
@@ -292,6 +292,16 @@ export function scoreSvg(container: HTMLElement | null | undefined): SVGSVGEleme
     return svg instanceof SVGSVGElement ? svg : null;
 }
 
+// Whether a written note is one somebody can play.
+//
+// A rest is not, and neither is a note the engraver reports at or below halfTone 0 — which
+// is how it describes something with no sounding pitch. Both readings appear at every site
+// that walks the notes, and the second is the one nobody would guess: written out four
+// times, it is four chances to keep the rest check and forget the other.
+function isPitched(note: { isRest(): boolean; halfTone: number }): boolean {
+    return !note.isRest() && note.halfTone > 0;
+}
+
 // Every overlay this module draws is marked with a class and cleared by it, so a repaint
 // never has to remember what it drew last time.
 function removeByClass(svg: SVGSVGElement, className: string): void {
@@ -376,7 +386,7 @@ export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string)
     // each record the true original colour rather than a sibling's fresh highlight.
     for (const gNote of osmd.cursor.GNotesUnderCursor()) {
         const note = gNote.sourceNote;
-        if (note.isRest() || note.halfTone <= 0) {
+        if (!isPitched(note)) {
             continue;
         }
         const element = svgOf(gNote);
@@ -425,7 +435,7 @@ export function snapshotNotePaint(osmd: OpenSheetMusicDisplay): (string | null)[
     while (!osmd.cursor.iterator.EndReached) {
         for (const gNote of osmd.cursor.GNotesUnderCursor()) {
             const note = gNote.sourceNote;
-            if (note.isRest() || note.halfTone <= 0) {
+            if (!isPitched(note)) {
                 continue;
             }
             const element = svgOf(gNote);
@@ -448,7 +458,7 @@ export function restoreNotePaint(osmd: OpenSheetMusicDisplay, colors: (string | 
     while (!osmd.cursor.iterator.EndReached) {
         for (const gNote of osmd.cursor.GNotesUnderCursor()) {
             const note = gNote.sourceNote;
-            if (note.isRest() || note.halfTone <= 0) {
+            if (!isPitched(note)) {
                 continue;
             }
             const color = colors[index++];
