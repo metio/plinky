@@ -12,9 +12,10 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 **A link without a language in it now opens the page you asked for.** Every page in
 Plinky lives under a language — `/en/`, `/de/` — and an address typed or shared
-without one used to land on "we couldn't find that", even when the piece was right
-there. It now takes you to the same page in your own language, keeping anything the
-link was carrying.
+without one used to go astray: `/music` landed on the home page, and a link to a
+piece landed on "we couldn't find that" even though the piece was right there. Both
+now open the page you asked for, in your own language, keeping anything the link was
+carrying with it.
 
 **Ways to practise now hands you the piece, not just the advice.** Each of the six
 methods leads with why it works, says what in Plinky does it, and carries a button

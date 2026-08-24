@@ -22,19 +22,31 @@ export default function LocaleLayout() {
         }
     }, [valid, locale]);
 
-    // An unknown locale prefix — a typo, a stale link, a bot probing paths — can't
-    // select a language, so redirect to the same page under the resolved locale rather
-    // than dead-ending: the visitor keeps the page they asked for. localizedHref picks the
-    // target the way the bare "/" does (the language last chosen, else the browser's,
-    // else English); the bad first segment is dropped and the rest re-localized. During
-    // prerender there is no navigator to resolve against — and an unknown locale is never
-    // prerendered — so defer the redirect to the client, exactly as the root redirect does.
+    // A first segment that is not a language can be two different mistakes, and which one
+    // it is can be read off whether anything follows it.
+    //
+    // "/zz/play/abc" fills the language slot with something that is not a language — a
+    // typo, a stale link, a bot probing paths — and the page after it is recoverable: drop
+    // the bad segment, keep the rest, localise that.
+    //
+    // "/music" is not a mistyped language at all. It is a page name that arrived with no
+    // language in front of it, from a hand-typed address or an old link, and dropping it
+    // would answer a request for the library with the home page. So a lone segment is kept
+    // and localised. The cost is that a bare "/zz" now lands on the not-found page instead
+    // of the home page: nothing at runtime can tell "/music" from "/zz", and of the two
+    // readings the one that serves a real address is worth more than the one that tidies
+    // away a typo.
+    //
+    // localizedHref picks the language the way the bare "/" does — the one last chosen,
+    // else the browser's, else English. During prerender there is no navigator to resolve
+    // against, and an unknown locale is never prerendered, so the redirect is deferred to
+    // the client exactly as the root redirect does.
     if (!valid) {
         if (typeof window === "undefined") {
             return null;
         }
-        const rest = pathname.replace(/^\/[^/]+/, "") || "/";
-        return <Navigate to={localizedHref(rest)} replace />;
+        const rest = pathname.replace(/^\/[^/]+/, "");
+        return <Navigate to={localizedHref(rest === "" ? pathname : rest)} replace />;
     }
 
     return (

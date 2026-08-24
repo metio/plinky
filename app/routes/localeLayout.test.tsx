@@ -24,6 +24,7 @@ function routerAt(initial: string) {
                 <Route path=":locale" element={<LocaleLayout />}>
                     <Route index element={<Destination />} />
                     <Route path="play/:scoreId" element={<Destination />} />
+                    <Route path="music" element={<Destination />} />
                 </Route>
             </Routes>
         </MemoryRouter>
@@ -40,10 +41,14 @@ describe("LocaleLayout", () => {
         expect(isLocale(dest.split("/")[1])).toBe(true);
     });
 
-    it("redirects a bare unknown-locale root to the localized home", async () => {
-        renderWithServices(routerAt("/zz"));
+    it("reads a lone segment as a page name, not as a mistyped locale", async () => {
+        // "/music" is the case this serves: a page asked for with no language in front of
+        // it. It is indistinguishable from a bare "/zz" typo, and answering the real
+        // address is worth more than tidying away the typo — which now reaches the
+        // not-found page rather than the home page.
+        renderWithServices(routerAt("/music"));
         const dest = (await screen.findByTestId("dest")).textContent ?? "";
-        expect(dest.startsWith("/zz")).toBe(false);
+        expect(dest).toMatch(/\/music\/$/);
         expect(isLocale(dest.split("/")[1])).toBe(true);
     });
 
