@@ -50,13 +50,25 @@ function counts(mastery: Mastery, mode: DecayMode, now: number): boolean {
     return mode === "gentle" || !isLapsed(mastery, now);
 }
 
+// The pieces of one grade that still count as mastered under the chosen decay. Written once
+// because the two readings below have to agree about what "in this grade" means: a count
+// that disagrees with the list it is a count of is the kind of thing nobody notices.
+function inGrade(
+    items: GradedMastery[],
+    grade: number,
+    mode: DecayMode,
+    now: number,
+): GradedMastery[] {
+    return items.filter((item) => item.grade === grade && counts(item.mastery, mode, now));
+}
+
 export function masteredInGrade(
     items: GradedMastery[],
     grade: number,
     mode: DecayMode,
     now: number,
 ): number {
-    return items.filter((item) => item.grade === grade && counts(item.mastery, mode, now)).length;
+    return inGrade(items, grade, mode, now).length;
 }
 
 export function starTier(masteredCount: number): StarTier {
@@ -104,10 +116,10 @@ export function gradeFreshness(
     mode: DecayMode,
     now: number,
 ): { mastered: number; due: number } {
-    const inGrade = items.filter((item) => item.grade === grade && counts(item.mastery, mode, now));
+    const kept = inGrade(items, grade, mode, now);
     return {
-        mastered: inGrade.length,
-        due: inGrade.filter((item) => isDue(item.mastery, now)).length,
+        mastered: kept.length,
+        due: kept.filter((item) => isDue(item.mastery, now)).length,
     };
 }
 

@@ -45,8 +45,9 @@ const beamsLabel: Record<Beams, string> = {
 // put on it. What is about every piece — the skill level, the reading aids, the score
 // layout — folds away, because Settings owns it too and a reader loses nothing by
 // opening it there instead.
-
-function RunSetupPanel() {
+//
+// The piece's own controls, on the piece's page.
+export function RunSetup() {
     const {
         lockTempo,
         staffCount,
@@ -450,11 +451,6 @@ function RunSetupPanel() {
             </Disclosure>
         </div>
     );
-}
-
-// The piece's own controls, on the piece's page.
-export function RunSetup() {
-    return <RunSetupPanel />;
 }
 
 // The octave move that fitted the piece to the player's keyboard, in the words a player

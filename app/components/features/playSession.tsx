@@ -29,13 +29,7 @@ import { transposeFifths } from "../../../core/ornament";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
-import {
-    useHintsStore,
-    useOnboardingStore,
-    useScheduler,
-    useServices,
-    useXmlCodec,
-} from "../../contexts/services";
+import { useHintsStore, useScheduler, useServices, useXmlCodec } from "../../contexts/services";
 import { useFullscreen } from "../../hooks/useFullscreen";
 import { useDuet } from "../../hooks/useDuet";
 import { useGhostRace } from "../../hooks/useGhostRace";
@@ -292,17 +286,7 @@ function usePlaySessionValue({
     const [hideKeyboard, setHideKeyboard] = useState(false);
     // The fullscreen fingering editor: swaps the on-screen keyboard for the
     // fingering strip and washes the score with the difficulty heat-map.
-    const [fingerStrip, setFingerStripState] = useState(false);
-    // Opening the fingering editor ticks its discovery step — the strip is the
-    // fingering drill's home now that its tab is gone. Takes a plain boolean rather
-    // than React's updater form: deciding whether this counts as "opened" meant
-    // calling an updater to look at its result, and React calls it again itself — so
-    // the function ran twice, against a value from this render rather than the live one.
-    const setFingerStrip = (open: boolean) => {
-        if (open) {
-        }
-        setFingerStripState(open);
-    };
+    const [fingerStrip, setFingerStrip] = useState(false);
     // Whether the Runs drawer (your saved performances of this piece) is open.
 
     const [raceGhost, setRaceGhost] = usePref(prefsStore, "raceGhost");
@@ -532,15 +516,7 @@ function usePlaySessionValue({
 
     // Hidden-notes (ear) practice: noteheads start blank and reveal green as they are
     // found, red once the tries budget is spent. Persisted like the other play prefs.
-    const _onboarding = useOnboardingStore();
-    const [hiddenNotes, setHiddenNotesPref] = usePref(prefsStore, "hiddenNotes");
-    // Turning the ear drill on ticks its discovery step — the toggle IS the
-    // feature now that the Ear tab is gone.
-    const setHiddenNotes = (value: boolean) => {
-        if (value) {
-        }
-        setHiddenNotesPref(value);
-    };
+    const [hiddenNotes, setHiddenNotes] = usePref(prefsStore, "hiddenNotes");
     const [revealTries, setRevealTries] = usePref(prefsStore, "revealTries");
     // The read-ahead drill: bars vanish behind the run so the eyes cannot go back.
     // Armed only while sight-read mode asks for it.

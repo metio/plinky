@@ -434,8 +434,12 @@ function buildSampledVoice(
     source.buffer = sample.buffer;
     source.playbackRate.value = sample.rate;
 
+    // One reading of the level, used both to open the envelope and to report what the
+    // voice is holding: two calls could only ever agree, and a change to one is a change
+    // the other silently disagrees with.
+    const level = sampledLevel(gain, velocity);
     const envelope = ctx.createGain();
-    envelope.gain.setValueAtTime(sampledLevel(gain, velocity), now);
+    envelope.gain.setValueAtTime(level, now);
     envelope.connect(room(ctx));
     source.connect(envelope);
     source.start(now);
@@ -448,7 +452,7 @@ function buildSampledVoice(
         frequency,
         startedAt: now,
         sampled: true,
-        level: sampledLevel(gain, velocity),
+        level,
     };
 }
 
