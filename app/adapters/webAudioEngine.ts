@@ -327,6 +327,31 @@ const DAMPER_S = 0.35;
 // reach for the whole scale where the synth's partials sit well under it.
 const SAMPLE_TRIM = 1.9;
 
+// The graph a sampled voice always has: the recording playing at its pitch-shifted rate,
+// through a gain the caller then shapes, into the room. Three places build it — a scheduled
+// strike, a held key, and the extra noises — and they differ only in what they do to the
+// envelope afterwards and when they start and stop.
+//
+// Worth having in one place because the ORDER matters and is easy to get subtly wrong: the
+// envelope opens at its level before anything is connected, and the source joins a graph
+// that already reaches the room. A source connected to a gain still at zero, or to one not
+// yet wired to the destination, plays silence into nothing.
+function sampledVoice(
+    ctx: BaseAudioContext,
+    sample: SampleVoice,
+    level: number,
+    at: number,
+): { source: AudioBufferSourceNode; envelope: GainNode } {
+    const source = ctx.createBufferSource();
+    source.buffer = sample.buffer;
+    source.playbackRate.value = sample.rate;
+    const envelope = ctx.createGain();
+    envelope.gain.setValueAtTime(level, at);
+    envelope.connect(room(ctx));
+    source.connect(envelope);
+    return { source, envelope };
+}
+
 function sampledLevel(gain: number, velocity: number): number {
     const preference = velocity > 0 ? gain * (127 / velocity) : gain;
     return Math.min(1, preference * SAMPLE_TRIM);
@@ -338,17 +363,11 @@ function renderSampledStrike(
     sample: SampleVoice,
 ): StruckStrike {
     const now = ctx.currentTime + Math.max(0, delay);
-    const source = ctx.createBufferSource();
-    source.buffer = sample.buffer;
-    source.playbackRate.value = sample.rate;
-
     const level = sampledLevel(gain, velocity);
-    const envelope = ctx.createGain();
-    envelope.gain.setValueAtTime(level, now);
+    const { source, envelope } = sampledVoice(ctx, sample, level, now);
     const damperFrom = now + Math.max(0.05, duration);
     envelope.gain.setValueAtTime(level, damperFrom);
     envelope.gain.exponentialRampToValueAtTime(0.0001, damperFrom + DAMPER_S);
-    envelope.connect(room(ctx));
     // NO key-off knock here, and the reason is worth keeping. A knock is the damper landing,
     // and on a real instrument it is a sparse sound: it needs a key to come up with nothing
     // else holding it, which under hands happens far less often than notes are played. A
@@ -430,18 +449,11 @@ function buildSampledVoice(
     sample: SampleVoice,
 ): Voice {
     const now = ctx.currentTime;
-    const source = ctx.createBufferSource();
-    source.buffer = sample.buffer;
-    source.playbackRate.value = sample.rate;
-
     // One reading of the level, used both to open the envelope and to report what the
     // voice is holding: two calls could only ever agree, and a change to one is a change
     // the other silently disagrees with.
     const level = sampledLevel(gain, velocity);
-    const envelope = ctx.createGain();
-    envelope.gain.setValueAtTime(level, now);
-    envelope.connect(room(ctx));
-    source.connect(envelope);
+    const { source, envelope } = sampledVoice(ctx, sample, level, now);
     source.start(now);
     // Long enough that a held key never runs out of recording before the player lifts it;
     // the buffer simply ends if they hold it longer than the string rang.
@@ -545,13 +557,7 @@ function scheduleExtra(
     if (!sample || level <= 0) {
         return;
     }
-    const source = ctx.createBufferSource();
-    source.buffer = sample.buffer;
-    source.playbackRate.value = sample.rate;
-    const envelope = ctx.createGain();
-    envelope.gain.setValueAtTime(level, at);
-    envelope.connect(room(ctx));
-    source.connect(envelope);
+    const { source } = sampledVoice(ctx, sample, level, at);
     source.start(at);
     source.stop(at + sample.buffer.duration);
 }
