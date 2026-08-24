@@ -17,6 +17,7 @@
 // card bakes its own: an exported file has no stylesheet to read them from, and a picture
 // that changed with the reader's theme would be a different picture in every message.
 
+import { escapeXml } from "./xmlText";
 import { isWhite, keyLane, whiteKeys } from "./keyboardGeometry";
 import { NOTE_TEXT, noteNameOf, pitchClassOf, type Spelling } from "./theory";
 
@@ -62,14 +63,6 @@ const EDGE = "#cbd5e1";
 const MARK = "#4f46e5";
 const MARK_TEXT = "#ffffff";
 const LABEL = "#64748b";
-
-function escapeXml(text: string): string {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-}
 
 // The picture, as a self-contained SVG document.
 export function svgKeyboardDiagram(options: DiagramOptions): string {

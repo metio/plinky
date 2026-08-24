@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { SEMITONE } from "./notes";
+
 // Reading the music out of a MusicXML document, rather than out of the engraver.
 //
 // Everything Plinky needs to know about a piece — when each note starts, how long it
@@ -187,8 +189,6 @@ export type XmlBar = {
     beatType: number;
 };
 
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-
 const text = (element: Element | null | undefined): string => element?.textContent?.trim() ?? "";
 
 const numberOf = (element: Element | null | undefined, fallback: number): number => {
@@ -206,7 +206,7 @@ function midiOf(note: Element): number | null {
     if (!pitch) {
         return null;
     }
-    const step = STEP_SEMITONES[text(child(pitch, "step")).toUpperCase()];
+    const step = SEMITONE[text(child(pitch, "step")).toUpperCase()];
     if (step === undefined) {
         return null;
     }

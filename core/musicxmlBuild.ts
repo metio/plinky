@@ -6,6 +6,7 @@
 // static finger-exercise scores are emitted by the same model offline in
 // dev/gen-exercise-scores.mjs.
 
+import { escapeXmlText } from "./xmlText";
 export { alterFor } from "./notes";
 
 export type BuiltPitch = { step: string; octave: number; alter: number };
@@ -27,10 +28,6 @@ export const RHYTHM: Record<RhythmValue, { divisions: number; type: string }> = 
 // pitches struck at the same moment and held for the same value, which MusicXML
 // spells as following notes marked <chord/>.
 export type BuiltNote = { pitch: BuiltPitch; value: RhythmValue; with?: BuiltPitch[] };
-
-function escapeXml(text: string): string {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 // One <note>. `chord` marks it as sounding with the note before it rather than
 // after — the duration is still written, but the reader does not advance.
@@ -131,7 +128,7 @@ export function buildScore(spec: ScoreSpec): string {
     });
     return `<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
-  <work><work-title>${escapeXml(spec.title)}</work-title></work>
+  <work><work-title>${escapeXmlText(spec.title)}</work-title></work>
   <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
   <part id="P1">
 ${measures.join("\n")}

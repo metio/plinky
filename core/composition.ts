@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { escapeXmlText } from "./xmlText";
 import type { MidiNote } from "./midiFile";
 import { cleanBeatsPerBar } from "./meter";
 import { packToCode, unpackFromCode } from "./shareCode";
@@ -425,10 +426,6 @@ function noteElements(
     return { xml: lines.join("\n"), holdingOut: holding };
 }
 
-function escapeXml(text: string): string {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 export type MusicXmlOptions = {
     title?: string;
     // Snap the staff to this many subdivisions per beat before notating. A higher
@@ -517,7 +514,7 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
-  <work><work-title>${escapeXml(title)}</work-title></work>
+  <work><work-title>${escapeXmlText(title)}</work-title></work>
   <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
   <part id="P1">
 ${measures.join("\n")}

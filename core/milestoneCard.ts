@@ -7,20 +7,13 @@
 // the SVG: system emoji rasterise unreliably through canvas, so the emoji rides in
 // the share *text* instead, where the platform renders it.
 
+import { escapeXml } from "./xmlText";
 export type MilestoneCard = {
     // The achievement, large and central — "Grade 5".
     title: string;
     // A supporting stat under it — "Skill 1840". Optional.
     detail?: string;
 };
-
-function escapeXml(text: string): string {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-}
 
 export function svgMilestone({ title, detail }: MilestoneCard): string {
     const width = 1080;

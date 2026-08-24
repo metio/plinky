@@ -13,7 +13,7 @@
 // build, but the browser computes an uploaded file's id to place it and to detect that it
 // duplicates a catalogue piece.
 
-import { STEP_SEMITONES } from "./pitch";
+import { SEMITONE } from "./notes";
 
 // Base62 (digits + letters): URL- and filename-safe, no leading `-`/`_` edge cases.
 const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -28,12 +28,12 @@ function noteSignature(xml: string): string {
         const body = match[1] ?? "";
         const step = body.match(/<step>\s*([A-G])\s*<\/step>/)?.[1];
         const octave = body.match(/<octave>\s*(-?\d+)\s*<\/octave>/)?.[1];
-        if (step === undefined || octave === undefined || STEP_SEMITONES[step] === undefined) {
+        if (step === undefined || octave === undefined || SEMITONE[step] === undefined) {
             continue;
         }
         const alter = Number(body.match(/<alter>\s*(-?\d+)\s*<\/alter>/)?.[1] ?? "0");
         const duration = body.match(/<duration>\s*(\d+)\s*<\/duration>/)?.[1] ?? "0";
-        const midi = (Number(octave) + 1) * 12 + STEP_SEMITONES[step]! + alter;
+        const midi = (Number(octave) + 1) * 12 + SEMITONE[step]! + alter;
         notes.push(`${midi}:${duration}`);
     }
     return notes.join(",");

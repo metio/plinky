@@ -10,7 +10,6 @@ import {
     frequencyToMidi,
     midiToFrequency,
     SILENCE_RMS,
-    STEP_SEMITONES,
 } from "./pitch";
 
 const SAMPLE_RATE = 44_100;
@@ -39,12 +38,6 @@ describe("midiToFrequency", () => {
 
     it("puts middle C (MIDI 60) near 261.63 Hz", () => {
         expect(midiToFrequency(60)).toBeCloseTo(261.6256, 3);
-    });
-});
-
-describe("STEP_SEMITONES", () => {
-    it("maps the seven natural letters to their offset above C", () => {
-        expect(STEP_SEMITONES).toEqual({ C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 });
     });
 });
 

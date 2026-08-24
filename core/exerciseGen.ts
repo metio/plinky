@@ -64,34 +64,6 @@ const MINOR_KEYS: Record<string, [string, number]> = {
     g: ["G", -2],
     d: ["D", -1],
 };
-const MAJOR_SLUGS = [
-    "c",
-    "g",
-    "d",
-    "a",
-    "e",
-    "b",
-    "gflat",
-    "dflat",
-    "aflat",
-    "eflat",
-    "bflat",
-    "f",
-];
-const MINOR_SLUGS = [
-    "a",
-    "e",
-    "b",
-    "fsharp",
-    "csharp",
-    "gsharp",
-    "eflat",
-    "bflat",
-    "f",
-    "c",
-    "g",
-    "d",
-];
 
 // A key slug as a musician writes it — "eflat" is E♭. Exported because a warm-up that
 // offers the next rung of the arcade should say which key it is about to ask for.
@@ -362,13 +334,20 @@ function normalizeExercise(config: ExerciseConfig): ExerciseConfig {
             supportsIntervals(config.type) && hands !== "contrary" ? config.interval : "single",
     };
 }
-function context(type: ExerciseType, key: string): { tonic: string; fifths: number } {
-    const minor =
+// Which of the two key tables a type is read against. Minor and major name their keys
+// differently — a slug of "fsharp" is a key in one and not in the other — so getting this
+// wrong does not read the wrong tonic, it fails to find the key at all.
+function isMinorType(type: ExerciseType): boolean {
+    return (
         type === "natural-minor-scale" ||
         type === "harmonic-minor-scale" ||
         type === "melodic-minor-scale" ||
-        type === "minor-arpeggio";
-    const [tonic, fifths] = (minor ? MINOR_KEYS : MAJOR_KEYS)[key] ?? ["C", 0];
+        type === "minor-arpeggio"
+    );
+}
+
+function context(type: ExerciseType, key: string): { tonic: string; fifths: number } {
+    const [tonic, fifths] = (isMinorType(type) ? MINOR_KEYS : MAJOR_KEYS)[key] ?? ["C", 0];
     return { tonic, fifths };
 }
 
@@ -542,12 +521,7 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
         return k === kind && m === mode;
     });
     if (!type) return null;
-    const minorType =
-        type === "natural-minor-scale" ||
-        type === "harmonic-minor-scale" ||
-        type === "melodic-minor-scale" ||
-        type === "minor-arpeggio";
-    if (!(minorType ? MINOR_KEYS : MAJOR_KEYS)[key]) {
+    if (!(isMinorType(type) ? MINOR_KEYS : MAJOR_KEYS)[key]) {
         return null;
     }
     let octaves: 1 | 2 = 1;
@@ -570,47 +544,40 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
 }
 
 // The browsable tiles: one per (type, key) in its canonical form.
+// What a browsable tile is: the plainest reading of a form in a key. One octave, right
+// hand, root position, one note at a time — every other combination is something a player
+// asks for on the exercise's own page rather than something the shelf offers up front.
+const browsable = (type: ExerciseType, key: string): ExerciseConfig => ({
+    type,
+    key,
+    octaves: 1,
+    hands: "right",
+    inversion: 0,
+    interval: "single",
+});
+
+const MAJOR_FORMS: ExerciseType[] = [
+    "major-scale",
+    "major-arpeggio",
+    "dom7-arpeggio",
+    "dim7-arpeggio",
+];
+const MINOR_FORMS: ExerciseType[] = [
+    "natural-minor-scale",
+    "harmonic-minor-scale",
+    "melodic-minor-scale",
+    "minor-arpeggio",
+];
+
+// The keys come from the tables themselves rather than a list beside them: a second list
+// in the same order is a chance to add a key to one and not the other.
 export const EXERCISE_TILES: ExerciseConfig[] = [
-    ...MAJOR_SLUGS.flatMap((key) =>
-        (["major-scale", "major-arpeggio", "dom7-arpeggio", "dim7-arpeggio"] as ExerciseType[]).map(
-            (type) => ({
-                type,
-                key,
-                octaves: 1 as const,
-                hands: "right" as const,
-                inversion: 0 as const,
-                interval: "single" as const,
-            }),
-        ),
-    ),
+    ...Object.keys(MAJOR_KEYS).flatMap((key) => MAJOR_FORMS.map((type) => browsable(type, key))),
     // A chromatic run covers every semitone regardless of key — a "G♭ chromatic
     // scale" is just the C one transposed, and enharmonic keys even fingerprint to
     // the same content id — so exactly one canonical C-rooted tile is browsable.
-    {
-        type: "chromatic-scale" as ExerciseType,
-        key: "c",
-        octaves: 1 as const,
-        hands: "right" as const,
-        inversion: 0 as const,
-        interval: "single" as const,
-    },
-    ...MINOR_SLUGS.flatMap((key) =>
-        (
-            [
-                "natural-minor-scale",
-                "harmonic-minor-scale",
-                "melodic-minor-scale",
-                "minor-arpeggio",
-            ] as ExerciseType[]
-        ).map((type) => ({
-            type,
-            key,
-            octaves: 1 as const,
-            hands: "right" as const,
-            inversion: 0 as const,
-            interval: "single" as const,
-        })),
-    ),
+    browsable("chromatic-scale", "c"),
+    ...Object.keys(MINOR_KEYS).flatMap((key) => MINOR_FORMS.map((type) => browsable(type, key))),
 ];
 
 export const isArpeggio = (type: ExerciseType): boolean => type.endsWith("-arpeggio");

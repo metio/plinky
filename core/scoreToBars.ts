@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { STEP_SEMITONES } from "./pitch";
+import { SEMITONE } from "./notes";
 import type { XmlCodec } from "./xml";
 // Turns a piece's MusicXML into per-bar chord positions for one hand, so a passage
 // can be fingered (or reproduced by ear). Each bar is a list of positions in play
@@ -24,11 +24,11 @@ function midiOf(note: Element): number | null {
     }
     const step = pitch.getElementsByTagName("step")[0]?.textContent ?? "";
     const octaveText = pitch.getElementsByTagName("octave")[0]?.textContent ?? "";
-    if (!(step in STEP_SEMITONES) || octaveText === "") {
+    if (!(step in SEMITONE) || octaveText === "") {
         return null;
     }
     const alter = Number(pitch.getElementsByTagName("alter")[0]?.textContent ?? "0");
-    const midi = (Number(octaveText) + 1) * 12 + STEP_SEMITONES[step]! + alter;
+    const midi = (Number(octaveText) + 1) * 12 + SEMITONE[step]! + alter;
     // A non-numeric <octave> or <alter> yields NaN, which would slip past the null
     // check and place a phantom position; treat it as an unreadable note.
     return Number.isFinite(midi) ? midi : null;

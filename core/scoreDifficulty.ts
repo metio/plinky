@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { fingerPositions, positionsCost } from "./fingering";
-import { STEP_SEMITONES } from "./pitch";
+import { SEMITONE } from "./notes";
 import type { XmlCodec } from "./xml";
 
 // How hard a score is to *play*, derived from the fingering cost model — the same
@@ -19,7 +19,7 @@ function midiOf(note: Element): number | null {
         return null; // a rest, or an unpitched note — nothing to finger
     }
     const step = pitch.querySelector("step")?.textContent?.trim() ?? "";
-    const semitone = STEP_SEMITONES[step];
+    const semitone = SEMITONE[step];
     if (semitone === undefined) {
         return null;
     }

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { escapeXml } from "./xmlText";
 import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
 
 // Compiles a finished run into a Wordle-style share artifact: the run is sliced into six
@@ -341,12 +342,4 @@ export function svgCard(grid: Grid, heading: string): string {
 ${cells}\
 <text x="${width / 2}" y="${top + gridH + 96}" fill="${CARD_FOOTER}" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
 </svg>`;
-}
-
-function escapeXml(text: string): string {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
 }

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { STEP_SEMITONES } from "./pitch";
+import { SEMITONE } from "./notes";
 import type { XmlCodec } from "./xml";
 import { LETTERS } from "./notes";
 // Transposes a score's MusicXML up or down by a number of semitones, client-side,
@@ -95,7 +95,7 @@ export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: numbe
     for (const pitch of doc.querySelectorAll("note > pitch")) {
         const step = pitch.querySelector("step")?.textContent?.trim() ?? "";
         const letter = LETTER_INDEX[step];
-        const semitone = STEP_SEMITONES[step];
+        const semitone = SEMITONE[step];
         if (letter === undefined || semitone === undefined) {
             continue;
         }
@@ -111,7 +111,7 @@ export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: numbe
         // The chromatic pitch moves by the exact semitone count; the new accidental
         // is whatever bridges the new letter at the new octave to that pitch.
         const newMidi = midi + semitones;
-        const newAlter = newMidi - ((newOctave + 1) * 12 + (STEP_SEMITONES[newLetter] ?? 0));
+        const newAlter = newMidi - ((newOctave + 1) * 12 + (SEMITONE[newLetter] ?? 0));
 
         const stepNode = pitch.querySelector("step");
         const octaveNode = pitch.querySelector("octave");

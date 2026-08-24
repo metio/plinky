@@ -13,6 +13,7 @@
 // that one leaves as a file with no stylesheet to read, this one stays on a page that has
 // one, and a rhythm that ignored the reader's theme would glow white in a dark room.
 
+import { escapeXml } from "./xmlText";
 import type { Cell, RhythmPattern } from "./rhythmPattern";
 import { cellBeats } from "./rhythmPattern";
 
@@ -299,14 +300,6 @@ export function rhythmSvg({ pattern, marks, activeNote, label }: NotationOptions
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${round(layout.width)} ${layout.height}" width="100%" style="height:auto;max-height:${layout.height}px" preserveAspectRatio="xMidYMid meet" ${
         label ? `role="img" aria-label="${escapeXml(label)}"` : 'aria-hidden="true"'
     }>${parts.join("")}</svg>`;
-}
-
-function escapeXml(text: string): string {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
 }
 
 function round(value: number): number {
