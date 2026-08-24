@@ -243,6 +243,27 @@ function keyGlows(down: readonly { pitch: number; heldMs: number }[]): Map<numbe
     return glows;
 }
 
+// The keys, white ones first and black ones over them.
+//
+// The order is the whole reason this is a function rather than one loop: a black key
+// overlaps the two white keys it sits between, so drawing them in pitch order would leave
+// the white neighbours painted on top of it. Both painters need that, and only one of them
+// tints a lit key by finger or hand.
+function paintKeyboard(
+    context: Context2D,
+    keys: SceneKey[],
+    layout: KeyLayout,
+    glowOf: (pitch: number) => number | null,
+    litOf?: (pitch: number) => string,
+): void {
+    for (const key of keys.filter((entry) => !entry.black)) {
+        paintKey(context, key, glowOf(key.pitch), layout, litOf?.(key.pitch));
+    }
+    for (const key of keys.filter((entry) => entry.black)) {
+        paintKey(context, key, glowOf(key.pitch), layout, litOf?.(key.pitch));
+    }
+}
+
 // The stage both painters set before they draw anything: the pitch range the run spans and
 // its keys, the margin and the type unit, and the chrome the frame wears.
 //
@@ -363,12 +384,7 @@ export function takeScenePainter({
         // still snaps back to full.
         const glows = keyGlows(frame.down);
         const glowOf = (pitch: number) => glows.get(pitch) ?? null;
-        for (const key of keys.filter((entry) => !entry.black)) {
-            paintKey(context, key, glowOf(key.pitch), keyLayout);
-        }
-        for (const key of keys.filter((entry) => entry.black)) {
-            paintKey(context, key, glowOf(key.pitch), keyLayout);
-        }
+        paintKeyboard(context, keys, keyLayout, glowOf);
 
         paintCredit(context, cfg);
     };
@@ -584,12 +600,7 @@ export function takeHighwayPainter({
         const hands = new Map(frame.down.map((entry) => [entry.pitch, entry.hand]));
         const litOf = (pitch: number) =>
             paintHex(scheme, { finger: fingers.get(pitch), hand: hands.get(pitch) }, ACCENT);
-        for (const key of keys.filter((entry) => !entry.black)) {
-            paintKey(context, key, glowOf(key.pitch), keyLayout, litOf(key.pitch));
-        }
-        for (const key of keys.filter((entry) => entry.black)) {
-            paintKey(context, key, glowOf(key.pitch), keyLayout, litOf(key.pitch));
-        }
+        paintKeyboard(context, keys, keyLayout, glowOf, litOf);
 
         paintCredit(context, cfg);
     };

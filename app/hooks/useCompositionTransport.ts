@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useTimerChain } from "./useTimerChain";
 import { useLatest } from "./useLatest";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { RecordedNote } from "../../core/composition";
 import { tailMs } from "../../core/recording";
 import { useScheduler } from "../contexts/services";
@@ -32,19 +33,15 @@ export function useCompositionTransport({
     const scheduler = useScheduler();
     const [playing, setPlaying] = useState(false);
     const [countingIn, setCountingIn] = useState(false);
-    const timersRef = useRef<number[]>([]);
+    // One pool of timers, cleared together — useTimerChain already owns that, including
+    // releasing what is still scheduled when the page goes away.
+    const timers = useTimerChain();
 
     const stop = useCallback(() => {
-        for (const id of timersRef.current) {
-            scheduler.cancel(id);
-        }
-        timersRef.current = [];
+        timers.clear();
         setPlaying(false);
         setCountingIn(false);
-    }, [scheduler]);
-
-    // Release any scheduled playback when the page goes away.
-    useEffect(() => stop, [stop]);
+    }, [timers]);
 
     const play = useCallback(() => {
         stop();
@@ -53,17 +50,15 @@ export function useCompositionTransport({
         }
         setPlaying(true);
         for (const note of notes) {
-            const id = scheduler.after(note.startMs, () => {
+            timers.push(() => {
                 playNote(note.pitch, {
                     velocity: note.velocity,
                     duration: Math.max(0.05, note.durationMs / 1000),
                 });
-            });
-            timersRef.current.push(id);
+            }, note.startMs);
         }
-        const end = scheduler.after(tailMs(notes) + 200, () => setPlaying(false));
-        timersRef.current.push(end);
-    }, [notes, playNote, stop, scheduler]);
+        timers.push(() => setPlaying(false), tailMs(notes) + 200);
+    }, [notes, playNote, stop, timers]);
 
     // Click one bar of lead-in, then hand the downbeat to the recorder so what's
     // played next sits on the grid, appending after any existing tail.
@@ -78,13 +73,11 @@ export function useCompositionTransport({
         }
         setCountingIn(true);
         const barMs = beatsPerBar * (60_000 / tempo);
-        timersRef.current.push(
-            scheduler.after(barMs, () => {
-                setCountingIn(false);
-                onDownbeatRef.current(scheduler.now());
-            }),
-        );
-    }, [beatsPerBar, tempo, scheduler]);
+        timers.push(() => {
+            setCountingIn(false);
+            onDownbeatRef.current(scheduler.now());
+        }, barMs);
+    }, [beatsPerBar, tempo, scheduler, timers]);
 
     return { playing, play, stop, countingIn, countIn };
 }
