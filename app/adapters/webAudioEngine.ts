@@ -245,6 +245,47 @@ export type StruckStrike = {
     releaseEnd: number;
 };
 
+// The lowpass every synthesised voice rings through, closing from bright to dark across the
+// note's whole life so the tone darkens all the way out rather than snapping bright-to-gone.
+// Its two ends are the same in both voices; only how long it takes to close differs.
+function ringFilter(
+    ctx: BaseAudioContext,
+    frequency: number,
+    from: number,
+    until: number,
+): BiquadFilterNode {
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), from);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), until);
+    filter.connect(room(ctx));
+    return filter;
+}
+
+// The stack of partials that makes the tone: each a multiple of the fundamental, slightly
+// detuned for the mild inharmonicity a real string has, mixed at its own weight into the
+// envelope. Started, and left for the caller to stop — a scheduled strike knows when its
+// note ends, a held key does not.
+function startPartials(
+    ctx: BaseAudioContext,
+    frequency: number,
+    envelope: GainNode,
+    at: number,
+): OscillatorNode[] {
+    return PARTIALS.map((partial) => {
+        const oscillator = ctx.createOscillator();
+        oscillator.type = partial.type;
+        oscillator.frequency.value = frequency * partial.ratio;
+        oscillator.detune.value = (partial.ratio - 1) * 2;
+        const partialGain = ctx.createGain();
+        partialGain.gain.value = partial.gain;
+        oscillator.connect(partialGain);
+        partialGain.connect(envelope);
+        oscillator.start(at);
+        return oscillator;
+    });
+}
+
 export function renderStrike(
     ctx: BaseAudioContext,
     strike: NoteStrike,
@@ -267,11 +308,7 @@ export function renderStrike(
     const sustain = gain * 0.5;
     const releaseEnd = Math.max(holdUntil, decayEnd) + tail;
 
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), now);
-    filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), releaseEnd);
-    filter.connect(room(ctx));
+    const filter = ringFilter(ctx, frequency, now, releaseEnd);
 
     const envelope = ctx.createGain();
     // Exponential ramps cannot reach zero, so the envelope rides just above it.
@@ -287,21 +324,12 @@ export function renderStrike(
     envelope.gain.exponentialRampToValueAtTime(0.0001, releaseEnd);
     envelope.connect(filter);
 
-    const oscillators = PARTIALS.map((partial) => {
-        const oscillator = ctx.createOscillator();
-        oscillator.type = partial.type;
-        oscillator.frequency.value = frequency * partial.ratio;
-        oscillator.detune.value = (partial.ratio - 1) * 2; // mild inharmonicity for warmth
-        const partialGain = ctx.createGain();
-        partialGain.gain.value = partial.gain;
-        oscillator.connect(partialGain);
-        partialGain.connect(envelope);
-        oscillator.start(now);
+    const oscillators = startPartials(ctx, frequency, envelope, now);
+    for (const oscillator of oscillators) {
         // Keep the oscillator alive a hair past the tail so its stop never clips the
         // ring-out the envelope is still fading.
         oscillator.stop(releaseEnd + 0.03);
-        return oscillator;
-    });
+    }
     return { envelope, oscillators, releaseEnd };
 }
 
@@ -472,11 +500,7 @@ function buildSampledVoice(
 // no release scheduled — the shelf holds until fadeVoice rings it out.
 function buildVoice(ctx: AudioContext, frequency: number, gain: number): Voice {
     const now = ctx.currentTime;
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), now);
-    filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), now + 0.6);
-    filter.connect(room(ctx));
+    const filter = ringFilter(ctx, frequency, now, now + 0.6);
 
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(0.0001, now);
@@ -484,18 +508,7 @@ function buildVoice(ctx: AudioContext, frequency: number, gain: number): Voice {
     envelope.gain.exponentialRampToValueAtTime(gain * 0.5, now + 0.18);
     envelope.connect(filter);
 
-    const oscillators = PARTIALS.map((partial) => {
-        const oscillator = ctx.createOscillator();
-        oscillator.type = partial.type;
-        oscillator.frequency.value = frequency * partial.ratio;
-        oscillator.detune.value = (partial.ratio - 1) * 2;
-        const partialGain = ctx.createGain();
-        partialGain.gain.value = partial.gain;
-        oscillator.connect(partialGain);
-        partialGain.connect(envelope);
-        oscillator.start(now);
-        return oscillator;
-    });
+    const oscillators = startPartials(ctx, frequency, envelope, now);
     return { envelope, oscillators, frequency, startedAt: now, level: gain };
 }
 

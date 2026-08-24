@@ -243,6 +243,71 @@ function keyGlows(down: readonly { pitch: number; heldMs: number }[]): Map<numbe
     return glows;
 }
 
+// The stage both painters set before they draw anything: the pitch range the run spans and
+// its keys, the margin and the type unit, and the chrome the frame wears.
+//
+// The type unit is the SMALLER side rather than the width, and that is the part worth having
+// in one place: a portrait frame is taller than wide, so scaling type by width would turn
+// its titles into billboards.
+function stageFor(input: {
+    title: string;
+    credit: string;
+    notes: RecordedNote[];
+    durationMs: number;
+    width: number;
+    height: number;
+    showTitle: boolean;
+    showWordmark: boolean;
+}): {
+    from: number;
+    to: number;
+    keys: SceneKey[];
+    margin: number;
+    unit: number;
+    cfg: ChromeConfig;
+} {
+    const { from, to } = sceneRange(input.notes.map((note) => note.pitch));
+    const margin = Math.round(input.width * 0.05);
+    const unit = Math.min(input.width, input.height);
+    return {
+        from,
+        to,
+        keys: sceneKeys(from, to),
+        margin,
+        unit,
+        cfg: {
+            title: input.title,
+            credit: input.credit,
+            width: input.width,
+            height: input.height,
+            unit,
+            margin,
+            durationMs: input.durationMs,
+            showTitle: input.showTitle,
+            showWordmark: input.showWordmark,
+        },
+    };
+}
+
+// Where the keys sit and what colour they are. Each painter decides the band; everything
+// else about it is the same picture.
+function keyLayoutFor(
+    width: number,
+    margin: number,
+    keyboardTop: number,
+    keyboardHeight: number,
+    keyColors?: { white: string; black: string },
+): KeyLayout {
+    return {
+        margin,
+        width,
+        keyboardTop,
+        keyboardHeight,
+        white: keyColors?.white ?? WHITE_KEY,
+        black: keyColors?.black ?? BLACK_KEY,
+    };
+}
+
 export function takeScenePainter({
     title,
     credit,
@@ -257,8 +322,16 @@ export function takeScenePainter({
     showWordmark = true,
     keyColors,
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
-    const { from, to } = sceneRange(notes.map((note) => note.pitch));
-    const keys = sceneKeys(from, to);
+    const { keys, margin, unit, cfg } = stageFor({
+        title,
+        credit,
+        notes,
+        durationMs,
+        width,
+        height,
+        showTitle,
+        showWordmark,
+    });
     // With a notation panel the keyboard cedes the middle of the stage to it.
     // A portrait frame drops the keyboard entirely (on the vertical feeds the
     // notation is the story, and the full-height panel keeps its glyphs readable
@@ -267,32 +340,10 @@ export function takeScenePainter({
     const scoreOnly = score !== null && (height > width || !keyboard);
     const keyboardTop = score ? height * 0.66 : height * 0.42;
     const keyboardHeight = score ? height * 0.24 : height * 0.4;
-    const margin = Math.round(width * 0.05);
-    // Portrait frames are taller than wide; type scales by the smaller side so
-    // titles stay titles instead of billboards.
-    const unit = Math.min(width, height);
     // The run's distinct onsets in playing order — step i of the snapshot sounded
     // at onsets[i], mirroring how the matcher and the take both count steps.
     const onsets = [...new Set(notes.map((note) => note.startMs))].sort((a, b) => a - b);
-    const cfg: ChromeConfig = {
-        title,
-        credit,
-        width,
-        height,
-        unit,
-        margin,
-        durationMs,
-        showTitle,
-        showWordmark,
-    };
-    const keyLayout: KeyLayout = {
-        margin,
-        width,
-        keyboardTop,
-        keyboardHeight,
-        white: keyColors?.white ?? WHITE_KEY,
-        black: keyColors?.black ?? BLACK_KEY,
-    };
+    const keyLayout = keyLayoutFor(width, margin, keyboardTop, keyboardHeight, keyColors);
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
@@ -478,10 +529,16 @@ export function takeHighwayPainter({
     // How much of the frame's height the keyboard takes; see core/videoLook.
     keyboardDepth?: number;
 }): (context: Context2D, timeMs: number) => void {
-    const { from, to } = sceneRange(notes.map((note) => note.pitch));
-    const keys = sceneKeys(from, to);
-    const margin = Math.round(width * 0.05);
-    const unit = Math.min(width, height);
+    const { keys, margin, cfg } = stageFor({
+        title,
+        credit,
+        notes,
+        durationMs,
+        width,
+        height,
+        showTitle,
+        showWordmark,
+    });
     // The keyboard sits at the foot; the blocks fall through the band above it,
     // from just below the title down to the keys' top (the strike line).
     //
@@ -491,25 +548,7 @@ export function takeHighwayPainter({
     const keyboardTop = height * 0.96 - keyboardHeight;
     const laneTop = height * 0.3;
     const regionHeight = keyboardTop - laneTop;
-    const cfg: ChromeConfig = {
-        title,
-        credit,
-        width,
-        height,
-        unit,
-        margin,
-        durationMs,
-        showTitle,
-        showWordmark,
-    };
-    const keyLayout: KeyLayout = {
-        margin,
-        width,
-        keyboardTop,
-        keyboardHeight,
-        white: keyColors?.white ?? WHITE_KEY,
-        black: keyColors?.black ?? BLACK_KEY,
-    };
+    const keyLayout = keyLayoutFor(width, margin, keyboardTop, keyboardHeight, keyColors);
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
