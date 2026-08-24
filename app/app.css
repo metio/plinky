@@ -31,25 +31,35 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
    Opacity modifiers work as usual: `bg-accent-surface/50`. */
 @theme {
+    /* Paper and ink, warm.
+       Every ground and every grey of text used to sit at hue 245-256 — a violet page, violet
+       hairlines, violet writing — which left violet nothing to mean, the same way the dark
+       theme's violet walls did. The line below has always said ink is brown-black rather
+       than blue-black; the values simply never were.
+       They are now, at hue 33-40, and violet is kept for the mark and for whichever action
+       matters most on the screen you are looking at. */
     /* Surfaces, back to front. */
-    --color-surface: #f9f8fc; /* the page itself — the score's own paper */
+    --color-surface: #faf7f2; /* the page itself — the score's own paper */
     --color-raised: #ffffff; /* cards and popovers over it, a shade lighter */
-    --color-sunken: #f2effa; /* inset panels */
-    --color-subtle: #ede9f9; /* quiet fills, chips, hovers */
-    --color-subtle-strong: #ded7f3;
+    --color-sunken: #f3eee6; /* inset panels */
+    --color-subtle: #efe9df; /* quiet fills, chips, hovers */
+    --color-subtle-strong: #e3dacb;
 
     /* Hairlines, at the weight a staff line is printed. */
-    --color-line-faint: #ede9f9;
-    --color-line: #e0daf4; /* the default border */
-    --color-line-strong: #c7bce8; /* inputs and controls */
+    --color-line-faint: #efe9df;
+    --color-line: #e8e0d4; /* the default border */
+    --color-line-strong: #cfc2ad; /* inputs and controls */
 
-    /* Text, strongest to quietest. Printing ink is brown-black, not blue-black. */
-    --color-ink: #191545; /* headings, primary text */
-    --color-ink-soft: #241f5c;
-    --color-body: #3a3568; /* running copy */
-    --color-muted: #6f6a9c; /* secondary and helper text — the pencil */
-    --color-faint: #8c88b4; /* receded, decorative glyphs */
-    --color-ink-disabled: #b6b2d2; /* quieter still than faint */
+    /* Text, strongest to quietest. Printing ink is brown-black, not blue-black.
+       muted and faint are the two that were solved for rather than picked: each clears its
+       contrast floor against the DARKEST ground it can land on (the sunken panel), not just
+       against white, which is where a warm grey quietly stops being readable. */
+    --color-ink: #241c12; /* headings, primary text */
+    --color-ink-soft: #3a2e1f;
+    --color-body: #4d4032; /* running copy */
+    --color-muted: #736554; /* secondary and helper text — the pencil */
+    --color-faint: #91816e; /* receded, decorative glyphs */
+    --color-ink-disabled: #c3b8a8; /* quieter still than faint */
 
     /* Ink blue carries the brand: links, selection, the primary action. */
     --color-accent: #4915d2;
@@ -158,9 +168,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        seven hues. With `spark` and `plink`, which the brand owns and which never carry
        data, they are the five petals of the greeting's flower.
        Each is the lightest value that still reads at 4.5:1 on its own theme. */
-    --color-bloom-leaf: #4c7d21;
-    --color-bloom-sky: #2275b4;
-    --color-bloom-rose: #cf2a88;
+    /* The decorative hues, and the only ones in the app that mean nothing at all. Every
+       colour that carries a meaning somewhere — green for right, red for wrong, the grade
+       bands, the hands — stays out of this set, so nobody has to wonder whether a pink
+       balloon is telling them something.
+       They are bright on purpose: the greeting's illustrations are drawn entirely from them,
+       and at the old weights the sun came out a bronze medallion rather than sunlight. */
+    --color-bloom-sun: #e8a723;
+    --color-bloom-flame: #ef7d3a;
+    --color-bloom-leaf: #57a01f;
+    --color-bloom-sky: #1e86d6;
+    --color-bloom-rose: #e0359a;
 
     /* The plink: one note, played. It is the dot on the i, and the dot in the app icon,
        and nothing else — the brand's whole spark, spent in one place.
@@ -302,9 +320,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-deep: var(--color-indigo-300);
 
     --color-plink: #c56bff;
-    --color-bloom-leaf: #568d25;
-    --color-bloom-sky: #2683c9;
-    --color-bloom-rose: #d84196;
+    --color-bloom-sun: #f0b73a;
+    --color-bloom-flame: #f58c4a;
+    --color-bloom-leaf: #6cb52f;
+    --color-bloom-sky: #3699e0;
+    --color-bloom-rose: #e84fa6;
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-400);

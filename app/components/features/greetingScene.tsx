@@ -19,7 +19,7 @@ import type { PartOfDay } from "../../../core/greeting";
 // grade bands) stays out, so nobody has to wonder whether a pink balloon is telling them
 // something.
 
-const PETALS = ["bg-spark", "bg-bloom-leaf", "bg-bloom-sky", "bg-plink", "bg-bloom-rose"];
+const PETALS = ["bg-bloom-sun", "bg-bloom-leaf", "bg-bloom-sky", "bg-plink", "bg-bloom-rose"];
 
 // How long the stalk takes to draw itself, in seconds. The petals wait it out, so this has
 // to agree with `--animate-stem-draw` in app.css — the two are one gesture split across a
@@ -27,17 +27,21 @@ const PETALS = ["bg-spark", "bg-bloom-leaf", "bg-bloom-sky", "bg-plink", "bg-blo
 // looks like.
 const STEM_SECONDS = 1.15;
 
-// The rays, by angle and colour. Gold with pink at the diagonals rather than eight of one
-// hue: a ring of identical spokes reads as a clock face.
+// The rays, by angle and colour. Gold, flame and pink rather than eight of one hue: a ring
+// of identical spokes reads as a clock face.
+//
+// These are the bloom colours rather than `spark`, which looks like the right gold and is
+// not available: spark is the grade-S colour and the "warm up" heading, so brightening it to
+// sunlight would drop its contrast wherever it is set as text.
 const RAYS: [number, string][] = [
-    [0, "bg-spark"],
-    [45, "bg-spark-strong"],
+    [0, "bg-bloom-sun"],
+    [45, "bg-bloom-flame"],
     [90, "bg-bloom-rose"],
-    [135, "bg-spark"],
-    [180, "bg-spark-strong"],
-    [225, "bg-spark"],
+    [135, "bg-bloom-sun"],
+    [180, "bg-bloom-flame"],
+    [225, "bg-bloom-sun"],
     [270, "bg-bloom-rose"],
-    [315, "bg-spark"],
+    [315, "bg-bloom-sun"],
 ];
 
 function Sun() {
@@ -56,7 +60,7 @@ function Sun() {
                     }}
                 />
             ))}
-            <span className="absolute left-1/2 top-1/2 -ml-[17px] -mt-[17px] size-[34px] rounded-full bg-spark" />
+            <span className="absolute left-1/2 top-1/2 -ml-[17px] -mt-[17px] size-[34px] rounded-full bg-bloom-sun" />
         </span>
     );
 }
@@ -114,7 +118,7 @@ function Flower() {
 // balloon drawn three times.
 const BALLOONS: { colour: string; string: string; left: number; top: number; delay: string }[] = [
     { colour: "bg-bloom-rose", string: "text-bloom-leaf", left: 8, top: 14, delay: "0s" },
-    { colour: "bg-plink", string: "text-spark", left: 26, top: 6, delay: "-1.2s" },
+    { colour: "bg-plink", string: "text-bloom-sun", left: 26, top: 6, delay: "-1.2s" },
     { colour: "bg-bloom-sky", string: "text-plink", left: 42, top: 16, delay: "-2.4s" },
 ];
 
@@ -159,11 +163,11 @@ function Balloons() {
 }
 
 const SPARKS: { left: number; top: number; size: number; colour: string; delay: string }[] = [
-    { left: 4, top: 10, size: 20, colour: "text-spark", delay: "0s" },
+    { left: 4, top: 10, size: 20, colour: "text-bloom-sun", delay: "0s" },
     { left: 40, top: 6, size: 17, colour: "text-bloom-rose", delay: "-0.8s" },
     { left: 28, top: 30, size: 18, colour: "text-plink", delay: "-1.6s" },
     { left: 8, top: 42, size: 14, colour: "text-bloom-sky", delay: "-2.2s" },
-    { left: 50, top: 38, size: 12, colour: "text-spark", delay: "-2.8s" },
+    { left: 50, top: 38, size: 12, colour: "text-bloom-sun", delay: "-2.8s" },
 ];
 
 const DOTS: { left: number; top: number; size: number; colour: string; delay: string }[] = [
