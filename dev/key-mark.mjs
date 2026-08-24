@@ -44,6 +44,7 @@ const SOURCES = [
     { source: "brand/source/plinky-mark.png", out: "brand/plinky-mark.png", what: "the lockup" },
     { source: "brand/source/plinky-icon.png", out: "brand/plinky-icon.png", what: "the icon" },
     { source: "brand/source/plinky-keys.png", out: "brand/plinky-keys.png", what: "the keys" },
+    { source: "brand/source/plinky-tile.png", out: "brand/plinky-tile.png", what: "the tile" },
 ];
 // The keyed masters are emitted at the largest size anything is rendered from — the brand
 // kit's 1024 icon. Keeping them at the sources' own 1254 would commit a third more bytes

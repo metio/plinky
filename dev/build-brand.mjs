@@ -25,6 +25,11 @@ const MARK = "brand/plinky-mark.png";
 // that rule the lockup out: the circle cuts through the name, and at that size the name is
 // a smear over the keys it is stealing room from. See core/iconMark.ts.
 const ICON = "brand/plinky-icon.png";
+// A newer lockup from the same hand, with the name set inside the tile rather than beside
+// it. Used where the picture is shown LARGE and uncropped — a repository's social preview
+// is rendered at 1280×640 and never cut to a circle — so the name is an asset there rather
+// than the smear it becomes at 56px.
+const TILE = "brand/plinky-tile.png";
 
 // The colours worth handing to somebody outside the codebase, with what each one MEANS —
 // a hex without its role is how a brand ends up with red used for decoration.
@@ -62,6 +67,7 @@ const css = await readFile(CSS, "utf8");
 // Carried into the page as a data URI rather than a file:// URL, so the render does not
 // depend on where the browser thinks its document lives.
 const mark = `data:image/png;base64,${(await readFile(MARK)).toString("base64")}`;
+const tileArt = `data:image/png;base64,${(await readFile(TILE)).toString("base64")}`;
 const icon = `data:image/png;base64,${(await readFile(ICON)).toString("base64")}`;
 // The mark carries its own rounded silhouette in its alpha, so it is scaled and never
 // clipped: a border-radius applied here is a guess at the artwork's own curve, and one
@@ -316,6 +322,37 @@ await shoot(tile(150), {
     path: `${OUT}/social/youtube-watermark-150.png`,
     transparent: true,
 });
+
+// A repository's social preview — what GitHub, Slack and a chat client unfurl for a link
+// to the code. 1280×640 is what GitHub asks for, and it is shown large and never cropped
+// to a circle, so this is the one place the name belongs INSIDE the picture: the tile can
+// carry it without competing with type set beside it.
+//
+// The ground is ink rather than the tile's own violet, for the same reason the profile
+// square uses ink — violet on violet loses the tile's edge, and the silhouette is what
+// makes it read as a mark. The tagline sits beside it saying the thing the name does not.
+//
+// Everything stays inside the middle three quarters: an unfurl is re-cropped by whoever is
+// doing the unfurling, and a preview designed edge to edge loses its ends.
+await shoot(
+    `<div style="width:1280px;height:640px;background:${colour.ink};display:flex;align-items:center;justify-content:center;gap:56px;padding:0 120px;box-sizing:border-box">
+       <img src="${tileArt}" alt="" style="width:340px;height:340px;flex:none;display:block">
+       <div style="${DISPLAY};font-size:64px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
+     </div>`,
+    { width: 1280, height: 640, path: `${OUT}/social/github-social-1280x640.png` },
+);
+
+// The same tile as a Reddit community icon, for comparison with profile-square-256.png,
+// which is built from the WORDLESS icon on purpose. Reddit crops a community icon to a
+// circle and shows it at about 56px beside a comment, where a name set under the keys is a
+// smear over them — so the wordless one is still the recommendation. This exists because
+// the choice is worth being able to see rather than to take on trust.
+await shoot(
+    `<div style="width:256px;height:256px;background:${colour.ink};display:flex;align-items:center;justify-content:center">
+       <img src="${tileArt}" alt="" style="width:256px;height:256px;display:block">
+     </div>`,
+    { width: 256, height: 256, path: `${OUT}/social/reddit-icon-wordmark-256.png` },
+);
 
 await browser.close();
 
