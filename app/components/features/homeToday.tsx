@@ -16,7 +16,7 @@ import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
 import {
     currentGrade,
-    dueReviews,
+    dueItems,
     type GradeCatalogItem,
     gradeSuggestions,
     loadGradeCatalogue,
@@ -392,14 +392,13 @@ export function HomeToday() {
                 (id) => services.mastery.load(id)?.learned === true,
                 (id) => known.isMissing(id),
             );
-            // The due ids resolve back to their kind through the loaded items, so the
-            // task knows whether opening one means a score or an ear drill.
-            const kindById = new Map(items.map((i) => [i.id, i.kind]));
             setSession({
                 tasks: todayTasks({
-                    due: dueReviews(items, now, prefs.reviewCap).map((id) => ({
-                        id,
-                        kind: kindById.get(id) ?? "piece",
+                    // Each due item carries its own kind, so the task knows whether
+                    // opening one means a score or an ear drill.
+                    due: dueItems(items, now, prefs.reviewCap).map((item) => ({
+                        id: item.id,
+                        kind: item.kind,
                     })),
                     dailyDoneToday,
                     assignment,

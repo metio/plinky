@@ -7,7 +7,7 @@ import type { ItemKind } from "../../../core/practisable";
 import { useScore } from "../../hooks/useScore";
 import { Button } from "../ui/button";
 import { linkClasses } from "../ui/classes";
-import { dueReviews, loadGradedMastery } from "../../lib/gradeProgress";
+import { dueItems, loadGradedMastery } from "../../lib/gradeProgress";
 import { setBacklog } from "../../../core/mastery";
 import { usePrefsStore, useServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
@@ -44,12 +44,8 @@ export function ReviewSession() {
                 // The queue is snapshotted with each item's kind, so it drives the right
                 // surface (a score, or an ear drill) even after practising one reschedules
                 // it out of the live due set.
-                const byId = new Map(items.map((item) => [item.id, item]));
-                const due = dueReviews(items, Date.now(), prefsStore.load().reviewCap).flatMap(
-                    (id) => {
-                        const item = byId.get(id);
-                        return item ? [{ id, title: item.title, kind: item.kind }] : [];
-                    },
+                const due = dueItems(items, Date.now(), prefsStore.load().reviewCap).map(
+                    (item) => ({ id: item.id, title: item.title, kind: item.kind }),
                 );
                 setQueue(due);
             }

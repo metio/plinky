@@ -11,7 +11,7 @@ import { MAX_GRADE } from "../../core/scoreDifficulty";
 import type { Grid } from "../../core/shareCard";
 import {
     currentGrade,
-    dueReviews,
+    dueItems,
     type GradeCatalogItem,
     type GradedMastery,
     gradeSuggestions,
@@ -66,7 +66,6 @@ export type YouInput = {
 export function buildYouData(input: YouInput): YouData {
     const { items, catalogue, mode, now } = input;
     const level = currentGrade(items);
-    const byId = new Map(items.map((item) => [item.id, item]));
     const masteredIds = new Set(
         items.filter((item) => item.mastery.learned && !item.mastery.backlog).map((i) => i.id),
     );
@@ -80,15 +79,12 @@ export function buildYouData(input: YouInput): YouData {
         skill: skillRating(items, mode, now),
         workingGrade,
         upNext: gradeSuggestions(catalogue, workingGrade, masteredIds, SUGGESTION_COUNT),
-        reviews: dueReviews(items, now, input.reviewCap).map((id) => {
-            const item = byId.get(id);
-            return {
-                id,
-                title: item?.title ?? id,
-                kind: item?.kind ?? "piece",
-                ...(item?.incipit ? { incipit: item.incipit } : {}),
-            };
-        }),
+        reviews: dueItems(items, now, input.reviewCap).map((item) => ({
+            id: item.id,
+            title: item.title,
+            kind: item.kind,
+            ...(item.incipit ? { incipit: item.incipit } : {}),
+        })),
         summary: input.summary,
         fingerprint: input.fingerprint,
         achievements: earnedAchievements(input, level),

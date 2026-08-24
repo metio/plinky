@@ -126,11 +126,15 @@ export function gradeFreshness(
 // The pieces to refresh now, most overdue first, capped so a day's maintenance stays
 // gentle. Mode-independent: a lapsed piece (competitive's "lost" piece) is still due
 // here, so refreshing it recovers it.
-export function dueReviews(
+// What is due, longest-waiting first, capped. Returns the ITEMS: every caller wants
+// something off them — a title, a kind, an incipit — and returning ids meant each one built
+// a Map to undo the .map(item => item.id) this had just done, complete with a fallback for
+// an item that cannot actually be missing, since the ids came from the same list.
+export function dueItems(
     items: GradedMastery[],
     now: number,
     cap: number = REVIEW_CAP,
-): string[] {
+): GradedMastery[] {
     return (
         items
             .filter((item) => isDue(item.mastery, now))
@@ -138,7 +142,6 @@ export function dueReviews(
             // same way it opens a score for a piece.
             .sort((a, b) => a.mastery.reviewAt - b.mastery.reviewAt)
             .slice(0, cap)
-            .map((item) => item.id)
     );
 }
 

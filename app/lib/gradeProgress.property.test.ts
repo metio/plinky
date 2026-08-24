@@ -8,7 +8,7 @@ import type { GradedMastery } from "./gradeProgress";
 import { REVIEW_CAP } from "../../core/review";
 import {
     currentGrade,
-    dueReviews,
+    dueItems,
     masteredInGrade,
     skillRating,
     STAR_THRESHOLDS,
@@ -102,8 +102,8 @@ describe("gradeProgress invariants", () => {
     it("never proposes more reviews than the cap", () => {
         fc.assert(
             fc.property(arbItems, arbNow, fc.integer({ min: 0, max: 50 }), (items, now, cap) => {
-                expect(dueReviews(items, now, cap).length).toBeLessThanOrEqual(cap);
-                expect(dueReviews(items, now).length).toBeLessThanOrEqual(REVIEW_CAP);
+                expect(dueItems(items, now, cap).length).toBeLessThanOrEqual(cap);
+                expect(dueItems(items, now).length).toBeLessThanOrEqual(REVIEW_CAP);
             }),
         );
     });

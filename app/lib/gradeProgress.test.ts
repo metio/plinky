@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
     currentGrade,
-    dueReviews,
+    dueItems,
     type GradeCatalogItem,
     type GradedMastery,
     gradeFreshness,
@@ -115,7 +115,7 @@ describe("gradeFreshness", () => {
     });
 });
 
-describe("dueReviews", () => {
+describe("dueItems", () => {
     it("returns due pieces most-overdue first, capped", () => {
         const items = [
             item("soon", 1, 1, mastery({ reviewAt: NOW - 1 * DAY })),
@@ -123,8 +123,8 @@ describe("dueReviews", () => {
             item("mid", 1, 1, mastery({ reviewAt: NOW - 5 * DAY })),
             item("fresh", 1, 1, fresh()),
         ];
-        expect(dueReviews(items, NOW)).toEqual(["oldest", "mid", "soon"]);
-        expect(dueReviews(items, NOW, 1)).toEqual(["oldest"]);
+        expect(dueItems(items, NOW).map((item) => item.id)).toEqual(["oldest", "mid", "soon"]);
+        expect(dueItems(items, NOW, 1).map((item) => item.id)).toEqual(["oldest"]);
     });
 
     it("includes a due ear item — the session drives its drill, most overdue first", () => {
@@ -132,7 +132,7 @@ describe("dueReviews", () => {
             item("ear-intervals-0", 1, 1, mastery({ reviewAt: NOW - 30 * DAY })),
             item("a-piece", 1, 1, mastery({ reviewAt: NOW - 5 * DAY })),
         ];
-        expect(dueReviews(items, NOW)).toEqual(["ear-intervals-0", "a-piece"]);
+        expect(dueItems(items, NOW).map((item) => item.id)).toEqual(["ear-intervals-0", "a-piece"]);
     });
 });
 
