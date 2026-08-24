@@ -108,14 +108,22 @@ const UI = "font-family:Inter,system-ui,sans-serif";
 
 const browser = await chromium.launch();
 
-// The violet the artwork is actually drawn on, read off the picture itself.
+// How far the artwork has to be scaled up for its own edges to fall outside the frame.
 //
-// The palette's own violet is close to it but not the same value, and "close" is exactly
-// what shows: the moment a platform crops a profile picture to a circle, a ground a shade
-// out from the tile reads as a ring around it. Sampling removes the question.
-async function groundOf(dataUrl) {
+// A profile picture must carry NO ground. Any colour behind the tile shows as a ring the
+// moment a platform crops it to a circle — ink showed as a dark one, and the tile's own
+// violet sampled a few pixels in showed as a lighter one, because the artwork is drawn with
+// a vignette and so has no single edge colour to match. There is nothing to match it to.
+//
+// So the artwork is bled past the frame instead and the background is left transparent.
+// Every pixel inside the circle is then artwork, and the frame's corners — the only place
+// transparency survives — are outside the circle every platform crops to.
+//
+// The factor is measured, not guessed: the transparent margin the artwork carries differs
+// between the two pictures, and a bleed large enough for one clips the other's wordmark.
+async function bleedOf(dataUrl) {
     const page = await browser.newPage();
-    const hex = await page.evaluate(async (src) => {
+    const scale = await page.evaluate(async (src) => {
         const img = new Image();
         img.src = src;
         await img.decode();
@@ -125,14 +133,24 @@ async function groundOf(dataUrl) {
         canvas.height = n;
         const context = canvas.getContext("2d");
         context.drawImage(img, 0, 0);
-        // A twentieth of the way in, at half height: inside the tile's flat left side, clear
-        // of the rounded corners and of everything drawn on top of it.
-        const [r, g, b] = context.getImageData(Math.round(n * 0.06), Math.round(n / 2), 1, 1).data;
-        return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+        // Along the middle row, which crosses the tile's flat left and right sides rather
+        // than its rounded corners: how far in before the artwork is solid?
+        const row = context.getImageData(0, Math.round(n / 2), n, 1).data;
+        let inset = 0;
+        while (inset < n / 4 && row[inset * 4 + 3] < 250) inset++;
+        // Scale so those insets land outside the frame, plus a pixel of slack for the
+        // rounding either side.
+        return (n + 2) / Math.max(1, n - 2 * (inset + 1));
     }, dataUrl);
     await page.close();
-    return hex;
+    return scale;
 }
+
+// A picture whose every visible pixel is artwork: bled past its frame, nothing behind it.
+const bled = (art, size, scale) =>
+    `<div style="width:${size}px;height:${size}px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+       <img src="${art}" alt="" style="width:${Math.round(size * scale)}px;height:${Math.round(size * scale)}px;flex:none;display:block">
+     </div>`;
 
 async function shoot(html, { width, height, path, scale = 1, full = false, transparent = false }) {
     const page = await browser.newPage({
@@ -271,21 +289,18 @@ await shoot(social(1080, 1350, 78), {
 // beside a comment, where that word is a smear. The keys and the falling note are centred,
 // so a circle takes only the tile's corners — nothing that carries meaning.
 //
-// The ground is the artwork's OWN violet, sampled from it. An earlier version used ink, to
-// keep the tile's rounded silhouette from dissolving into the background — but that reasoning
-// assumed the picture is shown as a square, and every platform in the table below crops it to
-// a circle. A circle destroys the silhouette regardless, so all the ink could ever do was show
-// as a dark ring at the left and right of the crop, which is what it did.
+// No ground behind it, and the artwork bled past the frame — see bleedOf above for why a
+// ground of any colour cannot work here.
 //
 // 800 is what YouTube asks for; 512 covers Facebook and Instagram; 256 is Reddit's.
-const iconGround = await groundOf(icon);
+const iconBleed = await bleedOf(icon);
 for (const size of [256, 512, 800]) {
-    await shoot(
-        `<div style="width:${size}px;height:${size}px;background:${iconGround};display:flex;align-items:center;justify-content:center">
-           <img src="${icon}" alt="" style="width:${Math.round(size * 0.94)}px;height:${Math.round(size * 0.94)}px;display:block">
-         </div>`,
-        { width: size, height: size, path: `${OUT}/social/profile-square-${size}.png` },
-    );
+    await shoot(bled(icon, size, iconBleed), {
+        width: size,
+        height: size,
+        path: `${OUT}/social/profile-square-${size}.png`,
+        transparent: true,
+    });
 }
 
 // A YouTube channel banner. YouTube crops one image four ways — a TV shows the whole
@@ -374,12 +389,12 @@ await shoot(
 // circle and shows it at about 56px beside a comment, where a name set under the keys is a
 // smear over them — so the wordless one is still the recommendation. This exists because
 // the choice is worth being able to see rather than to take on trust.
-await shoot(
-    `<div style="width:256px;height:256px;background:${await groundOf(tileArt)};display:flex;align-items:center;justify-content:center">
-       <img src="${tileArt}" alt="" style="width:256px;height:256px;display:block">
-     </div>`,
-    { width: 256, height: 256, path: `${OUT}/social/reddit-icon-wordmark-256.png` },
-);
+await shoot(bled(tileArt, 256, await bleedOf(tileArt)), {
+    width: 256,
+    height: 256,
+    path: `${OUT}/social/reddit-icon-wordmark-256.png`,
+    transparent: true,
+});
 
 await browser.close();
 

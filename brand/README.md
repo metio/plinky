@@ -23,7 +23,7 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 | `palette.png` | Every colour with its role, as a sheet. |
 | `palette.json` | The same, for tools. Hex plus the token each comes from. |
 | `type.png` | The two faces, set as the app sets them. |
-| `social/profile-square-*.png` | The profile picture, at 256 · 512 · 800. Built from the **wordless** icon, because every platform crops this one to a circle and shows it at about 56px beside a comment, and a circle cuts through a wordmark. The ground is the artwork's own violet, sampled from it: a ground even a shade out shows as a ring once the crop is a circle. |
+| `social/profile-square-*.png` | The profile picture, at 256 · 512 · 800. Built from the **wordless** icon, because every platform crops this one to a circle and shows it at about 56px beside a comment, and a circle cuts through a wordmark. There is no ground behind it at all — the artwork is bled past the frame and the corners left transparent. Any colour behind the tile shows as a ring once the crop is a circle, and the artwork is drawn with a vignette, so there is no single edge colour a ground could have matched. |
 | `social/open-graph-1200x630.png` | What a shared link unfurls as. |
 | `social/square-1080.png` | A square post. |
 | `social/instagram-portrait-1080x1350.png` | Instagram's tallest feed size — a square crops out of it without loss, and not the other way round. |
