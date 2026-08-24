@@ -366,10 +366,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        arrival rather than a picture that was always there. */
     --animate-petal-in: petal-in 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
     --animate-stem-draw: stem-draw 1.15s ease-out both;
-    --animate-stem-bend: stem-bend 6.8s ease-in-out infinite;
+    --animate-stem-sway: stem-sway 6.8s ease-in-out infinite;
+    --animate-head-sway: head-sway 6.8s ease-in-out infinite;
+    --animate-sun-bob: sun-bob 2.8s ease-in-out infinite;
+    --animate-ray-breathe: ray-breathe 2.8s ease-in-out infinite;
+    --animate-balloon-float: balloon-float 3.6s ease-in-out infinite;
+    --animate-string-sway: string-sway 3.6s ease-in-out infinite;
+    --animate-twinkle: twinkle 3.2s ease-in-out infinite;
     --animate-head-rise: head-rise 1.15s ease-out both;
-    --animate-bloom-sway: bloom-sway 6s ease-in-out infinite;
-    --animate-bloom-fold: bloom-fold 6s ease-in-out infinite;
     --animate-note-fall: note-fall 3.4s cubic-bezier(0.5, 0, 0.75, 0) infinite;
     --animate-plink-fall: plink-fall 1.6s infinite;
     --animate-plink-trail: plink-trail 1.6s linear infinite;
@@ -398,15 +402,90 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     }
 }
 
-/* A degree either way about the base. Slower than the growth and out of step with it, so
-   the two never settle into one repeating beat. */
-@keyframes stem-bend {
+/* The stalk leaning either way, slower than the growth and out of step with it so the two
+   never settle into one repeating beat. Once the flower has grown this is all that moves —
+   petals that kept growing and shrinking read as a pulsing badge rather than a plant. */
+@keyframes stem-sway {
     0%,
     100% {
-        transform: rotate(-1.2deg);
+        transform: rotate(-1.6deg);
     }
     50% {
-        transform: rotate(1.2deg);
+        transform: rotate(1.6deg);
+    }
+}
+
+/* The head leans a degree further than the stalk carrying it, and on the same beat. That
+   difference is the whole of it: weight on the end of a stem always arrives a little after
+   and travels a little more. */
+@keyframes head-sway {
+    0%,
+    100% {
+        transform: rotate(-2.5deg);
+    }
+    50% {
+        transform: rotate(2.5deg);
+    }
+}
+
+/* The sun as a whole, breathing on the spot. Four pixels is enough to be alive and little
+   enough that nobody watches it. */
+@keyframes sun-bob {
+    0%,
+    100% {
+        transform: translateY(2px);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+/* A ray reaching and settling. It keeps its own angle — the rotation is the ray's place in
+   the ring, not part of the motion — and each one runs on its own offset, because eight
+   rays in step is a clock face and eight apart is sunlight. */
+@keyframes ray-breathe {
+    0%,
+    100% {
+        transform: rotate(var(--ray-turn)) translateY(-22px) scaleY(0.86);
+    }
+    50% {
+        transform: rotate(var(--ray-turn)) translateY(-25px) scaleY(1.08);
+    }
+}
+
+/* A balloon floating rather than bouncing: the rise is small, the scale barely there, and
+   the two move together the way something buoyant does. */
+@keyframes balloon-float {
+    0%,
+    100% {
+        transform: translateY(3px) scale(0.99);
+    }
+    50% {
+        transform: translateY(-4px) scale(1.01);
+    }
+}
+
+@keyframes string-sway {
+    0%,
+    100% {
+        transform: rotate(-1.5deg);
+    }
+    50% {
+        transform: rotate(1.5deg);
+    }
+}
+
+/* A sparkle catching the light: it swells and turns a few degrees rather than blinking,
+   because a hard on-off in the corner of the eye is a notification. */
+@keyframes twinkle {
+    0%,
+    100% {
+        transform: scale(0.72) rotate(0deg);
+        opacity: 0.55;
+    }
+    50% {
+        transform: scale(1.06) rotate(8deg);
+        opacity: 1;
     }
 }
 
@@ -419,27 +498,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     }
     to {
         transform: translateY(0);
-    }
-}
-
-@keyframes bloom-sway {
-    0%,
-    100% {
-        transform: rotate(-7deg);
-    }
-    50% {
-        transform: rotate(7deg);
-    }
-}
-
-@keyframes bloom-fold {
-    0%,
-    40% {
-        transform: scale(1);
-    }
-    85%,
-    100% {
-        transform: scale(0.66);
     }
 }
 

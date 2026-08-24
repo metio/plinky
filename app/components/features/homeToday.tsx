@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
 import { partOfDay } from "../../../core/greeting";
-import { GreetingFlower } from "./greetingFlower";
+import { GreetingScene } from "./greetingScene";
 import { buildExerciseId, keyName } from "../../../core/exerciseGen";
 import { type Letter, letterFor } from "../../../core/grade";
 import { summarizePractice } from "../../../core/history";
@@ -471,7 +471,7 @@ export function HomeToday() {
             {/* Only once the clock has been read: the flower says which part of the day it
                 is, and drawn before `arrived` resolves it would say the wrong one and then
                 change its mind. */}
-            {arrived ? <GreetingFlower when={partOfDay(arrived.getHours())} /> : null}
+            {arrived ? <GreetingScene when={partOfDay(arrived.getHours())} /> : null}
             <div className="min-w-0 space-y-1">
                 {/* Most languages hand back a lowercase weekday — "mardi", "вторник",
                     "tiistai" — which is correct for the word and wrong for the start of a

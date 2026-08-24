@@ -44,12 +44,12 @@ says what you are looking at — "Songs · Grades 3, 4 · ★ Favourites" — an
 full set when you tap it, with every option on screen at once. Closed, it hands the
 page back to the music: four pieces are in view where none used to be.
 
-**The front page grows a flower, and it knows what time it is.** Beside the greeting a
-small plant now grows itself as you arrive: the stalk draws up from the ground, then
-the petals open on it one after another, each a different colour. It opens in the
-morning, turns toward the light through the afternoon, folds in the evening, and at
-night stays shut while a note falls to it. Once grown it stays grown, leaning a little
-the way a stalk carrying a flower head does.
+**The front page knows what time it is.** Beside the greeting there is now a small
+drawing for the hour you arrived: a sun in the morning, a flower through the
+afternoon, balloons in the evening, sparkles at night. The flower grows itself as you
+watch — the stalk draws up from the ground, then the petals open one after another,
+each a different colour — and once grown it stays grown, leaning the way a stalk
+carrying a flower head does, while a note falls to it.
 
 **More colour, and less violet.** The band across the top was the same violet as the
 logo, which left the logo nothing to stand against. The top of every screen is paper
