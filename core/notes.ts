@@ -92,3 +92,55 @@ export function keyLabelOf(midi: number, labels: NoteLabels): KeyLabel {
 export function midiOf(step: string, octave: number, alter = 0): number {
     return (octave + 1) * 12 + (SEMITONE[step] ?? 0) + alter;
 }
+
+// How each of the twelve pitch classes is written, sharp-side and flat-side.
+//
+// Both are needed and neither is "correct": the same key is A♯ climbing and B♭ falling, and
+// a scale that mixes them reads as a mistake. Held here beside the other facts about
+// letters, because a second copy of a spelling table is a chance for two parts of the app
+// to disagree about what note somebody just played.
+export const SHARP_SPELL: readonly { step: string; alter: number }[] = [
+    { step: "C", alter: 0 },
+    { step: "C", alter: 1 },
+    { step: "D", alter: 0 },
+    { step: "D", alter: 1 },
+    { step: "E", alter: 0 },
+    { step: "F", alter: 0 },
+    { step: "F", alter: 1 },
+    { step: "G", alter: 0 },
+    { step: "G", alter: 1 },
+    { step: "A", alter: 0 },
+    { step: "A", alter: 1 },
+    { step: "B", alter: 0 },
+];
+
+export const FLAT_SPELL: readonly { step: string; alter: number }[] = [
+    { step: "C", alter: 0 },
+    { step: "D", alter: -1 },
+    { step: "D", alter: 0 },
+    { step: "E", alter: -1 },
+    { step: "E", alter: 0 },
+    { step: "F", alter: 0 },
+    { step: "G", alter: -1 },
+    { step: "G", alter: 0 },
+    { step: "A", alter: -1 },
+    { step: "A", alter: 0 },
+    { step: "B", alter: -1 },
+    { step: "B", alter: 0 },
+];
+
+// A MIDI number written out: which letter, how it is altered, which octave.
+//
+// The rounding is not defensive tidiness. A pitch is a whole semitone by the time it reaches
+// notation, but one can arrive fractional from a shared take — the code carries whatever was
+// encoded — and a fractional index into the table returns nothing, so an export threw on a
+// link somebody had sent rather than refusing it politely.
+export function spellMidi(
+    midi: number,
+    flats = false,
+): { step: string; alter: number; octave: number } {
+    const semitone = Math.round(midi);
+    const pitchClass = ((semitone % 12) + 12) % 12;
+    const { step, alter } = (flats ? FLAT_SPELL : SHARP_SPELL)[pitchClass]!;
+    return { step, alter, octave: Math.floor(semitone / 12) - 1 };
+}

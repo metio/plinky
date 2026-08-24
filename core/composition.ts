@@ -3,6 +3,7 @@
 
 import { escapeXmlText } from "./xmlText";
 import { buildMidiFile, type MidiNote } from "./midiFile";
+import { spellMidi } from "./notes";
 import { cleanBeatsPerBar } from "./meter";
 import { packToCode, unpackFromCode } from "./shareCode";
 
@@ -232,32 +233,6 @@ export function decodeComposition(code: string): Composition | null {
 
 // A note's letter, chromatic alteration and octave, spelled with sharps since the
 // sketch carries no key signature.
-const PITCH_CLASSES: { step: string; alter: number }[] = [
-    { step: "C", alter: 0 },
-    { step: "C", alter: 1 },
-    { step: "D", alter: 0 },
-    { step: "D", alter: 1 },
-    { step: "E", alter: 0 },
-    { step: "F", alter: 0 },
-    { step: "F", alter: 1 },
-    { step: "G", alter: 0 },
-    { step: "G", alter: 1 },
-    { step: "A", alter: 0 },
-    { step: "A", alter: 1 },
-    { step: "B", alter: 0 },
-];
-
-function spell(midi: number): { step: string; alter: number; octave: number } {
-    // Rounded first. A pitch is a semitone by the time it reaches notation, but one can
-    // arrive fractional from a shared take — the code carries whatever was encoded — and a
-    // fractional index into the table returns nothing, so the export threw on a link
-    // somebody sent rather than refusing it.
-    const semitone = Math.round(midi);
-    const pitchClass = ((semitone % 12) + 12) % 12;
-    const { step, alter } = PITCH_CLASSES[pitchClass]!;
-    return { step, alter, octave: Math.floor(semitone / 12) - 1 };
-}
-
 // The note values, longest first, that a span of grid cells decomposes into. Each is
 // a plain or single-dotted power-of-two duration, enough to notate any cell count by
 // greedily taking the largest that fits and tying the remainder.
@@ -379,7 +354,7 @@ function pitchNote(
     tieBack: boolean,
     tieForward: boolean,
 ): string {
-    const { step, alter, octave } = spell(midi);
+    const { step, alter, octave } = spellMidi(midi);
     const chord = isChord ? "<chord/>" : "";
     const alterTag = alter === 0 ? "" : `<alter>${alter}</alter>`;
     const pitch = `<pitch><step>${step}</step>${alterTag}<octave>${octave}</octave></pitch>`;

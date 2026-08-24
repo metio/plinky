@@ -7,7 +7,7 @@
 // links, and mastery keep working; the canonical form (1 octave, right hand, root
 // position) keeps its plain id (scale-c-major) for backward compatibility.
 
-import { alterFor, LETTERS, SEMITONE } from "./notes";
+import { LETTERS, SEMITONE, alterFor, spellMidi } from "./notes";
 
 export type ExerciseType =
     | "major-scale"
@@ -107,38 +107,10 @@ const raise = (notes: Note[], tonic: string, degrees: number[]): Note[] =>
     );
 const turn = (asc: Note[], desc: Note[]): Note[] => asc.concat([...desc].reverse().slice(1));
 
-const SHARP_SPELL: [string, number][] = [
-    ["C", 0],
-    ["C", 1],
-    ["D", 0],
-    ["D", 1],
-    ["E", 0],
-    ["F", 0],
-    ["F", 1],
-    ["G", 0],
-    ["G", 1],
-    ["A", 0],
-    ["A", 1],
-    ["B", 0],
-];
-const FLAT_SPELL: [string, number][] = [
-    ["C", 0],
-    ["D", -1],
-    ["D", 0],
-    ["E", -1],
-    ["E", 0],
-    ["F", 0],
-    ["G", -1],
-    ["G", 0],
-    ["A", -1],
-    ["A", 0],
-    ["B", -1],
-    ["B", 0],
-];
 function spell(midi: number, flats: boolean): Note {
-    const pc = ((midi % 12) + 12) % 12;
-    const [letter, alter] = (flats ? FLAT_SPELL : SHARP_SPELL)[pc]!;
-    return { letter, octave: Math.floor(midi / 12) - 1, alter };
+    // The exercise model calls the letter `letter`; the shared speller calls it `step`.
+    const { step, alter, octave } = spellMidi(midi, flats);
+    return { letter: step, octave, alter };
 }
 
 // The single-line note sequence (up then down) for a scale or chromatic run.
