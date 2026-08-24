@@ -36,6 +36,22 @@ describe("PracticeMethods", () => {
         expect(screen.getAllByText(`${m.methods_in_plinky()}:`).length).toBe(METHODS.length);
     });
 
+    it("localises every link it builds, so a static host has a document to serve", async () => {
+        // A bare /play/<id> has no prerendered document: it resolves under `serve -s`,
+        // which falls back to the shell, and 404s on the host that actually ships. Every
+        // link here goes through localizedHref for the locale prefix AND the trailing
+        // slash that matches <path>/index.html.
+        mount();
+        await waitFor(() => {
+            const hrefs = screen.getAllByRole("link").map((l) => l.getAttribute("href") ?? "");
+            expect(hrefs.length).toBeGreaterThan(0);
+            for (const href of hrefs) {
+                expect(href).toMatch(/^\/en\//);
+                expect(href.split("?")[0]).toMatch(/\/$/);
+            }
+        });
+    });
+
     it("sends the two methods that are not about one piece to the review queue", async () => {
         mount();
         await waitFor(() => {
@@ -55,7 +71,7 @@ describe("PracticeMethods", () => {
             const hrefs = screen
                 .getAllByRole("link")
                 .map((link) => link.getAttribute("href") ?? "")
-                .filter((href) => href.startsWith("/play/"));
+                .filter((href) => href.includes("/play/"));
             expect(hrefs).toHaveLength(4);
             expect(hrefs.some((href) => href.includes("speed=0.6"))).toBe(true);
             expect(hrefs.some((href) => href.includes("hands=left"))).toBe(true);
@@ -72,7 +88,7 @@ describe("PracticeMethods", () => {
             const pieces = screen
                 .getAllByRole("link")
                 .map((link) => link.getAttribute("href") ?? "")
-                .filter((href) => href.startsWith("/play/"))
+                .filter((href) => href.includes("/play/"))
                 .map((href) => href.split("?")[0]);
             expect(pieces).toHaveLength(4);
             // Seeded by method id, so which piece each one offers is stable but they are

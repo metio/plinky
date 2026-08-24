@@ -8,6 +8,7 @@ import { type MethodId, METHODS, type PracticeMethod } from "../../../core/pract
 import { useMusicItems } from "../../hooks/useMusicItems";
 import { useServices } from "../../contexts/services";
 import { Card } from "../ui/card";
+import { localizedHref } from "../ui/href";
 import { sectionHeadingClasses } from "../ui/classes";
 import { m } from "../../paraglide/messages.js";
 
@@ -55,7 +56,7 @@ function MethodAction({ method, grade }: { method: PracticeMethod; grade: number
     if (method.route) {
         return (
             <Link
-                to={method.route}
+                to={localizedHref(method.route)}
                 className="inline-block text-sm font-semibold text-accent-strong hover:underline"
             >
                 {m.methods_review()}
@@ -68,7 +69,7 @@ function MethodAction({ method, grade }: { method: PracticeMethod; grade: number
     if (!piece || !method.opens) return null;
     return (
         <Link
-            to={`/play/${piece.id}${playOptionsQuery(method.opens)}`}
+            to={localizedHref(`/play/${piece.id}${playOptionsQuery(method.opens)}`)}
             className="inline-block text-sm font-semibold text-accent-strong hover:underline"
         >
             {m.methods_try({ grade })}
