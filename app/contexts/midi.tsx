@@ -261,6 +261,43 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // a teardown can flush it.
     const echoOffsRef = useRef<Map<number, SchedulerHandle>>(new Map());
 
+    // Releasing what is still sounding, when whatever would have released it never will.
+    //
+    // Three situations need this and they differ only in WHICH sources to let go of: one
+    // device gone quiet mid-note, a set of devices dropped off the bus, and the focus-gated
+    // inputs whose keyup never arrives once the window loses focus. Written once because
+    // the failure they all prevent is the same one — a note that rings forever — and three
+    // copies of it is three chances for one to stop matching the others.
+    //
+    // Only the sources the caller names are released: a pitch held by two devices at once
+    // keeps sounding on the one that still holds it.
+    const releaseHeldNotes = useCallback(
+        (matches: (device: string) => boolean, timestamp: number) => {
+            for (const note of [...heldNotesRef.current]) {
+                // Snapshot the source set — emitNote mutates it as each source releases.
+                for (const device of [...(heldSourcesRef.current.get(note) ?? [])]) {
+                    if (matches(device)) {
+                        emitNote("noteoff", note, 0, 1, device, timestamp);
+                    }
+                }
+            }
+        },
+        [emitNote],
+    );
+
+    // A pedal held when its device vanishes never sends its release either, so it would
+    // latch down and every note played after would ring on. Held pedals carry no device, so
+    // this lifts whatever was down — snapshotting first, since emitPedal mutates the set as
+    // it clears.
+    const liftHeldPedals = useCallback(
+        (timestamp: number) => {
+            for (const pedal of [...pedalsDownRef.current]) {
+                emitPedal(pedal, false, timestamp);
+            }
+        },
+        [emitPedal],
+    );
+
     // The lighted keyboard. Built once and kept: the port owns the picture currently on
     // the instrument, so it must outlive any one render to know what it owes a note-off
     // for. Everything variable — whether the feature is on, which device is listening,
@@ -364,14 +401,8 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 // will send no further note-offs. Release every note it was sounding and
                 // lift any held pedal, so nothing latches on — releasing only this device's
                 // own source of each note leaves a sibling device's held notes untouched.
-                for (const note of [...heldNotesRef.current]) {
-                    if (heldSourcesRef.current.get(note)?.has(deviceName)) {
-                        emitNote("noteoff", note, 0, 1, deviceName, timestamp);
-                    }
-                }
-                for (const pedal of [...pedalsDownRef.current]) {
-                    emitPedal(pedal, false, timestamp);
-                }
+                releaseHeldNotes((device) => device === deviceName, timestamp);
+                liftHeldPedals(timestamp);
                 return;
             }
             emitNote(
@@ -383,7 +414,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 timestamp,
             );
         },
-        [emitNote, emitPedal],
+        [emitNote, emitPedal, liftHeldPedals, releaseHeldNotes],
     );
 
     // The bridge reads state through a ref so it needs no re-attachment per render.
@@ -544,26 +575,17 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         );
         connectedInputsRef.current = nowConnected;
         if (droppedNames.size > 0) {
-            for (const note of [...heldNotesRef.current]) {
-                // Snapshot the source set — emitNote mutates it as each source releases.
-                for (const device of [...(heldSourcesRef.current.get(note) ?? [])]) {
-                    // Release only the dropped device's own source of the note; another
-                    // device still holding the same pitch keeps it sounding.
-                    if (droppedNames.has(device)) {
-                        emitNote("noteoff", note, 0, 1, device, performance.now());
-                    }
-                }
-            }
+            // Only the dropped devices' own sources; another device still holding the same
+            // pitch keeps it sounding.
+            releaseHeldNotes((device) => droppedNames.has(device), performance.now());
             // A pedal held when its device vanishes never sends its release either, so it
             // would latch down — every note played after would ring on. Held pedals carry
             // no device, so lift whatever pedal was down (snapshotting first, since
             // emitPedal mutates the set as it clears).
-            for (const pedal of [...pedalsDownRef.current]) {
-                emitPedal(pedal, false, performance.now());
-            }
+            liftHeldPedals(performance.now());
         }
         setDevices(list);
-    }, [makeHandler, emitNote, emitPedal]);
+    }, [makeHandler, liftHeldPedals, releaseHeldNotes]);
 
     // Each request gets a sequence number; only the latest may wire itself in.
     // A stale resolve (an earlier click, or one landing after unmount) closes its
@@ -713,18 +735,12 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         // computer keyboard, the on-screen keyboard, or a device — when focus is lost.
         const releaseAll = () => {
             pressed.clear();
-            for (const note of [...heldNotesRef.current]) {
-                // Release only the focus-gated sources — the computer and on-screen
-                // keyboards, whose keyup/pointerup never arrives once focus leaves. A MIDI
-                // device and the microphone keep streaming their own note-offs regardless
-                // of focus, so a note they still hold keeps sounding. Each ends on its own
-                // device, keeping its gentle ring-out.
-                for (const device of [...(heldSourcesRef.current.get(note) ?? [])]) {
-                    if (isFocusGatedInput(device)) {
-                        emitNote("noteoff", note, 0, 1, device, performance.now());
-                    }
-                }
-            }
+            // Only the focus-gated sources — the computer and on-screen keyboards, whose
+            // keyup/pointerup never arrives once focus leaves. A MIDI device and the
+            // microphone keep streaming their own note-offs regardless of focus, so a note
+            // they still hold keeps sounding. Each ends on its own device, keeping its
+            // gentle ring-out.
+            releaseHeldNotes(isFocusGatedInput, performance.now());
             // Lift any pedal held by a computer key too, so a pedal doesn't stick down.
             for (const pedal of pedalKeysDown.values()) {
                 emitPedal(pedal, false, performance.now());
@@ -741,7 +757,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             window.removeEventListener("keyup", onKeyUp);
             window.removeEventListener("blur", releaseAll);
         };
-    }, [emitNote, emitPedal, prefsStore]);
+    }, [emitNote, emitPedal, prefsStore, releaseHeldNotes]);
 
     useEffect(() => {
         return () => {
