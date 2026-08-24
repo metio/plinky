@@ -10,7 +10,12 @@ import type { MeasureBox } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
 import { usePrefsStore, useScheduler, useXmlCodec } from "../contexts/services";
 import { annotateFingerings } from "../lib/fingerScore";
-import { collectMeasureBoxes, restoreNotePaint, snapshotNotePaint } from "../lib/scoreColor";
+import {
+    collectMeasureBoxes,
+    restoreNotePaint,
+    scoreSvg,
+    snapshotNotePaint,
+} from "../lib/scoreColor";
 import { seekToWhole } from "../lib/scoreCursor";
 import type { FingerMap } from "../stores/fingeringStore";
 
@@ -352,9 +357,8 @@ export function useOsmdScore(
                     // Measure every bar's box off the fresh render, for the loop's
                     // selection overlay and click-to-select. The cursor is free here
                     // (nothing is playing), and a fresh render carries no selection.
-                    const svg = containerRef.current?.querySelector("svg");
-                    measureBoxesRef.current =
-                        svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
+                    const svg = scoreSvg(containerRef.current);
+                    measureBoxesRef.current = svg ? collectMeasureBoxes(osmd, svg) : [];
                     // A grand staff (two staves) can be drilled one hand at a
                     // time; a single-staff score offers no such choice.
                     setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
@@ -430,9 +434,8 @@ export function useOsmdScore(
             // A fresh render carries no measure boxes or overlay: re-measure the bars for the
             // loop selection and click-to-select. The render-version bump lets the caller
             // repaint the loop overlay the fresh SVG dropped.
-            const svg = containerRef.current?.querySelector("svg");
-            measureBoxesRef.current =
-                svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
+            const svg = scoreSvg(containerRef.current);
+            measureBoxesRef.current = svg ? collectMeasureBoxes(osmd, svg) : [];
             paintedRef.current = restoreNotePaint(osmd, paint);
             onFingeringRedrawRef.current();
             // Step the reset cursor back to where it stood — OSMD has no direct seek — and

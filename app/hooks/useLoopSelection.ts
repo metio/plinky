@@ -12,7 +12,12 @@ import {
 } from "react";
 import { loopClick } from "../../core/loop";
 import { type MeasureBox, measureAtPoint } from "../../core/scoreCanvas";
-import { clearBarSelection, clientPointToSvg, paintBarSelection } from "../lib/scoreColor";
+import {
+    clearBarSelection,
+    clientPointToSvg,
+    paintBarSelection,
+    scoreSvg,
+} from "../lib/scoreColor";
 
 // Section looping: Listen repeats a bar range over and over so a hard passage can be
 // drilled. The range is 1-based for the player (the cursor walks it 0-based, hence the
@@ -119,8 +124,8 @@ export function useLoopSelection({
     // Fill the selected bars with the red overlay, or clear it when the loop is off,
     // reading the live range from the ref so the callback stays stable.
     const paint = useCallback(() => {
-        const svg = containerRef.current?.querySelector("svg");
-        if (!(svg instanceof SVGSVGElement)) {
+        const svg = scoreSvg(containerRef.current);
+        if (!svg) {
             return;
         }
         if (loopRef.current.on) {
@@ -146,8 +151,8 @@ export function useLoopSelection({
             if (!canSelectRef.current()) {
                 return;
             }
-            const svg = containerRef.current?.querySelector("svg");
-            if (!(svg instanceof SVGSVGElement) || measureBoxes().length === 0) {
+            const svg = scoreSvg(containerRef.current);
+            if (!svg || measureBoxes().length === 0) {
                 return;
             }
             const point = clientPointToSvg(svg, clientX, clientY);

@@ -217,9 +217,7 @@ export function clearHalo(element: SVGElement): void {
 // Lift every note halo on a score — the reset the focus strip does before lighting the
 // current bar. Stale WeakMap entries self-heal through the isConnected check.
 export function clearAllHalos(svg: SVGSVGElement): void {
-    for (const halo of svg.querySelectorAll(`.${HALO_CLASS}`)) {
-        halo.remove();
-    }
+    removeByClass(svg, HALO_CLASS);
 }
 
 // The rendered box of each measure, in the SVG's coordinate space, unioned over its notes
@@ -283,39 +281,71 @@ const SELECTION_CLASS = "plinky-bar-selection";
 // selection fill.
 const HEAT_CLASS = "plinky-bar-heat";
 
-export function clearBarHeat(svg: SVGSVGElement): void {
-    for (const rect of svg.querySelectorAll(`.${HEAT_CLASS}`)) {
-        rect.remove();
+// The engraved page's own <svg>, or null before one exists.
+//
+// The guard is not ceremony: querySelector is typed as returning Element, and the engraver
+// replaces the whole subtree on every relayout — so between a render being asked for and
+// the page arriving there is a real window where the container holds nothing. Every caller
+// wants the same answer to that, so they ask the same question.
+export function scoreSvg(container: HTMLElement | null | undefined): SVGSVGElement | null {
+    const svg = container?.querySelector("svg");
+    return svg instanceof SVGSVGElement ? svg : null;
+}
+
+// Every overlay this module draws is marked with a class and cleared by it, so a repaint
+// never has to remember what it drew last time.
+function removeByClass(svg: SVGSVGElement, className: string): void {
+    for (const element of svg.querySelectorAll(`.${className}`)) {
+        element.remove();
     }
 }
 
-export function paintBarHeat(svg: SVGSVGElement, boxes: MeasureBox[], heats: number[]): void {
-    clearBarHeat(svg);
+// One washed rectangle per box the painter accepts. The two callers differ only in which
+// boxes they skip and what colour they wash — the geometry, the padding, the corner radius
+// and the pointer-events guard are the same picture, and the guard is the load-bearing one:
+// a backdrop that ate clicks would stop a bar being selectable.
+function paintBoxes(
+    svg: SVGSVGElement,
+    boxes: MeasureBox[],
+    className: string,
+    paint: (box: MeasureBox) => { fill: string; opacity: number } | null,
+): void {
+    removeByClass(svg, className);
+    // A little breathing room so the fill reads as a bar, not a tight box.
     const pad = 6;
     for (const box of boxes) {
-        const heat = heats[box.measure] ?? 0;
-        // Cold bars get no wash at all — the map highlights, it doesn't carpet.
-        if (heat <= 0.05) {
+        const wash = paint(box);
+        if (!wash) {
             continue;
         }
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("class", HEAT_CLASS);
+        rect.setAttribute("class", className);
         rect.setAttribute("x", String(box.x - pad));
         rect.setAttribute("y", String(box.y - pad));
         rect.setAttribute("width", String(box.width + pad * 2));
         rect.setAttribute("height", String(box.height + pad * 2));
         rect.setAttribute("rx", "4");
-        rect.setAttribute("fill", SELECT_COLOR);
-        rect.setAttribute("fill-opacity", String(0.06 + heat * 0.22));
+        rect.setAttribute("fill", wash.fill);
+        rect.setAttribute("fill-opacity", String(wash.opacity));
         rect.setAttribute("pointer-events", "none");
         svg.insertBefore(rect, svg.firstChild);
     }
 }
 
+export function clearBarHeat(svg: SVGSVGElement): void {
+    removeByClass(svg, HEAT_CLASS);
+}
+
+export function paintBarHeat(svg: SVGSVGElement, boxes: MeasureBox[], heats: number[]): void {
+    paintBoxes(svg, boxes, HEAT_CLASS, (box) => {
+        const heat = heats[box.measure] ?? 0;
+        // Cold bars get no wash at all — the map highlights, it doesn't carpet.
+        return heat <= 0.05 ? null : { fill: SELECT_COLOR, opacity: 0.06 + heat * 0.22 };
+    });
+}
+
 export function clearBarSelection(svg: SVGSVGElement): void {
-    for (const rect of svg.querySelectorAll(`.${SELECTION_CLASS}`)) {
-        rect.remove();
-    }
+    removeByClass(svg, SELECTION_CLASS);
 }
 
 export function paintBarSelection(
@@ -325,25 +355,9 @@ export function paintBarSelection(
     to: number,
     color: string = SELECT_COLOR,
 ): void {
-    clearBarSelection(svg);
-    const pad = 6; // a little breathing room so the fill reads as a bar, not a tight box
-    for (const box of boxes) {
-        if (box.measure < from || box.measure > to) {
-            continue;
-        }
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("class", SELECTION_CLASS);
-        rect.setAttribute("x", String(box.x - pad));
-        rect.setAttribute("y", String(box.y - pad));
-        rect.setAttribute("width", String(box.width + pad * 2));
-        rect.setAttribute("height", String(box.height + pad * 2));
-        rect.setAttribute("rx", "4");
-        rect.setAttribute("fill", color);
-        rect.setAttribute("fill-opacity", "0.2");
-        // The backdrop must never eat clicks meant for selecting a bar.
-        rect.setAttribute("pointer-events", "none");
-        svg.insertBefore(rect, svg.firstChild);
-    }
+    paintBoxes(svg, boxes, SELECTION_CLASS, (box) =>
+        box.measure < from || box.measure > to ? null : { fill: color, opacity: 0.2 },
+    );
 }
 
 // One notehead lifted to an "active" halo, remembering the halo colour it wore before —
