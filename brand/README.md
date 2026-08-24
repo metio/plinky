@@ -15,7 +15,7 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 | --- | --- |
 | `plinky-mark.png` | The lockup, and the master: 1024×1024 RGBA, transparent outside the tile's own rounded silhouette. Use it where the name has room to be read. |
 | `plinky-icon.png` | The same mark with the wordmark taken out and the keys recentred, 1024×1024 RGBA. Use it wherever the mark is worn small — a tab, a launcher, an app header — where the lockup's own lettering is a smudge. |
-| `plinky-tile.png` | A later lockup from the same hand, with the name set inside the tile rather than beside it, 1024×1024 RGBA. For pictures shown large and uncropped. |
+| `plinky-tile.png` | A later lockup from the same hand, with the name set inside the tile rather than beside it, 1024×1024 RGBA. For the one picture shown large and uncropped — never for a profile picture, where a circle crop cuts the ends off a name drawn that wide and that low. |
 | `source/plinky-mark.png` | The artwork as its author supplied it, flattened onto white. `npm run mark` keys it and writes the master. |
 | `icon/plinky-*.png` | The mark at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
 | `icon/lockup-paper.png` | The mark beside the tagline on paper, 960×320 at 2×, for light surfaces. |
@@ -30,7 +30,6 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 | `social/story-1080x1920.png` | A story or a reel. |
 | `social/facebook-cover-1640x624.png` | A Facebook page cover, at twice its shown size. |
 | `social/reddit-banner-*.png` | Reddit's community banner, desktop 1072×128 and mobile 1080×128. |
-| `social/reddit-icon-wordmark-256.png` | The community icon from the tile that carries the name, for anywhere it is shown large enough to read. Below about 50px the name blurs into the keys, which is why `profile-square-256` is still the recommendation. |
 | `social/github-social-1280x640.png` | A repository's social preview: what GitHub, Slack and a chat client unfurl for a link to the code. The one picture shown large enough for the name to sit inside it. |
 | `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
 | `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the mark and nothing else. |
@@ -41,7 +40,7 @@ first: `npm run build:single` (or `ci-build`), then `npm run brand`.
 | --- | --- | --- | --- |
 | Facebook | `profile-square-512` | `facebook-cover-1640x624` | `square-1080`, `open-graph-1200x630` |
 | Instagram | `profile-square-512` | — | `instagram-portrait-1080x1350`, `square-1080`, `story-1080x1920` |
-| Reddit | `profile-square-256` or `reddit-icon-wordmark-256` | `reddit-banner-desktop-1072x128`, `reddit-banner-mobile-1080x128` | — |
+| Reddit | `profile-square-256` | `reddit-banner-desktop-1072x128`, `reddit-banner-mobile-1080x128` | — |
 | GitHub | — | `github-social-1280x640` (Settings → Social preview) | — |
 | YouTube | `profile-square-800` | `youtube-banner-2048x1152` | `npm run promo:thumbs` — one per video |
 

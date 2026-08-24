@@ -26,9 +26,13 @@ const MARK = "brand/plinky-mark.png";
 // a smear over the keys it is stealing room from. See core/iconMark.ts.
 const ICON = "brand/plinky-icon.png";
 // A newer lockup from the same hand, with the name set inside the tile rather than beside
-// it. Used where the picture is shown LARGE and uncropped — a repository's social preview
-// is rendered at 1280×640 and never cut to a circle — so the name is an asset there rather
-// than the smear it becomes at 56px.
+// it. It serves exactly one picture, the repository's social preview, because that is the
+// only one shown large and uncropped.
+//
+// It cannot serve a profile picture, and no scaling fixes that: the name is wide and sits
+// low in the tile, while a circle inscribed in a square is at its narrowest down there, so
+// the ends of it fall outside the crop. That is a fact about where the word is drawn, not
+// about how the picture is exported.
 const TILE = "brand/plinky-tile.png";
 
 // The colours worth handing to somebody outside the codebase, with what each one MEANS —
@@ -383,18 +387,6 @@ await shoot(
      </div>`,
     { width: 1280, height: 640, path: `${OUT}/social/github-social-1280x640.png` },
 );
-
-// The same tile as a Reddit community icon, for comparison with profile-square-256.png,
-// which is built from the WORDLESS icon on purpose. Reddit crops a community icon to a
-// circle and shows it at about 56px beside a comment, where a name set under the keys is a
-// smear over them — so the wordless one is still the recommendation. This exists because
-// the choice is worth being able to see rather than to take on trust.
-await shoot(bled(tileArt, 256, await bleedOf(tileArt)), {
-    width: 256,
-    height: 256,
-    path: `${OUT}/social/reddit-icon-wordmark-256.png`,
-    transparent: true,
-});
 
 await browser.close();
 
