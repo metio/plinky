@@ -9,6 +9,7 @@
 // reimplemented here: a clip that does not look like Plinky is not worth posting.
 //
 // Usage: npm run promo:videos [-- --out dir] [--seconds 20] [--size 1080] [--fps 60]
+//        [--youtube] landscape 1920x1080, the whole piece · [--shorts] portrait 1080x1920
 //                             [--youtube] [--only text] [--resume] [--synth]
 //
 // Everything lands under promo/<composer>/<piece>/: reel.mp4 from a plain run, youtube.mp4
@@ -37,8 +38,14 @@ const SIZE = Number(argValue("--size") ?? 1080);
 // The painter keeps the waterfall over the keyboard at any aspect that is not taller than
 // it is wide, so this is a shape and a length, not a second renderer.
 const YOUTUBE = process.argv.includes("--youtube");
+// A Short is the same clip stood on its end. YouTube takes the square reel as one, but a
+// phone is 9:16 and a square uses barely half of it — and the painter has a real portrait
+// composition rather than a letterboxed landscape: taller than wide, it drops the keyboard
+// and gives the whole height to the notation, which is what keeps the glyphs readable at
+// arm's length. Feed length rather than the full piece, because a Short is a feed.
+const SHORTS = process.argv.includes("--shorts");
 const WIDTH = YOUTUBE ? 1920 : SIZE;
-const HEIGHT = YOUTUBE ? 1080 : SIZE;
+const HEIGHT = YOUTUBE ? 1080 : SHORTS ? Math.round((SIZE * 16) / 9) : SIZE;
 // The falling-notes highway is continuous motion, so frames are where its quality lives.
 // 60 is the ceiling rather than a preference: core/videoEncoding.ts tops out at H.264
 // level 4.2, which covers 1080p60 exactly and nothing beyond it — a limit chosen so an
@@ -121,7 +128,7 @@ function toAac(file) {
 function fileFor(piece, out) {
     const dir = `${out}/${folderFor(piece)}`;
     mkdirSync(dir, { recursive: true });
-    return `${dir}/${YOUTUBE ? "youtube" : "reel"}.mp4`;
+    return `${dir}/${YOUTUBE ? "youtube" : SHORTS ? "short" : "reel"}.mp4`;
 }
 
 function argValue(flag) {

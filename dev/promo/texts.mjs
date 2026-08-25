@@ -1,0 +1,93 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+// The words that go up with each clip: a YouTube title and description, written to
+// youtube.txt beside the video it belongs to.
+//
+// Generated rather than written, for the same reason the thumbnails are. Fifty-three
+// pieces is more than anybody edits by hand twice, and a description that drifts from the
+// clip it sits under is worse than none — the grade, the tempo and the licence all come
+// from the catalogue the video was rendered from, so they cannot disagree with it.
+//
+// What each description has to carry, in order of why: a sentence saying what the viewer
+// is looking at, the piece's own facts, a link that opens THAT piece to play, and the
+// licence. The link is the point of the whole exercise — a clip that cannot be acted on
+// is an advert, and one that opens the piece under the viewer's hands is an invitation.
+
+import { mkdir, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { folderFor, PIECES } from "./pieces.mjs";
+
+const OUT = process.argv.includes("--out")
+    ? process.argv[process.argv.indexOf("--out") + 1]
+    : "promo";
+const SITE = "https://plinky.fun";
+
+const manifest = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
+const items = Array.isArray(manifest) ? manifest : manifest.items;
+const byId = new Map(items.map((item) => [item.id, item]));
+
+// What a grade means to somebody reading a video description, who has never seen the
+// ladder. The number alone is jargon; this is the sentence it stands for.
+function difficulty(grade) {
+    if (grade <= 2) return "an early-grades piece — playable in your first months";
+    if (grade <= 4) return "around grades 3–4";
+    if (grade <= 6) return "around grades 5–6";
+    return "an advanced piece";
+}
+
+// A credit for a video card: the short form the promo list already chose, since that is
+// what is burnt into the frames. Saying something different underneath would read as two
+// different attributions of the same recording.
+// "Greensleeves by Traditional" reads as a person nobody has met. A tradition is what a
+// piece came FROM rather than who wrote it, and the sentence has to say so.
+function credit(composer) {
+    return /\b(traditional|trad|anonymous|anon)\b/i.test(composer)
+        ? ", traditional"
+        : ` by ${composer}`;
+}
+
+function describe(piece, entry) {
+    const grade = entry?.grade;
+    const tempo = entry?.tempo;
+    const facts = [
+        grade ? difficulty(grade) : null,
+        tempo ? `written at about ${tempo} beats a minute` : null,
+    ].filter(Boolean);
+
+    // One line per paragraph: YouTube wraps a description to the reader's own width, so
+    // hard breaks put in here show up as ragged half-lines on a phone.
+    return [
+        `${piece.title}${credit(piece.composer)}, played in Plinky — the notes falling as they sound, and the keys lighting under them.`,
+        "",
+        facts.length > 0
+            ? `${facts.join(", ")}.`.replace(/^./, (first) => first.toUpperCase())
+            : null,
+        facts.length > 0 ? "" : null,
+        `Play this one yourself: ${SITE}/en/play/${piece.id}/`,
+        "",
+        "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
+        "",
+        SITE,
+        "",
+        `Score: ${entry?.license ?? "CC0-1.0"}. The catalogue is Creative Commons throughout, so every piece here is one you are free to play, share and record.`,
+    ]
+        .filter((line) => line !== null)
+        .join("\n");
+}
+
+let written = 0;
+for (const piece of PIECES) {
+    const entry = byId.get(piece.id);
+    const dir = `${OUT}/${folderFor(piece)}`;
+    await mkdir(dir, { recursive: true });
+    // The title carries the word a viewer actually searches for. "Gymnopédie No. 1" alone
+    // competes with every recording ever made of it; the instrument is what narrows it.
+    const title = `${piece.title} — ${piece.composer} | piano`;
+    await writeFile(`${dir}/youtube.txt`, `${title}\n\n${describe(piece, entry)}\n`);
+    written += 1;
+    if (!entry) {
+        console.warn(`  ${piece.title}: not in the catalogue, so no grade or licence in its text`);
+    }
+}
+console.log(`Wrote ${written} youtube.txt files under ${OUT}/.`);

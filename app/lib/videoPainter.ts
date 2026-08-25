@@ -43,16 +43,25 @@ function mixHex(from: string, to: string, amount: number): string {
     return out;
 }
 
-// The stage palette, taken from the logo so an exported file looks like the app.
-// Contrast against the BACKGROUND ground (relative luminance 0.041): INK 11.0:1 and
-// MUTED 6.8:1, both past 4.5:1 for the title, wordmark and credit line.
-const BACKGROUND = "#3A0FA8";
+// The stage palette, taken from the logo so an exported file looks like the app — on a
+// black ground, which is a decision about the notes rather than about the stage.
+//
+// The notes are coloured by finger: warm red, orange, sunny yellow, pink and violet. Those
+// were fighting the deep violet they sat on, which is a near neighbour of two of them, and
+// a ground that competes with the thing it carries makes the thing quieter. Black takes
+// nothing from them and is what a video is expected to letterbox into anyway.
+//
+// Contrast only improves: measured against the old ground (relative luminance 0.041) INK
+// was 11.0:1 and MUTED 6.8:1, and black is darker than that, so both climb.
+const BACKGROUND = "#000000";
 const INK = "#F9F8FC";
 const MUTED = "#EDB2FD";
 const ACCENT = "#AA36FC";
 
 // WHITE_KEY stays a near-white the eye reads as an ivory key; BLACK_KEY is the
-// logo's violet-black rather than a neutral, so the keyboard sits in the same world.
+// logo's violet-black rather than a neutral, so the keyboard sits in the same world —
+// and on a black stage it is what keeps the black keys visible at all, being a step
+// lighter than the ground rather than the same colour as it.
 const WHITE_KEY = "#F9F8FC";
 const BLACK_KEY = "#191545";
 

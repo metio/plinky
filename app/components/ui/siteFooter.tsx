@@ -13,6 +13,9 @@ const CHANNELS: { brand: Brand; label: string; href: string }[] = [
         label: "Facebook",
         href: "https://www.facebook.com/profile.php?id=61591963944991",
     },
+    // The handle rather than the channel id: it is the same channel, and this form stays
+    // readable in a status bar and survives being renamed.
+    { brand: "youtube", label: "YouTube", href: "https://www.youtube.com/@PlinkyPiano" },
     { brand: "reddit", label: "Reddit", href: "https://www.reddit.com/r/plinky_piano/" },
     { brand: "github", label: "GitHub", href: "https://github.com/metio/plinky" },
 ];
