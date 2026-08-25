@@ -4,13 +4,7 @@
 import { useMemo, useSyncExternalStore } from "react";
 import { todayKey } from "../../core/daily";
 import { shiftDay } from "../../core/dateKey";
-import {
-    type PracticeLog,
-    type PracticeReport,
-    RANGE_DAYS,
-    type RangeKey,
-    summarizeRange,
-} from "../../core/practiceSession";
+import { type PracticeLog, type PracticeReport, summarizeRange } from "../../core/practiceSession";
 import { usePracticeLogStore } from "../contexts/services";
 
 // Subscribe a component to the practice diary, so a finished run anywhere in the
@@ -25,7 +19,10 @@ export function usePracticeLog(): PracticeLog | null {
 // The log rolled up over a window ending today. The window is anchored to the
 // render's clock, so a report left open overnight rolls onto the new day.
 export function usePracticeReport(
-    range: RangeKey,
+    // How many days the window covers, counting today. A count rather than a named range,
+    // because what a name like "month" covers is a calendar question, and the You page's
+    // scope dial is where that is answered — once, for every figure on the page.
+    days: number,
     log: PracticeLog | null,
     // The day the window ends on. Injected so a story or a test pins it — the panel is
     // a calendar, and one drawn from the wall clock renders differently every day.
@@ -41,6 +38,6 @@ export function usePracticeReport(
             return null;
         }
         // Inclusive of both ends, so "7 days" draws seven cells and not eight.
-        return summarizeRange(log, shiftDay(to, -(RANGE_DAYS[range] - 1)), to);
-    }, [log, range, to]);
+        return summarizeRange(log, shiftDay(to, -(Math.max(1, days) - 1)), to);
+    }, [log, days, to]);
 }

@@ -315,8 +315,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   of the piece gets better. It counts whole, unlooped readings only — a takeover from
   Listen or a drilled bar range covers a different stretch of music, and filing that
   under the same part would corrupt the record it's compared against.
-- **Notes you take longest to find** — on the You page, once you've read enough for it
-  to mean anything. Every practice run already timed how long each note took; this adds
+- **Notes you take longest to find** — on the You page under **All time**, once you've
+  read enough for it to mean anything. It is counted across everything you have ever
+  played rather than a period, and says so. Every practice run already timed how long each note took; this adds
   it up per note and names the handful that consistently slow you down, against the time
   a note usually takes you. Reading trouble is rarely spread evenly — it sits on a few
   ledger lines — and a grade averages that away. The placement test sits this one out:
@@ -504,10 +505,10 @@ with every note right. And it's **one row per hand** — a single row for a one-
 a **right** row over a **left** row once both hands are in play, so a lagging hand shows
 as a redder line against the other. The daily challenge shares as **Plinky N**, so
 everyone compares the same run, and the You page shares your lifetime fingerprint of the
-practice grade (Accuracy, Timing and Flow). A month with practice in it also gets its own
-recap card there — the notes played, the days at the keys and your biggest day — which
-shares those figures through the same platforms and the same image card as everything
-else.
+practice grade (Accuracy, Timing and Flow). The **How it's going** block there reports the
+notes played, the days at the keys and your biggest day for whichever period its switch is
+set to — this week, this month, this year or all time — and shares exactly those figures,
+named, through the same platforms and the same image card as everything else.
 
 Earned moments also surface their own **milestone card** on the run summary — your
 first S on a piece, reaching a new grade, or a flawless run — to share or save. Each

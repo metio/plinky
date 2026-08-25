@@ -10,6 +10,16 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**The You page has been rebuilt around one question at a time.** It had grown into
+fourteen stacked sections carrying six different stretches of time between them — a
+lifetime total near the top, a week chart under it, a report with its own controls, a
+month card near the bottom — with nothing to say those were the same figures over
+different periods. It is now four parts: where you stand, what is ready for you, your
+ladder, and how it is going. Everything that depends on a stretch of time sits in the
+last one behind a single This week / This month / This year / All time switch, sharing
+included, so you can ask the same question of any period and get an answer that says
+which period it is about.
+
 **Sharing your month now actually says how your month went.** The share button under
 the monthly recap used to post nothing but the month's name — it now carries the
 notes you played and the days you sat down, and offers the same platforms and the

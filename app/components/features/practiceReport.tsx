@@ -14,6 +14,7 @@ import {
     type PracticeReport as PracticeReportData,
     type PracticeSession,
     practiceLogToCsv,
+    RANGE_DAYS,
     type RangeKey,
 } from "../../../core/practiceSession";
 import { usePracticeLogStore } from "../../contexts/services";
@@ -240,7 +241,15 @@ const LISTED_SESSIONS = 10;
 export function PracticeReport({
     pieceTitle = (id) => id,
     now = new Date(),
+    days,
 }: {
+    // How many days to report on, counting today. Passed by the You page, whose scope dial
+    // governs every figure on it — the report then draws no range control of its own,
+    // because two controls for one question is the mess the page had.
+    //
+    // Left off (a story, a teacher's page), the report keeps its own control and its own
+    // rolling ranges, so it still stands on its own anywhere else.
+    days?: number;
     // Resolves a catalogue id to its title. Defaulted so a story or a test can mount
     // the panel without a catalogue, and injected rather than looked up here because
     // the panel has no business reading the library.
@@ -250,8 +259,9 @@ export function PracticeReport({
     now?: Date;
 }) {
     const [range, setRange] = useState<RangeKey>("month");
+    const governed = days !== undefined;
     const log = usePracticeLog();
-    const report = usePracticeReport(range, log, now);
+    const report = usePracticeReport(governed ? days : RANGE_DAYS[range], log, now);
     if (!log || !report) {
         return null;
     }
@@ -273,12 +283,14 @@ export function PracticeReport({
                 <p className="text-xs text-muted">{m.practice_report_intro()}</p>
             </div>
 
-            <SegmentedControl
-                label={m.practice_range_label()}
-                value={range}
-                onChange={setRange}
-                options={RANGES.map((id) => ({ id, label: RANGE_LABEL[id]() }))}
-            />
+            {!governed && (
+                <SegmentedControl
+                    label={m.practice_range_label()}
+                    value={range}
+                    onChange={setRange}
+                    options={RANGES.map((id) => ({ id, label: RANGE_LABEL[id]() }))}
+                />
+            )}
 
             {report.sessions === 0 ? (
                 <p className="text-sm text-muted">{m.practice_empty()}</p>

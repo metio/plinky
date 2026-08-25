@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { monthKey, monthlyRecap } from "../../../core/history";
 import { usePrefs } from "../../hooks/usePrefs";
 import { svgMilestone } from "../../../core/milestoneCard";
 import { practiceHref } from "../../../core/practisable";
@@ -14,18 +13,14 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 import { BakedIncipit } from "../ui/incipit";
 import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
+import { GoingBlock } from "./goingBlock";
 import { GradeRoadmap } from "./gradeRoadmap";
-import { PracticeReport } from "./practiceReport";
-import { PracticeBalance } from "./practiceBalance";
 import { RepertoirePanel } from "./repertoirePanel";
-import { RecapCard } from "./recapCard";
 import { FeatureBoundary } from "./featureBoundary";
-import { SlowNotes } from "./slowNotes";
 import { RefreshQueue } from "./refreshQueue";
 import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
-import { WeekChart } from "./weekChart";
-import { ActivityStats, YouStanding, StandingKey } from "./youStanding";
+import { StandingKey, YouStanding } from "./youStanding";
 import { PageHeader } from "../ui/pageHeader";
 
 // The "You" page: how good you are at playing, in one place. Standing (grade + skill)
@@ -44,9 +39,6 @@ export function StatsView() {
         return null;
     }
     const { level, skill, mode, workingGrade, upNext, summary, fingerprint } = data;
-    // This calendar month's practice, for the recap card — shown only when the month has
-    // something to celebrate, so it reads as a reward rather than an empty prompt.
-    const recap = monthlyRecap(history.load(), monthKey(new Date()));
     // The diary stores catalogue ids; the titles live with the graded items this page
     // already loaded, so resolving here costs nothing and keeps the report ignorant of
     // the library. An id with no match is shown as itself — a piece removed from the
@@ -58,101 +50,94 @@ export function StatsView() {
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.stats_heading()} hint={m.stats_intro()} />
 
-            <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
-            <StandingKey />
-
-            {/* The page's own intro promises three things — where you stand, what is
-                ready for you, and how it has been going — and for a long time it
-                delivered twelve blocks in the order they were built. What you could act
-                on now comes first, the ladder underneath it, and the record of how it
-                went after both, so the page reads forwards. */}
-            <Show when={upNext.length > 0}>
-                <SettingsSection title={m.grades_up_next({ grade: workingGrade })}>
-                    <ul className="space-y-1 text-sm">
-                        {upNext.map((item) => (
-                            <li key={item.id} className="flex items-center gap-2">
-                                {/* Drawn the way every other list of pieces names one:
-                                    the opening bars, then the title. */}
-                                <BakedIncipit
-                                    mark={item.incipit}
-                                    label={item.title}
-                                    colored={prefs.colorNotes}
-                                />
-                                <Link to={practiceHref(item)} className={linkClasses}>
-                                    {item.title}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </SettingsSection>
-            </Show>
-
-            <FeatureBoundary feature="RefreshQueue">
-                <RefreshQueue reviews={data.reviews} />
-            </FeatureBoundary>
-
-            {/* Named and framed like every other block on the page — and the frame is
-                where the app finally says out loud what has always been true of it. */}
-            <SettingsSection title={m.grades_roadmap_heading()} hint={m.grades_roadmap_hint()}>
-                <GradeRoadmap items={data.items} level={level} mode={mode} now={data.now} />
+            {/* Four blocks, and membership follows one rule a reader can feel: is this
+                number about a period, or not? Everything periodic lives in the last block
+                and nowhere else. The page used to be fourteen siblings in the order they
+                were built, carrying six different windows of time between them. */}
+            <SettingsSection title={m.you_block_standing()} hint={m.you_block_standing_hint()}>
+                <div className="space-y-4">
+                    <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
+                    {/* A legend, folded into the thing it explains rather than standing
+                        beside it as a section of equal weight. */}
+                    <StandingKey />
+                </div>
             </SettingsSection>
 
-            {/* Where the ladder starts for someone who has no idea. It answers the
-                question the roadmap raises, so it sits directly under it. */}
-            <SettingsSection title={m.placement_cta()} hint={m.placement_cta_hint()}>
-                <Link to="/placement" className={`${linkClasses} inline-block text-sm`}>
-                    {m.placement_start()} →
-                </Link>
-            </SettingsSection>
+            <SettingsSection title={m.you_block_ready()} hint={m.you_block_ready_hint()}>
+                <div className="space-y-6">
+                    <Show when={upNext.length > 0}>
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-body">
+                                {m.grades_up_next({ grade: workingGrade })}
+                            </h3>
+                            <ul className="space-y-1 text-sm">
+                                {upNext.map((item) => (
+                                    <li key={item.id} className="flex items-center gap-2">
+                                        {/* Drawn the way every other list of pieces names
+                                            one: the opening bars, then the title. */}
+                                        <BakedIncipit
+                                            mark={item.incipit}
+                                            label={item.title}
+                                            colored={prefs.colorNotes}
+                                        />
+                                        <Link to={practiceHref(item)} className={linkClasses}>
+                                            {item.title}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </Show>
 
-            <FeatureBoundary feature="AchievementGallery">
-                <AchievementGallery achievements={data.achievements} />
-            </FeatureBoundary>
-
-            <FeatureBoundary feature="RepertoirePanel">
-                <RepertoirePanel items={data.items} now={new Date()} />
-            </FeatureBoundary>
-
-            {/* Both count what has happened, so before anything has they are a pair of
-                zeros over an empty week — a frame promising insight it does not have. The
-                diary below says the same thing in a sentence, and offers what to do. */}
-            {summary && (summary.daysPracticed > 0 || summary.totalNotes > 0) && (
-                <SettingsSection title={m.progress_all_time()}>
-                    {/* Said out loud, because the month's recap further down counts the
-                        same two things and a reader cannot tell two unlabelled pairs of
-                        numbers apart. */}
-                    <ActivityStats
-                        daysPracticed={summary.daysPracticed}
-                        totalNotes={summary.totalNotes}
-                    />
-                    <FeatureBoundary feature="WeekChart">
-                        <WeekChart recent={summary.recent} />
+                    <FeatureBoundary feature="RefreshQueue">
+                        <RefreshQueue reviews={data.reviews} />
                     </FeatureBoundary>
-                </SettingsSection>
-            )}
+                </div>
+            </SettingsSection>
 
-            <FeatureBoundary feature="PracticeReport">
-                <PracticeReport pieceTitle={pieceTitle} />
+            <SettingsSection title={m.you_block_ladder()} hint={m.you_block_ladder_hint()}>
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <h3 className="text-sm font-medium text-body">
+                            {m.grades_roadmap_heading()}
+                        </h3>
+                        {/* The promise the app makes about grades, kept where the ladder
+                            is: a grade says what to expect, never what you may play. */}
+                        <p className="text-xs text-muted">{m.grades_roadmap_hint()}</p>
+                        <GradeRoadmap items={data.items} level={level} mode={mode} now={data.now} />
+                    </div>
+
+                    {/* Where the ladder starts for somebody who has no idea. Two lines in
+                        the footer of the ladder it is about, rather than a section of its
+                        own that only ever pointed somewhere else. */}
+                    <div className="space-y-1">
+                        <Link to="/placement" className={`${linkClasses} inline-block text-sm`}>
+                            {m.you_find_level()}
+                        </Link>
+                        <p className="text-xs text-muted">{m.placement_cta_hint()}</p>
+                    </div>
+
+                    <FeatureBoundary feature="RepertoirePanel">
+                        <RepertoirePanel items={data.items} now={new Date()} />
+                    </FeatureBoundary>
+
+                    <FeatureBoundary feature="AchievementGallery">
+                        <AchievementGallery achievements={data.achievements} />
+                    </FeatureBoundary>
+                </div>
+            </SettingsSection>
+
+            <FeatureBoundary feature="GoingBlock">
+                <GoingBlock
+                    history={history.load()}
+                    summary={summary}
+                    pieceTitle={pieceTitle}
+                    // data.now is the epoch millisecond the page's data was read at — the
+                    // same instant every figure in the block is measured against, so the
+                    // window and its contents cannot disagree.
+                    now={new Date(data.now)}
+                />
             </FeatureBoundary>
-
-            {/* Directly under the report, because it answers the question the report
-                raises: the report says how much practice happened, and this says which
-                pieces it happened to. */}
-            <FeatureBoundary feature="PracticeBalance">
-                <PracticeBalance pieceTitle={pieceTitle} />
-            </FeatureBoundary>
-
-            <FeatureBoundary feature="SlowNotes">
-                <SlowNotes />
-            </FeatureBoundary>
-
-            {/* Everything worth showing somebody else, together at the foot rather than
-                a share button in the middle of the page and a share card at the end. */}
-            {recap.totalNotes > 0 && (
-                <FeatureBoundary feature="RecapCard">
-                    <RecapCard recap={recap} />
-                </FeatureBoundary>
-            )}
 
             <Show when={level >= 1}>
                 <SettingsSection title={m.grades_share_heading()}>
