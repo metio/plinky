@@ -18,9 +18,11 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 import { folderFor, PIECES } from "./pieces.mjs";
 
-const OUT = process.argv.includes("--out")
-    ? process.argv[process.argv.indexOf("--out") + 1]
-    : "promo";
+// Absent and present-but-empty both fall back. indexOf answers -1 for absent, and -1 + 1
+// is 0 — argv[0] is the node binary, so the naive form writes every file inside whatever
+// directory node happens to live in.
+const outAt = process.argv.indexOf("--out");
+const OUT = (outAt >= 0 ? process.argv[outAt + 1] : undefined) ?? "promo";
 const SITE = "https://plinky.fun";
 
 const manifest = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
