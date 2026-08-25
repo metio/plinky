@@ -10,6 +10,16 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Sharing your month now actually says how your month went.** The share button under
+the monthly recap used to post nothing but the month's name — it now carries the
+notes you played and the days you sat down, and offers the same platforms and the
+same image card as sharing a grade does.
+
+**The four ways to warm up sit in a proper row.** On a phone they used to wrap into a
+ragged centred pile. Today's challenge now runs across the top with the arcade, a
+drill and ear training in a neat row beneath it — the same shape on a phone and on a
+computer.
+
 **See exactly how much of the recorded piano your device has.** Settings now shows how
 many of the concert grand's 637 recordings are stored here and how many are loaded
 ready to sound, so you can tell a working recorded piano from one that quietly never

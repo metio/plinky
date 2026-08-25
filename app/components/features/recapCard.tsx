@@ -1,10 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { shareOrCopy } from "../../lib/shareOrCopy";
 import type { MonthlyRecap } from "../../../core/history";
-import { SITE_URL } from "../../../core/site";
-import { useCopied } from "../../hooks/useCopied";
+import { svgMilestone } from "../../../core/milestoneCard";
+import { ShareButtons } from "./shareButtons";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 
@@ -18,21 +17,20 @@ function monthLabel(month: string): string {
 }
 
 // A Wrapped-style card of the month's practice: the notes played, the days at the keys,
-// and the biggest day, with one button to share it. A reward the You page offers when a
-// month has practice to celebrate — never a reminder, never shown for an empty month.
+// and the biggest day, with the app's own share row under it. A reward the You page offers
+// when a month has practice to celebrate — never a reminder, never shown for an empty
+// month.
 export function RecapCard({ recap }: { recap: MonthlyRecap }) {
-    const [copied, flashCopied] = useCopied();
     const heading = m.recap_heading({ month: monthLabel(recap.month) });
 
-    const share = async () => {
-        const text = `${heading} 🎹`;
-        await shareOrCopy({
-            share: { text, url: SITE_URL },
-            // No page of its own to point at, so the sentence and the site travel together.
-            copy: `${text} ${SITE_URL}`,
-            onCopied: flashCopied,
-        });
-    };
+    // Everything the card says, in one sentence a reader can post. It used to share the
+    // heading alone — "Your August 2026 in music" — which is the one line on the card that
+    // carries no information: the month is in it and the practice is not.
+    const boast = m.recap_boast({
+        notes: recap.totalNotes.toLocaleString(getLocale()),
+        days: recap.daysPracticed,
+        month: monthLabel(recap.month),
+    });
 
     return (
         <section className="space-y-4 rounded-xl border border-accent-line bg-gradient-to-br from-accent-surface to-ghost-surface p-5 dark:to-ghost-surface/40">
@@ -46,13 +44,23 @@ export function RecapCard({ recap }: { recap: MonthlyRecap }) {
                     {m.recap_best_day({ count: recap.bestDay.notes })}
                 </p>
             )}
-            <button
-                type="button"
-                onClick={share}
-                className="rounded-lg bg-accent-solid px-4 py-2 font-medium text-sm text-white transition hover:bg-chart-peak"
-            >
-                {copied ? m.share_copied() : m.recap_share()}
-            </button>
+            {/* The same buttons the grade milestone below this page uses — the platforms,
+                the system share sheet, and the card as an image — rather than one button
+                of its own. A month worth showing somebody is shown the same way a grade
+                is. */}
+            <ShareButtons
+                text={boast}
+                imageSvg={svgMilestone({
+                    // The number is the card, and the month and days are the line under
+                    // it: a month name set at the title's size runs off the edge.
+                    title: recap.totalNotes.toLocaleString(getLocale()),
+                    detail: m.recap_card_detail({
+                        month: monthLabel(recap.month),
+                        days: recap.daysPracticed,
+                    }),
+                })}
+                imageText={boast}
+            />
         </section>
     );
 }

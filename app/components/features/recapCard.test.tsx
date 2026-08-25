@@ -27,6 +27,41 @@ describe("RecapCard", () => {
         expect(screen.getByText(m.recap_best_day({ count: 640 }))).toBeTruthy();
     });
 
+    it("shares the month's practice, not just its name", () => {
+        // The bug this pins: the share button posted the heading alone — "Your July 2026 in
+        // music" — which is the one line on the card that carries no practice in it. What
+        // went out named a month and said nothing about it.
+        render(
+            <RecapCard
+                recap={{
+                    month: "2026-07",
+                    totalNotes: 4820,
+                    daysPracticed: 18,
+                    bestDay: { date: "2026-07-12", notes: 640 },
+                }}
+            />,
+        );
+        const posted = screen
+            .getAllByRole("link")
+            .map((link) => decodeURIComponent(link.getAttribute("href") ?? ""));
+        // Every platform link carries the same sentence, so any one of them proves it.
+        expect(posted.some((href) => href.includes("4,820") && href.includes("18"))).toBe(true);
+    });
+
+    it("offers the platforms the rest of the app shares through", () => {
+        // Rather than a button of its own that only ever copied. A month worth showing
+        // somebody is shown the same way a grade is.
+        render(
+            <RecapCard
+                recap={{ month: "2026-07", totalNotes: 4820, daysPracticed: 18, bestDay: null }}
+            />,
+        );
+        for (const platform of ["X", "Bluesky", "WhatsApp"]) {
+            expect(screen.getByRole("link", { name: m.share_on({ platform }) })).toBeTruthy();
+        }
+        expect(screen.getByRole("button", { name: m.share_copy() })).toBeTruthy();
+    });
+
     it("omits the best-day line when there was no standout day", () => {
         render(
             <RecapCard

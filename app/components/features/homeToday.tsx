@@ -25,6 +25,7 @@ import {
     surprisePick,
 } from "../../lib/gradeProgress";
 import { HeroKeyboard } from "./heroKeyboard";
+import { WarmUpWays } from "./warmUpWays";
 import { SurpriseButton } from "./surpriseButton";
 import {
     useAssignmentsStore,
@@ -186,31 +187,14 @@ function Moment({
 // narrow screen wraps more and will still grow a little; the alternative is a page that
 // jumps by two thirds of a screen, which is what this replaced.
 const WAITING = [
-    // The warm-up's placeholders stand in for four pills that are centred, so these are
-    // too: reserving the height but not the alignment would still slide the row sideways
-    // the moment the words arrive, which is the shift this exists to prevent.
+    // The warm-up's placeholders stand in for a lead button and three ways in beneath it,
+    // so they are centred in the same column: reserving the height but not the alignment
+    // would still slide the row sideways the moment the words arrive, which is the shift
+    // this exists to prevent.
     { label: m.today_moment_warmup, chips: 4, height: 216, centered: true },
     { label: m.today_moment_work, chips: 2, height: 112, centered: false },
     { label: m.today_moment_learn, chips: 1, height: 40, centered: false },
 ];
-
-// One press, one start. `lead` marks the day's own thing — the challenge everybody
-// gets, while it is still unopened — which is the only reason to weigh one of these
-// more than the others.
-function Chip({ to, lead = false, children }: { to: string; lead?: boolean; children: ReactNode }) {
-    return (
-        <Link
-            to={to}
-            className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
-                lead
-                    ? "border-spark bg-spark-surface text-spark-strong hover:border-spark-strong"
-                    : "border-line-strong bg-sunken text-ink hover:border-accent-line-strong hover:text-accent-strong"
-            }`}
-        >
-            {children}
-        </Link>
-    );
-}
 
 function Row({
     to,
@@ -532,29 +516,18 @@ export function HomeToday() {
             {header}
 
             <Moment label={m.today_moment_warmup()}>
-                {/* Centred on the keyboard beneath them, which is centred itself, along
-                    with its hint — four pills hard against the left edge read as the
-                    start of a list rather than as the four ways in that they are. */}
-                <div className="flex flex-wrap justify-center gap-2">
-                    {daily && (
-                        <Chip to={daily.to} lead={!daily.done}>
-                            {rowFor(daily, session.titles, session.bests, session.target).label}
-                        </Chip>
-                    )}
-                    {/* The endless ladder is one of the four, not a billboard beside
-                        them. It used to carry the rung as a number, which told a reader
-                        nothing: the ladder has no end, so seven is not seven of
-                        anything. The key it is about to ask for is what a sight-reader
-                        actually wants to know before pressing it. */}
-                    <Chip to={`/play/${arcadeId}`}>
-                        {m.arcade_title()}
-                        <span className="rounded-full bg-subtle px-1.5 text-xs text-muted">
-                            {keyName(arcadeConfig(session.arcadeLevel).key)}
-                        </span>
-                    </Chip>
-                    <Chip to="/daily?tab=warmup">{m.today_drill()}</Chip>
-                    <Chip to="/ear">{m.ear_title()}</Chip>
-                </div>
+                <WarmUpWays
+                    daily={
+                        daily && {
+                            to: daily.to,
+                            label: rowFor(daily, session.titles, session.bests, session.target)
+                                .label,
+                            done: daily.done,
+                        }
+                    }
+                    arcadeTo={`/play/${arcadeId}`}
+                    arcadeKey={keyName(arcadeConfig(session.arcadeLevel).key)}
+                />
                 {/* Somewhere to put your hands before anything is asked of them. It is
                     the same instrument the practice surfaces use, so a warm-up here and
                     a run on a piece feel like one keyboard. */}

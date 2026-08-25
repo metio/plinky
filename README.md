@@ -347,8 +347,9 @@ and **You** (how am I getting on). Settings and Help stay as the two icons in th
 **Today** is the front page, and it is the day's practice in the shape a teacher gives
 an hour:
 
-- **Warm up** — the day's challenge, your next rung of the sight-reading arcade, a fresh
-  drill, a round of ear training.
+- **Warm up** — the day's challenge across the top, with your next rung of the
+  sight-reading arcade (labelled with the key it will ask for), a fresh drill and a round
+  of ear training in a row beneath it.
 - **Work on** — your open assignment's next step ("Continue *First steps* — step 2 of
   5"), which goes straight into that piece, whatever is fading and wants a refresh, or
   the gentlest piece you haven't learned yet. A **Surprise me** button picks one for you.
@@ -503,7 +504,10 @@ with every note right. And it's **one row per hand** — a single row for a one-
 a **right** row over a **left** row once both hands are in play, so a lagging hand shows
 as a redder line against the other. The daily challenge shares as **Plinky N**, so
 everyone compares the same run, and the You page shares your lifetime fingerprint of the
-practice grade (Accuracy, Timing and Flow).
+practice grade (Accuracy, Timing and Flow). A month with practice in it also gets its own
+recap card there — the notes played, the days at the keys and your biggest day — which
+shares those figures through the same platforms and the same image card as everything
+else.
 
 Earned moments also surface their own **milestone card** on the run summary — your
 first S on a piece, reaching a new grade, or a flawless run — to share or save. Each
