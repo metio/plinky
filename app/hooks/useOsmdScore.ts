@@ -205,15 +205,12 @@ export function useOsmdScore(
         paintedRef.current = false;
     }, []);
 
-    // Wipe the injected paint (feedback halos) by re-rendering the score's SVG, then bump
-    // the render version. A bare render() rebuilds the SVG and so also drops any other
-    // overlay injected into it — the loop's selection rects — and the version bump is what
-    // tells their owner (useLoopSelection) to repaint them. Callers that render directly to
-    // clear stale halos must go through this, or the loop overlay silently vanishes.
-    // Lift the feedback halos and nothing else. wipePaint below re-renders, which is right
-    // between runs and wrong during one: a fresh render replaces the very note elements a
-    // running match is holding on to. A halo is a separate injected element, so taking it
-    // away leaves the engraving — and the run — untouched.
+    // Lift the feedback halos and nothing else — the cheap half of the pair below.
+    //
+    // wipePaint re-renders, which is right BETWEEN runs and wrong during one: a fresh
+    // render replaces the very note elements a running match is holding on to. A halo is a
+    // separate injected element, so taking it away leaves both the engraving and the run
+    // untouched, which is what lets a section loop start each pass on a clean score.
     const clearPaint = useCallback(() => {
         const svg = scoreSvg(containerRef.current);
         if (svg) {
@@ -222,6 +219,11 @@ export function useOsmdScore(
         }
     }, [containerRef]);
 
+    // Wipe the injected paint (feedback halos) by re-rendering the score's SVG, then bump
+    // the render version. A bare render() rebuilds the SVG and so also drops any other
+    // overlay injected into it — the loop's selection rects — and the version bump is what
+    // tells their owner (useLoopSelection) to repaint them. Callers that render directly to
+    // clear stale halos must go through this, or the loop overlay silently vanishes.
     const wipePaint = useCallback(() => {
         const osmd = osmdRef.current;
         if (!osmd) {
