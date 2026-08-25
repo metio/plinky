@@ -22,8 +22,18 @@
 // (core/person) is what runs here, so the index cannot disagree with the links that
 // point into it. Run through `npm run songs:bake`; `--check` is the CI guard.
 
+import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import { canonicalComposer, personSlug } from "../core/person";
+
+// The formatter, over a string. `--stdin-file-path` is what tells biome which rules apply,
+// and it writes the formatted source to stdout.
+function format(source: string): string {
+    return execFileSync("npx", ["biome", "format", `--stdin-file-path=${INDEX}`], {
+        input: source,
+        encoding: "utf8",
+    });
+}
 
 const SONGS = "public/songs/manifest.json";
 const EXERCISES = "public/exercises/manifest.json";
@@ -96,10 +106,24 @@ export async function bakePeopleIndex(check: boolean): Promise<boolean> {
     const sorted = [...index.entries()]
         .filter(([, entry]) => entry.pieces >= PRERENDER_MIN_PIECES)
         .sort(([left], [right]) => left.localeCompare(right));
+    // Emitted the way the formatter would write it, because both gates read this file:
+    // `songs:bake --check` compares it byte for byte against this string, and `lint` runs
+    // the formatter over the tree. Compact JSON satisfies the first and fails the second,
+    // and a run of the formatter over a generated file then breaks the first permanently —
+    // which is a trap nobody can be expected to remember, so the generator avoids it.
     const body = `{\n${sorted
-        .map(([slug, entry]) => `    ${JSON.stringify(slug)}: ${JSON.stringify(entry)},`)
+        .map(
+            ([slug, entry]) =>
+                `    ${JSON.stringify(slug)}: { name: ${JSON.stringify(entry.name)}, pieces: ${entry.pieces} },`,
+        )
         .join("\n")}\n}`;
-    const baked = `${HEADER}${body}${FOOTER}`;
+    // Run through the project's own formatter rather than guessed at. Both gates read this
+    // file — `--check` compares it byte for byte against this string, and `lint` runs the
+    // formatter over the whole tree — so the two agree only if the generator emits exactly
+    // what the formatter would. Matching its line-wrapping by hand would mean
+    // reimplementing it, and a formatter run over a generated file would then break the
+    // check permanently, which is a trap nobody can be expected to remember.
+    const baked = format(`${HEADER}${body}${FOOTER}`);
 
     if (check) {
         const current = await readFile(INDEX, "utf8").catch(() => "");
