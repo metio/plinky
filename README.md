@@ -656,7 +656,7 @@ Alexander Holm (CC-BY), sixteen recordings of every key depending on how hard it
 struck. There is nothing to download and wait for — a piece fetches the couple of dozen
 recordings it needs while you read it, a few hundred kilobytes each, and they are kept on
 your device; a note whose recording has not arrived is played by the synthesised voice, so
-nothing ever waits. Exported videos carry whichever piano you heard. iPhones normally mute
+nothing ever waits. The same panel shows how many of the instrument's 637 recordings this device holds and how many are loaded ready to sound, with a button to fetch the whole grand at once (about 85 MB — worth pressing before a flight) and one to delete the recordings and take the space back without switching the recorded piano off. Exported videos carry whichever piano you heard. iPhones normally mute
 browser audio under **Silent Mode**, so Plinky declares itself a playback audio
 session (iOS 16.4+) to play through it like a music app, and re-wakes sound after a
 call or app switch interrupts it. On an older iPhone, or if you still hear nothing,

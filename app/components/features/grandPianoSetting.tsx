@@ -4,6 +4,8 @@
 import { useSyncExternalStore } from "react";
 import { sampleCredit } from "../../../core/sampledPiano";
 import { useSampleSource } from "../../contexts/services";
+import { Button } from "../ui/button";
+import { ConfirmButton } from "../ui/confirmButton";
 import { SwitchField } from "../ui/fields";
 import { m } from "../../paraglide/messages.js";
 
@@ -40,24 +42,64 @@ export function GrandPianoSetting() {
                 }}
             />
             {state.enabled && (
-                <p className="text-xs text-muted">
-                    {/* "Fetching" only while something is actually being fetched. It used to
-                        stand for "no manifest yet", which on a revisit meant it sat there
-                        describing work nobody had started. */}
-                    {manifest
-                        ? sampleCredit(manifest)
-                        : state.loading
-                          ? m.settings_grand_piano_arriving()
-                          : m.settings_grand_piano_offline()}
-                    {state.held > 0 && (
-                        <>
-                            {" · "}
-                            {state.held === 1
-                                ? m.settings_grand_piano_held_one({ count: state.held })
-                                : m.settings_grand_piano_held_other({ count: state.held })}
-                        </>
-                    )}
-                </p>
+                <div className="space-y-2">
+                    <p className="text-xs text-muted">
+                        {/* "Fetching" only while something is actually being fetched. It used
+                            to stand for "no manifest yet", which on a revisit meant it sat
+                            there describing work nobody had started. */}
+                        {manifest
+                            ? sampleCredit(manifest)
+                            : state.loading
+                              ? m.settings_grand_piano_arriving()
+                              : m.settings_grand_piano_offline()}
+                    </p>
+                    {/* What the device actually holds, which is the question the switch alone
+                        cannot answer: a player who cannot hear the difference has no way to
+                        tell a recorded piano that is working from one that quietly never
+                        arrived. Held is of the whole pack, because "142 recordings" on its
+                        own says nothing about whether that is most of it or barely a start.
+                        Ready is this session, and the two differing is not a fault — the
+                        cache survives the tab and the decoded audio does not. */}
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                        <dt className="text-muted">{m.settings_grand_piano_on_device()}</dt>
+                        <dd className="text-right tabular-nums text-body">
+                            {state.wanted > 0
+                                ? m.settings_grand_piano_of_pack({
+                                      held: state.held,
+                                      total: state.wanted,
+                                  })
+                                : state.held}
+                        </dd>
+                        <dt className="text-muted">{m.settings_grand_piano_ready()}</dt>
+                        <dd className="text-right tabular-nums text-body">{state.ready}</dd>
+                    </dl>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                            onClick={() => {
+                                // Not awaited, like the switch: the figures above move as it
+                                // goes, which is the progress bar.
+                                void samples.fetchAll();
+                            }}
+                            disabled={
+                                state.loading || (state.wanted > 0 && state.held >= state.wanted)
+                            }
+                        >
+                            {state.loading
+                                ? m.settings_grand_piano_fetching()
+                                : m.settings_grand_piano_fetch_all()}
+                        </Button>
+                        <ConfirmButton
+                            confirmLabel={m.settings_grand_piano_clear_yes()}
+                            onConfirm={() => {
+                                void samples.clear();
+                            }}
+                            disabled={state.held === 0}
+                        >
+                            {m.settings_grand_piano_clear()}
+                        </ConfirmButton>
+                    </div>
+                    <p className="text-xs text-muted">{m.settings_grand_piano_fetch_all_help()}</p>
+                </div>
             )}
         </div>
     );

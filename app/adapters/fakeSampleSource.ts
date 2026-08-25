@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
+import { packFiles } from "../../core/sampledPiano";
 import type { PlayedNote, SampleSource, SampleState } from "../ports/sampleSource";
 import { NO_SAMPLES } from "../ports/sampleSource";
 
@@ -19,7 +20,11 @@ export type FakeSampleSource = SampleSource & {
 export function fakeSampleSource(manifest: SampleManifest | null = null): FakeSampleSource {
     const buffers = new Map<string, AudioBuffer>();
     const listeners = new Set<() => void>();
-    let state: SampleState = { ...NO_SAMPLES, enabled: manifest !== null };
+    let state: SampleState = {
+        ...NO_SAMPLES,
+        enabled: manifest !== null,
+        wanted: manifest ? packFiles(manifest).length : 0,
+    };
     const prepared: PlayedNote[][] = [];
     const announce = () => {
         for (const listener of listeners) {
@@ -47,6 +52,15 @@ export function fakeSampleSource(manifest: SampleManifest | null = null): FakeSa
         },
         async enable() {
             state = { ...state, enabled: true };
+            announce();
+        },
+        async fetchAll() {
+            state = { ...state, held: state.wanted };
+            announce();
+        },
+        async clear() {
+            buffers.clear();
+            state = { ...state, ready: 0, held: 0 };
             announce();
         },
         async forget() {

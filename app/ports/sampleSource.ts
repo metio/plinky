@@ -56,6 +56,14 @@ export interface SampleSource {
     // Forget every recording and the manifest with them, freeing the cache. The device
     // reset calls this too.
     forget(): Promise<void>;
+    // Fetch the whole pack now rather than a piece at a time. Nothing needs this to play —
+    // it exists for the player who is about to be somewhere without a network, and for the
+    // one who wants to see the figure move and know the recordings are real.
+    fetchAll(): Promise<void>;
+    // Empty the cache but keep using the recorded piano: they arrive again as pieces ask
+    // for them. This is the reclaim-the-space button, which is a different thing from
+    // turning the instrument off.
+    clear(): Promise<void>;
     // Told when the state changes, so a panel can redraw without polling.
     subscribe(listener: () => void): () => void;
 }
@@ -71,6 +79,15 @@ export type SampleState = {
     held: number;
     // A fetch is in flight, so a panel can say so rather than looking broken.
     loading: boolean;
+    // Recordings the pack holds in total, so `held` can be shown as a fraction of
+    // something. Zero until the manifest is known, which is also when it is unknowable.
+    wanted: number;
 };
 
-export const NO_SAMPLES: SampleState = { enabled: false, ready: 0, held: 0, loading: false };
+export const NO_SAMPLES: SampleState = {
+    enabled: false,
+    ready: 0,
+    held: 0,
+    loading: false,
+    wanted: 0,
+};

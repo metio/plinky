@@ -18,14 +18,25 @@ export default meta;
 
 type Story = StoryObj<typeof GrandPianoSetting>;
 
+const region = (file: string) => ({
+    file,
+    keyCentre: 60,
+    lowKey: 59,
+    highKey: 61,
+    lowVelocity: 1,
+    highVelocity: 127,
+});
+
 const MANIFEST: SampleManifest = {
     instrument: "Salamander Grand Piano V3",
     author: "Alexander Holm",
     license: "CC-BY-3.0",
     source: "https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html",
     version: "v1",
-    notes: [],
-    releases: [],
+    // A pack with a size, because the figure the panel shows is a fraction of one:
+    // "1 of 3" is the form that tells a reader whether the instrument is nearly here.
+    notes: [region("C4v8.opus"), region("C4v12.opus")],
+    releases: [{ ...region("C4rel.opus"), kind: "knock" }],
 };
 
 // A device that has never asked for the recordings: the switch and its one line of

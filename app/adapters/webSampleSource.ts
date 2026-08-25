@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
-import { EXTRA_KINDS, regionsNeeded } from "../../core/sampledPiano";
+import { EXTRA_KINDS, packFiles, regionsNeeded } from "../../core/sampledPiano";
 import type { PlayedNote, SampleSource, SampleState } from "../ports/sampleSource";
 import { NO_SAMPLES } from "../ports/sampleSource";
 
@@ -20,6 +20,9 @@ import { NO_SAMPLES } from "../ports/sampleSource";
 // re-fetched is not kept here.
 
 const CACHE = "plinky-piano-v1";
+
+// How many recordings the whole-pack fetch asks for at a time.
+const BATCH = 6;
 
 export type WebSampleOptions = {
     // Where the pack lives. Its version is part of the path, so a new pack is a new URL
@@ -134,7 +137,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
         } catch {
             return null;
         }
-        announce();
+        settle({ wanted: packFiles(manifest).length });
         return manifest;
     }
 
@@ -223,6 +226,44 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
                 settle({ loading: false });
             }
         },
+        // The whole pack, on request. In small batches rather than six hundred requests at
+        // once: a browser queues them anyway, and a burst that large competes with the
+        // fetches a player who is still playing actually needs.
+        //
+        // Fetched into the cache and not decoded. Decoding the pack would mean holding every
+        // recording in memory at once for a benefit that lasts until the tab closes, whereas
+        // the cache is the part that survives the flight this button exists for.
+        async fetchAll() {
+            const found = await loadManifest();
+            if (!found) {
+                return;
+            }
+            settle({ loading: true });
+            try {
+                const files = packFiles(found);
+                for (let at = 0; at < files.length; at += BATCH) {
+                    await Promise.all(files.slice(at, at + BATCH).map((file) => bytesFor(file)));
+                    // Counted from the cache each batch rather than tallied here, so the
+                    // figure stays what the device actually holds even if a fetch failed or
+                    // the browser evicted something mid-run.
+                    await countHeld();
+                }
+            } finally {
+                settle({ loading: false });
+            }
+        },
+        // The space back, without giving up the instrument. `forget` turns it off as well;
+        // this one leaves the manifest and the choice alone, so the recordings simply start
+        // arriving again with the next piece.
+        async clear() {
+            buffers.clear();
+            try {
+                await caches.delete(CACHE);
+            } catch {
+                // Nothing to delete, or no cache to delete it from.
+            }
+            settle({ ready: 0, held: 0 });
+        },
         async forget() {
             options.remember(false);
             buffers.clear();
@@ -232,7 +273,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             } catch {
                 // Nothing to delete, or no cache to delete it from.
             }
-            settle({ enabled: false, ready: 0, held: 0, loading: false });
+            settle({ enabled: false, ready: 0, held: 0, loading: false, wanted: 0 });
         },
     };
 }

@@ -133,6 +133,20 @@ export function regionsNeeded(
 // What a pack is owed on screen. The library is CC-BY: it may be used for anything,
 // including something somebody pays for, as long as it is credited — so the credit is not
 // optional and not a footnote.
+// Every distinct recording the pack holds — struck notes and the two extras alike, by
+// file, because a device holds files and two regions can name the same one.
+//
+// This is the denominator the settings panel counts against: "142 of 611 recordings", which
+// is the only form in which the figure means anything. On its own, "142 recordings" tells a
+// player nothing about whether the instrument is mostly here or barely started.
+export function packFiles(manifest: SampleManifest): string[] {
+    const files = new Set<string>();
+    for (const region of [...manifest.notes, ...manifest.releases]) {
+        files.add(region.file);
+    }
+    return [...files];
+}
+
 export function sampleCredit(manifest: SampleManifest): string {
     return `${manifest.instrument} by ${manifest.author} · ${manifest.license}`;
 }

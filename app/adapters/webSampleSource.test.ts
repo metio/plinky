@@ -43,7 +43,17 @@ function fakeCache() {
     return { cache, held };
 }
 
-function world(options: { failManifest?: boolean; cache?: Cache; enabled?: boolean } = {}) {
+function world(
+    options: {
+        failManifest?: boolean;
+        cache?: Cache;
+        enabled?: boolean;
+        // A pack of a different size, for the one question that needs more than one
+        // recording to answer.
+        manifest?: SampleManifest;
+    } = {},
+) {
+    const pack = options.manifest ?? MANIFEST;
     const asked: string[] = [];
     const fetcher = (async (input: RequestInfo | URL) => {
         const url = String(input);
@@ -51,7 +61,7 @@ function world(options: { failManifest?: boolean; cache?: Cache; enabled?: boole
         if (url.endsWith("manifest.json")) {
             return options.failManifest
                 ? new Response("no", { status: 404 })
-                : new Response(JSON.stringify(MANIFEST));
+                : new Response(JSON.stringify(pack));
         }
         return new Response(new Uint8Array([1, 2, 3, 4]).buffer);
     }) as unknown as typeof fetch;
@@ -91,6 +101,62 @@ describe("webSampleSource", () => {
         await vi.waitFor(() => expect(second.source.state().held).toBe(1));
         // And it knew that before decoding anything this time.
         expect(second.source.state().ready).toBe(0);
+    });
+
+    it("knows how big the pack is, so a count can be a fraction of it", async () => {
+        // "142 recordings" says nothing about whether the instrument is nearly here. The
+        // denominator comes off the manifest, and only once it has arrived.
+        const { source } = world();
+        expect(source.state().wanted).toBe(0);
+        await vi.waitFor(() => expect(source.state().wanted).toBe(1));
+    });
+
+    it("fetches the whole pack when asked, and nothing it already holds", async () => {
+        // For the player who is about to be somewhere without a network. Every file, in
+        // batches — and a second run over a full cache asks the network for nothing, which
+        // is what makes the button safe to press twice.
+        const many: SampleManifest = {
+            ...MANIFEST,
+            notes: Array.from({ length: 9 }, (_, at) => ({ ...REGION, file: `n${at}.opus` })),
+            releases: [{ ...REGION, file: "r0.opus", kind: "knock" as const }],
+        };
+        const { cache } = fakeCache();
+        const { source, asked } = world({ cache, manifest: many });
+        await source.fetchAll();
+        expect(source.state().held).toBe(10);
+        expect(asked.filter((url) => url.endsWith(".opus")).length).toBe(10);
+
+        asked.length = 0;
+        await source.fetchAll();
+        expect(asked).toEqual([]);
+        expect(source.state().held).toBe(10);
+    });
+
+    it("gives the space back without turning the instrument off", async () => {
+        // A player reclaiming the storage is not asking to go back to the synthesised
+        // piano: the choice stays, the manifest stays, and the recordings arrive again with
+        // the next piece. That is what makes this a different button from the switch.
+        const { cache, held } = fakeCache();
+        const deleted: string[] = [];
+        vi.stubGlobal("caches", {
+            delete: async (name: string) => {
+                deleted.push(name);
+                held.clear();
+                return true;
+            },
+        });
+        try {
+            const { source } = world({ cache });
+            await source.prepare([NOTE]);
+            expect(source.state().held).toBe(1);
+
+            await source.clear();
+            expect(deleted).toEqual(["plinky-piano-v1"]);
+            expect(source.state()).toMatchObject({ enabled: true, held: 0, ready: 0 });
+            expect(source.manifest()).not.toBeNull();
+        } finally {
+            vi.unstubAllGlobals();
+        }
     });
 
     it("says it is loading only while it is", async () => {

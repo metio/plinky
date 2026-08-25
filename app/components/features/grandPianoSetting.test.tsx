@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { SampleManifest } from "../../../core/sampledPiano";
 import { fakeSampleSource } from "../../adapters/fakeSampleSource";
@@ -13,14 +13,23 @@ import { GrandPianoSetting } from "./grandPianoSetting";
 
 afterEach(cleanup);
 
+const region = (file: string) => ({
+    file,
+    keyCentre: 60,
+    lowKey: 59,
+    highKey: 61,
+    lowVelocity: 1,
+    highVelocity: 127,
+});
+
 const MANIFEST: SampleManifest = {
     instrument: "Salamander Grand Piano V3",
     author: "Alexander Holm",
     license: "CC-BY-3.0",
     source: "https://example.test",
     version: "v1",
-    notes: [],
-    releases: [],
+    notes: [region("C4v8.opus"), region("C4v12.opus")],
+    releases: [{ ...region("C4rel.opus"), kind: "knock" as const }],
 };
 
 describe("GrandPianoSetting", () => {
@@ -53,24 +62,46 @@ describe("GrandPianoSetting", () => {
         expect(screen.getByText(m.settings_grand_piano_offline())).toBeTruthy();
     });
 
-    it("counts what the device holds, in the words that fit the number", () => {
+    it("counts what the device holds against what the pack has", () => {
+        // The figure a player can act on is the fraction. "1 recording" alone says nothing
+        // about whether the instrument is nearly here or has barely started, which is the
+        // question somebody who cannot hear the difference is actually asking.
         const samples = fakeSampleSource(MANIFEST);
         samples.put("C4v8.opus");
         renderWithServices(<GrandPianoSetting />, { samples });
-        expect(screen.getByText(/\b1 recording on this device/)).toBeTruthy();
-        cleanup();
-
-        const more = fakeSampleSource(MANIFEST);
-        more.put("C4v8.opus");
-        more.put("C4v12.opus");
-        renderWithServices(<GrandPianoSetting />, { samples: more });
-        expect(screen.getByText(/\b2 recordings on this device/)).toBeTruthy();
+        expect(
+            screen.getByText(m.settings_grand_piano_of_pack({ held: 1, total: 3 })),
+        ).toBeTruthy();
     });
 
-    it("says nothing about storage until something has been fetched", () => {
-        renderWithServices(<GrandPianoSetting />, { samples: fakeSampleSource(MANIFEST) });
-        // The switch's own caption ends "kept on this device", so the count is what is
-        // being looked for rather than the phrase.
-        expect(screen.queryByText(/\d+ recordings? on this device/)).toBeNull();
+    it("fetches the whole pack on request", async () => {
+        const samples = fakeSampleSource(MANIFEST);
+        renderWithServices(<GrandPianoSetting />, { samples });
+        expect(
+            screen.getByText(m.settings_grand_piano_of_pack({ held: 0, total: 3 })),
+        ).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: m.settings_grand_piano_fetch_all() }));
+        await waitFor(() =>
+            expect(
+                screen.getByText(m.settings_grand_piano_of_pack({ held: 3, total: 3 })),
+            ).toBeTruthy(),
+        );
+    });
+
+    it("gives the space back without giving up the instrument", async () => {
+        // Deleting the recordings is not the same act as turning the recorded piano off:
+        // the switch stays on and they arrive again with the next piece. Two buttons,
+        // because a player reclaiming a gigabyte is not asking to go back to the synth.
+        const samples = fakeSampleSource(MANIFEST);
+        samples.put("C4v8.opus");
+        renderWithServices(<GrandPianoSetting />, { samples });
+        fireEvent.click(screen.getByRole("button", { name: m.settings_grand_piano_clear() }));
+        fireEvent.click(screen.getByRole("button", { name: m.settings_grand_piano_clear_yes() }));
+        await waitFor(() =>
+            expect(
+                screen.getByText(m.settings_grand_piano_of_pack({ held: 0, total: 3 })),
+            ).toBeTruthy(),
+        );
+        expect(switchOn(m.settings_grand_piano)).toBe(true);
     });
 });
