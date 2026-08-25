@@ -25,6 +25,7 @@ const LISTED = 8;
 export function PracticeBalance({
     pieceTitle = (id) => id,
     now = Date.now(),
+    headed = true,
 }: {
     // Resolves a catalogue id to its title, injected rather than looked up here — the
     // panel has no business reading the library.
@@ -32,6 +33,12 @@ export function PracticeBalance({
     // The instant "last played" is measured back from. Injected by stories and tests,
     // which need a clock that does not move.
     now?: number;
+    // Whether the panel draws its own heading. The Stats page heads each of its
+    // questions once and gathers the answers beneath, so a panel answering one of them
+    // must not restate its name — two headings for one thing is what made that page read
+    // as a stack of sections rather than a set of answers. Everywhere else it still names
+    // itself.
+    headed?: boolean;
 }) {
     const log = usePracticeLog();
     if (!log) {
@@ -46,7 +53,7 @@ export function PracticeBalance({
     return (
         <section className="space-y-3">
             <div className="space-y-1">
-                <h2 className={sectionHeadingClasses}>{m.balance_title()}</h2>
+                {headed && <h2 className={sectionHeadingClasses}>{m.balance_title()}</h2>}
                 <p className="text-xs text-muted">{m.balance_intro()}</p>
             </div>
             <ul className="space-y-2">

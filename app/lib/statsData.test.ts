@@ -6,7 +6,7 @@ import type { Mastery } from "../../core/mastery";
 import type { Grid } from "../../core/shareCard";
 import type { GradeCatalogItem, GradedMastery } from "./gradeProgress";
 import { STAR_THRESHOLDS } from "./gradeProgress";
-import { buildYouData, type YouInput } from "./youData";
+import { buildStatsData, type YouInput } from "./statsData";
 
 const NOW = 1_700_000_000_000;
 const DAY = 86_400_000;
@@ -45,25 +45,25 @@ function input(overrides: Partial<YouInput> = {}): YouInput {
     };
 }
 
-const earned = (data: ReturnType<typeof buildYouData>, id: string) =>
+const earned = (data: ReturnType<typeof buildStatsData>, id: string) =>
     data.achievements.find((achievement) => achievement.id === id)?.earned;
 
-describe("buildYouData", () => {
+describe("buildStatsData", () => {
     it("places the player at the highest grade they have played well, and works one past it", () => {
-        const data = buildYouData(input({ items: [...pieces(1, 2), ...pieces(2, 2)] }));
+        const data = buildStatsData(input({ items: [...pieces(1, 2), ...pieces(2, 2)] }));
         expect(data.level).toBe(2);
         expect(data.workingGrade).toBe(3);
     });
 
     it("holds a beginner at grade zero, working toward the first grade", () => {
         // One strong run is not ability — it takes two pieces to place a grade.
-        const data = buildYouData(input({ items: pieces(1, 1) }));
+        const data = buildStatsData(input({ items: pieces(1, 1) }));
         expect(data.level).toBe(0);
         expect(data.workingGrade).toBe(1);
     });
 
     it("caps the working grade at the top of the ladder", () => {
-        const data = buildYouData(input({ items: pieces(8, 2) }));
+        const data = buildStatsData(input({ items: pieces(8, 2) }));
         expect(data.workingGrade).toBe(8);
     });
 
@@ -74,7 +74,7 @@ describe("buildYouData", () => {
             { id: "g1-mid", title: "Middling", grade: 1, cost: 3, kind: "piece" },
             { id: "g2-off", title: "Wrong grade", grade: 2, cost: 1, kind: "piece" },
         ];
-        const data = buildYouData(input({ catalogue }));
+        const data = buildStatsData(input({ catalogue }));
         expect(data.upNext.map((item) => item.id)).toEqual(["g1-easy", "g1-mid", "g1-hard"]);
     });
 
@@ -90,7 +90,7 @@ describe("buildYouData", () => {
             piece("done", 1, { bestScore: 50 }),
             piece("todo", 1, { bestScore: 50, backlog: true }),
         ];
-        const data = buildYouData(input({ items, catalogue }));
+        const data = buildStatsData(input({ items, catalogue }));
         expect(data.workingGrade).toBe(1);
         expect(data.upNext.map((item) => item.id)).toEqual(["todo"]);
     });
@@ -100,22 +100,22 @@ describe("buildYouData", () => {
             piece("stale", 1, { reviewAt: NOW - DAY }),
             piece("fresh", 1, { reviewAt: NOW + DAY }),
         ];
-        const data = buildYouData(input({ items }));
+        const data = buildStatsData(input({ items }));
         expect(data.reviews).toEqual([{ id: "stale", title: "stale", kind: "piece" }]);
     });
 
     it("holds the review queue to the player's cap", () => {
         const items = pieces(1, 6, { reviewAt: NOW - DAY });
-        expect(buildYouData(input({ items, reviewCap: 2 })).reviews).toHaveLength(2);
+        expect(buildStatsData(input({ items, reviewCap: 2 })).reviews).toHaveLength(2);
     });
 
     describe("badges", () => {
         it("awards a star tier once a grade holds enough mastered pieces", () => {
-            const bronze = buildYouData(input({ items: pieces(1, STAR_THRESHOLDS.bronze) }));
+            const bronze = buildStatsData(input({ items: pieces(1, STAR_THRESHOLDS.bronze) }));
             expect(earned(bronze, "star-bronze")).toBe(true);
             expect(earned(bronze, "star-silver")).toBe(false);
 
-            const silver = buildYouData(input({ items: pieces(1, STAR_THRESHOLDS.silver) }));
+            const silver = buildStatsData(input({ items: pieces(1, STAR_THRESHOLDS.silver) }));
             expect(earned(silver, "star-silver")).toBe(true);
             expect(earned(silver, "star-gold")).toBe(false);
         });
@@ -124,36 +124,36 @@ describe("buildYouData", () => {
             // Stars are judged gently whatever the player's mode, so a badge already
             // won cannot vanish over a stretch of days away.
             const lapsed = pieces(1, STAR_THRESHOLDS.bronze, { reviewAt: NOW - 400 * DAY });
-            const data = buildYouData(input({ items: lapsed, mode: "competitive" }));
+            const data = buildStatsData(input({ items: lapsed, mode: "competitive" }));
             expect(earned(data, "star-bronze")).toBe(true);
         });
 
         it("celebrates the highest grade ever reached, not the current standing", () => {
             // The milestone outlives the mastery behind it: an empty ladder still
             // shows the badge the player has already earned.
-            const data = buildYouData(input({ reachedGrade: 4 }));
+            const data = buildStatsData(input({ reachedGrade: 4 }));
             expect(earned(data, "grade-4")).toBe(true);
             expect(earned(data, "grade-5")).toBe(false);
         });
 
         it("celebrates a standing above the recorded milestone", () => {
-            const data = buildYouData(input({ items: pieces(2, 2), reachedGrade: 0 }));
+            const data = buildStatsData(input({ items: pieces(2, 2), reachedGrade: 0 }));
             expect(earned(data, "grade-2")).toBe(true);
         });
 
         it("awards the first S on any piece's best run", () => {
-            expect(earned(buildYouData(input({ items: pieces(1, 1) })), "first-s")).toBe(false);
-            const data = buildYouData(input({ items: [piece("ace", 1, { bestScore: 100 })] }));
+            expect(earned(buildStatsData(input({ items: pieces(1, 1) })), "first-s")).toBe(false);
+            const data = buildStatsData(input({ items: [piece("ace", 1, { bestScore: 100 })] }));
             expect(earned(data, "first-s")).toBe(true);
         });
 
         it("passes the flawless milestone through", () => {
-            expect(earned(buildYouData(input({ flawless: true })), "flawless")).toBe(true);
-            expect(earned(buildYouData(input()), "flawless")).toBe(false);
+            expect(earned(buildStatsData(input({ flawless: true })), "flawless")).toBe(true);
+            expect(earned(buildStatsData(input()), "flawless")).toBe(false);
         });
 
         it("counts an absent practice summary as no days and no notes", () => {
-            const data = buildYouData(input({ summary: null }));
+            const data = buildStatsData(input({ summary: null }));
             expect(data.achievements.some((a) => a.kind === "days" && a.earned)).toBe(false);
             expect(data.achievements.some((a) => a.kind === "notes" && a.earned)).toBe(false);
         });
@@ -161,7 +161,7 @@ describe("buildYouData", () => {
 
     it("passes the loaded summary and fingerprint straight through", () => {
         const fingerprint: Grid = [["best", "ok"]];
-        const data = buildYouData(input({ fingerprint }));
+        const data = buildStatsData(input({ fingerprint }));
         expect(data.fingerprint).toBe(fingerprint);
         expect(data.summary).toBeNull();
     });

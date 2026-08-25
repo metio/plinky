@@ -10,7 +10,7 @@ import { createServices, ServicesProvider } from "../contexts/services";
 import { createActivitySignal } from "../lib/activity";
 import type { GradeCatalogItem, GradedMastery } from "../lib/gradeProgress";
 import type { Mastery } from "../../core/mastery";
-import { useYouData } from "./useYouData";
+import { useStatsData } from "./useStatsData";
 
 const { masteryMock, catalogueMock } = vi.hoisted(() => ({
     masteryMock: vi.fn<() => Promise<GradedMastery[]>>(),
@@ -45,7 +45,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
     </ServicesProvider>
 );
 
-describe("useYouData", () => {
+describe("useStatsData", () => {
     it("is null until the mastery loads, then derives the standing in one shot", async () => {
         masteryMock.mockResolvedValue(
             Array.from({ length: 5 }, (_, i) => ({
@@ -62,7 +62,7 @@ describe("useYouData", () => {
             { id: "g2-easy", title: "Gentle Two", grade: 2, cost: 1, kind: "piece" },
         ]);
 
-        const { result } = renderHook(() => useYouData(), { wrapper });
+        const { result } = renderHook(() => useStatsData(), { wrapper });
         expect(result.current).toBeNull();
 
         await waitFor(() => expect(result.current).not.toBeNull());
@@ -87,7 +87,7 @@ describe("useYouData", () => {
         ]);
         catalogueMock.mockResolvedValue([]);
 
-        const { result } = renderHook(() => useYouData(), { wrapper });
+        const { result } = renderHook(() => useStatsData(), { wrapper });
         await waitFor(() => expect(result.current).not.toBeNull());
         expect(result.current?.reviews).toEqual([
             { id: "stale", title: "Für Elise", kind: "piece" },

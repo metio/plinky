@@ -11,16 +11,16 @@ import {
     loadGradeCatalogue,
     loadGradedMastery,
 } from "../lib/gradeProgress";
-import { buildYouData, type YouData } from "../lib/youData";
+import { buildStatsData, type StatsData } from "../lib/statsData";
 import { usePracticeSummary } from "./usePracticeSummary";
 import { usePrefs } from "./usePrefs";
 
 // The "You" page's data, loaded once per mount: mastery and the catalogue arrive
 // async (the personal data is absent from the prerendered shell), while the
 // practice summary and preferences are live subscriptions. The derivation itself
-// is buildYouData's — this hook only gathers its input. Null until the mastery
+// is buildStatsData's — this hook only gathers its input. Null until the mastery
 // has loaded, so the page can paint exactly once, fully.
-export function useYouData(): YouData | null {
+export function useStatsData(): StatsData | null {
     const services = useServices();
     const { prefs } = usePrefs();
     const summary = usePracticeSummary();
@@ -59,7 +59,7 @@ export function useYouData(): YouData | null {
         () =>
             items === null
                 ? null
-                : buildYouData({
+                : buildStatsData({
                       items,
                       catalogue,
                       mode: decayMode,

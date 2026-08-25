@@ -104,3 +104,36 @@ export function scopeSummary(history: History, scope: Scope, now: Date): ScopeSu
     }
     return { totalNotes, daysPracticed, bestDay };
 }
+
+// How this month compares with the one before it, for the line that opens the Stats page.
+//
+// Days rather than notes on purpose. Notes counts what a piece happens to contain — a
+// study of semiquavers outscores a slow Chopin nocturne by a factor of ten — so a player
+// who practised harder can be told they did less. Days answers "did I sit down", which is
+// the thing a player actually controls and the only honest measure of a month.
+//
+// It says what happened and stops. It does not say "better", because more days is not
+// better playing, and it never mentions a run of consecutive days: nothing here counts a
+// streak, and a month spent away is not a thing to be reported back to somebody.
+export type MonthOverMonth = {
+    days: number;
+    // Days more than last month, when there was a last month with practice in it and this
+    // month has more. Null otherwise — including when this month is quieter, which is not
+    // a figure worth putting in front of anybody.
+    more: number | null;
+    // Nothing recorded before this month: a first month rather than a comparison.
+    first: boolean;
+};
+
+export function monthOverMonth(history: History, now: Date): MonthOverMonth {
+    const days = scopeSummary(history, "month", now).daysPracticed;
+    const previous = new Date(now);
+    previous.setDate(0);
+    const before = scopeSummary(history, "month", previous).daysPracticed;
+    // "First month" means nothing recorded before this one at all, not merely a quiet
+    // previous month — somebody returning after a break is not starting over.
+    const everBefore = Object.entries(history).some(
+        ([date, notes]) => notes > 0 && date < (scopeStart("month", now) ?? ""),
+    );
+    return { days, more: before > 0 && days > before ? days - before : null, first: !everBefore };
+}

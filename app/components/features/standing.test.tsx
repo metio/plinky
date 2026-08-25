@@ -4,20 +4,20 @@
 
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { ActivityStats, YouStanding } from "./youStanding";
+import { ActivityStats, Standing } from "./standing";
 import { m } from "../../paraglide/messages.js";
 
 afterEach(cleanup);
 
-describe("YouStanding", () => {
+describe("Standing", () => {
     it("reads 'not graded yet' before the first grade is earned", () => {
-        render(<YouStanding level={0} skill={0} competitive={false} />);
+        render(<Standing level={0} skill={0} competitive={false} />);
         expect(screen.getByText(m.grades_not_started())).toBeTruthy();
         expect(screen.queryByText(/Competitive/)).toBeNull();
     });
 
     it("shows the grade, the skill rating and the competitive badge", () => {
-        render(<YouStanding level={3} skill={42} competitive />);
+        render(<Standing level={3} skill={42} competitive />);
         expect(screen.getByText("Grade 3")).toBeTruthy();
         expect(screen.getByText(/42/)).toBeTruthy();
         expect(screen.getByText(/Competitive/)).toBeTruthy();

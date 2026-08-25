@@ -22,7 +22,7 @@ describe("helpAnchorFor", () => {
     it("maps a page path (with locale prefix) to its help section key", () => {
         expect(helpAnchorFor("/en/play/abc123")).toBe("play");
         expect(helpAnchorFor("/de/music")).toBe("music");
-        expect(helpAnchorFor("/en/stats")).toBe("you");
+        expect(helpAnchorFor("/en/stats")).toBe("stats");
         expect(helpAnchorFor("/fr")).toBe("home");
     });
 

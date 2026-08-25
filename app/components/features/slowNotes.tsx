@@ -19,7 +19,15 @@ import { sectionHeadingClasses } from "../ui/classes";
 // be a new value every time React asked, which is the shape that loops.
 const NOTHING_YET: NoteStats = {};
 
-export function SlowNotes() {
+export function SlowNotes({
+    headed = true,
+}: {
+    // Whether the panel draws its own heading. The Stats page heads each of its questions
+    // once and gathers the answers beneath, so a panel answering one of them must not
+    // restate its name — two headings for one thing is what made that page read as a stack
+    // of sections rather than a set of answers. Everywhere else it still names itself.
+    headed?: boolean;
+}) {
     const store = useNoteStatsStore();
     const stats = useSyncExternalStore(store.subscribe, store.load, () => NOTHING_YET);
     const slow = slowestNotes(stats);
@@ -35,7 +43,7 @@ export function SlowNotes() {
 
     return (
         <section className="space-y-3">
-            <h2 className={sectionHeadingClasses}>{m.slow_notes_heading()}</h2>
+            {headed && <h2 className={sectionHeadingClasses}>{m.slow_notes_heading()}</h2>}
             <p className="text-sm text-muted">
                 {m.slow_notes_intro({ typical: (typical / 1000).toFixed(1) })}
             </p>

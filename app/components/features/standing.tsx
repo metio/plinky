@@ -6,7 +6,7 @@ import { Show } from "./conditional";
 
 // The headline card: which grade you're at, the skill rating beside it, and the
 // crossed-swords badge when the opt-in competitive decay is on.
-export function YouStanding({
+export function Standing({
     level,
     skill,
     competitive,

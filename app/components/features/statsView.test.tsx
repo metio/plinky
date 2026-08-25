@@ -63,11 +63,14 @@ describe("StatsView", () => {
             </MemoryRouter>,
         );
 
-        // The gentlest next-grade piece confirms the page resolved.
-        expect(await screen.findByRole("link", { name: "Gentle Two" })).toBeTruthy();
-        // Standing (Grade 1 shows in the headline and the roadmap row) and the
-        // retrospective stats merged in from /progress.
+        // The first question's heading confirms the page resolved.
+        expect(await screen.findByText(m.stats_q_standing())).toBeTruthy();
+        // Standing (Grade 1 shows in the headline and the roadmap row).
         expect(screen.getAllByText("Grade 1").length).toBeGreaterThan(0);
+        // The pieces at your grade you have NOT played are not here: that answers "what
+        // shall I do", which is the home page's job, and having it in both places let two
+        // surfaces disagree about what you owe.
+        expect(screen.queryByRole("link", { name: "Gentle Two" })).toBeNull();
     });
 
     it("counts the days and the notes once there are some", async () => {
@@ -85,7 +88,7 @@ describe("StatsView", () => {
             { store: kv },
         );
 
-        expect(await screen.findByRole("link", { name: "First Piece" })).toBeTruthy();
+        expect(await screen.findByText(m.stats_q_standing())).toBeTruthy();
         expect(screen.getAllByText(m.progress_days_practiced()).length).toBeGreaterThan(0);
     });
 
@@ -103,7 +106,7 @@ describe("StatsView", () => {
             </MemoryRouter>,
         );
 
-        expect(await screen.findByRole("link", { name: "First Piece" })).toBeTruthy();
+        expect(await screen.findByText(m.stats_q_standing())).toBeTruthy();
         expect(screen.queryByText(m.progress_days_practiced())).toBeNull();
     });
 
@@ -119,8 +122,38 @@ describe("StatsView", () => {
             </MemoryRouter>,
         );
 
-        expect(await screen.findByRole("link", { name: "First Piece" })).toBeTruthy();
+        expect(await screen.findByText(m.stats_q_standing())).toBeTruthy();
         expect(screen.queryByText("Getting started")).toBeNull();
+    });
+
+    it("asks every question once, and answers each under its own heading", async () => {
+        // The failure this replaces: four blocks laid over fourteen sections that still
+        // emitted their own headings inside them, so the page read as unchanged. Each
+        // question is a heading here, and the panels beneath it no longer name themselves.
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([
+            { id: "g1", title: "First Piece", grade: 1, cost: 1, kind: "piece" },
+        ]);
+
+        render(
+            <MemoryRouter>
+                <StatsView />
+            </MemoryRouter>,
+        );
+
+        for (const question of [
+            m.stats_q_standing,
+            m.stats_q_better,
+            m.stats_q_working,
+            m.stats_q_strongest,
+            m.stats_q_ladder,
+            m.stats_q_share,
+        ]) {
+            expect(await screen.findByText(question())).toBeTruthy();
+        }
+        // The share card used to hang at the foot with no heading while the phrase itself
+        // appeared twice on the page. One heading now, and only one.
+        expect(screen.getAllByText(m.stats_q_share()).length).toBe(1);
     });
 });
 

@@ -26,8 +26,11 @@ const EMOJI_STORIES = new Set([
     "achievementGallery.stories.tsx > Partly Earned",
     "achievementGallery.stories.tsx > Complete",
     "dailyReveal.stories.tsx > Present",
-    "youStanding.stories.tsx > Standing",
-    "youStanding.stories.tsx > Competitive",
+    "standing.stories.tsx > Levels",
+    "standing.stories.tsx > Competitive",
+    // The key explains the two badges by drawing them, so it carries the same 🎓 and ⚔️
+    // its siblings do — it was simply missed when they were listed.
+    "standing.stories.tsx > Key",
     "surpriseButton.stories.tsx > Default",
     "loopRangeBar.stories.tsx > Whole Song",
     "loopRangeBar.stories.tsx > Narrowed",

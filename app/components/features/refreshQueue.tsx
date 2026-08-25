@@ -16,8 +16,14 @@ import { m } from "../../paraglide/messages.js";
 // never met the feature, and this is its only entry point.
 export function RefreshQueue({
     reviews,
+    headed = true,
 }: {
     reviews: Array<{ id: string; title: string; kind: ItemKind; incipit?: string }>;
+    // Whether the panel draws its own heading. The Stats page heads each of its questions
+    // once and gathers the answers beneath, so a panel answering one of them must not
+    // restate its name — two headings for one thing is what made that page read as a stack
+    // of sections rather than a set of answers. Everywhere else it still names itself.
+    headed?: boolean;
 }) {
     // The reading aid that colours noteheads in a score colours these opening bars
     // too, read once for the whole list rather than per mark.
@@ -25,7 +31,7 @@ export function RefreshQueue({
     const due = reviews.length > 0;
     return (
         <section className="space-y-2">
-            <h2 className={sectionHeadingClasses}>{m.grades_refresh_heading()}</h2>
+            {headed && <h2 className={sectionHeadingClasses}>{m.grades_refresh_heading()}</h2>}
             {!due && <p className="text-sm text-muted">{m.grades_all_fresh()}</p>}
             <p className="text-sm text-muted">{m.refresh_why()}</p>
             {due ? (

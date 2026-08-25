@@ -109,11 +109,11 @@ const SECTIONS: {
         imageAlt: m.help_shot_assignments,
     },
     {
-        key: "you",
+        key: "stats",
         title: m.nav_stats,
-        text: m.help_text_you,
+        text: m.help_text_stats,
         image: "stats",
-        imageAlt: m.help_shot_you,
+        imageAlt: m.help_shot_stats,
     },
     {
         key: "review",

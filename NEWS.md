@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**The Stats page now asks the questions you came with.** Each heading is one of them —
+*How good am I? Am I getting better? What am I working on? Where am I strongest? How
+far can I go?* — and everything under a heading answers it, with nothing restating its
+own name in between. A line at the top says how many days you have played this month.
+Sharing your progress finally sits under a heading of its own, with the picture of
+your playing and your grade together. The list of pieces to try next has gone back to
+the front page, where deciding what to do already lives.
+
 **New drill now sits with the music it makes.** On the warm-up it was a button two
 panels above the score, so pressing it replaced a phrase you could not see and it
 looked like nothing happened. It now sits beside Practice, right above the phrase it

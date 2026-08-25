@@ -23,7 +23,7 @@ import {
 // How many pieces the "up next" shortlist offers.
 const SUGGESTION_COUNT = 4;
 
-export type YouData = {
+export type StatsData = {
     // Every graded piece with its mastery — the input the roadmap breaks down per grade.
     items: GradedMastery[];
     mode: DecayMode;
@@ -63,7 +63,7 @@ export type YouInput = {
 // Every field is a function of the input — the page's standing, roadmap, review
 // queue and badges all fall out of the pure gradeProgress helpers — so the whole
 // derivation is exercised as a table without mounting React or loading a store.
-export function buildYouData(input: YouInput): YouData {
+export function buildStatsData(input: YouInput): StatsData {
     const { items, catalogue, mode, now } = input;
     const level = currentGrade(items);
     const masteredIds = new Set(

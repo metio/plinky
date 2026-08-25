@@ -32,7 +32,19 @@ const STAGE_LABEL: Record<Stage, () => string> = {
 // second library. Everything is still reachable from the library itself.
 const LISTED = 12;
 
-export function RepertoirePanel({ items, now }: { items: GradedMastery[]; now: Date }) {
+export function RepertoirePanel({
+    items,
+    now,
+    headed = true,
+}: {
+    items: GradedMastery[];
+    now: Date;
+    // Whether the panel draws its own heading. The Stats page heads each of its questions
+    // once and gathers the answers beneath, so a panel answering one of them must not
+    // restate its name — two headings for one thing is what made that page read as a stack
+    // of sections rather than a set of answers. Everywhere else it still names itself.
+    headed?: boolean;
+}) {
     const store = useMasteryStore();
     // Subscribed rather than read once from the items prop: setting a date writes to
     // the mastery store, and a panel rendering off a snapshot taken when the page
@@ -51,7 +63,7 @@ export function RepertoirePanel({ items, now }: { items: GradedMastery[]; now: D
     return (
         <section className="space-y-3">
             <div className="space-y-1">
-                <h2 className={sectionHeadingClasses}>{m.repertoire_title()}</h2>
+                {headed && <h2 className={sectionHeadingClasses}>{m.repertoire_title()}</h2>}
                 <p className="text-xs text-muted">{m.repertoire_intro()}</p>
             </div>
             <ul className="space-y-2">

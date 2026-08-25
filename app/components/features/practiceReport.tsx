@@ -242,6 +242,7 @@ export function PracticeReport({
     pieceTitle = (id) => id,
     now = new Date(),
     days,
+    headed = true,
 }: {
     // How many days to report on, counting today. Passed by the You page, whose scope dial
     // governs every figure on it — the report then draws no range control of its own,
@@ -250,6 +251,11 @@ export function PracticeReport({
     // Left off (a story, a teacher's page), the report keeps its own control and its own
     // rolling ranges, so it still stands on its own anywhere else.
     days?: number;
+    // Whether the panel draws its own heading. The Stats page heads each of its questions
+    // once and gathers the answers beneath, so a panel answering one of them must not
+    // restate its name — two headings for one thing is what made that page read as a stack
+    // of sections rather than a set of answers. Everywhere else it still names itself.
+    headed?: boolean;
     // Resolves a catalogue id to its title. Defaulted so a story or a test can mount
     // the panel without a catalogue, and injected rather than looked up here because
     // the panel has no business reading the library.
@@ -279,8 +285,12 @@ export function PracticeReport({
     return (
         <section className="space-y-4">
             <div className="space-y-1">
-                <h2 className={sectionHeadingClasses}>{m.practice_report_title()}</h2>
-                <p className="text-xs text-muted">{m.practice_report_intro()}</p>
+                {headed && (
+                    <>
+                        <h2 className={sectionHeadingClasses}>{m.practice_report_title()}</h2>
+                        <p className="text-xs text-muted">{m.practice_report_intro()}</p>
+                    </>
+                )}
             </div>
 
             {!governed && (

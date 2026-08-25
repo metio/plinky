@@ -292,7 +292,7 @@ one-tap **review session** walks you through everything that's fading, and you c
   missing instead of leading to a dead end, and a one-tap action prunes those steps;
   importing a shared assignment says up front how many of its pieces resolve here,
   and deleting a score from Music warns when saved assignments still use it.
-- **Find your level** — a placement test, reached from the You page. Read a drill;
+- **Find your level** — a placement test, reached from the Stats page. Read a drill;
   if it goes well the next is harder, and three shaky runs stop it. It reports one
   number and the grade it lands near, so a newcomer starts where they actually read
   rather than where a dropdown guessed. Every drill is generated on the spot, so
@@ -315,7 +315,7 @@ one-tap **review session** walks you through everything that's fading, and you c
   of the piece gets better. It counts whole, unlooped readings only — a takeover from
   Listen or a drilled bar range covers a different stretch of music, and filing that
   under the same part would corrupt the record it's compared against.
-- **Notes you take longest to find** — on the You page under **All time**, once you've
+- **Notes you take longest to find** — on the Stats page under **Where am I strongest?**, once you've
   read enough for it to mean anything. It is counted across everything you have ever
   played rather than a period, and says so. Every practice run already timed how long each note took; this adds
   it up per note and names the handful that consistently slow you down, against the time
@@ -504,8 +504,8 @@ tempo, so a slow, careful run (a mouse plodding across the on-screen keys) shows
 with every note right. And it's **one row per hand** — a single row for a one-hand piece,
 a **right** row over a **left** row once both hands are in play, so a lagging hand shows
 as a redder line against the other. The daily challenge shares as **Plinky N**, so
-everyone compares the same run, and the You page shares your lifetime fingerprint of the
-practice grade (Accuracy, Timing and Flow). The **How it's going** block there reports the
+everyone compares the same run, and the Stats page shares your lifetime fingerprint of the
+practice grade (Accuracy, Timing and Flow). The **Am I getting better?** block there reports the
 notes played, the days at the keys and your biggest day for whichever period its switch is
 set to — this week, this month, this year or all time — and shares exactly those figures,
 named, through the same platforms and the same image card as everything else.
@@ -513,7 +513,7 @@ named, through the same platforms and the same image card as everything else.
 Earned moments also surface their own **milestone card** on the run summary — your
 first S on a piece, reaching a new grade, or a flawless run — to share or save. Each
 appears at most once and never interrupts; it just waits beside your results. All of
-them land permanently on the You page's **Achievements** shelf: every grade you've
+them land permanently on the Stats page's **Achievements** shelf: every grade you've
 ever reached, your first bronze/silver/gold star, the first S, the flawless run, and
 cumulative days-played and notes-played targets — unearned badges stay visible as
 goals, and taking a break never removes one.
