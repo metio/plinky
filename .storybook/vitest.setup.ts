@@ -37,6 +37,15 @@ const EMOJI_STORIES = new Set([
     "loopRangeBar.stories.tsx > One Bar",
     "gradeRoadmap.stories.tsx > Progressing",
     "gradeRoadmap.stories.tsx > Competitive",
+    // The filter row draws a sparkle on "not played yet" and a star on "favourites", both
+    // from the message catalogue rather than from the story — so unlike the warm-up's key
+    // name, there is no test data to change. A colour-emoji face and a dingbat are exactly
+    // the glyphs two machines rasterise differently.
+    "musicFilters.stories.tsx > With Due",
+    "musicFilters.stories.tsx > All Toggles",
+    "musicFilters.stories.tsx > Unfiltered",
+    "musicFilters.stories.tsx > Filtered",
+    "musicFilters.stories.tsx > Narrow",
 ]);
 
 // Stories whose thin, absolutely-positioned colour blocks rasterise
