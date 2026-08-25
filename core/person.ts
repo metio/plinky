@@ -289,9 +289,28 @@ function cleaned(raw: string): string {
         name = withoutWork;
     }
     name = name.replace(/[\s,]*\d{4}\s*[-–—]?\s*(\d{4})?\s*$/g, "");
+    // When a credit was written, not by whom: "…, first published 1855", "…, words 18th c."
+    // That is provenance about the WORK, and it trails the tradition it belongs to. The
+    // date rule below takes the year and would leave ", first published" hanging on the end
+    // of the name, so the clause goes whole.
+    name = name.replace(/,\s*[^,]*(\b\d{4}\b|\d{1,2}(st|nd|rd|th)\s*c\b)[^,]*$/i, "");
+
+    // "Bach, Johann Sebastian" reads as a surname first and is flipped back. A comma in
+    // PROSE is not that, and flipping one scrambles the credit into broken English:
+    // "Traditional — English ballad, first registered 1580" came out as "first registered
+    // Traditional — English ballad" and reached the piece page saying exactly that.
+    //
+    // So both halves have to look like parts of a name: one comma, at most three words
+    // either side, and no dash or digit — an enriched attribution carries all three.
     const comma = name.indexOf(",");
-    if (comma > 0 && comma < name.length - 1) {
-        name = `${name.slice(comma + 1)} ${name.slice(0, comma)}`;
+    if (comma > 0 && comma < name.length - 1 && name.indexOf(",", comma + 1) === -1) {
+        const before = name.slice(0, comma).trim();
+        const after = name.slice(comma + 1).trim();
+        const namelike = (part: string) =>
+            part.length > 0 && part.split(/\s+/).length <= 3 && !/[\d—–-]/.test(part);
+        if (namelike(before) && namelike(after)) {
+            name = `${after} ${before}`;
+        }
     }
     // One corpus writes its credits as a surname with the initials welded on the end —
     // "SchubertF", "BachJS", "BeethovenLv", "PejacsevichD". Each one owned a page of its

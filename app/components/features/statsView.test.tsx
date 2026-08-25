@@ -147,13 +147,16 @@ describe("StatsView", () => {
             m.stats_q_working,
             m.stats_q_strongest,
             m.stats_q_ladder,
-            m.stats_q_share,
         ]) {
             expect(await screen.findByText(question())).toBeTruthy();
         }
-        // The share card used to hang at the foot with no heading while the phrase itself
-        // appeared twice on the page. One heading now, and only one.
-        expect(screen.getAllByText(m.stats_q_share()).length).toBe(1);
+        // Sharing is the one question that can have no answer — it needs a fingerprint or a
+        // grade, and this device has neither — so its heading stays away rather than
+        // standing over nothing. When it does appear it carries ONE row of platform
+        // buttons: the card brings its own, and a second set beside it drew every platform
+        // twice at the foot of the live page. They cannot both render now; it is an
+        // either/or rather than two siblings.
+        expect(screen.queryByText(m.stats_q_share())).toBeNull();
     });
 });
 

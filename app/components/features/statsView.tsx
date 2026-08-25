@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { svgMilestone } from "../../../core/milestoneCard";
 import { useHistoryStore } from "../../contexts/services";
 import { useStatsData } from "../../hooks/useStatsData";
 import { m } from "../../paraglide/messages.js";
@@ -9,15 +8,16 @@ import { linkClasses } from "../ui/classes";
 import { SettingsSection } from "../ui/settingsSection";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { AchievementGallery } from "./achievementGallery";
-import { Show } from "./conditional";
 import { monthOverMonth } from "../../../core/statsScope";
 import { GoingBlock } from "./goingBlock";
 import { PracticeBalance } from "./practiceBalance";
+import { Show } from "./conditional";
 import { SlowNotes } from "./slowNotes";
 import { GradeRoadmap } from "./gradeRoadmap";
 import { RepertoirePanel } from "./repertoirePanel";
 import { FeatureBoundary } from "./featureBoundary";
 import { RefreshQueue } from "./refreshQueue";
+import { svgMilestone } from "../../../core/milestoneCard";
 import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
 import { StandingKey, Standing } from "./standing";
@@ -146,9 +146,18 @@ export function StatsView() {
                 to hang at the foot of the page with no heading at all — its own caption
                 said "Share your progress", which is also what the section above it was
                 called, so the page said it twice and titled it never. */}
-            <SettingsSection title={m.stats_q_share()} hint={m.stats_q_share_hint()}>
-                <div className="space-y-6">
-                    {fingerprint && (
+            {/* One way of showing somebody, never two and never none.
+                The card carries its own row of platform buttons — every share surface in
+                the app is that same row — so putting a second set beside it drew every
+                platform twice under one heading. They used to sit in different parts of the
+                page, which hid the repeat rather than avoiding it; gathering them is what
+                made it visible.
+                The card needs a fingerprint, which needs practice. Before there is any, the
+                grade is what there is to show, and once neither exists the section has
+                nothing to say and does not appear at all. */}
+            <Show when={fingerprint !== null || level >= 1}>
+                <SettingsSection title={m.stats_q_share()} hint={m.stats_q_share_hint()}>
+                    {fingerprint ? (
                         <ShareCard
                             grid={fingerprint}
                             caption={m.progress_share_caption()}
@@ -161,8 +170,7 @@ export function StatsView() {
                                     : "Plinky"
                             }
                         />
-                    )}
-                    <Show when={level >= 1}>
+                    ) : (
                         <ShareButtons
                             text={m.milestone_grade_boast({ level })}
                             imageSvg={svgMilestone({
@@ -171,9 +179,9 @@ export function StatsView() {
                             })}
                             imageText={m.milestone_grade_boast({ level })}
                         />
-                    </Show>
-                </div>
-            </SettingsSection>
+                    )}
+                </SettingsSection>
+            </Show>
         </main>
     );
 }
