@@ -4,7 +4,7 @@
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { LEAD_IN_MS } from "../../core/videoFrames";
-import { FONT_FAMILY, takeHighwayPainter, takeScenePainter } from "./videoPainter";
+import { BACKGROUND, FONT_FAMILY, takeHighwayPainter, takeScenePainter } from "./videoPainter";
 
 const WIDTH = 640;
 const HEIGHT = 360;
@@ -35,7 +35,14 @@ const ACCENT = [0xaa, 0x36, 0xfc];
 // The flat stage fill. Regions are measured as "anything that is not the ground",
 // which stays true however light or dark the brand's stage colour is — a brightness
 // cutoff only worked while the ground happened to be near-black.
-const GROUND = [0x3a, 0x0f, 0xa8];
+// Read from the painter rather than written down again. A second copy of a colour goes
+// stale the day the first one moves — which is exactly what happened when the stage went
+// black and this still said violet, so every pixel in the frame counted as ink.
+const GROUND = [
+    Number.parseInt(BACKGROUND.slice(1, 3), 16),
+    Number.parseInt(BACKGROUND.slice(3, 5), 16),
+    Number.parseInt(BACKGROUND.slice(5, 7), 16),
+];
 function isGround(data: Uint8ClampedArray, i: number, tolerance = 8): boolean {
     return (
         Math.abs(data[i]! - GROUND[0]!) <= tolerance &&
@@ -46,6 +53,12 @@ function isGround(data: Uint8ClampedArray, i: number, tolerance = 8): boolean {
 
 // Pixels close to the accent — a lit key decays away from the pure accent
 // while held, so closeness (not equality) is what "lit" means.
+// Pixels close to the accent. The tolerance is a parameter because two different questions
+// are asked of it: whether one exact thing was painted, and whether a shaded key is lit.
+// Wide enough to count a shaded key as lit, narrow enough that the ground and the ink are
+// nowhere near it.
+const LIT_TOLERANCE = 48;
+
 function countAccentPixels(context: OffscreenCanvasRenderingContext2D, tolerance = 8): number {
     const { data } = context.getImageData(0, 0, WIDTH, HEIGHT);
     let count = 0;
@@ -91,8 +104,13 @@ describe("takeScenePainter", () => {
     it("lights a key while its note sounds and rests it after", () => {
         // Both frames carry accent pixels from the progress rail; the sounding
         // key adds a key-sized block on top.
-        const during = countAccentPixels(paintAt(LEAD_IN_MS + 40));
-        const after = countAccentPixels(paintAt(LEAD_IN_MS + 1_700));
+        // A lit key is no longer one flat block of accent: it carries a sheen at the top
+        // and a shade toward its front lip, because a key filled flat reads as a stripe
+        // rather than a solid. So the question here is "is this key lit", which is a band
+        // around the accent — not "is this pixel exactly the accent", which was measuring
+        // the fill.
+        const during = countAccentPixels(paintAt(LEAD_IN_MS + 40), LIT_TOLERANCE);
+        const after = countAccentPixels(paintAt(LEAD_IN_MS + 1_700), LIT_TOLERANCE);
         expect(during).toBeGreaterThan(after + 500);
     });
 
@@ -100,9 +118,9 @@ describe("takeScenePainter", () => {
         // A fresh press paints a key-sized block of near-accent pixels; late in
         // the hold the key has decayed away from the accent, and the re-press
         // at 2000ms snaps it back.
-        const fresh = countAccentPixels(paintAt(LEAD_IN_MS + 40));
-        const faded = countAccentPixels(paintAt(LEAD_IN_MS + 1_300));
-        const repressed = countAccentPixels(paintAt(LEAD_IN_MS + 2_040));
+        const fresh = countAccentPixels(paintAt(LEAD_IN_MS + 40), LIT_TOLERANCE);
+        const faded = countAccentPixels(paintAt(LEAD_IN_MS + 1_300), LIT_TOLERANCE);
+        const repressed = countAccentPixels(paintAt(LEAD_IN_MS + 2_040), LIT_TOLERANCE);
         expect(fresh).toBeGreaterThan(faded + 500);
         expect(repressed).toBeGreaterThan(faded + 500);
     });

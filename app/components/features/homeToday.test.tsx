@@ -10,6 +10,8 @@ import { markLearned } from "../../../core/mastery";
 import type { GradeCatalogItem, GradedMastery } from "../../lib/gradeProgress";
 import { loadBundledScores } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
+import { advanceScheduler } from "../../testing/advanceScheduler";
+import { fakeScheduler } from "../../testing/fakeScheduler";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider } from "../../contexts/midi";
 import { renderWithServices } from "../../testing/renderWithServices";
@@ -51,6 +53,49 @@ const mount = (overrides = {}) =>
         // biome-ignore lint/suspicious/noExplicitAny: a partial exercise source is all the panel reads
         { exercises: exercises as any, midi: fakeMidi(), ...overrides },
     );
+
+describe("the greeting following the clock", () => {
+    it("changes in place when the part of the day does", async () => {
+        // What was reported as "the app switched to night mode and re-rendered". It was the
+        // other way round: the greeting was read once at mount and never again, so it could
+        // only change when something ELSE reloaded the page — and the reload was what a
+        // reader saw. Now it moves on its own, and nothing around it reloads.
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([]);
+        // 17:59, one minute short of the evening.
+        vi.setSystemTime(new Date(2026, 7, 25, 17, 59, 0, 0));
+        const scheduler = fakeScheduler();
+        mount({ scheduler });
+
+        const day = new Intl.DateTimeFormat("en", { weekday: "long" }).format(
+            new Date(2026, 7, 25),
+        );
+        expect(await screen.findByText(m.today_greeting_afternoon({ day }))).toBeTruthy();
+
+        // Let every async load settle first, so what is counted below is the effect of
+        // crossing the hour and not of the page still arriving.
+        let settled = -1;
+        await vi
+            .waitFor(
+                () => {
+                    const now = catalogueMock.mock.calls.length;
+                    expect(now).toBe(settled);
+                    settled = now;
+                },
+                { timeout: 5000 },
+            )
+            .catch(() => {});
+        settled = catalogueMock.mock.calls.length;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        const fetches = catalogueMock.mock.calls.length;
+        expect(fetches).toBe(settled);
+        vi.setSystemTime(new Date(2026, 7, 25, 18, 0, 0, 0));
+        await advanceScheduler(scheduler, 60 * 1000);
+
+        expect(screen.getByText(m.today_greeting_evening({ day }))).toBeTruthy();
+        expect(catalogueMock.mock.calls.length).toBe(fetches);
+    });
+});
 
 describe("HomeToday", () => {
     it("hands a brand-new player the starter assignment's first step", async () => {

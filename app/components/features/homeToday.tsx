@@ -5,7 +5,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
-import { partOfDay } from "../../../core/greeting";
+import { msUntilPartOfDayChanges, partOfDay } from "../../../core/greeting";
 import { GreetingScene } from "./greetingScene";
 import { buildExerciseId, keyName } from "../../../core/exerciseGen";
 import { type Letter, letterFor } from "../../../core/grade";
@@ -36,6 +36,7 @@ import {
     usePlacementStore,
     useTheoryStore,
     usePrefsStore,
+    useScheduler,
     useServices,
 } from "../../contexts/services";
 import { nextAssignmentStep } from "../../../core/assignment";
@@ -337,6 +338,25 @@ export function HomeToday() {
     const [arrived, setArrived] = useState<Date | null>(null);
     useEffect(() => setArrived(new Date()), []);
 
+    // ...and follows the clock from there. Left open across six in the evening the page
+    // went on wishing you a good afternoon, because this was read once at mount and never
+    // again — so the greeting only ever changed when something else reloaded the page, and
+    // the reload was what you saw rather than the greeting.
+    //
+    // Waits for the boundary rather than polling for it: four moments in a day do not need
+    // a timer awake for all of it. Only the heading and the drawing read this, so the
+    // change lands in place — nothing reloads and no session data is fetched again.
+    const scheduler = useScheduler();
+    useEffect(() => {
+        if (!arrived) {
+            return;
+        }
+        const handle = scheduler.after(msUntilPartOfDayChanges(arrived), () =>
+            setArrived(new Date()),
+        );
+        return () => scheduler.cancel(handle);
+    }, [arrived, scheduler]);
+
     useEffect(() => {
         let cancelled = false;
         Promise.all([
@@ -540,11 +560,14 @@ export function HomeToday() {
                             the keys it is about, and only while there is no instrument —
                             taken, the offer disappears rather than ticking itself off. */}
                         <Show when={!midiReady}>
-                            <Link to="/settings" className={linkClasses}>
+                            {/* Straight to the setting rather than to the page it is on:
+                                Settings is long, and a reader sent for one thing should
+                                land on it. */}
+                            <Link to="/settings#midi" className={linkClasses}>
                                 {m.settings_connect_midi()}
                             </Link>
                             <span aria-hidden="true">·</span>
-                            <Link to="/settings" className={linkClasses}>
+                            <Link to="/settings#keys" className={linkClasses}>
                                 {m.discover_keys()}
                             </Link>
                         </Show>
@@ -558,7 +581,7 @@ export function HomeToday() {
                 // only until it is answered: finger positions fit a hand, and a hand is
                 // the one thing Plinky cannot measure for itself.
                 hint={handSet ? undefined : m.grades_start_hand()}
-                hintTo={handSet ? undefined : "/settings"}
+                hintTo={handSet ? undefined : "/settings#hand"}
             >
                 <ul className="space-y-2">
                     {work.map((task, index) => {

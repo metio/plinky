@@ -23,9 +23,12 @@ describe("ChordReadout", () => {
         expect(screen.getByRole("status").className).toContain("h-6");
     });
 
-    it("names one key", () => {
+    it("says nothing for one key, which the key itself already says", () => {
+        // The keys can print their own names, so a single letter here repeated the one
+        // under the finger. What this is for is the sound you cannot look up — a shape
+        // your hand knows and your vocabulary does not — and that starts at two notes.
         render(<ChordReadout notes={[60]} />);
-        expect(shown()).toBe("C");
+        expect(shown()).toBe("");
     });
 
     it("names a chord", () => {

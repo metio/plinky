@@ -38,7 +38,12 @@ function say(sound: HeldSound): string {
 }
 
 export function ChordReadout({ notes }: { notes: readonly number[] }) {
-    const sound = nameHeldNotes(notes);
+    const held = nameHeldNotes(notes);
+    // One key gets no readout. The keys can already print their own names, so a single
+    // letter under the keyboard says what the key under the finger says — and the reason
+    // this is here at all is the sound you CANNOT look up: a shape your hand knows and
+    // your vocabulary does not. That starts at two notes.
+    const sound = held?.kind === "note" ? null : held;
     return (
         // Held open whether or not anything is sounding, so naming a chord does not push
         // the page down under the reader's hands mid-play.

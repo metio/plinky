@@ -27,3 +27,28 @@ export function partOfDay(hour: number): PartOfDay {
     }
     return "night";
 }
+
+// The boundaries themselves, in hours, so the wait below and the reading above cannot
+// drift apart: both are this list.
+const BOUNDARIES = [5, 12, 18, 22];
+
+// How long until the greeting would say something different, from a given moment.
+//
+// The front page names the part of the day it was opened in, and left open across one of
+// these hours it went on saying the old one — a page still wishing you a good afternoon at
+// seven in the evening. The alternative to waiting for the boundary is polling, which means
+// a timer doing nothing all day to catch four moments.
+//
+// Never zero: exactly on a boundary the answer is a whole day, not "right now", and a wait
+// of nothing would spin.
+export function msUntilPartOfDayChanges(now: Date): number {
+    const hour = now.getHours();
+    const next = BOUNDARIES.find((boundary) => boundary > hour) ?? BOUNDARIES[0]! + 24;
+    const at = new Date(now);
+    at.setHours(next, 0, 0, 0);
+    // A boundary that has already gone today is tomorrow's.
+    if (at.getTime() <= now.getTime()) {
+        at.setDate(at.getDate() + 1);
+    }
+    return at.getTime() - now.getTime();
+}

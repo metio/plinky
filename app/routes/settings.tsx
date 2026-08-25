@@ -44,6 +44,7 @@ import { type Groove, GROOVES } from "../../core/groove";
 import { BARS_PER_ROW, METRONOME_SUBDIVISIONS, NOTE_SCALES, REVEAL_TRIES } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
+import { useEffect } from "react";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
 import { PageHeader } from "../components/ui/pageHeader";
@@ -68,6 +69,17 @@ function grooveLabel(groove: Groove): string {
 }
 
 export default function Settings() {
+    // Land on the setting the reader was sent for. The front page points at the three
+    // people actually get stuck on — a piano to connect, the computer keys, the hand a
+    // fingering has to fit — and a client-router navigation does not act on the hash by
+    // itself, so a link to one of them otherwise arrived at the top of a long page.
+    useEffect(() => {
+        const anchor = window.location.hash.slice(1);
+        if (anchor) {
+            document.getElementById(anchor)?.scrollIntoView();
+        }
+    }, []);
+
     const { prefs, update } = usePrefs();
     const synth = useSynth();
     const { support: midiSupport, micStatus, keyLights, devices } = useMidiConnection();
@@ -90,6 +102,7 @@ export default function Settings() {
                 keyboard is the input there, so the whole panel is hidden. */}
             {midiSupport !== "unsupported" && (
                 <SettingsSection
+                    anchor="midi"
                     title={m.settings_connect_midi()}
                     hint={m.settings_midi_hint()}
                     icon={<PlugIcon className={ICON} />}
@@ -129,7 +142,11 @@ export default function Settings() {
                 </SettingsSection>
             )}
 
-            <SettingsSection title={m.settings_keyboard()} icon={<KeysIcon className={ICON} />}>
+            <SettingsSection
+                anchor="keys"
+                title={m.settings_keyboard()}
+                icon={<KeysIcon className={ICON} />}
+            >
                 <FeatureBoundary feature="KeyMapping">
                     <KeyMapping />
                 </FeatureBoundary>
@@ -272,6 +289,7 @@ export default function Settings() {
             </SettingsSection>
 
             <SettingsSection
+                anchor="hand"
                 title={m.settings_fingering()}
                 hint={m.settings_fingering_hint()}
                 icon={<FingersIcon className={ICON} />}

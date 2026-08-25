@@ -53,7 +53,7 @@ function mixHex(from: string, to: string, amount: number): string {
 //
 // Contrast only improves: measured against the old ground (relative luminance 0.041) INK
 // was 11.0:1 and MUTED 6.8:1, and black is darker than that, so both climb.
-const BACKGROUND = "#000000";
+export const BACKGROUND = "#000000";
 const INK = "#F9F8FC";
 const MUTED = "#EDB2FD";
 const ACCENT = "#AA36FC";
@@ -124,6 +124,10 @@ type Context2D = Pick<
     | "drawImage"
     | "clip"
     | "measureText"
+    // The keys are shaded rather than filled flat, which is what stops a long one reading
+    // as a stripe. Narrow on purpose, this list — every entry is something a stand-in
+    // context in a test has to answer.
+    | "createLinearGradient"
 > & {
     fillStyle: string | CanvasGradient | CanvasPattern;
     font: string;
@@ -215,9 +219,25 @@ type KeyLayout = {
     black: string;
 };
 
+// How much of a white key's height is its front face — the lip you see because a key is a
+// solid thing lying down rather than a painted stripe. Small: a real one is a few
+// millimetres of a long lever, and overdoing it turns a piano into a cartoon.
+const KEY_LIP = 0.09;
+// How far the top of a key is lifted toward white, and the bottom dropped toward its own
+// shadow. A single flat fill reads as a rectangle at any size; at a deep keyboard, where
+// the keys are longest, it reads as a stripe.
+const KEY_SHEEN = 0.22;
+const KEY_SHADE = 0.14;
+
 // A sounding key is the resting colour blended toward the accent by its glow —
 // full at the press, decaying while held — so a repeated press of the same key
 // visibly re-lights it instead of merging into one long hold.
+//
+// Shaped rather than filled flat. A key is lit from above and has a front face, and those
+// two facts are what stop a tall key from reading as a coloured stripe: a sheen down from
+// the top, a shade toward the bottom, and a distinct lip across the front. It matters most
+// exactly where the flat fill looked worst — the deeper the keyboard, the longer the key,
+// and the more a single colour has to carry.
 function paintKey(
     context: Context2D,
     key: SceneKey,
@@ -229,10 +249,31 @@ function paintKey(
     const w = key.width * (l.width - l.margin * 2);
     const h = key.black ? l.keyboardHeight * 0.62 : l.keyboardHeight;
     const rest = key.black ? l.black : l.white;
-    context.fillStyle = glow === null ? rest : mixHex(rest, lit, glow);
+    const base = glow === null ? rest : mixHex(rest, lit, glow);
+
+    const face = context.createLinearGradient(0, l.keyboardTop, 0, l.keyboardTop + h);
+    face.addColorStop(0, mixHex(base, "#FFFFFF", KEY_SHEEN));
+    face.addColorStop(key.black ? 0.7 : 0.55, base);
+    face.addColorStop(1, mixHex(base, "#000000", KEY_SHADE));
+    context.fillStyle = face;
     context.beginPath();
     context.roundRect(x + w * 0.04, l.keyboardTop, w * 0.92, h, 4);
     context.fill();
+
+    // The front face, darker than the key it belongs to, so the eye reads a solid with a
+    // near edge. Only the white keys carry it: a black key is already the dark thing.
+    if (!key.black) {
+        context.fillStyle = mixHex(base, "#000000", KEY_SHADE * 2.4);
+        context.beginPath();
+        context.roundRect(
+            x + w * 0.04,
+            l.keyboardTop + h * (1 - KEY_LIP),
+            w * 0.92,
+            h * KEY_LIP,
+            [0, 0, 4, 4],
+        );
+        context.fill();
+    }
 }
 
 // The freshest press glow per sounding pitch, so a re-press during a long hold

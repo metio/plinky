@@ -1,0 +1,283 @@
+<!-- SPDX-FileCopyrightText: The Plinky Authors -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<meta charset="utf-8" />
+<!-- Matters when this file is opened directly; inside an iframe the embedding page sets
+     the viewport instead, which is why the layout below asks no question a frame can
+     answer wrongly. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Plinky intro</title>
+<style>
+:root {
+    /* Everything adjustable lives here. */
+    --bg-deep: #0b0720;
+    --bg-lift: #1a1140;
+    --glow: #7c3aed;
+    --plink: #d946ef;
+    --url-ink: #e9e4ff;
+
+    /* Sized against the stage's own width (100cqw == 1920px), so the composition holds
+       at any size with no script involved. The master is 1024px, so at 27% of 1920 the
+       mark is 520px and never upscales. */
+    --logo-size: 27.08cqw;
+    --url-gap: 2.81cqw;
+
+    /* Where things are inside the mark, measured off the artwork itself. */
+    --dot-start-y: 11.5%;
+    --dot-hit-x: 50%;
+    --dot-hit-y: 56.3%;
+    --word-x0: 16.6%;
+    --word-x1: 86%;
+    --word-y0: 68.4%;
+    --word-y1: 92.8%;
+
+    /* The timeline. Every duration below is a slice of this. */
+    --t-fade: 0.5s;
+    --t-fall-in: 0.5s;
+    --t-fall: 0.7s;
+    --t-settle: 1.2s;
+    --t-shine-in: 1.8s;
+    --t-shine: 1.2s;
+    --t-url-in: 3s;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { background: #000; }
+/* Top-aligned on purpose. Centring needs a height to centre within, and inside a frame
+   that height is whatever the embedding page decided — a tall one pushes the composition
+   below the fold, which is the black screen this started as. At the top it is the first
+   thing on the page whatever the frame does. */
+body { margin: 0; display: grid; justify-items: center; align-content: start; }
+/* The measuring box. Everything inside is expressed as a share of ITS width, which is
+   the one number that is always right — an iframe can report a strange height, and the
+   script that used to divide by it left a black screen on a phone. */
+#wrap {
+    container-type: inline-size;
+    width: 100%;
+    max-width: calc(100dvh * 16 / 9);
+}
+
+/* The render box. 1920x1080 always; the preview scales it to fit the window. */
+#stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background:
+        radial-gradient(60% 60% at 50% 46%, var(--bg-lift) 0%, var(--bg-deep) 70%),
+        var(--bg-deep);
+}
+
+/* The atmosphere behind the mark: restrained, and it breathes at the end. */
+#halo {
+    position: absolute; inset: 0;
+    background: radial-gradient(34% 46% at 50% 44%, color-mix(in srgb, var(--glow) 46%, transparent) 0%, transparent 62%);
+    opacity: 0;
+    animation: halo-in var(--t-fade) ease-out forwards,
+               halo-breathe 3.4s 1.6s ease-in-out infinite;
+}
+@keyframes halo-in { to { opacity: 0.65; } }
+@keyframes halo-breathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.16); } }
+
+#lockup {
+    position: absolute;
+    left: 50%; top: 44%;
+    transform: translate(-50%, -50%);
+    width: var(--logo-size); height: var(--logo-size);
+}
+
+/* The mark itself, never redrawn and never cut. Everything else is light laid over it. */
+#mark {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
+    transform: scale(0.98);
+    animation: mark-in var(--t-fade) ease-out forwards,
+               mark-settle 0.6s var(--t-settle) cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    filter: drop-shadow(0 1.25cqw 3.1cqw rgba(0, 0, 0, 0.55));
+}
+@keyframes mark-in { to { opacity: 1; } }
+@keyframes mark-settle { to { transform: scale(1); } }
+
+/* The plink. The mark already draws this dot at rest on the centre key — this is the
+   same light arriving, so it lands exactly where the artwork has it and then hands over. */
+#dot {
+    position: absolute;
+    left: var(--dot-hit-x); top: var(--dot-start-y);
+    width: 3.6%; aspect-ratio: 1;
+    margin: -1.8% 0 0 -1.8%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #fff 38%, var(--plink) 72%, transparent 74%);
+    box-shadow: 0 0 1.35cqw 0.3cqw color-mix(in srgb, var(--plink) 70%, transparent);
+    opacity: 0;
+    animation: dot-in 0.18s var(--t-fall-in) ease-out forwards,
+               dot-fall var(--t-fall) var(--t-fall-in) cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards,
+               dot-out 0.34s calc(var(--t-fall-in) + var(--t-fall)) ease-out forwards;
+}
+@keyframes dot-in { to { opacity: 1; } }
+@keyframes dot-fall { to { top: var(--dot-hit-y); } }
+@keyframes dot-out { to { opacity: 0; transform: scale(1.5); } }
+
+/* The impact: one soft ring, and the key brightening under it. */
+#ripple {
+    position: absolute;
+    left: var(--dot-hit-x); top: var(--dot-hit-y);
+    width: 4%; aspect-ratio: 1; margin: -2% 0 0 -2%;
+    border-radius: 50%;
+    border: 0.1cqw solid color-mix(in srgb, var(--plink) 85%, white);
+    opacity: 0;
+    animation: ripple 0.85s calc(var(--t-fall-in) + var(--t-fall)) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes ripple {
+    0% { opacity: 0.9; transform: scale(0.4); }
+    100% { opacity: 0; transform: scale(6); }
+}
+#keyflash {
+    position: absolute;
+    left: var(--dot-hit-x); top: var(--dot-hit-y);
+    width: 13%; height: 15%; margin: -7% 0 0 -6.5%;
+    border-radius: 0.62cqw;
+    background: radial-gradient(circle, rgba(255,255,255,0.75) 0%, transparent 68%);
+    opacity: 0;
+    animation: keyflash 0.6s calc(var(--t-fall-in) + var(--t-fall)) ease-out forwards;
+}
+@keyframes keyflash { 0% { opacity: 0.85; } 100% { opacity: 0; } }
+
+/* The shine, clipped to the wordmark's own band so it reads as light crossing the
+   letters. The mark underneath is untouched — this only adds. */
+#shine {
+    position: absolute;
+    left: var(--word-x0); top: var(--word-y0);
+    width: calc(var(--word-x1) - var(--word-x0));
+    height: calc(var(--word-y1) - var(--word-y0));
+    overflow: hidden;
+    opacity: 0;
+    animation: shine-on 0.01s var(--t-shine-in) forwards;
+    mix-blend-mode: screen;
+}
+@keyframes shine-on { to { opacity: 1; } }
+#shine::after {
+    content: "";
+    position: absolute; top: -20%; bottom: -20%;
+    width: 26%;
+    left: -30%;
+    background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.10) 30%, rgba(255,255,255,0.72) 50%, rgba(255,255,255,0.10) 70%, transparent 100%);
+    filter: blur(0.3cqw);
+    animation: shine-sweep var(--t-shine) var(--t-shine-in) cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+@keyframes shine-sweep { to { left: 104%; } }
+
+/* The tittle of the "i" catches the light a moment after the sweep reaches it. */
+#sparkle {
+    position: absolute;
+    left: 45.5%; top: 71%;
+    width: 2.4%; aspect-ratio: 1; margin: -1.2% 0 0 -1.2%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, color-mix(in srgb, var(--plink) 80%, white) 45%, transparent 70%);
+    opacity: 0;
+    animation: sparkle 0.5s calc(var(--t-shine-in) + 0.42s) ease-out forwards;
+}
+@keyframes sparkle { 0% { opacity: 0; transform: scale(0.4); } 40% { opacity: 0.95; transform: scale(1); } 100% { opacity: 0; transform: scale(1.25); } }
+
+#url {
+    position: absolute;
+    left: 50%;
+    top: calc(44% + var(--logo-size) / 2 + var(--url-gap));
+    transform: translate(-50%, 0.73cqw);
+    font: 600 2.08cqw/1 "Nunito Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    letter-spacing: 0.14em;
+    color: var(--url-ink);
+    opacity: 0;
+    text-shadow: 0 0 1.35cqw color-mix(in srgb, var(--glow) 55%, transparent);
+    animation: url-in 0.55s var(--t-url-in) cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes url-in { to { opacity: 1; transform: translate(-50%, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+    #halo, #mark, #dot, #ripple, #keyflash, #shine, #shine::after, #sparkle, #url {
+        animation-duration: 0.01s !important;
+        animation-delay: 0s !important;
+    }
+}
+</style>
+
+<div id="wrap">
+<div id="stage">
+    <div id="halo"></div>
+    <div id="lockup">
+        <img id="mark" alt="Plinky" src="../../brand/plinky-mark.png" />
+        <div id="keyflash"></div>
+        <div id="ripple"></div>
+        <div id="dot"></div>
+        <div id="shine"></div>
+        <div id="sparkle"></div>
+    </div>
+    <div id="url">plinky.fun</div>
+</div>
+</div>
+
+<script>
+// The one moment sound belongs to: the dot reaching the key. Everything else is quiet.
+const IMPACT = 1.2;
+const DURATION = 5.0;
+
+// A soft piano-like plink, synthesised rather than sampled so the file stands alone —
+// three harmonics over a fast decay, which is what a struck string sounds like from a
+// distance. Nothing here is a chord: one note, briefly.
+function plink(context, when) {
+    const out = context.createGain();
+    out.gain.setValueAtTime(0.0001, when);
+    out.gain.exponentialRampToValueAtTime(0.32, when + 0.006);
+    out.gain.exponentialRampToValueAtTime(0.0001, when + 1.5);
+    out.connect(context.destination);
+    // E5, and two partials above it at the strengths a piano actually gives them.
+    for (const [ratio, level, decay] of [[1, 1, 1.5], [2, 0.32, 0.9], [3.01, 0.12, 0.55]]) {
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 659.25 * ratio;
+        gain.gain.setValueAtTime(level, when);
+        gain.gain.exponentialRampToValueAtTime(0.0001, when + decay);
+        osc.connect(gain).connect(out);
+        osc.start(when);
+        osc.stop(when + decay + 0.05);
+    }
+}
+
+// Frame-accurate seeking for the renderer: pause every animation and set a negative delay,
+// which is the same as asking the browser to show the frame at that time.
+const animated = () => [...document.querySelectorAll("#stage *, #stage")];
+window.plinkySeek = (seconds) => {
+    for (const el of animated()) {
+        const style = getComputedStyle(el);
+        if (style.animationName === "none") continue;
+        el.style.animationPlayState = "paused";
+        el.style.animationDelay = style.animationDelay
+            .split(",")
+            .map((delay) => `${Number.parseFloat(delay) - seconds}s`)
+            .join(", ");
+    }
+};
+window.plinkyDuration = DURATION;
+window.plinkyImpact = IMPACT;
+
+// Sound needs a gesture, so the preview offers one press and then runs clean.
+if (!location.search.includes("render")) {
+    const start = () => {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        plink(context, context.currentTime + IMPACT);
+        for (const el of animated()) {
+            el.style.animation = "none";
+            void el.offsetWidth;
+            el.style.animation = "";
+        }
+        document.getElementById("go").remove();
+        removeEventListener("click", start);
+    };
+    const go = document.createElement("button");
+    go.id = "go";
+    go.textContent = "▶ Play with sound";
+    go.style.cssText =
+        "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9;padding:10px 18px;border-radius:999px;border:1px solid #4c1d95;background:#1a1140;color:#e9e4ff;font:600 14px system-ui;cursor:pointer";
+    go.onclick = start;
+    document.body.append(go);
+}
+</script>

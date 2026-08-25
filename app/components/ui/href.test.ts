@@ -23,3 +23,17 @@ describe("localizedHref", () => {
         expect(localizedHref("/")).toMatch(/\/$/);
     });
 });
+
+describe("a link to a place on a page", () => {
+    it("keeps the hash after the slash, not before it", () => {
+        // The front page sends a reader to one setting rather than to the top of a long
+        // page. The slash has to land on the path — "/en/settings/#hand" — because
+        // "/en/settings#hand/" is a hash nothing on the page answers to.
+        expect(localizedHref("/settings#hand")).toBe("/en/settings/#hand");
+        expect(localizedHref("/settings#midi")).toBe("/en/settings/#midi");
+    });
+
+    it("leaves a plain path exactly as it was", () => {
+        expect(localizedHref("/settings")).toBe("/en/settings/");
+    });
+});

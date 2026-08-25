@@ -24,6 +24,7 @@ export function SettingsSection({
     icon,
     tone = "accent",
     level = 2,
+    anchor,
     children,
 }: {
     title: string;
@@ -32,6 +33,10 @@ export function SettingsSection({
     icon?: ReactNode;
     tone?: "accent" | "danger";
     level?: 2 | 3;
+    // An id to link to, so somewhere else in the app can send a reader to THIS setting
+    // rather than to the top of a long page and a hunt. The scroll margin keeps the
+    // heading clear of the sticky header it would otherwise land under.
+    anchor?: string;
     children: ReactNode;
 }) {
     const Heading = level === 2 ? "h2" : "h3";
@@ -39,7 +44,7 @@ export function SettingsSection({
     if (icon === undefined) {
         const heading = <Heading className={sectionHeadingClasses}>{title}</Heading>;
         return (
-            <section className="space-y-3">
+            <section id={anchor} className="scroll-mt-24 space-y-3">
                 {hint === undefined ? (
                     heading
                 ) : (
@@ -54,7 +59,10 @@ export function SettingsSection({
     }
 
     return (
-        <section className="space-y-4 rounded-2xl border border-line bg-raised p-5 shadow-sm">
+        <section
+            id={anchor}
+            className="scroll-mt-24 space-y-4 rounded-2xl border border-line bg-raised p-5 shadow-sm"
+        >
             <div className="flex items-start gap-3">
                 <span
                     aria-hidden="true"
