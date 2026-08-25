@@ -9,7 +9,8 @@
 // prefix, so each language prerenders to its own static page and the locale is
 // always read from the URL (see react-router.config.ts and app/entry.server.tsx).
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { compile } from "@inlang/paraglide-js";
 
 // The inlang project to compile. PLINKY_INLANG_PROJECT points at a copy carrying a
@@ -42,6 +43,54 @@ const urlPatterns = [
         ]),
     },
 ];
+
+// Recompiling is skipped when nothing that feeds it has changed.
+//
+// Two reasons, and the second is the one that bites. It is wasted work on every gate — the
+// prebuild step of build, dev, test and typecheck alike — and, worse, the compiler CLEARS
+// this directory before writing it. Two gates started at once therefore race over the same
+// tree, and the loser dies on `ENOTEMPTY` before running a single test: a run that looks
+// alive for an hour while it has in fact been dead since the first second.
+//
+// The stamp is over everything the output depends on, so a changed message, a changed
+// locale list, a pinned locale or an upgraded compiler all miss it and recompile.
+const OUT = "./app/paraglide";
+const STAMP = `${OUT}/.stamp`;
+
+function inputKey() {
+    const hash = createHash("sha256");
+    hash.update(readFileSync(`${project}/settings.json`));
+    for (const file of readdirSync("./messages").sort()) {
+        hash.update(file);
+        hash.update(readFileSync(`./messages/${file}`));
+    }
+    hash.update(staticLocale ?? "");
+    hash.update(project);
+    // The compiler's own version: an upgrade changes the output from identical input.
+    hash.update(
+        JSON.parse(readFileSync("./package.json", "utf8")).devDependencies[
+            "@inlang/paraglide-js"
+        ] ?? "",
+    );
+    return hash.digest("hex");
+}
+
+const key = inputKey();
+// runtime.js is checked too: a stamp beside a half-deleted tree would skip a compile the
+// build actually needs.
+if (
+    !process.argv.includes("--force") &&
+    existsSync(STAMP) &&
+    existsSync(`${OUT}/runtime.js`) &&
+    readFileSync(STAMP, "utf8") === key
+) {
+    process.exit(0);
+}
+
+// Cleared here rather than left to the compiler, which fails on a directory another run is
+// writing into. Everything under it is generated and gitignored, so removing it is always
+// safe and never loses anything a person wrote.
+rmSync(OUT, { recursive: true, force: true });
 
 await compile({
     project,
@@ -86,3 +135,7 @@ if (staticLocale) {
     }
     writeFileSync(runtimePath, unwrapped);
 }
+
+// Last, so a failure anywhere above leaves no stamp and the next run recompiles rather
+// than trusting a tree that was never finished.
+writeFileSync(STAMP, key);
