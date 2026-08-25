@@ -7,7 +7,7 @@ import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
 import { stripAccompaniment } from "../../core/accompaniment";
 import { stripBeams } from "../../core/beams";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
-import type { MeasureBox } from "../../core/scoreCanvas";
+import { type MeasureBox, SCORE_PAGE_MARGIN } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
 import { usePrefsStore, useScheduler, useXmlCodec } from "../contexts/services";
 import { annotateFingerings } from "../lib/fingerScore";
@@ -303,9 +303,22 @@ export function useOsmdScore(
                             RenderMeasureNumbers: boolean;
                             RenderMeasureNumbersOnlyAtSystemStart: boolean;
                             RenderFingerings: boolean;
+                            PageLeftMargin: number;
+                            PageRightMargin: number;
                         };
                     }
                 ).rules;
+                // The engraver keeps its own margin inside the container, on top of the
+                // page's. Trimmed to a hairline, because the plate it draws on already has
+                // padding and a printed rule of its own, and a second margin inside the
+                // first is width the music never gets.
+                //
+                // Worth only what it lets the layout do: bars per row is a step, not a
+                // slope, so this and the plate's full-bleed width below `sm` are only worth
+                // anything together — see the comment in scoreCanvas.tsx, and
+                // scoreDensity.browser.test.tsx, which pins both.
+                rules.PageLeftMargin = SCORE_PAGE_MARGIN;
+                rules.PageRightMargin = SCORE_PAGE_MARGIN;
                 // Force a fixed number of bars per row when the player picks one, for
                 // bigger, more readable notation on a small screen; 0 fits them to width.
                 rules.RenderXMeasuresPerLineAkaSystem = barsPerRow;

@@ -5,6 +5,16 @@
 // surface shares, and the geometry of picking a bar from a click. The
 // OSMD-coupled painting itself lives in app/lib/scoreColor.
 
+// The margin the engraver keeps inside its own container, in its units.
+//
+// Trimmed to a hairline because the plate it draws on already has padding and a printed
+// rule, and a second margin inside the first is width the music never gets. It is a
+// constant rather than a literal at the call site because how much music fits on a row is
+// a STEP rather than a slope — nothing improves until the usable width crosses the point
+// where another bar fits — so the value has to be the same one the density test measures
+// with, or that test would be measuring a number nothing uses.
+export const SCORE_PAGE_MARGIN = 1;
+
 // The colour a note turns once it has been played, marking progress on the score.
 export const PLAYED_COLOR = "#22c55e";
 // The colour marking where the racing ghost currently is, distinct from played

@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Twice as much music on a phone screen, at the same size.** A score used to give you
+about one bar per row on a phone: most of the width went on the page's own margins and
+the engraver's, redrawn on every row. The music now runs the full width of the screen,
+so the same piece takes about half the scrolling — with the notes exactly as big as
+they were. Nothing was removed from the notation to make room.
+
 **The You page has been rebuilt around one question at a time.** It had grown into
 fourteen stacked sections carrying six different stretches of time between them — a
 lifetime total near the top, a week chart under it, a report with its own controls, a

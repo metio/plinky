@@ -654,6 +654,10 @@ Every keyboard shows a small badge in its corner — a green tick the moment a M
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your
 instrument is hooked up.
 
+On a phone the score spans the full width of the screen, which is worth about twice as
+many bars per row as the padded layout it replaced — at the same note size, with nothing
+dropped from the notation. Note size stays yours to set.
+
 Sound is synthesised in the browser, so the on-screen and computer keyboards make
 sound everywhere — MIDI is only for *input* from a real piano. **Settings → Sound** can
 swap that synthesised piano for a **recorded grand**: the Salamander Grand Piano by

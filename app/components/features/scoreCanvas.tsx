@@ -75,8 +75,23 @@ export function ScoreCanvas() {
         // paper field, a soft two-layer drop shadow, and a hairline rule inset from the
         // rounded edge — the plate border of an engraved music edition. `relative` anchors
         // that decorative rule.
+        //
+        // The plate spans the whole screen below `sm`, cancelling the page's own padding
+        // with a negative margin. Not a cosmetic choice: how much music fits on a row is a
+        // STEP rather than a slope — nothing improves until the usable width crosses the
+        // point where another bar fits, and then it improves all at once. Measured on a
+        // 24-bar piano score at 393px, the step sits between 357px and 369px of usable
+        // width, and the page's padding plus the plate's own left 321px. Full-bleed leaves
+        // 369px — the plate keeps its p-3, the page's 24px goes to the music — and the same
+        // score draws in 2526px instead of 4665px, about two bars a row instead of one, at
+        // exactly the same note size.
+        //
+        // Which is why the padding here cannot be tuned by eye: giving half of it back puts
+        // the width at 345px and buys precisely nothing. scoreDensity.browser.test.tsx pins
+        // the step so a later tidy-up of page padding fails a gate rather than silently
+        // halving the music on screen.
         <div
-            className={`relative rounded-xl bg-paper p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_32px_-14px_rgba(0,0,0,0.20)] ${
+            className={`relative -mx-6 rounded-xl bg-paper p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_32px_-14px_rgba(0,0,0,0.20)] sm:mx-0 ${
                 fullscreen ? "flex min-h-0 flex-1 flex-col" : ""
             }`}
         >
