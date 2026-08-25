@@ -173,7 +173,36 @@ export default defineConfig({
                     setupFiles: [".storybook/vitest.setup.ts"],
                     browser: {
                         enabled: true,
-                        provider: playwright(),
+                        // Font rendering, pinned. Everything else about the render
+                        // box is already fixed — one engine from the flake, one
+                        // viewport, self-hosted fonts, frozen animations — and text
+                        // was the last thing left floating with the machine: on
+                        // Linux, Chromium takes hinting and subpixel settings from
+                        // the host's fontconfig, and Fedora and the CI runner do not
+                        // agree. Glyph edges then land on different subpixels and a
+                        // few hundred pixels differ with no code change at all.
+                        //
+                        // That mattered because the difference is the same size as a
+                        // real one. Measured on the same story: 455 pixels from the
+                        // machine alone, 556 from recolouring a label. No threshold
+                        // can separate those, so the fix has to be the rendering
+                        // rather than the tolerance — a looser allowance buys a green
+                        // run by giving up the regressions this suite exists to catch.
+                        //
+                        // Hinting off makes outlines independent of the host's
+                        // hintstyle; LCD text off renders grayscale instead of
+                        // subpixel, so the RGB order fontconfig happens to declare
+                        // stops mattering; subpixel positioning off puts every glyph
+                        // on a whole pixel.
+                        provider: playwright({
+                            launchOptions: {
+                                args: [
+                                    "--font-render-hinting=none",
+                                    "--disable-lcd-text",
+                                    "--disable-font-subpixel-positioning",
+                                ],
+                            },
+                        }),
                         headless: true,
                         // One canonical render box: the screenshots are pixel
                         // baselines, so the viewport must never float with the
