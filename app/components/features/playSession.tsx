@@ -106,6 +106,15 @@ export type PlaySessionProps = {
     // the score — the session can't own the tab, the route does.
     runsView?: boolean;
     onShowScore?: () => void;
+    // An action belonging to the piece rather than to playing it, shown to the LEFT of
+    // Practice on the resting page — so the front door keeps Listen on its right, where it
+    // has always been.
+    //
+    // The warm-up's "another one" is the case this exists for: the phrase is generated, so
+    // asking for a different one is a thing you do TO the piece, and a button that sits two
+    // panels above the score it replaces reads as broken because the replacement happens
+    // off screen. Beside the score, the change is the next thing you look at.
+    leadAction?: ReactNode;
 };
 
 // Assembles the whole play session: all the hooks, the effects that coordinate them, and
@@ -128,6 +137,7 @@ function usePlaySessionValue({
     assessment,
     canShareGhost,
     seededResult,
+    leadAction,
     runsView = false,
     onShowScore,
 }: PlaySessionProps) {
@@ -1101,6 +1111,7 @@ function usePlaySessionValue({
         ephemeral,
         assessment,
         lockTempo,
+        leadAction,
         // The layout shell + full-screen state.
         containerRef,
         rootRef,

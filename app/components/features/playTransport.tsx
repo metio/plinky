@@ -37,6 +37,7 @@ export function PlayTransport() {
         setTempo,
         lockTempo,
         sightRead,
+        leadAction,
     } = usePlaySession();
 
     // Listen appears twice, and means slightly different things in the two places. In the
@@ -155,6 +156,10 @@ export function PlayTransport() {
                     the staff is what a reader came for, and two cards of controls between
                     the title and the music would push it off a phone. */}
                 <div className="flex flex-wrap items-center gap-3">
+                    {/* An action on the piece itself, where the warm-up puts "another
+                        one". Left of the front door so Listen keeps its place on its
+                        right. */}
+                    {leadAction}
                     {practiceButton}
                     {/* Secondary beside the primary: the piece still has one front door,
                         and hearing it first is the ordinary thing to want before walking

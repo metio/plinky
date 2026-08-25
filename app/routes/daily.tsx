@@ -7,10 +7,12 @@ import { Button } from "../components/ui/button";
 import { DailyReveal } from "../components/features/dailyReveal";
 import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreViewer } from "../components/features/scoreViewer";
+import { RotateIcon } from "../components/ui/icons";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
 import { useDailyStore } from "../contexts/services";
 import { DEFAULT_DRILL, type DrillOptions, generateDrill } from "../../core/drill";
+import { Disclosure } from "../components/ui/disclosure";
 import { DrillSetup } from "../components/features/drillSetup";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -137,12 +139,15 @@ export default function DailyRoute() {
             ) : (
                 <>
                     <p className="text-sm text-muted">{m.sprint_intro()}</p>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <Button variant="primary" onClick={() => regenerate(drill)}>
-                            {m.drill_new()}
-                        </Button>
-                    </div>
-                    <DrillSetup value={drill} onChange={reshape} />
+                    {/* The drill's shape, folded away. It is a panel of eleven controls,
+                        and left open it stood between the button that makes a phrase and
+                        the phrase itself — so a fresh drill appeared off screen and the
+                        button read as broken. Above the score, like the run's own set-up
+                        cards are below it: the thing you are reading stays the thing in
+                        the middle. */}
+                    <Disclosure summary={m.drill_setup()}>
+                        <DrillSetup value={drill} onChange={reshape} />
+                    </Disclosure>
                     {warmupXml && (
                         <ScoreViewer
                             key={run}
@@ -151,6 +156,17 @@ export default function DailyRoute() {
                             title={m.daily_tab_warmup()}
                             beatsPerBar={drill.beatsPerBar}
                             ephemeral
+                            // Beside the score it replaces, left of Practice so Listen
+                            // keeps its place on its right. Ghost rather than filled: the
+                            // warm-up's front door is still Practice, and two filled
+                            // buttons side by side would leave a reader choosing between
+                            // them rather than pressing one.
+                            leadAction={
+                                <Button variant="ghost" onClick={() => regenerate(drill)}>
+                                    <RotateIcon />
+                                    {m.drill_new()}
+                                </Button>
+                            }
                         />
                     )}
                 </>

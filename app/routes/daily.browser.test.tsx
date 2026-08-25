@@ -151,9 +151,22 @@ describe("Daily", () => {
         );
         // The folded-in sprint: switching tabs reveals its controls and a phrase.
         fireEvent.click(await screen.findByText("Warm up"));
-        expect(screen.getByText("New drill")).toBeTruthy();
-        // The drill panel shapes the phrase in place of the old two-hands button.
-        expect(screen.getByText("Shape the drill")).toBeTruthy();
+        // The drill's shape is folded away rather than standing between the button that
+        // makes a phrase and the phrase itself — so the summary is here and the eleven
+        // controls behind it are not.
+        expect(screen.getByRole("button", { name: "Shape the drill" })).toBeTruthy();
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
+        // "New drill" belongs to the score it replaces, so it arrives with the score and
+        // sits in its action row — left of Practice, with Listen still on Practice's
+        // right. A button two panels above the staff regenerated something off screen and
+        // read as doing nothing at all.
+        const actions = await screen.findByRole("button", { name: /New drill/ });
+        const row = actions.parentElement as HTMLElement;
+        const labels = Array.from(row.querySelectorAll("button")).map((button) =>
+            (button.textContent ?? "").trim(),
+        );
+        expect(labels[0]).toContain("New drill");
+        expect(labels[1]).toContain("Practice");
+        expect(labels[2]).toContain("Listen");
     });
 });
