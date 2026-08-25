@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Ovaj mjesec svirao si {days} dana, {more} više nego prošli.",
     "stats_opening_first": "Tvoji prvi dani za tipkama — ovdje počinje.",
     "help_text_stats": "Tvoja jedina stranica napretka. Pokazuje stupanj na kojem stojiš od osam i što je ostalo do sljedećeg, tvoju razinu, dane vježbanja i odsvirane tonove, sporo pomični otisak sastavljen od točnosti, vremena i tečnosti, te skladbe za ponavljanje uz sesiju na jedan dodir.\n\nOndje ćeš naći i Pronađi svoju razinu, test razvrstavanja; tonove koje najdulje tražiš, onu šačicu koja te svaki put usporava; Tvoje vježbanje, dnevnik zbrojen po tjednu, mjesecu, tri mjeseca ili godini, sa sjenčanom mrežom koja pokazuje kamo je vježbanje otišlo, gdje možeš dodati ručno zapisane minute i preuzeti zapis kao proračunsku tablicu; Na pultu, ono na čemu radiš i u kojoj je fazi svaka skladba — učenje, slijeganje, uglađivanje, održavanje; i Postignuća, svaki stupanj i svaku značku koju si osvojio, s neosvojenima prikazanima kao ciljevi.\n\nPraznine ne smetaju. Plinky ne broji nizove i nikad ne predbacuje preskočen dan: miran tjedan jednostavno je nacrtan kao miran tjedan.",
-    "help_shot_stats": "tvoj napredak"
+    "help_shot_stats": "tvoj napredak",
+    "warmup_card_title": "Prije nego zasviraš",
+    "warmup_card_hint": "Zagrij se na tonovima koje skladba traži.",
+    "warmup_card_notes": "{notes} za pronaći. Odsviraj ljestvicu koja ih koristi pa se vrati.",
+    "warmup_card_white": "Samo bijele tipke. Odsviraj ljestvicu da ruka sjedne pa se vrati.",
+    "warmup_back": "Natrag na {title}"
 }

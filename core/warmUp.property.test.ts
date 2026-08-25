@@ -28,15 +28,19 @@ describe("the warm-up offered before a piece", () => {
         );
     });
 
-    it("never counts a negative number of accidentals", () => {
-        // Flats arrive as a negative signature, and the sentence built around this number
-        // says "three flats" — "-3 flats" is exactly the sort of thing that ships.
+    it("names exactly as many black keys as the signature carries", () => {
+        // Flats arrive as a negative signature; a count taken raw would be negative, and a
+        // list built from it would be empty for every flat key in the catalogue.
         fc.assert(
             fc.property(signature, mode, (fifths, minor) => {
                 const warm = warmUpFor({ fifths, minor, isExercise: false });
                 if (warm !== null) {
-                    expect(warm.accidentals).toBeGreaterThanOrEqual(0);
-                    expect(warm.accidentals).toBe(Math.abs(fifths));
+                    expect(warm.accidentals.length).toBe(Math.abs(fifths));
+                    // Sharps or flats, never a mixture: no signature has both.
+                    const kind = fifths >= 0 ? "♯" : "♭";
+                    for (const note of warm.accidentals) {
+                        expect(note).toContain(kind);
+                    }
                 }
             }),
         );

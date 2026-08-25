@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Questo mese hai suonato {days} giorni, {more} in più del mese scorso.",
     "stats_opening_first": "I tuoi primi giorni ai tasti: si comincia da qui.",
     "help_text_stats": "La tua unica pagina dei progressi. Mostra il grado in cui sei sulla scala a otto e quanto manca al successivo, il tuo livello, i giorni di studio e le note suonate, un'impronta che si muove lentamente fatta di precisione, tempo e scorrevolezza, e i brani da ripassare con una sessione a un tocco.\n\nCi trovi anche Trova il tuo livello, il test di collocamento; le note che ci metti più tempo a trovare, che indicano la manciata che ti rallenta ogni volta; Il tuo studio, un diario raccolto su una settimana, un mese, tre mesi o un anno, con una griglia sfumata che mostra dove è andato lo studio, dove puoi aggiungere minuti annotati a mano e scaricare il registro come foglio di calcolo; Sul leggio, ciò su cui stai lavorando e la fase di ogni brano — imparare, assestare, rifinire, mantenere; e i Traguardi, ogni grado e ogni distintivo ottenuto, con quelli mancanti mostrati come obiettivi.\n\nI vuoti vanno benissimo. Plinky non conta serie e non rimprovera mai un giorno saltato: una settimana tranquilla viene semplicemente disegnata come una settimana tranquilla.",
-    "help_shot_stats": "i tuoi progressi"
+    "help_shot_stats": "i tuoi progressi",
+    "warmup_card_title": "Prima di suonare",
+    "warmup_card_hint": "Scaldati sulle note che questo brano chiede.",
+    "warmup_card_notes": "{notes} da trovare. Suona la scala che le usa, poi torna qui.",
+    "warmup_card_white": "Solo tasti bianchi. Suona la scala per assestare la mano, poi torna qui.",
+    "warmup_back": "Torna a {title}"
 }

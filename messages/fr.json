@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Vous avez joué {days} jours ce mois-ci, {more} de plus que le mois dernier.",
     "stats_opening_first": "Vos premiers jours au clavier — tout commence ici.",
     "help_text_stats": "Ta page de progression, la seule. Elle montre le grade où tu en es sur l'échelle de huit et ce qu'il reste pour le suivant, ton niveau, les jours travaillés et les notes jouées, une empreinte à évolution lente faite de justesse, de temps et de flux, ainsi que les morceaux à revoir avec une séance en un toucher.\n\nTu y trouveras aussi Trouver ton niveau, le test de placement ; les notes que tu mets le plus de temps à trouver, qui nomment la poignée qui te ralentit à chaque fois ; Ton travail, un journal cumulé sur une semaine, un mois, trois mois ou un an, avec une grille ombrée montrant où le travail est passé, où tu peux ajouter des minutes notées à la main et télécharger le journal en tableur ; Sur le pupitre, ce que tu travailles et le stade de chaque morceau — apprendre, se poser, polir, entretenir ; et les Réussites, chaque grade et chaque badge obtenus, ceux qui restent étant montrés comme des objectifs.\n\nLes trous ne sont pas un problème. Plinky ne compte pas les séries et ne reproche jamais un jour manqué : une semaine calme est simplement dessinée comme une semaine calme.",
-    "help_shot_stats": "ta progression"
+    "help_shot_stats": "ta progression",
+    "warmup_card_title": "Avant de jouer",
+    "warmup_card_hint": "Échauffez-vous sur les notes que ce morceau demande.",
+    "warmup_card_notes": "{notes} à trouver. Jouez la gamme qui les utilise, puis revenez.",
+    "warmup_card_white": "Rien que des touches blanches. Jouez la gamme pour poser la main, puis revenez.",
+    "warmup_back": "Retour à {title}"
 }

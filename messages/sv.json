@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Du spelade {days} dagar den här månaden, {more} fler än förra.",
     "stats_opening_first": "Dina första dagar vid tangenterna — här börjar det.",
     "help_text_stats": "Din enda framstegssida. Den visar steget du står på av de åtta och vad som återstår till nästa, din nivå, övade dagar och spelade toner, ett långsamt rörligt fingeravtryck av precision, timing och flyt, och styckena som ska repeteras med ett pass på ett tryck.\n\nDu hittar också Hitta din nivå, placeringsprovet; tonerna du tar längst tid på dig att hitta, som pekar ut den handfull som bromsar dig varje gång; Din övning, en dagbok samlad över en vecka, en månad, tre månader eller ett år, med ett skuggat rutnät som visar vart övningen gick, där du kan lägga till minuter förda för hand och ladda ner loggen som kalkylark; På notstället, det du arbetar med och vilket skede varje stycke är i — lära in, låta sätta sig, putsa, hålla vid liv; och Bedrifter, varje steg och varje märke du nått, med de återstående visade som mål.\n\nLuckor gör inget. Plinky räknar inga rader och förebrår dig aldrig en överhoppad dag: en lugn vecka ritas helt enkelt som en lugn vecka.",
-    "help_shot_stats": "dina framsteg"
+    "help_shot_stats": "dina framsteg",
+    "warmup_card_title": "Innan du spelar",
+    "warmup_card_hint": "Värm upp på tonerna stycket ber om.",
+    "warmup_card_notes": "{notes} att hitta. Spela skalan med dem och kom sedan tillbaka.",
+    "warmup_card_white": "Bara vita tangenter. Spela skalan så handen sätter sig, och kom sedan tillbaka.",
+    "warmup_back": "Tillbaka till {title}"
 }

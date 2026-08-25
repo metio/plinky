@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**A piece now offers you the scale it is built from.** Under the music, before you
+start: which black keys this piece will ask for, named, and the scale that puts them
+under your hand. Play it, and the link brings you straight back to the piece. It is an
+offer and nothing is locked behind it — skip it and nothing is lost.
+
 **One composer, one page.** Handel had six pages, Bach six, Tchaikovsky four, Bartók
 three — the same person split across every way the sheet music spelled their name, so
 "more by this composer" showed you a fraction of what was there. Seventy-two of those

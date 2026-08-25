@@ -158,7 +158,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "ferdinand-beyer": { name: "Ferdinand Beyer", pieces: 3 },
     "filippo-azzaiolo": { name: "Filippo Azzaiolo", pieces: 10 },
     "florence-ashton-marshall": { name: "Florence Ashton Marshall", pieces: 2 },
-    "francesco-paolo-tosti": { name: "Francesco Paolo Tosti", pieces: 5 },
+    "francesco-paolo-tosti": { name: "Francesco Paolo Tosti", pieces: 4 },
     "francisco-de-penalosa": { name: "Francisco de Peñalosa", pieces: 1 },
     "francisco-tarrega": { name: "Francisco Tárrega", pieces: 2 },
     "francois-couperin": { name: "François Couperin", pieces: 1 },
@@ -431,7 +431,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "william-smallwood": { name: "William Smallwood", pieces: 1 },
     "william-tansur": { name: "William Tansur", pieces: 1 },
     "william-walker": { name: "William Walker", pieces: 3 },
-    "wolfgang-amadeus-mozart": { name: "Wolfgang Amadeus Mozart", pieces: 47 },
+    "wolfgang-amadeus-mozart": { name: "Wolfgang Amadeus Mozart", pieces: 46 },
 };
 
 // The canonical name for a slug, or null when the catalogue credits nobody by it —

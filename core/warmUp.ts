@@ -18,14 +18,27 @@
 import type { ExerciseConfig } from "./exerciseGen";
 import { keySlugFor } from "./exerciseGen";
 
+// The order sharps and flats appear in a key signature, which never varies: F C G D A E B
+// for sharps and its reverse for flats. Two flats is always B♭ and E♭, never any other
+// pair — which is what lets the offer name the actual notes rather than only counting them.
+const SHARP_ORDER = ["F♯", "C♯", "G♯", "D♯", "A♯", "E♯", "B♯"];
+const FLAT_ORDER = ["B♭", "E♭", "A♭", "D♭", "G♭", "C♭", "F♭"];
+
+// The black keys this signature asks for, in the order the signature writes them.
+export function accidentalsOf(fifths: number): string[] {
+    const order = fifths >= 0 ? SHARP_ORDER : FLAT_ORDER;
+    return order.slice(0, Math.min(Math.abs(fifths), order.length));
+}
+
 export type WarmUp = {
     // The exercise to play, ready for buildExerciseId.
     exercise: ExerciseConfig;
     // The key slug, for keyName() — the copy says which key it is about to teach.
     key: string;
-    // How many sharps or flats the hand has to place, always positive. The whole reason
-    // the offer is worth making, and the number the sentence is built around.
-    accidentals: number;
+    // The black keys the hand has to place, named and in signature order. The whole reason
+    // the offer is worth making: "B♭, E♭, A♭" is something to go and find, where "three
+    // flats" is only something to be told.
+    accidentals: string[];
 };
 
 // Both hands, one octave: the shape a warm-up wants. Two octaves is a practice session
@@ -41,6 +54,11 @@ const SHAPE = { octaves: 1, hands: "both", inversion: 0, interval: "single" } as
 export function warmUpFor(input: {
     // Sharps positive, flats negative, exactly as a score writes it.
     fifths: number;
+    // Whether the piece is in the minor. Measured across the catalogue, only about one
+    // score in twenty declares a mode at all, so this is nearly always false — and it
+    // matters less than it looks: a signature's major scale and its relative minor hold
+    // exactly the same seven notes, so either one puts the same black keys under the hand.
+    // The copy therefore names the accidentals rather than claiming the piece's key.
     minor: boolean;
     // Whether the piece is itself a generated exercise or study.
     isExercise: boolean;
@@ -54,7 +72,7 @@ export function warmUpFor(input: {
     }
     return {
         key,
-        accidentals: Math.abs(input.fifths),
+        accidentals: accidentalsOf(input.fifths),
         exercise: {
             ...SHAPE,
             // The minor scale a player is taught first, and the one the key signature

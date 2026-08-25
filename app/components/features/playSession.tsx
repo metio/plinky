@@ -1106,6 +1106,10 @@ function usePlaySessionValue({
         // Piece identity and framing.
         id,
         title,
+        // The key signature the piece opens in, so a surface can say which black keys it
+        // will ask for. Read from the score on the way in and moved with any transposition,
+        // so it is what the player will actually be reading rather than what the file says.
+        fifths: marks.fifths,
         credit: credit ?? "",
         daily,
         ephemeral,

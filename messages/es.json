@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Este mes has tocado {days} días, {more} más que el mes pasado.",
     "stats_opening_first": "Tus primeros días ante las teclas: aquí empieza todo.",
     "help_text_stats": "Tu única página de progreso. Enseña el grado en el que estás dentro de la escalera de ocho y lo que falta para el siguiente, tu nivel, los días practicados y las notas tocadas, una huella de movimiento lento hecha de precisión, tiempo y fluidez, y las piezas que toca repasar con una sesión de un toque.\n\nTambién encontrarás Encuentra tu nivel, la prueba de ubicación; las notas que más tardas en encontrar, que nombran el puñado que te frena una y otra vez; Tu práctica, un diario recogido por semana, mes, tres meses o año, con una cuadrícula sombreada que enseña adónde ha ido la práctica, donde puedes añadir minutos apuntados a mano y descargar el registro como hoja de cálculo; En el atril, lo que estás trabajando y en qué fase está cada pieza — aprender, asentar, pulir, mantener; y los Logros, cada grado y cada insignia conseguidos, con los que faltan enseñados como metas.\n\nLos huecos no pasan nada. Plinky no cuenta rachas y nunca reprocha un día perdido: una semana tranquila se dibuja simplemente como una semana tranquila.",
-    "help_shot_stats": "tu progreso"
+    "help_shot_stats": "tu progreso",
+    "warmup_card_title": "Antes de tocar",
+    "warmup_card_hint": "Calienta con las notas que pide esta pieza.",
+    "warmup_card_notes": "{notes} que encontrar. Toca la escala que las usa y vuelve.",
+    "warmup_card_white": "Solo teclas blancas. Toca la escala para asentar la mano y vuelve.",
+    "warmup_back": "Volver a {title}"
 }

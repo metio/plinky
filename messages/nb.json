@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Du spilte {days} dager denne måneden, {more} flere enn forrige.",
     "stats_opening_first": "Dine første dager ved tangentene — her begynner det.",
     "help_text_stats": "Den ene framgangssiden din. Den viser trinnet du står på av de åtte og hva som gjenstår til det neste, nivået ditt, dager med øving og toner spilt, et langsomt bevegelig fingeravtrykk av presisjon, timing og flyt, og stykkene som skal friskes opp med en økt på ett trykk.\n\nDu finner også Finn nivået ditt, plasseringsprøven; tonene du bruker lengst tid på å finne, som peker ut den håndfullen som bremser deg hver gang; Øvingen din, en dagbok samlet over en uke, en måned, tre måneder eller et år, med et skravert rutenett som viser hvor øvingen gikk, der du kan legge til minutter ført for hånd og laste ned loggen som regneark; På notestativet, det du jobber med og hvilket stadium hvert stykke er i — lære, sette seg, pusse, holde ved like; og Bragder, hvert trinn og hvert merke du har nådd, med de gjenstående vist som mål.\n\nHull gjør ingenting. Plinky teller ingen rekker og bebreider deg aldri en hoppet dag: en stille uke tegnes rett og slett som en stille uke.",
-    "help_shot_stats": "framgangen din"
+    "help_shot_stats": "framgangen din",
+    "warmup_card_title": "Før du spiller",
+    "warmup_card_hint": "Varm opp på tonene stykket ber om.",
+    "warmup_card_notes": "{notes} å finne. Spill skalaen med dem, og kom så tilbake.",
+    "warmup_card_white": "Bare hvite tangenter. Spill skalaen så hånden setter seg, og kom så tilbake.",
+    "warmup_back": "Tilbake til {title}"
 }

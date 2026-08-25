@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Je speelde deze maand op {days} dagen, {more} meer dan vorige maand.",
     "stats_opening_first": "Je eerste dagen achter de toetsen — hier begint het.",
     "help_text_stats": "Je enige voortgangspagina. Ze toont de graad waar je staat op de ladder van acht en wat er tot de volgende nog te gaan is, je niveau, geoefende dagen en gespeelde noten, een langzaam bewegende vingerafdruk van nauwkeurigheid, timing en vloeiendheid, en de stukken die aan herhaling toe zijn met een sessie op één tik.\n\nJe vindt er ook Vind je niveau, de plaatsingstest; de noten waar je het langst over doet, die de handvol benoemen die je telkens ophouden; Jouw oefenen, een dagboek samengevat over een week, een maand, drie maanden of een jaar, met een rooster in tinten dat laat zien waar het oefenen heen ging, waar je met de hand genoteerde minuten kunt toevoegen en het logboek als spreadsheet kunt downloaden; Op de lessenaar, waar je aan werkt en in welke fase elk stuk zit — leren, laten bezinken, bijschaven, bijhouden; en Prestaties, elke graad en elk insigne dat je hebt behaald, met de nog openstaande als doelen.\n\nGaten zijn prima. Plinky telt geen reeksen en verwijt je nooit een overgeslagen dag: een rustige week wordt eenvoudigweg als een rustige week getekend.",
-    "help_shot_stats": "jouw voortgang"
+    "help_shot_stats": "jouw voortgang",
+    "warmup_card_title": "Voor je speelt",
+    "warmup_card_hint": "Warm op met de noten die dit stuk vraagt.",
+    "warmup_card_notes": "{notes} te vinden. Speel de toonladder ermee en kom dan terug.",
+    "warmup_card_white": "Alleen witte toetsen. Speel de toonladder om je hand te laten wennen en kom dan terug.",
+    "warmup_back": "Terug naar {title}"
 }

@@ -654,6 +654,11 @@ Every keyboard shows a small badge in its corner — a green tick the moment a M
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your
 instrument is hooked up.
 
+Under the music, a piece offers the scale it is built from: the black keys it will ask
+for, named, and the scale that finds them — with a link back to the piece when you have
+played it. Nothing is locked behind it. It reads the key from the score itself, so it
+knows what the piece actually asks for rather than guessing from its opening.
+
 On a phone the score spans the full width of the screen, which is worth about twice as
 many bars per row as the padded layout it replaced — at the same note size, with nothing
 dropped from the notation. Note size stays yours to set.

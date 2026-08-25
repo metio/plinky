@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Këtë muaj ke luajtur {days} ditë, {more} më shumë se muajin e kaluar.",
     "stats_opening_first": "Ditët e tua të para te tastet — këtu fillon.",
     "help_text_stats": "Faqja jote e vetme e përparimit. Tregon shkallën ku ndodhesh nga tetë dhe sa mbetet për të ardhshmen, nivelin tënd, ditët e ushtruara dhe tingujt e luajtur, një gjurmë gishti që lëviz ngadalë e përbërë nga saktësia, koha dhe rrjedhshmëria, si dhe pjesët për përsëritje me një seancë me një prekje.\n\nAty do të gjesh edhe Gjej nivelin tënd, provën e vendosjes; tingujt që i gjen më ngadalë, atë grusht që të ngadalëson çdo herë; Ushtrimi yt, një ditar i përmbledhur për një javë, një muaj, tre muaj ose një vit, me një rrjetë me hije që tregon ku shkoi ushtrimi, ku mund të shtosh minuta të shënuara me dorë dhe të shkarkosh regjistrin si fletë llogaritjeje; Në leksionar, atë që po punon dhe fazën e secilës pjesë — mësim, ulje, lëmim, mbajtje; dhe Arritjet, çdo shkallë e çdo distinktiv që ke fituar, me ato të pafituarat të treguara si synime.\n\nBoshllëqet s'kanë rëndësi. Plinky nuk numëron vargje dhe kurrë s'ta përplas një ditë të kapërcyer: një javë e qetë thjesht vizatohet si javë e qetë.",
-    "help_shot_stats": "përparimi yt"
+    "help_shot_stats": "përparimi yt",
+    "warmup_card_title": "Para se të luash",
+    "warmup_card_hint": "Ngroh duart me notat që kërkon kjo pjesë.",
+    "warmup_card_notes": "{notes} për t'u gjetur. Luaj shkallën që i përdor, pastaj kthehu.",
+    "warmup_card_white": "Vetëm taste të bardha. Luaj shkallën që dora të vendoset, pastaj kthehu.",
+    "warmup_back": "Kthehu te {title}"
 }

@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Ebben a hónapban {days} napon játszottál, {more} nappal többön, mint az előzőben.",
     "stats_opening_first": "Első napjaid a billentyűknél — itt kezdődik.",
     "help_text_stats": "Az egyetlen haladási oldalad. Megmutatja, melyik fokon állsz a nyolcból, és mi van hátra a következőig, a szintedet, a gyakorolt napokat és a lejátszott hangokat, a pontosságból, időzítésből és folyamatosságból álló, lassan mozduló ujjlenyomatot, valamint az ismétlésre váró darabokat egy koppintásos gyakorlással.\n\nMegtalálod ott a Találd meg a szinted besoroló tesztet is; a hangokat, amelyek megtalálása a legtovább tart, vagyis azt a maroknyit, amely minden alkalommal lassít; a Gyakorlásod naplót egy hétre, egy hónapra, három hónapra vagy egy évre összesítve, árnyalt ráccsal, amely mutatja, hová ment a gyakorlás, ahol kézzel jegyzett perceket adhatsz hozzá, és táblázatként töltheted le a naplót; a Kottatartón részt, vagyis amin dolgozol, és hogy melyik darab milyen szakaszban van — tanulás, ülepedés, csiszolás, szinten tartás; és az Eredményeket, minden megszerzett fokot és jelvényt, a még megszerzendőkkel célként megmutatva.\n\nA hézagok rendben vannak. A Plinky nem számol sorozatokat, és sosem veti a szemedre a kihagyott napot: egy csendes hét egyszerűen csendes hétként van felrajzolva.",
-    "help_shot_stats": "a haladásod"
+    "help_shot_stats": "a haladásod",
+    "warmup_card_title": "Mielőtt játszol",
+    "warmup_card_hint": "Melegíts be azokon a hangokon, amelyeket a darab kér.",
+    "warmup_card_notes": "{notes} megtalálandó. Játszd le a skálát, amely használja őket, aztán gyere vissza.",
+    "warmup_card_white": "Csak fehér billentyűk. Játszd le a skálát, hogy a kéz elhelyezkedjen, aztán gyere vissza.",
+    "warmup_back": "Vissza: {title}"
 }

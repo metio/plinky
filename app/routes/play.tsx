@@ -11,6 +11,7 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { ExerciseForms } from "../components/features/exerciseForms";
+import { ReturnToPiece } from "../components/features/returnToPiece";
 import { BacklogButton } from "../components/features/backlogButton";
 import { MarkLearnedButton } from "../components/features/markLearnedButton";
 import { type PlayMode, PlayModeBar } from "../components/features/playModeBar";
@@ -153,6 +154,12 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                     {parseExerciseId(score.id) && (
                         <ExerciseForms config={parseExerciseId(score.id)!} />
                     )}
+                    {/* The way back to the piece this scale was opened to prepare. A
+                        warm-up that ends by leaving somebody in a side room is a detour;
+                        the point of the pairing is that the two are minutes apart. The
+                        title travels in the address rather than being looked up, so the
+                        link is right on the first paint and costs no catalogue read. */}
+                    <ReturnToPiece />
                     <ScoreViewer
                         key={score.id}
                         id={score.id}

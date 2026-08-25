@@ -8,6 +8,7 @@ import { LoopRangeBar } from "./loopRangeBar";
 import { usePlaySession } from "./playSession";
 import { PlayStage } from "./playStage";
 import { PlayTransport } from "./playTransport";
+import { WarmUpCard } from "./warmUpCard";
 import { RaceVerdict } from "./raceVerdict";
 import { RunResult } from "./runResult";
 import { RunShare } from "./runShare";
@@ -105,6 +106,14 @@ export function PlaySurface() {
                     />
                 )}
                 <ScoreCanvas />
+
+                {/* Before the set-up cards, because it is the thing to do before playing
+                    rather than a way of playing: the scale this piece is built from, so the
+                    black keys it will ask for are under the hand before the reading starts.
+                    Silent in full screen, where a run is already under way. */}
+                <FullScreen off>
+                    <WarmUpCard />
+                </FullScreen>
 
                 {/* Under the music: how you play this piece, and the challenges you can
                     put on it. They used to be one fold called "Set up your run" — two for

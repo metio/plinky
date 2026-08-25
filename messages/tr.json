@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Bu ay {days} gün çaldın, geçen aydan {more} gün fazla.",
     "stats_opening_first": "Tuşlardaki ilk günlerin — her şey burada başlıyor.",
     "help_text_stats": "Tek ilerleme sayfan. Sekiz basamaklı merdivende hangi basamakta olduğunu ve bir sonrakine ne kaldığını, seviyeni, çalıştığın günleri ve çaldığın sesleri, doğruluk, zamanlama ve akıştan oluşan yavaş kımıldayan bir parmak izini ve tekrar sırası gelen parçaları tek dokunuşluk bir oturumla gösterir.\n\nAyrıca Seviyeni bul yerleştirme sınavını; bulman en uzun süren sesleri, yani seni her seferinde yavaşlatan o avuç dolusunu; Çalışman'ı, bir hafta, bir ay, üç ay ya da bir yıl üzerinden toplanmış, çalışmanın nereye gittiğini gösteren gölgeli bir ızgarayla, elle yazdığın dakikaları ekleyebildiğin ve günlüğü hesap tablosu olarak indirebildiğin bir günlüğü; Nota sehpasında, üzerinde çalıştıklarını ve her parçanın hangi aşamada olduğunu — öğrenme, oturma, cilalama, koruma; ve Başarımlar'ı, kazandığın her basamağı ve rozeti, kazanılmayanlar hedef olarak gösterilmiş hâlde bulursun.\n\nBoşluklar sorun değil. Plinky seri saymaz ve atlanan bir günü asla yüzüne vurmaz: sakin bir hafta yalnızca sakin bir hafta olarak çizilir.",
-    "help_shot_stats": "ilerlemen"
+    "help_shot_stats": "ilerlemen",
+    "warmup_card_title": "Çalmadan önce",
+    "warmup_card_hint": "Bu parçanın istediği notalarla ısın.",
+    "warmup_card_notes": "Bulunacak {notes}. Onları kullanan diziyi çal, sonra geri dön.",
+    "warmup_card_white": "Yalnızca beyaz tuşlar. Elin yerleşsin diye diziyi çal, sonra geri dön.",
+    "warmup_back": "{title} parçasına dön"
 }

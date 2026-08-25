@@ -391,7 +391,14 @@ const BUDGET_VENDOR_KB = 324;
 // 372. Menus that close the way every other menu closes — a press elsewhere, or Escape.
 // A fifth of a kilobyte for a hook two of them share, against a reported bug where the only
 // way out of the Export menu was the button that opened it.
-const BUDGET_APP_KB = 376;
+// 382. Every composer gets a prerendered page, not only the ones with three pieces or more.
+// The floor bought a page whose behaviour depended on how many pieces its composer happened
+// to have — prerendered above the line, client-rendered below it — and merging the duplicate
+// spellings moved composers across that line in both directions. The index it is built from
+// ships in the app bundle as the name a person page shows before the catalogue arrives, so
+// it went from 157 entries to 403: 3.0 KB gzipped to 7.7. The prerendered set went from
+// 4,082 pages to 10,634.
+const BUDGET_APP_KB = 382;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Tento mesiac si hral {days} dní, o {more} viac než minulý.",
     "stats_opening_first": "Tvoje prvé dni pri klávesoch — tu to začína.",
     "help_text_stats": "Tvoja jediná stránka pokroku. Ukazuje stupeň, na ktorom stojíš z ôsmich, a čo zostáva do ďalšieho, tvoju úroveň, dni cvičenia a zahrané tóny, pomaly sa meniaci odtlačok zložený z presnosti, času a plynulosti a skladby na zopakovanie so sedením na jedno ťuknutie.\n\nNájdeš tam aj Nájdi svoju úroveň, zaraďovací test; tóny, ktoré hľadáš najdlhšie, teda tú hŕstku, ktorá ťa zakaždým zdržuje; Tvoje cvičenie, denník zhrnutý za týždeň, mesiac, tri mesiace alebo rok, s tieňovanou mriežkou ukazujúcou, kam cvičenie šlo, kam môžeš doplniť ručne zapísané minúty a stiahnuť záznam ako tabuľku; Na pulte, na čom pracuješ a v akej fáze každá skladba je — učenie, usádzanie, leštenie, udržiavanie; a Úspechy, každý stupeň a odznak, ktorý si získal, s nezískanými ukázanými ako ciele.\n\nMedzery nevadia. Plinky nepočíta série a nikdy nevyčíta vynechaný deň: pokojný týždeň sa jednoducho nakreslí ako pokojný týždeň.",
-    "help_shot_stats": "tvoj pokrok"
+    "help_shot_stats": "tvoj pokrok",
+    "warmup_card_title": "Než začneš hrať",
+    "warmup_card_hint": "Rozohraj sa na tónoch, ktoré skladba potrebuje.",
+    "warmup_card_notes": "{notes} na nájdenie. Zahraj stupnicu, ktorá ich používa, a vráť sa.",
+    "warmup_card_white": "Len biele klávesy. Zahraj stupnicu, nech ruka sadne, a vráť sa.",
+    "warmup_back": "Späť na {title}"
 }

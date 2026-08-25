@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Soitit tässä kuussa {days} päivänä, {more} enemmän kuin viime kuussa.",
     "stats_opening_first": "Ensimmäiset päiväsi koskettimilla — tästä se alkaa.",
     "help_text_stats": "Ainoa edistymissivusi. Se näyttää tason, jolla olet kahdeksan portaan tikkailla, ja mitä seuraavaan on jäljellä, taitotasosi, harjoitellut päivät ja soitetut sävelet, hitaasti liikkuvan sormenjäljen tarkkuudesta, ajoituksesta ja soljuvuudesta, sekä kerrattavat kappaleet yhden napautuksen harjoituskerralla.\n\nSieltä löytyvät myös Etsi tasosi, sijoituskoe; sävelet, joiden löytämiseen sinulta menee kauimmin, eli se kourallinen joka hidastaa sinua joka kerta; Harjoittelusi, päiväkirja koottuna viikolta, kuukaudelta, kolmelta kuukaudelta tai vuodelta, sävytettynä ruudukkona joka näyttää mihin harjoittelu meni, ja johon voit lisätä käsin kirjatut minuutit ja ladata lokin taulukkona; Nuottitelineellä, mitä työstät ja missä vaiheessa kukin kappale on — opettelu, asettuminen, viimeistely, ylläpito; ja Saavutukset, jokainen taso ja merkki jonka olet saanut, saavuttamattomat tavoitteina näytettyinä.\n\nAukot eivät haittaa. Plinky ei laske putkia eikä koskaan moiti väliin jäänyttä päivää: hiljainen viikko piirretään yksinkertaisesti hiljaisena viikkona.",
-    "help_shot_stats": "edistymisesi"
+    "help_shot_stats": "edistymisesi",
+    "warmup_card_title": "Ennen kuin soitat",
+    "warmup_card_hint": "Lämmittele niillä sävelillä, joita kappale pyytää.",
+    "warmup_card_notes": "{notes} löydettävänä. Soita asteikko niillä ja palaa sitten.",
+    "warmup_card_white": "Pelkkiä valkoisia koskettimia. Soita asteikko, niin käsi asettuu, ja palaa sitten.",
+    "warmup_back": "Takaisin: {title}"
 }

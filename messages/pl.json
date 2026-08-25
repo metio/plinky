@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "W tym miesiącu grałeś przez {days} dni, o {more} więcej niż w poprzednim.",
     "stats_opening_first": "Twoje pierwsze dni przy klawiszach — tu się zaczyna.",
     "help_text_stats": "Twoja jedyna strona postępów. Pokazuje stopień, na którym stoisz na drabinie ośmiu, i ile brakuje do następnego, twój poziom, dni ćwiczeń i zagrane dźwięki, wolno zmienny odcisk palca złożony z dokładności, czasu i płynności oraz utwory do powtórki z sesją na jedno dotknięcie.\n\nZnajdziesz tam też Znajdź swój poziom, test wstępny; dźwięki, których szukasz najdłużej, czyli tę garstkę, która hamuje cię za każdym razem; Twoje ćwiczenie, dziennik zebrany z tygodnia, miesiąca, trzech miesięcy albo roku, z cieniowaną siatką pokazującą, dokąd poszło ćwiczenie, gdzie możesz dopisać minuty zanotowane ręcznie i pobrać dziennik jako arkusz; Na pulpicie, nad czym pracujesz i na jakim etapie jest każdy utwór — nauka, osiadanie, dopracowanie, utrzymanie; oraz Osiągnięcia, każdy stopień i odznakę, które zdobyłeś, z niezdobytymi pokazanymi jako cele.\n\nPrzerwy nie szkodzą. Plinky nie liczy serii i nigdy nie wypomina opuszczonego dnia: spokojny tydzień jest po prostu narysowany jako spokojny tydzień.",
-    "help_shot_stats": "twoje postępy"
+    "help_shot_stats": "twoje postępy",
+    "warmup_card_title": "Zanim zagrasz",
+    "warmup_card_hint": "Rozgrzej się na dźwiękach, których wymaga ten utwór.",
+    "warmup_card_notes": "{notes} do znalezienia. Zagraj gamę, która ich używa, i wróć.",
+    "warmup_card_white": "Same białe klawisze. Zagraj gamę, żeby ręka się ułożyła, i wróć.",
+    "warmup_back": "Powrót do {title}"
 }

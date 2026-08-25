@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Du hast diesen Monat an {days} Tagen gespielt, {more} mehr als im letzten.",
     "stats_opening_first": "Deine ersten Tage an den Tasten – hier fängt es an.",
     "help_text_stats": "Deine eine Fortschrittsseite. Sie zeigt die Stufe, auf der du auf der achtstufigen Leiter stehst, und was bis zur nächsten fehlt, deine Spielstärke, geübte Tage und gespielte Noten, einen langsam wandernden Fingerabdruck aus Genauigkeit, Timing und Fluss sowie die Stücke, die zur Wiederholung anstehen, mit einer Sitzung auf einen Tipp.\n\nAußerdem findest du dort Finde dein Niveau, den Einstufungstest; die Noten, für die du am längsten brauchst, die die Handvoll benennen, die dich immer wieder bremsen; Dein Üben, ein Tagebuch über eine Woche, einen Monat, drei Monate oder ein Jahr, mit einem Raster, das zeigt, wohin das Üben ging, wo du von Hand notierte Minuten ergänzen und das Protokoll als Tabelle herunterladen kannst; Auf dem Notenpult, was du gerade erarbeitest und in welchem Stadium jedes Stück steht — lernen, sich setzen, polieren, halten; und Erfolge, jede Stufe und jedes Abzeichen, das du erreicht hast, mit den offenen als Ziele.\n\nLücken sind in Ordnung. Plinky zählt keine Serien und macht dir einen ausgelassenen Tag nie zum Vorwurf: eine ruhige Woche wird schlicht als ruhige Woche gezeichnet.",
-    "help_shot_stats": "dein Fortschritt"
+    "help_shot_stats": "dein Fortschritt",
+    "warmup_card_title": "Bevor du spielst",
+    "warmup_card_hint": "Wärm dich mit den Tönen auf, die dieses Stück braucht.",
+    "warmup_card_notes": "{notes} sind zu finden. Spiel die Tonleiter damit und komm dann zurück.",
+    "warmup_card_white": "Nur weiße Tasten. Spiel die Tonleiter, damit die Hand sitzt, und komm dann zurück.",
+    "warmup_back": "Zurück zu {title}"
 }

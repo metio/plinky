@@ -29,6 +29,15 @@ corde = "corde"
 # "gamme" is French for a scale, quoted in the README and NEWS as an example of a
 # piece being named in the reader's own language.
 gamme = "gamme"
+# Pease — Alfred Humphries Pease, the public-domain composer whose credit the person
+# aliases map to his full name.
+pease = "pease"
+# "Worte" is German for "words", and "Musik" for music: harvested song credits label
+# the two halves ("Worte & Musik: …"), which core/person strips to find the composer.
+worte = "worte"
+# "tradicional" is the Spanish and Portuguese spelling of "traditional" — a marker in
+# the corpora that names a tradition rather than a person.
+tradicional = "tradicional"
 # "ist" is German ("is"), kept verbatim in the machine-translation notice's prevail
 # clause "maßgeblich ist die deutsche Fassung", which every translated legal page —
 # including the checked English base — carries word for word.

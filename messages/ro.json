@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "Luna aceasta ai cântat {days} zile, cu {more} mai multe decât luna trecută.",
     "stats_opening_first": "Primele tale zile la clape — de aici începe.",
     "help_text_stats": "Singura ta pagină de progres. Arată treapta pe care ești din cele opt și ce mai e până la următoarea, nivelul tău, zilele de exercițiu și sunetele cântate, o amprentă cu mișcare lentă alcătuită din acuratețe, timp și cursivitate, precum și piesele de reluat, cu o sesiune dintr-o atingere.\n\nMai găsești acolo Află-ți nivelul, testul de plasare; sunetele pe care le găsești cel mai greu, adică pumnul acela care te încetinește de fiecare dată; Exercițiul tău, un jurnal adunat pe o săptămână, o lună, trei luni sau un an, cu o grilă în nuanțe care arată unde s-a dus exercițiul, unde poți adăuga minute notate de mână și descărca jurnalul ca foaie de calcul; Pe pupitru, la ce lucrezi și în ce etapă e fiecare piesă — învățare, așezare, șlefuire, întreținere; și Realizările, fiecare treaptă și fiecare insignă câștigate, cu cele necâștigate arătate drept ținte.\n\nGolurile nu sunt o problemă. Plinky nu numără serii și nu îți reproșează niciodată o zi sărită: o săptămână liniștită este pur și simplu desenată ca o săptămână liniștită.",
-    "help_shot_stats": "progresul tău"
+    "help_shot_stats": "progresul tău",
+    "warmup_card_title": "Înainte să cânți",
+    "warmup_card_hint": "Încălzește-te pe notele pe care le cere piesa.",
+    "warmup_card_notes": "{notes} de găsit. Cântă gama care le folosește, apoi întoarce-te.",
+    "warmup_card_white": "Numai clape albe. Cântă gama ca să-ți așezi mâna, apoi întoarce-te.",
+    "warmup_back": "Înapoi la {title}"
 }

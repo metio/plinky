@@ -1303,5 +1303,10 @@
     "stats_opening_days_more": "You played on {days} days this month, {more} more than last month.",
     "stats_opening_first": "Your first days at the keys — this is where it starts.",
     "help_text_stats": "Your one progress page. It shows the grade you are at on the eight-grade ladder and what is left to reach the next, your skill rating, days practised and notes played, a slow-moving fingerprint of your accuracy, timing and flow, and the pieces due for review with a one-tap session.\n\nYou will also find Find your level, the placement test; the notes you take longest to find, which names the handful that consistently slow you down; Your practice, a diary rolled up over a week, a month, three months or a year with a shading grid showing where the practice went, where you can add hand-logged minutes and download the log as a spreadsheet; On the music stand, what you are working on and each piece's stage — learning, settling in, polishing, keeping it; and Achievements, every grade and badge you have earned, with the unearned ones shown as goals.\n\nGaps are fine. Plinky never counts streaks and never reproaches a missed day: a quiet week is simply drawn as a quiet week.",
-    "help_shot_stats": "A screenshot of your progress"
+    "help_shot_stats": "A screenshot of your progress",
+    "warmup_card_title": "Before you play",
+    "warmup_card_hint": "Warm up on the notes this piece asks for.",
+    "warmup_card_notes": "{notes} to find. Play the scale that uses them, then come back.",
+    "warmup_card_white": "Nothing but white keys. Play the scale to settle your hand, then come back.",
+    "warmup_back": "Back to {title}"
 }

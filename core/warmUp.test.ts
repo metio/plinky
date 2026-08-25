@@ -32,15 +32,25 @@ describe("warmUpFor", () => {
         const warm = warmUpFor({ fifths: -3, minor: false, isExercise: false });
         expect(warm).not.toBeNull();
         expect(warm?.key).toBe("eflat");
-        expect(warm?.accidentals).toBe(3);
+        expect(warm?.accidentals).toEqual(["B♭", "E♭", "A♭"]);
         expect(warm?.exercise.type).toBe("major-scale");
     });
 
-    it("counts flats as a count, not as a negative number", () => {
-        // The sentence says "three flats". A signature of -3 rendered raw would say
-        // "-3 flats", which is the kind of thing that ships.
-        expect(warmUpFor({ fifths: -5, minor: false, isExercise: false })?.accidentals).toBe(5);
-        expect(warmUpFor({ fifths: 5, minor: false, isExercise: false })?.accidentals).toBe(5);
+    it("names the black keys, in the order a signature writes them", () => {
+        // Two flats is always B♭ then E♭ and never another pair, so the offer can say which
+        // notes to go and find rather than only how many there are.
+        expect(warmUpFor({ fifths: -2, minor: false, isExercise: false })?.accidentals).toEqual([
+            "B♭",
+            "E♭",
+        ]);
+        expect(warmUpFor({ fifths: 3, minor: false, isExercise: false })?.accidentals).toEqual([
+            "F♯",
+            "C♯",
+            "G♯",
+        ]);
+        // C major asks for none, and an offer with nothing to place still teaches the
+        // shape of the scale.
+        expect(warmUpFor({ fifths: 0, minor: false, isExercise: false })?.accidentals).toEqual([]);
     });
 
     it("names the minor scale the signature actually writes", () => {
