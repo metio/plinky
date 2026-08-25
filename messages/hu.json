@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "még nincs itt — a következő darabbal érkezik",
     "settings_grand_piano_on_device": "Ezen az eszközön",
     "settings_grand_piano_of_pack": "{held} / {total}",
-    "settings_grand_piano_ready": "Most játszható",
+    "settings_grand_piano_ready": "Ebben a munkamenetben betöltve",
     "settings_grand_piano_fetch_all": "Összes letöltése",
     "settings_grand_piano_fetching": "Letöltés…",
     "settings_grand_piano_fetch_all_help": "A felvételek maguktól megérkeznek játék közben. Töltsd le mindet, ha hamarosan hálózat nélkül maradsz — nagyjából 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Melegíts be azokon a hangokon, amelyeket a darab kér.",
     "warmup_card_notes": "{notes} megtalálandó. Játszd le a skálát, amely használja őket, aztán gyere vissza.",
     "warmup_card_white": "Csak fehér billentyűk. Játszd le a skálát, hogy a kéz elhelyezkedjen, aztán gyere vissza.",
-    "warmup_back": "Vissza: {title}"
+    "warmup_back": "Vissza: {title}",
+    "settings_grand_piano_ready_hint": "A felvételek akkor töltődnek be, amikor egy darab kéri őket, így ez minden látogatáskor nulláról indul és játék közben nő. Az számít, ami az eszközön van — az azonnal betöltődik."
 }

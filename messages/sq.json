@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "ende s'ka ardhur — vjen me copën tënde të radhës",
     "settings_grand_piano_on_device": "Në këtë pajisje",
     "settings_grand_piano_of_pack": "{held} nga {total}",
-    "settings_grand_piano_ready": "Gati për t’u luajtur",
+    "settings_grand_piano_ready": "Të ngarkuara këtë herë",
     "settings_grand_piano_fetch_all": "Shkarko të gjitha tani",
     "settings_grand_piano_fetching": "Po shkarkohet…",
     "settings_grand_piano_fetch_all_help": "Regjistrimet vijnë vetë ndërsa luan. Shkarkoji të gjitha nëse së shpejti do të jesh pa rrjet — rreth 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Ngroh duart me notat që kërkon kjo pjesë.",
     "warmup_card_notes": "{notes} për t'u gjetur. Luaj shkallën që i përdor, pastaj kthehu.",
     "warmup_card_white": "Vetëm taste të bardha. Luaj shkallën që dora të vendoset, pastaj kthehu.",
-    "warmup_back": "Kthehu te {title}"
+    "warmup_back": "Kthehu te {title}",
+    "settings_grand_piano_ready_hint": "Regjistrimet ngarkohen kur një pjesë i kërkon, prandaj numri nis nga zeroja çdo herë dhe rritet ndërsa luan. Rëndësi ka çfarë ndodhet në pajisje — ato ngarkohen menjëherë."
 }

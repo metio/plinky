@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "还没到——会随你的下一首曲子一起来",
     "settings_grand_piano_on_device": "本设备上",
     "settings_grand_piano_of_pack": "{total} 个中的 {held} 个",
-    "settings_grand_piano_ready": "现在可发声",
+    "settings_grand_piano_ready": "本次访问已载入",
     "settings_grand_piano_fetch_all": "立即全部下载",
     "settings_grand_piano_fetching": "下载中…",
     "settings_grand_piano_fetch_all_help": "录音会在你弹奏时自动到达。若即将没有网络，可以先全部下载 — 约 85 MB。",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "用这首曲子要用到的音热身。",
     "warmup_card_notes": "要找的是 {notes}。弹一遍用到它们的音阶，然后回来。",
     "warmup_card_white": "全是白键。弹一遍音阶让手安定下来，然后回来。",
-    "warmup_back": "返回《{title}》"
+    "warmup_back": "返回《{title}》",
+    "settings_grand_piano_ready_hint": "录音在乐曲需要时才载入，所以每次访问都从零开始，随着弹奏增加。真正重要的是设备上的数量 —— 那些会立即载入。"
 }

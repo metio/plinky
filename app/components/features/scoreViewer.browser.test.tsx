@@ -1145,6 +1145,44 @@ describe("ScoreViewer", () => {
         expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy();
     });
 
+    it("clears what the last pass painted when a loop comes round", async () => {
+        // The colour on the score means "how far you have got". Looping the same bars used
+        // to leave the first pass's green in place, so the second one began already
+        // finished and the trail meant nothing in the one place a reader leans on it most.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // One bar of four C5s, looped to itself: playing four notes completes a lap.
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        const { container } = mount(phrase, {
+            beatsPerBar: 4,
+            options: { loop: { from: 1, to: 1 } },
+        });
+        fireEvent.click(await awaitReady());
+        const key = await screen.findByLabelText("C 5");
+        const press = () => {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        };
+
+        // Part way through: the notes played so far are green.
+        press();
+        press();
+        await waitFor(
+            () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
+            { timeout: 30000 },
+        );
+
+        // Finishing the bar laps it, and the slate is clean for the next pass.
+        press();
+        press();
+        await waitFor(
+            () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeNull(),
+            { timeout: 30000 },
+        );
+    });
+
     it("plays a grand staff back, sounding both hands", async () => {
         // A two-hand phrase feeds both staves' notes into one playback step. When the
         // hands hold notes of different lengths the step must advance at the next onset

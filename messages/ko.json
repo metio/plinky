@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "아직 없습니다 — 다음 곡과 함께 도착합니다",
     "settings_grand_piano_on_device": "이 기기에 있는 수",
     "settings_grand_piano_of_pack": "{total}개 중 {held}개",
-    "settings_grand_piano_ready": "지금 연주 가능",
+    "settings_grand_piano_ready": "이번 방문에 불러온 수",
     "settings_grand_piano_fetch_all": "지금 전부 받기",
     "settings_grand_piano_fetching": "받는 중…",
     "settings_grand_piano_fetch_all_help": "녹음은 연주하는 동안 저절로 도착합니다. 곧 네트워크가 없는 곳에 간다면 전부 받아 두세요 — 약 85 MB입니다.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "이 곡이 요구하는 음으로 손을 풀어 보세요.",
     "warmup_card_notes": "찾을 음은 {notes}. 그 음을 쓰는 음계를 치고 돌아오세요.",
     "warmup_card_white": "흰건반뿐입니다. 손이 자리 잡도록 음계를 치고 돌아오세요.",
-    "warmup_back": "{title}(으)로 돌아가기"
+    "warmup_back": "{title}(으)로 돌아가기",
+    "settings_grand_piano_ready_hint": "녹음은 곡이 필요로 할 때 불러옵니다. 방문할 때마다 0에서 시작해 연주하는 동안 늘어납니다. 중요한 것은 기기에 있는 수이고, 그것들은 즉시 불러옵니다."
 }

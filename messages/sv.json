@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "inte här än — kommer med nästa stycke",
     "settings_grand_piano_on_device": "På den här enheten",
     "settings_grand_piano_of_pack": "{held} av {total}",
-    "settings_grand_piano_ready": "Redo att spela nu",
+    "settings_grand_piano_ready": "Laddat detta besök",
     "settings_grand_piano_fetch_all": "Hämta alla nu",
     "settings_grand_piano_fetching": "Hämtar…",
     "settings_grand_piano_fetch_all_help": "Inspelningarna kommer av sig själva medan du spelar. Hämta alla om du snart är utan nät — det är ungefär 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Värm upp på tonerna stycket ber om.",
     "warmup_card_notes": "{notes} att hitta. Spela skalan med dem och kom sedan tillbaka.",
     "warmup_card_white": "Bara vita tangenter. Spela skalan så handen sätter sig, och kom sedan tillbaka.",
-    "warmup_back": "Tillbaka till {title}"
+    "warmup_back": "Tillbaka till {title}",
+    "settings_grand_piano_ready_hint": "Inspelningar laddas när ett stycke ber om dem, så siffran börjar på noll varje besök och växer medan du spelar. Det som finns på enheten är det som räknas — det laddas direkt."
 }

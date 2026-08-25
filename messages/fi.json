@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "ei vielä täällä — tulee seuraavan kappaleen mukana",
     "settings_grand_piano_on_device": "Tällä laitteella",
     "settings_grand_piano_of_pack": "{held}/{total}",
-    "settings_grand_piano_ready": "Valmiina soimaan",
+    "settings_grand_piano_ready": "Ladattu tällä kerralla",
     "settings_grand_piano_fetch_all": "Lataa kaikki nyt",
     "settings_grand_piano_fetching": "Ladataan…",
     "settings_grand_piano_fetch_all_help": "Äänitteet saapuvat itsestään soittaessasi. Lataa kaikki, jos olet pian ilman verkkoa — kokoa noin 85 Mt.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Lämmittele niillä sävelillä, joita kappale pyytää.",
     "warmup_card_notes": "{notes} löydettävänä. Soita asteikko niillä ja palaa sitten.",
     "warmup_card_white": "Pelkkiä valkoisia koskettimia. Soita asteikko, niin käsi asettuu, ja palaa sitten.",
-    "warmup_back": "Takaisin: {title}"
+    "warmup_back": "Takaisin: {title}",
+    "settings_grand_piano_ready_hint": "Äänitteet ladataan vasta kun kappale pyytää niitä, joten luku alkaa joka kerta nollasta ja kasvaa soittaessasi. Merkitystä on sillä, mitä laitteella on — se latautuu heti."
 }

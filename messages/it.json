@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "non c'è ancora — arriverà col prossimo brano",
     "settings_grand_piano_on_device": "Su questo dispositivo",
     "settings_grand_piano_of_pack": "{held} di {total}",
-    "settings_grand_piano_ready": "Pronte a suonare",
+    "settings_grand_piano_ready": "Caricate in questa visita",
     "settings_grand_piano_fetch_all": "Scarica tutte ora",
     "settings_grand_piano_fetching": "Download in corso…",
     "settings_grand_piano_fetch_all_help": "Le registrazioni arrivano da sole mentre suoni. Scaricale tutte se stai per restare senza rete — sono circa 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Scaldati sulle note che questo brano chiede.",
     "warmup_card_notes": "{notes} da trovare. Suona la scala che le usa, poi torna qui.",
     "warmup_card_white": "Solo tasti bianchi. Suona la scala per assestare la mano, poi torna qui.",
-    "warmup_back": "Torna a {title}"
+    "warmup_back": "Torna a {title}",
+    "settings_grand_piano_ready_hint": "Le registrazioni si caricano quando un brano le chiede, quindi il numero riparte da zero a ogni visita e sale mentre suoni. Conta quello che è sul dispositivo: quello si carica subito."
 }

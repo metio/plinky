@@ -14,6 +14,7 @@ import { annotateFingerings } from "../lib/fingerScore";
 import {
     collectMeasureBoxes,
     restoreNotePaint,
+    clearAllHalos,
     scoreSvg,
     snapshotNotePaint,
 } from "../lib/scoreColor";
@@ -49,6 +50,9 @@ export type OsmdScore = {
     // window), so the next run re-renders to wipe it only when there is something to clear.
     markPainted: () => void;
     painted: () => boolean;
+    // Take the feedback halos off without re-rendering — what a section loop wants when it
+    // comes round, where a re-render would pull the score out from under the run.
+    clearPaint: () => void;
     resetPaint: () => void;
     // Re-render to wipe the injected feedback halos, repainting the loop overlay too.
     wipePaint: () => void;
@@ -206,6 +210,18 @@ export function useOsmdScore(
     // overlay injected into it — the loop's selection rects — and the version bump is what
     // tells their owner (useLoopSelection) to repaint them. Callers that render directly to
     // clear stale halos must go through this, or the loop overlay silently vanishes.
+    // Lift the feedback halos and nothing else. wipePaint below re-renders, which is right
+    // between runs and wrong during one: a fresh render replaces the very note elements a
+    // running match is holding on to. A halo is a separate injected element, so taking it
+    // away leaves the engraving — and the run — untouched.
+    const clearPaint = useCallback(() => {
+        const svg = scoreSvg(containerRef.current);
+        if (svg) {
+            clearAllHalos(svg);
+            paintedRef.current = false;
+        }
+    }, [containerRef]);
+
     const wipePaint = useCallback(() => {
         const osmd = osmdRef.current;
         if (!osmd) {
@@ -572,6 +588,7 @@ export function useOsmdScore(
         measureBoxes,
         centerCursor,
         markPainted,
+        clearPaint,
         painted,
         resetPaint,
         wipePaint,

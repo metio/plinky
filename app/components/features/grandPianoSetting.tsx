@@ -73,6 +73,13 @@ export function GrandPianoSetting() {
                         <dt className="text-muted">{m.settings_grand_piano_ready()}</dt>
                         <dd className="text-right tabular-nums text-body">{state.ready}</dd>
                     </dl>
+                    {/* The two figures count different things and the second one used to
+                        read as a fault: a device holding all 637 recordings still showed
+                        "43 ready", which sounds like 594 of them failed. They did not — a
+                        recording is decoded when a piece asks for it, and decoded audio
+                        does not outlive the tab while the cache does. Saying so is cheaper
+                        than the panel being right and unbelievable. */}
+                    <p className="text-xs text-muted">{m.settings_grand_piano_ready_hint()}</p>
                     <div className="flex flex-wrap items-center gap-2">
                         <Button
                             onClick={() => {

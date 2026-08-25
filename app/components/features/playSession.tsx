@@ -431,6 +431,7 @@ function usePlaySessionValue({
         measureBoxes,
         centerCursor,
         markPainted,
+        clearPaint,
     } = score;
 
     // The hand the run drills. A single-staff piece has no hand to choose — the selector
@@ -581,6 +582,16 @@ function usePlaySessionValue({
         hand,
         marks,
         forgiving: aids.forgiving,
+        // A loop coming round again clears what the last pass drew. Without it the second
+        // time through the same bars is already green from the first, so the colour stops
+        // showing where you are and the loop — the one place a reader most needs that —
+        // is where it helps least.
+        //
+        // The halos are lifted straight off the SVG rather than through wipePaint, which
+        // re-renders: a fresh render mid-run would replace the very note elements the run
+        // is holding on to. Anything else that paints — a ghost, a keep-up window — draws
+        // again on its own next tick.
+        onLap: clearPaint,
         onCorrect: (info: CorrectInfo) => {
             // Skip the note-echo under mic input — you hear your own piano.
             if (!micListening) {

@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "încă nu e aici — vine cu următoarea piesă",
     "settings_grand_piano_on_device": "Pe acest dispozitiv",
     "settings_grand_piano_of_pack": "{held} din {total}",
-    "settings_grand_piano_ready": "Gata de cântat",
+    "settings_grand_piano_ready": "Încărcate în această vizită",
     "settings_grand_piano_fetch_all": "Descarcă tot acum",
     "settings_grand_piano_fetching": "Se descarcă…",
     "settings_grand_piano_fetch_all_help": "Înregistrările vin singure în timp ce cânți. Descarcă-le pe toate dacă urmează să rămâi fără rețea — sunt circa 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Încălzește-te pe notele pe care le cere piesa.",
     "warmup_card_notes": "{notes} de găsit. Cântă gama care le folosește, apoi întoarce-te.",
     "warmup_card_white": "Numai clape albe. Cântă gama ca să-ți așezi mâna, apoi întoarce-te.",
-    "warmup_back": "Înapoi la {title}"
+    "warmup_back": "Înapoi la {title}",
+    "settings_grand_piano_ready_hint": "Înregistrările se încarcă atunci când o piesă le cere, așa că numărul pornește de la zero la fiecare vizită și crește în timp ce cânți. Contează ce se află pe dispozitiv — acelea se încarcă imediat."
 }

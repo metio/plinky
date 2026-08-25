@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "δεν είναι ακόμη εδώ — θα έρθει με το επόμενο κομμάτι",
     "settings_grand_piano_on_device": "Σε αυτή τη συσκευή",
     "settings_grand_piano_of_pack": "{held} από {total}",
-    "settings_grand_piano_ready": "Έτοιμες να παίξουν",
+    "settings_grand_piano_ready": "Φορτώθηκαν σε αυτή την επίσκεψη",
     "settings_grand_piano_fetch_all": "Λήψη όλων τώρα",
     "settings_grand_piano_fetching": "Γίνεται λήψη…",
     "settings_grand_piano_fetch_all_help": "Οι ηχογραφήσεις έρχονται μόνες τους καθώς παίζεις. Κατέβασέ τις όλες αν πρόκειται να μείνεις χωρίς δίκτυο — περίπου 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Ζεστάσου στις νότες που ζητά αυτό το κομμάτι.",
     "warmup_card_notes": "{notes} να βρεις. Παίξε την κλίμακα που τις χρησιμοποιεί και γύρνα πίσω.",
     "warmup_card_white": "Μόνο άσπρα πλήκτρα. Παίξε την κλίμακα για να στρώσει το χέρι και γύρνα πίσω.",
-    "warmup_back": "Πίσω στο {title}"
+    "warmup_back": "Πίσω στο {title}",
+    "settings_grand_piano_ready_hint": "Οι ηχογραφήσεις φορτώνονται όταν τις ζητήσει ένα κομμάτι, οπότε ο αριθμός ξεκινά από το μηδέν κάθε φορά και ανεβαίνει καθώς παίζεις. Σημασία έχει τι υπάρχει στη συσκευή — αυτά φορτώνουν αμέσως."
 }

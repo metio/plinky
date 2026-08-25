@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "henüz burada değil — bir sonraki parçanla gelir",
     "settings_grand_piano_on_device": "Bu cihazda",
     "settings_grand_piano_of_pack": "{total} kayıttan {held}",
-    "settings_grand_piano_ready": "Şimdi çalmaya hazır",
+    "settings_grand_piano_ready": "Bu ziyarette yüklenen",
     "settings_grand_piano_fetch_all": "Hepsini şimdi indir",
     "settings_grand_piano_fetching": "İndiriliyor…",
     "settings_grand_piano_fetch_all_help": "Kayıtlar sen çalarken kendiliğinden gelir. Yakında ağsız kalacaksan hepsini indir — yaklaşık 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Bu parçanın istediği notalarla ısın.",
     "warmup_card_notes": "Bulunacak {notes}. Onları kullanan diziyi çal, sonra geri dön.",
     "warmup_card_white": "Yalnızca beyaz tuşlar. Elin yerleşsin diye diziyi çal, sonra geri dön.",
-    "warmup_back": "{title} parçasına dön"
+    "warmup_back": "{title} parçasına dön",
+    "settings_grand_piano_ready_hint": "Kayıtlar bir parça istediğinde yüklenir, bu yüzden sayı her ziyarette sıfırdan başlar ve sen çaldıkça artar. Önemli olan cihazda ne olduğudur — onlar anında yüklenir."
 }

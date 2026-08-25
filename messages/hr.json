@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "još nije tu — stiže sa sljedećom skladbom",
     "settings_grand_piano_on_device": "Na ovom uređaju",
     "settings_grand_piano_of_pack": "{held} od {total}",
-    "settings_grand_piano_ready": "Spremno za sviranje",
+    "settings_grand_piano_ready": "Učitano u ovom posjetu",
     "settings_grand_piano_fetch_all": "Preuzmi sve sada",
     "settings_grand_piano_fetching": "Preuzimanje…",
     "settings_grand_piano_fetch_all_help": "Snimke stižu same dok sviraš. Preuzmi ih sve ako uskoro ostaješ bez mreže — oko 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Zagrij se na tonovima koje skladba traži.",
     "warmup_card_notes": "{notes} za pronaći. Odsviraj ljestvicu koja ih koristi pa se vrati.",
     "warmup_card_white": "Samo bijele tipke. Odsviraj ljestvicu da ruka sjedne pa se vrati.",
-    "warmup_back": "Natrag na {title}"
+    "warmup_back": "Natrag na {title}",
+    "settings_grand_piano_ready_hint": "Snimke se učitavaju kad ih skladba zatraži, pa broj svaki put kreće od nule i raste dok sviraš. Važno je ono što je na uređaju — to se učita odmah."
 }

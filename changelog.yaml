@@ -4,6 +4,16 @@
 - date: 2026-08-23
   entries:
     - |-
+      **Looping a passage now wipes the colour each time round.** The green trail shows how
+      far you have got, and on a loop it used to still be there from the pass before — so
+      the second time through, the bars were already coloured and told you nothing. Each
+      pass starts clean.
+    - |-
+      **The recorded-piano panel explains its second number.** Having all 637 recordings on
+      the device while it said "43 ready to play" read like something had gone wrong.
+      Nothing had: recordings load as a piece asks for them, and that count starts from
+      nothing each visit. It now says so.
+    - |-
       **A piece now offers you the scale it is built from.** Under the music, before you
       start: which black keys this piece will ask for, named, and the scale that puts them
       under your hand. Play it, and the link brings you straight back to the piece. It is an

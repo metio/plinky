@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "aún no está — llegará con tu próxima pieza",
     "settings_grand_piano_on_device": "En este dispositivo",
     "settings_grand_piano_of_pack": "{held} de {total}",
-    "settings_grand_piano_ready": "Listas para sonar",
+    "settings_grand_piano_ready": "Cargadas en esta visita",
     "settings_grand_piano_fetch_all": "Descargar todas",
     "settings_grand_piano_fetching": "Descargando…",
     "settings_grand_piano_fetch_all_help": "Las grabaciones llegan solas mientras tocas. Descárgalas todas si vas a quedarte sin red — son unos 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Calienta con las notas que pide esta pieza.",
     "warmup_card_notes": "{notes} que encontrar. Toca la escala que las usa y vuelve.",
     "warmup_card_white": "Solo teclas blancas. Toca la escala para asentar la mano y vuelve.",
-    "warmup_back": "Volver a {title}"
+    "warmup_back": "Volver a {title}",
+    "settings_grand_piano_ready_hint": "Las grabaciones se cargan cuando una pieza las pide, así que esto empieza en cero cada visita y sube mientras tocas. Lo que importa es lo que hay en el dispositivo: eso se carga al instante."
 }

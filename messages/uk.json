@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "ще немає — прийде з наступною п'єсою",
     "settings_grand_piano_on_device": "На цьому пристрої",
     "settings_grand_piano_of_pack": "{held} з {total}",
-    "settings_grand_piano_ready": "Готові звучати",
+    "settings_grand_piano_ready": "Завантажено за цей візит",
     "settings_grand_piano_fetch_all": "Завантажити всі",
     "settings_grand_piano_fetching": "Завантаження…",
     "settings_grand_piano_fetch_all_help": "Записи надходять самі, поки ви граєте. Завантажте всі, якщо невдовзі залишитеся без мережі — це близько 85 МБ.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Розігрійтеся на тих нотах, яких просить п'єса.",
     "warmup_card_notes": "{notes} — їх треба знайти. Зіграйте гаму з ними й повертайтеся.",
     "warmup_card_white": "Лише білі клавіші. Зіграйте гаму, щоб рука лягла, і повертайтеся.",
-    "warmup_back": "Назад до «{title}»"
+    "warmup_back": "Назад до «{title}»",
+    "settings_grand_piano_ready_hint": "Записи завантажуються, коли їх просить п'єса, тож лік починається з нуля щовізиту й зростає, поки ви граєте. Важливо те, що є на пристрої, — воно завантажується миттєво."
 }

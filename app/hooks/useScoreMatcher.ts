@@ -433,6 +433,11 @@ export function useScoreMatcher(
     getOsmd: () => OpenSheetMusicDisplay | null,
     options: {
         onCorrect?: (info: CorrectInfo) => void;
+        // A section loop has come round again. The run's own state rewinds here, but what
+        // the run DREW on the score does not — so the second pass over the same bars starts
+        // already coloured green and the trail stops meaning "how far you have got". The
+        // surface owns the paint, so it is told rather than reached into.
+        onLap?: () => void;
         // A wrong note at a position: its whole-piece step index and how many wrong
         // attempts that position has absorbed so far (1 on the first slip) — what a
         // tries budget compares against.
@@ -696,6 +701,9 @@ export function useScoreMatcher(
                 seekCursorTo(osmd, runHandRef.current, runStepsRef.current[0]!.whole);
                 setDone(0);
                 setMissedHere(false);
+                // Wipe the lap that has just ended, so the bars ahead read as unplayed
+                // again. Announced rather than done here: the halos belong to the surface.
+                optionsRef.current.onLap?.();
                 publish(fresh);
                 return;
             }

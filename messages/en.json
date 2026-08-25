@@ -489,7 +489,7 @@
     "settings_grand_piano_offline": "not here yet — it arrives with your next piece",
     "settings_grand_piano_on_device": "On this device",
     "settings_grand_piano_of_pack": "{held} of {total}",
-    "settings_grand_piano_ready": "Ready to play now",
+    "settings_grand_piano_ready": "Loaded this visit",
     "settings_grand_piano_fetch_all": "Download all now",
     "settings_grand_piano_fetching": "Downloading…",
     "settings_grand_piano_fetch_all_help": "The recordings arrive on their own as you play. Download them all if you are about to be somewhere without a network — it is about 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Warm up on the notes this piece asks for.",
     "warmup_card_notes": "{notes} to find. Play the scale that uses them, then come back.",
     "warmup_card_white": "Nothing but white keys. Play the scale to settle your hand, then come back.",
-    "warmup_back": "Back to {title}"
+    "warmup_back": "Back to {title}",
+    "settings_grand_piano_ready_hint": "Recordings are decoded as a piece asks for them, so this starts at nothing each visit and climbs while you play. What is on the device is what matters — those load instantly."
 }

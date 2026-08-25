@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "nog niet hier — komt met je volgende stuk",
     "settings_grand_piano_on_device": "Op dit apparaat",
     "settings_grand_piano_of_pack": "{held} van {total}",
-    "settings_grand_piano_ready": "Nu speelklaar",
+    "settings_grand_piano_ready": "Deze sessie geladen",
     "settings_grand_piano_fetch_all": "Alles nu downloaden",
     "settings_grand_piano_fetching": "Bezig met downloaden…",
     "settings_grand_piano_fetch_all_help": "De opnamen komen vanzelf terwijl je speelt. Download ze allemaal als je zo zonder netwerk zit — het is ongeveer 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Warm op met de noten die dit stuk vraagt.",
     "warmup_card_notes": "{notes} te vinden. Speel de toonladder ermee en kom dan terug.",
     "warmup_card_white": "Alleen witte toetsen. Speel de toonladder om je hand te laten wennen en kom dan terug.",
-    "warmup_back": "Terug naar {title}"
+    "warmup_back": "Terug naar {title}",
+    "settings_grand_piano_ready_hint": "Opnamen worden pas geladen als een stuk erom vraagt, dus dit begint elk bezoek op nul en loopt op terwijl je speelt. Wat op het apparaat staat telt — dat laadt meteen."
 }

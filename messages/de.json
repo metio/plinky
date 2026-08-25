@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "noch nicht da — kommt mit deinem nächsten Stück",
     "settings_grand_piano_on_device": "Auf diesem Gerät",
     "settings_grand_piano_of_pack": "{held} von {total}",
-    "settings_grand_piano_ready": "Jetzt spielbereit",
+    "settings_grand_piano_ready": "In dieser Sitzung geladen",
     "settings_grand_piano_fetch_all": "Alle jetzt laden",
     "settings_grand_piano_fetching": "Wird geladen…",
     "settings_grand_piano_fetch_all_help": "Die Aufnahmen kommen beim Spielen von selbst. Lade alle, wenn du gleich ohne Netz unterwegs bist – es sind etwa 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Wärm dich mit den Tönen auf, die dieses Stück braucht.",
     "warmup_card_notes": "{notes} sind zu finden. Spiel die Tonleiter damit und komm dann zurück.",
     "warmup_card_white": "Nur weiße Tasten. Spiel die Tonleiter, damit die Hand sitzt, und komm dann zurück.",
-    "warmup_back": "Zurück zu {title}"
+    "warmup_back": "Zurück zu {title}",
+    "settings_grand_piano_ready_hint": "Aufnahmen werden erst geladen, wenn ein Stück sie braucht. Die Zahl beginnt bei jedem Besuch bei null und wächst beim Spielen. Entscheidend ist, was auf dem Gerät liegt – das lädt sofort."
 }

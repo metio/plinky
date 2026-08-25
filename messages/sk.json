@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "ešte tu nie je — príde s ďalšou skladbou",
     "settings_grand_piano_on_device": "V tomto zariadení",
     "settings_grand_piano_of_pack": "{held} z {total}",
-    "settings_grand_piano_ready": "Pripravené hrať",
+    "settings_grand_piano_ready": "Načítané pri tejto návšteve",
     "settings_grand_piano_fetch_all": "Stiahnuť všetko",
     "settings_grand_piano_fetching": "Sťahuje sa…",
     "settings_grand_piano_fetch_all_help": "Nahrávky prichádzajú samy počas hrania. Stiahni všetky, ak budeš čoskoro bez siete — je to asi 85 MB.",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "Rozohraj sa na tónoch, ktoré skladba potrebuje.",
     "warmup_card_notes": "{notes} na nájdenie. Zahraj stupnicu, ktorá ich používa, a vráť sa.",
     "warmup_card_white": "Len biele klávesy. Zahraj stupnicu, nech ruka sadne, a vráť sa.",
-    "warmup_back": "Späť na {title}"
+    "warmup_back": "Späť na {title}",
+    "settings_grand_piano_ready_hint": "Nahrávky sa načítajú, keď si ich skladba vyžiada, takže číslo začína pri každej návšteve na nule a rastie počas hrania. Dôležité je, čo je v zariadení — to sa načíta okamžite."
 }

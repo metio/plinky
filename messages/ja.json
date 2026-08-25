@@ -366,7 +366,7 @@
     "settings_grand_piano_offline": "まだ届いていません — 次の曲と一緒に来ます",
     "settings_grand_piano_on_device": "この端末にある数",
     "settings_grand_piano_of_pack": "{total} 件中 {held} 件",
-    "settings_grand_piano_ready": "いま鳴らせる数",
+    "settings_grand_piano_ready": "今回読み込んだ数",
     "settings_grand_piano_fetch_all": "今すぐすべて取得",
     "settings_grand_piano_fetching": "取得中…",
     "settings_grand_piano_fetch_all_help": "録音は弾いているあいだに自動で届きます。ネットのない場所へ行く前なら、まとめて取得しておけます（約 85 MB）。",
@@ -1308,5 +1308,6 @@
     "warmup_card_hint": "この曲が求める音で指をならしましょう。",
     "warmup_card_notes": "探す音は {notes}。それを使う音階を弾いてから戻ってきてください。",
     "warmup_card_white": "白鍵だけです。手をなじませる音階を弾いてから戻ってきてください。",
-    "warmup_back": "{title} に戻る"
+    "warmup_back": "{title} に戻る",
+    "settings_grand_piano_ready_hint": "録音は曲が必要としたときに読み込まれます。訪れるたびにゼロから始まり、弾くうちに増えます。大事なのは端末にある数で、そちらはすぐ読み込まれます。"
 }
