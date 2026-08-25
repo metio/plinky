@@ -73,22 +73,16 @@ describe("the greeting following the clock", () => {
         expect(await screen.findByText(m.today_greeting_afternoon({ day }))).toBeTruthy();
 
         // Let every async load settle first, so what is counted below is the effect of
-        // crossing the hour and not of the page still arriving.
-        let settled = -1;
-        await vi
-            .waitFor(
-                () => {
-                    const now = catalogueMock.mock.calls.length;
-                    expect(now).toBe(settled);
-                    settled = now;
-                },
-                { timeout: 5000 },
-            )
-            .catch(() => {});
-        settled = catalogueMock.mock.calls.length;
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        const fetches = catalogueMock.mock.calls.length;
-        expect(fetches).toBe(settled);
+        // crossing the hour and not of the page still arriving. The count has to hold
+        // still across a gap, not merely be non-zero: a load in flight would otherwise
+        // land after the clock moves and read as a re-fetch the clock caused.
+        let fetches = -1;
+        await vi.waitFor(async () => {
+            const before = catalogueMock.mock.calls.length;
+            await new Promise((resolve) => setTimeout(resolve, 50));
+            expect(catalogueMock.mock.calls.length).toBe(before);
+            fetches = before;
+        });
         vi.setSystemTime(new Date(2026, 7, 25, 18, 0, 0, 0));
         await advanceScheduler(scheduler, 60 * 1000);
 
