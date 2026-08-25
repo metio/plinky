@@ -44,8 +44,13 @@ const YOUTUBE = process.argv.includes("--youtube");
 // and gives the whole height to the notation, which is what keeps the glyphs readable at
 // arm's length. Feed length rather than the full piece, because a Short is a feed.
 const SHORTS = process.argv.includes("--shorts");
-const WIDTH = YOUTUBE ? 1920 : SIZE;
-const HEIGHT = YOUTUBE ? 1080 : SHORTS ? Math.round((SIZE * 16) / 9) : SIZE;
+// H.264 encodes in 4:2:0, where each chroma sample covers two pixels each way, so both
+// sides have to be even. The defaults are; an odd --size is not, and the portrait height
+// derived from one is odd for its own reasons — 500 gives 889. Rounding down by one is
+// invisible and the alternative is an encoder that refuses the frame.
+const even = (value) => value - (value % 2);
+const WIDTH = even(YOUTUBE ? 1920 : SIZE);
+const HEIGHT = even(YOUTUBE ? 1080 : SHORTS ? Math.round((SIZE * 16) / 9) : SIZE);
 // The falling-notes highway is continuous motion, so frames are where its quality lives.
 // 60 is the ceiling rather than a preference: core/videoEncoding.ts tops out at H.264
 // level 4.2, which covers 1080p60 exactly and nothing beyond it — a limit chosen so an
