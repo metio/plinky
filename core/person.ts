@@ -205,6 +205,14 @@ const ALIASES: Record<string, string> = {
     // composer, so this fixes the spelling without merging the two.
     "alessandro scarlatti": "Alessandro Scarlatti",
 
+    // Initials whose owner the piece itself names: Köhler's Op. 93 is his flute method,
+    // Carcassi's Op. 59 his guitar method, and Cavalleria rusticana is Mascagni's opera.
+    // Popper's credit carries his dates. None of these needed looking up anywhere else.
+    "d. popper": "David Popper",
+    "e. kohler": "Ernesto Köhler",
+    "m. carcassi": "Matteo Carcassi",
+    "p. mascagni": "Pietro Mascagni",
+
     // ---- A third pass, from comparing every page against every other by surname, by
     // containment and by edit distance rather than by eye. These are the ones a person
     // scrolling an alphabetical directory cannot see: the two spellings sort far apart, and
@@ -257,6 +265,12 @@ function cleaned(raw: string): string {
     // A bracketed aside ("[published as …]") is about the work or the pen name, not
     // the person, and would otherwise split one composer across two pages.
     name = name.replace(/\s*\[[^\]]*\]/g, "");
+    // When a credit was written, not by whom: "…, first published 1855", "…, words 18th c."
+    // That is provenance about the WORK, and it trails the tradition it belongs to. The
+    // date rule below takes the year and would leave ", first published" hanging on the end
+    // of the name, so the clause goes whole.
+    name = name.replace(/,\s*[^,]*(\b\d{4}\b|\d{1,2}(st|nd|rd|th)\s*c\b)[^,]*$/i, "");
+
     // A work number appended to the credit ("… Opus 100.", "Op.11.No.1") names the
     // piece, not its composer — so it and everything after it goes. But only when a
     // name survives in front of it: some corpora write the work number FIRST
@@ -289,11 +303,13 @@ function cleaned(raw: string): string {
         name = withoutWork;
     }
     name = name.replace(/[\s,]*\d{4}\s*[-–—]?\s*(\d{4})?\s*$/g, "");
-    // When a credit was written, not by whom: "…, first published 1855", "…, words 18th c."
-    // That is provenance about the WORK, and it trails the tradition it belongs to. The
-    // date rule below takes the year and would leave ", first published" hanging on the end
-    // of the name, so the clause goes whole.
-    name = name.replace(/,\s*[^,]*(\b\d{4}\b|\d{1,2}(st|nd|rd|th)\s*c\b)[^,]*$/i, "");
+    // Who arranged it, which is not who wrote it. The parenthesised form is already
+    // handled; this is the one that arrives welded to the name because the dates between
+    // them were stripped — "Gioachino Rossini (1792-1868)arr. E Muirhead".
+    name = name.replace(
+        /\s*\b(arr|arrs|arranged|arrangement|transcr|transcribed|ed)\b\.?\s+(by\s+)?.*$/i,
+        "",
+    );
 
     // "Bach, Johann Sebastian" reads as a surname first and is flipped back. A comma in
     // PROSE is not that, and flipping one scrambles the credit into broken English:
