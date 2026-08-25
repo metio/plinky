@@ -65,6 +65,25 @@ const MINOR_KEYS: Record<string, [string, number]> = {
     d: ["D", -1],
 };
 
+// The key slug for a written key signature, which is what a score carries: a number of
+// sharps (positive) or flats (negative), and whether the music is major or minor.
+//
+// The tables above map slug to signature, and this is the inverse. It exists because a
+// score says "three flats" and an exercise wants "eflat" — the same fact, written the two
+// different ways the two halves of the app already speak.
+//
+// Null outside the twelve keys each mode ships, which is what a signature of six sharps in
+// a major piece is: real, rare, and not something to answer with the wrong scale.
+export function keySlugFor(fifths: number, minor: boolean): string | null {
+    const table = minor ? MINOR_KEYS : MAJOR_KEYS;
+    for (const [slug, [, signature]] of Object.entries(table)) {
+        if (signature === fifths) {
+            return slug;
+        }
+    }
+    return null;
+}
+
 // A key slug as a musician writes it — "eflat" is E♭. Exported because a warm-up that
 // offers the next rung of the arcade should say which key it is about to ask for.
 export const keyName = (slug: string): string =>
