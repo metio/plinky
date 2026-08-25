@@ -13,10 +13,10 @@
 // page is a real, crawlable entity in the static HTML, and the piece list still fills
 // in from the manifest on the client exactly as before.
 //
-// Only the prerendered composers are listed, not all 542. Below the floor a page is
-// rendered on the client, where the manifest supplies the name anyway a moment later —
-// so an entry there would buy nothing and cost every visitor the bytes, since the
-// index ships in the person route's chunk.
+// Every composer the catalogue credits is listed. The index ships in the person route's
+// chunk, so each entry costs every visitor a few bytes — measured at about 8 KB gzipped
+// for the whole table, which is the price of every composer page being a real crawlable
+// document rather than only the well-represented ones.
 //
 // Derived, never hand-edited: the same canonicalisation the app uses at runtime
 // (core/person) is what runs here, so the index cannot disagree with the links that
@@ -38,12 +38,6 @@ function format(source: string): string {
 const SONGS = "public/songs/manifest.json";
 const EXERCISES = "public/exercises/manifest.json";
 const INDEX = "core/peopleIndex.ts";
-
-// A composer page listing one or two pieces is thin: little for a reader, little for a
-// crawler, and 601 of them multiplied by every locale is a build cost with nothing on
-// the other side of it. Below the floor a composer still has a working page — it is
-// simply rendered on the client like any other, rather than prerendered.
-export const PRERENDER_MIN_PIECES = 3;
 
 type CataloguePiece = { composer?: string };
 
@@ -103,9 +97,16 @@ export async function bakePeopleIndex(check: boolean): Promise<boolean> {
 
     // Sorted by slug so the generated file's diff shows what actually changed rather
     // than reshuffling on every catalogue import.
-    const sorted = [...index.entries()]
-        .filter(([, entry]) => entry.pieces >= PRERENDER_MIN_PIECES)
-        .sort(([left], [right]) => left.localeCompare(right));
+    // Every composer the catalogue credits, however few pieces they carry.
+    //
+    // There used to be a floor of three, on the reasoning that a one-piece page is thin for
+    // a reader and for a crawler alike. What that actually bought was a page whose
+    // behaviour depended on how many pieces its composer happened to have — prerendered
+    // above the line, client-rendered below it — which is a distinction nobody outside the
+    // build can see and everybody inside it has to remember. Merging the duplicate spellings
+    // also moved composers across the line in both directions, which is exactly the kind of
+    // invisible churn a threshold produces.
+    const sorted = [...index.entries()].sort(([left], [right]) => left.localeCompare(right));
     // Emitted the way the formatter would write it, because both gates read this file:
     // `songs:bake --check` compares it byte for byte against this string, and `lint` runs
     // the formatter over the tree. Compact JSON satisfies the first and fails the second,
@@ -136,8 +137,6 @@ export async function bakePeopleIndex(check: boolean): Promise<boolean> {
     }
 
     await writeFile(INDEX, baked);
-    console.log(
-        `Composer index: ${index.size} composers credited, ${sorted.length} with ${PRERENDER_MIN_PIECES}+ pieces (prerendered).`,
-    );
+    console.log(`Composer index: ${sorted.length} composers, every one prerendered.`);
     return true;
 }

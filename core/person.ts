@@ -96,6 +96,129 @@ const ALIASES: Record<string, string> = {
     "frederik kuhlau": "Friedrich Kuhlau",
     "by scott joplin": "Scott Joplin",
     "john philip sousa": "John Philip Sousa",
+    // ---- Found by walking every composer page in the shipped catalogue, 2026-08-25.
+    // Each of these owned a page of its own — most of them one piece deep, sitting a few
+    // rows from the composer they belong to in the same alphabetical directory.
+
+    // Initials and short forms the mechanical cleanup cannot join to a full name.
+    "j. s bach": "Johann Sebastian Bach",
+    "joh. seb. bach": "Johann Sebastian Bach",
+    "w a mozart": "Wolfgang Amadeus Mozart",
+    "m. praetorius": "Michael Praetorius",
+    "p. tchaikovsky": "Pyotr Ilyich Tchaikovsky",
+    "s. rachmaninoff": "Sergei Rachmaninoff",
+    "fr. chopin": "Frédéric Chopin",
+    "e. grieg": "Edvard Grieg",
+    "edvard h. grieg": "Edvard Grieg",
+    "f. mendelssohn-bartholdy": "Felix Mendelssohn",
+    "g f handel": "George Frideric Handel",
+
+    // Surnames left bare, either by the corpus or by unwelding a source code
+    // ("SchubertF" arrives here as "Schubert"). Each is unambiguous in this catalogue:
+    // the bare "Purcell" carries Dido's Lament, which is Henry's.
+    schubert: "Franz Schubert",
+    debussy: "Claude Debussy",
+    joplin: "Scott Joplin",
+    satie: "Erik Satie",
+    kumar: "Ramana Kumar",
+    purcell: "Henry Purcell",
+    offenbach: "Jacques Offenbach",
+    rossini: "Gioachino Rossini",
+    tosti: "Francesco Paolo Tosti",
+    somervell: "Arthur Somervell",
+    spagnoletti: "Paolo Spagnoletti",
+    yaniewicz: "Feliks Janiewicz",
+    pease: "Alfred Humphries Pease",
+    pejacsevich: "Dora Pejačević",
+    // The second J is "Junior": the corpus writes Johann Strauss II this way and gives
+    // his father a code of his own, so this is one man rather than both.
+    strauss: "Johann Strauss II",
+
+    // Spellings of one person that differ by more than case.
+    "giuseppi verdi": "Giuseppe Verdi",
+    "modest moussorgsky": "Modest Mussorgsky",
+    "peter ilyich tchaikovsky": "Pyotr Ilyich Tchaikovsky",
+    "peter tchaikovsky": "Pyotr Ilyich Tchaikovsky",
+    "jean phillipe rameau": "Jean-Philippe Rameau",
+    "jean philippe rameau": "Jean-Philippe Rameau",
+    "claude-achille debussy": "Claude Debussy",
+    "frédéric françois chopin": "Frédéric Chopin",
+    "frederic chopin": "Frédéric Chopin",
+    "felix mendelssohn bartholdy": "Felix Mendelssohn",
+    "turloch o'carolan": "Turlough O'Carolan",
+    "handel george frideric": "George Frideric Handel",
+    "georg friedrich handel": "George Frideric Handel",
+    "georg-friedrich haendel": "George Frideric Handel",
+    // Case alone, which the lowercase key already folds — listed so the canonical
+    // spelling is the one that wins rather than whichever score loaded first.
+    "ludwig van beethoven": "Ludwig van Beethoven",
+
+    // Text the harvest welded onto a name: a title in front of it, a tempo marking behind
+    // it, a lyricist after it. The piece is the same piece; the credit simply arrived
+    // carrying its neighbours.
+    "an die musik - schubert": "Franz Schubert",
+    "turlough o'carolan andante con moto": "Turlough O'Carolan",
+    // Thomas Moore wrote the words to a traditional Irish air, welded on with no label to
+    // cut at — so unlike its neighbours this one cannot be reached mechanically. The music
+    // is the traditional half, which is what a piano catalogue credits.
+    "traditionalthomas moore": "Traditional",
+    // A 1708 hymnal rather than a person: the Easter Hymn in it is anonymous.
+    "from lyra davidica": "Traditional",
+
+    // Characters that did not survive the corpus being read in the wrong encoding, and
+    // one that did not survive being read at all. Nothing in the string says it is
+    // broken, so only a table can reach them.
+    "bedåich smetana": "Bedřich Smetana",
+    "g. f. h?ndel": "George Frideric Handel",
+
+    // Leopold Mozart, Wolfgang's father — a composer in his own right, and NOT the same
+    // person. Spelled out precisely because the surname invites the wrong merge.
+    "l. mozart": "Leopold Mozart",
+
+    // ---- A second pass, from grouping every page by surname and reading what stood
+    // beside what. These are pairs the walk of the directory did not turn up, because the
+    // two spellings sort apart: "Amy Beach" and "Amy Marcy Beach" are nowhere near each
+    // other alphabetically, and neither is obviously wrong on its own.
+    "robert alexander schumann": "Robert Schumann",
+    "franz joseph haydn": "Joseph Haydn",
+    pachelbel: "Johann Pachelbel",
+    "antonio lucio vivaldi": "Antonio Vivaldi",
+    "henry walford davies": "Walford Davies",
+    "alexander c. mackenzie": "Alexander Mackenzie",
+    "m. clementi": "Muzio Clementi",
+    "amy marcy beach": "Amy Beach",
+    "s. coleridge-taylor": "Samuel Coleridge-Taylor",
+    "aleksandr scriabin": "Alexander Scriabin",
+    "h. t. burleigh": "Harry Thacker Burleigh",
+    "sigismond thalberg": "Sigismund Thalberg",
+    "james pierpont": "James Lord Pierpont",
+    // Francisca Edwiges Neves Gonzaga, known and published as Chiquinha.
+    "francisca gonzaga": "Chiquinha Gonzaga",
+    "examples by rimsky-korsakov": "Nikolai Rimsky-Korsakov",
+    // A dice game of doubtful attribution, catalogued under Mozart as K.516f; Simrock
+    // published it and the harvest welded the publisher to the composer.
+    "nikolaus simrockw. a. mozart": "Wolfgang Amadeus Mozart",
+    // The keyboard transcription is Bach's, after Vivaldi's concerto, and it is Bach's
+    // BWV number the piece is filed under.
+    "vivaldi/bach": "Johann Sebastian Bach",
+    // A capital the corpus dropped. Alessandro is Domenico's father and a different
+    // composer, so this fixes the spelling without merging the two.
+    "alessandro scarlatti": "Alessandro Scarlatti",
+
+    // ---- A third pass, from comparing every page against every other by surname, by
+    // containment and by edit distance rather than by eye. These are the ones a person
+    // scrolling an alphabetical directory cannot see: the two spellings sort far apart, and
+    // each looks perfectly correct where it stands.
+
+    // Surname first, with no comma to flip on — the corpus writes the Hungarian order, and
+    // one of the three also lost its accents on the way in.
+    "bartók béla": "Béla Bartók",
+    "bela bartok": "Béla Bartók",
+    "bach johann sebastian": "Johann Sebastian Bach",
+    "elgar edward": "Edward Elgar",
+    "rimsky-korsakov": "Nikolai Rimsky-Korsakov",
+    "c. saint-saens": "Camille Saint-Saëns",
+
     // Not a person alias but a credit somebody typed a thought into. The harvested score
     // carries "Traditional I think", which is a note to self rather than an attribution —
     // and unlike the dated and catalogue-numbered credits around it, nothing else here
@@ -124,7 +247,13 @@ function cleaned(raw: string): string {
         .replace(/&quot;/gi, '"')
         .replace(/&amp;/gi, "&")
         .replace(/&#39;|&apos;/gi, "'");
-    name = name.replace(/\s*\([^)]*\)/g, "");
+    // An aside is replaced by a space rather than deleted: a credit that writes the dates
+    // mid-string ("Turlough O'Carolan (1670-1738)ANDANTE CON MOTO") otherwise has the words
+    // either side of it welded into one, and the weld reads as a name nobody has.
+    name = name.replace(/\s*\([^)]*\)\s*/g, " ");
+    // An aside somebody never closed ("Georg Friedrich Handel (1685-1759"). The balanced
+    // rule above cannot see it, so the dates reached the page as part of the name.
+    name = name.replace(/\s*\([^)]*$/, "");
     // A bracketed aside ("[published as …]") is about the work or the pen name, not
     // the person, and would otherwise split one composer across two pages.
     name = name.replace(/\s*\[[^\]]*\]/g, "");
@@ -135,6 +264,19 @@ function cleaned(raw: string): string {
     // the composer entirely and leave the piece credited to nobody.
     // Leading work numbers first, as many as are stacked up ("Op 39, No. 15 Brahms"),
     // each dropped on its own so the name behind them survives.
+    // What the person DID, written in front of what they are called: "Music: Grattan
+    // Flood", "Composed by …", "Worte & Musik: …", "by Scott Joplin". The label is about
+    // the credit, not the human, and each spelling of it was splitting one composer off
+    // into a page of their own.
+    name = name.replace(
+        /^[\s,.]*(worte\s*&\s*musik|music|musik|musique|tune|melody|air|composed\s+by|original\s+song\s+by|words\s+and\s+music\s+by|examples\s+by|arranged\s+by|by)\b\s*:?\s*/i,
+        "",
+    );
+    // Who wrote the WORDS, and everything after them. A song credit routinely names both
+    // halves — "Tune: Trad ScotlandWords: Robert Burns" — and a piano catalogue credits
+    // the music: the lyricist wrote no notes. No word boundary in front, because the
+    // harvest welds the second label straight onto the end of the first half.
+    name = name.replace(/(words|lyrics|text|worte|poem|poetry|dichtung)\s*:.*$/i, "");
     const LEADING_WORK = /^[\s,.]*\b(op|opus|no|nr|bwv|kv|k)\b\.?\s*[\d.]+[\s,.]*/i;
     while (LEADING_WORK.test(name)) {
         name = name.replace(LEADING_WORK, "");
@@ -151,6 +293,20 @@ function cleaned(raw: string): string {
     if (comma > 0 && comma < name.length - 1) {
         name = `${name.slice(comma + 1)} ${name.slice(0, comma)}`;
     }
+    // One corpus writes its credits as a surname with the initials welded on the end —
+    // "SchubertF", "BachJS", "BeethovenLv", "PejacsevichD". Each one owned a page of its
+    // own, one piece deep, sitting a few rows from the composer it belongs to.
+    //
+    // The initials go rather than the surname: a bare surname is what the alias table
+    // already knows how to finish, so "SchubertF" becomes "Schubert" and then Franz
+    // Schubert. Only a single word ending in capitals matches, which is what makes it
+    // safe — "McDonald" and "DeVries" carry lowercase after their inner capital and are
+    // left alone.
+    // The initials may themselves be capitalised pairs — "BeethovenLv" is L. v. Beethoven
+    // — so each is an upper case optionally carrying one lower. The surname in front must
+    // run to three characters or more, which is what keeps real names out: "McDonald" and
+    // "MacKay" have too little before the break and too much after it.
+    name = name.replace(/^(\p{Lu}\p{Ll}{2,})(?:\p{Lu}\p{Ll}?){1,3}$/u, "$1");
     // A trailing full stop is punctuation from the credit line, never part of a name.
     return name
         .replace(/\s+/g, " ")
@@ -171,7 +327,7 @@ export function canonicalComposer(raw: string): string {
 // link, no page. Matched as words anywhere in the credit, so an enriched
 // attribution ("Traditional — …, 1761") stays a non-person too.
 const NOT_A_PERSON =
-    /\b(trad|traditional|traditionnel|anonymous|anonymus|anonimo|anónimo|anon|volkslied|gregorian|plainchant|folk\s?song|spiritual|shanty)\b/i;
+    /\b(trad|traditional|traditionnelle?|tradicional|anonymous|anonymus|anonyme|anonimo|anónimo|anon|volkslied|gregorian[ao]?|gregoriana|plainchant|folk(\s?song|\s?tune)?|spiritual|shanty|misc|hymn\s?tune)\b/i;
 
 // The longest a credit can be and still be somebody's name. Real ones run well under
 // this — the catalogue's longest genuine composer is "Corona Elisabeth Wilhelmine

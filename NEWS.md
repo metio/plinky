@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**One composer, one page.** Handel had six pages, Bach six, Tchaikovsky four, Bartók
+three — the same person split across every way the sheet music spelled their name, so
+"more by this composer" showed you a fraction of what was there. Seventy-two of those
+phantom pages are gone. Credits that arrived with a lyricist, a publisher or a tempo
+marking welded onto the name now read as the composer alone, and a piece credited to
+"Tune: Trad Scotland" is filed as traditional rather than as somebody called Trad.
+Every composer in the catalogue now gets a proper page of their own, however few
+pieces they have.
+
 **The Stats page now asks the questions you came with.** Each heading is one of them —
 *How good am I? Am I getting better? What am I working on? Where am I strongest? How
 far can I go?* — and everything under a heading answers it, with nothing restating its

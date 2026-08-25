@@ -181,7 +181,8 @@ describe("credits whose work number comes first", () => {
         // work number led it, leaving three real pieces attributed to nobody.
         expect(canonicalComposer("Op 39, No. 15 Johannes Brahms")).toBe("Johannes Brahms");
         expect(canonicalComposer("No.1. F. Chopin. Op.6")).toBe("Frédéric Chopin");
-        expect(canonicalComposer("Opus 36 No. 1 M. Clementi")).toBe("M. Clementi");
+        // Survives as the full name: "M. Clementi" is Muzio, joined to his own page.
+        expect(canonicalComposer("Opus 36 No. 1 M. Clementi")).toBe("Muzio Clementi");
     });
 
     it("still drops a work number that trails the name", () => {
@@ -245,5 +246,110 @@ describe("credits that are notes to self", () => {
     it("leaves a genuinely enriched attribution alone", () => {
         // "Traditional — Irish" says something true about the piece. Only the hedge goes.
         expect(canonicalComposer("Traditional — Irish, 1761")).toBe("Traditional — Irish");
+    });
+});
+
+describe("credits welded to their neighbours", () => {
+    it("splits a name from an aside that had no space around it", () => {
+        // The dates sit mid-string and the strip used to delete them without leaving a gap,
+        // welding the words either side into a name nobody has.
+        expect(canonicalComposer("Turlough O'Carolan (1670-1738)ANDANTE CON MOTO")).toBe(
+            "Turlough O'Carolan",
+        );
+    });
+
+    it("drops an aside its writer never closed", () => {
+        // The balanced rule cannot see this one, so the life dates reached the page as part
+        // of the composer's name.
+        expect(canonicalComposer("Georg Friedrich Handel (1685-1759")).toBe(
+            "George Frideric Handel",
+        );
+    });
+
+    it("keeps the composer when the credit names the lyricist too", () => {
+        // A song credit names both halves and a piano catalogue credits the music: the
+        // lyricist wrote no notes. The second label arrives welded to the first half.
+        // Both reduce to the tradition that wrote the tune, which owns no page.
+        expect(canonicalComposer("Tune: Trad ScotlandWords: Robert Burns")).toBe("Trad Scotland");
+        expect(personSlug(canonicalComposer("Tune: Trad ScotlandWords: Robert Burns"))).toBe("");
+        expect(canonicalComposer("TraditionalThomas Moore")).toBe("Traditional");
+    });
+
+    it("drops a label saying what the person did", () => {
+        expect(canonicalComposer("Music: Grattan Flood (1859-1928)")).toBe("Grattan Flood");
+        expect(canonicalComposer("Composed by The Seatbelts")).toBe("The Seatbelts");
+        expect(canonicalComposer("Original song by Giacomo Puccini")).toBe("Giacomo Puccini");
+        expect(canonicalComposer("Worte & Musik: Siegfried Köhler (1946)")).toBe(
+            "Siegfried Köhler",
+        );
+    });
+});
+
+describe("surnames with the initials welded on", () => {
+    it("unwelds a source code into the composer it stands for", () => {
+        // One corpus writes its credits this way, and each one owned a page of its own a
+        // few rows from the composer it belongs to.
+        expect(canonicalComposer("SchubertF")).toBe("Franz Schubert");
+        expect(canonicalComposer("BachJS")).toBe("Johann Sebastian Bach");
+        expect(canonicalComposer("DebussyC")).toBe("Claude Debussy");
+        expect(canonicalComposer("PejacsevichD")).toBe("Dora Pejačević");
+    });
+
+    it("reads initials that carry a lower case letter of their own", () => {
+        // "Lv" is L. v. — Ludwig van.
+        expect(canonicalComposer("BeethovenLv")).toBe("Ludwig van Beethoven");
+    });
+
+    it("leaves real names that merely have a capital inside them", () => {
+        // The surname in front must run to three characters and the tail must be initials,
+        // which is what keeps these out.
+        expect(canonicalComposer("McDonald")).toBe("McDonald");
+        expect(canonicalComposer("MacKay")).toBe("MacKay");
+        expect(canonicalComposer("DeVries")).toBe("DeVries");
+    });
+});
+
+describe("one person, one page", () => {
+    it("joins the spellings a harvest produced for the same composer", () => {
+        // Each of these owned a page until it was merged. Handel alone had six.
+        const handel = [
+            "Handel George Frideric",
+            "G F Handel",
+            "Georg-Friedrich HAENDEL (1685 1759)",
+            "Georg Friedrich Handel (1685-1759",
+        ].map(canonicalComposer);
+        expect(new Set(handel)).toEqual(new Set(["George Frideric Handel"]));
+
+        // Surname first with no comma to flip on, and the same name with its accents lost.
+        const bartok = ["Bartók Béla", "Bela Bartok", "Béla Bartók"].map(canonicalComposer);
+        expect(new Set(bartok)).toEqual(new Set(["Béla Bartók"]));
+    });
+
+    it("keeps apart the people who merely share a surname", () => {
+        // Leopold is Wolfgang's father and a composer in his own right; the surname invites
+        // exactly the wrong merge. Philp and Phillips are two Victorian composers with
+        // different dates and different countries.
+        expect(canonicalComposer("L. Mozart")).toBe("Leopold Mozart");
+        expect(canonicalComposer("W. A. Mozart")).toBe("Wolfgang Amadeus Mozart");
+        expect(canonicalComposer("Elizabeth Philp")).toBe("Elizabeth Philp");
+        expect(canonicalComposer("Elizabeth Phillips")).toBe("Elizabeth Phillips");
+        // Alessandro is Domenico's father: the capital is fixed, the person is not merged.
+        expect(canonicalComposer("Alessandro scarlatti")).toBe("Alessandro Scarlatti");
+        expect(canonicalComposer("Domenico Scarlatti")).toBe("Domenico Scarlatti");
+    });
+});
+
+describe("credits that name a tradition rather than a person", () => {
+    it("recognises the markers in the languages the corpora use", () => {
+        for (const credit of [
+            "Chanson traditionnelle",
+            "Melodía gregoriana",
+            "Anonyme (Pijin english)",
+            "Misc Christmas",
+            "Russian Folk",
+            "Old Swedish folk tune",
+        ]) {
+            expect(personSlug(canonicalComposer(credit))).toBe("");
+        }
     });
 });
