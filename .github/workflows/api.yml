@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Deploys the optional backend. The design and the rollout live in BACKEND.md.
+#
+# Manual on purpose, for now. Automatic deployment on every push to main is where this
+# ends up, and the trigger is written below ready to be uncommented — but it stays off
+# until the account side exists, because a push-triggered job that cannot authenticate
+# turns main red on every unrelated commit and teaches everyone to ignore it.
+#
+# Before turning it on, three things have to be true, and the checklist in BACKEND.md
+# under "Provisioning" is the long form:
+#
+#   1. CLOUDFLARE_API_TOKEN carries Workers Scripts:Edit. It has Pages:Edit today, which
+#      deploys the site and nothing else.
+#   2. The privacy policy's API section is published, in every locale. Deploying a Worker
+#      nothing calls sends no visitor data anywhere, but the client that polls it does,
+#      and the two changes are one commit apart.
+#   3. The `core/**` path filter below is understood: the website deploy already
+#      triggers on it, so filtering this to `worker/**` alone would ship a shared-code
+#      change to the browser and never to the Worker, leaving the two running different
+#      builds of the one module they are supposed to share — invisibly, since both
+#      nominally import the same file.
+
+name: API
+
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: Which Worker to deploy
+                required: true
+                default: preview
+                type: choice
+                options: [preview, production]
+    # push:
+    #     branches: [main]
+    #     paths:
+    #         - worker/**
+    #         - core/**
+    #         - .github/workflows/api.yml
+
+permissions:
+    contents: read
+
+concurrency:
+    group: api-${{ github.event.inputs.environment || 'preview' }}
+    cancel-in-progress: false
+
+jobs:
+    deploy:
+        name: deploy
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+            - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+            # The same gate the pull request ran. A deploy that skips it is a deploy that
+            # can ship what CI would have refused.
+            - run: nix develop --command ci-worker
+            - name: Deploy
+              env:
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  TARGET: ${{ github.event.inputs.environment || 'preview' }}
+              working-directory: worker
+              run: |
+                  set -e
+                  if [ "$TARGET" = "production" ]; then
+                    npx wrangler deploy
+                  else
+                    npx wrangler deploy --env preview
+                  fi

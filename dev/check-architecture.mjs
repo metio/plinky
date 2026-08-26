@@ -24,10 +24,12 @@ import { spawnSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const TREES = ["core", "app", "dev", "react-router.config.ts"];
+const TREES = ["core", "app", "dev", "worker/src", "react-router.config.ts"];
 // The trees the layer rules are actually about. dev/ is scanned too, but it is the one
 // depcruise can read without a TypeScript compiler — so it proves nothing about health.
-const MUST_SEE = ["app/", "core/"];
+// worker/src is here for the same reason the floor exists at all: it is a small tree
+// whose one rule nobody would notice going quiet.
+const MUST_SEE = ["app/", "core/", "worker/src/"];
 // How much of a tree must be reached before the run counts as having looked at it. Well
 // under 1 because generated files, type-only declarations and modules nothing imports are
 // legitimately absent; well over the ~2-20% a blind cruise drags in behind dev/.
@@ -41,7 +43,7 @@ function sourceCount(tree) {
         for (const entry of readdirSync(dir)) {
             const path = join(dir, entry);
             if (statSync(path).isDirectory()) {
-                if (entry !== "paraglide" && !entry.startsWith("__")) {
+                if (entry !== "paraglide" && entry !== "node_modules" && !entry.startsWith("__")) {
                     walk(path);
                 }
                 continue;
