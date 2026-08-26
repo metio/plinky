@@ -8,6 +8,22 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 26 August 2026
+
+**Collecting results reads two assignments as two assignments.** Paste in whatever
+arrived and each set gets its own table, with its own columns and its own CSV.
+Everything used to land in one table whose columns came from whichever set was
+longest, so a student who had done a different one showed a dash under every piece —
+which looks exactly like having skipped them all.
+
+**One assignment now reads as one assignment, however it reached each student.** A
+set you hand out keeps the same identity on every device it lands on, so the class
+comes back together instead of splitting by the order people happened to open your
+links.
+
+**A due date stays put.** Setting one on an assignment and coming back to the page
+later lost it. It stays now.
+
 ## 23 August 2026
 
 **Looping a passage now wipes the colour each time round.** The green trail shows how

@@ -80,3 +80,76 @@ describe("useAssignmentDraft", () => {
         expect(result.current.visible).toBe(PICKER_PAGE);
     });
 });
+
+describe("the identity a draft carries", () => {
+    // A counter rather than the ambient generator, so the test can name what each
+    // draft was given. Built once per test and closed over: constructing it inside
+    // the render callback would hand every render a counter starting at one, and the
+    // hook would look like it never minted a second id.
+    const counting = () => {
+        let next = 0;
+        return () => `origin-${++next}`;
+    };
+
+    it("gives a new draft an origin", () => {
+        const newId = counting();
+        const { result } = renderHook(() => useAssignmentDraft(newId));
+        act(() => result.current.addItem("a"));
+
+        expect(result.current.draft([]).origin).toBe("origin-1");
+    });
+
+    it("hands out the same origin however many times the draft is read", () => {
+        // A teacher who shares a draft link and then saves it must hand out the
+        // identity the save stores; minting per read would give the class one id and
+        // the teacher another, and the reports would name an assignment nobody has.
+        const newId = counting();
+        const { result } = renderHook(() => useAssignmentDraft(newId));
+        act(() => result.current.addItem("a"));
+
+        const shared = result.current.draft([]);
+        act(() => result.current.setName("Week 3"));
+        const saved = result.current.draft([]);
+
+        expect(saved.origin).toBe(shared.origin);
+    });
+
+    it("keeps an edited assignment's origin", () => {
+        const newId = counting();
+        const { result } = renderHook(() => useAssignmentDraft(newId));
+        const existing = makeAssignment({
+            id: "week-3",
+            origin: "already-shared",
+            name: "Week 3",
+            items: [{ id: "a" }],
+        });
+
+        act(() => result.current.startEdit(existing));
+
+        expect(result.current.draft([]).origin).toBe("already-shared");
+    });
+
+    it("gives the next draft a fresh origin", () => {
+        const newId = counting();
+        const { result } = renderHook(() => useAssignmentDraft(newId));
+        act(() => result.current.addItem("a"));
+        const first = result.current.draft([]).origin;
+
+        act(() => result.current.reset());
+        act(() => result.current.addItem("b"));
+
+        expect(result.current.draft([]).origin).not.toBe(first);
+    });
+
+    it("gives an assignment saved without one an origin when it is edited", () => {
+        const newId = counting();
+        const { result } = renderHook(() => useAssignmentDraft(newId));
+        const bare = makeAssignment({ id: "old", name: "Old", items: [{ id: "a" }] });
+        expect(bare.origin).toBeUndefined();
+
+        act(() => result.current.startEdit(bare));
+
+        // Which number it draws does not matter; that it stops being anonymous does.
+        expect(result.current.draft([]).origin).toMatch(/^origin-/);
+    });
+});

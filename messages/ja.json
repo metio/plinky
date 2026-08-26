@@ -461,6 +461,7 @@
     "collect_played": "弾いた数",
     "collect_of": "{total}中{played}",
     "collect_unnamed": "名前なし",
+    "collect_untitled": "タイトルなし",
     "solfege_do": "ド",
     "solfege_re": "レ",
     "solfege_mi": "ミ",

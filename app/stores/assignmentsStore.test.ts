@@ -99,3 +99,52 @@ describe("assignmentsStore", () => {
         expect(store.list()).toEqual([]);
     });
 });
+
+describe("what survives being stored", () => {
+    // Every optional field, populated. The reparse rebuilds each entry through
+    // makeAssignment, so a field it forgets to pass is defaulted away — and because
+    // the next save writes the rebuilt object back, the loss is permanent after one
+    // read-then-write rather than merely invisible. A due date was lost exactly this
+    // way. Adding a field to Assignment without carrying it through fails here.
+    const populated = (): Assignment =>
+        makeAssignment({
+            id: "week-1",
+            origin: "origin-1",
+            name: "Week 1",
+            description: "Warm up, then the piece.",
+            dueOn: "2026-09-14",
+            items: [
+                { id: "scale-c-major", tempo: 100 },
+                { id: "minuet-in-g", note: "mind the repeat" },
+            ],
+        });
+
+    it("round-trips every field of an assignment", () => {
+        const store = createAssignmentsStore(memoryStore());
+        const assignment = populated();
+        store.save(assignment);
+        expect(store.list()[0]).toEqual(assignment);
+    });
+
+    it("still holds every field after a read, an edit and another read", () => {
+        // The read-then-write path: whatever the first list() dropped, the save that
+        // follows it commits.
+        const kv = memoryStore();
+        const store = createAssignmentsStore(kv);
+        store.save(populated());
+        const read = store.list()[0];
+        expect(read).toBeDefined();
+        store.save({ ...(read as Assignment), name: "Week 1, revised" });
+        const again = store.list()[0];
+        expect(again?.dueOn).toBe("2026-09-14");
+        expect(again?.origin).toBe("origin-1");
+        expect(again?.description).toBe("Warm up, then the piece.");
+    });
+
+    it("keeps a set with no optional fields free of them", () => {
+        const store = createAssignmentsStore(memoryStore());
+        const bare = makeAssignment({ id: "bare", name: "Bare", items: [{ id: "a" }] });
+        store.save(bare);
+        expect(store.list()[0]).toEqual(bare);
+    });
+});

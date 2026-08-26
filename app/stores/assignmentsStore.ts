@@ -31,11 +31,18 @@ export function createAssignmentsStore(kv: KeyValueStore): AssignmentsStore {
                     if (!isRecord(entry) || !Array.isArray(entry.items)) {
                         return null;
                     }
+                    // Every field, every time. What this list omits, makeAssignment
+                    // defaults away and the next save writes back without — so a
+                    // field left out here is not merely unread, it is deleted on the
+                    // first read-then-write. assignmentsStore.test.ts round-trips a
+                    // fully populated assignment to keep the two in step.
                     const assignment = makeAssignment({
                         id: typeof entry.id === "string" ? entry.id : undefined,
+                        origin: typeof entry.origin === "string" ? entry.origin : undefined,
                         name: typeof entry.name === "string" ? entry.name : undefined,
                         description:
                             typeof entry.description === "string" ? entry.description : undefined,
+                        dueOn: typeof entry.dueOn === "string" ? entry.dueOn : undefined,
                         items: entry.items,
                     });
                     return assignment.items.length > 0 ? assignment : null;

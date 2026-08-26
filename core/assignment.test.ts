@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 import {
     MAX_DESCRIPTION_LENGTH,
     MAX_ITEMS,
+    MAX_NAME_LENGTH,
+    MAX_ORIGIN_LENGTH,
     MAX_TEMPO,
     MIN_TEMPO,
     addItem,
@@ -469,5 +471,72 @@ describe("withFreeId", () => {
         const once = withFreeId(week3, [week3.id]);
         const twice = withFreeId(week3, [week3.id, once.id]);
         expect(new Set([week3.id, once.id, twice.id]).size).toBe(3);
+    });
+});
+
+describe("the identity a shared set keeps", () => {
+    const shared = makeAssignment({
+        origin: "origin-1",
+        name: "Week 3",
+        items: [{ id: "a" }, { id: "b" }],
+    });
+
+    it("carries the origin through a share link", () => {
+        const received = decodeAssignmentLink(encodeAssignmentLink(shared));
+        expect(received?.origin).toBe("origin-1");
+    });
+
+    it("carries the origin through a file", () => {
+        expect(parseAssignment(serializeAssignment(shared)).origin).toBe("origin-1");
+    });
+
+    it("keeps the origin when the local id has to change", () => {
+        // Two devices file one assignment differently — the second import re-slugs to
+        // avoid overwriting — and both still report against the identity they were sent.
+        const refiled = withFreeId(shared, [shared.id]);
+        expect(refiled.id).not.toBe(shared.id);
+        expect(refiled.origin).toBe("origin-1");
+    });
+
+    it("gives every receiver of one link the same origin", () => {
+        const link = encodeAssignmentLink(shared);
+        const received = [1, 2, 3].map(() => decodeAssignmentLink(link));
+        expect(new Set(received.map((one) => one?.origin)).size).toBe(1);
+    });
+
+    it("keeps the origin when the set is renamed after being handed out", () => {
+        // The local id is a slug of the name, so a rename moves it. Reports already on
+        // their way back name the origin, which does not move.
+        const renamed = makeAssignment({ ...shared, id: "week-3-scales", name: "Week 3 — scales" });
+        expect(renamed.origin).toBe("origin-1");
+    });
+
+    it("leaves a set that was never shared without one", () => {
+        expect(makeAssignment({ name: "Mine", items: [{ id: "a" }] }).origin).toBeUndefined();
+    });
+
+    it("drops an empty origin rather than storing one", () => {
+        expect(makeAssignment({ origin: "   ", name: "N", items: [{ id: "a" }] }).origin).toBe(
+            undefined,
+        );
+    });
+
+    it("bounds an origin arriving off a link", () => {
+        const long = makeAssignment({ origin: "x".repeat(500), name: "N", items: [{ id: "a" }] });
+        expect(long.origin?.length).toBe(MAX_ORIGIN_LENGTH);
+    });
+});
+
+describe("name length", () => {
+    it("bounds a name arriving off a link", () => {
+        const long = makeAssignment({
+            name: "n".repeat(MAX_NAME_LENGTH + 50),
+            items: [{ id: "a" }],
+        });
+        expect(long.name.length).toBe(MAX_NAME_LENGTH);
+    });
+
+    it("leaves an ordinary name alone", () => {
+        expect(makeAssignment({ name: "  Week 3  ", items: [{ id: "a" }] }).name).toBe("Week 3");
     });
 });

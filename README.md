@@ -303,8 +303,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   device turns how the list went into one code to paste into a message. The teacher
   drops however many arrive into **Collect results**, reads them as a class table —
   a piece nobody attempted shows blank rather than failed — and downloads a CSV for
-  whatever they already keep marks in. Nothing is stored on either side; the collect
-  page is a lens over the text in the box. It is **not proof** and the app says so:
+  whatever they already keep marks in. Paste in several assignments at once and each
+  gets its own table, its own columns and its own CSV, because a blank under a piece
+  a student was never asked for reads exactly like one they skipped. Nothing is
+  stored on either side; the collect page is a lens over the text in the box. It is **not proof** and the app says so:
   a code is written by the device it describes, so it replaces the transcription, not
   the trust. An assignment can also be handed out straight into **Google Classroom**
   (a plain link — no third-party script rides along).

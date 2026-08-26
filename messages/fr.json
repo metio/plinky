@@ -461,6 +461,7 @@
     "collect_played": "Joué",
     "collect_of": "{played} sur {total}",
     "collect_unnamed": "Quelqu'un",
+    "collect_untitled": "Sans titre",
     "solfege_do": "do",
     "solfege_re": "ré",
     "solfege_mi": "mi",

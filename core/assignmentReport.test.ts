@@ -9,6 +9,8 @@ import {
     collectReports,
     decodeReport,
     encodeReport,
+    groupReports,
+    MAX_REPORT_ITEMS,
     MAX_WHO_LENGTH,
     NOT_PLAYED,
     reportLetter,
@@ -313,5 +315,107 @@ describe("the sheet a teacher opens runs nothing a student wrote", () => {
     it("guards a name that both starts a formula and carries a comma", () => {
         const reports = [buildReport(assignment, scores({}), '=1,"2"', 1)];
         expect(reportsToCsv(reports, title).split("\n")[1]!).toBe(`"'=1,""2""",0/3,0,,,`);
+    });
+});
+
+describe("which assignment a report names", () => {
+    const items = [{ id: "twinkle" }, { id: "ode-to-joy" }];
+
+    it("names the origin the teacher minted, not the local filing id", () => {
+        const shared = makeAssignment({ id: "week-3-2", origin: "origin-1", name: "W", items });
+        expect(buildReport(shared, scores({}), "Ada", 0).assignmentId).toBe("origin-1");
+    });
+
+    it("names the local id for a set that was never shared", () => {
+        const mine = makeAssignment({ id: "my-set", name: "Mine", items });
+        expect(buildReport(mine, scores({}), "Ada", 0).assignmentId).toBe("my-set");
+    });
+
+    it("gives every device that was sent one link the same id, however each filed it", () => {
+        // The failure this closes: the local id is a slug of the name, made unique
+        // against what the device already holds — so which of two same-named sets
+        // became "week-3" depended on the order each pupil opened the links, and the
+        // teacher's table grouped a class by whichever order they happened to click in.
+        const origin = "origin-1";
+        const filings = ["week-3", "week-3-2", "week-3-3"];
+        const reports = filings.map((id) =>
+            buildReport(makeAssignment({ id, origin, name: "W", items }), scores({}), id, 0),
+        );
+        expect(new Set(reports.map((report) => report.assignmentId)).size).toBe(1);
+    });
+});
+
+describe("a paste holding more than one assignment", () => {
+    const piano = makeAssignment({
+        origin: "piano",
+        name: "Piano, week 3",
+        items: [{ id: "twinkle" }, { id: "ode-to-joy" }],
+    });
+    const theory = makeAssignment({
+        origin: "theory",
+        name: "Theory, week 3",
+        items: [{ id: "intervals" }],
+    });
+    const paste = [
+        buildReport(piano, scores({ twinkle: 90, "ode-to-joy": 70 }), "Ada", 1),
+        buildReport(theory, scores({ intervals: 80 }), "Ada", 2),
+        buildReport(piano, scores({ twinkle: 60 }), "Bo", 3),
+    ]
+        .map(encodeReport)
+        .join("\n");
+
+    it("reads as one table per assignment", () => {
+        const groups = groupReports(collectReports(paste));
+        expect(groups.map((group) => group.assignmentName)).toEqual([
+            "Piano, week 3",
+            "Theory, week 3",
+        ]);
+        expect(groups.map((group) => group.reports.length)).toEqual([2, 1]);
+    });
+
+    it("gives each assignment its own columns", () => {
+        // Read as one table, Ada's theory row would show a dash under Twinkle and Ode
+        // to Joy — indistinguishable from a piece she was asked for and skipped.
+        const [piano, theory] = groupReports(collectReports(paste));
+        expect(piano?.columns).toEqual(["twinkle", "ode-to-joy"]);
+        expect(theory?.columns).toEqual(["intervals"]);
+    });
+
+    it("keeps one person's two assignments apart", () => {
+        const forAda = groupReports(collectReports(paste)).map((group) =>
+            group.reports.find((report) => report.who === "Ada"),
+        );
+        expect(forAda.every((report) => report !== undefined)).toBe(true);
+    });
+
+    it("groups a single assignment into one table", () => {
+        const one = groupReports(
+            collectReports(encodeReport(buildReport(piano, scores({}), "A", 0))),
+        );
+        expect(one).toHaveLength(1);
+    });
+
+    it("has no groups for a paste with nothing readable in it", () => {
+        expect(groupReports(collectReports("not a code at all"))).toEqual([]);
+    });
+});
+
+describe("what a crafted code may not do to the table", () => {
+    it("bounds the number of columns one code can ask for", () => {
+        const many = makeAssignment({
+            id: "big",
+            name: "Big",
+            items: Array.from({ length: MAX_REPORT_ITEMS + 100 }, (_, at) => ({ id: `p${at}` })),
+        });
+        // The assignment itself caps first, so the honest path never reaches the
+        // parser's cap — both hold, which is the point.
+        const decoded = decodeReport(encodeReport(buildReport(many, scores({}), "A", 0)));
+        expect(decoded?.items.length).toBeLessThanOrEqual(MAX_REPORT_ITEMS);
+    });
+
+    it("bounds a column heading arriving off the wire", () => {
+        const long = makeAssignment({ id: "x", name: "N", items: [{ id: "p".repeat(5000) }] });
+        const decoded = decodeReport(encodeReport(buildReport(long, scores({}), "A", 0)));
+        expect(decoded?.items[0]?.id.length).toBeLessThan(5000);
     });
 });

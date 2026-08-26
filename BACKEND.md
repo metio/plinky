@@ -14,7 +14,11 @@ configured the app behaves exactly as it does now, and every gate still passes.
 This document is the design and the implementation plan. It is maintained
 alongside the code — see [Maintaining this document](#maintaining-this-document).
 
-**Status: planned. Nothing described here is built yet.**
+**Status: planned.** No endpoint, Worker or database exists. Three `core/` changes
+phase 1 depends on shipped on 2026-08-26 and are marked where they are described:
+the assignment `origin`, the report parser's caps, and per-assignment grouping in
+`/collect`. Each stands on its own in the client-only app; none of them talks to
+anything.
 
 Revised 2026-08-09 after an adversarial review across security, privacy, platform
 limits, architecture fit, sync correctness, referee soundness and operations. That
@@ -75,7 +79,7 @@ They are listed in the order the [Rollout](#rollout) builds them.
 | --- | --- | --- |
 | Result collection | A pupil's assignment result reaches their teacher without a paste | No shared mutable storage between two devices |
 | Catalogue submission | A submitted score arrives without a GitHub account, and a living artist's own music reaches the catalogue | The prefilled-issue URL caps at roughly 8 KB |
-| Artist pages | An artist edits their own bio and social links | The client cannot hold a content-store credential without publishing it |
+| Artist pages | An artist's own bio and links change without a maintainer typing them in | An edit has to reach the repository, and a browser cannot open a pull request on its own |
 | Daily comparison | A daily run is placed against everyone else's | Aggregation across players requires a common store |
 | Progress vault | Progress follows a player between devices | `localStorage` is per-origin, per-device |
 
@@ -279,9 +283,15 @@ route on the production one.
 
 ## Repository layout
 
-A `worker/` directory at the repository root, following the `studio/` precedent —
-its own `package.json`, its own `package-lock.json`, its own `tsconfig.json`,
-excluded from the root TypeScript project.
+A `worker/` directory at the repository root: its own `package.json`, its own
+`package-lock.json`, its own `tsconfig.json`, excluded from the root TypeScript
+project.
+
+This was written as "following the `studio/` precedent". That directory left with
+Sanity on 2026-08-13 and only a stale `"studio"` in `tsconfig.json`'s `exclude`
+remains, so the worker is the first sub-project rather than the second. The shape
+still holds — it is the reason `dev/*.mts` is excluded from `tsc` too — but nobody
+should go looking for the example.
 
 ```text
 worker/
@@ -317,8 +327,11 @@ currently look at `worker/` at all:
 }
 ```
 
-and `worker` joins the `depcruise` argument list in the `arch` script. Without
-both changes the rule exists and never runs.
+and `worker` joins `TREES` in `dev/check-architecture.mjs`, which is where the
+`depcruise` argument list actually lives — `npm run arch` invokes that script rather
+than `depcruise` directly. Without both changes the rule exists and never runs. The
+same script fails when depcruise reaches under 60% of the files on disk, so a
+directory it cannot resolve is caught rather than passed over.
 
 ## Client architecture
 
@@ -516,22 +529,42 @@ flow. The wire format is the compact form that module produces, validated by its
 existing parser. The paste flow keeps working unchanged; this is a second
 transport for the same payload.
 
-**A shared assignment loses its identity today, and phase 1 cannot work until it
-keeps one.** `encodeAssignmentLink` drops the local id deliberately — the comment
-in `core/assignment.ts` says the receiver assigns its own — and `buildReport` then
-stamps that locally minted id onto the report as `assignmentId`. Thirty pupils
-doing the same assignment therefore produce thirty different `assignmentId`
-values. The paste flow tolerates this because a teacher reads a list and groups it
-by eye; a `result` table keyed on `assignment_id` would scatter one assignment
-across thirty rows that never join up, which is precisely the table this
-capability exists to produce.
+**A shared assignment kept no stable identity, and phase 1 could not work until it
+did. Shipped 2026-08-26.** The original account of this was wrong in a way worth
+recording, because the fix follows from the real mechanism rather than the assumed
+one. `encodeAssignmentLink` drops the local id deliberately — the comment in
+`core/assignment.ts` says the receiver assigns its own — but the receiver did not
+mint a random one: `makeAssignment` fell back to `slugifyName(name)`, so thirty
+pupils sent one link mostly derived the *same* id. The defect was not thirty ids
+for one assignment; it was that the shared identity was **derived from a mutable
+display name and re-minted on local collision**. Renaming a set after handing it
+out moved its id. Two sets a teacher named alike slugged identically, so
+`withFreeId` re-identified whichever arrived second — and which one that was
+depended on the order each pupil opened the links, so one class's reports carried
+ids that disagreed pupil by pupil.
 
-The fix is a **teacher-minted assignment id carried through the share code**,
-alongside the class id below. The compact wire shape grows from `{n, d?, i}` to
-`{n, d?, i, a, c?}` — `a` the stable assignment id, `c` the class it belongs to.
-Plinky has no live users, so the format simply changes and the tests change with
-it, rather than needing a compatibility path. This is a phase-1 prerequisite and
-it lands before any network code.
+The fix, now in the tree, is an **`origin` minted where the assignment is written
+and carried unchanged through every link, file and import**, distinct from the
+local `id` a device files it under. The compact wire shape grows from
+`{n, d?, u?, i}` to `{n, d?, u?, o?, i}` — `o` the origin. It is minted by the
+builder through an injected `newId`, held in draft state so a link shared before
+the save carries the identity the save then stores. `buildReport` stamps
+`assignment.origin ?? assignment.id`, so **the report wire format is unchanged**:
+`assignmentId` was always the grouping key and is now trustworthy. The class id
+this section also wanted arrives with the classes it names, rather than as a field
+with nothing to hold.
+
+Plinky has no live users, so the format simply changed and the tests changed with
+it, rather than needing a compatibility path.
+
+The same change fixed what it uncovered: `/collect` rendered every pasted report in
+one table whose columns came from the widest report, so a pupil who did a different
+assignment showed a dash under pieces they were never asked for — indistinguishable
+from a piece skipped. `groupReports` in `core/assignmentReport.ts` now splits a paste
+by assignment, one table and one CSV each. And `assignmentsStore`'s reparse dropped
+`dueOn`, so a due date survived the write and vanished on the next read; a test that
+round-trips a fully populated assignment now fails when a field is added and not
+carried.
 
 **A pupil belongs to more than one class, and usually will.** Two music schools is
 the obvious case; one school where a pupil takes both piano and theory is the
@@ -553,12 +586,15 @@ to do with a server.
 Leaving a class deletes the membership, which needs a tombstone once the vault
 exists so that leaving stays left.
 
-**The parser needs caps it does not have today.** `decodeReport` accepts an
-arbitrarily long item list and arbitrarily long `who` and `assignmentName`
-strings, which is safe for a paste a human performs and unsafe for an endpoint.
-Adding `MAX_REPORT_ITEMS` and length caps to the `core/` parser, with a
-`fast-check` property asserting them, is a prerequisite of phase 1 rather than a
-hardening step afterwards, and it improves the paste path too.
+**The parser needed caps it did not have. Shipped 2026-08-26.** `decodeReport`
+already capped `who` at `MAX_WHO_LENGTH`; what it accepted without bound was the
+item list, the item ids, `assignmentId` and `assignmentName` — safe for a paste a
+human performs and unsafe for an endpoint. `MAX_REPORT_ITEMS` (the assignment's own
+`MAX_ITEMS`: a report answers a list, so it can never honestly be longer than the
+longest list) and `MAX_REPORT_ID_LENGTH` now bound them, with `MAX_NAME_LENGTH`
+added to `core/assignment.ts` for the same reason. `core/assignmentReport.property.test.ts`
+asserts every cap holds for arbitrary input and that decode never throws; the module
+had no property suite before, alone among the codecs.
 
 **Per-result deletion is a requirement, not a nicety.** Thirty pupils share one
 write token, so any of them can submit under another's name; the token is a
@@ -659,8 +695,8 @@ user-generated-content liability regime described in the backend ledger.
 **Living artists publishing their own music is the same endpoint plus an
 attribution.** A submission may name the artist it belongs to, and at review time
 the maintainer links it to that artist's page. Nothing new is needed to decide
-whether the artist is really who they say: the maintainer already curates who
-appears on the board, and that curation is the verification. No claiming flow, no
+whether the artist is really who they say: the maintainer already curates every
+piece that enters the catalogue, and that curation is the verification. No claiming flow, no
 identity service, no accounts.
 
 What this gives an artist is a page on Plinky listing their own pieces, playable
@@ -834,8 +870,11 @@ already refuses to trust a client clock for `reported_at`; the merge decision
 variable deserves the same suspicion.
 
 **Deletion needs tombstones, or nothing can ever be deleted.** Plinky deletes in
-five places today: clearing a fingering map, removing a take, removing an
-assignment, un-starring a favourite, and deleting an imported score. Under a merge
+seven places today: clearing a fingering map, removing a take, removing an
+assignment, un-starring a favourite, deleting an imported score, removing a practice
+session, and clearing a placement result. Only the first removes a key; the rest
+rewrite an array or a set, so nothing on the device distinguishes "never had it"
+from "deleted it". Under a merge
 that treats absence as "not yet seen", every one of them is undone by the next
 sync from a device that still holds the value — a deleted take returns, and
 returns again each time it is deleted, forever. A deletion is therefore a
@@ -857,6 +896,9 @@ implementation detail:
 | `plinky:favorites` | OR-Set with per-id tombstones | The only mutator is a toggle that *deletes*; plain union means the star list can never shrink |
 | `plinky:mastery:<id>` | Field-wise: `max` on `bestScore`, LWW on `learned`, LWW on `backlog`, LWW on `intervalDays`/`reviewAt` | `learned` and `backlog` are reversible toggles, so `or` would make un-marking impossible |
 | `plinky:history` | Per-day `max` | Each day's note count is a total; the larger reflects more practice |
+| `plinky:practice-log` | OR-Set by session `start`, with tombstones | `remove(start)` deletes a session from the teacher's report, so a plain union resurrects it |
+| `plinky:theory` | Set union | Grow-only: `markMet` only ever adds, and unknown lesson ids are dropped on read |
+| `plinky:samples` | Not synced | Device-scoped, and the only value that is not JSON — a raw `"1"`/`"0"` naming whether this device downloads recordings |
 | `plinky:lifetime` | Per-date field-wise `max`, cap at 14 after merge | Days hold a path-dependent average, so only a per-field rule is well defined |
 | `plinky:notestats` | Per-device lanes, summed at read | Absolute lifetime totals; summing two snapshots is not idempotent and doubles on every re-sync |
 | `plinky:takes:<id>` | OR-Set by take id, **no cap applied on merge** | A recording is the only value that cannot be re-derived; capping the union at 5 destroys recordings |
@@ -877,12 +919,20 @@ implementation detail:
 and the client surfaces that it was skipped. A gate in the spirit of
 `npm run tokens` and `npm run messages:check` fails the build when a `plinky:`
 key exists in the app with no policy in this table, so the table cannot silently
-fall behind the stores. Three keys were missing from the first draft of this
-table, which is the argument for the gate.
+fall behind the stores.
 
-**Do-not-sync list.** `micCalibration`, `barsPerRow` and
-`noteScale` are documented in `core/prefs.ts` as per-device, and syncing them
-pushes one room's tuning onto another piano and a phone's layout onto a desktop.
+Three keys were missing from the first draft of this table. A census on 2026-08-26
+found three missing again — `practice-log`, `theory` and `samples`, added above —
+which is a stronger argument for the gate than the first omission was: the table was
+reviewed, corrected, and drifted anyway. Two other counts in this document were
+wrong the same way, and both are corrected below: four `Prefs` fields carry a
+per-device comment rather than three, and the app deletes in seven places rather
+than five.
+
+**Do-not-sync list.** `micCalibration`, `barsPerRow`, `noteScale` and
+`instrumentRange` are documented in `core/prefs.ts` as per-device, and syncing them
+pushes one room's tuning onto another piano, a phone's layout onto a desktop, and
+the range of the keyboard in this room onto one that has different keys.
 
 **Class memberships carry a credential, which is a deliberate trade.**
 `plinky:classes` holds write tokens, so syncing it puts them in the vault in
@@ -1267,7 +1317,7 @@ CREATE TABLE submission (
     object_key      TEXT NOT NULL,          -- R2 key of the uploaded score
     title           TEXT NOT NULL,
     composer        TEXT,
-    artist_id       TEXT REFERENCES artist(id),  -- set when a living artist publishes their own work
+    artist_slug     TEXT,                   -- the person page a living artist's own work belongs to
     licence         TEXT NOT NULL,          -- SPDX id from the accepted set
     source_url      TEXT NOT NULL,
     submitter_note  TEXT,
@@ -1415,13 +1465,21 @@ that no raw IP is written into any table in the [data model](#data-model). The
 earlier phrasing — "no IP beyond a transient window" — claimed more than the
 platform allows.
 
-**Cloudflare becomes a processor the moment phase 0 deploys.** The health poll
-alone sends every visitor's IP to a new US-based processor, before any opt-in and
-before any feature exists. The privacy policy therefore needs its API section
-written and published *before* phase 0 goes live, naming Cloudflare, Inc., the
-data-processing addendum, the transfer basis, the categories (IP and request
-metadata), the purpose (delivery and abuse control) and the legal basis. This is a
-phase-0 blocker, not a phase-1 one, and it is the earliest deadline in the plan.
+**Cloudflare becomes a processor the moment a visitor's browser calls the API.**
+The health poll alone sends every visitor's IP to a new US-based processor, before
+any opt-in and before any feature exists. The privacy policy therefore needs its API
+section written and published *before* the client makes its first request, naming
+Cloudflare, Inc., the data-processing addendum, the transfer basis, the categories
+(IP and request metadata), the purpose (delivery and abuse control) and the legal
+basis.
+
+The deadline is the first client-side call rather than the first `wrangler deploy`.
+Phase 0 changes nothing in the client by construction, and a Worker nobody calls
+receives no visitor IPs — building `worker/` in the repository sends nothing anywhere
+at all. So the scaffolding and its CI wiring can land and be reviewed while the
+policy text is being written; what must not happen is a client that polls
+`/v1/health` before the section is published. It remains the earliest deadline in
+the plan, and it now names the event that triggers it rather than a phase.
 
 **The display name is personal data of children, and labelling it a nickname does
 not change that.** A teacher who tells thirty pupils to enter their names creates
@@ -1476,7 +1534,7 @@ the beacon cannot answer a question about a feature.
 
 | Artefact | Blocks |
 | --- | --- |
-| Privacy policy section naming Cloudflare as processor | Phase 0 deploy |
+| Privacy policy section naming Cloudflare as processor | The client's first API call, not the Worker's first deploy |
 | Controller/processor determination for classroom use | Phase 1 in real classrooms |
 | Processor agreement template for schools | Phase 1 in real classrooms |
 | DPIA covering result collection | Phase 1 in real classrooms |
@@ -1633,7 +1691,7 @@ not use. `worker` joins `exclude` beside `studio`, and the worker gets its own
 | Change | File | Consequence if skipped |
 | --- | --- | --- |
 | `worker-points-down` rule | `.dependency-cruiser.cjs` | The worker could import `app/` |
-| `worker` in the depcruise arguments | `package.json` `arch` script | The rule above never runs |
+| `worker` in `TREES` | `dev/check-architecture.mjs` | The rule above never runs |
 | `worker/vitest.config.ts`, owned by the worker | `worker/` | Worker tests never execute |
 | A knip **workspace** entry, not just `project` | `knip.json` | See below |
 | `worker/**` in the include list | `biome.json` | Worker code is unlinted |
@@ -1643,16 +1701,19 @@ not use. `worker` joins `exclude` beside `studio`, and the worker gets its own
 **The worker owns its own vitest config.** Adding a `worker` project to the root
 `vitest.config.ts` and invoking tests through a `ci-worker` wrapper that runs
 `npm test` inside `worker/` are mutually exclusive, and the root project would
-also silently pull worker files into the coverage ratchet. The `studio/`
-precedent applies: the worker owns its config, its dependencies and its test
-command, and `ci-worker` is the only thing that invokes them.
+also silently pull worker files into the coverage ratchet — its `include` is
+`app/**` and `core/**`, and its thresholds are a ratchet a new directory would
+move. So the worker owns its config, its dependencies and its test command, and
+`ci-worker` is the only thing that invokes them.
 
 **Knip needs an entry point, not just a project glob.** Adding `worker/**` to
 `project` without declaring entries makes every worker file an unused-file error
-and fails the gate immediately. Either configure `worker` as a knip workspace with
-its own `entry` (`src/index.ts`, `src/limiter.ts`), or follow `studio/` and leave
-it out of knip entirely — an explicit decision either way, since the default
-outcome of a half-configuration is a red build.
+and fails the gate immediately. `knip.json` today has `entry: ["app/routes/*.tsx"]`
+and `project: ["app/**/*.{ts,tsx}", "core/**/*.ts"]`, so the worker is outside its
+scope until something puts it there. Either configure `worker` as a knip workspace
+with its own `entry` (`src/index.ts`, `src/limiter.ts`), or leave it out
+deliberately — an explicit decision either way, since the default outcome of a
+half-configuration is a red build.
 
 `ci:parity` is the gate that makes this list self-enforcing in one direction: a CI
 job invoking anything other than a `ci-*` wrapper fails, and a `ci-*` name with no
@@ -1700,8 +1761,9 @@ called out rather than left to the checklist. **Every D1 database and R2 bucket 
 production *and* preview — is created with `--jurisdiction=eu`**, because the
 jurisdiction cannot be added afterwards and fixing it later means migrating data
 and swapping a binding on a live API. **The privacy policy's API section is
-published before the first deploy**, because the health poll alone sends visitor
-IPs to a new processor.
+published before the client calls the API**, because the health poll alone sends
+visitor IPs to a new processor. Deploying a Worker that nothing calls does not, so
+the scaffolding need not wait on the text — only the client does.
 
 Exit criteria: a deployed health endpoint; a deliberately broken worker test turns
 the build red; `wrangler d1 info` confirms the `eu` jurisdiction on every
@@ -1712,11 +1774,14 @@ handler; the class-creation and results-reading screens; the submit offer on
 assignment completion.
 
 Three prerequisites land before any network code, because each is a change to
-`core/` that the endpoint depends on: a **stable teacher-minted assignment id and
-class id carried through the share code** (the wire shape grows to
-`{n, d?, i, a, c?}`); the **`plinky:classes` membership store**, so a pupil can
-belong to several classes at once; and **element and length caps on the report
-parser**, with properties asserting them.
+`core/` that the endpoint depends on. Two of them shipped on 2026-08-26, before any
+`worker/` directory existed, and both earned their place in the client-only app on
+their own: a **stable assignment identity carried through the share code** — the
+`origin` field, wire shape now `{n, d?, u?, o?, i}` — and **element and length caps
+on the report parser**, with properties asserting them. The third is outstanding:
+the **`plinky:classes` membership store**, so a pupil can belong to several classes
+at once. It waits for the classes it names, since a store of memberships nothing can
+join is a store with nothing in it.
 
 Exit criteria: a real teacher collects real results from two devices; thirty
 reports of one assignment group into one row set rather than thirty; **a pupil
@@ -1726,11 +1791,13 @@ turning the health flag off cleanly removes the feature. **Real classroom use
 additionally waits on the controller/processor determination and the DPIA** in
 [Privacy and law](#privacy-and-law); development does not.
 
-**Phase 2 — artists.** Two capabilities that both route through maintainer review:
-[catalogue submission](#capability-catalogue-submission), including a living
-artist publishing their own CC-licensed work, and
-[artist pages](#capability-artist-pages). Requires R2, and therefore a payment
-method on file and a billing alert.
+**Phase 2 — artists.** One endpoint carrying two kinds of payload, both routed
+through maintainer review: [catalogue submission](#capability-catalogue-submission),
+including a living artist publishing their own CC-licensed work, and the profile
+edits behind [artist pages](#capability-artist-pages). Since the Sanity proxy went,
+artist pages have no backend half of their own — a profile edit is a submission like
+a piece is. Requires R2, and therefore a payment method on file and a billing
+alert.
 
 The client-only half of artist pages — a profile in the repository, folded into the
 people index so `/person/:slug` gains a bio, a photo and social links — has no
@@ -1741,9 +1808,8 @@ queue rather than an endpoint of its own.
 Exit criteria: a submission travels from `/music/import` through review to a
 pull request without the submitter holding a GitHub account; fingerprinting runs
 in Actions rather than in a Worker; orphaned uploads are collected within 24
-hours; an artist edits their own links through a capability link and cannot touch
-any other document or any field outside the whitelist; and a link to a
-non-allowlisted domain queues rather than publishing.
+hours; and an artist's profile edit arrives as a submission and reaches the site
+only once a maintainer has merged it.
 
 **Phase 3 — daily comparison.** Exit criterion: a histogram renders after a daily
 run, labelled as self-reported, showing the player's band and no rank; the daily
@@ -1805,6 +1871,11 @@ never rewritten.
 | 2026-08-13 | Sanity is removed from the app entirely; help content ships in the tree, the board and the news banner are gone | Nothing should load from a third party at runtime: the help text now lives in the message catalogue and its pictures in `public/help/`, so the help a reader sees matches the build they are running and works offline. This reverses the artist-page proxy above — there is no Sanity document left to patch, so that capability would need a store of its own if it is ever revived |
 | 2026-08-13 | Production moves from GitHub Pages to Cloudflare Pages, by direct upload from Actions rather than Cloudflare's Git integration | One vendor for the site, the previews and (later) the API, and an apex Cloudflare already serves — which removes the proxy/TLS step that was the main objection to same-origin `/api/*` routing above. Direct upload because the build must run in the repo's nix devshell across the per-locale matrix, which Cloudflare's own builder cannot reproduce. The privacy policy's hosting section names Cloudflare in all 26 locales as of the same change |
 | 2026-08-13 | Google Analytics is replaced by Cloudflare Web Analytics, and the consent banner, the consent setting and the whole analytics port go with it | The beacon uses no cookies, no local storage and no fingerprint, so there is nothing to consent to: the banner every visitor met on arrival and the Settings toggle behind it both existed only to gate GA. The cost is real and deliberate — Cloudflare Web Analytics has no custom events, so the 33 tracked events (runs, shares, imports, exports, milestones) stop being collected. A question about a specific feature now needs its own endpoint rather than a flag |
+| 2026-08-26 | An assignment carries an `origin` minted where it was written, distinct from the local `id` a device files it under. Supersedes the 2026-08-09 row above, whose reasoning was wrong | That row said thirty pupils produce thirty ids. They did not: `makeAssignment` fell back to `slugifyName(name)`, so a link mostly yielded the same id for everyone. The real defect was that the shared identity was derived from a mutable display name and re-minted by `withFreeId` on local collision — so renaming a set moved its id, and two sets named alike were re-identified in whichever order each pupil opened the links. A minted origin is stable under both. The report wire format did not change: `assignmentId` was always the grouping key and is now trustworthy |
+| 2026-08-26 | The class id is not added to the share code until classes exist | The 2026-08-09 shape `{n, d?, i, a, c?}` reserved a field with nothing to put in it, against a wire format that is free to change while there are no live users. `o` alone ships now; `c` arrives with the capability that mints it |
+| 2026-08-26 | The privacy policy's API section blocks the client's first API call, not the Worker's first deploy | A Worker nobody calls receives no visitor IPs, and phase 0 changes nothing in the client by construction. Naming the triggering event rather than a phase lets the scaffolding land and be reviewed while the policy text is written, without weakening the deadline |
+| 2026-08-26 | Phase 2 is one endpoint with two payload kinds, not two capabilities | With the Sanity proxy gone, artist pages have no backend half of their own — a profile edit is a submission like a piece is, which the 2026-08-13 row already decided. The phase description and its exit criteria had not caught up, and still tested a scoped edit token, a field whitelist and a link allowlist that this document elsewhere says do not exist |
+| 2026-08-26 | The merge-policy table gets its gate before the vault, not with it | A census against the tree found the table missing three keys for the second time — reviewed, corrected on 2026-08-09, and drifted again. Two other counts in this document were wrong the same way. A table this document cannot keep right by reading is one a check should keep right instead |
 | 2026-08-13 | Artist profiles live in the repository and change through the submission queue, not through an editing endpoint | With no CMS to proxy, a live-edit path would mean building a store, a token, a field whitelist and a link allowlist to guard it. A profile edit is a submission like a piece is, which the artist decision above already chose as the mechanism — so the read path is a file that ships with the build, and nothing an artist writes is public until a person has read it |
 
 ## Open questions

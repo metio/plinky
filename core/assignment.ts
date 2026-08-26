@@ -22,7 +22,17 @@ export interface AssignmentItem {
 export interface Assignment {
     format: "plinky-assignment";
     version: 1;
+    // How this device files the set: a slug of the name, made unique against what is
+    // already stored. It is local by design — two devices that received the same link
+    // may hold it under different ids, and re-importing a set the device already has
+    // deliberately mints a new one so neither copy is lost.
     id: string;
+    // The id minted where the set was written, carried unchanged through every share
+    // link, file and import. It is what a handed-back report names, so thirty devices
+    // that were sent one assignment report against one identity however each of them
+    // filed it. Absent on a set that was never shared, whose local id is identity
+    // enough.
+    origin?: string;
     name: string;
     description?: string;
     // The local calendar date the set is being worked toward — a lesson, an exam, a
@@ -73,6 +83,24 @@ function cleanDescription(value: unknown): string | undefined {
     return trimmed.length > 0 ? trimmed.slice(0, MAX_DESCRIPTION_LENGTH) : undefined;
 }
 
+// A name heads a card, a table and a share message, so it is bounded like every
+// other string that arrives off a link. Roomy enough for a real title with a date
+// and a class in it, short enough that no layout has to cope with a paragraph.
+export const MAX_NAME_LENGTH = 200;
+
+// An origin is machine-minted and never typed, so this is a sanity bound on
+// something off the wire rather than a limit anyone can reach: a UUID is 36
+// characters and the identity of a set is not a place to carry a payload.
+export const MAX_ORIGIN_LENGTH = 64;
+
+function cleanOrigin(value: unknown): string | undefined {
+    if (typeof value !== "string") {
+        return undefined;
+    }
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed.slice(0, MAX_ORIGIN_LENGTH) : undefined;
+}
+
 function cleanItem(value: unknown): AssignmentItem | null {
     if (!isRecord(value) || typeof value.id !== "string" || value.id.length === 0) {
         return null;
@@ -113,14 +141,18 @@ export const MAX_ITEMS = 500;
 // Build a validated assignment from loose parts, dropping malformed items.
 export function makeAssignment(parts: {
     id?: string;
+    origin?: string;
     name?: string;
     description?: string;
     dueOn?: string;
     items: unknown[];
 }): Assignment {
     const name =
-        typeof parts.name === "string" && parts.name.trim() ? parts.name.trim() : "Untitled";
+        typeof parts.name === "string" && parts.name.trim()
+            ? parts.name.trim().slice(0, MAX_NAME_LENGTH)
+            : "Untitled";
     const description = cleanDescription(parts.description);
+    const origin = cleanOrigin(parts.origin);
     const items = parts.items
         .slice(0, MAX_ITEMS)
         .map(cleanItem)
@@ -129,6 +161,7 @@ export function makeAssignment(parts: {
         format: FORMAT,
         version: 1,
         id: parts.id && parts.id.length > 0 ? parts.id : slugifyName(name),
+        ...(origin ? { origin } : {}),
         name,
         ...(description ? { description } : {}),
         // A date that isn't a real calendar day is dropped rather than kept: a set
@@ -159,6 +192,7 @@ export function parseAssignment(json: string): Assignment {
     }
     const assignment = makeAssignment({
         id: typeof data.id === "string" ? data.id : undefined,
+        origin: typeof data.origin === "string" ? data.origin : undefined,
         name: typeof data.name === "string" ? data.name : undefined,
         description: typeof data.description === "string" ? data.description : undefined,
         dueOn: typeof data.dueOn === "string" ? data.dueOn : undefined,
@@ -171,16 +205,18 @@ export function parseAssignment(json: string): Assignment {
 }
 
 // The compact shape carried by a share link — short keys, the local id dropped (the
-// receiver assigns its own), each item a tuple so the payload stays small before
-// compression: [id], [id, tempo], or [id, tempo, note].
+// receiver assigns its own) but the origin kept (it is the same set wherever it
+// lands), each item a tuple so the payload stays small before compression: [id],
+// [id, tempo], or [id, tempo, note].
 type CompactItem = [string] | [string, number] | [string, number, string];
-type Compact = { n: string; d?: string; u?: string; i: CompactItem[] };
+type Compact = { n: string; d?: string; u?: string; o?: string; i: CompactItem[] };
 
 function toCompact(assignment: Assignment): Compact {
     return {
         n: assignment.name,
         ...(assignment.description ? { d: assignment.description } : {}),
         ...(assignment.dueOn ? { u: assignment.dueOn } : {}),
+        ...(assignment.origin ? { o: assignment.origin } : {}),
         i: assignment.items.map((item): CompactItem => {
             if (item.note) {
                 return [item.id, item.tempo ?? 0, item.note];
@@ -205,6 +241,7 @@ function fromCompact(compact: unknown): Assignment {
         return cleanItem({ id, tempo, note });
     });
     return makeAssignment({
+        origin: typeof compact.o === "string" ? compact.o : undefined,
         name: typeof compact.n === "string" ? compact.n : undefined,
         description: typeof compact.d === "string" ? compact.d : undefined,
         dueOn: typeof compact.u === "string" ? compact.u : undefined,

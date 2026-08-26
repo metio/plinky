@@ -461,6 +461,7 @@
     "collect_played": "연주함",
     "collect_of": "{total}개 중 {played}개",
     "collect_unnamed": "이름 없음",
+    "collect_untitled": "제목 없음",
     "solfege_do": "도",
     "solfege_re": "레",
     "solfege_mi": "미",

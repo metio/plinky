@@ -86,3 +86,92 @@ describe("Collect", () => {
         expect(screen.queryByRole("table")).toBeNull();
     });
 });
+
+describe("Collect with more than one assignment pasted", () => {
+    const piano = makeAssignment({
+        id: "piano-week-3",
+        origin: "origin-piano",
+        name: "Piano, week 3",
+        items: [{ id: "twinkle" }, { id: "ode-to-joy" }],
+    });
+    const theory = makeAssignment({
+        id: "theory-week-3",
+        origin: "origin-theory",
+        name: "Theory, week 3",
+        items: [{ id: "intervals" }],
+    });
+    const report = (
+        assignment: Parameters<typeof buildReport>[0],
+        who: string,
+        scores: Record<string, number>,
+    ) => encodeReport(buildReport(assignment, (id) => scores[id] ?? null, who, 1));
+
+    const both = () =>
+        paste(
+            [
+                report(piano, "Ada", { twinkle: 91, "ode-to-joy": 70 }),
+                report(theory, "Ada", { intervals: 80 }),
+                report(piano, "Grace", { twinkle: 60 }),
+            ].join("\n"),
+        );
+
+    it("gives each assignment its own table under its own name", () => {
+        renderWithServices(<Collect />, { store: memoryStore() });
+
+        both();
+
+        expect(screen.getAllByRole("table")).toHaveLength(2);
+        expect(screen.getByRole("heading", { name: "Piano, week 3" })).toBeTruthy();
+        expect(screen.getByRole("heading", { name: "Theory, week 3" })).toBeTruthy();
+    });
+
+    it("does not put one assignment's pieces in another's columns", () => {
+        renderWithServices(<Collect />, { store: memoryStore() });
+
+        both();
+
+        // Read as one table, Ada's theory row showed a dash under Twinkle and Ode to
+        // Joy — a piece she was never asked for, presented as one she skipped.
+        const [pianoTable, theoryTable] = screen.getAllByRole("table");
+        expect(pianoTable?.textContent).toContain("twinkle");
+        expect(theoryTable?.textContent).not.toContain("twinkle");
+        expect(theoryTable?.textContent).toContain("intervals");
+    });
+
+    it("counts every report across the assignments", () => {
+        renderWithServices(<Collect />, { store: memoryStore() });
+
+        both();
+
+        expect(screen.getByText(m.collect_found({ count: 3 }))).toBeTruthy();
+    });
+
+    it("offers a download for each assignment separately", () => {
+        renderWithServices(<Collect />, { store: memoryStore() });
+
+        both();
+
+        expect(screen.getAllByRole("button", { name: m.collect_csv() })).toHaveLength(2);
+    });
+
+    it("names each table by its assignment", () => {
+        renderWithServices(<Collect />, { store: memoryStore() });
+
+        both();
+
+        // Two tables announced only as "table" are two tables nobody can tell apart.
+        expect(screen.getByRole("table", { name: "Piano, week 3" })).toBeTruthy();
+        expect(screen.getByRole("table", { name: "Theory, week 3" })).toBeTruthy();
+    });
+
+    it("heads a set whose name did not travel with the codes", () => {
+        renderWithServices(<Collect />, { store: memoryStore() });
+
+        const nameless = makeAssignment({ id: "x", origin: "o", name: " ", items: [{ id: "a" }] });
+        // makeAssignment substitutes its own placeholder for an empty name, so the
+        // wire case is a code carrying no name at all.
+        paste(encodeReport({ ...buildReport(nameless, () => 1, "Ada", 1), assignmentName: "" }));
+
+        expect(screen.getByRole("heading", { name: m.collect_untitled() })).toBeTruthy();
+    });
+});

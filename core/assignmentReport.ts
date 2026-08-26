@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { Assignment } from "./assignment";
+import { type Assignment, MAX_ITEMS, MAX_NAME_LENGTH } from "./assignment";
 import { toCsv } from "./csv";
 import { letterFor } from "./grade";
 import { isRecord } from "./guards";
@@ -37,6 +37,14 @@ export type AssignmentReport = {
 };
 
 export const MAX_WHO_LENGTH = 60;
+
+// Bounds on everything else a code carries. A report is pasted by a teacher who was
+// sent it, so these are not a defence against a class — they are what keeps one
+// crafted code from filling a table with a thousand columns headed by a kilobyte
+// each. MAX_REPORT_ITEMS matches the assignment's own MAX_ITEMS: a report answers a
+// list, so it can never honestly be longer than the longest list.
+export const MAX_REPORT_ITEMS = MAX_ITEMS;
+export const MAX_REPORT_ID_LENGTH = 200;
 // A piece the device has no score for. Distinct from zero, which is a run that
 // happened and went badly — a teacher reads those differently.
 export const NOT_PLAYED = -1;
@@ -54,7 +62,10 @@ export function buildReport(
     at: number,
 ): AssignmentReport {
     return {
-        assignmentId: assignment.id,
+        // The identity the teacher minted, so every device sent this assignment reports
+        // against one id. A set that was never shared has no origin and is only ever
+        // reported by the device that wrote it, where the local id is identity enough.
+        assignmentId: assignment.origin ?? assignment.id,
         assignmentName: assignment.name ?? "",
         who: who.trim().slice(0, MAX_WHO_LENGTH),
         items: assignment.items.map((item) => {
@@ -128,18 +139,21 @@ export function decodeReport(code: string): AssignmentReport | null {
         return null;
     }
     const items: ReportItem[] = [];
-    for (const entry of raw.i) {
+    // Capped on the way in rather than after: the loop is the unbounded work, and a
+    // list longer than any assignment could hold is not a report that was cut short,
+    // it is one that was written by hand.
+    for (const entry of raw.i.slice(0, MAX_REPORT_ITEMS)) {
         if (!Array.isArray(entry) || typeof entry[0] !== "string") {
             continue;
         }
-        items.push({ id: entry[0], score: readScore(entry[1]) });
+        items.push({ id: entry[0].slice(0, MAX_REPORT_ID_LENGTH), score: readScore(entry[1]) });
     }
     if (items.length === 0) {
         return null;
     }
     return {
-        assignmentId: raw.a,
-        assignmentName: typeof raw.n === "string" ? raw.n : "",
+        assignmentId: raw.a.slice(0, MAX_REPORT_ID_LENGTH),
+        assignmentName: typeof raw.n === "string" ? raw.n.slice(0, MAX_NAME_LENGTH) : "",
         who: typeof raw.w === "string" ? raw.w.slice(0, MAX_WHO_LENGTH) : "",
         items,
         at: typeof raw.t === "number" && Number.isFinite(raw.t) ? raw.t : 0,
@@ -170,6 +184,57 @@ export function collectReports(text: string): AssignmentReport[] {
     return [...byKey.values()];
 }
 
+// The pieces a set of reports answers, in the order the fullest of them lists them,
+// so a student who skipped the tail still lines up with everyone else.
+function reportColumns(reports: AssignmentReport[]): string[] {
+    return reports.reduce<string[]>(
+        (widest, report) =>
+            report.items.length > widest.length ? report.items.map((item) => item.id) : widest,
+        [],
+    );
+}
+
+// One assignment's worth of a paste: the reports that name it, and the pieces they
+// answer.
+export type ReportGroup = {
+    assignmentId: string;
+    assignmentName: string;
+    columns: string[];
+    reports: AssignmentReport[];
+};
+
+// A paste split by the assignment each report names.
+//
+// A teacher collecting a term pastes whatever arrived, and what arrives is several
+// assignments at once. Read as one table they cannot be: the columns would be
+// whichever set happened to be longest, and every student who did a different one
+// would show a dash under every piece — which reads as "did not play" rather than
+// "was never asked". One table per assignment is the only honest shape.
+//
+// Groups keep the order their first report was pasted in, and reports keep theirs
+// within a group, so a teacher watching the table build sees it grow downward
+// rather than reshuffle.
+export function groupReports(reports: AssignmentReport[]): ReportGroup[] {
+    const byAssignment = new Map<string, AssignmentReport[]>();
+    for (const report of reports) {
+        const group = byAssignment.get(report.assignmentId);
+        if (group) {
+            group.push(report);
+        } else {
+            byAssignment.set(report.assignmentId, [report]);
+        }
+    }
+    return [...byAssignment].map(([assignmentId, group]) => ({
+        assignmentId,
+        // The name any one of them carries. They agree unless a teacher renamed the set
+        // between handing it out and collecting it back, in which case the first one
+        // pasted names the group and the identity underneath is unaffected.
+        assignmentName: group[0]?.assignmentName ?? "",
+        columns: reportColumns(group),
+        reports: group,
+    }));
+}
+
 // The collected reports as a spreadsheet: one row per student, one column per
 // piece of the assignment they answered, so it opens in whatever the teacher
 // already uses to record marks.
@@ -180,13 +245,7 @@ export function reportsToCsv(
     if (reports.length === 0) {
         return "";
     }
-    // Columns follow the longest report's order, so a student who skipped the tail
-    // still lines up with everyone else.
-    const columns = reports.reduce<string[]>(
-        (widest, report) =>
-            report.items.length > widest.length ? report.items.map((item) => item.id) : widest,
-        [],
-    );
+    const columns = reportColumns(reports);
     const header = ["Name", "Played", "Average", ...columns.map(pieceTitle)];
     const rows = reports.map((report) => {
         const { played, total, average } = reportSummary(report);

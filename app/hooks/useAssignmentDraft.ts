@@ -21,7 +21,11 @@ export const PICKER_PAGE = 20;
 // The builder's draft: the one assignment being assembled or edited. All the
 // basket mechanics live here — adding, removing, reordering, per-step tempo and
 // note — so the builder component only renders and the route only saves.
-export function useAssignmentDraft() {
+//
+// `newId` mints the origin an assignment keeps for life. It is a parameter so a
+// test can name what it gets; the default is the ambient generator, wired here at
+// the app layer because core takes its randomness as an argument.
+export function useAssignmentDraft(newId: () => string = () => crypto.randomUUID()) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     // The date the set is being worked toward, "" for an open-ended one.
@@ -32,6 +36,11 @@ export function useAssignmentDraft() {
     // The id of the saved assignment being edited, so saving overwrites it in
     // place instead of creating a sibling.
     const [editingId, setEditingId] = useState<string | null>(null);
+    // The identity this draft carries wherever it goes. Minted once and held, not
+    // derived per call: a teacher who shares a draft link before saving it must hand
+    // out the same identity the save then stores, or the reports that come back name
+    // an assignment the teacher does not have.
+    const [origin, setOrigin] = useState(newId);
 
     // A new search resets the pagination — page depth belongs to the old results.
     const setQuery = (value: string) => {
@@ -56,6 +65,7 @@ export function useAssignmentDraft() {
     const draft = (existingIds: string[]): Assignment =>
         makeAssignment({
             id: editingId ?? newAssignmentId(name, existingIds),
+            origin,
             name,
             description,
             dueOn,
@@ -69,6 +79,7 @@ export function useAssignmentDraft() {
         setItems([]);
         setQueryState("");
         setEditingId(null);
+        setOrigin(newId());
     };
 
     const startEdit = (assignment: Assignment) => {
@@ -77,6 +88,10 @@ export function useAssignmentDraft() {
         setDueOn(assignment.dueOn ?? "");
         setItems(assignment.items);
         setEditingId(assignment.id);
+        // An edit keeps the identity it was handed out under, so reports already on
+        // their way back still name it. A set saved before origins existed has none,
+        // and gains one now rather than staying anonymous forever.
+        setOrigin(assignment.origin ?? newId());
     };
 
     return {

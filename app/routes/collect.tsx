@@ -1,10 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useState } from "react";
+import { slugifyName } from "../../core/assignment";
 import {
     type AssignmentReport,
     collectReports,
+    groupReports,
+    type ReportGroup,
     reportLetter,
     reportsToCsv,
     reportSummary,
@@ -44,17 +47,9 @@ function usePieceTitles(): (id: string) => string {
 // box, so closing it leaves no record of anyone's students on the device.
 export default function CollectRoute() {
     const [text, setText] = useState("");
-    const reports = useMemo(() => collectReports(text), [text]);
+    const groups = useMemo(() => groupReports(collectReports(text)), [text]);
     const titleOf = usePieceTitles();
-
-    const columns = reports.reduce<string[]>(
-        (widest, report) =>
-            report.items.length > widest.length ? report.items.map((item) => item.id) : widest,
-        [],
-    );
-
-    const download = () =>
-        downloadBlob(reportsToCsv(reports, titleOf), "text/csv", "plinky-assignment.csv");
+    const found = groups.reduce((count, group) => count + group.reports.length, 0);
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
@@ -70,54 +65,76 @@ export default function CollectRoute() {
                 />
             </label>
 
-            {text.trim().length > 0 && reports.length === 0 && (
+            {text.trim().length > 0 && found === 0 && (
                 <p role="status" className="text-sm text-muted">
                     {m.collect_nothing()}
                 </p>
             )}
 
-            {reports.length > 0 && (
+            {found > 0 && (
                 <>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <p className="text-sm text-muted">
-                            {m.collect_found({ count: reports.length })}
-                        </p>
-                        <Button variant="secondary" onClick={download}>
-                            {m.collect_csv()}
-                        </Button>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-max border-collapse text-sm">
-                            <thead>
-                                <tr className="border-b border-line text-left">
-                                    <th scope="col" className="p-2">
-                                        {m.collect_who()}
-                                    </th>
-                                    <th scope="col" className="p-2">
-                                        {m.collect_played()}
-                                    </th>
-                                    {columns.map((id) => (
-                                        <th key={id} scope="col" className="p-2">
-                                            {titleOf(id)}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {reports.map((report) => (
-                                    <Row
-                                        key={`${report.assignmentId}:${report.who}`}
-                                        report={report}
-                                        columns={columns}
-                                    />
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <p className="text-sm text-muted">{m.collect_found({ count: found })}</p>
+                    {groups.map((group) => (
+                        <GroupTable key={group.assignmentId} group={group} titleOf={titleOf} />
+                    ))}
                     <p className="text-xs text-muted">{m.report_not_proof()}</p>
                 </>
             )}
         </main>
+    );
+}
+
+// One assignment's table. Each set gets its own columns: a piece nobody in this
+// group was asked to play is not a column they all left blank.
+function GroupTable({ group, titleOf }: { group: ReportGroup; titleOf: (id: string) => string }) {
+    const name = group.assignmentName || m.collect_untitled();
+    // Several tables share the page, so each is named by its own heading. Announced
+    // as "table" and nothing else, they would be indistinguishable from one another.
+    const headingId = useId();
+    const download = () =>
+        downloadBlob(reportsToCsv(group.reports, titleOf), "text/csv", `${slugifyName(name)}.csv`);
+    return (
+        <section className="space-y-3">
+            <div className="flex flex-wrap items-center gap-3">
+                <h2 id={headingId} className="font-medium text-body">
+                    {name}
+                </h2>
+                <Button variant="secondary" onClick={download} aria-describedby={headingId}>
+                    {m.collect_csv()}
+                </Button>
+            </div>
+            <div className="overflow-x-auto">
+                <table
+                    aria-labelledby={headingId}
+                    className="w-full min-w-max border-collapse text-sm"
+                >
+                    <thead>
+                        <tr className="border-b border-line text-left">
+                            <th scope="col" className="p-2">
+                                {m.collect_who()}
+                            </th>
+                            <th scope="col" className="p-2">
+                                {m.collect_played()}
+                            </th>
+                            {group.columns.map((id) => (
+                                <th key={id} scope="col" className="p-2">
+                                    {titleOf(id)}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {group.reports.map((report) => (
+                            <Row
+                                key={`${report.assignmentId}:${report.who}`}
+                                report={report}
+                                columns={group.columns}
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
     );
 }
 

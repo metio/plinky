@@ -461,6 +461,7 @@
     "collect_played": "Soitettu",
     "collect_of": "{played}/{total}",
     "collect_unnamed": "Joku",
+    "collect_untitled": "Nimetön",
     "solfege_do": "do",
     "solfege_re": "re",
     "solfege_mi": "mi",
