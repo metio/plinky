@@ -10,16 +10,21 @@
 // transliteration, and a plain misspelling.
 
 import { readFileSync } from "node:fs";
-import { canonicalComposer, personSlug } from "../core/person";
+import { canonicalPeople, personSlug } from "../core/person";
 
 const songs = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
 const items = Array.isArray(songs) ? songs : songs.items;
 
 const counts = new Map<string, number>();
 for (const it of items) {
-    const canon = canonicalComposer(it.composer ?? "");
-    if (!personSlug(canon)) continue;
-    counts.set(canon, (counts.get(canon) ?? 0) + 1);
+    // Every person the credit names, the same way the pages are built. Reading one name per
+    // credit made the report describe a catalogue that no longer exists: a joint credit
+    // counted as a page of its own, so "Gesius / Telemann" showed up beside Telemann as a
+    // pair to consider merging, when the pair is exactly what the split had already removed.
+    for (const canon of canonicalPeople(it.composer ?? "")) {
+        if (!personSlug(canon)) continue;
+        counts.set(canon, (counts.get(canon) ?? 0) + 1);
+    }
 }
 const names = [...counts.keys()];
 
