@@ -133,6 +133,9 @@ npm run icons         # regenerates public/ icons + favicon from icon.svg (not a
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # makes git call a file binary, and a binary file reviews
                       # as an empty diff
+nix develop --command ci-worker   # the optional backend: its own npm project, typechecked
+                      # and run in workerd (blocking). Never a root npm script — worker/
+                      # has its own package-lock.json and its own toolchain.
 nix develop --command ci-build   # the single-locale (en) build CI + the deploy measure
 npm run size          # bundle budget — measures the ci-build output
 npm run a11y:light    # CI ONLY — axe over the built site (builds it first)

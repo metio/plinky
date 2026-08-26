@@ -120,6 +120,18 @@
             '')
             (pkgs.writeShellScriptBin "ci-size" ''exec npm run size "$@"'')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
+            # The worker is its own npm project with its own lockfile, so it installs and
+            # runs its own toolchain rather than the root one. `set -e` is not decoration:
+            # without it the wrapper reports only the last command's status, so a failing
+            # worker typecheck passes CI in silence. Anchored on the repository root so the
+            # same name works from any directory.
+            (pkgs.writeShellScriptBin "ci-worker" ''
+              set -e
+              cd "$(git rev-parse --show-toplevel)"/worker
+              npm ci
+              npm run typecheck
+              exec npm test "$@"
+            '')
           ];
         in
         {

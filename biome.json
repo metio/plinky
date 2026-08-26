@@ -13,6 +13,7 @@
             "dev/**/*.ts",
             "dev/**/*.mts",
             "dev/**/*.mjs",
+            "worker/**/*.ts",
             "*.ts"
         ]
     },

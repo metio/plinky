@@ -116,6 +116,16 @@ jobs:
       # Two composer pages that might be one person need a human to rule on which. The
       # rulings live in dev/catalog-people-distinct.json; a merge belongs in core/person.ts.
       - run: nix develop --command ci-people-check
+  worker:
+    name: worker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      # The optional backend: its own npm project, its own lockfile, its own toolchain.
+      # The wrapper installs them, so this job runs no root `npm ci` of its own. Handlers
+      # are typechecked and then run in workerd, the runtime that will serve them.
+      - run: nix develop --command ci-worker
   bytes:
     name: bytes
     runs-on: ubuntu-latest
@@ -179,6 +189,7 @@ jobs:
         nav,
         arch,
         people,
+        worker,
         bytes,
         tailwind,
         tokens,
