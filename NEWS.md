@@ -8,7 +8,23 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
-## 26 August 2026
+## 26 August 2026 — night
+
+**Three Burgmüller pages became one, and Cherubini got his own.** The études arrive
+spelled five different ways — with the umlaut and without, with all four names and
+with none — and each spelling had been opening a page of its own, so his twenty-five
+pieces were scattered across three. They are together now. And a piece whose sheet
+music never named its composer had been filed under a composer called "Ave Maria -
+Cherubini", which is the title with a surname stuck on the end; it is Luigi
+Cherubini, and he has a page.
+
+**A piece two people wrote now names them both.** A chorale melody and the setting of
+it, a transcription that kept both names, three people who scored a game between them
+— the credit used to read as one long run-on name, and only the first of them could
+be reached. Each name is now its own link, wherever the credit appears, and the
+composer list counts a shared piece for everyone who wrote it.
+
+## 26 August 2026 — evening
 
 **Collecting results reads two assignments as two assignments.** Paste in whatever
 arrived and each set gets its own table, with its own columns and its own CSV.

@@ -91,7 +91,12 @@ const ALIASES: Record<string, string> = {
     "clara mathilda faisst": "Clara Faisst",
     "alexander campbell mackenzie": "Alexander Mackenzie",
     "friedrich burgmüller": "Johann Friedrich Franz Burgmüller",
-    "johann friedrich franz burgmüller opus 100": "Johann Friedrich Franz Burgmüller",
+    // The études arrive under every combination of his four names, and one score
+    // spells him without the umlaut. His brother Norbert was a composer too, so a bare
+    // surname is ambiguous in principle — not here: both stray credits sit on Op. 100
+    // and Op. 109, which are Friedrich's, and Norbert wrote no piano method.
+    burgmüller: "Johann Friedrich Franz Burgmüller",
+    "johann friedrich burgmuller": "Johann Friedrich Franz Burgmüller",
     "l. streabbog": "Louis Streabbog",
     "frederik kuhlau": "Friedrich Kuhlau",
     "by scott joplin": "Scott Joplin",
@@ -539,23 +544,36 @@ export type PersonCount = { slug: string; name: string; pieces: number };
 // once. Building no per-composer piece lists and sorting none of them is the rest of the
 // saving: peopleFrom does both, at some cost, for a page that reads them.
 export function composerCounts(pieces: readonly { composer: string }[]): PersonCount[] {
-    const resolved = new Map<string, { slug: string; name: string } | null>();
+    const resolved = new Map<string, PersonCount[]>();
     const counts = new Map<string, PersonCount>();
     for (const piece of pieces) {
-        let identity = resolved.get(piece.composer);
-        if (identity === undefined) {
-            const slug = personSlug(piece.composer);
-            identity = slug ? { slug, name: canonicalComposer(piece.composer) } : null;
-            resolved.set(piece.composer, identity);
+        let identities = resolved.get(piece.composer);
+        if (identities === undefined) {
+            // Every person the credit names, exactly as peopleFrom reads it. Reading one
+            // name per credit gave the directory a row for "Gesius / Telemann" — a
+            // composer nobody is — linked to whichever of them came first, while the
+            // pages themselves had long since split the piece between the two of them.
+            const bySlug = new Map<string, PersonCount>();
+            for (const name of canonicalPeople(piece.composer)) {
+                const slug = personSlug(name);
+                // Keyed by slug rather than collected in order, so a credit naming one
+                // person twice — two spellings the alias table folds together — counts
+                // the piece once. personSlugs already dedupes this way; canonicalPeople
+                // answers names, and two names can be one person.
+                if (slug !== "" && !bySlug.has(slug)) {
+                    bySlug.set(slug, { slug, name, pieces: 0 });
+                }
+            }
+            identities = [...bySlug.values()];
+            resolved.set(piece.composer, identities);
         }
-        if (!identity) {
-            continue;
-        }
-        const seen = counts.get(identity.slug);
-        if (seen) {
-            seen.pieces += 1;
-        } else {
-            counts.set(identity.slug, { ...identity, pieces: 1 });
+        for (const identity of identities) {
+            const seen = counts.get(identity.slug);
+            if (seen) {
+                seen.pieces += 1;
+            } else {
+                counts.set(identity.slug, { ...identity, pieces: 1 });
+            }
         }
     }
     return [...counts.values()].sort((a, b) => a.name.localeCompare(b.name));
@@ -565,13 +583,16 @@ export function peopleFrom(pieces: PersonPiece[]): Person[] {
     const bySlug = new Map<string, Person>();
     for (const piece of pieces) {
         // A piece credited to several people belongs on each of their pages, rather than on
-        // one page for a composite of them that no one is.
-        const names = canonicalPeople(piece.composer);
-        for (const name of names) {
+        // one page for a composite of them that no one is. Once each, though: a credit
+        // that names one person under two spellings is still one person, and listing the
+        // piece twice on their page is the same error read from the other end.
+        const mine = new Set<string>();
+        for (const name of canonicalPeople(piece.composer)) {
             const slug = personSlug(name);
-            if (!slug) {
+            if (!slug || mine.has(slug)) {
                 continue;
             }
+            mine.add(slug);
             const person = bySlug.get(slug) ?? { slug, name, pieces: [] };
             person.pieces.push(piece);
             bySlug.set(slug, person);

@@ -338,5 +338,10 @@
         "id": "krFYW7PbQL4a",
         "composer": "Johann Sebastian Bach",
         "why": "The credit ran three things together - a name, a BWV number and the notebook. IMSLP and Bach Digital both file BWV 515 under Johann Sebastian. Authorship is genuinely divided: New Grove assigns the melody tentatively to Gottfried Heinrich Bach and the bass certainly to Johann Sebastian, so his is the defensible single name."
+    },
+    {
+        "id": "enwyT5ojXxVZ",
+        "composer": "Luigi Cherubini",
+        "why": "The score carries no creator at all - only an engraved title line reading 'Ave Maria - Cherubini', which the import took for the composer. The title was welded onto the surname, so the piece opened a person page called 'Ave Maria Cherubini' and the real composer had none. Luigi Cherubini (1760-1842) is the only Cherubini in the repertoire and set the Ave Maria more than once."
     }
 ]

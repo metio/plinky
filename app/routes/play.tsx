@@ -5,9 +5,9 @@ import { useState } from "react";
 import { Attribution } from "../components/ui/attribution";
 import { ScoreIncipit } from "../components/features/scoreIncipit";
 import { Button } from "../components/ui/button";
+import { ComposerCredit, composerCreditText } from "../components/ui/composerCredit";
 import { attributionFor } from "../../core/attribution";
-import { canonicalComposer, personSlug } from "../../core/person";
-import { LocalizedLink as Link } from "../components/ui/localizedLink";
+import { canonicalPeople, personSlug } from "../../core/person";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { ExerciseForms } from "../components/features/exerciseForms";
@@ -50,23 +50,29 @@ export function meta({ params }: Route.MetaArgs) {
     if (!score) {
         return routeMeta(m.meta_play_title(), m.meta_play_description_fallback());
     }
+    // Cleaned, like the heading a reader sees. These carried the raw credit, so a piece
+    // whose page read "Carl Czerny" was described to a search engine as "C. Czerny
+    // Op.599 No.1" — the one place a bad credit escaped the app.
+    const credit = composerCreditText(score.composer);
     const description = score.composer
-        ? m.meta_play_description_by({ title: score.title, composer: score.composer })
+        ? m.meta_play_description_by({ title: score.title, composer: credit })
         : m.meta_play_description({ title: score.title });
     const locale = getLocale();
-    // The piece's place in the catalogue: Home › Library › [Composer] › Piece. The
-    // composer crumb links to their page when the credit resolves to a real person,
-    // matching the prerendered /person/:slug and the on-page composer link.
-    const slug = score.composer ? personSlug(score.composer) : "";
+    // The piece's place in the catalogue: Home › Library › [Composer] › Piece. A trail
+    // holds one crumb, so a piece two people share is filed under the first of them —
+    // the name and the link now agree about which one that is, where the crumb used to
+    // read both names and point at one.
+    const first = score.composer ? (canonicalPeople(score.composer)[0] ?? "") : "";
+    const slug = personSlug(first);
     const trail = [
         { name: m.nav_today(), path: "/" },
         { name: m.music_title(), path: "/music/" },
-        ...(slug ? [{ name: canonicalComposer(score.composer), path: `/person/${slug}/` }] : []),
+        ...(slug ? [{ name: first, path: `/person/${slug}/` }] : []),
         { name: score.title, path: `/play/${score.id}/` },
     ];
     return [
         ...routeMeta(score.title, description),
-        { "script:ld+json": musicCompositionData(score.title, score.composer, locale) },
+        { "script:ld+json": musicCompositionData(score.title, credit, locale) },
         { "script:ld+json": breadcrumbData(locale, trail) },
     ];
 }
@@ -122,22 +128,14 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             </div>
                         </div>
                         {score.composer && (
-                            <p className="text-sm text-muted">
-                                {/* The composer's name opens their page — everything of
-                                    theirs in the catalogue, one tap away. */}
-                                {personSlug(score.composer) ? (
-                                    <Link
-                                        to={`/person/${personSlug(score.composer)}`}
-                                        className="hover:text-accent-strong hover:underline"
-                                    >
-                                        {canonicalComposer(score.composer)}
-                                    </Link>
-                                ) : (
-                                    // Cleaned on this branch too: a credit naming a
-                                    // tradition rather than a person is still a credit.
-                                    canonicalComposer(score.composer)
-                                )}
-                            </p>
+                            /* Each name opens its own page — everything of theirs in the
+                               catalogue, one tap away, including the second person on a
+                               credit two of them share. */
+                            <ComposerCredit
+                                composer={score.composer}
+                                className="text-sm text-muted"
+                                linkClassName="hover:text-accent-strong hover:underline"
+                            />
                         )}
                         {/* The piece's opening bar, under its name — the mark a
                             thematic catalogue would file it by. */}
@@ -168,7 +166,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         credit={creditLine(
                             score.title,
                             attributionFor({
-                                composer: score.composer,
+                                // Burnt into an exported video, so it is cleaned like
+                                // everything else that names the composer.
+                                composer: composerCreditText(score.composer),
                                 license: score.license,
                                 source: score.source,
                             }),

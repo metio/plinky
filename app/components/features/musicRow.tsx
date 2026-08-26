@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { MusicItem } from "../../../core/music";
-import { canonicalComposer, personSlug } from "../../../core/person";
 import { m } from "../../paraglide/messages.js";
 import { IconButton } from "../ui/button";
 import { ConfirmButton } from "../ui/confirmButton";
+import { ComposerCredit } from "../ui/composerCredit";
 import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../ui/icons";
 import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
@@ -85,24 +85,13 @@ export function MusicRow({
                             </span>
                         )}
                     </Link>
-                    {item.composer &&
-                        (personSlug(item.composer) ? (
-                            <Link
-                                to={`/person/${personSlug(item.composer)}`}
-                                className="relative z-10 block w-fit max-w-full truncate text-xs text-muted hover:text-accent-strong hover:underline"
-                            >
-                                {canonicalComposer(item.composer)}
-                            </Link>
-                        ) : (
-                            // Canonicalised here too, not just on the person branch: a
-                            // credit that names a tradition rather than a person still goes
-                            // through the same cleaning, and one that skipped it printed a
-                            // harvested score's "Traditional I think" straight into the
-                            // library.
-                            <span className="block truncate text-xs text-muted">
-                                {canonicalComposer(item.composer)}
-                            </span>
-                        ))}
+                    {item.composer && (
+                        <ComposerCredit
+                            composer={item.composer}
+                            className="relative z-10 block w-fit max-w-full truncate text-xs text-muted"
+                            linkClassName="hover:text-accent-strong hover:underline"
+                        />
+                    )}
                 </span>
                 <GradeChip grade={item.grade} />
             </div>

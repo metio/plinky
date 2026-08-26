@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
     canonicalComposer,
+    composerCounts,
     nameFromSlug,
     peopleFrom,
     personFor,
@@ -444,5 +445,77 @@ describe("a credit that names more than one person", () => {
             "b",
             "a",
         ]);
+    });
+});
+
+describe("one composer under every spelling the catalogue holds", () => {
+    it("merges the Burgmüller variants, bare surname and un-umlauted alike", () => {
+        // Five spellings across the two manifests, which made three composer pages: one
+        // with twenty-three pieces and two with one each. His brother Norbert was a
+        // composer too, so a bare surname is ambiguous in principle — not here, since
+        // both strays sit on Op. 100 and Op. 109.
+        const canonical = "Johann Friedrich Franz Burgmüller";
+        for (const variant of [
+            "Johann Friedrich Franz Burgmüller",
+            "Friedrich Burgmüller",
+            "Johann Friedrich Franz Burgmüller Opus 100.",
+            "Burgmüller",
+            "Johann Friedrich Burgmuller",
+        ]) {
+            expect(canonicalComposer(variant)).toBe(canonical);
+            expect(personSlug(variant)).toBe(personSlug(canonical));
+        }
+    });
+});
+
+describe("counting the composers a shelf holds", () => {
+    it("gives each person in a shared credit the piece", () => {
+        // The directory read one name per credit while the pages read every name, so a
+        // piece two people wrote made a row for a composer nobody is — "Gesius /
+        // Telemann", linked to whichever of them came first — and left the other short.
+        const counts = composerCounts([
+            { composer: "Bartholomäus Gesius / Georg Philipp Telemann" },
+            { composer: "Georg Philipp Telemann" },
+        ]);
+
+        expect(counts.map((one) => one.slug).sort()).toEqual([
+            "bartholomaus-gesius",
+            "georg-philipp-telemann",
+        ]);
+        expect(counts.find((one) => one.slug === "georg-philipp-telemann")?.pieces).toBe(2);
+        expect(counts.find((one) => one.slug === "bartholomaus-gesius")?.pieces).toBe(1);
+        expect(counts.some((one) => one.name.includes("/"))).toBe(false);
+    });
+
+    it("agrees with the person pages about who holds what", () => {
+        // The two answers are built by different functions over the same credits; a
+        // reader who follows a directory row to a page must find the count it promised.
+        const pieces = [
+            { id: "a", title: "A", composer: "Bartholomäus Gesius / Georg Philipp Telemann" },
+            { id: "b", title: "B", composer: "Georg Philipp Telemann" },
+            { id: "c", title: "C", composer: "Mildred J. Hill & Patty S. Hill" },
+        ];
+        for (const count of composerCounts(pieces)) {
+            expect(personFor(pieces, count.slug)?.pieces.length).toBe(count.pieces);
+        }
+    });
+
+    it("counts a credit naming nobody towards nobody", () => {
+        expect(composerCounts([{ composer: "Traditional" }, { composer: "" }])).toEqual([]);
+    });
+
+    it("counts one person once however many names the credit repeats", () => {
+        // Two spellings the alias table folds together are one person, and the piece is
+        // one piece. Counting per name rather than per person credited it twice.
+        const counts = composerCounts([{ composer: "J. S. Bach / Johann Sebastian Bach" }]);
+
+        expect(counts).toHaveLength(1);
+        expect(counts[0]?.pieces).toBe(1);
+    });
+
+    it("lists a piece once on a page even when the credit names its composer twice", () => {
+        const pieces = [{ id: "a", title: "A", composer: "J. S. Bach / Johann Sebastian Bach" }];
+
+        expect(personFor(pieces, "johann-sebastian-bach")?.pieces).toHaveLength(1);
     });
 });
