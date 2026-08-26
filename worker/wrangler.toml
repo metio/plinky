@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Plinky's optional backend. The design, the rollout and the reasoning behind every
+# choice here live in BACKEND.md at the repository root.
+#
+# Phase 0 is the pipeline and nothing that runs through it: one /v1/health endpoint,
+# no bindings, no database, no bucket. That is deliberate — a Worker with no storage
+# cannot lose anybody's data, and the storage this will need has to be created with
+# an EU jurisdiction that cannot be added afterwards. See "Provisioning" in
+# BACKEND.md before adding the first binding.
+
+name = "plinky-api"
+main = "src/index.ts"
+# Pinned, never floating: the runtime's behaviour is part of what the tests pin, and
+# a date that moves on its own moves them with it.
+#
+# It also cannot outrun the workerd that `@cloudflare/vitest-pool-workers` bundles,
+# which trails the published wrangler by a few days — a date newer than that binary
+# supports fails every test with ERR_RUNTIME_FAILURE and a message naming the newest
+# date it will accept. Raise this and the pool together, and take the pool's answer.
+compatibility_date = "2026-08-22"
+workers_dev = false
+
+# Observability is on because the alternative is diagnosing a production failure from
+# a status code. It retains request metadata including client IP, which is named in
+# the privacy policy's API section — see "Privacy and law" in BACKEND.md.
+[observability]
+enabled = true
+
+[vars]
+ALLOWED_ORIGINS = "https://plinky.fun"
+# Every capability off. Phase 0 has none to turn on, and a flag that answers true
+# advertises an endpoint that returns 404.
+FEATURE_RESULTS = "off"
+FEATURE_SUBMISSIONS = "off"
+FEATURE_DAILY = "off"
+FEATURE_VAULT = "off"
+
+# Preview is a separate Worker with separate everything, never a route on production.
+# Preview branches are disposable and already get their own origin precisely so that
+# one cannot corrupt real data; the same reasoning reaches the backend.
+[env.preview]
+name = "plinky-api-preview"
+workers_dev = true
+
+[env.preview.vars]
+ALLOWED_ORIGINS = "https://plinky.fun,http://localhost:5173"
+FEATURE_RESULTS = "off"
+FEATURE_SUBMISSIONS = "off"
+FEATURE_DAILY = "off"
+FEATURE_VAULT = "off"
