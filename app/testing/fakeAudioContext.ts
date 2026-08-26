@@ -2,20 +2,28 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Enough of a Web Audio context for the engine to build its graphs against, and — the
-// point of it — a record of which oscillators were started and which were ever stopped.
+// point of it — a record of which oscillators were started and when each was told to stop.
 //
-// A voice that is started and never stopped is this project's recurring audio defect: the
-// synthesised path schedules no stop of its own, so anything dropped from a held set
-// without being ended rings until something unrelated silences it. That is invisible to a
-// smoke test, which only asks whether the graph built without throwing, so it needs a
-// context that remembers.
+// A voice that is started and never stopped is this project's recurring audio defect: a
+// path that schedules no stop of its own rings until something unrelated silences it. That
+// is invisible to a smoke test, which only asks whether the graph built without throwing,
+// so it needs a context that remembers.
+//
+// Never-stopped is not the whole question, though, which is why the stop TIME is kept.
+// Every held voice now schedules its own far-off end, so "was it ever stopped" no longer
+// separates a note ringing under the pedal from one that has been let go — both were
+// stopped, one in a fifth of a second and one in sixteen. Ask ringingAt for that.
 
-export type FakeOscillator = { started: boolean; stopped: boolean };
+export type FakeOscillator = { started: boolean; stopped: boolean; stopAt: number | null };
 
 export type FakeAudioContext = {
     context: AudioContext;
-    // Oscillators started and never stopped — a voice still sounding.
+    // Oscillators started and never stopped at all — a voice nothing will ever end.
     live(): number;
+    // Oscillators still sounding at `seconds` on the context clock: started, and either
+    // never stopped or stopped after that moment. This is how a test asks whether a note is
+    // still ringing at some point in the future rather than merely whether it is doomed.
+    ringingAt(seconds: number): number;
     started(): number;
     // Which channels of the room's impulse response were written. Both, or the room has no
     // width; none, and nothing was ever routed through it.
@@ -125,7 +133,7 @@ export function fakeAudioContext(): FakeAudioContext {
         // to accept a buffer and pass audio on.
         createConvolver: () => ({ ...node("convolver"), buffer: null, normalize: true }),
         createBufferSource: () => {
-            const source = { started: false, stopped: false };
+            const source: FakeOscillator = { started: false, stopped: false, stopAt: null };
             oscillators.push(source);
             recordings.push(source);
             return {
@@ -140,13 +148,16 @@ export function fakeAudioContext(): FakeAudioContext {
                 start: () => {
                     source.started = true;
                 },
-                stop: () => {
+                // The last call wins, as it does in the real thing: a release scheduling an
+                // earlier end over the voice's own far-off one is exactly that case.
+                stop: (when?: number) => {
                     source.stopped = true;
+                    source.stopAt = when ?? 0;
                 },
             };
         },
         createOscillator: () => {
-            const osc = { started: false, stopped: false };
+            const osc: FakeOscillator = { started: false, stopped: false, stopAt: null };
             oscillators.push(osc);
             return {
                 ...node("oscillator"),
@@ -158,8 +169,9 @@ export function fakeAudioContext(): FakeAudioContext {
                 start: () => {
                     osc.started = true;
                 },
-                stop: () => {
+                stop: (when?: number) => {
                     osc.stopped = true;
+                    osc.stopAt = when ?? 0;
                 },
             };
         },
@@ -168,6 +180,10 @@ export function fakeAudioContext(): FakeAudioContext {
     return {
         context,
         live: () => oscillators.filter((one) => one.started && !one.stopped).length,
+        ringingAt: (seconds) =>
+            oscillators.filter(
+                (one) => one.started && (one.stopAt === null || one.stopAt > seconds),
+            ).length,
         started: () => oscillators.filter((one) => one.started).length,
         impulseChannels: () => [...impulseChannels].sort((one, other) => one - other),
         reachesConvolver: (label: string) => reaches(edges, label, "convolver"),

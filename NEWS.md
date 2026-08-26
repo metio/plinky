@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 26 August 2026 — later
+
+**A note held under the sustain pedal now dies away, the way a string does.** Keep the
+right pedal down too long — which everybody does — and one note used to go on sounding
+at full strength, indefinitely, with a slow wobble in it. Nothing was ever going to
+stop it: not the key, which was up, and not the pedal, which was down. Now a held note
+rings out over seconds and falls silent on its own, longer in the bass and shorter at
+the top, matched to how long the recorded piano's own strings ring.
+
 ## 26 August 2026 — night
 
 **Those square and triangle noteheads have a name.** Nearly three hundred pieces here

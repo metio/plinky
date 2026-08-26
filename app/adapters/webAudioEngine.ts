@@ -141,6 +141,32 @@ export function releaseTail(frequency: number): number {
     return bassTail + (trebleTail - bassTail) * clamped;
 }
 
+// How long a synthesised voice rings before it falls silent on its own, with nothing
+// stopping it — no key, no damper, no pedal lifting.
+//
+// A string does not ring forever. Hold the sustain pedal on a real piano, walk away, and
+// the sound dies: the energy the hammer put in leaves as sound, and after half a minute
+// there is none of it left. The synthesised voice modelled the shelf and nothing after it,
+// so a note held by a key or a pedal sounded at a constant level for as long as the page
+// stayed open — and its partials are deliberately detuned, so a tone that should have
+// faded instead sat there beating against itself, which is heard as a slow wobble in pitch.
+//
+// The numbers come from the recorded instrument, measured off the pack: A2 rings just under
+// 16 seconds, A6 just under 7, and the sampled voice already ends when its recording does.
+// Matching them is what keeps one instrument from ringing on after the other has stopped.
+// Clamped past the endpoints like the release tail, so the deepest bass rings A2's length
+// rather than the pack's full 25 seconds — a bound this errs under rather than over.
+export function sustainRing(frequency: number): number {
+    const lowHz = 110; // ~A2
+    const highHz = 1760; // ~A6
+    const bassRing = 16;
+    const trebleRing = 7;
+    const span = Math.log2(highHz) - Math.log2(lowHz);
+    const t = (Math.log2(frequency) - Math.log2(lowHz)) / span;
+    const clamped = Math.max(0, Math.min(1, t));
+    return bassRing + (trebleRing - bassRing) * clamped;
+}
+
 // The tail is capped by the fraction of a note it warrants below, so a short note keeps a
 // crisp articulation instead of every note ringing out the same.
 const TAIL_PER_DURATION = 0.6;
@@ -431,6 +457,10 @@ type Voice = {
     oscillators: AudioScheduledSourceNode[];
     frequency: number;
     startedAt: number; // ctx.currentTime at press, for the held-scaled tail
+    // When this voice goes quiet on its own, with nothing releasing it: the end of the
+    // recording, or the end of the synthesised ring. Past it there is no string still
+    // sounding, so there is nothing to ring out and no damper left to land — see endVoice.
+    endsAt: number;
     // A recording rings the way the string did; there is no synthesised tail to model, so
     // the ending is a damper falling and nothing else.
     sampled?: boolean;
@@ -485,31 +515,45 @@ function buildSampledVoice(
     source.start(now);
     // Long enough that a held key never runs out of recording before the player lifts it;
     // the buffer simply ends if they hold it longer than the string rang.
-    source.stop(now + sample.buffer.duration);
+    const endsAt = now + sample.buffer.duration;
+    source.stop(endsAt);
     return {
         envelope,
         oscillators: [source],
         frequency,
         startedAt: now,
+        endsAt,
         sampled: true,
         level,
     };
 }
 
-// A held voice: the same partials, attack and darkening filter as a struck note, but with
-// no release scheduled — the shelf holds until fadeVoice rings it out.
+// A held voice: the same partials, attack and darkening filter as a struck note, and then
+// the long decay of a string nobody is stopping. fadeVoice cuts it short on a real release;
+// left alone — under a held key, or a sustain pedal somebody forgot — it dies by itself,
+// because that is what a string does.
 function buildVoice(ctx: AudioContext, frequency: number, gain: number): Voice {
     const now = ctx.currentTime;
+    const shelfAt = now + 0.18;
+    const endsAt = shelfAt + sustainRing(frequency);
     const filter = ringFilter(ctx, frequency, now, now + 0.6);
 
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(0.0001, now);
     envelope.gain.exponentialRampToValueAtTime(gain, now + 0.012);
-    envelope.gain.exponentialRampToValueAtTime(gain * 0.5, now + 0.18);
+    envelope.gain.exponentialRampToValueAtTime(gain * 0.5, shelfAt);
+    // From the shelf to silence. An exponential ramp cannot reach zero, so it rides just
+    // above it, the way every other envelope here does.
+    envelope.gain.exponentialRampToValueAtTime(0.0001, endsAt);
     envelope.connect(filter);
 
     const oscillators = startPartials(ctx, frequency, envelope, now);
-    return { envelope, oscillators, frequency, startedAt: now, level: gain };
+    // A stop of its own, so nothing has to remember to end it. Releasing the key calls
+    // stop again with an earlier time, and the later call is the one that applies.
+    for (const oscillator of oscillators) {
+        oscillator.stop(endsAt + 0.03);
+    }
+    return { envelope, oscillators, frequency, startedAt: now, endsAt, level: gain };
 }
 
 // The most extra body a generous release adds, so a lengthened tap sings without droning
@@ -580,9 +624,23 @@ function playExtra(ctx: AudioContext, note: number, kind: ExtraKind, level: numb
     scheduleExtra(ctx, note, kind, level, ctx.currentTime);
 }
 
+// Whether a voice has already gone quiet on its own — its recording run out, or its ring
+// decayed away. Nothing is sounding, so there is nothing left to end.
+function fallenSilent(ctx: BaseAudioContext, voice: Voice): boolean {
+    return ctx.currentTime >= voice.endsAt;
+}
+
 function endVoice(ctx: AudioContext, note: number, holdScale = 1): void {
     const voice = voices.get(note);
     if (!voice) {
+        return;
+    }
+    // A note that stopped ringing while the pedal was down is over, and lifting the pedal
+    // is not an event in its life. Ringing it out would fade a silence, and the damper
+    // knock would be a piano dropping a felt onto a string that stopped moving half a
+    // minute ago — audible, and a sound the instrument does not make.
+    if (fallenSilent(ctx, voice)) {
+        voices.delete(note);
         return;
     }
     // Only for a recorded instrument, and only where the damper genuinely lands — this is
@@ -734,9 +792,10 @@ export const webAudioEngine: AudioEngine = {
             return;
         }
         const existing = voices.get(note);
-        if (existing) {
+        if (existing && !fallenSilent(ctx, existing)) {
             // A re-press of a still-sounding note: fade the old voice fast so the new
-            // strike lands cleanly rather than summing with a ghost of the last.
+            // strike lands cleanly rather than summing with a ghost of the last. One that
+            // already died needs no fading — its oscillators have stopped.
             fadeVoice(ctx, existing, 0.03);
         }
         keyDown.add(note);

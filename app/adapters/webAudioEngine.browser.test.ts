@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { releaseTail, ringTail, webAudioEngine } from "./webAudioEngine";
+import { releaseTail, ringTail, sustainRing, webAudioEngine } from "./webAudioEngine";
 
 // Smoke the real Web Audio path under a browser: the engine opens its shared
 // context and the synthesis graphs build without throwing. What the strikes
@@ -83,6 +83,32 @@ describe("webAudioEngine", () => {
         expect(() =>
             webAudioEngine.strike({ note: 60, gain: 0, velocity: 90, duration: 0.2, delay: 0 }),
         ).not.toThrow();
+    });
+
+    it("rings a held note out over seconds, not forever, and not a release tail", () => {
+        // What a string does when nothing stops it: the energy the hammer put in leaves as
+        // sound and then there is none left. A note held under the pedal used to sound at a
+        // constant level for as long as the page stayed open.
+        //
+        // The lengths are measured off the recorded instrument, which already behaves this
+        // way because its recording simply runs out: A2 rings just under 16 seconds and A6
+        // just under 7. The two instruments have to agree, or one goes on after the other
+        // has stopped.
+        expect(sustainRing(110)).toBeCloseTo(16, 0);
+        expect(sustainRing(1760)).toBeCloseTo(7, 0);
+        // Far longer than the tail a released key gets — a pedalled note is not a released
+        // one that happens to ring a bit more.
+        expect(sustainRing(262)).toBeGreaterThan(releaseTail(262) * 10);
+    });
+
+    it("rings a low held note longer than a high one, and clamps past the endpoints", () => {
+        expect(sustainRing(110)).toBeGreaterThan(sustainRing(440));
+        expect(sustainRing(440)).toBeGreaterThan(sustainRing(1760));
+        // Below A2 and above A6 the interpolation stops rather than running away: the
+        // deepest bass rings A2's length and the top treble A6's, both finite.
+        expect(sustainRing(27.5)).toBe(sustainRing(110));
+        expect(sustainRing(4186)).toBe(sustainRing(1760));
+        expect(Number.isFinite(sustainRing(1))).toBe(true);
     });
 
     it("caps a note's ring by its own length so short notes stay crisp", () => {
