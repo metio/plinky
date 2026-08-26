@@ -323,5 +323,20 @@
         "id": "TxOvCpQggcHi",
         "title": "War hinaus gezogen, lustig singend, wälderwärts",
         "why": "The harvested title wrapped the song's first line in quotation marks and appended the corpus's own '[untitled]' marker — the transcriber's note that the source gave no title, not part of the name. A song known by its opening line is named by that line."
+    },
+    {
+        "id": "UOVxrBuASVZu",
+        "composer": "Carl Philipp Emanuel Bach",
+        "why": "Credited to Anna Magdalena Bach, who did not write it. The H number is the Helm catalogue of her stepson, and IMSLP files the set as '4 Pieces for Anna Magdalena Bach, H.1 (Bach, Carl Philipp Emanuel)'. Her name is in the title because the pieces were written FOR her notebook."
+    },
+    {
+        "id": "v49akHGDia8y",
+        "composer": "Carl Philipp Emanuel Bach",
+        "why": "Credited to 'Anna Magdalena Bach Notebook', which is the manuscript the piece was copied into rather than anybody who wrote it. BWV Anh. is the appendix of works NOT by Johann Sebastian, and IMSLP catalogues this march under Carl Philipp Emanuel. Commercial editions still print his father's name; the Anhang number is the argument against it."
+    },
+    {
+        "id": "krFYW7PbQL4a",
+        "composer": "Johann Sebastian Bach",
+        "why": "The credit ran three things together - a name, a BWV number and the notebook. IMSLP and Bach Digital both file BWV 515 under Johann Sebastian. Authorship is genuinely divided: New Grove assigns the melody tentatively to Gottfried Heinrich Bach and the bass certainly to Johann Sebastian, so his is the defensible single name."
     }
 ]

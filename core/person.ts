@@ -222,6 +222,16 @@ const ALIASES: Record<string, string> = {
     // seventh. "Bach-Gounod" is left alone on purpose: the hyphen is the conventional way
     // to credit the Ave Maria to both of them, and splitting on hyphens would tear
     // Rimsky-Korsakov in half.
+    // Three spellings of Bach's second son, which would otherwise be three pages of one
+    // piece each. The full name is the canonical one, as it is for his father.
+    // Hanon is the Virtuoso Pianist, whose exercises the catalogue carries; Wilton's own
+    // credit carries the dates that name him, 1761-1832.
+    "c. l. hanon": "Charles-Louis Hanon",
+    "c.h. wilton": "Charles Henry Wilton",
+    "c. h. wilton": "Charles Henry Wilton",
+    "c. p. e. bach": "Carl Philipp Emanuel Bach",
+    "c.p.e. bach": "Carl Philipp Emanuel Bach",
+    "cpe bach": "Carl Philipp Emanuel Bach",
     gounod: "Charles Gounod",
     "pyotr tchaikovsky": "Pyotr Ilyich Tchaikovsky",
     delibes: "Léo Delibes",
