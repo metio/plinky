@@ -10,5 +10,41 @@
         "title": "Heart and soul remix",
         "composer": "Sean Granados",
         "why": "A remix over Hoagy Carmichael's 1938 tune, who died in 1981, so the composition is under copyright until 2052. Admitted by the same bare 'granados' surname and labelled CC0-1.0 by its uploader, which is exactly what the allowlist exists not to believe."
+    },
+    {
+        "id": "0WkihLusA2GD",
+        "title": "In der weihnachtsbäckerei",
+        "composer": "Rolf Zuckowski",
+        "why": "Written by Rolf Zuckowski in 1987, who is alive, so it is in copyright for a long time yet. The file is worse than that: its own credit line reads 'flowkey version', making it a transcription of a commercial app's arrangement of a copyrighted song. It reached the catalogue labelled CC0-1.0 and was admitted because 'weihnacht' appeared in its title."
+    },
+    {
+        "id": "JYXsZ0tMvyui",
+        "title": "Weihnachtsmann und co kg theme",
+        "composer": "Misc Soundtrack",
+        "why": "A television theme, credited to the corpus placeholder 'Misc Soundtrack' and carrying no author at all. Music written for a screen is modern by definition, and the placeholder that should have said so read as anonymity instead. Admitted on 'weihnacht' in its title."
+    },
+    {
+        "id": "N9joUhalQj0B",
+        "title": "The real folk blues",
+        "composer": "Composed by The Seatbelts",
+        "why": "The Cowboy Bebop closing theme, written by Yoko Kanno for the Seatbelts in 1998; the file names 'Cowboy Bebop OST' and an arranger. Admitted because its title contains 'folk'."
+    },
+    {
+        "id": "cq8FxiYOE67k",
+        "title": "Oh Noel",
+        "composer": "Nate Piffer & Dallon Weekes",
+        "why": "A song by the band I Don't Know How But They Found Me, whose name the file carries along with the transcriber's. Both writers are alive. Admitted because its title contains 'noel'."
+    },
+    {
+        "id": "ikvnpg9wpYUe",
+        "title": "Animal Crossing City Folk: The City (Evening)",
+        "composer": "Manaka Tominaga & Shiho Fujii & Kazumi Totaka",
+        "why": "Nintendo game music from 2008, credited to the three staff composers who wrote it. Admitted because the game is called City Folk and 'folk' appeared in the title."
+    },
+    {
+        "id": "RnYGkZdhvU68",
+        "title": "Celtic Hymn",
+        "composer": "Juan Francisco Piqueras Toharias",
+        "why": "Removed as unconfirmable rather than as known copyright, which is the harder call of the six. The score names no composer at all - the manifest credit is the uploader - so there is nothing to date and nothing to check. It may well be their own work released under CC0, which the catalogue would welcome; the allowlist's standing answer is that anything we cannot confirm is dropped, and a smaller safe catalogue beats a larger risky one. Reverse this entry if the composer confirms it is theirs."
     }
 ]

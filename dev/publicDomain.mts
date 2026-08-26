@@ -10,7 +10,8 @@
 //
 // "Safe" means one of:
 //   - the composer field names a death year on or before the life+70 cutoff,
-//   - the work is traditional / folk / anonymous / a hymn or carol, or
+//   - the credit claims no author at all and the work is traditional / folk /
+//     anonymous / a hymn or carol, or
 //   - the composer is a well-known public-domain composer.
 //
 // NOT legal advice; a backstop, not a guarantee. A single composition year is ignored
@@ -19,6 +20,8 @@
 // Works enter the public domain 70 years after the author's death (life+70), i.e. on
 // 1 January of the 71st year. From 2026, a death in 1955 or earlier is clear.
 const DEATH_CUTOFF = 1955;
+
+import { personSlug } from "../core/person.ts";
 
 // PDMX composer fields carry accents inconsistently ("Fauré" / "Faure", "Händel" /
 // "Handel", "Dvořák" / "Dvorak"), so fold diacritics away before matching and write the
@@ -33,7 +36,7 @@ const TRADITIONAL =
 // match "Bacharach" or a title's "bachelor", "clementi" must not match "clementine".
 // Not exhaustive — the death range catches the rest where dates are given.
 const PD_SURNAMES =
-    /\b(bach|mozart|beethoven|chopin|schubert|brahms|haendel|handel|vivaldi|haydn|debussy|satie|grieg|schumann|liszt|rossini|mendelssohn|clementi|czerny|scarlatti|purcell|joplin|sousa|pachelbel|telemann|elgar|dvorak|verdi|wagner|bizet|saint-?saens|faure|albeniz|rimsky|borodin|burgmuller|gurlitt|kuhlau|diabelli|hanon|gounod|offenbach|paganini|carcassi|giuliani|tarrega|ravel|gershwin|mascagni|puccini|smetana|holst|nielsen|janacek|scriabin|macdowell|streabbog|spindler|reinecke|kirchner|lemoine|couppey|bertini|loeschhorn|duvernoy|kohler|wohlfahrt|schytte|gillock|heller|albinoni|corelli|couperin|rameau|lully|tartini|boccherini|cherubini|hummel|weber|paderewski|massenet|delibes|chaminade|moszkowski|sinding|sgambati|thalberg|moscheles|cramer|dowland|sullivan|carolan|frescobaldi|buxtehude|palestrina|monteverdi|praetorius|froberger|sweelinck|cimarosa|paisiello|gottschalk|rebikov|guilmant|widor|vierne|dandrieu|daquin|marcello|kjerulf|oesten|goedicke|gedike|maykapar|sor|field|byrd|gade|raff|nevin|bartok|mahler|weill|gardel|butterworth|halvorsen|tagore|ponce|tosti|lavallee)\b/;
+    /\b(bach|mozart|beethoven|chopin|schubert|brahms|haendel|handel|vivaldi|haydn|debussy|satie|grieg|schumann|liszt|rossini|mendelssohn|clementi|czerny|scarlatti|purcell|joplin|sousa|pachelbel|telemann|elgar|dvorak|verdi|wagner|bizet|saint-?saens|faure|albeniz|rimsky|borodin|burgmuller|gurlitt|kuhlau|diabelli|hanon|gounod|offenbach|paganini|carcassi|giuliani|tarrega|ravel|gershwin|mascagni|puccini|smetana|holst|nielsen|janacek|scriabin|macdowell|streabbog|spindler|reinecke|kirchner|lemoine|couppey|bertini|loeschhorn|duvernoy|kohler|wohlfahrt|schytte|gillock|heller|albinoni|corelli|couperin|rameau|lully|tartini|boccherini|cherubini|hummel|weber|paderewski|massenet|delibes|chaminade|moszkowski|sinding|sgambati|thalberg|moscheles|cramer|dowland|sullivan|carolan|frescobaldi|buxtehude|palestrina|monteverdi|praetorius|froberger|sweelinck|cimarosa|paisiello|gottschalk|rebikov|guilmant|widor|vierne|dandrieu|daquin|marcello|kjerulf|oesten|goedicke|gedike|maykapar|sor|field|byrd|gade|raff|nevin|bartok|mahler|weill|gardel|butterworth|halvorsen|tagore|ponce|tosti|lavallee|reichardt|ravenscroft|leontovych|kinkel|faisst|lyapunov)\b/;
 // Deliberately NOT listed as a bare surname, despite the composer themselves being public
 // domain: it would admit copyrighted namesakes or co-written works. "gonzaga" would match
 // Luiz Gonzaga (d. 1989, e.g. "Asa Branca") alongside the PD Chiquinha Gonzaga; "waller"
@@ -50,7 +53,18 @@ const PD_SURNAMES =
 // namesake — to admit on its own, so the full name is required. Stephen Foster (d. 1864)
 // must not open the door to David Foster; Adolphe Adam (d. 1856) needs more than the bare
 // token "adam".
-const PD_FULLNAMES = /\b(stephen foster|adolphe adam|enrique granados)\b/;
+//
+// The second group was added when the traditional markers stopped reading titles. Every
+// one of them wrote a hymn, a Wiegenlied or a Noël that had been admitted on the strength
+// of that word rather than on their own name, and every one died long enough ago to
+// qualify: Humfrey 1674, Ravenscroft 1635, Brady 1726, Reichardt 1826, Cornelius 1874,
+// Flies (18th c.), Holden 1844, Ingalls 1838, Leontovych 1921, Kinkel 1858, Holmès 1903,
+// Le Beau 1927, Hill 1915, Faisst 1948, Parry 1918, Gabriel 1877, Lyapunov 1924, Lang
+// 1880, Franz 1892. Most needed the full name — "hill", "gabriel", "lang", "franz",
+// "holden", "brady", "cornelius" and "parry" are all ordinary modern surnames, and
+// "flies" is an ordinary English word.
+const PD_FULLNAMES =
+    /\b(stephen foster|adolphe adam|enrique granados|pelham humfrey|nicholas brady|peter cornelius|bernhard flies|oliver holden|jeremiah ingalls|joe hill|charles hubert hastings parry|virginia gabriel|josephine lang|robert franz|luise adolpha le beau|augusta (mary anne )?holmes)\b/;
 
 // A handful of composers whose PDMX field truncates or continues the surname
 // ("Tchaikovsky", "Rachmaninoff", "Mussorgsky"): match the stem with a trailing \w* so a
@@ -67,14 +81,37 @@ const PD_STEMS = /\b(tchaikov|tschaikow|rachmanin|mussorg|moussorg)\w*/;
 // is Issachar Miron (published 1941).
 const COPYRIGHTED_WORKS = /\b(petit papa noel|you are my sunshine|tzena)\b/;
 
+// Music written for a screen is modern by definition — there were no soundtracks before
+// there were films — so a credit or a title announcing one is announcing a work still in
+// copyright, whoever the uploader named. The corpora label these with a placeholder
+// composer ("Misc Soundtrack") that claims no author, which every other rule here reads
+// as anonymity; it is the opposite. "theme" alone is not a marker: a theme and variations
+// is a form, not a film.
+const SCREEN_MUSIC = /\bsoundtrack\b|\bost\b|\bvideo\s?game\b|\banime\b/;
+
 export function isPublicDomain(composer: string, title = ""): boolean {
     if (composer.trim() === "") {
         return false; // no attribution — can't confirm anything
     }
-    if (COPYRIGHTED_WORKS.test(fold(title))) {
+    if (COPYRIGHTED_WORKS.test(fold(title)) || SCREEN_MUSIC.test(fold(`${composer} ${title}`))) {
         return false;
     }
-    if (TRADITIONAL.test(fold(`${composer} ${title}`))) {
+    // A traditional marker in the COMPOSER field is an attribution: whoever uploaded it is
+    // telling us nobody claims the work.
+    if (TRADITIONAL.test(fold(composer))) {
+        return true;
+    }
+    // In a TITLE the same word says nothing about authorship — it is a word about the
+    // music, and copyrighted music has words about music in its name. Reading both fields
+    // as one string admitted five works still in copyright on the strength of a title:
+    // Animal Crossing: City *Folk*, a 2019 song called "Oh *Noel*", a *Weihnacht*slied
+    // written in 1987, and the Cowboy Bebop theme, "The Real *Folk* Blues".
+    //
+    // So a title marker only corroborates a credit that names nobody. core/person.ts
+    // already decides that question — it is what stops "Traditional" getting a composer
+    // page — and its answer is the one to use here: a credit it will not give a page to is
+    // a credit claiming no author, which is exactly when "Coventry carol" should count.
+    if (TRADITIONAL.test(fold(title)) && personSlug(composer) === "") {
         return true;
     }
     // A "(birth–death)" range: the second year is the death year.

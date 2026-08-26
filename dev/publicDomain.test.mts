@@ -116,3 +116,99 @@ describe("the copyrighted-works denylist beats the traditional label", () => {
         expect(isPublicDomain("Traditional", "Greensleeves")).toBe(true);
     });
 });
+
+describe("a word in the title never admits a work on its own", () => {
+    // The hole this closes, with the five works that came through it. A traditional
+    // marker in the composer field says nobody claims the work; the same word in a title
+    // says something about the music, and copyrighted music has words about music in its
+    // name.
+    it("refuses a copyrighted work whose title reads as traditional", () => {
+        for (const [composer, title] of [
+            ["Rolf Zuckowski", "In der weihnachtsbäckerei"],
+            ["Composed by The Seatbelts", "The real folk blues"],
+            ["Nate Piffer & Dallon Weekes", "Oh Noel"],
+            ["Manaka Tominaga & Shiho Fujii & Kazumi Totaka", "Animal Crossing City Folk"],
+            ["Misc Soundtrack", "Weihnachtsmann und co kg theme"],
+        ] as const) {
+            expect(isPublicDomain(composer, title), `${composer} — ${title}`).toBe(false);
+        }
+    });
+
+    it("still admits an unattributed work its title names as traditional", () => {
+        // The case the title rule exists for: nobody is claiming these, and the credit
+        // says so. core/person.ts decides what counts as claiming nobody, which is the
+        // same answer that stops "Traditional" getting a composer page.
+        expect(isPublicDomain("Misc Christmas", "Coventry carol")).toBe(true);
+        expect(isPublicDomain("Misc Christmas", "The first noel")).toBe(true);
+        expect(isPublicDomain("from Lyra Davidica 1708", "Easter Hymn")).toBe(true);
+        expect(isPublicDomain("Traditional", "Anything at all")).toBe(true);
+    });
+
+    it("refuses a named living composer however traditional the title sounds", () => {
+        expect(isPublicDomain("Someone Alive", "A folk hymn carol wiegenlied")).toBe(false);
+    });
+});
+
+describe("music written for a screen", () => {
+    it("is refused whichever field announces it", () => {
+        // Modern by definition: there were no soundtracks before there were films. The
+        // corpora label these with a composer placeholder that claims no author, which
+        // every other rule here would read as anonymity.
+        expect(isPublicDomain("Misc Soundtrack", "Anything")).toBe(false);
+        expect(isPublicDomain("Traditional", "Cowboy Bebop OST")).toBe(false);
+        expect(isPublicDomain("Traditional", "Some anime opening")).toBe(false);
+        expect(isPublicDomain("Traditional", "A video game march")).toBe(false);
+    });
+
+    it("leaves a theme that is a musical form alone", () => {
+        // "theme" is not a marker: a theme and variations is a form, not a film.
+        expect(isPublicDomain("Wolfgang Amadeus Mozart", "Theme and Variations")).toBe(true);
+    });
+});
+
+describe("composers admitted by name rather than by a word in their titles", () => {
+    it("admits the ones whose hymns and lullabies used to carry them in", () => {
+        for (const composer of [
+            "Pelham Humfrey",
+            "Thomas Ravenscroft",
+            "Nicholas Brady",
+            "Louise Reichardt",
+            "Peter Cornelius",
+            "Bernhard Flies",
+            "Oliver Holden",
+            "Jeremiah Ingalls",
+            "Mykola Leontovych",
+            "Johanna Kinkel",
+            "Augusta Holmès",
+            "Augusta Mary Anne Holmès",
+            "Luise Adolpha Le Beau",
+            "Joe Hill",
+            "Clara Faisst",
+            "Charles Hubert Hastings Parry",
+            "Virginia Gabriel",
+            "Sergei Lyapunov",
+            "Josephine Lang",
+            "Robert Franz",
+        ]) {
+            expect(isPublicDomain(composer, "Untitled"), composer).toBe(true);
+        }
+    });
+
+    it("keeps the common surnames shut to everybody else who bears them", () => {
+        // Each of these needs its full name, because the surname alone is an ordinary
+        // modern one — and "flies" is an ordinary English word.
+        for (const composer of [
+            "Peter Gabriel",
+            "David Hill",
+            "Lang Lang",
+            "Franz Ferdinand",
+            "Tom Brady",
+            "William Holden",
+            "Cornelius",
+            "Flies",
+            "Parry Gripp",
+        ]) {
+            expect(isPublicDomain(composer, "Untitled"), composer).toBe(false);
+        }
+    });
+});

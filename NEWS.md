@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 26 August 2026 — night
 
+**Six pieces have left the catalogue, and should never have been in it.** Everything
+here is Creative Commons, and the filter that decides what may enter had a gap: it
+would let a piece in on a word in its *title*. So a Christmas song written in 1987
+came in on "Weihnacht", a game soundtrack on the word "Folk" in the game's own name,
+and a band's song on the word "Noel" — all four still in copyright, whatever the
+label on the file said. The gap is closed: a word in a title now only counts when the
+credit names nobody at all, which is what it was meant for. Nothing else moved, and
+four hundred pieces that were only ever admitted by luck are now admitted by name.
+
 **Three Burgmüller pages became one, and Cherubini got his own.** The études arrive
 spelled five different ways — with the umlaut and without, with all four names and
 with none — and each spelling had been opening a page of its own, so his twenty-five

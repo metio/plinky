@@ -60,24 +60,23 @@ ist = "ist"
 # credits in every language the corpora use ("Worte & Musik: …"). It is derived, never
 # hand-written: correcting a word in it would be undone by the next bake.
 #
-# The help seed carries all 26 locales in one NDJSON file, so — unlike messages/,
-# where the English base can stay checked on its own — there is no way to spell-check
-# its English without also flagging the other 25 languages.
 # The Impressum and Datenschutzerklärung are German legal documents (§ 5 DDG /
 # GDPR); the operator's name/address and the German page titles stay literal in the
 # route components — typos only knows English, so it flags those legitimate German
 # words. The prose itself now lives in messages/ (the English base stays checked);
 # the German is authoritative and every other locale is a machine translation.
-# dev/catalog-curation.json is keyed by the same content-addressed song ids as the
+# The hand-kept catalogue files are keyed by the same content-addressed song ids as the
 # manifest above, and their letter runs read as misspellings ("…jqyY", "6Ue…"). Every
-# entry added would flag a new one. The cost is that the short "why" notes in it go
-# unchecked, which is the same bargain the manifest already makes.
+# entry added would flag a new one — "ikvnpg9wpYUe" did. The cost is that the short "why"
+# notes in them go unchecked, which is the same bargain the manifest already makes.
 [files]
 extend-exclude = [
     "dev/catalog-curation.json",
+    "dev/catalog-excluded.json",
+    "dev/catalog-duplicates.json",
+    "dev/catalog-flagged.json",
     "messages/*",
     "!messages/en.json",
-    "studio/seed/help.ndjson",
     "songs/*",
     "scores/*",
     "public/songs/*",
