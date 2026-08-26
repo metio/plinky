@@ -24,7 +24,7 @@
 
 import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
-import { canonicalComposer, personSlug } from "../core/person";
+import { canonicalPeople, personSlug } from "../core/person";
 
 // The formatter, over a string. `--stdin-file-path` is what tells biome which rules apply,
 // and it writes the formatted source to stdout.
@@ -81,17 +81,22 @@ export async function bakePeopleIndex(check: boolean): Promise<boolean> {
     const index = new Map<string, { name: string; pieces: number }>();
     for (const piece of pieces) {
         const credit = piece.composer ?? "";
-        const slug = personSlug(credit);
-        // personSlug returns "" for an attribution that names a tradition rather than a
-        // human ("Traditional", "Anonymous"): those have no page, so no entry.
-        if (!slug) {
-            continue;
-        }
-        const entry = index.get(slug);
-        if (entry) {
-            entry.pieces += 1;
-        } else {
-            index.set(slug, { name: canonicalComposer(credit), pieces: 1 });
+        // Every person the credit names, because a piece two of them share earns each of
+        // them the piece — a chorale melody and the setting of it are one piece and two
+        // composers, and a page for the pair of them is a page for nobody.
+        for (const name of canonicalPeople(credit)) {
+            const slug = personSlug(name);
+            // personSlug returns "" for an attribution that names a tradition rather than a
+            // human ("Traditional", "Anonymous"): those have no page, so no entry.
+            if (!slug) {
+                continue;
+            }
+            const entry = index.get(slug);
+            if (entry) {
+                entry.pieces += 1;
+            } else {
+                index.set(slug, { name, pieces: 1 });
+            }
         }
     }
 

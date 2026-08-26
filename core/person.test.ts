@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { canonicalComposer, nameFromSlug, peopleFrom, personFor, personSlug } from "./person";
+import {
+    canonicalComposer,
+    nameFromSlug,
+    peopleFrom,
+    personFor,
+    personSlug,
+    personSlugs,
+} from "./person";
 
 // Spellings lifted verbatim from the shipped manifest — the whole point of the
 // canonicalization is that these real variants land on one name.
@@ -351,5 +358,74 @@ describe("credits that name a tradition rather than a person", () => {
         ]) {
             expect(personSlug(canonicalComposer(credit))).toBe("");
         }
+    });
+});
+
+describe("a credit that names more than one person", () => {
+    it("gives each of them the piece, rather than one page for the pair", () => {
+        // A chorale melody by Gesius that Telemann set is one piece and two composers.
+        // Joined, they made /person/bartholomaus-gesius-georg-philipp-telemann — a page for
+        // a composer who never existed, while neither real one was credited at all.
+        expect(personSlugs("Bartholomäus Gesius / Georg Philipp Telemann")).toEqual([
+            "bartholomaus-gesius",
+            "georg-philipp-telemann",
+        ]);
+        expect(personSlugs("Mildred J. Hill & Patty S. Hill")).toEqual([
+            "mildred-j-hill",
+            "patty-s-hill",
+        ]);
+        expect(personSlugs("Scott Joplin and Scott Hayden")).toEqual([
+            "scott-joplin",
+            "scott-hayden",
+        ]);
+    });
+
+    it("canonicalises each name in its own right", () => {
+        // "Bach" alone would sort away from himself; each part goes through the same
+        // aliasing a lone credit does.
+        expect(personSlugs("Bach / Marcello")).toEqual(["johann-sebastian-bach", "marcello"]);
+    });
+
+    it("leaves alone the credits that only look like two people", () => {
+        // Each of these carries a separator inside something the cleaning strips first, so
+        // splitting the RAW credit would tear one person in half.
+        expect(personSlugs("Worte & Musik: Siegfried Köhler (1946)")).toEqual(["siegfried-kohler"]);
+        expect(personSlugs("Jane Mary Guest [aka Jenny Guest; Jane Mary Miles]")).toEqual([
+            "jane-mary-guest",
+        ]);
+        expect(
+            personSlugs(
+                "Poldowski (the professional pseudonym of the Belgian-born British composer and pianist born Régine Wieniawski)",
+            ),
+        ).toEqual(["poldowski"]);
+    });
+
+    it("drops the halves that name no person", () => {
+        // "E Minor / Traditional" names a key and a tradition. Neither is somebody, and the
+        // key half would otherwise open a composer page for E Minor.
+        expect(personSlugs("E Minor / Traditional")).toEqual([]);
+    });
+
+    it("still answers one slug for the ordinary credit", () => {
+        expect(personSlug("Frédéric Chopin")).toBe("frederic-chopin");
+        expect(personSlugs("Frédéric Chopin")).toEqual(["frederic-chopin"]);
+        expect(personSlug("Traditional")).toBe("");
+    });
+
+    it("puts a shared piece on both composers' pages", () => {
+        const pieces = [
+            {
+                id: "a",
+                title: "Befiehl du deine Wege",
+                composer: "Bartholomäus Gesius / Georg Philipp Telemann",
+                grade: 3,
+            },
+            { id: "b", title: "Fantasia TWV 33", composer: "Georg Philipp Telemann", grade: 2 },
+        ];
+        expect(personFor(pieces, "bartholomaus-gesius")?.pieces.map((p) => p.id)).toEqual(["a"]);
+        expect(personFor(pieces, "georg-philipp-telemann")?.pieces.map((p) => p.id)).toEqual([
+            "b",
+            "a",
+        ]);
     });
 });

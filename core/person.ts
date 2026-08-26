@@ -370,6 +370,11 @@ export function canonicalComposer(raw: string): string {
 // for display ("trad." reads as Traditional) but never become a person: no
 // link, no page. Matched as words anywhere in the credit, so an enriched
 // attribution ("Traditional — …, 1761") stays a non-person too.
+// A key, not a name. One credit reads "E Minor / Traditional", where the first half names
+// the key the piece is in — split off from the tradition beside it, it would otherwise open
+// a composer page for E Minor.
+const A_KEY = /^[a-g][\u266f\u266d#b]?\s*(major|minor|dur|moll)$/i;
+
 const NOT_A_PERSON =
     /\b(trad|traditional|traditionnelle?|tradicional|anonymous|anonymus|anonyme|anonimo|anónimo|anon|volkslied|gregorian[ao]?|gregoriana|plainchant|folk(\s?song|\s?tune)?|spiritual|shanty|misc|hymn\s?tune)\b/i;
 
@@ -403,12 +408,48 @@ function cannotBeAPerson(name: string): boolean {
 // safe in a path. Empty when the composer is unknown or is an attribution
 // marker rather than a person.
 export function personSlug(raw: string): string {
-    // Tested against the CLEANED name, not the raw credit. A parenthetical or bracketed
-    // aside describes the arrangement rather than the author — "Harry Thacker Burleigh
-    // (arranged from a traditional Negro Spiritual)" is a piece BY Burleigh — and
-    // testing before that aside is stripped hands his work to nobody.
-    const name = canonicalComposer(raw);
-    if (NOT_A_PERSON.test(name) || cannotBeAPerson(name)) {
+    // The first person a credit names, which for the overwhelming majority of them is the
+    // only one. Callers that have to account for every name use personSlugs.
+    return personSlugs(raw)[0] ?? "";
+}
+
+// Every person a credit names, as slugs, in the order written.
+//
+// A credit is usually one person, and sometimes several: a chorale melody by Gesius that
+// Telemann set, Bach's transcription of a Marcello concerto, two Hills who wrote Happy
+// Birthday between them. Joined into one string they used to make one composite "person",
+// so /person/bartholomaus-gesius-georg-philipp-telemann existed as a page for a composer
+// who never did, and neither of the two real ones was credited with the piece at all.
+//
+// The split runs on the CLEANED name and not the raw credit, which is what makes it safe:
+// "Poldowski (the professional pseudonym of the ... composer and pianist ...)", "Worte &
+// Musik: Siegfried Köhler" and "Jane Mary Guest [aka Jenny Guest; ...]" all carry a
+// separator inside a part that cleaning removes first, and each is one person.
+export function personSlugs(raw: string): string[] {
+    const slugs: string[] = [];
+    for (const name of canonicalPeople(raw)) {
+        const slug = slugOf(name);
+        if (slug && !slugs.includes(slug)) {
+            slugs.push(slug);
+        }
+    }
+    return slugs;
+}
+
+// The canonical name of every person a credit names. Each part is canonicalised in its own
+// right, so "Bach / Marcello" gives Johann Sebastian Bach rather than a "Bach" who sorts
+// away from himself.
+export function canonicalPeople(raw: string): string[] {
+    const cleaned = canonicalComposer(raw);
+    const parts = cleaned.split(/\s+\/\s+|\s+&\s+|\s+\band\b\s+/i);
+    return parts.length === 1
+        ? [cleaned]
+        : parts.map((part) => canonicalComposer(part.trim())).filter((part) => part !== "");
+}
+
+// The slug a single, already-canonical name gets, or "" when it names no person.
+function slugOf(name: string): string {
+    if (NOT_A_PERSON.test(name) || cannotBeAPerson(name) || A_KEY.test(name.trim())) {
         return "";
     }
     return name
@@ -489,17 +530,18 @@ export function composerCounts(pieces: readonly { composer: string }[]): PersonC
 export function peopleFrom(pieces: PersonPiece[]): Person[] {
     const bySlug = new Map<string, Person>();
     for (const piece of pieces) {
-        const slug = personSlug(piece.composer);
-        if (!slug) {
-            continue;
+        // A piece credited to several people belongs on each of their pages, rather than on
+        // one page for a composite of them that no one is.
+        const names = canonicalPeople(piece.composer);
+        for (const name of names) {
+            const slug = personSlug(name);
+            if (!slug) {
+                continue;
+            }
+            const person = bySlug.get(slug) ?? { slug, name, pieces: [] };
+            person.pieces.push(piece);
+            bySlug.set(slug, person);
         }
-        const person = bySlug.get(slug) ?? {
-            slug,
-            name: canonicalComposer(piece.composer),
-            pieces: [],
-        };
-        person.pieces.push(piece);
-        bySlug.set(slug, person);
     }
     const people = [...bySlug.values()];
     for (const person of people) {
@@ -520,14 +562,16 @@ export function personFor(pieces: PersonPiece[], slug: string): Person | null {
     // their piece lists to answer a question about a single person. The slug of a credit
     // is cached per raw string, because three thousand pieces carry only a few hundred
     // distinct spellings and canonicalizing one is a chain of regexes.
-    const slugs = new Map<string, string>();
+    const slugs = new Map<string, string[]>();
     const mine = pieces.filter((piece) => {
         let seen = slugs.get(piece.composer);
         if (seen === undefined) {
-            seen = personSlug(piece.composer);
+            // Every person the credit names, so a piece two composers share is found from
+            // either of their pages.
+            seen = personSlugs(piece.composer);
             slugs.set(piece.composer, seen);
         }
-        return seen === slug;
+        return seen.includes(slug);
     });
     return mine.length > 0 ? (peopleFrom(mine)[0] ?? null) : null;
 }
