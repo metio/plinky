@@ -400,6 +400,23 @@ describe("a credit that names more than one person", () => {
         ).toEqual(["poldowski"]);
     });
 
+    it("splits the two hyphenated joint credits, by hand", () => {
+        // A hyphen cannot be split by rule — Rimsky-Korsakov and Saint-Saëns are one person
+        // each — so these two are listed. Both are a setting so much its arranger's that the
+        // credit kept both names: Gounod's melody over Bach's prelude, and Dietsch's 1842
+        // Ave Maria built from an Arcadelt chanson.
+        expect(personSlugs("Bach-Gounod")).toEqual(["johann-sebastian-bach", "charles-gounod"]);
+        expect(personSlugs("Arcadelt-Dietsch")).toEqual([
+            "jacques-arcadelt",
+            "pierre-louis-dietsch",
+        ]);
+    });
+
+    it("leaves a hyphenated surname whole", () => {
+        expect(personSlugs("Rimsky-Korsakov")).toEqual(["nikolai-rimsky-korsakov"]);
+        expect(personSlugs("Camille Saint-Saëns")).toEqual(["camille-saint-saens"]);
+    });
+
     it("drops the halves that name no person", () => {
         // "E Minor / Traditional" names a key and a tradition. Neither is somebody, and the
         // key half would otherwise open a composer page for E Minor.

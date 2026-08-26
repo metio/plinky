@@ -420,6 +420,19 @@ export function personSlug(raw: string): string {
     return personSlugs(raw)[0] ?? "";
 }
 
+// Credits that join two people with a hyphen, listed by hand because no rule can tell them
+// from a hyphenated surname: Rimsky-Korsakov, Saint-Saëns and Mendelssohn-Bartholdy are one
+// person each, and nothing in the shape of the string says which kind it is.
+//
+// Both entries are the same piece of music history — a setting so much its arranger's that
+// the credit kept them both. Gounod wrote his melody over Bach's first prelude; Dietsch
+// built his Ave Maria out of an Arcadelt chanson in 1842 and presented it as an Arcadelt
+// discovery. Keyed by the cleaned credit, lowercased.
+const JOINT_CREDITS: Record<string, string[]> = {
+    "bach-gounod": ["Johann Sebastian Bach", "Charles Gounod"],
+    "arcadelt-dietsch": ["Jacques Arcadelt", "Pierre-Louis Dietsch"],
+};
+
 // Every person a credit names, as slugs, in the order written.
 //
 // A credit is usually one person, and sometimes several: a chorale melody by Gesius that
@@ -448,6 +461,10 @@ export function personSlugs(raw: string): string[] {
 // away from himself.
 export function canonicalPeople(raw: string): string[] {
     const cleaned = canonicalComposer(raw);
+    const joint = JOINT_CREDITS[cleaned.toLowerCase()];
+    if (joint) {
+        return joint;
+    }
     const parts = cleaned.split(/\s+\/\s+|\s+&\s+|\s+\band\b\s+/i);
     return parts.length === 1
         ? [cleaned]
