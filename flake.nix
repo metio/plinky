@@ -99,6 +99,10 @@
             (pkgs.writeShellScriptBin "ci-bake-check" ''exec npm run songs:bake -- --check "$@"'')
             (pkgs.writeShellScriptBin "ci-prune-check" ''exec npm run songs:prune -- --check "$@"'')
             (pkgs.writeShellScriptBin "ci-repair-check" ''exec npm run songs:repair -- --check "$@"'')
+            # Composer pages that might be one person. Every candidate pair needs a ruling in
+            # dev/catalog-people-distinct.json — this was a report nobody ran, and Burgmüller
+            # held three pages until a reader noticed.
+            (pkgs.writeShellScriptBin "ci-people-check" ''exec npm run people:dupes -- --check "$@"'')
             (pkgs.writeShellScriptBin "ci-mark-check" ''exec npm run mark -- --check "$@"'')
             (pkgs.writeShellScriptBin "ci-news-check" ''exec npm run news:check "$@"'')
             (pkgs.writeShellScriptBin "ci-twip" ''exec npm run twip -- "$@"'')

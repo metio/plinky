@@ -138,9 +138,8 @@ describe("a word in the title never admits a work on its own", () => {
         // The case the title rule exists for: nobody is claiming these, and the credit
         // says so. core/person.ts decides what counts as claiming nobody, which is the
         // same answer that stops "Traditional" getting a composer page.
-        expect(isPublicDomain("Misc Christmas", "Coventry carol")).toBe(true);
-        expect(isPublicDomain("Misc Christmas", "The first noel")).toBe(true);
         expect(isPublicDomain("from Lyra Davidica 1708", "Easter Hymn")).toBe(true);
+        expect(isPublicDomain("Anonymous", "A carol")).toBe(true);
         expect(isPublicDomain("Traditional", "Anything at all")).toBe(true);
     });
 
@@ -210,5 +209,22 @@ describe("composers admitted by name rather than by a word in their titles", () 
         ]) {
             expect(isPublicDomain(composer, "Untitled"), composer).toBe(false);
         }
+    });
+});
+
+describe("a credit that names a category rather than a person", () => {
+    it("is refused however traditional the rest of it reads", () => {
+        // "Misc Christmas", "Misc Traditional", "Misc Soundtrack" are the corpora's filing
+        // buckets sitting in the field that should say who wrote the piece. It is neither
+        // an attribution nor a claim of anonymity, and every rule that read it read it
+        // wrongly: the soundtrack bucket passed as nobody-claims-it, and the Christmas one
+        // carried two carols in on a word in their titles.
+        for (const composer of ["Misc Christmas", "Misc Traditional", "Misc Soundtrack", "misc"]) {
+            expect(isPublicDomain(composer, "Coventry carol"), composer).toBe(false);
+        }
+    });
+
+    it("leaves a real name that merely begins the same way alone", () => {
+        expect(isPublicDomain("Mischa Levitzki (1898-1941)", "Untitled")).toBe(true);
     });
 });

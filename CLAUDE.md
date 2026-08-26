@@ -119,6 +119,10 @@ npm run tailwind      # every class name compiles against app.css (blocking)
 npm run tokens        # colour is named by role, not hue (blocking)
 npm run messages:check # every locale carries every message (blocking)
 npm run news:check    # NEWS.md still matches changelog.yaml (blocking)
+npm run people:dupes  # the report: composer pages that might be one person
+npm run people:dupes -- --check  # the gate (blocking) — every candidate pair needs a
+                      # ruling in dev/catalog-people-distinct.json, or an alias in
+                      # core/person.ts if they really are one person
 npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
 npm run lint          # biome lint + format; a WARNING fails it too

@@ -106,6 +106,16 @@ jobs:
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
       - run: nix develop --command ci-arch
+  people:
+    name: people
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
+      # Two composer pages that might be one person need a human to rule on which. The
+      # rulings live in dev/catalog-people-distinct.json; a merge belongs in core/person.ts.
+      - run: nix develop --command ci-people-check
   bytes:
     name: bytes
     runs-on: ubuntu-latest
@@ -160,7 +170,21 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, dco, bake-check, news, nav, arch, bytes, tailwind, tokens, i18n, ci-parity]
+    needs:
+      [
+        frontend,
+        dco,
+        bake-check,
+        news,
+        nav,
+        arch,
+        people,
+        bytes,
+        tailwind,
+        tokens,
+        i18n,
+        ci-parity,
+      ]
     if: always()
     runs-on: ubuntu-latest
     steps:

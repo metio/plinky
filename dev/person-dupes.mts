@@ -1,100 +1,90 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Every pair of composer pages that might be one person, so the alias table can be checked
-// against the whole catalogue rather than against whichever names somebody happened to
-// scroll past. Reports candidates for a human to rule on — it never merges anything.
+// Every pair of composer pages that might be one person, checked against the pairs somebody
+// has already ruled on. It never merges anything: a candidate is a question for a human,
+// because the same surname under two first names is a father and a son as often as it is
+// one person spelled twice.
 //
-// Four tests, because one person splits in four different ways: the same surname under two
-// first names, one name contained in another, a surname that differs only by accent or
-// transliteration, and a plain misspelling.
+//   npm run people:dupes            the report, every candidate pair
+//   npm run people:dupes -- --check the gate: fails on a pair nobody has ruled on
+//
+// This was a report nobody ran, and it cost exactly what an unrun report costs. Burgmüller
+// held three composer pages — a bare surname, an un-umlauted spelling, and his full name —
+// and it went unnoticed until a reader browsing the site found it. The report could not have
+// caught it either, because it read only the songs manifest and both strays live in the
+// exercises one. Both halves of that are fixed here: it reads every credit the catalogue
+// carries, and it is a gate.
+//
+// A ruling is a pair of names and a reason. The reason is the point: a bare pair, a year
+// later, is indistinguishable from somebody silencing the gate — the same argument
+// dev/curation.mts makes about a bare id and a replacement string. Where two names really
+// are one person, the fix is not a ruling here but an alias in core/person.ts, which merges
+// them everywhere at once.
 
-import { readFileSync } from "node:fs";
-import { canonicalPeople, personSlug } from "../core/person";
+import { readFile } from "node:fs/promises";
+import { candidatePairs, compare, creditedPeople, parseRulings } from "./personDupes.mts";
 
-const songs = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
-const items = Array.isArray(songs) ? songs : songs.items;
+const SONGS = "public/songs/manifest.json";
+const EXERCISES = "public/exercises/manifest.json";
+// Pairs a human has ruled on as genuinely two people. Data rather than a code list, for the
+// same reason the catalogue's other hand-kept files are: an import rewrites the manifests,
+// and a judgement made once should outlive them.
+const RULINGS = "dev/catalog-people-distinct.json";
 
-const counts = new Map<string, number>();
-for (const it of items) {
-    // Every person the credit names, the same way the pages are built. Reading one name per
-    // credit made the report describe a catalogue that no longer exists: a joint credit
-    // counted as a page of its own, so "Gesius / Telemann" showed up beside Telemann as a
-    // pair to consider merging, when the pair is exactly what the split had already removed.
-    for (const canon of canonicalPeople(it.composer ?? "")) {
-        if (!personSlug(canon)) continue;
-        counts.set(canon, (counts.get(canon) ?? 0) + 1);
+const check = process.argv.includes("--check");
+
+async function credits(path: string): Promise<string[]> {
+    const parsed = JSON.parse(await readFile(path, "utf8"));
+    const items = Array.isArray(parsed) ? parsed : (parsed.items ?? []);
+    return items.map((item: { composer?: string }) => item.composer ?? "");
+}
+
+const counts = creditedPeople([...(await credits(SONGS)), ...(await credits(EXERCISES))]);
+const pairs = candidatePairs([...counts.keys()]);
+
+let raw: unknown;
+try {
+    raw = JSON.parse(await readFile(RULINGS, "utf8"));
+} catch (error) {
+    console.error(`${RULINGS} is not readable: ${(error as Error).message}`);
+    process.exit(1);
+}
+const { rulings, problems } = parseRulings(raw);
+if (problems.length > 0) {
+    console.error(`${RULINGS}:\n- ${problems.join("\n- ")}`);
+    process.exit(1);
+}
+
+const { unruled, unused } = compare(pairs, rulings);
+const held = (name: string) => counts.get(name) ?? 0;
+
+if (!check) {
+    console.log(`${counts.size} composer pages, ${pairs.length} candidate pairs\n`);
+    for (const { a, b, why } of [...pairs].sort((x, y) => x.why.localeCompare(y.why))) {
+        const ruled = unruled.some((one) => one.a === a && one.b === b) ? "  NEW" : "";
+        console.log(`  [${why}]  ${a} (${held(a)})  <->  ${b} (${held(b)})${ruled}`);
     }
-}
-const names = [...counts.keys()];
-
-// Accents, case and punctuation folded away, so a transliteration compares to its original.
-const fold = (text: string) =>
-    text
-        .normalize("NFD")
-        .replace(/\p{Mn}/gu, "")
-        .toLowerCase()
-        .replace(/[^a-z\s]/g, "")
-        .trim();
-const words = (name: string) => fold(name).split(/\s+/).filter(Boolean);
-const surname = (name: string) => words(name).at(-1) ?? "";
-
-// Edit distance, capped: anything past two edits is a different name, and stopping early
-// keeps the all-pairs walk cheap.
-function within(a: string, b: string, max: number): boolean {
-    if (Math.abs(a.length - b.length) > max) return false;
-    let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= a.length; i++) {
-        const row = [i];
-        let best = i;
-        for (let j = 1; j <= b.length; j++) {
-            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-            row[j] = Math.min(row[j - 1]! + 1, previous[j]! + 1, previous[j - 1]! + cost);
-            best = Math.min(best, row[j]!);
-        }
-        if (best > max) return false;
-        previous = row;
-    }
-    return previous[b.length]! <= max;
+    process.exit(0);
 }
 
-type Pair = { a: string; b: string; why: string };
-const found: Pair[] = [];
-const seen = new Set<string>();
-const add = (a: string, b: string, why: string) => {
-    const key = [a, b].sort().join(" ");
-    if (seen.has(key)) return;
-    seen.add(key);
-    found.push({ a, b, why });
-};
-
-for (let i = 0; i < names.length; i++) {
-    for (let j = i + 1; j < names.length; j++) {
-        const a = names[i]!;
-        const b = names[j]!;
-        const sa = surname(a);
-        const sb = surname(b);
-        if (sa.length < 4 || sb.length < 4) continue;
-        const wa = words(a);
-        const wb = words(b);
-        if (sa === sb) {
-            // The same surname under two first names. Often two real people (a father and
-            // a son, a husband and a wife), so this reports rather than decides.
-            add(a, b, "same surname");
-        } else if (within(sa, sb, 1)) {
-            add(a, b, "surname differs by one letter");
-        } else if (fold(a) !== fold(b) && within(fold(a), fold(b), 2)) {
-            add(a, b, "whole name within two edits");
-        }
-        if (sa === sb) continue;
-        const setA = new Set(wa);
-        if (wb.length > 0 && wb.every((word) => setA.has(word))) {
-            add(a, b, "one name is contained in the other");
-        }
-    }
+if (unruled.length === 0 && unused.length === 0) {
+    console.log(
+        `${counts.size} composer pages: all ${pairs.length} candidate pair(s) ruled on in ${RULINGS}.`,
+    );
+    process.exit(0);
 }
 
-console.log(`${names.length} composer pages, ${found.length} candidate pairs\n`);
-for (const { a, b, why } of found.sort((x, y) => x.why.localeCompare(y.why))) {
-    console.log(`  [${why}]  ${a} (${counts.get(a)})  <->  ${b} (${counts.get(b)})`);
+for (const { a, b, why } of unruled) {
+    console.error(`✗ nobody has ruled on [${why}]  ${a} (${held(a)})  <->  ${b} (${held(b)})`);
 }
+for (const { a, b } of unused) {
+    console.error(`✗ ${RULINGS} rules on ${a} <-> ${b}, which the catalogue no longer pairs`);
+}
+console.error(
+    `\nIf they are two people, add the pair to ${RULINGS} with a "why".\n` +
+        "If they are one person, add an alias to core/person.ts instead — that merges them\n" +
+        "everywhere at once — then run `npm run songs:bake` and commit the baked index.\n" +
+        "A ruling the catalogue no longer pairs is stale: remove the entry.",
+);
+process.exit(1);

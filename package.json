@@ -30,6 +30,7 @@
         "nav": "node dev/nav-graph.mjs",
         "news": "tsx dev/changelog.mts",
         "news:check": "tsx dev/changelog.mts --check",
+        "people:dupes": "tsx dev/person-dupes.mts",
         "piano:build": "node dev/piano/build-pack.mjs",
         "piano:demo": "node dev/piano/demo.mjs",
         "piano:pack": "node dev/piano/measure-pack.mjs",

@@ -80,6 +80,7 @@ path = [
     "dev/catalog-curation.json",
     "dev/catalog-duplicates.json",
     "dev/catalog-excluded.json",
+    "dev/catalog-people-distinct.json",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"

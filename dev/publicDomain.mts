@@ -14,6 +14,9 @@
 //     anonymous / a hymn or carol, or
 //   - the composer is a well-known public-domain composer.
 //
+// And in every case the credit has to be an attribution rather than a filing category:
+// "Misc Christmas" says nothing about who wrote the piece, so nothing here may read it.
+//
 // NOT legal advice; a backstop, not a guarantee. A single composition year is ignored
 // (it doesn't tell us the author's death year); only a "(birth–death)" range counts.
 
@@ -89,11 +92,24 @@ const COPYRIGHTED_WORKS = /\b(petit papa noel|you are my sunshine|tzena)\b/;
 // is a form, not a film.
 const SCREEN_MUSIC = /\bsoundtrack\b|\bost\b|\bvideo\s?game\b|\banime\b/;
 
+// "Misc Christmas", "Misc Traditional", "Misc Soundtrack" — the corpora's own filing
+// buckets, sitting in the field that is supposed to say who wrote the piece. It is not an
+// attribution and it is not a claim of anonymity either; it is the absence of both, and
+// every rule here that reads it does so wrongly. "Misc Soundtrack" read as nobody claiming
+// the work when it meant a television theme; "Misc Christmas" carried two carols in on a
+// word in their titles. A credit that names a category rather than a person tells us
+// nothing, and nothing is not enough.
+const CATEGORY_NOT_A_COMPOSER = /^misc\b/;
+
 export function isPublicDomain(composer: string, title = ""): boolean {
     if (composer.trim() === "") {
         return false; // no attribution — can't confirm anything
     }
-    if (COPYRIGHTED_WORKS.test(fold(title)) || SCREEN_MUSIC.test(fold(`${composer} ${title}`))) {
+    if (
+        COPYRIGHTED_WORKS.test(fold(title)) ||
+        SCREEN_MUSIC.test(fold(`${composer} ${title}`)) ||
+        CATEGORY_NOT_A_COMPOSER.test(fold(composer))
+    ) {
         return false;
     }
     // A traditional marker in the COMPOSER field is an attribution: whoever uploaded it is

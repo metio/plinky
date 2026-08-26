@@ -46,5 +46,35 @@
         "title": "Celtic Hymn",
         "composer": "Juan Francisco Piqueras Toharias",
         "why": "Removed as unconfirmable rather than as known copyright, which is the harder call of the six. The score names no composer at all - the manifest credit is the uploader - so there is nothing to date and nothing to check. It may well be their own work released under CC0, which the catalogue would welcome; the allowlist's standing answer is that anything we cannot confirm is dropped, and a smaller safe catalogue beats a larger risky one. Reverse this entry if the composer confirms it is theirs."
+    },
+    {
+        "id": "57NiLrDpVNl0",
+        "title": "Coventry carol",
+        "composer": "Misc Christmas",
+        "why": "Credited to \"Misc Christmas\", which is one of the corpora's filing buckets rather than anybody who wrote it. A composer field naming a category tells a reader nothing and gives the piece no page to belong to. The music is a genuine 16th-century carol and could have been kept by relabelling the credit \"Traditional\"; removing it is the deliberate choice, since a relabelling would still leave the piece with nobody who wrote it. The import now refuses any credit beginning \"Misc\", so this is the last of them."
+    },
+    {
+        "id": "549duSjeyha6",
+        "title": "The first noel",
+        "composer": "Misc Christmas",
+        "why": "Credited to \"Misc Christmas\", which is one of the corpora's filing buckets rather than anybody who wrote it. A composer field naming a category tells a reader nothing and gives the piece no page to belong to. Traditional and long out of copyright, removed for the credit rather than the licence. The import now refuses any credit beginning \"Misc\", so this is the last of them."
+    },
+    {
+        "id": "ddapF7FdiDn1",
+        "title": "Russian Folk Song",
+        "composer": "Misc Traditional",
+        "why": "Credited to \"Misc Traditional\", which is one of the corpora's filing buckets rather than anybody who wrote it. A composer field naming a category tells a reader nothing and gives the piece no page to belong to. Both the title and the credit describe a category instead of naming anything. The import now refuses any credit beginning \"Misc\", so this is the last of them."
+    },
+    {
+        "id": "daQuSijfNYT6",
+        "title": "Lourdes Hymn",
+        "composer": "Misc Traditional",
+        "why": "Credited to \"Misc Traditional\", which is one of the corpora's filing buckets rather than anybody who wrote it. A composer field naming a category tells a reader nothing and gives the piece no page to belong to. Nineteenth-century and out of copyright, removed for the credit rather than the licence. The import now refuses any credit beginning \"Misc\", so this is the last of them."
+    },
+    {
+        "id": "8iNZNfxRUIsl",
+        "title": "O sacred Head now wounded",
+        "composer": "Misc Traditional",
+        "why": "Credited to \"Misc Traditional\", which is one of the corpora's filing buckets rather than anybody who wrote it. A composer field naming a category tells a reader nothing and gives the piece no page to belong to. The chorale is Hassler's melody as Bach set it, and the catalogue already holds it properly credited elsewhere; this copy names nobody at all. The import now refuses any credit beginning \"Misc\", so this is the last of them."
     }
 ]
