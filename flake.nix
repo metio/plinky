@@ -55,6 +55,32 @@
           # ci-actionlint, ci-markdown) come from devshell.lib.mkDevShell, defined once
           # org-wide; the wrappers below are the repo-specific gates.
           ciCommands = [
+            # Runs a command inside a cgroup that cannot take the desktop with it. This
+            # host is a workstation as well as a build box: a gate that instruments the
+            # whole tree pushed the browser's heap into swap twice and took tmux with it
+            # the second time, and the load average passed 40 on sixteen cores.
+            #
+            # MemorySwapMax=0 is the property that matters. Denied swap, a run that
+            # overreaches is OOM-killed inside its own scope while everything outside it
+            # keeps its pages — the run dies instead of the machine. CPUQuota leaves cores
+            # for the desktop, and IOWeight keeps writeback from starving it.
+            #
+            # A no-op on CI and anywhere without a systemd user session, so the same
+            # command line works in both places: CI has a fleet and wants the whole runner.
+            #   nix develop --command capped npm run coverage
+            # CAPPED_CPU and CAPPED_MEM override the defaults for a run that needs more.
+            (pkgs.writeShellScriptBin "capped" ''
+              set -e
+              if [ -n "''${CI:-}" ] || ! systemd-run --user --scope --quiet -- true >/dev/null 2>&1; then
+                exec "$@"
+              fi
+              exec systemd-run --user --scope --quiet --collect \
+                -p "CPUQuota=''${CAPPED_CPU:-600%}" \
+                -p "MemoryMax=''${CAPPED_MEM:-8G}" \
+                -p MemorySwapMax=0 \
+                -p IOWeight=50 \
+                -- "$@"
+            '')
             (pkgs.writeShellScriptBin "ci-typecheck" ''exec npm run typecheck "$@"'')
             (pkgs.writeShellScriptBin "ci-test" ''exec npm run test "$@"'')
             (pkgs.writeShellScriptBin "ci-test-browser" ''exec npm run test:browser "$@"'')

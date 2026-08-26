@@ -398,7 +398,13 @@ const BUDGET_VENDOR_KB = 324;
 // ships in the app bundle as the name a person page shows before the catalogue arrives, so
 // it went from 157 entries to 403: 3.0 KB gzipped to 7.7. The prerendered set went from
 // 4,082 pages to 10,634.
-const BUDGET_APP_KB = 382;
+// 383. A credit naming two composers gives each of them a page. personSlugs answers every
+// person in a credit where personSlug answered one, and the split runs on the cleaned name
+// so the credits that only look like two people stay whole. The weight is the four
+// composites leaving the index and the eight real people arriving in their place, plus the
+// splitting itself — a tenth of a kilobyte over the line, for pages that had been credited
+// to a composer who never existed while neither real one was credited at all.
+const BUDGET_APP_KB = 383;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

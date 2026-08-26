@@ -35,6 +35,10 @@ pease = "pease"
 # "Worte" is German for "words", and "Musik" for music: harvested song credits label
 # the two halves ("Worte & Musik: …"), which core/person strips to find the composer.
 worte = "worte"
+# "Befiehl du deine Wege" is a German chorale — Gesius's melody, which Telemann set —
+# quoted in the person tests as the real two-composer credit it arrives under.
+deine = "deine"
+wege = "wege"
 # "tradicional" is the Spanish and Portuguese spelling of "traditional" — a marker in
 # the corpora that names a tradition rather than a person.
 tradicional = "tradicional"

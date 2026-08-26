@@ -52,20 +52,39 @@ one.** Not a subset of those, not "the ones the change looks related to" — a
 cheap gate you skip is a gate CI runs for you, slower and after the push. The
 whole point of the flake is that local and CI resolve identical tools.
 
-**Four gates belong to CI, and must not be run here.** They saturate this
-machine for tens of minutes at a time and make it unusable while they do —
-which is a host limit like any other, and CI has a fleet for exactly this:
+**Four gates are heavy, and on this host they run under `capped` — always.**
+They instrument the whole tree or drive a browser over every page, and run loose
+they do not merely take a long time: they push the desktop's pages into swap.
+That froze the browser twice and killed a tmux session, with the load average
+past 40 on sixteen cores.
 
-| Gate | Why it stays on CI |
+```sh
+nix develop --command capped npm run coverage
+nix develop --command capped npm run test:storybook -- -u
+nix develop --command capped ci-lighthouse
+nix develop --command capped npm run a11y:light
+```
+
+| Gate | What it does |
 | --- | --- |
-| `npm run coverage` | Instruments the whole tree and reruns every project; load average past 30 on this box. |
-| `npm run test:storybook` | 290 screenshots across two themes, one browser round-trip each. Run it only when baselines genuinely need refreshing (`-- -u` after a deliberate visual change), never as a check. |
+| `npm run coverage` | Instruments the whole tree and reruns every project. |
+| `npm run test:storybook` | ~290 screenshots across two themes, one browser round-trip each. Run it as a check only when you mean to; `-- -u` refreshes baselines after a deliberate visual change. |
 | `ci-lighthouse` | Builds the site, then drives 22 pages through headless Chrome. |
 | `npm run a11y:light` / `a11y:dark` | Builds the site, then axe over the same 22 pages, twice. |
 
-Push and read the run instead. If one of them fails on CI and the failure is not
-obvious from the log, *then* reproduce that single gate locally, alone, and say
-so — a deliberate one-off, not the routine.
+`capped` is a devShell wrapper (`flake.nix`) that puts the command in a systemd
+scope with `CPUQuota=600%`, `MemoryMax=8G`, `MemorySwapMax=0` and `IOWeight=50`.
+`MemorySwapMax=0` is the one that saves the machine: denied swap, a run that
+overreaches is OOM-killed inside its own scope while everything outside keeps its
+pages — the run dies instead of the desktop. `CAPPED_CPU` and `CAPPED_MEM`
+override the defaults. On CI, and anywhere without a systemd user session, it
+execs straight through, so the same command line works in both places.
+
+Two things `capped` does not fix. It bounds one command, not two: running two
+`nix develop --command npm …` invocations at once still races on the gitignored
+`app/paraglide/` (see below), and two capped runs still add up. And CI remains
+where these gates are *expected* to run — pushing and reading the run is still
+cheaper than a local sweep when you have no particular reason to reproduce one.
 
 The other host limit is the ordinary one: this is a Fedora Atomic (ostree)
 machine with rootless Podman and nix-portable, so a gate needing `kind`, a
