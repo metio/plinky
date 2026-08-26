@@ -217,6 +217,13 @@ const ALIASES: Record<string, string> = {
     // piece names its owner: Bertini's Op. 29 is his 24 études, the Erato praeludium is
     // from Fischer's Musicalischer Parnassus (its suites are named for the muses), the
     // "six sonates faciles" are Dussek's, and the Flower Duet is from Lakmé.
+    // Two the promo list writes differently from every corpus, so nothing else had taught
+    // the table about them. Six other spellings of Tchaikovsky already merge; this is the
+    // seventh. "Bach-Gounod" is left alone on purpose: the hyphen is the conventional way
+    // to credit the Ave Maria to both of them, and splitting on hyphens would tear
+    // Rimsky-Korsakov in half.
+    gounod: "Charles Gounod",
+    "pyotr tchaikovsky": "Pyotr Ilyich Tchaikovsky",
     delibes: "Léo Delibes",
     "h. bertini": "Henri Bertini",
     "j. k. f. fischer": "Johann Kaspar Ferdinand Fischer",

@@ -81,7 +81,14 @@ export const PIECES = [
 // share a title — a Schubert Ave Maria and a Bach/Gounod one — but not under the same
 // composer, so the composer segment settles what a flat name could not.
 export function folderFor(piece) {
-    return `${slug(piece.composer)}/${slug(piece.title)}`;
+    return `${folderForComposer(piece.composer)}/${slug(piece.title)}`;
+}
+
+// The folder holding everything of one composer's — every piece of theirs, and the playlist
+// text that collects them. Built from the same slug the piece paths are, so a playlist
+// cannot land beside a different composer's clips than the one it names.
+export function folderForComposer(composer) {
+    return slug(composer);
 }
 
 // Two pieces landing on one path would have the second overwrite the first, and a folder
