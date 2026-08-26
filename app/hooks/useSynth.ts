@@ -3,6 +3,7 @@
 
 import { useCallback, useMemo } from "react";
 import { noteGain } from "../../core/loudness";
+import { isInstrumentInput } from "../../core/midi";
 import { wetFor } from "../../core/room";
 import type { PedalKind } from "../../core/pedals";
 import { useAudioEngine, usePrefsStore } from "../contexts/services";
@@ -33,7 +34,9 @@ export type UseSynthResult = {
     // A live voice for a held key: it rings until releaseNote (or the pedal lifts), so the
     // sound follows the player's own key hold. A quick release sounds staccato, a long hold
     // sustains — the articulation the player actually gave.
-    pressNote: (note: number, options?: { velocity?: number }) => void;
+    // `device` names what pressed the key, so a note an instrument is already sounding
+    // is not sounded twice. Omitted where the caller is not an instrument path.
+    pressNote: (note: number, options?: { velocity?: number; device?: string }) => void;
     // holdScale (default 1) lets an imprecise input's short tap ring on; see the engine's
     // release. A real MIDI key leaves it at 1.
     releaseNote: (note: number, holdScale?: number) => void;
@@ -98,7 +101,18 @@ export function useSynth(): UseSynthResult {
     );
 
     const pressNote = useCallback(
-        (note: number, options: { velocity?: number } = {}) => {
+        (note: number, options: { velocity?: number; device?: string } = {}) => {
+            // The player's own instrument is making this sound already, so Plinky does not
+            // make it again. Only for a note from a real instrument: a drawn key and a
+            // computer key have no voice of their own and would go silent. A caller that
+            // names no device is not an instrument path and always sounds.
+            if (
+                prefsStore.load().instrumentSounds &&
+                options.device !== undefined &&
+                isInstrumentInput(options.device)
+            ) {
+                return;
+            }
             const gain = gainFor(options.velocity ?? 90);
             if (gain === null) {
                 return;
@@ -106,7 +120,7 @@ export function useSynth(): UseSynthResult {
             audio.resume();
             audio.press(note, gain, options.velocity ?? 90);
         },
-        [gainFor, audio],
+        [gainFor, audio, prefsStore],
     );
 
     // Release and pedal always reach the engine — a muted session opened no voice, so they

@@ -62,6 +62,17 @@ export type Prefs = {
     colorNotes: boolean;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
+    // Your own instrument makes the sound, so Plinky does not play your notes a second
+    // time. A digital piano with speakers, or an acoustic one with MIDI fitted, is already
+    // sounding every key you press — answering it adds a second voice a few milliseconds
+    // behind your own. Off by default, because most keyboards a beginner plugs in are
+    // silent controllers that would leave them hearing nothing.
+    //
+    // It silences only the notes YOU play, and only from a real instrument. Listen, the
+    // metronome, the ear trainer, the duet's other hand and every demonstration still
+    // sound, and so do the on-screen and computer keyboards, which have no voice of their
+    // own. Stored per device — the piano is in this room.
+    instrumentSounds: boolean;
     // Echo what Plinky plays to a connected instrument, lighting its keys.
     midiEcho: boolean;
     // Light the keys you are about to play on an instrument that illuminates them —
@@ -230,6 +241,7 @@ function defaults(): Prefs {
         colorNotes: true,
         noteHints: "always",
         noteLabels: "all",
+        instrumentSounds: false,
         midiEcho: false,
         keyLights: false,
         lightProfile: "casio",
@@ -321,6 +333,7 @@ export function parsePrefs(raw: string | null): Prefs {
         const parsed = JSON.parse(raw ?? "{}");
         return {
             sound: bool(parsed.sound, base.sound),
+            instrumentSounds: bool(parsed.instrumentSounds, base.instrumentSounds),
             midiEcho: bool(parsed.midiEcho, base.midiEcho),
             keyLights: bool(parsed.keyLights, base.keyLights),
             lightProfile: oneOf(parsed.lightProfile, LIGHT_PROFILE_IDS, base.lightProfile),

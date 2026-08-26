@@ -58,6 +58,19 @@ export function SpeakerIcon({ className }: IconProps) {
     );
 }
 
+// The same cone with the waves crossed out. A diagonal slash is the more usual mute
+// glyph, but laid over a filled cone at this size it reads as a smudge; putting the cross
+// where the waves were says the same thing with the strokes the set already uses.
+export function SpeakerOffIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M4 9.5h3l4-3.5v12l-4-3.5H4z" fill="currentColor" stroke="none" />
+            <path d="M14.5 9 20 15" />
+            <path d="M20 9 14.5 15" />
+        </Icon>
+    );
+}
+
 // A filled square — the universal "stop".
 export function StopIcon({ className }: IconProps) {
     return (

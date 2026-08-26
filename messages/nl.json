@@ -473,6 +473,8 @@
     "slow_notes_heading": "Noten die je het langst zoekt",
     "slow_notes_intro": "De meeste noten lees je in ongeveer {typical}s. Deze duren langer — een paar minuten waard.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Mijn piano klinkt zelf",
+    "settings_instrument_sounds_help": "Zet dit aan bij een digitale of akoestische piano en Plinky speelt jouw noten niet nog een keer terug. Alles wat Plinky zelf speelt — Luisteren, de metronoom, de andere hand — blijft. Standaard uit, want de meeste keyboards klinken niet zelf.",
     "settings_midi_echo": "Mijn piano speelt mee",
     "settings_midi_echo_help": "Stuurt elke noot op het moment dat Plinky hem speelt, zodat een geluidsmodule met zijn eigen klank kan meespelen. Standaard uit. Als je keyboard de toetsen verlicht, stuurt Plinky dit op een ander kanaal, zodat de twee elkaar niet in de weg zitten.",
     "section_best_heading": "Je beste van dit stuk: {total}",

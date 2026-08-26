@@ -473,6 +473,8 @@
     "slow_notes_heading": "Töne, die du am längsten suchst",
     "slow_notes_intro": "Die meisten Töne liest du in etwa {typical}s. Diese dauern länger — ein paar Minuten wert.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Mein Klavier klingt selbst",
+    "settings_instrument_sounds_help": "Schalte das für ein Digital- oder akustisches Klavier ein, dann spielt Plinky deine Noten nicht noch einmal zurück. Alles, was Plinky von sich aus spielt — Anhören, das Metronom, die andere Hand — bleibt. Standardmäßig aus, denn die meisten Keyboards klingen nicht von allein.",
     "settings_midi_echo": "Auf meinem Keyboard mitlaufen lassen",
     "settings_midi_echo_help": "Schickt jede Note in dem Moment, in dem Plinky sie spielt, damit ein Klangmodul mit seinem eigenen Klang mitspielen kann. Standardmäßig aus. Wenn dein Keyboard die Tasten aufleuchten lässt, schickt Plinky das hier auf einem anderen Kanal, damit sich beides nicht in die Quere kommt.",
     "section_best_heading": "Dein Bestes für dieses Stück: {total}",

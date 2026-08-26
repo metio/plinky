@@ -606,8 +606,12 @@ function usePlaySessionValue({
                 // pitch's key is already up. Pressing a voice for that pitch would open one
                 // with no key-up left to release it — it would ring on forever.
                 for (const pitch of info.pitches) {
-                    if (funnel.isHeld(pitch)) {
-                        synth.pressNote(pitch, { velocity: info.velocity });
+                    const device = funnel.deviceOf(pitch);
+                    if (device !== null) {
+                        // The device that pressed the key, not the one that pressed the
+                        // last key: a chord can be rolled across two inputs, and only the
+                        // instrument's own notes are the ones it is already sounding.
+                        synth.pressNote(pitch, { velocity: info.velocity, device });
                     }
                 }
             }

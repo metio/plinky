@@ -51,13 +51,19 @@ export type NoteFunnel = {
     // while an earlier pitch is already up, and pressing a guide voice for that pitch
     // would open one with no key-up left to release it.
     isHeld: (pitch: number) => boolean;
+    // What pressed a key that is still down, or null when nothing is. The play surface
+    // needs it to decide whether to voice the note: a note from an instrument that makes
+    // its own sound must not be answered with a second one.
+    deviceOf: (pitch: number) => string | null;
     // Handed to the MIDI context. Returned rather than subscribed here so the decisions
     // above can be exercised directly, without a provider or a device.
     listener: Required<NoteListener>;
 };
 
 export function useNoteFunnel(options: NoteFunnelOptions): NoteFunnel {
-    const held = useRef(new Set<number>());
+    // Note to the device holding it: a set would answer whether a key is down but not
+    // what is holding it, and both questions are asked of the same moment.
+    const held = useRef(new Map<number, string>());
     const [holding, setHolding] = useState(false);
     const latest = useRef(options);
     latest.current = options;
@@ -77,7 +83,7 @@ export function useNoteFunnel(options: NoteFunnelOptions): NoteFunnel {
                 }
                 // Only keyed input, which releases cleanly, defers the exit.
                 if (event.device !== MIC_DEVICE) {
-                    held.current.add(event.note);
+                    held.current.set(event.note, event.device);
                     sync();
                 }
                 o.registerNote(event.note, event.timestamp, event.velocity);
@@ -110,6 +116,7 @@ export function useNoteFunnel(options: NoteFunnelOptions): NoteFunnel {
     return {
         holding,
         isHeld: (pitch) => held.current.has(pitch),
+        deviceOf: (pitch) => held.current.get(pitch) ?? null,
         listener,
     };
 }

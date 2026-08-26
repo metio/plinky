@@ -473,6 +473,8 @@
     "slow_notes_heading": "Bulman en uzun süren notalar",
     "slow_notes_intro": "Çoğu notayı yaklaşık {typical}s'de okuyorsun. Bunlar daha uzun sürüyor — her biri birkaç dakikaya değer.",
     "slow_notes_seconds": "{seconds}sn",
+    "settings_instrument_sounds": "Piyanom kendi sesini çıkarıyor",
+    "settings_instrument_sounds_help": "Dijital ya da akustik bir piyanoda bunu aç, Plinky çaldığın notaları bir daha çalmasın. Plinky'nin kendi çaldıkları — Dinle, metronom, öteki el — sürer. Çoğu klavye kendiliğinden ses çıkarmadığı için varsayılan kapalıdır.",
     "settings_midi_echo": "Piyanom müziği takip etsin",
     "settings_midi_echo_help": "Her notayı Plinky çaldığı anda gönderir; bir ses modülü kendi sesiyle birlikte çalabilsin diye. Varsayılan olarak kapalı. Klavyen tuşları yakıyorsa Plinky bunu başka bir kanaldan gönderir, böylece ikisi birbirine karışmaz.",
     "section_best_heading": "Bu parçadaki en iyin: {total}",

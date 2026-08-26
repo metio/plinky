@@ -473,6 +473,8 @@
     "slow_notes_heading": "Notas que demoras mais a encontrar",
     "slow_notes_intro": "A maioria das notas leva-te cerca de {typical}s a ler. Estas demoram mais — valem uns minutos cada.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "O meu piano soa sozinho",
+    "settings_instrument_sounds_help": "Liga isto num piano digital ou acústico e o Plinky deixa de repetir as tuas notas. Tudo o que o Plinky toca por si — Ouvir, o metrónomo, a outra mão — continua. Desligado por omissão, porque a maioria dos teclados não soa sozinha.",
     "settings_midi_echo": "Deixar o meu piano acompanhar",
     "settings_midi_echo_help": "Envia cada nota no momento em que o Plinky a toca, para que um módulo de som toque junto com o seu próprio som. Desligado por omissão. Se o teu teclado acende as teclas, o Plinky envia isto noutro canal, para que os dois não se atrapalhem.",
     "section_best_heading": "O teu melhor nesta peça: {total}",

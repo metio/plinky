@@ -17,6 +17,7 @@ const BASE: Prefs = {
     colorNotes: true,
     noteHints: "always",
     noteLabels: "all",
+    instrumentSounds: false,
     midiEcho: false,
     keyLights: false,
     lightProfile: "casio",

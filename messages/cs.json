@@ -473,6 +473,8 @@
     "slow_notes_heading": "Tóny, které hledáš nejdéle",
     "slow_notes_intro": "Většinu tónů přečteš asi za {typical}s. Tyhle trvají déle — stojí za pár minut.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Moje piano zní samo",
+    "settings_instrument_sounds_help": "Zapni to u digitálního nebo akustického piana a Plinky přestane tvoje tóny přehrávat znovu. Všechno, co Plinky hraje sám — Poslech, metronom, druhá ruka — zůstává. Ve výchozím stavu vypnuto, protože většina klaviatur sama nezní.",
     "settings_midi_echo": "Sledovat hru na mé klaviatuře",
     "settings_midi_echo_help": "Posílá každou notu ve chvíli, kdy ji Plinky zahraje, aby ji zvukový modul zahrál s ním svým vlastním zvukem. Standardně vypnuto. Když ti svítí klávesy, posílá to Plinky na jiném kanálu, aby si obě věci nepřekážely.",
     "section_best_heading": "Tvoje nejlepší podání téhle skladby: {total}",

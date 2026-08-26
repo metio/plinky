@@ -473,6 +473,8 @@
     "slow_notes_heading": "Notat që i gjen më ngadalë",
     "slow_notes_intro": "Shumicën e notave i lexon për rreth {typical}s. Këto zgjasin më shumë — ia vlejnë disa minuta secila.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Pianoja ime tingëllon vetë",
+    "settings_instrument_sounds_help": "Ndize këtë për një piano dixhitale ose akustike dhe Plinky nuk i luan më notat e tua sërish. Gjithçka që luan Plinky vetë — Dëgjo, metronomi, dora tjetër — vazhdon. E fikur si parazgjedhje, se shumica e tastierave nuk tingëllojnë vetë.",
     "settings_midi_echo": "Pianoja ime të ndjekë muzikën",
     "settings_midi_echo_help": "Dërgon çdo notë në çastin kur Plinky e luan, që një modul zëri të luajë bashkë me zërin e vet. E fikur si parazgjedhje. Nëse tastiera jote i ndriçon tastet, Plinky e dërgon këtë në një kanal tjetër, që të dyja të mos pengojnë njëra-tjetrën.",
     "section_best_heading": "Më e mira jote në këtë pjesë: {total}",

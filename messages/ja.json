@@ -473,6 +473,8 @@
     "slow_notes_heading": "見つけるのに時間がかかる音",
     "slow_notes_intro": "ほとんどの音は約{typical}秒で読めています。これらはもっとかかります — それぞれ数分の練習で変わります。",
     "slow_notes_seconds": "{seconds}秒",
+    "settings_instrument_sounds": "自分のピアノが鳴る",
+    "settings_instrument_sounds_help": "電子ピアノやアコースティックピアノならこれをオンに。Plinky があなたの音を鳴らし直すのをやめます。Plinky 自身が鳴らすもの——聴く、メトロノーム、もう片方の手——はそのままです。ほとんどのキーボードは自分では鳴らないので、既定はオフです。",
     "settings_midi_echo": "ピアノでも一緒に鳴らす",
     "settings_midi_echo_help": "Plinky が鳴らした瞬間に、その音を送ります。音源モジュールが自分の音色で一緒に鳴らせます。既定はオフです。鍵盤を光らせているときは、Plinky はこれを別のチャンネルで送るので、ふたつがぶつかりません。",
     "section_best_heading": "この曲のベスト：{total}",

@@ -38,3 +38,14 @@ export const Bare: Story = { args: { noteLabels: "off", noteHints: "never" } };
 // A free-play surface has no next note to hint, so it omits the pair and the
 // cycle button stays off the bar altogether.
 export const NoHints: Story = { args: { noteHints: undefined, onNoteHints: undefined } };
+
+// A piano that makes its own sound, so Plinky stays out of the way. The glyph is the
+// crossed-out speaker while it is on, and the plain one while Plinky is still answering.
+export const OwnInstrument: Story = {
+    args: { instrumentSounds: true, onInstrumentSounds: () => {} },
+};
+
+// Off, and offered: the same button before it is pressed.
+export const OwnInstrumentOff: Story = {
+    args: { instrumentSounds: false, onInstrumentSounds: () => {} },
+};

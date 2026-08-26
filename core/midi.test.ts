@@ -7,6 +7,7 @@ import {
     holdScaleFor,
     IMPRECISE_HOLD_SCALE,
     isFocusGatedInput,
+    isInstrumentInput,
     isPreciseInput,
     KEYBOARD_DEVICE,
     keyToNote,
@@ -229,5 +230,16 @@ describe("spokenPitch", () => {
     it("numbers the octaves the way a piano is labelled, middle C in the fourth", () => {
         expect(spokenPitch(21)).toBe("A 0"); // the lowest key of an 88-key piano
         expect(spokenPitch(108)).toBe("C 8"); // and the highest
+    });
+});
+
+describe("isInstrumentInput", () => {
+    it("is true only for a device somebody is actually playing", () => {
+        // It decides whether Plinky voices the note. A real instrument may be sounding it
+        // already; a drawn key, a typed key and a microphone make no sound of their own.
+        expect(isInstrumentInput("Yamaha P-125")).toBe(true);
+        expect(isInstrumentInput(ON_SCREEN_DEVICE)).toBe(false);
+        expect(isInstrumentInput(KEYBOARD_DEVICE)).toBe(false);
+        expect(isInstrumentInput(MIC_DEVICE)).toBe(false);
     });
 });

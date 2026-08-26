@@ -473,6 +473,8 @@
     "slow_notes_heading": "Dźwięki, których szukasz najdłużej",
     "slow_notes_intro": "Większość dźwięków czytasz w około {typical}s. Te trwają dłużej — warte kilku minut.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Moje pianino brzmi samo",
+    "settings_instrument_sounds_help": "Włącz to przy pianinie cyfrowym lub akustycznym, a Plinky przestanie odtwarzać twoje dźwięki drugi raz. Wszystko, co Plinky gra samo — Posłuchaj, metronom, druga ręka — zostaje. Domyślnie wyłączone, bo większość klawiatur sama nie brzmi.",
     "settings_midi_echo": "Niech pianino idzie za muzyką",
     "settings_midi_echo_help": "Wysyła każdą nutę w chwili, gdy Plinky ją gra, żeby moduł brzmieniowy mógł zagrać razem własnym brzmieniem. Domyślnie wyłączone. Jeśli twoja klawiatura podświetla klawisze, Plinky wysyła to innym kanałem, żeby jedno nie wchodziło drugiemu w drogę.",
     "section_best_heading": "Twój najlepszy wynik w tym utworze: {total}",

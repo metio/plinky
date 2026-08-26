@@ -473,6 +473,8 @@
     "slow_notes_heading": "Note che impieghi più tempo a trovare",
     "slow_notes_intro": "La maggior parte delle note ti richiede circa {typical}s. Queste durano di più — valgono qualche minuto ciascuna.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Il mio pianoforte suona da sé",
+    "settings_instrument_sounds_help": "Attivalo per un pianoforte digitale o acustico e Plinky smette di risuonare le tue note. Tutto ciò che Plinky suona da solo — Ascolta, il metronomo, l'altra mano — resta. Disattivato di default: la maggior parte delle tastiere non suona da sé.",
     "settings_midi_echo": "Fai seguire la musica al mio piano",
     "settings_midi_echo_help": "Manda ogni nota nel momento in cui Plinky la suona, così un modulo sonoro può suonare insieme con la sua voce. Disattivato di base. Se la tua tastiera accende i tasti, Plinky manda questo su un altro canale, così i due non si intralciano.",
     "section_best_heading": "Il tuo meglio su questo brano: {total}",

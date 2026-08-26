@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 27 August 2026
+
+**If your piano makes its own sound, Plinky can stop doubling it.** Playing a digital
+or acoustic piano through MIDI, every note came out twice — once from the instrument
+and once from Plinky a moment behind. There is a switch in Settings now, and a button
+above the keys while you play. It quiets only the notes you play: Listen, the
+metronome, the other hand and every demonstration carry on as before. The on-screen
+and computer keyboards carry on too, since they have no sound of their own.
+
 ## 26 August 2026 — later
 
 **A note held under the sustain pedal now dies away, the way a string does.** Keep the

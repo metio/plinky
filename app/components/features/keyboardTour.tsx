@@ -90,7 +90,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
 
     useMidiInput({
         onNoteOn: (event) => {
-            synth.pressNote(event.note, { velocity: event.velocity });
+            synth.pressNote(event.note, { velocity: event.velocity, device: event.device });
             heard(event.note);
         },
         onNoteOff: (event) => synth.releaseNote(event.note, holdScaleFor(event.device)),

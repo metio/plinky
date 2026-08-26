@@ -473,6 +473,8 @@
     "slow_notes_heading": "Tóny, ktoré hľadáš najdlhšie",
     "slow_notes_intro": "Väčšinu tónov prečítaš asi za {typical}s. Tieto trvajú dlhšie — stoja za pár minút.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Môj klavír znie sám",
+    "settings_instrument_sounds_help": "Zapni to pri digitálnom alebo akustickom klavíri a Plinky prestane tvoje tóny prehrávať znova. Všetko, čo Plinky hrá sám — Počúvanie, metronóm, druhá ruka — zostáva. Predvolene vypnuté, lebo väčšina klaviatúr sama neznie.",
     "settings_midi_echo": "Nech ma moje piano sprevádza",
     "settings_midi_echo_help": "Posiela každú notu vo chvíli, keď ju Plinky zahrá, aby ju zvukový modul hral s ním vlastným zvukom. Štandardne vypnuté. Ak sa ti rozsvecujú klávesy, Plinky to posiela na inom kanáli, aby si tie dve veci neprekážali.",
     "section_best_heading": "Tvoje najlepšie podanie tejto skladby: {total}",

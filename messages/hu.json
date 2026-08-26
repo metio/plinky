@@ -473,6 +473,8 @@
     "slow_notes_heading": "Hangok, amiket a legtovább keresel",
     "slow_notes_intro": "A legtöbb hangot nagyjából {typical}s alatt olvasod. Ezek tovább tartanak — megér fejenként pár percet.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "A zongorám magától szól",
+    "settings_instrument_sounds_help": "Digitális vagy akusztikus zongorához kapcsold be, és a Plinky nem játssza vissza a hangjaidat. Amit a Plinky magától szólaltat meg — Hallgatás, a metronóm, a másik kéz — marad. Alapból ki, mert a legtöbb billentyűzet magától nem szól.",
     "settings_midi_echo": "Kövesse a zongorám a zenét",
     "settings_midi_echo_help": "Minden hangot elküld abban a pillanatban, amikor a Plinky megszólaltatja, hogy egy hangmodul a saját hangján együtt szólhasson. Alapból ki. Ha a billentyűzeted világítja a billentyűket, a Plinky ezt másik csatornán küldi, hogy a kettő ne zavarja egymást.",
     "section_best_heading": "A legjobbad ebből a darabból: {total}",

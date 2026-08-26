@@ -473,6 +473,8 @@
     "slow_notes_heading": "Toner du tar längst tid på dig att hitta",
     "slow_notes_intro": "De flesta toner läser du på ungefär {typical}s. De här tar längre tid — värda några minuter var.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Mitt piano låter själv",
+    "settings_instrument_sounds_help": "Slå på det för ett digitalt eller akustiskt piano, så spelar Plinky inte dina toner igen. Allt Plinky spelar själv — Lyssna, metronomen, andra handen — fortsätter. Av som standard, eftersom de flesta klaviaturer inte låter av sig själva.",
     "settings_midi_echo": "Låt pianot följa med",
     "settings_midi_echo_help": "Skickar varje ton i samma stund som Plinky spelar den, så att en ljudmodul kan spela med i sitt eget ljud. Av som standard. Om din klaviatur tänder tangenterna skickar Plinky det här på en annan kanal, så att de två inte kommer i vägen för varandra.",
     "section_best_heading": "Ditt bästa av det här stycket: {total}",

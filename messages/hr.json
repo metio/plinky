@@ -473,6 +473,8 @@
     "slow_notes_heading": "Tonovi koje najdulje tražiš",
     "slow_notes_intro": "Većinu tonova pročitaš za otprilike {typical}s. Ovi traju dulje — vrijedni su nekoliko minuta.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Moj klavir sam zvuči",
+    "settings_instrument_sounds_help": "Uključi ovo za digitalni ili akustični klavir i Plinky više neće ponavljati tvoje note. Sve što Plinky svira sam — Slušaj, metronom, druga ruka — ostaje. Zadano isključeno, jer većina klavijatura sama ne zvuči.",
     "settings_midi_echo": "Neka me moj klavir prati",
     "settings_midi_echo_help": "Šalje svaku notu u trenutku kad je Plinky odsvira, da zvučni modul može svirati uz nju svojim zvukom. Prema zadanom isključeno. Ako ti klavijatura osvjetljava tipke, Plinky ovo šalje na drugom kanalu da si to dvoje ne smeta.",
     "section_best_heading": "Tvoje najbolje izvedeno u ovoj skladbi: {total}",

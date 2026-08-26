@@ -473,6 +473,8 @@
     "slow_notes_heading": "Sävelet, joiden löytäminen kestää kauimmin",
     "slow_notes_intro": "Useimmat sävelet luet noin {typical}s:ssa. Nämä kestävät kauemmin — muutaman minuutin arvoisia.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Pianoni soi itse",
+    "settings_instrument_sounds_help": "Laita tämä päälle digitaali- tai akustisella pianolla, niin Plinky ei soita säveliäsi uudelleen. Kaikki minkä Plinky soittaa itse — Kuuntele, metronomi, toinen käsi — jatkuu. Oletuksena pois, koska useimmat koskettimistot eivät soi itse.",
     "settings_midi_echo": "Seuraa soittoa pianollani",
     "settings_midi_echo_help": "Lähettää jokaisen sävelen sillä hetkellä, kun Plinky soittaa sen, jotta äänimoduuli voi soittaa mukana omalla äänellään. Oletuksena pois. Jos koskettimistosi sytyttää koskettimia, Plinky lähettää tämän eri kanavalla, jotteivät nämä kaksi häiritse toisiaan.",
     "section_best_heading": "Paras suorituksesi tästä kappaleesta: {total}",

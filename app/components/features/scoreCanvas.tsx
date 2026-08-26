@@ -133,6 +133,10 @@ export function ScoreCanvas() {
                     }
                     noteHints={aids.noteHints}
                     onNoteHints={setNoteHints}
+                    instrumentSounds={prefsStore.load().instrumentSounds}
+                    onInstrumentSounds={(value) =>
+                        prefsStore.save({ ...prefsStore.load(), instrumentSounds: value })
+                    }
                 />
             )}
             {/* The study countdown: the score is up and the run has not begun, so the

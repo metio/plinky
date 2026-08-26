@@ -473,6 +473,8 @@
     "slow_notes_heading": "Notele pe care le găsești cel mai greu",
     "slow_notes_intro": "Majoritatea notelor îți iau cam {typical}s. Acestea durează mai mult — merită câteva minute fiecare.",
     "slow_notes_seconds": "{seconds}s",
+    "settings_instrument_sounds": "Pianul meu sună singur",
+    "settings_instrument_sounds_help": "Activează-l pentru un pian digital sau acustic și Plinky nu îți mai repetă notele. Tot ce cântă Plinky singur — Ascultă, metronomul, cealaltă mână — rămâne. Dezactivat implicit, fiindcă majoritatea claviaturilor nu sună singure.",
     "settings_midi_echo": "Pianul meu să urmeze muzica",
     "settings_midi_echo_help": "Trimite fiecare notă în clipa în care Plinky o cântă, ca un modul de sunet să cânte alături cu sunetul lui. Dezactivat implicit. Dacă claviatura ta aprinde clapele, Plinky trimite asta pe alt canal, ca cele două să nu se încurce.",
     "section_best_heading": "Cel mai bun al tău la piesa asta: {total}",

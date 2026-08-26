@@ -666,7 +666,12 @@ many bars per row as the padded layout it replaced — at the same note size, wi
 dropped from the notation. Note size stays yours to set.
 
 Sound is synthesised in the browser, so the on-screen and computer keyboards make
-sound everywhere — MIDI is only for *input* from a real piano. **Settings → Sound** can
+sound everywhere — MIDI is only for *input* from a real piano. If that piano makes its
+own sound, you can stop Plinky doubling it: **My piano makes its own sound**, in
+**Settings → Sound** or as a button above the keys while you play, quiets the notes you
+play and nothing else. Listen, the metronome, the other hand of a duet and every
+demonstration still sound, and so do the on-screen and computer keyboards, which have no
+voice of their own. It is remembered per device, since the piano is in one room. **Settings → Sound** can
 swap that synthesised piano for a **recorded grand**: the Salamander Grand Piano by
 Alexander Holm (CC-BY), sixteen recordings of every key depending on how hard it is
 struck. There is nothing to download and wait for — a piece fetches the couple of dozen

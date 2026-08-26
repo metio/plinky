@@ -473,6 +473,8 @@
     "slow_notes_heading": "찾는 데 가장 오래 걸리는 음",
     "slow_notes_intro": "대부분의 음은 약 {typical}초에 읽고 있어요. 이 음들은 더 걸려요 — 각각 몇 분이면 달라져요.",
     "slow_notes_seconds": "{seconds}초",
+    "settings_instrument_sounds": "내 피아노가 스스로 소리 내요",
+    "settings_instrument_sounds_help": "디지털 피아노나 어쿠스틱 피아노라면 켜 두세요. Plinky가 당신이 친 음을 다시 울리지 않습니다. Plinky가 스스로 연주하는 것 — 듣기, 메트로놈, 반대쪽 손 — 은 그대로예요. 대부분의 건반은 스스로 소리 내지 않아서 기본은 꺼짐입니다.",
     "settings_midi_echo": "피아노도 함께 따라가기",
     "settings_midi_echo_help": "Plinky가 소리 내는 순간 그 음을 보내서, 음원 모듈이 자기 음색으로 함께 울릴 수 있어요. 기본은 꺼짐이에요. 건반에 불을 켜 두었다면 Plinky는 이걸 다른 채널로 보내니 둘이 서로 방해하지 않아요.",
     "section_best_heading": "이 곡의 최고 기록: {total}",

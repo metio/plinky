@@ -1004,10 +1004,12 @@ wrong the same way, and both are corrected below: four `Prefs` fields carry a
 per-device comment rather than three, and the app deletes in seven places rather
 than five.
 
-**Do-not-sync list.** `micCalibration`, `barsPerRow`, `noteScale` and
-`instrumentRange` are documented in `core/prefs.ts` as per-device, and syncing them
-pushes one room's tuning onto another piano, a phone's layout onto a desktop, and
-the range of the keyboard in this room onto one that has different keys.
+**Do-not-sync list.** `micCalibration`, `barsPerRow`, `noteScale`, `instrumentRange`
+and `instrumentSounds` are documented in `core/prefs.ts` as per-device, and syncing them
+pushes one room's tuning onto another piano, a phone's layout onto a desktop, the range
+of the keyboard in this room onto one that has different keys, and — worst of the five —
+silence onto a device with no instrument attached, where the player would press a key and
+hear nothing with no clue why.
 
 **Class memberships carry a credential, which is a deliberate trade.**
 `plinky:classes` holds write tokens, so syncing it puts them in the vault in

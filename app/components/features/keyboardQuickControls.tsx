@@ -9,11 +9,12 @@ import {
     type NoteLabels,
 } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
-import { KeysIcon } from "../ui/icons";
+import { KeysIcon, SpeakerOffIcon, SpeakerIcon } from "../ui/icons";
 import { ToggleIconButton } from "../ui/toggleIconButton";
 
 // The keyboard's own quick controls, sitting right above the keys in full
-// screen: fold the keys away, cycle the note names, cycle the next-note hint.
+// screen: fold the keys away, cycle the note names, cycle the next-note hint,
+// and hand the sound back to a piano that makes its own.
 // Each is a shortcut onto the same preference the tools drawer and Settings
 // edit with full captions — one source of truth, two doors — so a change here
 // is a change everywhere.
@@ -40,6 +41,8 @@ export function KeyboardQuickControls({
     onNoteLabels,
     noteHints,
     onNoteHints,
+    instrumentSounds,
+    onInstrumentSounds,
     floating = false,
 }: {
     // Whether the keys are folded away; the cluster stays visible as the way back.
@@ -52,6 +55,10 @@ export function KeyboardQuickControls({
     // omits the pair and the cycle button stays off the bar.
     noteHints?: NoteHints;
     onNoteHints?: (value: NoteHints) => void;
+    // Your instrument is sounding your notes already, so Plinky stays out of the way.
+    // Optional, like the hint pair: a surface with no instrument in play omits it.
+    instrumentSounds?: boolean;
+    onInstrumentSounds?: (value: boolean) => void;
     // Pin the cluster to its nearest positioned ancestor's bottom-right corner —
     // the score box — instead of taking a row of its own. Out of the flow, hiding
     // the keys frees their whole strip for the score.
@@ -96,6 +103,18 @@ export function KeyboardQuickControls({
                         </button>
                     )}
                 </>
+            )}
+            {/* Outside the fold, unlike the two cycles: folding the keys away is what a
+                player with a real piano in front of them does, which is exactly who this
+                switch is for. */}
+            {instrumentSounds !== undefined && onInstrumentSounds !== undefined && (
+                <ToggleIconButton
+                    pressed={instrumentSounds}
+                    label={m.settings_instrument_sounds()}
+                    onClick={() => onInstrumentSounds(!instrumentSounds)}
+                >
+                    {instrumentSounds ? <SpeakerOffIcon /> : <SpeakerIcon />}
+                </ToggleIconButton>
             )}
             <ToggleIconButton
                 pressed={hidden}

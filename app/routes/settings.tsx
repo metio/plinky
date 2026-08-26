@@ -111,6 +111,12 @@ export default function Settings() {
                         <MidiConnect />
                     </FeatureBoundary>
                     <SwitchField
+                        label={m.settings_instrument_sounds()}
+                        checked={prefs.instrumentSounds}
+                        onChange={(instrumentSounds) => update({ instrumentSounds })}
+                        help={m.settings_instrument_sounds_help()}
+                    />
+                    <SwitchField
                         label={m.settings_midi_echo()}
                         checked={prefs.midiEcho}
                         onChange={(midiEcho) => update({ midiEcho })}

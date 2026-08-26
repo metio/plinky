@@ -119,13 +119,31 @@ export const ON_SCREEN_DEVICE = "On-screen keyboard";
 export const MIC_DEVICE = "Microphone";
 export const KEYBOARD_VELOCITY = 80;
 
+// The three stand-ins for an instrument: keys drawn on a screen, the computer's own
+// keyboard, and a microphone listening to a room. Any other device name is a MIDI
+// instrument somebody has plugged in and is actually playing.
+const STAND_INS: readonly string[] = [ON_SCREEN_DEVICE, KEYBOARD_DEVICE, MIC_DEVICE];
+
 // Whether an input source carries true velocity and rhythm. The on-screen and
 // computer-keyboard fallbacks send a fixed velocity and can't tap a precise beat,
 // and microphone pitch detection adds its own latency and wobble on top — so runs
 // played on any of them are timed with widened windows; a real MIDI instrument
 // (any other device name) is held to the tight ones.
 export function isPreciseInput(device: string): boolean {
-    return device !== ON_SCREEN_DEVICE && device !== KEYBOARD_DEVICE && device !== MIC_DEVICE;
+    return !STAND_INS.includes(device);
+}
+
+// Whether the note came from an instrument the player is touching, rather than from a
+// stand-in for one. It decides whether Plinky voices the note itself: a real piano or a
+// digital one may already be making the sound, while a drawn key and a computer key make
+// none and would be silent if Plinky did not answer them.
+//
+// The same set as isPreciseInput today, and deliberately a second function rather than a
+// second use of the first: one asks how tightly to time a run and the other asks whether
+// to make a sound, and a silent MIDI controller — precise, and needing Plinky's voice —
+// would move one of them without the other.
+export function isInstrumentInput(device: string): boolean {
+    return !STAND_INS.includes(device);
 }
 
 // Whether an input's key presses are delivered only while the window holds focus.

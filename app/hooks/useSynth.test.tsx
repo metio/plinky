@@ -5,6 +5,7 @@
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { KEYBOARD_DEVICE, ON_SCREEN_DEVICE } from "../../core/midi";
 import type { Prefs } from "../../core/prefs";
 import { ROOM_WET } from "../../core/room";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
@@ -147,5 +148,64 @@ describe("decoration when audio is asleep", () => {
         const { audio, playNote } = harness();
         playNote(60, { decorative: true });
         expect(audio.strikes).toHaveLength(1);
+    });
+});
+
+describe("when the player's own instrument makes the sound", () => {
+    // Reported from a real piano over USB MIDI: every note was being played twice, once by
+    // the piano and once by Plinky a few milliseconds behind. It is also why a stuck note
+    // was audible at all — the voice that hung was Plinky's copy, not the piano's string.
+    const MIDI = "Yamaha P-125";
+
+    it("leaves a note from the instrument to the instrument", () => {
+        const { audio, synth } = harness({ instrumentSounds: true });
+
+        synth.pressNote(60, { velocity: 100, device: MIDI });
+
+        expect(audio.voices).toEqual([]);
+    });
+
+    it("still answers the on-screen and computer keyboards, which have no voice", () => {
+        // The setting is about the instrument in the room. A drawn key and a typed key
+        // make no sound of their own, so silencing them would leave the player with
+        // nothing at all.
+        const { audio, synth } = harness({ instrumentSounds: true });
+
+        synth.pressNote(60, { velocity: 100, device: ON_SCREEN_DEVICE });
+        synth.pressNote(62, { velocity: 100, device: KEYBOARD_DEVICE });
+        synth.pressNote(64, { velocity: 100 });
+
+        expect(audio.voices.map((one) => one.note)).toEqual([60, 62, 64]);
+    });
+
+    it("still plays everything Plinky plays by itself", () => {
+        // Listen, the metronome, the duet's other hand and every demonstration go through
+        // strike rather than press, and none of them is the player's own instrument.
+        const { audio, synth } = harness({ instrumentSounds: true });
+
+        synth.playNote(60);
+
+        expect(audio.strikes).toHaveLength(1);
+    });
+
+    it("answers the instrument when the setting is off", () => {
+        const { audio, synth } = harness({ instrumentSounds: false });
+
+        synth.pressNote(60, { velocity: 100, device: MIDI });
+
+        expect(audio.voices).toHaveLength(1);
+    });
+
+    it("still ends a voice and still tracks the pedal", () => {
+        // Release and pedal must reach the engine regardless: a session that opened no
+        // voice has nothing to end, but the pedal state has to stay true either way.
+        const { audio, synth } = harness({ instrumentSounds: true });
+
+        synth.pressNote(60, { velocity: 100, device: MIDI });
+        synth.releaseNote(60);
+        synth.setPedal("sustain", true);
+
+        expect(audio.voices).toEqual([{ kind: "release", note: 60, holdScale: 1 }]);
+        expect(audio.pedals).toContainEqual({ pedal: "sustain", down: true });
     });
 });
