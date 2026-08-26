@@ -18,17 +18,22 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - .github/workflows/website.yml
-      - app/**
-      - core/**
-      - messages/**
-      - public/**
-      - package.json
-      - package-lock.json
-      - vite.config.ts
-      - react-router.config.ts
-      - tsconfig.json
+    # Every push to main deploys. There is no version, no tag and no release here, so the
+    # deployed site IS main -- and a filter that decides otherwise is a promise broken
+    # silently, on exactly the commits nobody thinks to check.
+    #
+    # There used to be a path allowlist, and an allowlist fails closed: anything it does not
+    # name is a change that ships nothing, and every new build input has to be remembered
+    # into it. Four kinds were already missing, each of which rewrites the site:
+    # dev/pages.mjs, which react-router.config.ts imports to decide WHICH PAGES EXIST;
+    # project.inlang/settings.json, the locale list the matrix below is built from, so a new
+    # language would have deployed nothing; flake.nix and flake.lock, the toolchain
+    # everything is built with; and dev/merge-locale-artifacts.mjs, dev/stamp-sw.mjs and
+    # dev/gen-sitemap.mjs, which the deploy job runs over the output it uploads.
+    #
+    # The cost is the build matrix running for a commit that changes only prose. That is
+    # cheap, it is CI's own hardware, and it buys back the one thing worth having here:
+    # main and the live site cannot disagree.
 permissions:
   contents: read
 concurrency:
@@ -125,8 +130,14 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         # --branch=main is what makes this a production deploy rather than a preview:
         # Cloudflare decides by comparing it against the project's production branch.
+        #
+        # --commit-hash stamps the deployment with the commit it was built from, so
+        # "is the live site current?" is a question with an answer: the dashboard names
+        # the commit, and it either is main's tip or it is not. Without it every
+        # deployment is anonymous and staleness can only be guessed at from the content.
         run: >-
           nix develop --command npx --yes wrangler@4 pages deploy build/client
           --project-name=plinky
           --branch=main
+          --commit-hash=${{ github.sha }}
           --commit-dirty=true
