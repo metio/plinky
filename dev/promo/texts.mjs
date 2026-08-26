@@ -72,7 +72,14 @@ function describe(piece, entry) {
         "",
         SITE,
         "",
-        `Score: ${entry?.license ?? "CC0-1.0"}. The catalogue is Creative Commons throughout, so every piece here is one you are free to play, share and record.`,
+        // No entry means no licence, and a licence is a legal fact about a particular
+        // score rather than a default. Guessing CC0 would tell a viewer they may reuse an
+        // edition nothing here has checked — and it contradicted the warning printed
+        // below, which says the text carries no licence. Every piece in the promo set has
+        // one today, so this drops nothing; it is here for the one that arrives without.
+        entry?.license
+            ? `Score: ${entry.license}. The catalogue is Creative Commons throughout, so every piece here is one you are free to play, share and record.`
+            : null,
     ]
         .filter((line) => line !== null)
         .join("\n");
