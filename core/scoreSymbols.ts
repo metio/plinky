@@ -72,6 +72,11 @@ const PRESENT: Record<string, (xml: string) => boolean> = {
     accidental: (xml) => /<accidental[\s>]/.test(xml),
     bassClef: (xml) => /<sign>F<\/sign>/.test(xml),
     ledger: needsLedger,
+    // A shape-note edition names each degree of the scale in the notehead. The element
+    // is only worth pointing at when it carries a shape: MusicXML also uses <notehead>
+    // for an ordinary "normal" head and for slashes and clusters that mean something
+    // else entirely, and a reader looking at round notes has no question to ask.
+    shapeNote: (xml) => /<notehead[^>]*>\s*(do|re|mi|fa|so|la|ti)\s*<\/notehead>/.test(xml),
     repeat: (xml) => /<repeat[\s/>]/.test(xml),
     // Every piece has a time signature, so its presence says nothing. Four beats to the
     // bar is what a reader assumes without being told; anything else is the thing worth

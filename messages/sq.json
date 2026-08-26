@@ -769,6 +769,8 @@
     "glossary_time_signature_gloss": "Dy numrat pas shenjave të tonalitetit: i sipërmi numëron rrahjet në masë, i poshtmi thotë cila notë vlen një rrahje.",
     "glossary_bass_clef_name": "Çelësi i basit",
     "glossary_bass_clef_gloss": "Çelësi i pentagramit të poshtëm, zakonisht dora jote e majtë. E njëjta kokë note këtu do të thotë tjetër tast se në çelësin e violinës.",
+    "glossary_shape_note_name": "Nota me forma",
+    "glossary_shape_note_gloss": "Çdo kokë note ka formën e vet — një trekëndësh për shkallën e parë, një katror për të gjashtën — që ta gjesh melodinë pa nxjerrë tonalitetin. Forma emërton shkallën, jo tingullin: nuk ndryshon asgjë nga ç'dëgjon.",
     "glossary_fermata_name": "Korona",
     "glossary_fermata_gloss": "Një pikë nën një hark mbi notë: mbaje më gjatë se ç'është shkruar, aq sa të duket e drejtë. Rrahja të pret.",
     "glossary_beam_name": "Traversa",

@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "Dwie liczby po znakach przykluczowych: górna liczy miary w takcie, dolna mówi, która nuta jest jedną miarą.",
     "glossary_bass_clef_name": "Klucz basowy",
     "glossary_bass_clef_gloss": "Klucz dolnej pięciolinii, zwykle twojej lewej ręki. Ta sama główka nuty oznacza tu inny klawisz niż w kluczu wiolinowym.",
+    "glossary_shape_note_name": "Nuty kształtowe",
+    "glossary_shape_note_gloss": "Każda główka nuty ma własny kształt — trójkąt dla pierwszego stopnia gamy, kwadrat dla szóstego — żeby znaleźć melodię bez ustalania tonacji. Kształt nazywa stopień, nie dźwięk: nie zmienia niczego, co słychać.",
     "glossary_fermata_name": "Fermata",
     "glossary_fermata_gloss": "Kropka pod łukiem nad nutą: przytrzymaj ją dłużej, niż zapisano, tak długo, jak wydaje się właściwe. Puls na ciebie czeka.",
     "glossary_beam_name": "Belka",

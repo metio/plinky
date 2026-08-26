@@ -769,6 +769,8 @@
     "glossary_time_signature_gloss": "Cele două cifre de după armură: cea de sus numără timpii dintr-o măsură, cea de jos spune ce notă ține un timp.",
     "glossary_bass_clef_name": "Cheia fa",
     "glossary_bass_clef_gloss": "Cheia portativului de jos, de obicei mâna ta stângă. Aceeași notă înseamnă aici o altă clapă decât în cheia sol.",
+    "glossary_shape_note_name": "Note cu forme",
+    "glossary_shape_note_gloss": "Fiecare cap de notă are forma lui — un triunghi pentru prima treaptă a gamei, un pătrat pentru a șasea — ca să găsești melodia fără să deduci tonalitatea. Forma numește treapta, nu sunetul: nu schimbă nimic din ce auzi.",
     "glossary_fermata_name": "Coroană",
     "glossary_fermata_gloss": "Un punct sub un arc deasupra notei: ține-o mai mult decât e scris, cât ți se pare potrivit. Pulsul te așteaptă.",
     "glossary_beam_name": "Bară de legătură",

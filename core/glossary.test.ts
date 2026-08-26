@@ -12,7 +12,7 @@ import {
     performSnippet,
     snippetSeconds,
 } from "./glossary";
-import { buildSnippet, DIVISIONS, noteDivisions, type Snippet } from "./glossaryScore";
+import { buildSnippet, DIVISIONS, noteDivisions, type Snippet, snippetMidi } from "./glossaryScore";
 
 const bar = (notes: Snippet["notes"], over: Partial<Snippet> = {}): Snippet => ({
     clef: "treble",
@@ -186,5 +186,32 @@ describe("the glossary catalogue", () => {
                 ]),
             ),
         ).toBeCloseTo(4 * (60 / GLOSSARY_TEMPO));
+    });
+});
+
+describe("shape notes", () => {
+    const entry = GLOSSARY.find((one) => one.id === "shapeNote");
+
+    it("draws a whole octave, so the shapes read as a set", () => {
+        // A shape names a degree of the scale, which means one shape on its own says
+        // nothing: the explanation is seeing all seven and do arriving back at do.
+        const shapes = entry?.shown.notes.map((note) => note.notehead);
+
+        expect(shapes).toEqual(["do", "re", "mi", "fa", "so", "la", "ti", "do"]);
+        expect(new Set(shapes).size).toBe(7);
+    });
+
+    it("offers no second reading, because a shape changes no sound", () => {
+        // The entry the glossary's own rule describes: a mark that instructs the reader
+        // rather than the sound gets one reading and a gloss saying what to do with it.
+        expect(entry?.plain).toBeNull();
+    });
+
+    it("sounds the plain scale it is drawn as", () => {
+        // Nothing outside the engraver reads a notehead, so the shapes must not reach the
+        // pitches: this has to be an ordinary C major scale to the ear.
+        const midi = entry?.shown.notes.map((note) => snippetMidi(note, entry.shown.fifths));
+
+        expect(midi).toEqual([60, 62, 64, 65, 67, 69, 71, 72]);
     });
 });

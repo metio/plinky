@@ -76,6 +76,12 @@ export type SnippetNote = {
     beam?: "begin" | "continue" | "end";
     // A hairpin opening at this note and closing at the one carrying "stop".
     wedge?: "crescendo" | "diminuendo" | "stop";
+    // The shape the notehead is drawn as. Round unless a score asks otherwise: a
+    // shape-note edition draws each degree of the scale as its own shape, so a singer
+    // reads the degree off the page rather than working it out from the key. It is a
+    // reading aid and nothing else — the pitch and the length are unchanged, which is why
+    // nothing outside the engraver ever looks at this.
+    notehead?: "do" | "re" | "mi" | "fa" | "so" | "la" | "ti";
 };
 
 export type Snippet = {
@@ -141,9 +147,12 @@ function noteXml(note: SnippetNote): string {
     const dot = note.dotted ? "<dot/>" : "";
     const accidental = note.accidental ? `<accidental>${note.accidental}</accidental>` : "";
     const beam = note.beam ? `<beam number="1">${note.beam}</beam>` : "";
+    const notehead = note.notehead ? `<notehead>${note.notehead}</notehead>` : "";
     // Child order is fixed by the MusicXML schema: pitch, duration, tie, type, dot,
-    // accidental, beam, then notations.
-    return `      <note>${pitchXml(note)}<duration>${noteDivisions(note)}</duration>${tie}<type>${note.value}</type>${dot}${accidental}${beam}${notationsXml(note)}</note>`;
+    // accidental, notehead, beam, then notations. A notehead written out of order is
+    // dropped rather than rejected, so the example would draw round notes and look right
+    // enough to pass a glance.
+    return `      <note>${pitchXml(note)}<duration>${noteDivisions(note)}</duration>${tie}<type>${note.value}</type>${dot}${accidental}${notehead}${beam}${notationsXml(note)}</note>`;
 }
 
 // A dynamic or a hairpin is a direction placed under the staff, written just before the

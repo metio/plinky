@@ -240,6 +240,8 @@
     "glossary_time_signature_gloss": "The two numbers after the key: the top one counts the beats in a bar, the bottom says which note gets one.",
     "glossary_bass_clef_name": "Bass clef",
     "glossary_bass_clef_gloss": "The lower staff's clef, usually your left hand. The same dot means a different key here than it would in the treble clef.",
+    "glossary_shape_note_name": "Shape notes",
+    "glossary_shape_note_gloss": "Each notehead is drawn as its own shape — a triangle for the first step of the scale, a square for the sixth — so a singer finds the tune without working out the key. The shape names the step, not the sound: it changes nothing you hear.",
     "glossary_fermata_name": "Fermata",
     "glossary_fermata_gloss": "A dot under an arc over the note: hold it longer than it is written, for as long as feels right. The beat waits for you.",
     "glossary_beam_name": "Beam",

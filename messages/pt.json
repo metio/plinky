@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "Os dois números a seguir à armação: o de cima conta os tempos do compasso, o de baixo diz que nota vale um tempo.",
     "glossary_bass_clef_name": "Clave de fá",
     "glossary_bass_clef_gloss": "A clave da pauta de baixo, normalmente a tua mão esquerda. A mesma cabeça de nota significa aqui uma tecla diferente da que seria em clave de sol.",
+    "glossary_shape_note_name": "Notas com forma",
+    "glossary_shape_note_gloss": "Cada cabeça de nota tem uma forma própria — um triângulo para o primeiro grau da escala, um quadrado para o sexto — para encontrares a melodia sem descobrir a tonalidade. A forma nomeia o grau, não o som: não muda nada do que se ouve.",
     "glossary_fermata_name": "Fermata",
     "glossary_fermata_gloss": "Um ponto sob um arco por cima da nota: segura-a mais tempo do que está escrito, o tempo que te parecer certo. A pulsação espera por ti.",
     "glossary_beam_name": "Barra de ligação",

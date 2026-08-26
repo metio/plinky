@@ -769,6 +769,8 @@
     "glossary_time_signature_gloss": "조표 뒤의 두 숫자: 위는 한 마디의 박 수를, 아래는 어떤 음표가 한 박인지를 알려줍니다.",
     "glossary_bass_clef_name": "낮은음자리표",
     "glossary_bass_clef_gloss": "아래쪽 보표의 자리표로, 보통 왼손이에요. 같은 자리의 음표라도 높은음자리표와는 다른 건반을 뜻합니다.",
+    "glossary_shape_note_name": "모양 음표",
+    "glossary_shape_note_gloss": "음표 머리마다 모양이 다릅니다 — 음계의 첫째 음은 삼각형, 여섯째 음은 사각형 — 조를 따지지 않아도 선율을 찾을 수 있어요. 모양은 음의 자리를 알려줄 뿐 소리를 바꾸지는 않아서, 들리는 것은 그대로예요.",
     "glossary_fermata_name": "늘임표",
     "glossary_fermata_gloss": "음표 위 호 아래의 점: 적힌 것보다 길게, 알맞다 싶을 만큼 붙잡고 있으세요. 박이 기다려 줍니다.",
     "glossary_beam_name": "빔",

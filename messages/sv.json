@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "De två siffrorna efter tonartssignaturen: den övre räknar slagen i takten, den nedre säger vilken not som är ett slag.",
     "glossary_bass_clef_name": "Basklav",
     "glossary_bass_clef_gloss": "Det nedre notsystemets klav, oftast din vänsterhand. Samma nothuvud betyder här en annan tangent än i diskantklav.",
+    "glossary_shape_note_name": "Formnoter",
+    "glossary_shape_note_gloss": "Varje nothuvud får en egen form — en triangel för skalans första steg, en kvadrat för det sjätte — så att du hittar melodin utan att räkna ut tonarten. Formen namnger steget, inte ljudet: den ändrar ingenting du hör.",
     "glossary_fermata_name": "Fermat",
     "glossary_fermata_gloss": "En punkt under en båge över noten: håll den längre än skrivet, så länge det känns rätt. Pulsen väntar på dig.",
     "glossary_beam_name": "Balk",

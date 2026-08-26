@@ -395,6 +395,30 @@ export const GLOSSARY: GlossaryEntry[] = [
         plain: null,
     },
     {
+        // A whole octave, because the shapes only mean anything as a set: each one names a
+        // degree of the scale, so seeing do reach do again is the explanation. Two bars for
+        // the eight notes, the way a scale is written anywhere else.
+        id: "shapeNote",
+        category: "place",
+        shown: {
+            ...TREBLE,
+            notes: [
+                { step: "C", octave: 4, value: "quarter", notehead: "do" },
+                { step: "D", octave: 4, value: "quarter", notehead: "re" },
+                { step: "E", octave: 4, value: "quarter", notehead: "mi" },
+                { step: "F", octave: 4, value: "quarter", notehead: "fa" },
+                { step: "G", octave: 4, value: "quarter", notehead: "so" },
+                { step: "A", octave: 4, value: "quarter", notehead: "la" },
+                { step: "B", octave: 4, value: "quarter", notehead: "ti" },
+                { step: "C", octave: 5, value: "quarter", notehead: "do" },
+            ],
+        },
+        // Nothing to compare. A shape is a reading aid and changes no sound at all, so the
+        // second reading would be the same eight notes drawn differently — which is the
+        // point, and is better said in the gloss than demonstrated by silence.
+        plain: null,
+    },
+    {
         // Go back and play it again. The example sounds twice, since a repeat that played
         // once would be teaching the opposite of what it says.
         id: "repeat",

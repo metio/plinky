@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "Die zwei Zahlen nach den Vorzeichen: die obere zählt die Schläge im Takt, die untere sagt, welche Note einen Schlag bekommt.",
     "glossary_bass_clef_name": "Bassschlüssel",
     "glossary_bass_clef_gloss": "Der Schlüssel des unteren Systems, meist deine linke Hand. Derselbe Notenkopf meint hier eine andere Taste als im Violinschlüssel.",
+    "glossary_shape_note_name": "Formnoten",
+    "glossary_shape_note_gloss": "Jeder Notenkopf bekommt eine eigene Form — ein Dreieck für die erste Stufe der Tonleiter, ein Quadrat für die sechste — damit man die Melodie findet, ohne die Tonart zu bestimmen. Die Form benennt die Stufe, nicht den Klang: zu hören ist nichts davon.",
     "glossary_fermata_name": "Fermate",
     "glossary_fermata_gloss": "Ein Punkt unter einem Bogen über der Note: halte sie länger als geschrieben, so lange es sich richtig anfühlt. Der Takt wartet auf dich.",
     "glossary_beam_name": "Balken",

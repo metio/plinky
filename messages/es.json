@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "Las dos cifras después de la armadura: la de arriba cuenta los tiempos del compás, la de abajo dice qué nota vale un tiempo.",
     "glossary_bass_clef_name": "Clave de fa",
     "glossary_bass_clef_gloss": "La clave del pentagrama de abajo, normalmente tu mano izquierda. La misma cabeza de nota significa aquí una tecla distinta que en clave de sol.",
+    "glossary_shape_note_name": "Notas con forma",
+    "glossary_shape_note_gloss": "Cada cabeza de nota lleva su propia forma — un triángulo para el primer grado de la escala, un cuadrado para el sexto — para encontrar la melodía sin averiguar la tonalidad. La forma nombra el grado, no el sonido: no cambia nada de lo que se oye.",
     "glossary_fermata_name": "Calderón",
     "glossary_fermata_gloss": "Un punto bajo un arco sobre la nota: sostenla más de lo escrito, tanto como te parezca. El pulso te espera.",
     "glossary_beam_name": "Barra de corchea",

@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "De to tal efter tonearten: det øverste tæller slagene i takten, det nederste siger, hvilken node der er ét slag.",
     "glossary_bass_clef_name": "Basnøgle",
     "glossary_bass_clef_gloss": "Det nederste nodesystems nøgle, som regel din venstre hånd. Det samme nodehoved betyder her en anden tangent end i g-nøgle.",
+    "glossary_shape_note_name": "Formnoder",
+    "glossary_shape_note_gloss": "Hvert nodehoved får sin egen form — en trekant for første trin i skalaen, en firkant for sjette — så du finder melodien uden at regne tonearten ud. Formen navngiver trinnet, ikke lyden: den ændrer ikke noget, du hører.",
     "glossary_fermata_name": "Fermat",
     "glossary_fermata_gloss": "En prik under en bue over noden: hold den længere end skrevet, så længe det føles rigtigt. Pulsen venter på dig.",
     "glossary_beam_name": "Bjælke",

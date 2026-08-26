@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "De twee cijfers na de toonsoort: het bovenste telt de tellen in een maat, het onderste zegt welke noot er één krijgt.",
     "glossary_bass_clef_name": "Bassleutel",
     "glossary_bass_clef_gloss": "De sleutel van de onderste balk, meestal je linkerhand. Dezelfde notenkop betekent hier een andere toets dan in de vioolsleutel.",
+    "glossary_shape_note_name": "Vormnoten",
+    "glossary_shape_note_gloss": "Elke nootkop krijgt een eigen vorm — een driehoek voor de eerste trap van de toonladder, een vierkant voor de zesde — zodat je de melodie vindt zonder de toonsoort uit te zoeken. De vorm noemt de trap, niet de klank: je hoort er niets van.",
     "glossary_fermata_name": "Fermate",
     "glossary_fermata_gloss": "Een punt onder een boog boven de noot: houd hem langer aan dan er staat, zolang als goed voelt. De maat wacht op je.",
     "glossary_beam_name": "Waardestreep",

@@ -31,6 +31,7 @@ export const SYMBOL_NAMES: Record<string, () => string> = {
     accidental: m.glossary_accidental_name,
     timeSignature: m.glossary_time_signature_name,
     bassClef: m.glossary_bass_clef_name,
+    shapeNote: m.glossary_shape_note_name,
 };
 
 export const SYMBOL_GLOSSES: Record<string, () => string> = {
@@ -52,6 +53,7 @@ export const SYMBOL_GLOSSES: Record<string, () => string> = {
     accidental: m.glossary_accidental_gloss,
     timeSignature: m.glossary_time_signature_gloss,
     bassClef: m.glossary_bass_clef_gloss,
+    shapeNote: m.glossary_shape_note_gloss,
 };
 
 // The four questions a mark can answer. The grouping is the first thing a reader sees,

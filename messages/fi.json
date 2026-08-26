@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "Etumerkinnän jälkeiset kaksi numeroa: ylempi laskee tahdin iskut, alempi kertoo, mikä nuotti on yksi isku.",
     "glossary_bass_clef_name": "F-avain",
     "glossary_bass_clef_gloss": "Alemman nuottiviivaston avain, yleensä vasen kätesi. Sama nuotinpää tarkoittaa täällä eri kosketinta kuin G-avaimella.",
+    "glossary_shape_note_name": "Muotonuotit",
+    "glossary_shape_note_gloss": "Jokainen nuotinpää saa oman muotonsa — kolmio asteikon ensimmäiselle sävelelle, neliö kuudennelle — jotta melodian löytää ilman sävellajin päättelyä. Muoto nimeää sävelen paikan, ei ääntä: se ei muuta mitään kuultavaa.",
     "glossary_fermata_name": "Fermaatti",
     "glossary_fermata_gloss": "Piste kaaren alla nuotin yllä: pidä sitä kirjoitettua pidempään, niin kauan kuin tuntuu oikealta. Pulssi odottaa sinua.",
     "glossary_beam_name": "Palkki",

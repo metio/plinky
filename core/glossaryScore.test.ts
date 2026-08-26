@@ -107,6 +107,32 @@ describe("buildSnippet", () => {
         expect(xml).not.toContain("<notations>");
     });
 
+    it("writes a notehead shape after the accidental, where the schema wants it", () => {
+        // Out of order it is dropped rather than rejected, so the example would draw round
+        // notes and look right enough to pass a glance.
+        const xml = buildSnippet({
+            clef: "treble",
+            fifths: 0,
+            beatsPerBar: 4,
+            notes: [
+                { step: "C", octave: 4, value: "whole", accidental: "natural", notehead: "do" },
+            ],
+        });
+
+        expect(xml).toContain("<accidental>natural</accidental><notehead>do</notehead>");
+    });
+
+    it("leaves a note with no shape round", () => {
+        const xml = buildSnippet({
+            clef: "treble",
+            fifths: 0,
+            beatsPerBar: 4,
+            notes: [{ step: "C", octave: 4, value: "whole" }],
+        });
+
+        expect(xml).not.toContain("notehead");
+    });
+
     it("writes the dot after the type, where the schema wants it", () => {
         const xml = buildSnippet(bar([{ step: "C", octave: 5, value: "half", dotted: true }]));
 

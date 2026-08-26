@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "Dva broja iza predznaka: gornji broji dobe u taktu, donji kaže koja nota vrijedi jednu dobu.",
     "glossary_bass_clef_name": "Bas ključ",
     "glossary_bass_clef_gloss": "Ključ donjeg crtovlja, obično tvoja lijeva ruka. Ista glava note ovdje znači drugu tipku nego u violinskom ključu.",
+    "glossary_shape_note_name": "Oblikovane note",
+    "glossary_shape_note_gloss": "Svaka glava note dobiva svoj oblik — trokut za prvi stupanj ljestvice, kvadrat za šesti — da melodiju nađeš bez određivanja tonaliteta. Oblik imenuje stupanj, ne zvuk: ne mijenja ništa što čuješ.",
     "glossary_fermata_name": "Korona",
     "glossary_fermata_gloss": "Točka pod lukom iznad note: drži je dulje nego što je zapisano, onoliko koliko ti se čini pravim. Puls te čeka.",
     "glossary_beam_name": "Greda",

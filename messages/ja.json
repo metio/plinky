@@ -769,6 +769,8 @@
     "glossary_time_signature_gloss": "調号のあとの2つの数字。上は1小節の拍数を数え、下はどの音符が1拍かを示します。",
     "glossary_bass_clef_name": "ヘ音記号",
     "glossary_bass_clef_gloss": "下の段の音部記号で、たいていは左手です。同じ位置の音符でも、ト音記号とは違う鍵盤を指します。",
+    "glossary_shape_note_name": "シェイプノート",
+    "glossary_shape_note_gloss": "符頭ごとに形が違います——音階の第1音は三角形、第6音は四角形——調を割り出さなくても旋律をたどれます。形が示すのは音階上の位置であって音そのものではないので、聞こえ方は何も変わりません。",
     "glossary_fermata_name": "フェルマータ",
     "glossary_fermata_gloss": "音符の上、弧の下に置かれた点。書かれた長さより長く、ちょうどよいと思えるところまで伸ばします。拍のほうが待ってくれます。",
     "glossary_beam_name": "連桁",

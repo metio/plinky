@@ -125,3 +125,23 @@ describe("symbolsInScore", () => {
         expect(ids(soundingOnly)).not.toContain("tie");
     });
 });
+
+describe("shape notes in a real edition", () => {
+    const note = (head: string) =>
+        `<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration>` +
+        `<type>quarter</type><notehead>${head}</notehead></note>`;
+
+    it("points at a notehead that names a degree of the scale", () => {
+        for (const shape of ["do", "re", "mi", "fa", "so", "la", "ti"]) {
+            expect(ids(note(shape)), shape).toContain("shapeNote");
+        }
+    });
+
+    it("says nothing about a notehead that is drawn round", () => {
+        // MusicXML uses <notehead> for far more than shapes, and a reader looking at
+        // ordinary notes has no question to ask.
+        expect(ids(note("normal"))).not.toContain("shapeNote");
+        expect(ids(note("slash"))).not.toContain("shapeNote");
+        expect(ids(note("cluster"))).not.toContain("shapeNote");
+    });
+});

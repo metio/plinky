@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "Les deux chiffres après l'armure : celui du haut compte les temps de la mesure, celui du bas dit quelle note vaut un temps.",
     "glossary_bass_clef_name": "Clé de fa",
     "glossary_bass_clef_gloss": "La clé de la portée du bas, en général ta main gauche. La même tête de note désigne ici une autre touche qu'en clé de sol.",
+    "glossary_shape_note_name": "Notes à formes",
+    "glossary_shape_note_gloss": "Chaque tête de note reçoit sa propre forme — un triangle pour le premier degré de la gamme, un carré pour le sixième — pour trouver la mélodie sans chercher la tonalité. La forme nomme le degré, pas le son : elle ne change rien à ce qu'on entend.",
     "glossary_fermata_name": "Point d'orgue",
     "glossary_fermata_gloss": "Un point sous un arc au-dessus de la note : tiens-la plus longtemps qu'écrit, aussi longtemps que tu le sens. La pulsation t'attend.",
     "glossary_beam_name": "Ligature",

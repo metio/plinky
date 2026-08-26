@@ -769,6 +769,8 @@
     "glossary_time_signature_gloss": "Az előjegyzés utáni két szám: a felső az ütem ütéseit számolja, az alsó megmondja, melyik hang ér egy ütést.",
     "glossary_bass_clef_name": "Basszuskulcs",
     "glossary_bass_clef_gloss": "Az alsó vonalrendszer kulcsa, általában a bal kezedé. Ugyanaz a hangjegyfej itt más billentyűt jelent, mint violinkulcsban.",
+    "glossary_shape_note_name": "Alakhangjegyek",
+    "glossary_shape_note_gloss": "Minden kottafej saját alakot kap — háromszög a skála első fokához, négyzet a hatodikhoz — így a dallam a hangnem kiszámolása nélkül is megvan. Az alak a fokot nevezi meg, nem a hangot: abból, amit hallasz, semmit nem változtat.",
     "glossary_fermata_name": "Korona",
     "glossary_fermata_gloss": "Pont egy ív alatt a hangjegy fölött: tartsd tovább, mint ahogy le van írva, ameddig jónak érzed. A lüktetés megvár.",
     "glossary_beam_name": "Gerenda",

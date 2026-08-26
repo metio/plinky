@@ -769,6 +769,8 @@
     "glossary_time_signature_gloss": "Dve čísla za predznamenaním: horné počíta doby v takte, dolné hovorí, ktorá nota je jedna doba.",
     "glossary_bass_clef_name": "Basový kľúč",
     "glossary_bass_clef_gloss": "Kľúč spodnej osnovy, zvyčajne tvoja ľavá ruka. Tá istá notová hlavička tu znamená inú klávesu než v husľovom kľúči.",
+    "glossary_shape_note_name": "Tvarové noty",
+    "glossary_shape_note_gloss": "Každá notová hlavička má vlastný tvar — trojuholník pre prvý stupeň stupnice, štvorec pre šiesty — aby si melódiu našiel bez určovania tóniny. Tvar pomenúva stupeň, nie zvuk: na tom, čo počuješ, nemení nič.",
     "glossary_fermata_name": "Koruna",
     "glossary_fermata_gloss": "Bodka pod oblúčikom nad notou: drž ju dlhšie, než je napísané, tak dlho, ako to cítiš. Pulz na teba počká.",
     "glossary_beam_name": "Trámec",

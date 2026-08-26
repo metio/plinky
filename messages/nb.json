@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "De to tallene etter tonearten: det øverste teller slagene i takten, det nederste sier hvilken note som er ett slag.",
     "glossary_bass_clef_name": "Bassnøkkel",
     "glossary_bass_clef_gloss": "Nøkkelen til det nederste notesystemet, som regel venstrehånden din. Det samme notehodet betyr her en annen tangent enn i g-nøkkel.",
+    "glossary_shape_note_name": "Formnoter",
+    "glossary_shape_note_gloss": "Hvert notehode får sin egen form — en trekant for første trinn i skalaen, en firkant for sjette — så du finner melodien uten å finne ut tonearten. Formen navngir trinnet, ikke lyden: den endrer ingenting du hører.",
     "glossary_fermata_name": "Fermate",
     "glossary_fermata_gloss": "En prikk under en bue over noten: hold den lenger enn skrevet, så lenge det kjennes riktig. Pulsen venter på deg.",
     "glossary_beam_name": "Bjelke",

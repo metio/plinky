@@ -769,6 +769,8 @@
     "glossary_time_signature_gloss": "Donanımdan sonraki iki sayı: üstteki ölçüdeki vuruşları sayar, alttaki hangi notanın bir vuruş ettiğini söyler.",
     "glossary_bass_clef_name": "Fa anahtarı",
     "glossary_bass_clef_gloss": "Alttaki portenin anahtarı, genelde sol elin. Aynı nota başı burada sol anahtarındakinden başka bir tuşu gösterir.",
+    "glossary_shape_note_name": "Şekilli notalar",
+    "glossary_shape_note_gloss": "Her nota başının kendi şekli vardır — dizinin birinci derecesi için üçgen, altıncısı için kare — böylece tonaliteyi çıkarmadan ezgiyi bulursun. Şekil sesi değil dereceyi adlandırır: duyduğun hiçbir şey değişmez.",
     "glossary_fermata_name": "Uzatma işareti",
     "glossary_fermata_gloss": "Notanın üstünde bir yayın altındaki nokta: yazıldığından uzun tut, doğru geldiği kadar. Nabız seni bekler.",
     "glossary_beam_name": "Bağ çizgisi",

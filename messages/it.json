@@ -770,6 +770,8 @@
     "glossary_time_signature_gloss": "I due numeri dopo l'armatura: quello sopra conta i movimenti della battuta, quello sotto dice quale nota ne vale uno.",
     "glossary_bass_clef_name": "Chiave di basso",
     "glossary_bass_clef_gloss": "La chiave del pentagramma inferiore, di solito la tua mano sinistra. La stessa testa di nota qui indica un tasto diverso che in chiave di violino.",
+    "glossary_shape_note_name": "Note sagomate",
+    "glossary_shape_note_gloss": "Ogni testa di nota ha una forma propria — un triangolo per il primo grado della scala, un quadrato per il sesto — così si trova la melodia senza ricavare la tonalità. La forma indica il grado, non il suono: non cambia nulla di ciò che si sente.",
     "glossary_fermata_name": "Corona",
     "glossary_fermata_gloss": "Un punto sotto un arco sopra la nota: tienila più a lungo di quanto è scritto, quanto ti sembra giusto. Il tempo ti aspetta.",
     "glossary_beam_name": "Travatura",
