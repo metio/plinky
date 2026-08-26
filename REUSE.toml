@@ -76,7 +76,11 @@ SPDX-FileCopyrightText = "The catalogue score contributors"
 SPDX-License-Identifier = "CC-BY-SA-2.5"
 
 [[annotations]]
-path = ["dev/catalog-curation.json", "dev/catalog-duplicates.json"]
+path = [
+    "dev/catalog-curation.json",
+    "dev/catalog-duplicates.json",
+    "dev/catalog-excluded.json",
+]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Takes out of the catalogue what should never have been in it: transcriptions a machine
-// produced rather than a person engraved, and second copies of a work already there.
+// produced rather than a person engraved, second copies of a work already there, and works
+// named by hand as not ours to carry.
 //
 // Both were found by ear first. A reader reported one Für Elise sounding broken around bars
 // 24 and 28, and then noticed the library held three of them.
@@ -18,6 +19,12 @@
 // notes as SOUND (core/incipit.ts). All three, because any two of them are not enough:
 // composer and title alone would have merged Bach's two different Menuets, Schubert's three
 // different Ständchen and two numbers out of Die Zauberflöte — nine distinct works.
+//
+// **Excluded** works are the hand-named ones, almost always a licence the catalogue cannot
+// stand behind. The uploader's own label is not evidence: both of the first two entries
+// arrived marked CC0 over music firmly in copyright. Where the reason is a hole in the
+// import filter, fix dev/publicDomain.mts as well — that stops the next one, while this
+// removes the one already baked in.
 //
 // The opening test is deliberately conservative and under-merges: two transcriptions that
 // disagree about the first bar drift out of step and read as different pieces. That leaves a
@@ -46,6 +53,10 @@ const OUT = "public/songs";
 // Kept as data rather than done by hand, because the manifest is rewritten from the
 // harvested corpora on every import: a deletion made once would come back with the next one.
 const PAIRS = "dev/catalog-duplicates.json";
+// Works removed on their own merits rather than for having a twin — see EXCLUDED's note
+// above. Data for the same reason the pairs are: an import rewrites the manifest, so a
+// deletion made by hand would come back with the next one.
+const EXCLUDED = "dev/catalog-excluded.json";
 
 type Song = { id: string; title: string; composer: string; incipit?: string; bars: number };
 
@@ -158,11 +169,27 @@ async function main() {
         byHand.push(pair.drop);
     }
 
-    const goneIds = new Set([...machineIds, ...extra.map((song) => song.id), ...byHand]);
+    // The hand-named removals, checked against the catalogue the same way: an id that is
+    // already gone is stale and says so rather than passing silently.
+    const excluded: { id: string; title: string; composer: string; why: string }[] = JSON.parse(
+        await readFile(EXCLUDED, "utf8"),
+    );
+    const banned = excluded.filter((one) => present.has(one.id));
+
+    const goneIds = new Set([
+        ...banned.map((one) => one.id),
+        ...machineIds,
+        ...extra.map((song) => song.id),
+        ...byHand,
+    ]);
+    console.log(`excluded by hand       : ${banned.length}`);
     console.log(`beyond repair          : ${machine.length}`);
     console.log(`duplicate copies       : ${extra.length}`);
     console.log(`duplicates found by ear: ${byHand.length}`);
     console.log(`catalogue              : ${manifest.length} → ${manifest.length - goneIds.size}`);
+    for (const one of banned) {
+        console.log(`   excluded: ${one.id}  ${one.title} (${one.composer})`);
+    }
     for (const song of extra) {
         console.log(`   duplicate: ${song.id}  ${song.title} (${song.composer})`);
     }
