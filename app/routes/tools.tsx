@@ -32,6 +32,7 @@ import { ChordChanges } from "../components/features/chordChanges";
 import { FeatureBoundary } from "../components/features/featureBoundary";
 import { SaveDiagram, SavePictureButton } from "../components/features/savePictureButton";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
+import { scoreOf } from "../../core/theoryDemo";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { useMetronome } from "../hooks/useMetronome";
@@ -187,8 +188,7 @@ function ScaleExplorer() {
                 options={SCALE_IDS.map((id) => ({ id, label: scaleName(id) }))}
             />
             <SoundingKeyboard
-                lit={pitches}
-                phrases={[{ notes: pitches, spread: true }]}
+                score={scoreOf([pitches], { spread: true })}
                 label={m.tools_hear_it()}
             />
             {/* A scale is as worth taking away as a chord, and the README and the
@@ -224,11 +224,7 @@ function ChordExplorer() {
                 onChange={setQuality}
                 options={CHORD_QUALITIES.map((id) => ({ id, label: chordName(id) }))}
             />
-            <SoundingKeyboard
-                lit={pitches}
-                phrases={[{ notes: pitches }]}
-                label={m.tools_hear_it()}
-            />
+            <SoundingKeyboard score={scoreOf([pitches])} label={m.tools_hear_it()} />
             <SavePictureButton
                 from={ROOT}
                 to={ROOT + 24}
@@ -269,8 +265,15 @@ function IntervalFinder() {
             {/* Sounded together and then apart: an interval is a distance you can hear
                 either way round, and hearing both is how the name sticks. */}
             <SoundingKeyboard
-                lit={[from, to]}
-                phrases={[{ notes: [from, to] }, { notes: [from, to], spread: true }]}
+                score={{
+                    clef: "treble",
+                    fifths: 0,
+                    steps: [
+                        { notes: [from, to], value: "half" },
+                        { notes: [from], value: "half" },
+                        { notes: [to], value: "half" },
+                    ],
+                }}
                 label={m.tools_hear_it()}
             />
         </Panel>

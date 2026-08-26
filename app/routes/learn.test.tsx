@@ -6,6 +6,7 @@ import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AudioEngine } from "../ports/audioEngine";
+import { LESSONS } from "../../core/theoryCourse";
 import { m } from "../paraglide/messages.js";
 import { renderWithServices } from "../testing/renderWithServices";
 import Learn from "./learn";
@@ -37,7 +38,7 @@ describe("the Learn page", () => {
             expect(screen.getByText(`${label} →`)).toBeTruthy();
         }
         // The entry carries the page's own opening line, so the two always agree.
-        expect(screen.getByText(m.theory_intro())).toBeTruthy();
+        expect(screen.getByText(m.theory_intro({ count: LESSONS.length }))).toBeTruthy();
     });
 
     it("gives the pages that had no door one that outlives a checklist", () => {

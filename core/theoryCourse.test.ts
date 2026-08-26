@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { CHORD_QUALITIES, SCALE_IDS } from "./theory";
+import { CIRCLE } from "./circleOfFifths";
+import { buildSnippet } from "./glossaryScore";
 import { courseProgress, LESSONS, lessonById, lessonsIn, UNITS } from "./theoryCourse";
+import { demoMoments, demoNotes, demoSnippet } from "./theoryDemo";
 
 describe("LESSONS", () => {
     it("gives every lesson a unique id and a real unit", () => {
@@ -23,47 +25,61 @@ describe("LESSONS", () => {
         expect(UNITS.flatMap(lessonsIn)).toHaveLength(LESSONS.length);
     });
 
-    it("names only scales and chords the theory module can build", () => {
+    it("gives every lesson notes to sound", () => {
+        // A lesson is a thing you do. One with nothing to hear is a paragraph.
         for (const lesson of LESSONS) {
-            if (lesson.demo.kind === "scale") {
-                expect(SCALE_IDS).toContain(lesson.demo.scale);
-            }
-            if (lesson.demo.kind === "chord") {
-                expect(CHORD_QUALITIES).toContain(lesson.demo.quality);
-            }
+            expect(demoNotes(lesson.demo).length, lesson.id).toBeGreaterThan(0);
         }
     });
 
-    it("gives every comparison two different things to compare", () => {
+    it("draws every lesson on a stave, not just the ones about reading", () => {
+        // Eight of the fourteen had no written example at all, because the page only drew
+        // one for the reading unit. A chord is as much a thing on a page as a rest is.
         for (const lesson of LESSONS) {
-            if (lesson.demo.kind === "compare") {
-                expect(lesson.demo.first).not.toEqual(lesson.demo.second);
-                expect(lesson.demo.first.length).toBeGreaterThan(0);
-                expect(lesson.demo.second.length).toBeGreaterThan(0);
-            }
+            const snippet = demoSnippet(lesson.demo);
+            expect(snippet.notes.length, lesson.id).toBeGreaterThan(0);
+            expect(() => buildSnippet(snippet), lesson.id).not.toThrow();
         }
     });
 
-    it("gives every written example something to sound and a full bar to draw", () => {
+    it("fills whole bars, so no lesson draws a bar that does not add up", () => {
         for (const lesson of LESSONS) {
-            if (lesson.demo.kind !== "stave") {
-                continue;
-            }
-            // The example is pressable, so it has to have notes behind it; and a lesson
-            // about length is only honest if its bars actually add up.
-            expect(lesson.demo.play.length, lesson.id).toBeGreaterThan(0);
-            const beats = lesson.demo.notes.reduce(
-                (total, note) => total + (BEATS[note.value] ?? 0) * (note.dotted ? 1.5 : 1),
+            const beats = lesson.demo.steps.reduce(
+                (total, step) => total + (BEATS[step.value] ?? 0),
                 0,
             );
             expect(beats % 4, lesson.id).toBe(0);
         }
     });
 
-    it("plays more than one chord in every run of them", () => {
+    it("keeps every lesson's notes on the keyboard it draws", () => {
+        // The bass lesson sounded three notes below middle C under a keyboard that starts
+        // at middle C, so it lit nothing at all. A lesson's range has to hold its notes.
         for (const lesson of LESSONS) {
-            if (lesson.demo.kind === "progression") {
-                expect(lesson.demo.chords.length, lesson.id).toBeGreaterThan(1);
+            for (const note of demoNotes(lesson.demo)) {
+                expect(note, `${lesson.id} low`).toBeGreaterThanOrEqual(lesson.demo.from);
+                expect(note, `${lesson.id} high`).toBeLessThanOrEqual(lesson.demo.to);
+            }
+        }
+    });
+
+    it("sounds what it draws, and draws what it sounds", () => {
+        // The defect this closes, at its root: the drawing and the playing were derived
+        // separately and disagreed. Every pitch a lesson sounds is now a pitch it drew.
+        for (const lesson of LESSONS) {
+            const drawn = demoSnippet(lesson.demo).notes.filter((note) => note.step !== null);
+            const sounded = demoMoments(lesson.demo).flatMap((moment) => moment.notes);
+            expect(drawn.length, lesson.id).toBe(sounded.length);
+        }
+    });
+
+    it("names a key the circle actually holds, where a lesson shows one", () => {
+        for (const lesson of LESSONS) {
+            if (lesson.demo.circle !== undefined) {
+                expect(
+                    CIRCLE.map((one) => one.tonic),
+                    lesson.id,
+                ).toContain(lesson.demo.circle);
             }
         }
     });

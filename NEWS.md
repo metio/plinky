@@ -17,6 +17,24 @@ stop it: not the key, which was up, and not the pedal, which was down. Now a hel
 rings out over seconds and falls silent on its own, longer in the bass and shorter at
 the top, matched to how long the recorded piano's own strings ring.
 
+**Every theory lesson now plays what it shows you.** The little score under each
+lesson, the sound, and the keys that light up were worked out three separate ways,
+and they disagreed. The lesson about note lengths played its seven notes on top of
+each other, so you heard one. The lesson about rests played both notes at once, so
+the silence it is about could not happen. The lesson about the bass clef sounded
+three notes as a chord under a keyboard that did not reach down to them. All three
+read from one thing now, so what you see is what you hear.
+
+**All fourteen lessons have music to read, and the keys follow along.** Eight of them
+showed a keyboard and nothing on a stave. Now every lesson draws its own example —
+chords stacked, rests where the silences are — and pressing the button lights each
+note as it sounds instead of lighting everything at once. When it finishes, the whole
+shape comes back.
+
+**The page no longer promises eight lessons and then counts fourteen.** Both numbers
+come from the course itself now, so they cannot drift again, and the closing line says
+what it means and links you to the glossary and the little tools.
+
 ## 26 August 2026 — night
 
 **Those square and triangle noteheads have a name.** Nearly three hundred pieces here

@@ -15,6 +15,7 @@ import { chordName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 import { SegmentedControl } from "../ui/segmentedControl";
 import { SavePictureButton } from "./savePictureButton";
+import { scoreOf } from "../../../core/theoryDemo";
 import { SoundingKeyboard } from "./soundingKeyboard";
 
 // Why one change falls under the hand and another fights it.
@@ -87,11 +88,7 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
             </dl>
 
             {/* Both chords in turn, so the ear gets the change the numbers describe. */}
-            <SoundingKeyboard
-                lit={from}
-                phrases={[{ notes: from }, { notes: to }]}
-                label={m.tools_hear_it()}
-            />
+            <SoundingKeyboard score={scoreOf([from, to])} label={m.tools_hear_it()} />
             <SavePictureButton
                 from={rootNote}
                 to={rootNote + 24}

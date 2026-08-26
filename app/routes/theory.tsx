@@ -5,8 +5,7 @@ import { useEffect } from "react";
 
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
-import { NOTE_TEXT, noteNameOf, scalePitches } from "../../core/theory";
-import { chordPitches } from "../../core/theory";
+import { NOTE_TEXT, noteNameOf } from "../../core/theory";
 import {
     type Demo,
     type Lesson,
@@ -15,15 +14,18 @@ import {
     UNITS,
     type UnitId,
 } from "../../core/theoryCourse";
-import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../core/glossaryScore";
+import { buildSnippet } from "../../core/glossaryScore";
+import { demoMoments, demoSnippet } from "../../core/theoryDemo";
 import { FeatureBoundary } from "../components/features/featureBoundary";
 import { NotationExample } from "../components/features/notationExample";
-import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
+import { SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useTheoryStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/theory";
-import { sectionHeadingClasses } from "../components/ui/classes";
+import { linkClasses, sectionHeadingClasses } from "../components/ui/classes";
+import { LinkedText, slot } from "../components/ui/linkedText";
+import { LocalizedLink } from "../components/ui/localizedLink";
 import { PageHeader } from "../components/ui/pageHeader";
 import { Card } from "../components/ui/card";
 
@@ -41,12 +43,6 @@ export function meta(_args: Route.MetaArgs) {
         },
     ];
 }
-
-// Middle C: where a lesson's tonic sits, matching the register the shared demo draws.
-const KEY_FROM = DEMO_FROM;
-// The pause between the two halves of a comparison: long enough that they are heard as
-// two things rather than one, short enough to hold both in the ear at once.
-const COMPARE_GAP_MS = 900;
 
 const UNIT_NAME: Record<UnitId, () => string> = {
     reading: () => m.theory_unit_reading(),
@@ -88,88 +84,14 @@ const LESSON_BODY: Record<string, () => string> = {
     colour: () => m.theory_colour_body(),
 };
 
-// Every demonstration comes down to "these notes, lit and playable" — one set at a
-// time, or two in turn for a comparison. Resolving each demo to that shape here keeps
-// the lesson components to one apiece instead of one per idea.
-function litNotes(demo: Demo): number[] {
-    switch (demo.kind) {
-        case "keyboard":
-            return demo.notes;
-        case "scale":
-            return scalePitches(demo.tonic, demo.scale);
-        case "chord":
-            return chordPitches(demo.root, demo.quality);
-        case "compare":
-            // Both halves at once: the lesson is about the difference between them, and
-            // a keyboard showing only the first one draws the question without the
-            // answer. In every comparison here the two overlap but for a key or two,
-            // which is precisely what there is to see.
-            return [...demo.first, ...demo.second];
-        case "circle":
-            return chordPitches(KEY_FROM + demo.tonic, "major");
-        case "progression":
-            return [...new Set(demo.chords.flat())];
-        case "stave":
-            return demo.play;
-    }
-}
-
-// The reading unit talks about the page — five lines, four gaps, a dot's height saying
-// which key — while every demonstration was a keyboard. The lesson that names the stave
-// now shows one, with the very notes it is about, so the reader can look at the thing the
-// sentence describes instead of taking it on trust.
-function readingXml(demo: Demo): string | null {
-    // A written example carries its own engraving: the lesson is about the marks, so the
-    // marks are given rather than derived from a set of pitches.
-    if (demo.kind === "stave") {
-        return buildSnippet({
-            clef: demo.clef,
-            fifths: demo.fifths,
-            beatsPerBar: 4,
-            notes: demo.notes,
-        });
-    }
-    const notes: SnippetNote[] = [];
-    for (const pitch of litNotes(demo)) {
-        const letter = NATURAL_OF[((pitch % 12) + 12) % 12];
-        // Only the naturals are drawn: an accidental needs the sharp or flat spelling the
-        // lesson has not introduced yet, and the shape of the stave is what is being shown.
-        if (letter) {
-            notes.push({ step: letter, octave: Math.floor(pitch / 12) - 1, value: "half" });
-        }
-    }
-    return notes.length > 0
-        ? buildSnippet({ clef: "treble", fifths: 0, beatsPerBar: 4, notes })
-        : null;
-}
-
 function LessonDemo({ demo, onPlay }: { demo: Demo; onPlay: () => void }) {
-    const key = demo.kind === "circle" ? CIRCLE.find((one) => one.tonic === demo.tonic) : null;
-    // A comparison plays the same idea twice — the second reading after a gap, so the
-    // ear hears them as a pair rather than a single run.
-    const phrases =
-        demo.kind === "compare"
-            ? [{ notes: demo.first }, { notes: demo.second, afterMs: COMPARE_GAP_MS }]
-            : demo.kind === "progression"
-              ? // One after another with the same gap a comparison uses, so a pair of
-                // chords reads as a pair rather than as one long sound.
-                demo.chords.map((notes, index) => ({
-                    notes,
-                    ...(index > 0 ? { afterMs: COMPARE_GAP_MS } : {}),
-                }))
-              : [{ notes: litNotes(demo), spread: demo.kind === "scale" }];
-
+    const key = demo.circle !== undefined ? CIRCLE.find((one) => one.tonic === demo.circle) : null;
     return (
         <SoundingKeyboard
-            lit={litNotes(demo)}
-            phrases={phrases}
-            label={
-                demo.kind === "compare"
-                    ? m.theory_hear_both()
-                    : demo.kind === "progression"
-                      ? m.theory_hear_them()
-                      : m.theory_hear_it()
-            }
+            score={demo}
+            from={demo.from}
+            to={demo.to}
+            label={demoMoments(demo).length > 1 ? m.theory_hear_them() : m.theory_hear_it()}
             onPlay={onPlay}
         >
             {key && (
@@ -210,14 +132,12 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
                     copy and a table. A lesson that cannot draw its example is still a
                     lesson worth reading, and the same boundary guards the same component
                     on the glossary page. */}
-                {lesson.unit === "reading" && readingXml(lesson.demo) && (
-                    <FeatureBoundary feature="NotationExample">
-                        <NotationExample
-                            xml={readingXml(lesson.demo) ?? ""}
-                            label={LESSON_TITLE[lesson.id]?.() ?? ""}
-                        />
-                    </FeatureBoundary>
-                )}
+                <FeatureBoundary feature="NotationExample">
+                    <NotationExample
+                        xml={buildSnippet(demoSnippet(lesson.demo))}
+                        label={LESSON_TITLE[lesson.id]?.() ?? ""}
+                    />
+                </FeatureBoundary>
                 <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
             </Card>
         </li>
@@ -225,7 +145,7 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
 }
 
 // The theory under the page: what a stave encodes, why a piece carries sharps, and
-// what makes a chord sound the way it does. Eight lessons, each one a paragraph and
+// what makes a chord sound the way it does. Each lesson is a paragraph and
 // something to play — the glossary says what a mark means, this says why the music is
 // built that way.
 export default function TheoryRoute() {
@@ -240,7 +160,7 @@ export default function TheoryRoute() {
     let counter = 0;
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <PageHeader title={m.theory_title()} hint={m.theory_intro()} />
+            <PageHeader title={m.theory_title()} hint={m.theory_intro({ count: LESSONS.length })} />
 
             {UNITS.map((unit) => (
                 <section key={unit} className="space-y-3">
@@ -254,7 +174,27 @@ export default function TheoryRoute() {
                 </section>
             ))}
 
-            <p className="text-sm text-muted">{m.theory_outro({ count: LESSONS.length })}</p>
+            <p className="text-sm text-muted">
+                <LinkedText
+                    text={m.theory_outro({
+                        count: LESSONS.length,
+                        glossary: slot("glossary"),
+                        tools: slot("tools"),
+                    })}
+                    links={{
+                        glossary: (
+                            <LocalizedLink to="/glossary" className={linkClasses}>
+                                {m.glossary_title()}
+                            </LocalizedLink>
+                        ),
+                        tools: (
+                            <LocalizedLink to="/tools" className={linkClasses}>
+                                {m.tools_title()}
+                            </LocalizedLink>
+                        ),
+                    }}
+                />
+            </p>
         </main>
     );
 }

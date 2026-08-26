@@ -161,3 +161,40 @@ describe("snippetMidi", () => {
         expect(snippetMidi({ step: null, value: "quarter" }, 0)).toBeNull();
     });
 });
+
+describe("a chord in a written example", () => {
+    it("stacks the notes in one bar instead of laying them out in a row", () => {
+        // The bar closes on the note that filled it — but not while the rest of the stack
+        // is still to come, or a triad would be split across a barline that is not there.
+        const xml = buildSnippet({
+            clef: "treble",
+            fifths: 0,
+            beatsPerBar: 4,
+            notes: [
+                { step: "C", octave: 4, value: "whole" },
+                { step: "E", octave: 4, value: "whole", chord: true },
+                { step: "G", octave: 4, value: "whole", chord: true },
+            ],
+        });
+
+        expect(xml.match(/<measure /g)).toHaveLength(1);
+        expect(xml.match(/<chord\/>/g)).toHaveLength(2);
+        // The marker comes before the pitch it stacks on, where the schema wants it.
+        expect(xml).toContain("<note><chord/><pitch><step>E</step>");
+    });
+
+    it("still bars a row of single notes the way it always did", () => {
+        const xml = buildSnippet({
+            clef: "treble",
+            fifths: 0,
+            beatsPerBar: 4,
+            notes: [
+                { step: "C", octave: 4, value: "whole" },
+                { step: "D", octave: 4, value: "whole" },
+            ],
+        });
+
+        expect(xml.match(/<measure /g)).toHaveLength(2);
+        expect(xml).not.toContain("<chord/>");
+    });
+});

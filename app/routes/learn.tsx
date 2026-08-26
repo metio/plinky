@@ -13,6 +13,7 @@ import {
 } from "../components/ui/icons";
 import { routeMeta, webPageData } from "../../core/site";
 import { useSynth } from "../hooks/useSynth";
+import { LESSONS } from "../../core/theoryCourse";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/learn";
@@ -49,7 +50,13 @@ export function meta(_args: Route.MetaArgs) {
 // The notes climb an octave, so running a mouse down the list plays a scale.
 const ENTRIES = [
     { to: "/basics", label: m.basics_title, blurb: m.basics_intro, Icon: KeysIcon, note: 60 },
-    { to: "/theory", label: m.theory_title, blurb: m.theory_intro, Icon: BookIcon, note: 62 },
+    {
+        to: "/theory",
+        label: m.theory_title,
+        blurb: () => m.theory_intro({ count: LESSONS.length }),
+        Icon: BookIcon,
+        note: 62,
+    },
     {
         to: "/glossary",
         label: m.glossary_title,

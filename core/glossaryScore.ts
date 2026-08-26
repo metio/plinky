@@ -76,6 +76,11 @@ export type SnippetNote = {
     beam?: "begin" | "continue" | "end";
     // A hairpin opening at this note and closing at the one carrying "stop".
     wedge?: "crescendo" | "diminuendo" | "stop";
+    // Sounds together with the note before it, rather than after it — the second and third
+    // notes of a chord. MusicXML stacks a chord by marking every note after the first,
+    // which is also why a chord note takes no time of its own: the bar has already counted
+    // the one it is stacked on.
+    chord?: boolean;
     // The shape the notehead is drawn as. Round unless a score asks otherwise: a
     // shape-note edition draws each degree of the scale as its own shape, so a singer
     // reads the degree off the page rather than working it out from the key. It is a
@@ -148,11 +153,14 @@ function noteXml(note: SnippetNote): string {
     const accidental = note.accidental ? `<accidental>${note.accidental}</accidental>` : "";
     const beam = note.beam ? `<beam number="1">${note.beam}</beam>` : "";
     const notehead = note.notehead ? `<notehead>${note.notehead}</notehead>` : "";
-    // Child order is fixed by the MusicXML schema: pitch, duration, tie, type, dot,
+    // <chord/> comes before the pitch it stacks on, which is the one place the schema puts
+    // a marker ahead of the note's own identity.
+    const chord = note.chord ? "<chord/>" : "";
+    // Child order is fixed by the MusicXML schema: chord, pitch, duration, tie, type, dot,
     // accidental, notehead, beam, then notations. A notehead written out of order is
     // dropped rather than rejected, so the example would draw round notes and look right
     // enough to pass a glance.
-    return `      <note>${pitchXml(note)}<duration>${noteDivisions(note)}</duration>${tie}<type>${note.value}</type>${dot}${accidental}${notehead}${beam}${notationsXml(note)}</note>`;
+    return `      <note>${chord}${pitchXml(note)}<duration>${noteDivisions(note)}</duration>${tie}<type>${note.value}</type>${dot}${accidental}${notehead}${beam}${notationsXml(note)}</note>`;
 }
 
 // A dynamic or a hairpin is a direction placed under the staff, written just before the
@@ -186,10 +194,17 @@ function intoMeasures(notes: SnippetNote[], beatsPerBar: number): SnippetNote[][
     const measures: SnippetNote[][] = [];
     let current: SnippetNote[] = [];
     let filled = 0;
-    for (const note of notes) {
+    for (const [at, note] of notes.entries()) {
         current.push(note);
-        filled += noteDivisions(note);
-        if (filled >= barDivisions) {
+        // A chord note is stacked on the one before it and occupies no time of its own.
+        // Counting it would fill the bar three times over for a triad and split it across
+        // a barline that is not there.
+        filled += note.chord ? 0 : noteDivisions(note);
+        // The bar cannot close while the rest of a chord is still to come: the note that
+        // filled it is the bottom of the stack, and the notes above it belong in the same
+        // bar or they are not the same chord.
+        const stackUnfinished = notes[at + 1]?.chord === true;
+        if (filled >= barDivisions && !stackUnfinished) {
             measures.push(current);
             current = [];
             filled = 0;

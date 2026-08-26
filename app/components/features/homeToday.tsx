@@ -142,7 +142,7 @@ const LEARN_LABEL: Record<LearnPickId, () => string> = {
 const LEARN_BLURB: Record<LearnPickId, () => string> = {
     basics: m.learn_basics_blurb,
     placement: m.placement_intro,
-    theory: m.theory_intro,
+    theory: () => m.theory_intro({ count: LESSONS.length }),
     glossary: m.glossary_intro,
     methods: m.methods_intro,
     tools: m.tools_intro,
