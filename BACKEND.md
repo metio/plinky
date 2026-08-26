@@ -79,7 +79,7 @@ They are listed in the order the [Rollout](#rollout) builds them.
 | --- | --- | --- |
 | Result collection | A pupil's assignment result reaches their teacher without a paste | No shared mutable storage between two devices |
 | Catalogue submission | A submitted score arrives without a GitHub account, and a living artist's own music reaches the catalogue | The prefilled-issue URL caps at roughly 8 KB |
-| Artist pages | An artist's own bio and links change without a maintainer typing them in | An edit has to reach the repository, and a browser cannot open a pull request on its own |
+| Artist pages | A living artist writes and edits their own page, and it is live on the next deploy | An edit has to reach the repository, and a browser cannot open a pull request on its own |
 | Daily comparison | A daily run is placed against everyone else's | Aggregation across players requires a common store |
 | Progress vault | Progress follows a player between devices | `localStorage` is per-origin, per-device |
 
@@ -692,6 +692,22 @@ without a maintainer accepting it. This is a licensing requirement rather than a
 quality preference, and it is also what keeps the project outside the
 user-generated-content liability regime described in the backend ledger.
 
+**The harvest filter must never gate a submission, or living artists are locked out by
+construction.** `dev/publicDomain.mts` is an allowlist that admits a work only where the
+composition is affirmatively public domain: a death year on or before the cutoff, a
+traditional or anonymous marker, or a composer on a curated list of the long dead. That
+is right for a scraped corpus, where an uploader's CC0 claim is worth nothing. It is
+exactly wrong for a submission, where the submitter *is* the rights holder — measured
+2026-08-26, a living artist's own original work under CC0 is rejected by that function
+and always will be, because there is no death year to check and no famous surname to
+match.
+
+So the two gates are separate and must stay separate. The harvest filter guards the
+corpora. A submission is guarded by the licence choice, the source URL and the
+attestation below, plus a maintainer reading it. Wiring `isPublicDomain` into the
+submission endpoint "for consistency" would close the door this capability exists to
+open.
+
 **Living artists publishing their own music is the same endpoint plus an
 attribution.** A submission may name the artist it belongs to, and at review time
 the maintainer links it to that artist's page. Nothing new is needed to decide
@@ -724,27 +740,86 @@ gains a header. **No server is involved, it works offline, and the profile a rea
 sees is the one that shipped with their build** — the same properties the help page
 gained when its content moved in-tree.
 
-**The backend is only needed so an artist can change it without a maintainer typing
-it in.** That is the [catalogue submission](#capability-catalogue-submission) path,
-not a second mechanism: a profile edit is a submission like a piece is, it lands in
-the review queue, and a maintainer merges it. The decision that living artists
-publish through submission and curation was already taken for their music; their
-profile is the same act with a smaller payload.
+**A living artist writes their own page. Decided 2026-08-26, reversing the row below
+it.** Every composer in the catalogue is dead — the licence allowlist admits a work only
+where the *composition* is provably public domain, so by construction the catalogue is
+people who died before 1956, plus traditional music with no author at all. The living
+artists this capability exists for are the opposite case in every respect: they are here,
+they are the rights holder, and a page about them that only somebody else can edit is a
+page that goes stale the first time they change instrument, label or handle.
 
-So there is no artist-editing endpoint, no scoped write token, no field whitelist and
-no link allowlist to maintain. The moderation surface an editable public profile
-would open on a site children use closes with it: nothing an artist writes is live
-until a person has read it. What the Worker carries is one more submission kind.
+The 2026-08-13 decision routed a profile edit through the submission queue, so an artist
+could change their page but a maintainer had to merge it. That is one person in the loop
+for every typo, and it makes the operator the bottleneck on exactly the growth the
+capability is for. It is reversed here.
 
-**Superseded design, kept because it will otherwise be proposed again.** Until
-2026-08-13 the artist record was a Sanity document behind `/board`, and this section
-designed a Worker that proxied a scoped patch into Sanity's mutate API — a per-artist
-edit token, a server-side field whitelist, an allowlist deciding which links published
-immediately and which queued for review, and revocation by rotating the token. Studio
-logins had been rejected because the free plan's roles could not confine an editor to
-one document. All of it rested on there being a live CMS to patch. Sanity is gone from
-Plinky entirely, `/board` with it, so the proxy has nothing to proxy; the machinery
-listed above went with the store it guarded, not because it was wrong.
+**The artist edits the backend; the backend edits the repository.** The read path does
+not move: the profile is still a file that ships with the build. What changes is who
+writes the file.
+
+1. An artist opens their edit link and changes their blurb, their picture or their links.
+2. The Worker validates the fields against a whitelist and stores the record.
+3. A scheduled Actions job regenerates the in-tree profile from the stored records and
+   pushes.
+4. The site redeploys, and the change is live.
+
+**This is only reasonable because of the release model.** Every push to `main` deploys
+and there are no versions, tags or releases, so step 4 is minutes rather than a release
+cycle. The same design under the CalVer scheme this project used until 2026-08-13 would
+have meant an artist's typo waiting for a scheduled release, which is why the earlier
+answer was a live CMS instead.
+
+What it keeps, and the reason for the indirection rather than serving profiles from D1:
+the person page still works offline, still carries no runtime third-party fetch, and the
+profile a reader sees is still the one that shipped with their build. Those were the four
+properties the 2026-08-13 decision was protecting, and none of them is given up.
+
+**Moderation becomes a dial rather than a gate.** The property worth keeping from the
+superseded design is that nothing a stranger writes appears unread on a site children
+use — and the way to keep it without a human in every loop is the split that design
+already had. A text edit from an artist whose work a maintainer has already accepted
+publishes on the next deploy. Anything that introduces a **new outbound link or a new
+image** queues for review, because those are what carry a payload somewhere else. An
+artist who has never had a submission accepted has no edit token at all, so there is no
+anonymous write path to moderate.
+
+**Identity is the token the curation already produces.** No accounts, no passwords, no
+claiming flow, no identity service. When a maintainer accepts an artist's first
+submission and links it to a person page, that mint is the moment: the artist gets an
+edit token for that one slug and nothing else. It is a capability token like every other
+one here — 128 bits, stored as a SHA-256 hash, presented as a bearer value, revoked by
+rotating it. It reaches the artist in a link, and that link puts it in the fragment,
+which the receiving route strips with `history.replaceState` before anything else runs.
+
+**Endpoints.**
+
+```text
+GET   /v1/artist/:slug   the stored record, for the edit screen to fill itself from
+PATCH /v1/artist/:slug   Authorization: Bearer <editToken>; whitelisted fields only
+```
+
+`PATCH` is the only write, it touches one row, and the whitelist is server-side: a field
+the client sends that the whitelist does not name is dropped rather than refused, so a
+newer client cannot be told it failed for sending something a newer server understands.
+There is no endpoint that lists artists, and none that returns a token it did not just
+mint.
+
+**Where this came from, because the shape is older than the store.** Until 2026-08-13
+the artist record was a Sanity document behind `/board`, and this section designed a
+Worker that proxied a scoped patch into Sanity's mutate API — a per-artist edit token, a
+server-side field whitelist, an allowlist deciding which links published immediately and
+which queued for review, and revocation by rotating the token. Studio logins had been
+rejected because the free plan's roles could not confine an editor to one document. All
+of it rested on there being a live CMS to patch, and when Sanity left, the proxy had
+nothing to proxy.
+
+Every one of those four pieces is above, unchanged in substance, over a different store.
+That is the useful thing to notice rather than the churn: the machinery was never the
+part that was wrong. What was wrong was reading a public page out of a mutable third-party
+store at runtime, and it is the one piece not revived — the profile is generated into the
+tree instead. Between 2026-08-13 and 2026-08-26 the answer was to drop the editing with
+the store, which cost an artist their own page to keep a property that the generation step
+turns out to preserve anyway.
 
 **Consent works here in a way it does not for pupils.** An artist is an adult asking
 for a public profile, so consent is freely given and valid, and the obligations are
@@ -1305,10 +1380,19 @@ CREATE TABLE vault_entry (
 );
 CREATE INDEX vault_by_rev ON vault_entry(vault, rev);
 
--- No artist table. Profiles live in the repository and change through the submission
--- queue like any other contribution, so there is no per-artist edit token to store and
--- nothing for the Worker to authorise. The table that stood here held the scoped
--- credential for patching a Sanity document; both are gone.
+-- A living artist's own page, and the one credential that lets them write it. The record
+-- is the source the in-tree profile is generated from, not what the app reads: the person
+-- page still ships its profile with the build. See "Capability: artist pages".
+CREATE TABLE artist (
+    slug            TEXT PRIMARY KEY,       -- the person page it belongs to
+    edit_token_hash TEXT NOT NULL,          -- SHA-256; grants PATCH on this row alone
+    blurb           TEXT,                   -- what the artist wrote about themselves
+    picture_key     TEXT,                   -- R2 key, set through the submission queue
+    links           TEXT NOT NULL,          -- JSON [{label, url}, …], whitelisted on write
+    reviewed_at     INTEGER,                -- when a maintainer last read it; NULL = queued
+    created_at      INTEGER NOT NULL,
+    updated_at      INTEGER NOT NULL
+);
 
 -- Catalogue submissions awaiting review.
 CREATE TABLE submission (
@@ -1317,7 +1401,7 @@ CREATE TABLE submission (
     object_key      TEXT NOT NULL,          -- R2 key of the uploaded score
     title           TEXT NOT NULL,
     composer        TEXT,
-    artist_slug     TEXT,                   -- the person page a living artist's own work belongs to
+    artist_slug     TEXT REFERENCES artist(slug),  -- set when a living artist publishes their own work
     licence         TEXT NOT NULL,          -- SPDX id from the accepted set
     source_url      TEXT NOT NULL,
     submitter_note  TEXT,
@@ -1337,6 +1421,7 @@ Retention, enforced by a scheduled Worker (one of the five free cron triggers):
 | `vault_entry` tombstones | 90 days after every member has synced past them | Row deleted |
 | `submission`, `pending` | 24 hours | Row and object deleted |
 | `submission`, decided | 30 days after accept or reject | Row deleted; the object is deleted at reject |
+| `artist` | Kept while the page exists; deleted on request | An artist asked for a public profile and can ask for it back — see [Privacy and law](#privacy-and-law) |
 | R2 objects with no row | Swept on reconciliation | Deleted |
 
 **Activity, not readership, keeps a class alive.** Keying expiry on the teacher's
@@ -1436,8 +1521,9 @@ is separate from the root, so a dependency added for the server cannot reach the
 client bundle, and Renovate covers both.
 
 **What is deliberately absent.** No admin endpoint, no way to list all classes, no
-way to read another vault, no server-side eval of anything user-supplied, and no
-endpoint that returns a token it did not just create.
+way to read another vault, no way to edit an artist page but your own, no way to list
+the artists at all, no server-side eval of anything user-supplied, and no endpoint that
+returns a token it did not just create.
 
 ## Privacy and law
 
@@ -1455,6 +1541,14 @@ or a password.
 who asked for a public profile, so consent is freely given and valid, and the
 duties are ordinary — name the processing, offer removal. Everything difficult
 below concerns children who did not choose to be there.
+
+Two details follow from an artist writing their own page rather than a maintainer typing
+it. What is stored is what they chose to publish plus one credential — the hash of their
+edit token — and the credential is the thing that makes erasure answerable without an
+admin path: deleting the row ends both the profile and the ability to write it. And
+because the profile is generated into the repository, removal has a second half that a
+database row does not: the generated file and its history. A profile withdrawn from the
+API and left in the tree has not been withdrawn.
 
 **IP addresses are processed, and saying otherwise would be false.** Cloudflare
 sees the client IP on every request, Workers observability retains request
@@ -1791,13 +1885,18 @@ turning the health flag off cleanly removes the feature. **Real classroom use
 additionally waits on the controller/processor determination and the DPIA** in
 [Privacy and law](#privacy-and-law); development does not.
 
-**Phase 2 — artists.** One endpoint carrying two kinds of payload, both routed
-through maintainer review: [catalogue submission](#capability-catalogue-submission),
-including a living artist publishing their own CC-licensed work, and the profile
-edits behind [artist pages](#capability-artist-pages). Since the Sanity proxy went,
-artist pages have no backend half of their own — a profile edit is a submission like
-a piece is. Requires R2, and therefore a payment method on file and a billing
-alert.
+**Phase 2 — artists.** Two things, in this order.
+[Catalogue submission](#capability-catalogue-submission) first, because it is what mints
+an artist's identity: a maintainer accepting somebody's first piece and linking it to a
+person page is the moment their edit token exists. Then
+[artist pages](#capability-artist-pages) — `GET`/`PATCH` on one row, a whitelist, and the
+Actions job that writes the profile back into the tree. Requires R2, and therefore a
+payment method on file and a billing alert.
+
+The client-only half — a profile in the repository, folded into the people index — has no
+backend dependency and can ship before any of it. Doing so first is worth it on its own:
+it is the read path the editing half writes into, so building it early means phase 2 adds
+a writer to something already working rather than a feature and its plumbing at once.
 
 The client-only half of artist pages — a profile in the repository, folded into the
 people index so `/person/:slug` gains a bio, a photo and social links — has no
@@ -1808,8 +1907,10 @@ queue rather than an endpoint of its own.
 Exit criteria: a submission travels from `/music/import` through review to a
 pull request without the submitter holding a GitHub account; fingerprinting runs
 in Actions rather than in a Worker; orphaned uploads are collected within 24
-hours; and an artist's profile edit arrives as a submission and reaches the site
-only once a maintainer has merged it.
+hours; an artist edits their own blurb and links through a capability link, cannot touch
+another artist's page or any field outside the whitelist, and sees the change live on the
+next deploy without a maintainer typing anything; and an edit introducing a new outbound
+link or a new image queues for review rather than publishing.
 
 **Phase 3 — daily comparison.** Exit criterion: a histogram renders after a daily
 run, labelled as self-reported, showing the player's band and no rank; the daily
@@ -1876,6 +1977,11 @@ never rewritten.
 | 2026-08-26 | The privacy policy's API section blocks the client's first API call, not the Worker's first deploy | A Worker nobody calls receives no visitor IPs, and phase 0 changes nothing in the client by construction. Naming the triggering event rather than a phase lets the scaffolding land and be reviewed while the policy text is written, without weakening the deadline |
 | 2026-08-26 | Phase 2 is one endpoint with two payload kinds, not two capabilities | With the Sanity proxy gone, artist pages have no backend half of their own — a profile edit is a submission like a piece is, which the 2026-08-13 row already decided. The phase description and its exit criteria had not caught up, and still tested a scoped edit token, a field whitelist and a link allowlist that this document elsewhere says do not exist |
 | 2026-08-26 | The merge-policy table gets its gate before the vault, not with it | A census against the tree found the table missing three keys for the second time — reviewed, corrected on 2026-08-09, and drifted again. Two other counts in this document were wrong the same way. A table this document cannot keep right by reading is one a check should keep right instead |
+| 2026-08-26 | **A living artist edits their own page through the API. Reverses the 2026-08-13 row below, which routed a profile edit through the submission queue** | Every composer in the catalogue is dead by construction — the licence allowlist admits only affirmatively public-domain compositions — so the artists this capability serves are precisely the ones who are alive to maintain a page. Making a maintainer merge every typo puts the operator in the loop for the one thing the capability exists to take them out of, and makes them the bottleneck on its growth. The property the earlier decision was protecting is kept a different way: the read path is still a file that ships with the build, so the page still works offline and still fetches nothing at runtime — the artist writes the backend and a scheduled job writes the repository |
+| 2026-08-26 | The profile is generated back into the tree rather than served from D1 | Serving it live would trade four properties for one convenience: offline reading, no runtime third-party fetch, a profile that matches the build a reader is running, and a page that cannot break because a database is down. Writing the file instead costs a deploy, and a deploy is minutes |
+| 2026-08-26 | This design depends on the release model and would not survive its reversal | Every push to `main` deploys and there are no versions or tags, which is what makes "the artist edits, the site redeploys" a wait of minutes. Under the CalVer scheme this project used until 2026-08-13 the same design would have parked an artist's typo until the next scheduled release, which is exactly why the answer then was a live CMS. If releases ever come back, this decision has to be re-argued rather than inherited |
+| 2026-08-26 | Moderation is a dial: text publishes, a new link or image queues | The property worth keeping is that nothing a stranger writes appears unread on a site children use. A human in every loop is not the only way to hold it — an artist with no accepted submission has no token at all, so there is no anonymous write path, and what needs reading is what carries a payload elsewhere |
+| 2026-08-26 | The harvest allowlist never gates a submission | Measured: a living artist's own CC0 work is rejected by `isPublicDomain` and always will be, since there is no death year to check and no listed surname to match. Correct for a scraped corpus where an uploader's licence claim is worth nothing; the exact opposite where the submitter is the rights holder and attests to it. Wiring the two together would lock out every artist the capability is for |
 | 2026-08-13 | Artist profiles live in the repository and change through the submission queue, not through an editing endpoint | With no CMS to proxy, a live-edit path would mean building a store, a token, a field whitelist and a link allowlist to guard it. A profile edit is a submission like a piece is, which the artist decision above already chose as the mechanism — so the read path is a file that ships with the build, and nothing an artist writes is public until a person has read it |
 
 ## Open questions
