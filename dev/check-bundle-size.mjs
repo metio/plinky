@@ -404,7 +404,19 @@ const BUDGET_VENDOR_KB = 324;
 // composites leaving the index and the eight real people arriving in their place, plus the
 // splitting itself — a tenth of a kilobyte over the line, for pages that had been credited
 // to a composer who never existed while neither real one was credited at all.
-const BUDGET_APP_KB = 383;
+// 384. A theory lesson became one timeline that the page, the speakers and the keyboard
+// all read. They read three before — an engraver deriving half notes from a pitch set, a
+// player striking every pitch of a phrase at once, a keyboard lighting the lot statically
+// — and three derivations of one idea disagree: the lesson about note length struck seven
+// identical notes together, which is one note, and the lesson about rests played both
+// notes at once, so the silence it teaches could not happen. Seven demo kinds collapse
+// into one shape, and what that deletes very nearly pays for what it adds. The seven
+// tenths of a kilobyte over the line are the timeline module — its engraving, its clock,
+// and the spelling that finally lets a black key be drawn — plus the helper that puts a
+// link inside a translated sentence without cutting the sentence into fragments. The
+// eight lessons that gained a written example cost nothing here: the engraver was already
+// on the page for the other six.
+const BUDGET_APP_KB = 384;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
