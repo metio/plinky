@@ -113,11 +113,12 @@ function card(piece, cut) {
              <div style="font-size:${titleSize(piece.title, cut.scale)}px;font-weight:600;color:${PAPER};line-height:1.08;letter-spacing:-0.015em;text-wrap:balance">${piece.title}</div>
              <div style="font-family:Inter,system-ui,sans-serif;font-size:${Math.round(36 * cut.scale)}px;color:${PAPER};opacity:.72;margin-top:${Math.round(20 * cut.scale)}px">${piece.composer}</div>
            </div>
-           <div style="position:relative;display:flex;align-items:baseline;gap:${Math.round(20 * cut.scale)}px">
-             <div style="font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:-0.01em;color:${PAPER};line-height:1">
-               Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>nky
-             </div>
-             <div style="font-family:Inter,system-ui,sans-serif;font-size:${Math.round(26 * cut.scale)}px;color:${PAPER};opacity:.6">plinky.fun</div>
+           <!-- One lockup, not two. Setting the wordmark and then "plinky.fun" beside it
+                wrote the name twice on a card that has room to say it once — so the domain
+                is the wordmark's own tail, in the same face, and the address and the name
+                are the same object. -->
+           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:-0.01em;color:${PAPER};line-height:1">
+             Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>nky.fun
            </div>
          </div>`;
 }

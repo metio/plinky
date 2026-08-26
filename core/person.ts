@@ -213,6 +213,15 @@ const ALIASES: Record<string, string> = {
     "m. carcassi": "Matteo Carcassi",
     "p. mascagni": "Pietro Mascagni",
 
+    // The same again, from reading the directory rather than the code. Each one's own
+    // piece names its owner: Bertini's Op. 29 is his 24 études, the Erato praeludium is
+    // from Fischer's Musicalischer Parnassus (its suites are named for the muses), the
+    // "six sonates faciles" are Dussek's, and the Flower Duet is from Lakmé.
+    delibes: "Léo Delibes",
+    "h. bertini": "Henri Bertini",
+    "j. k. f. fischer": "Johann Kaspar Ferdinand Fischer",
+    "j. l. dussek": "Jan Ladislav Dussek",
+
     // ---- A third pass, from comparing every page against every other by surname, by
     // containment and by edit distance rather than by eye. These are the ones a person
     // scrolling an alphabetical directory cannot see: the two spellings sort far apart, and
