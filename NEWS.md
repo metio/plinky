@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 27 August 2026 — night
+
+**When something breaks quietly, you can now see it.** A crash used to show you a
+panel with a button to report it — but only if it happened while the page was being
+drawn. Anything that went wrong in the background left no trace at all: a feature
+that simply did nothing, and no way to say what. Settings now keeps the last few
+problems this device hit, with the same one-press report, and nothing is sent
+anywhere unless you press it.
+
 ## 27 August 2026 — evening
 
 **Your progress is harder to lose.** Browsers treat ordinary site storage as

@@ -25,6 +25,7 @@ import { SettingsSection } from "../components/ui/settingsSection";
 import { DangerZone } from "../components/features/dangerZone";
 import { FeatureBoundary } from "../components/features/featureBoundary";
 import { ProgressBackup } from "../components/features/progressBackup";
+import { RecentProblems } from "../components/features/recentProblems";
 import { HandSize } from "../components/features/handSize";
 import { ReadingLevel } from "../components/features/readingLevel";
 import { KeyMapping } from "../components/features/keyMapping";
@@ -464,6 +465,12 @@ export default function Settings() {
                     {m.settings_get_help()} →
                 </a>
             </SettingsSection>
+
+            {/* Only present when something has actually gone wrong, so it sits above the
+                danger zone rather than in it: reporting a fault is not destructive. */}
+            <FeatureBoundary feature="RecentProblems">
+                <RecentProblems />
+            </FeatureBoundary>
 
             <FeatureBoundary feature="DangerZone">
                 <DangerZone />

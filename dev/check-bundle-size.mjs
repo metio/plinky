@@ -416,7 +416,21 @@ const BUDGET_VENDOR_KB = 324;
 // link inside a translated sentence without cutting the sentence into fragments. The
 // eight lessons that gained a written example cost nothing here: the engraver was already
 // on the page for the other six.
-const BUDGET_APP_KB = 384;
+// 386. Faults that never reach a React boundary are written down and shown in Settings,
+// with the same one-press report the crash page offers. A rejected promise or a throw
+// from a timer used to leave nothing at all — no fallback, no link, a feature that simply
+// stopped working — and with every push deploying, the only signal was somebody thinking
+// to say so. The weight is the bounded log in core, its store, the window adapter and the
+// panel: 1.1 KB, measured at 385.1.
+//
+// Worth recording about the measurement rather than the feature: this figure sums every
+// chunk across all 25 routes, so it is not what any one visitor downloads (the play page
+// is ~262 KB eager, home ~205 KB) and it can only ever rise — a new page raises it even
+// when nobody's download grew. That is why this ledger holds some fifty raises and two
+// falls. A per-document budget computed from the built HTML would be the honest gate and
+// could fall; until then this one keeps its one real virtue, which is making a human
+// decide.
+const BUDGET_APP_KB = 386;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

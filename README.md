@@ -580,7 +580,11 @@ would otherwise start from zero. Browsers treat ordinary site storage as disposa
 and can clear it when a device runs short of space, so once you have finished a run
 Plinky asks yours to keep what you have done. Most grant it silently; a few ask you
 first, and Firefox is one of them. And if a run ever can't be written down, the result
-panel says so rather than showing you a grade that won't be there tomorrow. **Settings → Your progress** downloads the lot as a
+panel says so rather than showing you a grade that won't be there tomorrow. And when
+something breaks in the background rather than on screen — a download that never
+arrived, a decode that gave up — **Settings → Recent problems** keeps the last few, each
+with a button that reports it. The section is absent when there is nothing to show, and
+nothing leaves the device unless you press the button. **Settings → Your progress** downloads the lot as a
 single file: grades and the review schedule, saved takes and ghosts, worked-out
 fingerings, preferences, achievements and your score library. Restore it on another
 device — or back onto this one if its storage is ever cleared — and Plinky picks up

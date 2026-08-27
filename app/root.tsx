@@ -8,6 +8,7 @@ import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
+import { FaultRecorder } from "./components/features/faultRecorder";
 import { StorageBanner } from "./components/features/storageBanner";
 import { UpdateBanner } from "./components/features/updateBanner";
 import { MilestoneBannerHost } from "./components/features/milestoneBanner";
@@ -383,6 +384,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     store, and a provider that only wrapped the routed tree would leave
                     the header on the default services, silently ignoring any override. */}
                 <ServicesProvider>
+                    {/* Nothing outside a React render reaches a boundary, so the faults
+                        that leave no fallback and no report link are written down here
+                        instead — for the reader to send from Settings when they do. */}
+                    <FaultRecorder />
                     <Header />
                     {/* The layout is the composition root: it hands the banner the
                         adapter's health signal so the banner itself stays oblivious

@@ -202,6 +202,16 @@ export default defineConfig({
                                     "--disable-font-subpixel-positioning",
                                 ],
                             },
+                            // The clock and the calendar, pinned for the same reason the
+                            // fonts are: a story that formats a date reads the browser's
+                            // timezone and locale, which come from the machine. The same
+                            // instant renders "11:15 AM" here and "9:15 AM" on a UTC
+                            // runner, and en-GB would write it differently again — a
+                            // baseline that fails on a machine rather than on a change,
+                            // which is precisely what the font pinning above exists to
+                            // prevent. Fixed here rather than in each story, so the next
+                            // component that shows a time inherits it.
+                            contextOptions: { timezoneId: "UTC", locale: "en-US" },
                         }),
                         headless: true,
                         // One canonical render box: the screenshots are pixel

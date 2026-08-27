@@ -4,6 +4,7 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
 import { audioContext, playFromSamples, webAudioEngine } from "../adapters/webAudioEngine";
+import { windowErrors } from "../adapters/windowErrors";
 import { webStoragePersistence } from "../adapters/webStoragePersistence";
 import { webSampleSource } from "../adapters/webSampleSource";
 import { sampleLookup } from "../lib/sampleVoices";
@@ -20,6 +21,7 @@ import { samplesEnabled } from "../../core/sampledPiano";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import type { ErrorFeed } from "../ports/errorFeed";
 import type { StoragePersistence } from "../ports/storagePersistence";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
@@ -42,6 +44,7 @@ import { createFingeringStore, type FingeringStore } from "../stores/fingeringSt
 import { createGhostStore, type GhostStore } from "../stores/ghostStore";
 import { createLifetimeStore, type LifetimeStore } from "../stores/lifetimeStore";
 import { createTakesStore, type TakesStore } from "../stores/takesStore";
+import { createErrorLogStore, type ErrorLogStore } from "../stores/errorLogStore";
 import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
 import { createPracticeLogStore, type PracticeLogStore } from "../stores/practiceLogStore";
 import { createSongSource, type SongSource } from "../stores/songSource";
@@ -62,6 +65,9 @@ export type AppServices = {
     store: KeyValueStore;
     // Asking the browser not to evict any of it (see StoragePersistence).
     persistence: StoragePersistence;
+    // What went wrong on this device lately, and where those faults arrive from.
+    errors: ErrorLogStore;
+    errorFeed: ErrorFeed;
     // The single sources of truth for each family of persistent state, built over
     // `store`.
     prefs: PrefsStore;
@@ -159,6 +165,8 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     return {
         store,
         persistence: overrides.persistence ?? webStoragePersistence,
+        errors: overrides.errors ?? createErrorLogStore(store),
+        errorFeed: overrides.errorFeed ?? windowErrors,
         prefs: overrides.prefs ?? createPrefsStore(store),
         mastery: overrides.mastery ?? createMasteryStore(store),
         history: overrides.history ?? createHistoryStore(store),
@@ -201,6 +209,8 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
 // never silently ignore an override.
 const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     persistence: true,
+    errors: true,
+    errorFeed: true,
     store: true,
     prefs: true,
     mastery: true,
@@ -354,6 +364,10 @@ export function useSampleSource(): SampleSource {
 
 export function usePersistence(): StoragePersistence {
     return useServices().persistence;
+}
+
+export function useErrorLogStore(): ErrorLogStore {
+    return useServices().errors;
 }
 
 export function useXmlCodec(): XmlCodec {

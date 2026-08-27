@@ -2,6 +2,17 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-08-27
+  label: night
+  entries:
+    - |-
+      **When something breaks quietly, you can now see it.** A crash used to show you a
+      panel with a button to report it — but only if it happened while the page was being
+      drawn. Anything that went wrong in the background left no trace at all: a feature
+      that simply did nothing, and no way to say what. Settings now keeps the last few
+      problems this device hit, with the same one-press report, and nothing is sent
+      anywhere unless you press it.
+
+- date: 2026-08-27
   label: evening
   entries:
     - |-
