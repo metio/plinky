@@ -139,6 +139,7 @@
     "action_dismiss": "Închide",
     "action_close": "Închide",
     "storage_write_failed": "Stocarea acestui dispozitiv e plină sau blocată — progresul nou nu se salvează.",
+    "storage_stale_build": "Această filă rulează o versiune mai veche de Plinky decât cea folosită deja pe acest dispozitiv, așa că nu salvează nimic — ar suprascrie un progres mai nou. Reîncarcă pagina.",
     "sound_ios_hint": "Fără sunet? Pe iPhone dezactivează modul silențios (comutatorul lateral sau butonul Acțiune la modelele mai noi) și dă volumul mai tare.",
     "sound_inapp_hint": "Fără sunet aici? Acest browser din aplicație îl blochează — apasă meniul ••• și alege Deschide în Safari.",
     "settings_reset_failed": "O parte din date n-a putut fi ștearsă — spațiul de stocare al dispozitivului poate fi plin sau blocat. Nimic n-a fost reîncărcat; încearcă din nou.",

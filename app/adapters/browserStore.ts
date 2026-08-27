@@ -3,6 +3,8 @@
 
 import { createEmitter } from "../../core/emitter";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import type { StorageHealth } from "../ports/storageHealth";
+import { versionedStore } from "./versionedStore";
 
 // The one place the app touches `localStorage`. Merely *accessing* the global can throw
 // a SecurityError — Firefox with site-data disabled, a sandboxed iframe — and a
@@ -84,4 +86,20 @@ export function createBrowserStore(): { store: KeyValueStore; health: BrowserSto
 // instance — services.tsx hands the store to every feature, root.tsx hands the
 // health to the banner — so the banner reflects the writes the app actually
 // made.
-export const { store: browserStore, health: storageHealth } = createBrowserStore();
+const browser = createBrowserStore();
+
+// Guarded before anything else sees it, so no store can write over values a newer build
+// left behind. The guard is a plain KeyValueStore, so everything downstream is unchanged
+// — a refusal arrives as the write verdict callers already handle.
+const versioned = versionedStore(browser.store);
+
+export const browserStore = versioned.store;
+
+// What the banner watches. Two different problems, and the copy for one is wrong for the
+// other: telling somebody on a stale tab that their storage is full sends them off to
+// delete files that were never the trouble.
+export const storageHealth: StorageHealth = {
+    problem: () =>
+        versioned.standing === "newer" ? "stale" : browser.health.failed() ? "refused" : null,
+    subscribe: browser.health.subscribe,
+};

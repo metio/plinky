@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 27 August 2026 — later
 
+**A tab left open on an old version won't overwrite your newer progress.** Plinky
+updates itself quietly, so a tab you opened yesterday can still be running
+yesterday's version — and it would happily save over work done since, quietly
+flattening anything it didn't understand. Such a tab now stops saving and says so,
+with a nudge to reload. It can still read and back up everything, which is the part
+that matters if you get caught out by it.
+
 **Restoring a backup is now all or nothing.** If the device ran out of room
 part-way through, the restore stopped where it was and left you with a mix — some
 of your progress from the backup, the rest from this device — while the message on

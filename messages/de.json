@@ -139,6 +139,7 @@
     "action_dismiss": "Schließen",
     "action_close": "Schließen",
     "storage_write_failed": "Der Speicher dieses Geräts ist voll oder blockiert – neuer Fortschritt wird nicht gespeichert.",
+    "storage_stale_build": "Dieser Tab läuft mit einer älteren Version von Plinky, als auf diesem Gerät schon benutzt wurde, und speichert deshalb nichts — das würde neueren Fortschritt überschreiben. Lade die Seite neu.",
     "sound_ios_hint": "Kein Ton? Schalte auf dem iPhone den Stummmodus aus (über den seitlichen Schalter oder den Action Button bei neueren Modellen) und dreh die Lautstärke auf.",
     "sound_inapp_hint": "Kein Ton hier? Dieser In-App-Browser blockiert ihn – tippe auf das •••-Menü und wähle „In Safari öffnen“.",
     "settings_reset_failed": "Einige Daten konnten nicht gelöscht werden – der Speicher dieses Geräts ist möglicherweise voll oder blockiert. Es wurde nichts neu geladen; versuch es einfach noch einmal.",

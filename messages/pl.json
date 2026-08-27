@@ -139,6 +139,7 @@
     "action_dismiss": "Odrzuć",
     "action_close": "Zamknij",
     "storage_write_failed": "Pamięć tego urządzenia jest pełna lub zablokowana — nowe postępy nie są zapisywane.",
+    "storage_stale_build": "Ta karta działa na starszej wersji Plinky niż ta, której już użyto na tym urządzeniu, więc nic nie zapisuje — nadpisałaby nowsze postępy. Odśwież stronę.",
     "sound_ios_hint": "Brak dźwięku? Na iPhonie wyłącz tryb cichy (przełącznik boczny lub przycisk Czynność w nowszych modelach) i zwiększ głośność.",
     "sound_inapp_hint": "Brak dźwięku tutaj? Ta przeglądarka w aplikacji go blokuje — dotknij menu ••• i wybierz Otwórz w Safari.",
     "settings_reset_failed": "Niektórych danych nie udało się usunąć — pamięć urządzenia może być pełna lub zablokowana. Nic nie zostało przeładowane; spróbuj ponownie.",

@@ -139,6 +139,7 @@
     "action_dismiss": "Avfärda",
     "action_close": "Stäng",
     "storage_write_failed": "Enhetens lagring är full eller blockerad — nya framsteg sparas inte.",
+    "storage_stale_build": "Den här fliken kör en äldre version av Plinky än den som redan använts på den här enheten, så den sparar ingenting — det skulle skriva över nyare framsteg. Ladda om sidan.",
     "sound_ios_hint": "Inget ljud? På iPhone, stäng av Tyst läge (sidoströmbrytaren eller Åtgärdsknappen på nyare modeller) och höj volymen.",
     "sound_inapp_hint": "Inget ljud här? Den här inbyggda webbläsaren blockerar det — tryck på •••-menyn och välj Öppna i Safari.",
     "settings_reset_failed": "Viss data kunde inte raderas — enhetens lagring kan vara full eller blockerad. Inget laddades om, så försök gärna igen.",

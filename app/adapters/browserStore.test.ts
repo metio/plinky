@@ -21,7 +21,7 @@ describe("browserStore", () => {
 
     it("exposes one shared instance behind the module's store and health", () => {
         expect(withDeniedStorage(() => browserStore.set("plinky:x", "1"))).toBe(false);
-        expect(storageHealth.failed()).toBe(true);
+        expect(storageHealth.problem()).toBe("refused");
     });
 });
 

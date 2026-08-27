@@ -139,6 +139,7 @@
     "action_dismiss": "Ignora",
     "action_close": "Chiudi",
     "storage_write_failed": "La memoria di questo dispositivo è piena o bloccata — i nuovi progressi non vengono salvati.",
+    "storage_stale_build": "Questa scheda usa una versione di Plinky più vecchia di quella già usata su questo dispositivo, quindi non salva nulla: sovrascriverebbe progressi più recenti. Ricarica la pagina.",
     "sound_ios_hint": "Nessun suono? Su iPhone disattiva la modalità Silenzioso (l'interruttore laterale o il tasto Azione sui modelli più recenti) e alza il volume.",
     "sound_inapp_hint": "Nessun suono qui? Questo browser in-app lo blocca — tocca il menu ••• e scegli «Apri in Safari».",
     "settings_reset_failed": "Alcuni dati non sono stati cancellati — la memoria del dispositivo potrebbe essere piena o bloccata. Non è stato ricaricato nulla; riprova.",

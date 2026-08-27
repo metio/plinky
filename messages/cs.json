@@ -139,6 +139,7 @@
     "action_dismiss": "Zavřít",
     "action_close": "Zavřít",
     "storage_write_failed": "Úložiště tohoto zařízení je plné nebo blokované — nový pokrok se neukládá.",
+    "storage_stale_build": "Tato karta běží na starší verzi Plinky, než jaká už na tomto zařízení byla použita, takže nic neukládá — přepsala by novější postup. Načti stránku znovu.",
     "sound_ios_hint": "Není slyšet zvuk? Na iPhonu vypněte tichý režim (boční přepínač nebo tlačítko Akce u novějších modelů) a zvyšte hlasitost.",
     "sound_inapp_hint": "Není tu slyšet zvuk? Tento prohlížeč v aplikaci ho blokuje — klepněte na nabídku ••• a zvolte Otevřít v Safari.",
     "settings_reset_failed": "Některá data se nepodařilo vymazat — úložiště zařízení může být plné nebo blokované. Nic se znovu nenačetlo; zkuste to znovu.",

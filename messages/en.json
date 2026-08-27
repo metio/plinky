@@ -265,6 +265,7 @@
     "action_dismiss": "Dismiss",
     "action_close": "Close",
     "storage_write_failed": "This device's storage is full or blocked — new progress isn't being saved.",
+    "storage_stale_build": "This tab is running an older version of Plinky than this device has been used with, so it isn't saving anything — that would overwrite newer progress. Reload the page to catch up.",
     "sound_ios_hint": "No sound? On iPhone, turn off Silent Mode (the side switch, or the Action button on newer models) and turn the volume up.",
     "sound_inapp_hint": "No sound here? This in-app browser blocks it — tap the ••• menu and choose Open in Safari.",
     "coach_practice_loop": "New here? Have a listen first, then play along as slowly as you like. If you slip, keep going — there's no need to start over.",

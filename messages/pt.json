@@ -139,6 +139,7 @@
     "action_dismiss": "Dispensar",
     "action_close": "Fechar",
     "storage_write_failed": "O armazenamento deste dispositivo está cheio ou bloqueado — o novo progresso não está a ser guardado.",
+    "storage_stale_build": "Este separador está a usar uma versão do Plinky mais antiga do que a já usada neste dispositivo, por isso não guarda nada — sobrescreveria progresso mais recente. Recarrega a página.",
     "sound_ios_hint": "Sem som? No iPhone, desative o Modo Silencioso (o botão lateral ou o botão de Ação nos modelos mais recentes) e aumente o volume.",
     "sound_inapp_hint": "Sem som aqui? Este navegador integrado bloqueia o áudio — toca no menu ••• e escolhe Abrir no Safari.",
     "settings_reset_failed": "Alguns dados não puderam ser apagados — o armazenamento deste dispositivo pode estar cheio ou bloqueado. Nada foi recarregado; tenta de novo.",

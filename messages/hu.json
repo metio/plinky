@@ -139,6 +139,7 @@
     "action_dismiss": "Elvetés",
     "action_close": "Bezárás",
     "storage_write_failed": "Ennek az eszköznek a tárhelye megtelt vagy le van tiltva — az új haladás nem mentődik.",
+    "storage_stale_build": "Ez a lap a Plinky régebbi változatát futtatja, mint amit ezen az eszközön már használtak, ezért semmit sem ment — felülírná az újabb haladást. Töltsd újra az oldalt.",
     "sound_ios_hint": "Nincs hang? iPhone-on kapcsold ki a Néma üzemmódot (az oldalsó kapcsoló, vagy újabb modelleken a Művelet gomb), és hangosítsd fel.",
     "sound_inapp_hint": "Itt nincs hang? Ez az alkalmazáson belüli böngésző blokkolja — koppints a ••• menüre, és válaszd a Megnyitás Safariban lehetőséget.",
     "settings_reset_failed": "Néhány adatot nem sikerült törölni — az eszköz tárhelye megtelhetett, vagy le van tiltva. Semmi sem töltődött újra; próbáld újra.",

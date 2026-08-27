@@ -139,6 +139,7 @@
     "action_dismiss": "Kapat",
     "action_close": "Kapat",
     "storage_write_failed": "Bu cihazın depolaması dolu ya da engellenmiş — yeni ilerleme kaydedilmiyor.",
+    "storage_stale_build": "Bu sekme, bu cihazda daha önce kullanılandan eski bir Plinky sürümü çalıştırıyor, bu yüzden hiçbir şey kaydetmiyor — daha yeni ilerlemenin üzerine yazardı. Sayfayı yeniden yükle.",
     "sound_ios_hint": "Ses yok mu? iPhone'da Sessiz Mod'u kapat (yan düğme ya da yeni modellerde Eylem düğmesi) ve sesi aç.",
     "sound_inapp_hint": "Burada ses yok mu? Bu uygulama içi tarayıcı sesi engelliyor — ••• menüsüne dokun ve Safari'de Aç'ı seç.",
     "settings_reset_failed": "Bazı veriler silinemedi — cihazının depolaması dolu ya da engellenmiş olabilir. Hiçbir şey yeniden yüklenmedi; tekrar dene.",

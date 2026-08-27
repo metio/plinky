@@ -139,6 +139,7 @@
     "action_dismiss": "Afvis",
     "action_close": "Luk",
     "storage_write_failed": "Denne enheds lager er fuldt eller blokeret — nye fremskridt gemmes ikke.",
+    "storage_stale_build": "Denne fane kører en ældre version af Plinky end den, der allerede er brugt på denne enhed, så den gemmer ikke noget — det ville overskrive nyere fremgang. Genindlæs siden.",
     "sound_ios_hint": "Ingen lyd? På iPhone skal du slå Lydløs fra (sidekontakten eller Handling-knappen på nyere modeller) og skrue op for lyden.",
     "sound_inapp_hint": "Ingen lyd her? Denne indbyggede browser blokerer den — tryk på •••-menuen, og vælg Åbn i Safari.",
     "settings_reset_failed": "Nogle data kunne ikke slettes — din enheds lager kan være fuldt eller blokeret. Intet blev genindlæst; prøv igen.",

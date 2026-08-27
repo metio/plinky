@@ -430,7 +430,15 @@ const BUDGET_VENDOR_KB = 324;
 // falls. A per-document budget computed from the built HTML would be the honest gate and
 // could fall; until then this one keeps its one real virtue, which is making a human
 // decide.
-const BUDGET_APP_KB = 386;
+// 387. Values on a device now carry the shape they were written in, and a build that
+// does not know that shape stops writing rather than flattening it. Every push deploys
+// and a tab applies the new build only at its next route change, so two builds run at
+// once routinely — and an older one reads a field it does not know as a default, then
+// writes that default back. The weight is the version check, the store that enforces it
+// and a second banner message, since telling somebody on a stale tab that their storage
+// is full sends them off deleting files that were never the trouble. 0.3 KB, measured at
+// 386.2.
+const BUDGET_APP_KB = 387;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -139,6 +139,7 @@
     "action_dismiss": "Descartar",
     "action_close": "Cerrar",
     "storage_write_failed": "El almacenamiento de este dispositivo está lleno o bloqueado: el progreso nuevo no se está guardando.",
+    "storage_stale_build": "Esta pestaña usa una versión de Plinky más antigua que la ya usada en este dispositivo, así que no guarda nada: sobrescribiría un progreso más reciente. Recarga la página.",
     "sound_ios_hint": "¿Sin sonido? En el iPhone, desactiva el modo Silencio (el interruptor lateral o el botón Acción en los modelos más recientes) y sube el volumen.",
     "sound_inapp_hint": "¿Aquí no hay sonido? Este navegador integrado lo bloquea: toca el menú ••• y elige «Abrir en Safari».",
     "settings_reset_failed": "No se pudieron borrar algunos datos: el almacenamiento de este dispositivo puede estar lleno o bloqueado. No se recargó nada; inténtalo de nuevo.",

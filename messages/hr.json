@@ -139,6 +139,7 @@
     "action_dismiss": "Odbaci",
     "action_close": "Zatvori",
     "storage_write_failed": "Pohrana ovog uređaja je puna ili blokirana — novi napredak se ne sprema.",
+    "storage_stale_build": "Ova kartica radi na starijoj verziji Plinkyja nego što je već korištena na ovom uređaju, pa ništa ne sprema — prepisala bi noviji napredak. Ponovno učitaj stranicu.",
     "sound_ios_hint": "Nema zvuka? Na iPhoneu isključi Nečujni način rada (bočni preklopnik ili tipka Radnja na novijim modelima) i pojačaj glasnoću.",
     "sound_inapp_hint": "Nema zvuka ovdje? Ovaj ugrađeni preglednik ga blokira — dodirni izbornik ••• i odaberi Otvori u Safariju.",
     "settings_reset_failed": "Neke podatke nije bilo moguće izbrisati — pohrana uređaja možda je puna ili blokirana. Ništa nije ponovno učitano; pokušaj ponovno.",

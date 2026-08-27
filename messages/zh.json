@@ -139,6 +139,7 @@
     "action_dismiss": "关闭",
     "action_close": "关闭",
     "storage_write_failed": "此设备的存储已满或被禁用——新进度未能保存。",
+    "storage_stale_build": "此标签页运行的 Plinky 版本比这台设备用过的更旧，因此不会保存任何内容——保存会覆盖更新的进度。请重新加载页面。",
     "sound_ios_hint": "没有声音？在 iPhone 上，请关闭静音模式（侧边开关，或较新机型上的操作按钮），并调高音量。",
     "sound_inapp_hint": "这里没有声音？此应用内浏览器会拦截声音——请点按 ••• 菜单并选择“在 Safari 中打开”。",
     "settings_reset_failed": "部分数据无法清除——你的设备存储可能已满或被禁用。未重新加载任何内容；请重试。",

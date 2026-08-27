@@ -139,6 +139,7 @@
     "action_dismiss": "Sulje",
     "action_close": "Sulje",
     "storage_write_failed": "Tämän laitteen tallennustila on täynnä tai estetty — uutta edistymistä ei tallenneta.",
+    "storage_stale_build": "Tämä välilehti käyttää vanhempaa Plinkyn versiota kuin tällä laitteella on jo käytetty, joten se ei tallenna mitään — se korvaisi uudemman edistymisen. Lataa sivu uudelleen.",
     "sound_ios_hint": "Ei ääntä? Poista iPhonessa Äänetön-tila käytöstä (sivukytkimellä tai uusimmissa malleissa Toiminto-painikkeella) ja nosta äänenvoimakkuutta.",
     "sound_inapp_hint": "Ei ääntä täällä? Tämä sovelluksen sisäinen selain estää sen — napauta •••-valikkoa ja valitse Avaa Safarissa.",
     "settings_reset_failed": "Osaa tiedoista ei saatu poistettua — laitteen tallennustila voi olla täynnä tai estetty. Mitään ei ladattu uudelleen; kokeile uudestaan.",

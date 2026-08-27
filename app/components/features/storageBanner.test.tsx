@@ -4,17 +4,18 @@
 
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { type StorageHealth, StorageBanner } from "./storageBanner";
+import type { StorageHealth, StorageProblem } from "../../ports/storageHealth";
+import { StorageBanner } from "./storageBanner";
 
 afterEach(cleanup);
 
 // A controllable stand-in for the adapter's health signal — the banner takes it
 // as a prop, so the test never touches localStorage or the real adapter.
-function fakeHealth(initiallyFailed = false): StorageHealth & { fail(): void } {
-    let failed = initiallyFailed;
+function fakeHealth(initially: StorageProblem = null): StorageHealth & { fail(): void } {
+    let problem = initially;
     const listeners = new Set<() => void>();
     return {
-        failed: () => failed,
+        problem: () => problem,
         subscribe(onChange) {
             listeners.add(onChange);
             return () => {
@@ -22,7 +23,7 @@ function fakeHealth(initiallyFailed = false): StorageHealth & { fail(): void } {
             };
         },
         fail() {
-            failed = true;
+            problem = "refused";
             for (const listener of [...listeners]) {
                 listener();
             }
@@ -44,12 +45,12 @@ describe("StorageBanner", () => {
     });
 
     it("shows immediately when the failure predates the mount", () => {
-        render(<StorageBanner health={fakeHealth(true)} />);
+        render(<StorageBanner health={fakeHealth("refused")} />);
         expect(screen.getByRole("alert")).toBeDefined();
     });
 
     it("dismisses on ✕ and stays dismissed for this page load", () => {
-        const health = fakeHealth(true);
+        const health = fakeHealth("refused");
         render(<StorageBanner health={health} />);
         fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
         expect(screen.queryByRole("alert")).toBeNull();
