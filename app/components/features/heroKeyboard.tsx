@@ -35,6 +35,8 @@ export function HeroKeyboard() {
     // note-on, released on note-off — so the hold shapes the sound exactly as it does in
     // the trainer. Notes outside this octave (from a full MIDI keyboard) still sound.
     useMidiInput({
+        // The landing page's keyboard is playable, by design.
+        keys: true,
         onNoteOn: (event) =>
             synth.pressNote(event.note, { velocity: event.velocity, device: event.device }),
         // A tap on the hero rings on a little (holdScaleFor) so even a quick click sings.

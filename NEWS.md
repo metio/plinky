@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 27 August 2026 — later
 
+**Arrow keys scroll the page again, and Space presses buttons.** The computer
+keyboard is one of the ways to play Plinky, and it was taking the keys it needs on
+every page — not only where you play. On Help, Settings or the glossary, pressing
+Down did nothing at all instead of scrolling; the language picker could not be
+changed from the keyboard; and if you had bound Space to the sustain pedal, as the
+key-mapping panel suggests, Space stopped working on every button in the app. Those
+keys now belong to the page everywhere except where somebody is actually playing.
+
 **The playing surface is lighter while you hold a note.** The fill that drains
 across a key as you hold it was quietly redrawing the whole page sixty times a
 second — every panel, every reading, the lot — to animate one key. Now only the keys

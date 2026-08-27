@@ -132,7 +132,9 @@ export function useCompositionRecorder({
         [apply, applyStep],
     );
 
-    useMidiInput({ onNoteOn: handleNoteOn, onNoteOff: handleNoteOff });
+    // Compose records whatever you play, and the computer keyboard is one of the
+    // instruments you can play it on.
+    useMidiInput({ keys: true, onNoteOn: handleNoteOn, onNoteOff: handleNoteOff });
 
     // A gap of the chosen length, and taking the last step back — the two things step
     // entry needs that playing does not.

@@ -172,6 +172,8 @@ export function RhythmTrainer({
     // the event's own timestamp, because only the MIDI path carries a trustworthy one and
     // a run graded on two different clocks would be graded on neither.
     useMidiInput({
+        // A rhythm is tapped back on whatever is to hand, the computer keys included.
+        keys: true,
         onNoteOn: (event) => tap(isPreciseInput(event.device)),
     });
 

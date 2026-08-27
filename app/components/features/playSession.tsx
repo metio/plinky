@@ -673,7 +673,9 @@ function usePlaySessionValue({
         setPedal: synth.setPedal,
     });
     const holdingNote = funnel.holding;
-    useMidiInput(funnel.listener);
+    // The play surface: the computer keyboard is one of the three ways to play here,
+    // so it takes the keys it needs while this is mounted.
+    useMidiInput({ ...funnel.listener, keys: true });
     const connected = useMidiConnected();
 
     // The ghost race — a previous run replayed against the clock on the staff and the

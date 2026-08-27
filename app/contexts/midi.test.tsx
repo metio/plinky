@@ -29,6 +29,14 @@ const wrapperWith = (midi: FakeMidi) => {
 // split is the point: pressing a key re-renders what lights keys, and nothing else.
 const useMidiState = () => ({ ...useMidiConnection(), heldNotes: useHeldNotes() });
 
+// A surface on which the computer keyboard is an instrument. Everywhere else the keys
+// belong to the page, so a test that means to play them has to say so — exactly as a
+// real surface does.
+const usePlayingSurface = () => {
+    useMidiInput({ keys: true });
+    return useMidiState();
+};
+
 afterEach(cleanup);
 
 describe("MidiProvider", () => {
@@ -203,6 +211,7 @@ describe("MidiProvider", () => {
         const useProbe = () => {
             const c = useMidiState();
             useMidiInput({
+                keys: true,
                 onNoteOn: (e) => ons.push(e.note),
                 onNoteOff: (e) => offs.push(e.note),
             });
@@ -242,7 +251,7 @@ describe("MidiProvider", () => {
         const offs: number[] = [];
         const useProbe = () => {
             const c = useMidiState();
-            useMidiInput({ onNoteOff: (e) => offs.push(e.note) });
+            useMidiInput({ keys: true, onNoteOff: (e) => offs.push(e.note) });
             return c;
         };
         const { result } = renderHook(useProbe, { wrapper: wrapperWith(midi) });
@@ -264,7 +273,7 @@ describe("MidiProvider", () => {
     });
 
     it("plays from the computer keyboard and shifts the octave", () => {
-        const { result } = renderHook(() => useMidiState(), {
+        const { result } = renderHook(() => usePlayingSurface(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z" })));
@@ -277,7 +286,7 @@ describe("MidiProvider", () => {
     });
 
     it("releases keys still held when the window loses focus", () => {
-        const { result } = renderHook(() => useMidiState(), {
+        const { result } = renderHook(() => usePlayingSurface(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z" })));
@@ -320,7 +329,7 @@ describe("MidiProvider", () => {
     });
 
     it("releases a computer-keyboard note by physical key even if the glyph changed", () => {
-        const { result } = renderHook(() => useMidiState(), {
+        const { result } = renderHook(() => usePlayingSurface(), {
             wrapper: wrapperWith(fakeMidi()),
         });
         // Press 'z' (KeyZ). A modifier engaged before release reports a different glyph,
@@ -356,7 +365,7 @@ describe("MidiProvider", () => {
         const pedals: [PedalKind, boolean][] = [];
         const useProbe = () => {
             const c = useMidiState();
-            useMidiInput({ onPedal: (pedal, down) => pedals.push([pedal, down]) });
+            useMidiInput({ keys: true, onPedal: (pedal, down) => pedals.push([pedal, down]) });
             return c;
         };
         const { result } = renderHook(useProbe, { wrapper: wrapperWith(midi) });
@@ -390,7 +399,7 @@ describe("MidiProvider", () => {
         );
         const useProbe = () => {
             const c = useMidiState();
-            useMidiInput({ onPedal: (pedal, down) => pedals.push([pedal, down]) });
+            useMidiInput({ keys: true, onPedal: (pedal, down) => pedals.push([pedal, down]) });
             return c;
         };
         renderHook(useProbe, { wrapper });
@@ -472,5 +481,102 @@ describe("a cable pulled out and put back", () => {
 
         act(() => replaced.emit([0x90, 62, 100]));
         expect(result.current.heldNotes).toContain(62);
+    });
+
+    describe("whose keys they are", () => {
+        // The window handler is mounted app-wide because a MIDI device may be plugged in
+        // anywhere. The computer keyboard is different: it can only play by taking keys
+        // away from the page, and on a page nobody is playing, taking them is pure harm.
+        const press = (init: KeyboardEventInit) => {
+            const event = new KeyboardEvent("keydown", { ...init, cancelable: true });
+            act(() => {
+                window.dispatchEvent(event);
+            });
+            return event;
+        };
+
+        it("leaves the keys to the page when no surface is playing", () => {
+            const { result } = renderHook(() => useMidiState(), {
+                wrapper: wrapperWith(fakeMidi()),
+            });
+
+            const played = press({ key: "z", code: "KeyZ" });
+
+            expect(result.current.heldNotes).not.toContain(60);
+            expect(played.defaultPrevented).toBe(false);
+        });
+
+        it("leaves the arrow keys scrolling when no surface is playing", () => {
+            // /help, /settings, /glossary — every long page in the app. A reader pressed
+            // Down and nothing moved.
+            const { result } = renderHook(() => useMidiState(), {
+                wrapper: wrapperWith(fakeMidi()),
+            });
+
+            const down = press({ key: "ArrowDown" });
+
+            expect(down.defaultPrevented).toBe(false);
+            expect(result.current.octaveOffset).toBe(0);
+        });
+
+        it("takes them once a surface is playing", () => {
+            const { result } = renderHook(() => usePlayingSurface(), {
+                wrapper: wrapperWith(fakeMidi()),
+            });
+
+            const played = press({ key: "z", code: "KeyZ" });
+
+            expect(result.current.heldNotes).toContain(60);
+            expect(played.defaultPrevented).toBe(true);
+        });
+
+        it("gives an arrow back at the end of its range, where it would do nothing", () => {
+            // Held at the bottom of the map, Down cannot shift anything — so blocking the
+            // scroll buys nothing and costs the reader their page.
+            const { result } = renderHook(() => usePlayingSurface(), {
+                wrapper: wrapperWith(fakeMidi()),
+            });
+            for (let i = 0; i < 12; i++) {
+                press({ key: "ArrowDown" });
+            }
+            const floor = result.current.octaveOffset;
+
+            const spare = press({ key: "ArrowDown" });
+
+            expect(result.current.octaveOffset).toBe(floor);
+            expect(spare.defaultPrevented).toBe(false);
+        });
+
+        it("leaves a select its arrow keys", () => {
+            // The language switcher is a <select>, and it could not be changed from the
+            // keyboard at all.
+            renderHook(() => usePlayingSurface(), { wrapper: wrapperWith(fakeMidi()) });
+            const select = document.createElement("select");
+            document.body.append(select);
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowDown", cancelable: true });
+            act(() => {
+                select.dispatchEvent(event);
+            });
+
+            expect(event.defaultPrevented).toBe(false);
+            select.remove();
+        });
+
+        it("leaves a button its space bar, even with a pedal bound to it", () => {
+            // The key-mapping panel suggests binding Space to the sustain pedal, which
+            // stopped every button in the app from working.
+            renderHook(() => usePlayingSurface(), { wrapper: wrapperWith(fakeMidi()) });
+            const button = document.createElement("button");
+            document.body.append(button);
+
+            const event = new KeyboardEvent("keydown", { key: " ", cancelable: true });
+            act(() => {
+                button.dispatchEvent(event);
+            });
+
+            expect(event.defaultPrevented).toBe(false);
+            button.remove();
+        });
     });
 });

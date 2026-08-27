@@ -6,6 +6,10 @@ import { holdScaleFor, isPreciseInput, MIC_DEVICE, type MidiNoteEvent } from "..
 import type { PedalKind } from "../../core/pedals";
 import type { NoteListener } from "../contexts/midi";
 
+// Every handler present. `keys` is deliberately outside it: that flag describes the
+// surface rather than what it does with a note, and the surface is what says it.
+type NoteHandlers = Required<Omit<NoteListener, "keys">>;
+
 // Where every note the player makes arrives, whatever made it: a MIDI piano, the
 // computer keyboard, the on-screen keys, or the microphone listening to a real one.
 //
@@ -57,7 +61,7 @@ export type NoteFunnel = {
     deviceOf: (pitch: number) => string | null;
     // Handed to the MIDI context. Returned rather than subscribed here so the decisions
     // above can be exercised directly, without a provider or a device.
-    listener: Required<NoteListener>;
+    listener: NoteHandlers;
 };
 
 export function useNoteFunnel(options: NoteFunnelOptions): NoteFunnel {
@@ -70,7 +74,7 @@ export function useNoteFunnel(options: NoteFunnelOptions): NoteFunnel {
 
     const sync = useCallback(() => setHolding(held.current.size > 0), []);
 
-    const listener = useMemo<Required<NoteListener>>(
+    const listener = useMemo<NoteHandlers>(
         () => ({
             onNoteOn: (event: MidiNoteEvent) => {
                 const o = latest.current;

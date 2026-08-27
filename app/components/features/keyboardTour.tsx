@@ -89,6 +89,8 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     const heard = useCallback((note: number) => setState((current) => observe(current, note)), []);
 
     useMidiInput({
+        // The tour teaches the computer-keyboard map, so it has to hear it.
+        keys: true,
         onNoteOn: (event) => {
             synth.pressNote(event.note, { velocity: event.velocity, device: event.device });
             heard(event.note);

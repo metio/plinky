@@ -42,6 +42,20 @@ import { useServices } from "./services";
 import { resetDevice } from "../lib/resetDevice";
 
 export type NoteListener = {
+    // Whether the computer keyboard is an instrument on this surface.
+    //
+    // The window-level key handler is mounted app-wide, because a MIDI device may be
+    // plugged in anywhere. The computer keyboard is different: it can only play by
+    // taking keys away from the page, and on a page nobody is playing, taking them is
+    // pure harm — arrows stop scrolling, a pedal bound to Space stops buttons working.
+    // So the surfaces where somebody is actually playing say so, and everywhere else
+    // the keys belong to the page.
+    //
+    // Off by default, which is the safe direction: a surface that forgets loses
+    // computer-keyboard play, which is its whole input method and impossible to miss.
+    // The opposite default fails silently on every page in the app, which is the bug
+    // this replaces.
+    keys?: boolean;
     onNoteOn?: (event: MidiNoteEvent) => void;
     onNoteOff?: (event: MidiNoteEvent) => void;
     // One of the three pedals changed. A real MIDI device sends these as control changes;
@@ -157,6 +171,18 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // real piano note stays precise while an on-screen note keeps its gentle ring-out),
     // rather than cutting a note a still-live source is holding.
     const heldSourcesRef = useRef(new Map<number, Set<string>>());
+
+    // Whether any mounted surface is playing with the computer keyboard. Read off the
+    // subscriber set rather than kept as a second registry, so it cannot fall out of step
+    // with who is actually listening.
+    const playingWithKeys = useCallback(() => {
+        for (const listener of subscribersRef.current) {
+            if (listener.keys) {
+                return true;
+            }
+        }
+        return false;
+    }, []);
 
     const subscribe = useCallback((listener: NoteListener) => {
         subscribersRef.current.add(listener);
@@ -657,32 +683,54 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         // release — event.key would read ":" then and never match the press.
         const pedalKeysDown = new Map<string, PedalKind>();
 
-        const isTextEntry = (target: EventTarget | null): boolean => {
+        // Whether the focused control has its own use for this key, in which case it
+        // gets it. Typing is the obvious case; the others are not, and each was a real
+        // fault: a <select> is operated with the arrow keys, so a language switcher
+        // could not be changed from the keyboard, and a button or link is activated with
+        // Space or Enter, so a pedal bound to Space — which the key-mapping panel
+        // suggests — stopped every button in the app from working.
+        const wantsTheKey = (target: EventTarget | null, key: string): boolean => {
             const el = target as HTMLElement | null;
+            if (!el) {
+                return false;
+            }
+            if (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable) {
+                return true;
+            }
+            if (el.tagName === "SELECT") {
+                return true;
+            }
+            const activates = key === " " || key === "enter";
             return (
-                !!el &&
-                (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
+                activates &&
+                (el.tagName === "BUTTON" || el.tagName === "A" || el.tagName === "SUMMARY")
             );
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
+            const key = event.key.toLowerCase();
             if (
                 event.repeat ||
                 event.metaKey ||
                 event.ctrlKey ||
                 event.altKey ||
-                isTextEntry(event.target)
+                !playingWithKeys() ||
+                wantsTheKey(event.target, key)
             ) {
                 return;
             }
-            const key = event.key.toLowerCase();
 
             if (key === "arrowup" || key === "arrowdown") {
-                event.preventDefault();
                 const next = Math.min(
                     MAX_OCTAVE_OFFSET,
                     Math.max(MIN_OCTAVE_OFFSET, octaveRef.current + (key === "arrowup" ? 1 : -1)),
                 );
+                // Already as low or as high as the map goes: the key did nothing, so the
+                // page keeps it and the reader can still scroll.
+                if (next === octaveRef.current) {
+                    return;
+                }
+                event.preventDefault();
                 octaveRef.current = next;
                 setOctaveOffset(next);
                 return;
@@ -756,7 +804,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             window.removeEventListener("keyup", onKeyUp);
             window.removeEventListener("blur", releaseAll);
         };
-    }, [emitNote, emitPedal, prefsStore, releaseHeldNotes]);
+    }, [emitNote, emitPedal, prefsStore, releaseHeldNotes, playingWithKeys]);
 
     useEffect(() => {
         return () => {
@@ -843,12 +891,17 @@ export function useMidiInput(handlers: NoteListener): void {
     const { subscribe } = useMidiConnection();
     const handlersRef = useLatest(handlers);
 
+    // `keys` is read at subscribe time rather than through the ref: it says what kind of
+    // surface this is, which does not change while it is mounted, and the provider reads
+    // it off the subscriber set.
+    const keys = handlers.keys ?? false;
     useEffect(() => {
         return subscribe({
+            keys,
             onNoteOn: (event) => handlersRef.current.onNoteOn?.(event),
             onNoteOff: (event) => handlersRef.current.onNoteOff?.(event),
             onPedal: (pedal, down, timestamp) =>
                 handlersRef.current.onPedal?.(pedal, down, timestamp),
         });
-    }, [subscribe]);
+    }, [subscribe, keys]);
 }
