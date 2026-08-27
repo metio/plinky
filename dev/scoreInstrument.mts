@@ -26,6 +26,11 @@ const INSTRUMENTAL =
 // This is not hypothetical: seven guitar and lute pieces reached the catalogue as
 // tablature, Satie's Gymnopédie No.1 among them, and were only found when a player asked
 // why one of them looked so strange.
+// The names a sung part carries. Kept beside the other vocabularies rather than inside
+// the classifier, so a corpus that spells a voice a new way is fixed in one place.
+const VOCAL =
+    /voice|vocal|voci|singstimme|gesang|soprano|sopran|mezzo|alto|contralto|tenor|baritone|bariton|bass\b|basso|chor|choir|coro|cantus|discantus|superius/;
+
 const NON_PIANO_CLEF = /<sign>\s*(TAB|jianpu)\s*<\/sign>/i;
 const NON_STANDARD_STAFF = /<staff-lines>\s*(?!5\s*<)\d+\s*<\/staff-lines>/i;
 
@@ -116,4 +121,53 @@ export function nonPianoVocalReason(xml: string): string | null {
         return "no-keyboard";
     }
     return null;
+}
+
+// What a score IS, rather than whether a given catalogue will take it.
+//
+// The gates above answer one question — may this in? — and throw the answer away. That is
+// what left the catalogue unable to tell a beginner's solo piece from a Schubert
+// accompaniment: both passed some gate, and nothing recorded which. Keeping the answer is
+// what lets the grade ladder draw only from solo piano while the library keeps the songs.
+export type ScoreKind =
+    // Keyboard alone: what a beginner is graded on.
+    | "solo-piano"
+    // A singer over a piano part. Playable — Plinky opens the piano and can sound the
+    // voice as accompaniment — but not what a first grade should be built from.
+    | "voice-and-piano"
+    // Vocal parts reduced onto a grand staff. Indistinguishable from piano by part name,
+    // because the reduction drops the vocal names, so this is only ever known from the
+    // source that made it.
+    | "choral-reduction"
+    // Anything else that got in: an ensemble, a transcription for another instrument.
+    | "other";
+
+// The kind of a score read from the file itself. Only worth asking for a mixed corpus like
+// PDMX — a curated source knows what it harvested and says so in its config, which is both
+// cheaper and more truthful than re-deriving it here.
+export function scoreKind(xml: string): ScoreKind {
+    if (nonPianoReason(xml)) {
+        return "other";
+    }
+    const names = [
+        ...xml.matchAll(
+            /<(?:part-name|instrument-name)[^>]*>([^<]*)<\/(?:part-name|instrument-name)>/gi,
+        ),
+    ].map((match) => match[1]!.trim().toLowerCase());
+    let keyboard = false;
+    let vocal = false;
+    for (const name of names) {
+        if (KEYBOARD.test(name)) {
+            keyboard = true;
+        } else if (VOCAL.test(name)) {
+            vocal = true;
+        } else if (INSTRUMENTAL.test(name) || OTHER_INSTRUMENT.test(name)) {
+            return "other";
+        }
+    }
+    if (vocal) {
+        return keyboard ? "voice-and-piano" : "choral-reduction";
+    }
+    // More than two parts with no name that says otherwise is not one instrument.
+    return (xml.match(/<score-part\b/gi) ?? []).length > 2 ? "other" : "solo-piano";
 }

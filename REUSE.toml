@@ -160,3 +160,12 @@ path = ["app/**/__story-shots__/**/*.png"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# A tsconfig for typechecking dev/*.mts, which the main one excludes. JSON carries no
+# comments, so its licence is declared here.
+[[annotations]]
+path = "tsconfig.devcheck.json"
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+

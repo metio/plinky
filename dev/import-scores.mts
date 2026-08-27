@@ -19,15 +19,76 @@
 import { rawDifficulty, MAX_GRADE } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { createReadStream, existsSync, readFileSync } from "node:fs";
+import { parse } from "csv-parse";
+import { copyrightReason } from "./copyrightSignals.mts";
+import { isPublicDomain } from "./publicDomain.mts";
+import { legibleTitle } from "./legibleTitle.mts";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { strFromU8, unzipSync } from "fflate";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
-import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
+import {
+    nonPianoVocalReason,
+    nonSoloPianoReason,
+    type ScoreKind,
+    scoreKind,
+} from "./scoreInstrument.mts";
 import { songId } from "../core/songId.ts";
 import { licenseDir, licenseInfo } from "../core/attribution.ts";
 
 const OUT = "public/songs";
+const PDMX_ROOT = process.env.PDMX_DIR ?? "pdmx";
+
+// PDMX is not a curated repo but a 30 GB dump of user uploads, so it arrives with its own
+// index and its own reasons to say no. Everything here is about which of 254,077 rows are
+// even worth opening; once a file is opened it goes through the same gate, fingerprint and
+// grading as every other source.
+async function pdmxCandidates(): Promise<Candidate[]> {
+    const rows: Candidate[] = [];
+    const num = (value: string | undefined) => Number(value);
+    await new Promise<void>((resolve, reject) => {
+        createReadStream(`${PDMX_ROOT}/PDMX.csv`)
+            .pipe(parse({ columns: true, skip_empty_lines: true, relax_quotes: true }))
+            .on("data", (row: Record<string, string>) => {
+                const composer = (row.composer_name || row.artist_name || "").trim();
+                const title = (row.song_name || row.title || "").trim();
+                const bars = num(row["song_length.bars"]);
+                const notes = num(row.n_notes);
+                if (
+                    (row.license === "publicdomain" || row.license === "cc-zero") &&
+                    // PDMX's CC0 tag is unreliable — sheet music of a copyrighted song
+                    // infringes the composition however the uploader tagged it.
+                    isPublicDomain(composer, title) &&
+                    !copyrightReason(composer) &&
+                    // A piece nobody can name is a piece nobody can find.
+                    legibleTitle(title) !== "" &&
+                    row["subset:rated_deduplicated"] === "True" &&
+                    row["subset:no_license_conflict"] === "True" &&
+                    row.is_draft === "False" &&
+                    row.mxl &&
+                    row.mxl !== "N/A" &&
+                    // Four bars, not eight: the pieces a beginner meets first are short by
+                    // definition, and Czerny's opening set is named for being eight bars
+                    // long — a floor at eight decided by rounding whether it qualified.
+                    Number.isFinite(bars) &&
+                    bars >= 4 &&
+                    bars <= 200 &&
+                    Number.isFinite(notes) &&
+                    notes >= 24 &&
+                    notes <= 4000
+                ) {
+                    rows.push({
+                        path: `${PDMX_ROOT}/${row.mxl.replace(/^\.\//, "")}`,
+                        title,
+                        composer,
+                    });
+                }
+            })
+            .on("end", () => resolve())
+            .on("error", reject);
+    });
+    return rows;
+}
 const SOURCES_DIR = "sources";
 
 type SourceConfig = {
@@ -48,7 +109,24 @@ type SourceConfig = {
     titleField?: "movement" | "work";
     // KernScores names composers "Last, First"; flip to "First Last" for display.
     reorderComposer?: boolean;
+    // What this source's scores ARE, recorded on every row it writes. A curated corpus
+    // knows: OpenScore Lieder is art song, CPDL is choral reduced to a grand staff,
+    // Mutopia is solo keyboard. Only a mixed corpus has to be asked file by file, which
+    // is what the function form is for.
+    //
+    // This is the field that lets the grade ladder draw from solo piano alone while the
+    // library keeps everything — the alternative being to throw two thousand playable,
+    // correctly-licensed scores away for being filed under the wrong heading.
+    kind: ScoreKind | ((xml: string) => ScoreKind);
+    // Where this source's files come from, when they are not simply the .mxl under
+    // sources/<id>. PDMX is a 30 GB corpus indexed by a CSV, so it says for itself which
+    // of a quarter of a million files are even candidates.
+    candidates?: () => Promise<Candidate[]>;
 };
+
+// A file this source offers, with whatever the source already knows about it. The title
+// and composer are hints: the MusicXML is still the authority once it is read.
+export type Candidate = { path: string; title?: string; composer?: string };
 
 // The corpora we trust for licensing (curated projects), all commercially usable.
 // OpenScore Lieder is 19th-century art song (voice over piano) → the piano-or-vocal gate.
@@ -58,6 +136,10 @@ type SourceConfig = {
 // (attribution.ts is the single source of truth), so a paid tier stays clear of NC content.
 const CONFIGS: Record<string, SourceConfig> = {
     "openscore-lieder": {
+        // 19th-century art song: a singer over a piano part. Kept deliberately — Plinky
+        // opens the piano and can sound the voice as accompaniment — and labelled, so the
+        // grade ladder does not offer a Schubert accompaniment as a first piece.
+        kind: "voice-and-piano",
         repos: ["https://github.com/OpenScore/Lieder.git"],
         license: "CC0-1.0",
         gate: nonPianoVocalReason,
@@ -67,6 +149,8 @@ const CONFIGS: Record<string, SourceConfig> = {
     // LilyPond to two-staff piano MusicXML by dev/mutopia-harvest.py (run separately in
     // dev/mutopia.Containerfile, since LilyPond is too heavy for the lean importer image).
     mutopia: {
+        // dev/mutopia-harvest.py harvests solo keyboard and nothing else.
+        kind: "solo-piano",
         repos: [],
         preconverted: true,
         license: "CC0-1.0",
@@ -92,6 +176,10 @@ const CONFIGS: Record<string, SourceConfig> = {
     // Only CC0/CC-BY/CC-BY-SA/PD editions are harvested; the licence varies per edition,
     // so the harvester encodes each one's SPDX bucket in the filename (like Mutopia).
     cpdl: {
+        // Choral editions reduced to a grand staff by dev/cpdl-harvest.py, which drops the
+        // vocal part names on the way — so nothing in the file says it was ever choral and
+        // only the harvester knows. This is why kind is a property of the source.
+        kind: "choral-reduction",
         repos: [],
         preconverted: true,
         license: "CC0-1.0",
@@ -107,6 +195,16 @@ const CONFIGS: Record<string, SourceConfig> = {
         gate: nonSoloPianoReason,
         titleField: "work",
     },
+    // The base corpus, and the only mixed one: a dump of user uploads rather than a
+    // curated repertoire, so what each piece IS has to be read from the file rather than
+    // known from the source.
+    pdmx: {
+        repos: [],
+        candidates: pdmxCandidates,
+        license: "CC0-1.0",
+        gate: nonSoloPianoReason,
+        kind: scoreKind,
+    },
 };
 
 type SongMeta = {
@@ -116,6 +214,9 @@ type SongMeta = {
     grade: number;
     cost: number;
     license: string;
+    // What this piece IS (see ScoreKind): what lets the grade ladder ask for solo piano
+    // while the library keeps the songs and the choral reductions.
+    kind: ScoreKind;
     source: string;
     tempo: number;
     beatsPerBar: number;
@@ -127,11 +228,9 @@ const clean = (value: string | undefined): string => {
     return text === "NA" || text === "N/A" ? "" : text;
 };
 
-const norm = (value: string): string => (value || "").toLowerCase().trim().replace(/\s+/g, " ");
+const _norm = (value: string): string => (value || "").toLowerCase().trim().replace(/\s+/g, " ");
 // Dedup key. A song collection shares one work-title across many movements, and
 // different composers reuse the same song title ("Ständchen", "Ave Maria"), so the
-// identity is the composer plus the specific (movement) title, never the title alone.
-const songKey = (composer: string, title: string): string => `${norm(composer)}|${norm(title)}`;
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
 function readMxl(path: string): string {
@@ -199,6 +298,10 @@ async function main() {
     // stray checkout can't leak in.
     await mkdir(`${SOURCES_DIR}/${key}`, { recursive: true });
     const files: string[] = [];
+    if (cfg.candidates) {
+        const offered = await cfg.candidates();
+        files.push(...offered.map((one) => one.path));
+    }
     if (cfg.preconverted) {
         const dir = `${SOURCES_DIR}/${key}/_mxl`;
         files.push(
@@ -229,15 +332,26 @@ async function main() {
         ? JSON.parse(await readFile(manifestPath, "utf8"))
         : [];
     // Drop this source's prior entries (and their files) so a re-run is a clean replace;
-    // other sources are left untouched.
-    const kept = existing.filter((song) => (song.source ?? "pdmx") !== key);
-    for (const song of existing) {
-        if ((song.source ?? "pdmx") === key) {
-            await rm(`${OUT}/${licenseDir(song.license)}/${song.id}.mxl`, { force: true });
-        }
+    // every other source is left standing. This is what makes the importers runnable in
+    // sequence, and it is the whole reason none of them may empty the directory first.
+    //
+    // A row with no `source` belongs to nobody yet — it predates the field. Reading those
+    // as this source's would delete the entire catalogue the first time any importer ran,
+    // which is the bug this replaced, reintroduced through the default. They are kept, and
+    // an unstamped row is replaced only when this run produces the same piece: the id is a
+    // content fingerprint, so that is the same music, and the new row carries the source
+    // the old one was missing. The catalogue converges as each source is re-imported.
+    const owned = (song: SongMeta) => song.source === key;
+    const kept = existing.filter((song) => !owned(song));
+    for (const song of existing.filter(owned)) {
+        await rm(`${OUT}/${licenseDir(song.license)}/${song.id}.mxl`, { force: true });
     }
-    const takenKeys = new Set(kept.map((song) => songKey(song.composer, song.title)));
-    const takenIds = new Set(kept.map((song) => song.id));
+    const unstamped = new Map(
+        kept.filter((song) => !song.source).map((song) => [song.id, song] as const),
+    );
+    // An unstamped row does not reserve its id: this run may replace it with the same
+    // music, properly attributed.
+    const takenIds = new Set(kept.filter((song) => song.source).map((song) => song.id));
 
     const added: (SongMeta & { src: string })[] = [];
     const dropped = { gate: 0, dup: 0, unreadable: 0, ineligible: 0 };
@@ -273,8 +387,19 @@ async function main() {
         // The id is a content fingerprint: stable across re-imports, identical for
         // identical music (which then collapses to one entry).
         const id = songId(xml);
-        const dupeKey = songKey(composer, title);
-        if (takenIds.has(id) || takenKeys.has(dupeKey)) {
+        // Collapsed by what the music IS, never by what it is called.
+        //
+        // Keying on composer-and-title looked equivalent and was not: a teaching
+        // collection is exactly the case where many different pieces carry one title,
+        // because the uploader names every file after the opus. Burgmüller's twenty-five
+        // studies collapsed to a single row literally called "25 Études faciles et
+        // progressives Op.100", and the same happened to every method book in the corpora
+        // — the beginner repertoire, filtered out for looking repetitive.
+        //
+        // Two transcriptions of one piece share a fingerprint and still collapse. Near
+        // duplicates that differ in engraving are a separate question, and
+        // `npm run songs:dedup` is where it belongs.
+        if (takenIds.has(id)) {
             dropped.dup++;
             continue;
         }
@@ -286,7 +411,6 @@ async function main() {
             continue;
         }
         takenIds.add(id);
-        takenKeys.add(dupeKey);
         added.push({
             id,
             title,
@@ -295,6 +419,7 @@ async function main() {
             cost,
             license,
             source: key,
+            kind: typeof cfg.kind === "function" ? cfg.kind(xml) : cfg.kind,
             tempo: tempoOf(xml),
             beatsPerBar: beatsOf(xml),
             bars: barsOf(xml),
@@ -313,7 +438,14 @@ async function main() {
 
     // Merge and provisionally grade over the whole catalogue's costs; songs:bake will
     // re-derive the identical boundaries and write them into the engine + seed.
-    const merged: SongMeta[] = [...kept, ...added.map(({ src: _src, ...meta }) => meta)];
+    const superseded = new Set(added.filter((song) => unstamped.has(song.id)).map((s) => s.id));
+    if (superseded.size > 0) {
+        console.log(`${superseded.size} unstamped row(s) adopted by "${key}" and now attributed.`);
+    }
+    const merged: SongMeta[] = [
+        ...kept.filter((song) => !superseded.has(song.id)),
+        ...added.map(({ src: _src, ...meta }) => meta),
+    ];
     const boundaries = octileBoundaries(
         merged.map((song) => song.cost),
         MAX_GRADE,

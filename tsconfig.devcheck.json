@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "dev/**/*.mts",
+        "core/**/*.ts"
+    ],
+    "exclude": [],
+    "compilerOptions": {
+        "noEmit": true,
+        "skipLibCheck": true,
+        "allowImportingTsExtensions": true
+    }
+}

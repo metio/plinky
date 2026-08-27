@@ -5,11 +5,6 @@
         "why": "Father and son. Leopold (1719-1787) wrote the violin treatise and the Kindersinfonie; Wolfgang (1756-1791) is his son."
     },
     {
-        "a": "Fritz Spindler",
-        "b": "Mario Spindler",
-        "why": "Fritz Spindler (1817-1905) wrote the salon pieces and sonatinas a piano catalogue knows him for. Mario Spindler is a different person entirely and not that Spindler."
-    },
-    {
         "a": "Mildred J. Hill",
         "b": "Patty S. Hill",
         "why": "Sisters, and co-authors: Mildred wrote the tune of 'Good Morning to All' and Patty the words. The credit names them both because both are owed it."
@@ -25,11 +20,6 @@
         "why": "No relation, as above. Hill is an ordinary surname and this pair will keep recurring."
     },
     {
-        "a": "Joseph Parry",
-        "b": "Charles Hubert Hastings Parry",
-        "why": "Two Victorian composers with one surname and no relation: Joseph Parry (1841-1903) was Welsh and wrote Myfanwy; Hubert Parry (1848-1918) was English and wrote Jerusalem."
-    },
-    {
         "a": "Robert Schumann",
         "b": "Clara Schumann",
         "why": "Husband and wife. Both composed, both are in the catalogue under their own names, and neither is a spelling of the other."
@@ -43,11 +33,6 @@
         "a": "Robert Franz",
         "b": "Ignaz Franz",
         "why": "No relation. Robert Franz (1815-1892) wrote Lieder; Ignaz Franz (1719-1790) was a priest who wrote the hymn 'Grosser Gott, wir loben dich'."
-    },
-    {
-        "a": "Siegfried Köhler",
-        "b": "Ernesto Köhler",
-        "why": "No relation, and a century apart: Ernesto Köhler (1849-1907) was a flautist and Siegfried Köhler (1927-1984) a German composer."
     },
     {
         "a": "Domenico Scarlatti",
@@ -78,11 +63,6 @@
         "a": "Liza Lehmann",
         "b": "Amelia Lehmann",
         "why": "Mother and daughter. Amelia (1838-1903) published under the initials A. L.; Liza (1862-1918) wrote the song cycles."
-    },
-    {
-        "a": "Clarence Pinetop Smith",
-        "b": "John Stafford Smith",
-        "why": "No relation and nothing in common but a surname: Pinetop Smith (1904-1929) recorded the first boogie-woogie; John Stafford Smith (1750-1836) wrote the tune that became the American anthem."
     },
     {
         "a": "George Frideric Handel",
@@ -146,12 +126,17 @@
     },
     {
         "a": "Ethel Smyth",
-        "b": "Clarence Pinetop Smith",
-        "why": "Smyth and Smith differ by a letter and are different people. Ethel Smyth (1858-1944) wrote The Wreckers."
-    },
-    {
-        "a": "Ethel Smyth",
         "b": "John Stafford Smith",
         "why": "As above; the Smith spellings pair with each other and with Smyth, and all three are separate composers."
+    },
+    {
+        "a": "Clarence Smith",
+        "b": "Ethel Smyth",
+        "why": "Different names as well as different people: Clarence 'Pinetop' Smith (1904-1929) was an American boogie-woogie pianist; Dame Ethel Smyth (1858-1944) an English composer and suffragette. Paired only because the check compares surnames a letter apart."
+    },
+    {
+        "a": "Clarence Smith",
+        "b": "John Stafford Smith",
+        "why": "A shared surname and nothing else. John Stafford Smith (1750-1836) wrote the tune that became the American anthem; Clarence Smith was a Chicago boogie-woogie pianist a century later."
     }
 ]

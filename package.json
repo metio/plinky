@@ -49,7 +49,7 @@
         "songs:bake": "tsx dev/bake-grades.mts",
         "songs:cost": "tsx dev/backfill-song-cost.mts",
         "songs:dedup": "tsx dev/dedup-songs.mts",
-        "songs:import": "tsx dev/import-pdmx.mts",
+        "songs:import": "tsx dev/import-scores.mts pdmx",
         "songs:incipits": "tsx dev/bake-incipits.mts",
         "songs:reid": "tsx dev/reid-songs.mts",
         "start": "react-router-serve ./build/server/index.js",

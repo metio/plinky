@@ -12,6 +12,30 @@
 // lowercase form. Small and curated: only entries that demonstrably occur in
 // the catalogue's corpora belong here.
 const ALIASES: Record<string, string> = {
+    // Spellings the corpora arrived with: a typo, an initial, an anglicisation, or an
+    // arranger's name run into the composer's. Each names one person already here.
+    "fransisco tárrega": "Francisco Tárrega",
+    "belá bartók": "Béla Bartók",
+    "george frederick handel": "George Frideric Handel",
+    "molly cline george f. handel": "George Frideric Handel",
+    "frederic chopin\\": "Frédéric Chopin",
+    "giaccomo puccini": "Giacomo Puccini",
+    "sank tac: j. s. bach": "Johann Sebastian Bach",
+    "j. b. duvernoy": "Jean-Baptiste Duvernoy",
+    "johan pachelbel": "Johann Pachelbel",
+    pachelebel: "Johann Pachelbel",
+    "framz liszt": "Franz Liszt",
+    "j. n. hummel": "Johann Nepomuk Hummel",
+    "f. mendelssohn": "Felix Mendelssohn",
+    "c. debussy": "Claude Debussy",
+    "claude debussy": "Claude Debussy",
+    "henry lemoine": "Henri Lemoine",
+    "georgez bizet": "Georges Bizet",
+    "sir edward elgar": "Edward Elgar",
+    "gabriel faure": "Gabriel Fauré",
+    "marice ravel": "Maurice Ravel",
+    schumann: "Robert Schumann",
+    "schumann -": "Robert Schumann",
     "j. s. bach": "Johann Sebastian Bach",
     "js bach": "Johann Sebastian Bach",
     bach: "Johann Sebastian Bach",
