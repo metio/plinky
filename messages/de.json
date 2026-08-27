@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Diese Datei ist kein Plinky-Backup.",
     "progress_backup_error_empty": "Dieses Backup ist leer — es gibt nichts einzuspielen.",
     "progress_backup_error_storage": "Der Speicher dieses Geräts ist voll oder blockiert, das Einspielen hat nicht geklappt. Hier hat sich nichts geändert.",
+    "progress_backup_error_partial": "Der Speicher dieses Geräts ist voll oder blockiert, deshalb konnte nur ein Teil der Sicherung wiederhergestellt werden — und das Gelandete ließ sich auch nicht zurücknehmen. Dein Fortschritt ist jetzt eine Mischung aus beiden Geräten. Schaff Platz und stelle dieselbe Datei noch einmal her.",
     "sight_read": "Dieses Stück vom Blatt spielen",
     "sight_read_caption": "Ein kalter Durchgang, ohne Hilfe — Namen, Farben, Fingersatz, Hinweise und Highway treten für den Lauf zur Seite. Dein erster Durchgang bleibt als dein Blattspiel dieses Stücks.",
     "sight_read_aids_note": "Ein Blattspiel liest auf der obersten Stufe: keine Farben, kein Fingersatz, kein Highway, kein zweiter Versuch.",

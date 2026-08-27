@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Ten plik nie jest kopią Plinky.",
     "progress_backup_error_empty": "Ta kopia jest pusta — nie ma czego przywracać.",
     "progress_backup_error_storage": "Pamięć tego urządzenia jest pełna lub zablokowana, więc przywracanie się nie powiodło. Tutaj nic się nie zmieniło.",
+    "progress_backup_error_partial": "Pamięć tego urządzenia jest pełna lub zablokowana, więc przywrócono tylko część kopii — a tego, co już weszło, też nie dało się cofnąć. Twoje postępy to mieszanka obu urządzeń. Zwolnij miejsce i przywróć ten sam plik jeszcze raz.",
     "sight_read": "Zagraj ten utwór a vista",
     "sight_read_caption": "Jedno czytanie na zimno, bez podpórek — nazwy, kolory, palcowanie, podpowiedzi i autostrada ustępują na czas przejścia. Twoje pierwsze czytanie zostaje jako twoje czytanie a vista tego utworu.",
     "sight_read_aids_note": "Czytanie a vista czyta się na szczycie drabiny: bez kolorów, bez palcowania, bez autostrady, bez drugiej próby.",

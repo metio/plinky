@@ -517,6 +517,7 @@
     "progress_backup_error_unreadable": "That file isn't a Plinky backup.",
     "progress_backup_error_empty": "That backup is empty — there's nothing to restore.",
     "progress_backup_error_storage": "This device's storage is full or blocked, so the restore didn't land. Nothing here has changed.",
+    "progress_backup_error_partial": "This device's storage is full or blocked, so only part of the backup could be restored — and what had landed couldn't be put back either. Your progress is a mix of both devices. Free some space and restore the same file again to settle it.",
     "sight_read": "Sight-read this piece",
     "sight_read_caption": "One cold read, nothing to lean on — the names, colours, fingering, hints and highway all step aside for the run. Your first read is kept as your sight-read of this piece.",
     "sight_read_aids_note": "A sight-read run reads at the top of the ladder: no colours, no fingering, no highway, no second try.",

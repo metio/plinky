@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Bu dosya bir Plinky yedeği değil.",
     "progress_backup_error_empty": "Bu yedek boş — geri yüklenecek bir şey yok.",
     "progress_backup_error_storage": "Bu cihazın depolaması dolu ya da engelli, bu yüzden geri yükleme tamamlanmadı. Burada hiçbir şey değişmedi.",
+    "progress_backup_error_partial": "Bu cihazın depolaması dolu ya da engelli, bu yüzden yedeğin yalnızca bir kısmı geri yüklenebildi — ve geçmiş olanlar da geri alınamadı. İlerlemen şu an iki cihazın karışımı. Biraz yer aç ve aynı dosyayı yeniden geri yükle.",
     "sight_read": "Bu parçayı deşifre çal",
     "sight_read_caption": "Soğuk bir okuma, tutunacak hiçbir şey yok — adlar, renkler, parmak numaraları, ipuçları ve şerit bu geçiş boyunca kenara çekilir. İlk okuyuşun bu parçanın deşifresi olarak saklanır.",
     "sight_read_aids_note": "Deşifre en üst basamaktan okunur: renk yok, parmak numarası yok, şerit yok, ikinci deneme yok.",

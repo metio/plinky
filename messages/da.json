@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Denne fil er ikke en Plinky-sikkerhedskopi.",
     "progress_backup_error_empty": "Denne sikkerhedskopi er tom — der er intet at gendanne.",
     "progress_backup_error_storage": "Enhedens lagerplads er fuld eller blokeret, så gendannelsen gik ikke igennem. Intet her er ændret.",
+    "progress_backup_error_partial": "Denne enheds lager er fuldt eller blokeret, så kun en del af sikkerhedskopien kunne gendannes — og det, der var nået igennem, kunne heller ikke fortrydes. Din fremgang er en blanding fra begge enheder. Frigør plads, og gendan den samme fil igen.",
     "sight_read": "Spil dette stykke fra bladet",
     "sight_read_caption": "Én kold gennemlæsning, intet at læne sig op ad — navnene, farverne, fingersætningen, hjælpene og motorvejen træder til side. Din første læsning gemmes som din prima vista af stykket.",
     "sight_read_aids_note": "En prima vista-gennemgang læser øverst på stigen: ingen farver, ingen fingersætning, ingen motorvej, intet andet forsøg.",

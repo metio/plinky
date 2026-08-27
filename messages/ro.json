@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Acest fișier nu este o copie Plinky.",
     "progress_backup_error_empty": "Această copie este goală — nu e nimic de restaurat.",
     "progress_backup_error_storage": "Spațiul de stocare al acestui dispozitiv este plin sau blocat, așa că restaurarea nu a reușit. Aici nu s-a schimbat nimic.",
+    "progress_backup_error_partial": "Stocarea acestui dispozitiv este plină sau blocată, așa că doar o parte din copie a putut fi restaurată — iar ce intrase deja nu a putut fi anulat. Progresul tău este un amestec de pe ambele dispozitive. Eliberează spațiu și restaurează același fișier din nou.",
     "sight_read": "Citește piesa asta la prima vedere",
     "sight_read_caption": "O citire la rece, fără nimic de care să te sprijini — numele, culorile, digitația, indiciile și autostrada se dau la o parte. Prima ta citire rămâne ca citirea ta la prima vedere a piesei.",
     "sight_read_aids_note": "O citire la prima vedere se citește în vârful scării: fără culori, fără digitație, fără autostradă, fără a doua încercare.",

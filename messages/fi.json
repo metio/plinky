@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Tämä tiedosto ei ole Plinky-varmuuskopio.",
     "progress_backup_error_empty": "Tämä varmuuskopio on tyhjä — palautettavaa ei ole.",
     "progress_backup_error_storage": "Laitteen tallennustila on täynnä tai estetty, joten palautus ei mennyt läpi. Täällä ei muuttunut mikään.",
+    "progress_backup_error_partial": "Tämän laitteen tallennustila on täynnä tai estetty, joten varmuuskopiosta palautui vain osa — eikä jo mennyttä saatu peruttua. Edistymisesi on nyt sekoitus kummastakin laitteesta. Vapauta tilaa ja palauta sama tiedosto uudelleen.",
     "sight_read": "Soita tämä kappale prima vista",
     "sight_read_caption": "Yksi kylmä lukukerta, ei mitään mihin nojata — nimet, värit, sormitukset, vihjeet ja väylä väistyvät soiton ajaksi. Ensimmäinen lukukertasi jää tämän kappaleen prima vistaksi.",
     "sight_read_aids_note": "Prima vista luetaan tikkaiden ylimmällä puolalla: ei värejä, ei sormituksia, ei väylää, ei toista yritystä.",

@@ -591,9 +591,10 @@ device — or back onto this one if its storage is ever cleared — and Plinky p
 where you left off.
 
 Restoring replaces what's on the device rather than merging into it, so a piece you
-deleted before backing up doesn't come back to life; it asks before it does that. If
-the device is out of room the restore stops rather than half-landing, and says so —
-nothing already there is touched.
+deleted before backing up doesn't come back to life; it asks before it does that. It is
+all or nothing: if the device runs out of room part-way, whatever had already been
+written is put back, so you are never left holding half of each device. In the rare case
+where even that is refused, it says so rather than claiming nothing changed.
 
 ## Playing
 

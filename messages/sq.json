@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Ky skedar nuk është kopje e Plinky-t.",
     "progress_backup_error_empty": "Kjo kopje është bosh — s'ka çfarë të rikthehet.",
     "progress_backup_error_storage": "Hapësira e kësaj pajisjeje është plot ose e bllokuar, ndaj rikthimi nuk u krye. Këtu nuk ka ndryshuar asgjë.",
+    "progress_backup_error_partial": "Hapësira e kësaj pajisjeje është plot ose e bllokuar, prandaj u rikthye vetëm një pjesë e kopjes — dhe ajo që kishte kaluar nuk u zhbë dot. Përparimi yt është përzierje e të dyja pajisjeve. Liro pak vend dhe rikthe të njëjtin skedar sërish.",
     "sight_read": "Lexoje këtë pjesë në të parë",
     "sight_read_caption": "Një lexim i ftohtë, pa asgjë për t'u mbështetur — emrat, ngjyrat, gishtërimi, sugjerimet dhe autostrada tërhiqen mënjanë. Leximi yt i parë ruhet si leximi yt në faqe i kësaj pjese.",
     "sight_read_aids_note": "Një lexim në faqe lexohet në majë të shkallës: pa ngjyra, pa gishtërim, pa autostradë, pa mundësi të dytë.",

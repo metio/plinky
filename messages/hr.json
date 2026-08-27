@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Ova datoteka nije Plinky kopija.",
     "progress_backup_error_empty": "Ova je kopija prazna — nema se što vratiti.",
     "progress_backup_error_storage": "Pohrana ovog uređaja je puna ili blokirana pa vraćanje nije uspjelo. Ovdje se ništa nije promijenilo.",
+    "progress_backup_error_partial": "Pohrana ovog uređaja je puna ili blokirana, pa je vraćen samo dio sigurnosne kopije — a ono što je prošlo nije se moglo ni poništiti. Tvoj napredak je mješavina oba uređaja. Oslobodi prostor i vrati istu datoteku ponovno.",
     "sight_read": "Odsviraj ovaj komad s lista",
     "sight_read_caption": "Jedno hladno čitanje, bez oslonca — imena, boje, prstomet, natuknice i autocesta sklanjaju se za vrijeme prolaza. Tvoje prvo čitanje ostaje kao tvoje čitanje s lista ove skladbe.",
     "sight_read_aids_note": "Čitanje s lista čita se na vrhu ljestvice: bez boja, bez prstometa, bez autoceste, bez drugog pokušaja.",

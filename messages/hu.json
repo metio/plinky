@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Ez a fájl nem Plinky-mentés.",
     "progress_backup_error_empty": "Ez a mentés üres — nincs mit visszaállítani.",
     "progress_backup_error_storage": "Az eszköz tárhelye tele van vagy le van tiltva, így a visszaállítás nem sikerült. Itt semmi nem változott.",
+    "progress_backup_error_partial": "Ennek az eszköznek a tárhelye tele van vagy le van tiltva, ezért a mentésnek csak egy része állt vissza — és ami már átment, azt sem lehetett visszavonni. A haladásod most a két eszköz keveréke. Szabadíts fel helyet, és állítsd vissza ugyanazt a fájlt újra.",
     "sight_read": "Játszd le ezt a darabot lapról",
     "sight_read_caption": "Egy hideg átolvasás, kapaszkodó nélkül — a nevek, a színek, az ujjrend, a súgások és a sáv mind félreállnak. Az első olvasásod marad meg a darab lapról olvasásaként.",
     "sight_read_aids_note": "Egy lapról olvasás a létra tetején olvas: nincs szín, nincs ujjrend, nincs sáv, nincs második próba.",

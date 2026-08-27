@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Den här filen är ingen Plinky-säkerhetskopia.",
     "progress_backup_error_empty": "Den här säkerhetskopian är tom — det finns inget att återställa.",
     "progress_backup_error_storage": "Enhetens lagring är full eller blockerad, så återställningen gick inte igenom. Inget här har ändrats.",
+    "progress_backup_error_partial": "Den här enhetens lagring är full eller blockerad, så bara en del av säkerhetskopian kunde återställas — och det som redan gått igenom gick inte att ångra. Dina framsteg är en blandning från båda enheterna. Frigör utrymme och återställ samma fil igen.",
     "sight_read": "Spela det här stycket a prima vista",
     "sight_read_caption": "En kall genomläsning, inget att luta sig mot — namnen, färgerna, fingersättningen, tipsen och motorvägen kliver åt sidan. Din första läsning sparas som din prima vista av stycket.",
     "sight_read_aids_note": "En prima vista-genomgång läser högst upp på stegen: inga färger, ingen fingersättning, ingen motorväg, inget andra försök.",

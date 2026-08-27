@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Denne filen er ingen Plinky-sikkerhetskopi.",
     "progress_backup_error_empty": "Denne sikkerhetskopien er tom — det er ingenting å gjenopprette.",
     "progress_backup_error_storage": "Lagringen på denne enheten er full eller blokkert, så gjenopprettingen gikk ikke gjennom. Ingenting her er endret.",
+    "progress_backup_error_partial": "Lagringen på denne enheten er full eller blokkert, så bare en del av sikkerhetskopien kunne gjenopprettes — og det som allerede var kommet gjennom, lot seg ikke angre heller. Framgangen din er en blanding fra begge enhetene. Frigjør plass og gjenopprett den samme fila på nytt.",
     "sight_read": "Spill dette stykket fra bladet",
     "sight_read_caption": "Én kald gjennomlesing, ingenting å lene seg på — navnene, fargene, fingersettingen, hintene og motorveien trer til side. Din første lesing lagres som din prima vista av stykket.",
     "sight_read_aids_note": "En prima vista-gjennomgang leser øverst på stigen: ingen farger, ingen fingersetting, ingen motorvei, ingen andre forsøk.",

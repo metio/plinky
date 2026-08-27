@@ -52,16 +52,25 @@ export function exportProgress(kv: KeyValueStore, savedAt: string): string {
 
 export type RestoreResult =
     | { ok: true; restored: number; savedAt: string }
-    // "storage" means the device refused the writes — quota, or blocked storage.
-    | { ok: false; problem: ProgressPackProblem | "storage" };
+    // The bundle could not be read. Nothing was touched.
+    | { ok: false; problem: ProgressPackProblem }
+    // The device refused a write — quota, or blocked storage. `undone` says whether the
+    // writes that had already landed were put back, because the two leave the player in
+    // very different places and only one of them can honestly be called "nothing
+    // changed".
+    | { ok: false; problem: "storage"; undone: boolean };
 
 // Replace this device's state with a bundle's.
 //
-// The writes land *before* anything is pruned, so a restore that runs out of quota
-// leaves the device holding what it already had plus whatever fitted, rather than
-// an emptied store. Only once every value is in do keys absent from the bundle go —
-// that pruning is what makes this a restore rather than a merge, so a piece you
-// deleted before backing up does not come back to life on the other device.
+// A restore is all or nothing. Writing straight through and stopping at the first
+// refusal leaves the device holding half of one device's progress and half of
+// another's — mastery from the bundle, takes and ghosts from here — with no way back
+// and nothing on screen saying so. So the previous values are held first, and a refusal
+// puts them back.
+//
+// The pruning runs last and only on success: dropping keys the bundle does not carry is
+// what makes this a restore rather than a merge, so a piece deleted before backing up
+// does not come back to life on the other device.
 export function importProgress(kv: KeyValueStore, json: string): RestoreResult {
     const result = parseProgressPack(json);
     if (!result.ok) {
@@ -69,15 +78,34 @@ export function importProgress(kv: KeyValueStore, json: string): RestoreResult {
     }
 
     const { entries, savedAt } = result.pack;
-    let restored = 0;
+    // Each write, with what the device held there before it. Only what actually landed
+    // needs undoing — a refusal on the first key has changed nothing, and there is no
+    // sense reporting a failed rollback of nothing.
+    const landed: [string, string | null][] = [];
+
     for (const [key, value] of Object.entries(entries)) {
-        if (kv.set(PREFIX + key, value)) {
-            restored++;
+        const full = PREFIX + key;
+        const before = kv.get(full);
+        if (kv.set(full, value)) {
+            landed.push([full, before]);
+            continue;
         }
+        // Put back everything written so far. A key the device did not hold before is
+        // removed rather than restored, so a failed restore leaves no half of the bundle
+        // behind.
+        let undone = true;
+        for (const [written, previous] of landed) {
+            if (previous === null) {
+                kv.remove(written);
+            } else if (!kv.set(written, previous)) {
+                // The device refused even a value it was already holding. Nothing more
+                // can be done from here, and saying "nothing changed" would be a lie.
+                undone = false;
+            }
+        }
+        return { ok: false, problem: "storage", undone };
     }
-    if (restored < Object.keys(entries).length) {
-        return { ok: false, problem: "storage" };
-    }
+    const restored = landed.length;
 
     const keep = new Set(Object.keys(entries).map((key) => PREFIX + key));
     for (const key of kv.keys()) {

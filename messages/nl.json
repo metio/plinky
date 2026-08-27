@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Dit bestand is geen Plinky-back-up.",
     "progress_backup_error_empty": "Deze back-up is leeg — er is niets terug te zetten.",
     "progress_backup_error_storage": "De opslag van dit apparaat is vol of geblokkeerd, dus het terugzetten is niet gelukt. Hier is niets veranderd.",
+    "progress_backup_error_partial": "De opslag van dit apparaat is vol of geblokkeerd, dus maar een deel van de back-up kon worden teruggezet — en wat er al stond kon ook niet ongedaan worden gemaakt. Je voortgang is nu een mengsel van beide apparaten. Maak ruimte vrij en zet hetzelfde bestand nog eens terug.",
     "sight_read": "Dit stuk van blad spelen",
     "sight_read_caption": "Één koude lezing, zonder houvast — de namen, kleuren, vingerzetting, hints en highway gaan even opzij. Je eerste lezing blijft bewaard als je blad-lezing van dit stuk.",
     "sight_read_aids_note": "Een blad-lezing leest bovenaan de ladder: geen kleuren, geen vingerzetting, geen highway, geen tweede kans.",

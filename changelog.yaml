@@ -5,6 +5,13 @@
   label: later
   entries:
     - |-
+      **Restoring a backup is now all or nothing.** If the device ran out of room
+      part-way through, the restore stopped where it was and left you with a mix — some
+      of your progress from the backup, the rest from this device — while the message on
+      screen said nothing had changed. What has landed is now put back, so a restore that
+      cannot finish leaves the device exactly as it was. In the rare case where even that
+      is refused, the message says so plainly instead.
+    - |-
       **Arrow keys scroll the page again, and Space presses buttons.** The computer
       keyboard is one of the ways to play Plinky, and it was taking the keys it needs on
       every page — not only where you play. On Help, Settings or the glossary, pressing

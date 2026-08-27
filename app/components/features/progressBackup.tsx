@@ -62,7 +62,12 @@ export function ProgressBackup() {
         }
         setError(
             result.problem === "storage"
-                ? m.progress_backup_error_storage()
+                ? // Two different places to be left in, and only one of them is "nothing
+                  // changed". Saying that when half a bundle had landed would send the
+                  // player away believing their device was untouched.
+                  result.undone
+                    ? m.progress_backup_error_storage()
+                    : m.progress_backup_error_partial()
                 : result.problem === "empty"
                   ? m.progress_backup_error_empty()
                   : m.progress_backup_error_unreadable(),

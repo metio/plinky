@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Ce fichier n'est pas une sauvegarde Plinky.",
     "progress_backup_error_empty": "Cette sauvegarde est vide — il n'y a rien à restaurer.",
     "progress_backup_error_storage": "Le stockage de cet appareil est plein ou bloqué, la restauration n'a pas abouti. Rien n'a changé ici.",
+    "progress_backup_error_partial": "Le stockage de cet appareil est plein ou bloqué, donc seule une partie de la sauvegarde a pu être restaurée — et ce qui était passé n'a pas pu être remis en place non plus. Ta progression mélange les deux appareils. Libère de la place et restaure le même fichier pour tout remettre d'aplomb.",
     "sight_read": "Déchiffrer ce morceau",
     "sight_read_caption": "Une lecture à froid, sans appui — les noms, les couleurs, les doigtés, les indices et l'autoroute s'effacent le temps du passage. Ta première lecture est gardée comme ton déchiffrage de ce morceau.",
     "sight_read_aids_note": "Un déchiffrage se lit tout en haut de l'échelle : pas de couleurs, pas de doigtés, pas d'autoroute, pas de seconde chance.",

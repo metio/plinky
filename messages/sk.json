@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Tento súbor nie je záloha Plinky.",
     "progress_backup_error_empty": "Táto záloha je prázdna — nie je čo obnoviť.",
     "progress_backup_error_storage": "Úložisko tohto zariadenia je plné alebo blokované, obnovenie neprebehlo. Tu sa nič nezmenilo.",
+    "progress_backup_error_partial": "Úložisko tohto zariadenia je plné alebo zablokované, takže sa obnovila len časť zálohy — a to, čo už prešlo, sa nepodarilo vrátiť späť. Tvoj postup je zmesou oboch zariadení. Uvoľni miesto a obnov ten istý súbor znova.",
     "sight_read": "Zahrať túto skladbu z listu",
     "sight_read_caption": "Jedno čítanie za studena, bez opory — názvy, farby, prstoklad, nápovedy aj diaľnica na čas prechodu ustúpia. Tvoje prvé čítanie zostane ako tvoja hra z listu tejto skladby.",
     "sight_read_aids_note": "Hra z listu číta na najvyššej priečke: bez farieb, bez prstokladu, bez diaľnice, bez druhého pokusu.",

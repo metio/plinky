@@ -392,6 +392,7 @@
     "progress_backup_error_unreadable": "Ese archivo no es una copia de Plinky.",
     "progress_backup_error_empty": "Esa copia está vacía — no hay nada que restaurar.",
     "progress_backup_error_storage": "El almacenamiento de este dispositivo está lleno o bloqueado y la restauración no se completó. Aquí no ha cambiado nada.",
+    "progress_backup_error_partial": "El almacenamiento de este dispositivo está lleno o bloqueado, así que solo se pudo restaurar parte de la copia — y lo que ya había entrado tampoco se pudo deshacer. Tu progreso es una mezcla de los dos dispositivos. Libera espacio y restaura el mismo archivo otra vez.",
     "sight_read": "Leer esta pieza a primera vista",
     "sight_read_caption": "Una lectura en frío, sin nada en que apoyarse: los nombres, los colores, las digitaciones, las pistas y la autopista se apartan durante la pasada. Tu primera lectura se guarda como tu lectura a primera vista de esta pieza.",
     "sight_read_aids_note": "Una lectura a primera vista se lee en lo más alto de la escalera: sin colores, sin digitaciones, sin autopista, sin segundo intento.",
