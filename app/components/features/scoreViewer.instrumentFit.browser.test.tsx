@@ -12,7 +12,7 @@ import { memoryStore } from "../../adapters/memoryStore";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
 import { createPrefsStore } from "../../stores/prefsStore";
-import { PlaySessionProvider, usePlaySession } from "./playSession";
+import { PlaySessionProvider, usePlayPiece, usePlaySetup } from "./playSession";
 import { PlaySurface } from "./playSurface";
 
 // Whether a piece that reaches past the player's keys actually moves into them.
@@ -84,11 +84,12 @@ async function mount(xml: string, instrumentRange: InstrumentRange | null) {
 type Seen = { shift: number; kind: string; sounding: string };
 let seen: Seen = { shift: 0, kind: "none", sounding: "none" };
 function Probe() {
-    const session = usePlaySession();
+    const setup = usePlaySetup();
+    const piece = usePlayPiece();
     seen = {
-        shift: session.transpose,
-        kind: session.instrumentFit.kind,
-        sounding: session.sounding ? `${session.sounding.from}-${session.sounding.to}` : "none",
+        shift: setup.transpose,
+        kind: piece.instrumentFit.kind,
+        sounding: piece.sounding ? `${piece.sounding.from}-${piece.sounding.to}` : "none",
     };
     return null;
 }

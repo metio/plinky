@@ -7,7 +7,7 @@ import { m } from "../../paraglide/messages.js";
 import { SettingsSection } from "../ui/settingsSection";
 import { NotesIcon } from "../ui/icons";
 import { LocalizedLink as Link } from "../ui/localizedLink";
-import { usePlaySession } from "./playSession";
+import { usePlayPiece } from "./playSession";
 
 // The scale this piece is built from, offered under the score before you play it.
 //
@@ -24,7 +24,7 @@ import { usePlaySession } from "./playSession";
 //
 // An offer, never a requirement: nothing is gated behind it and skipping it costs nothing.
 export function WarmUpCard() {
-    const { id, fifths, title } = usePlaySession();
+    const { fifths, id, title } = usePlayPiece();
     const warmUp = warmUpFor({
         fifths,
         // Not read from the score: see above. The scale is right either way.

@@ -10,7 +10,7 @@ import { fakeMidi } from "../../adapters/fakeMidi";
 import { fakeSampleSource } from "../../adapters/fakeSampleSource";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
-import { PlaySessionProvider, usePlaySession } from "./playSession";
+import { PlaySessionProvider, usePlaySetup } from "./playSession";
 import { PlaySurface } from "./playSurface";
 
 // Whether opening a piece actually asks for its recordings.
@@ -48,7 +48,7 @@ afterEach(() => {
 // the player does rather than by rebuilding the score.
 let transposeTo: (semitones: number) => void = () => {};
 function Probe() {
-    const session = usePlaySession();
+    const session = usePlaySetup();
     transposeTo = session.setTranspose;
     return null;
 }

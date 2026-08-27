@@ -10,7 +10,14 @@ import { inScope, type Scope, scopeDays, scopeStart, scopeSummary } from "./stat
 // Any day within a few years either side of the clock, so windows are sometimes empty,
 // sometimes full, and the future is well represented.
 const dateKey = fc
-    .date({ min: new Date("2023-01-01T00:00:00Z"), max: new Date("2029-12-31T00:00:00Z") })
+    .date({
+        min: new Date("2023-01-01T00:00:00Z"),
+        max: new Date("2029-12-31T00:00:00Z"),
+        // fc.date() puts an Invalid Date in its domain even between bounds, and these
+        // properties are about real clocks: an invalid one has no today for a window to
+        // cover, so it fails an assertion that is right about every date there is.
+        noInvalidDate: true,
+    })
     .map((at) => todayKey(at));
 
 const history = fc
@@ -20,6 +27,7 @@ const history = fc
 const clock = fc.date({
     min: new Date("2024-01-01T00:00:00Z"),
     max: new Date("2029-12-31T00:00:00Z"),
+    noInvalidDate: true,
 });
 
 const NARROWER: [Scope, Scope][] = [

@@ -44,6 +44,7 @@ import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useEndRun } from "../../hooks/useEndRun";
+import { useLatest } from "../../hooks/useLatest";
 import { useLatestPress } from "../../hooks/useLatestPress";
 import { useNoteFunnel } from "../../hooks/useNoteFunnel";
 import { useRunGrading } from "../../hooks/useRunGrading";
@@ -1115,120 +1116,222 @@ function usePlaySessionValue({
     );
 
     // Dismiss the rotate-your-phone nudge, and remember the choice.
-    const dismissRotate = () => {
+    const dismissRotate = useCallback(() => {
         hints.markSeen(ROTATE_HINT_ID);
-    };
+    }, [hints]);
 
-    return {
-        // Piece identity and framing.
-        id,
-        title,
-        // The key signature the piece opens in, so a surface can say which black keys it
-        // will ask for. Read from the score on the way in and moved with any transposition,
-        // so it is what the player will actually be reading rather than what the file says.
-        fifths: marks.fifths,
-        credit: credit ?? "",
-        daily,
-        ephemeral,
-        assessment,
-        lockTempo,
-        leadAction,
-        // The layout shell + full-screen state.
-        containerRef,
-        rootRef,
-        gradePanelRef,
-        fullscreen,
-        compact,
-        exitFullscreen,
-        leavePlaySurface,
-        hideKeyboard,
-        setHideKeyboard,
-        fingerStrip,
-        setFingerStrip,
-        runsView,
-        showScore: () => onShowScore?.(),
-        portrait,
-        coarsePointer,
-        rotateDismissed,
-        dismissRotate,
-        // The render surface.
-        score,
-        ready,
-        loadError: score.loadError,
-        staffCount,
-        measureCount,
-        // Reading + keyboard framing.
-        reading,
-        keyRange,
-        // The same reading unrounded: the notes the engraving sounds, which is what
-        // deciding whether they fit an instrument needs.
-        sounding,
-        hintNotes,
-        // The feed rather than the fills: one stable object, so a hold no longer
-        // rewrites this value sixty times a second and repaints every panel that
-        // reads it. The keyboard subscribes for itself.
-        holds: holdIndicator.holds,
-        noteHints,
-        setNoteHints,
-        focusXml,
-        // Tempo settings.
-        tempo,
-        setTempo,
-        trainerOn,
-        setTrainerOn,
-        trainerTarget,
-        setTrainerTarget,
-        metronomeOn,
-        setMetronomeOn,
-        // Play options.
-        enforceTempo,
-        setEnforceTempo,
-        guideNotes,
-        setGuideNotes,
-        duet,
-        setDuet,
-        forgiving,
-        setForgiving,
-        raceGhost,
-        setRaceGhost,
-        focusLoop,
-        setFocusLoop,
-        // Sight-read mode and its study countdown.
-        sightRead,
-        // The aids a run actually reads with — the player's own settings, or the
-        // sight-reader rung while the mode is on. Every surface reads these rather
-        // than the stored preferences, so the override cannot be half-applied.
-        aids,
-        // What this piece scored the first time it was ever read cold, or null when it
-        // has never been sight-read here.
-        sightReadRecord,
-        hiddenNotes,
-        setHiddenNotes,
-        revealTries,
-        setRevealTries,
-        transpose,
-        setTranspose,
-        // Whether the piece had to be moved to fit the instrument in the room, so the
-        // transpose control can say why it is not on zero.
-        instrumentFit,
-        showMine,
-        setShowMine,
-        hasSaved,
-        hand,
-        setHand,
-        // The piece's own MusicXML, for consumers that render their own staff
-        // (the exported video's recognizable score).
-        xml,
+    // The prop is read through a ref so this stays one function for the life of the
+    // session: it sits in the shell's value, and a new identity each render would stop
+    // that value ever holding.
+    const onShowScoreRef = useLatest(onShowScore);
+    const showScore = useCallback(() => onShowScoreRef.current?.(), []);
+
+    // Piece — what is being played. Changes when a score loads or is transposed,
+    // and not otherwise.
+    const piece = useMemo(
+        () => ({
+            // Piece identity and framing.
+            id,
+            title,
+            // The key signature the piece opens in, so a surface can say which black keys it
+            // will ask for. Read from the score on the way in and moved with any transposition,
+            // so it is what the player will actually be reading rather than what the file says.
+            fifths: marks.fifths,
+            credit: credit ?? "",
+            daily,
+            ephemeral,
+            assessment,
+            // The piece's own MusicXML, for consumers that render their own staff
+            // (the exported video's recognizable score).
+            xml,
+            // The render surface.
+            score,
+            ready,
+            loadError: score.loadError,
+            staffCount,
+            measureCount,
+            focusXml,
+            keyRange,
+            // The same reading unrounded: the notes the engraving sounds, which is what
+            // deciding whether they fit an instrument needs.
+            sounding,
+            // Whether the piece had to be moved to fit the instrument in the room, so the
+            // transpose control can say why it is not on zero.
+            instrumentFit,
+        }),
+        [
+            id,
+            title,
+            marks.fifths,
+            credit,
+            daily,
+            ephemeral,
+            assessment,
+            xml,
+            score,
+            ready,
+            score.loadError,
+            staffCount,
+            measureCount,
+            focusXml,
+            keyRange,
+            sounding,
+            instrumentFit,
+        ],
+    );
+
+    // Shell — the frame around the surface: full screen, orientation, which
+    // panels are folded away. Changes when the reader rearranges their view.
+    const shell = useMemo(
+        () => ({
+            // The layout shell + full-screen state.
+            containerRef,
+            rootRef,
+            gradePanelRef,
+            fullscreen,
+            compact,
+            leavePlaySurface,
+            hideKeyboard,
+            setHideKeyboard,
+            fingerStrip,
+            setFingerStrip,
+            runsView,
+            showScore,
+            portrait,
+            coarsePointer,
+            rotateDismissed,
+            dismissRotate,
+            leadAction,
+        }),
+        [
+            fullscreen,
+            compact,
+            leavePlaySurface,
+            hideKeyboard,
+            fingerStrip,
+            runsView,
+            showScore,
+            portrait,
+            coarsePointer,
+            rotateDismissed,
+            dismissRotate,
+            leadAction,
+        ],
+    );
+
+    // Options — everything the setup panel and the quick controls edit. The
+    // largest group by far, and the one that used to repaint the whole surface: a change
+    // of trainer target has nothing to say to the keyboard or the result panel.
+    const setup = useMemo(
+        () => ({
+            // Reading + keyboard framing.
+            reading,
+            // The aids a run actually reads with — the player's own settings, or the
+            // sight-reader rung while the mode is on. Every surface reads these rather
+            // than the stored preferences, so the override cannot be half-applied.
+            aids,
+            setNoteHints,
+            // Tempo settings.
+            tempo,
+            setTempo,
+            lockTempo,
+            trainerOn,
+            setTrainerOn,
+            trainerTarget,
+            setTrainerTarget,
+            metronomeOn,
+            setMetronomeOn,
+            // Play options.
+            enforceTempo,
+            setEnforceTempo,
+            guideNotes,
+            setGuideNotes,
+            duet,
+            setDuet,
+            setForgiving,
+            raceGhost,
+            setRaceGhost,
+            focusLoop,
+            setFocusLoop,
+            // Sight-read mode and its study countdown.
+            sightRead,
+            // What this piece scored the first time it was ever read cold, or null when it
+            // has never been sight-read here.
+            sightReadRecord,
+            hiddenNotes,
+            setHiddenNotes,
+            revealTries,
+            setRevealTries,
+            transpose,
+            setTranspose,
+            showMine,
+            setShowMine,
+            hasSaved,
+            hand,
+            setHand,
+        }),
+        [
+            reading,
+            aids,
+            setNoteHints,
+            tempo,
+            setTempo,
+            lockTempo,
+            trainerOn,
+            setTrainerOn,
+            trainerTarget,
+            setTrainerTarget,
+            metronomeOn,
+            setMetronomeOn,
+            enforceTempo,
+            guideNotes,
+            duet,
+            setForgiving,
+            raceGhost,
+            setRaceGhost,
+            focusLoop,
+            sightRead,
+            sightReadRecord,
+            hiddenNotes,
+            setHiddenNotes,
+            revealTries,
+            setRevealTries,
+            transpose,
+            setTranspose,
+            showMine,
+            hasSaved,
+            hand,
+        ],
+    );
+
+    // Run — the live performance and what comes of it. The only group that
+    // changes while somebody is playing, so it is the only one the surface follows at
+    // that rate.
+    //
+    // Deliberately not memoised, unlike the three above it. Its contents change on very
+    // nearly every render of this hook — the matcher and the playback do — so a memo
+    // could hold only if the transport actions it also carries were each wrapped in a
+    // dependency array of their own. Those are the longest functions in the file, and a
+    // dependency missed in one is a stale closure in the middle of a run: a worse bug
+    // than the re-renders it would save, and one the tests would not reliably catch.
+    // What the split buys is above: a tweak in the setup panel no longer touches the
+    // score, the keyboard or the result panel, because those three values do hold.
+    const run = {
         // Transports and the run.
         matcher,
         keepUp,
         listenPlayback,
         ghostRace,
         loop,
-        runResult,
-        runTempoScale,
+        // The feed rather than the fills: one stable object, so a hold no longer
+        // rewrites this value sixty times a second and repaints every panel that
+        // reads it. The keyboard subscribes for itself.
+        holds: holdIndicator.holds,
+        hintNotes,
         // MIDI connection.
         connected,
+        runResult,
+        runTempoScale,
         // Saved takes.
         takes: takesList.takes,
         // Actions the surface drives.
@@ -1240,20 +1343,58 @@ function usePlaySessionValue({
         replayTake,
         deleteTake,
     };
+
+    return { piece, shell, setup, run };
 }
 
-export type PlaySession = ReturnType<typeof usePlaySessionValue>;
+type PlaySession = ReturnType<typeof usePlaySessionValue>;
 
-const PlaySessionContext = createContext<PlaySession | null>(null);
+export type PlayPiece = PlaySession["piece"];
+export type PlayShell = PlaySession["shell"];
+export type PlaySetup = PlaySession["setup"];
+export type PlayRun = PlaySession["run"];
 
-// Read the play session. Throws outside a provider so a wrongly mounted surface fails loud
-// rather than silently rendering an empty score.
-export function usePlaySession(): PlaySession {
-    const session = useContext(PlaySessionContext);
-    if (!session) {
-        throw new Error("usePlaySession must be used within a PlaySessionProvider");
+// Four contexts rather than one.
+//
+// A single value carrying everything meant every consumer heard about every change: a
+// nudged trainer target repainted the keyboard, the score and the result panel, none of
+// which have any use for it. Reading the surface's own consumers shows why that was so
+// wasteful — of the fields they read between them, roughly three quarters are read by
+// exactly one component, and the setup panel alone owns half of those.
+//
+// The split is by how fast a thing changes rather than by what it is about, because that
+// is what decides who has to re-render. Piece changes when a score loads; shell when the
+// reader rearranges their view; options when they tweak a control; run continuously,
+// while somebody is playing. A component takes only the ones it needs and is left alone
+// by the rest.
+const PieceContext = createContext<PlayPiece | null>(null);
+const ShellContext = createContext<PlayShell | null>(null);
+const SetupContext = createContext<PlaySetup | null>(null);
+const RunContext = createContext<PlayRun | null>(null);
+
+function read<T>(value: T | null, what: string): T {
+    if (!value) {
+        throw new Error(`use${what} must be used within a PlaySessionProvider`);
     }
-    return session;
+    return value;
+}
+
+// Each throws outside a provider, so a wrongly mounted surface fails loud rather than
+// silently rendering an empty score.
+export function usePlayPiece(): PlayPiece {
+    return read(useContext(PieceContext), "PlayPiece");
+}
+
+export function usePlayShell(): PlayShell {
+    return read(useContext(ShellContext), "PlayShell");
+}
+
+export function usePlaySetup(): PlaySetup {
+    return read(useContext(SetupContext), "PlaySetup");
+}
+
+export function usePlayRun(): PlayRun {
+    return read(useContext(RunContext), "PlayRun");
 }
 
 // Runs the whole play session and renders the full-screen shell around the surface. The
@@ -1263,21 +1404,31 @@ export function PlaySessionProvider({
     children,
     ...props
 }: PlaySessionProps & { children: ReactNode }) {
-    const session = usePlaySessionValue(props);
+    const { piece, shell, setup, run } = usePlaySessionValue(props);
+    // Nested rather than composed into one wrapper: each provider re-renders its own
+    // subtree when its value changes, and nesting is what keeps those four decisions
+    // separate. Run is innermost because it changes most often, so the least sits
+    // beneath it.
     return (
-        <PlaySessionContext.Provider value={session}>
-            <FullscreenProvider active={session.fullscreen}>
-                <div
-                    ref={session.rootRef}
-                    className={
-                        session.fullscreen
-                            ? "fixed inset-0 z-50 flex flex-col gap-2 bg-surface p-3"
-                            : "space-y-3"
-                    }
-                >
-                    {children}
-                </div>
-            </FullscreenProvider>
-        </PlaySessionContext.Provider>
+        <PieceContext.Provider value={piece}>
+            <ShellContext.Provider value={shell}>
+                <SetupContext.Provider value={setup}>
+                    <RunContext.Provider value={run}>
+                        <FullscreenProvider active={shell.fullscreen}>
+                            <div
+                                ref={shell.rootRef}
+                                className={
+                                    shell.fullscreen
+                                        ? "fixed inset-0 z-50 flex flex-col gap-2 bg-surface p-3"
+                                        : "space-y-3"
+                                }
+                            >
+                                {children}
+                            </div>
+                        </FullscreenProvider>
+                    </RunContext.Provider>
+                </SetupContext.Provider>
+            </ShellContext.Provider>
+        </PieceContext.Provider>
     );
 }

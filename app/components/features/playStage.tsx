@@ -9,7 +9,7 @@ import { FingeringStrip } from "./fingeringStrip";
 import { FocusStrip } from "./focusStrip";
 import { FullScreen, Show } from "./conditional";
 import { PianoKeyboard } from "./pianoKeyboard";
-import { usePlaySession } from "./playSession";
+import { usePlayPiece, usePlayShell, usePlaySetup, usePlayRun } from "./playSession";
 
 // The practice stage — everything below the score: the progress + MIDI-connect row, the
 // ghost race track, the turn-your-phone nudge, the mobile focus strip, and the on-screen
@@ -17,30 +17,20 @@ import { usePlaySession } from "./playSession";
 // through all of full screen (unless folded away from the score corner's quick
 // controls), so the keys are there to noodle on before a run starts.
 export function PlayStage() {
+    const { focusXml, id, keyRange, score, staffCount, xml } = usePlayPiece();
     const {
-        matcher,
-        fullscreen,
-        compact,
-        connected,
-        ghostRace,
-        portrait,
         coarsePointer,
-        rotateDismissed,
-        dismissRotate,
-        focusXml,
-        hideKeyboard,
-        fingerStrip,
-        hintNotes,
-        listenPlayback,
-        holds,
-        keyRange,
-        id,
-        xml,
-        staffCount,
+        compact,
         containerRef,
-        score,
-        aids,
-    } = usePlaySession();
+        dismissRotate,
+        fingerStrip,
+        fullscreen,
+        hideKeyboard,
+        portrait,
+        rotateDismissed,
+    } = usePlayShell();
+    const { aids } = usePlaySetup();
+    const { connected, ghostRace, hintNotes, holds, listenPlayback, matcher } = usePlayRun();
 
     // A stable handle to the rendered score SVG, so the strip's heat effect only
     // repaints when the render actually changes, not on every stage re-render.

@@ -6,7 +6,7 @@ import { m } from "../../paraglide/messages.js";
 import { ScoreSkeleton } from "../ui/scoreSkeleton";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
 import { NotesHighway } from "./notesHighway";
-import { usePlaySession } from "./playSession";
+import { usePlayPiece, usePlayShell, usePlaySetup, usePlayRun } from "./playSession";
 
 // The score itself: the bordered scroll box OSMD renders into, the staff that stands in
 // while it fills, plus the load-error notice.
@@ -15,26 +15,11 @@ import { usePlaySession } from "./playSession";
 // In full screen the keyboard's quick controls ride this box's corner rather than taking
 // a row of their own, so folding the keys away hands their whole strip to the score.
 export function ScoreCanvas() {
-    const {
-        containerRef,
-        fullscreen,
-        compact,
-        ready,
-        measureCount,
-        loadError,
-        matcher,
-        listenPlayback,
-        keepUp,
-        loop,
-        title,
-        hideKeyboard,
-        setHideKeyboard,
-        fingerStrip,
-        setNoteHints,
-        keyRange,
-        aids,
-        sightRead,
-    } = usePlaySession();
+    const { keyRange, loadError, measureCount, ready, title } = usePlayPiece();
+    const { compact, containerRef, fingerStrip, fullscreen, hideKeyboard, setHideKeyboard } =
+        usePlayShell();
+    const { aids, setNoteHints, sightRead } = usePlaySetup();
+    const { keepUp, listenPlayback, loop, matcher } = usePlayRun();
     const prefsStore = usePrefsStore();
     // In the notes-highway reading mode, a tall highway covers the staff — OSMD stays
     // mounted and rendered underneath (the cursor keeps walking it), so the staff is

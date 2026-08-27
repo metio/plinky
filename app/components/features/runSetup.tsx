@@ -20,7 +20,7 @@ import { SettingsSection } from "../ui/settingsSection";
 import { Spinner } from "../ui/spinner";
 import { Stepper } from "../ui/stepper";
 import { ReadingLevel } from "./readingLevel";
-import { usePlaySession } from "./playSession";
+import { usePlayPiece, usePlaySetup, usePlayRun } from "./playSession";
 import { Show } from "./conditional";
 
 const ICON = "h-5 w-5";
@@ -48,49 +48,43 @@ const beamsLabel: Record<Beams, string> = {
 //
 // The piece's own controls, on the piece's page.
 export function RunSetup() {
+    const { instrumentFit, measureCount, ready, score, staffCount, xml } = usePlayPiece();
     const {
-        lockTempo,
-        staffCount,
-        hand,
-        setHand,
-        matcher,
-        enforceTempo,
-        setEnforceTempo,
-        guideNotes,
-        setGuideNotes,
-        duet,
-        setDuet,
-        transpose,
-        setTranspose,
-        instrumentFit,
-        hiddenNotes,
-        setHiddenNotes,
-        revealTries,
-        setRevealTries,
-        trainerOn,
-        setTrainerOn,
-        trainerTarget,
-        setTrainerTarget,
-        raceGhost,
-        setRaceGhost,
-        ready,
-        measureCount,
-        loop,
-        hasSaved,
-        showMine,
-        setShowMine,
-        metronomeOn,
-        setMetronomeOn,
-        setForgiving,
         aids,
+        duet,
+        enforceTempo,
+        focusLoop,
+        guideNotes,
+        hand,
+        hasSaved,
+        hiddenNotes,
+        lockTempo,
+        metronomeOn,
+        raceGhost,
         reading,
-        score,
+        revealTries,
+        setDuet,
+        setEnforceTempo,
+        setFocusLoop,
+        setForgiving,
+        setGuideNotes,
+        setHand,
+        setHiddenNotes,
+        setMetronomeOn,
+        setRaceGhost,
+        setRevealTries,
+        setShowMine,
+        setTrainerOn,
+        setTrainerTarget,
+        setTranspose,
+        showMine,
         sightRead,
         sightReadRecord,
-        focusLoop,
-        setFocusLoop,
-        xml,
-    } = usePlaySession();
+        trainerOn,
+        trainerTarget,
+        transpose,
+    } = usePlaySetup();
+    const { loop, matcher } = usePlayRun();
     // Derived from the aid prefs, never stored — the same single source of truth the
     // skill-level control reads, so the panel can never disagree with the picker above it.
     const { prefs } = usePrefs();

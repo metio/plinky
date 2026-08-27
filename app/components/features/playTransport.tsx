@@ -11,7 +11,7 @@ import { ToggleIconButton } from "../ui/toggleIconButton";
 import { Button, IconButton } from "../ui/button";
 import { CloseIcon, FingersIcon, PlayIcon, RotateIcon, SpeakerIcon, StopIcon } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
-import { usePlaySession } from "./playSession";
+import { usePlayPiece, usePlayShell, usePlaySetup, usePlayRun } from "./playSession";
 
 // The play controls. Full screen keeps only what you reach for WHILE playing — Listen,
 // Practice/Stop, progress, restart, tempo, and the fingering-editor workspace. Settings
@@ -20,25 +20,11 @@ import { usePlaySession } from "./playSession";
 // settings of its own. Every button drives a session action; the bar holds no state but
 // the tempo popover's.
 export function PlayTransport() {
-    const {
-        ready,
-        matcher,
-        keepUp,
-        listenPlayback,
-        enforceTempo,
-        listen,
-        restartListen,
-        practice,
-        playAlong,
-        fingerStrip,
-        setFingerStrip,
-        leavePlaySurface,
-        tempo,
-        setTempo,
-        lockTempo,
-        sightRead,
-        leadAction,
-    } = usePlaySession();
+    const { ready } = usePlayPiece();
+    const { fingerStrip, leadAction, leavePlaySurface, setFingerStrip } = usePlayShell();
+    const { enforceTempo, lockTempo, setTempo, sightRead, tempo } = usePlaySetup();
+    const { keepUp, listen, listenPlayback, matcher, playAlong, practice, restartListen } =
+        usePlayRun();
 
     // Listen appears twice, and means slightly different things in the two places. In the
     // full-screen bar it is the transport control beside Practice. On the resting page it

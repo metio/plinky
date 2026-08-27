@@ -5,7 +5,7 @@ import { m } from "../../paraglide/messages.js";
 import { FullScreen, Show } from "./conditional";
 import { KeepUpResultCard } from "./keepUpResultCard";
 import { LoopRangeBar } from "./loopRangeBar";
-import { usePlaySession } from "./playSession";
+import { usePlayPiece, usePlayShell, usePlaySetup, usePlayRun } from "./playSession";
 import { PlayStage } from "./playStage";
 import { PlayTransport } from "./playTransport";
 import { WarmUpCard } from "./warmUpCard";
@@ -23,33 +23,23 @@ import { RunSetup } from "./runSetup";
 // the layout and the finished-run readouts (the loop bar, the keep-up card, the grade panel
 // and the runs drawer), which are small and site-specific to this arrangement.
 export function PlaySurface() {
+    const { assessment, credit, daily, ephemeral, id, measureCount, ready, title, xml } =
+        usePlayPiece();
+    const { fullscreen, gradePanelRef, runsView, showScore } = usePlayShell();
+    const { hand } = usePlaySetup();
     const {
-        id,
-        title,
-        credit,
-        daily,
-        ephemeral,
-        fullscreen,
-        ready,
-        measureCount,
-        matcher,
+        deleteTake,
+        ghostRace,
         keepUp,
         listenPlayback,
-        ghostRace,
         loop,
+        matcher,
+        replayTake,
         runResult,
         runTempoScale,
-        gradePanelRef,
-        assessment,
-        runsView,
-        showScore,
-        takes,
-        xml,
-        hand,
-        replayTake,
-        deleteTake,
         saveCurrentTake,
-    } = usePlaySession();
+        takes,
+    } = usePlayRun();
 
     return (
         <>
