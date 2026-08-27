@@ -39,6 +39,12 @@ export function fakeMidiInput(
         onMessage(next) {
             handler = next;
         },
+        // The caller's timestamp is passed straight through, which the real adapter
+        // deliberately does not do — it discards the driver's clock and stamps on receipt
+        // with performance.now() (see webMidi.wrapInput, and the test that pins it). The
+        // divergence is on purpose: a test needs to say when a note happened. It does
+        // mean a timing assertion written against this fake proves nothing about the
+        // clock a real instrument is read on.
         emit(data, timestamp = 0) {
             handler?.(new Uint8Array(data), timestamp);
         },

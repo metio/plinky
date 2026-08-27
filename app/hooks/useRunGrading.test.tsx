@@ -18,6 +18,29 @@ const SONG = "gymnopedie";
 // A run finishing on the wall clock the store stamps it with.
 const AT = 1_700_000_000_000;
 
+// A run of eight cleared notes, one per beat, with per-note deviations — a wrong key
+// before the hit, an offset from the notated time, which hand played it. The default is a
+// clean run read dead on the beat.
+function run(
+    shape: (index: number) => { wrongBefore?: number; offsetMs?: number; staff?: number },
+    count = 8,
+    beatMs = 500,
+): RunCapture {
+    const capture = startCapture();
+    for (let i = 0; i < count; i++) {
+        const { wrongBefore = 0, offsetMs = 0, staff = 0 } = shape(i);
+        capture.notes.push({
+            targetMs: i * beatMs,
+            playedMs: i * beatMs + offsetMs,
+            wrongBefore,
+            velocity: 80,
+            pitches: [60 + i],
+            staves: [staff],
+        });
+    }
+    return capture;
+}
+
 // A run of `count` cleared notes, one per beat, played dead on the notated time —
 // the shape the matcher hands over when a piece is read cleanly at tempo.
 function playedRun(count: number, beatMs = 500): RunCapture {
@@ -279,6 +302,79 @@ describe("waiting for the keys to come up", () => {
             h.finish();
 
             expect(h.calls.reportProgressSaved).toHaveBeenCalledWith(true);
+        });
+    });
+
+    describe("the numbers the panel is handed", () => {
+        // Every accuracy figure in the integration tests is seeded — the panel is given
+        // { accuracy: 90 } and asked whether it renders it. That leaves the wire from a
+        // played run to a graded one asserted by nothing, and the failures it would let
+        // through are the worst kind: an off-by-one in the step index or a crossed metric
+        // yields a plausible wrong number with every test green.
+        //
+        // The figures below were measured from the grader rather than assumed. One of
+        // them corrected an assumption on the way: a run played uniformly late scores
+        // timing 100, because timing is read against the player's own drift and playing
+        // evenly behind the beat is even playing.
+        const graded = (h: ReturnType<typeof harness>) =>
+            h.calls.recordResult.mock.calls[0]?.[0]?.grade;
+
+        it("grades a clean run at the top of every reading", () => {
+            const h = harness();
+            h.finish({ capture: { current: playedRun(8) } });
+
+            expect(graded(h)).toMatchObject({ accuracy: 100, timing: 100, flow: 100, letter: "S" });
+        });
+
+        it("charges a wrong key to accuracy and flow, and leaves timing alone", () => {
+            // The crossed-metric case: a swap between accuracy and timing reads as a
+            // plausible number either way.
+            //
+            // Accuracy comes from the run's own wrong-key counter, while the per-note
+            // wrongBefore feeds flow — two separate paths into one panel, which is
+            // exactly the kind of wire that had nothing asserting it. Both are set here,
+            // as a real run sets them.
+            const h = harness();
+            h.finish({
+                wrong: 1,
+                capture: { current: run((i) => ({ wrongBefore: i === 3 ? 1 : 0 })) },
+            });
+
+            expect(graded(h)).toMatchObject({ accuracy: 89, timing: 100, flow: 88, letter: "A" });
+        });
+
+        it("leaves accuracy alone when the playing is uneven", () => {
+            // The mirror of the case above: ragged timing must not read as wrong notes.
+            const jitter = [0, 180, -160, 200, -190, 170, -150, 190];
+            const h = harness();
+            h.finish({ capture: { current: run((i) => ({ offsetMs: jitter[i] ?? 0 })) } });
+
+            expect(graded(h)).toMatchObject({ accuracy: 100, timing: 25, letter: "B" });
+        });
+
+        it("does not punish a run that is late but even", () => {
+            // Timing is read against the player's own drift, so playing consistently
+            // behind the beat is playing evenly. Asserted because it is surprising, and
+            // because a change that "fixed" it would be a regression.
+            const h = harness();
+            h.finish({ capture: { current: run(() => ({ offsetMs: 220 })) } });
+
+            expect(graded(h)).toMatchObject({ accuracy: 100, timing: 100, letter: "S" });
+        });
+
+        it("hears one hand dragging behind the other", () => {
+            // The hand-attribution case. Swapping the staves would still produce a
+            // plausible figure, so the run is built with the left hand alone dragging.
+            const h = harness();
+            h.finish({
+                capture: {
+                    current: run((i) =>
+                        i % 2 === 1 ? { offsetMs: 260, staff: 1 } : { offsetMs: 0, staff: 0 },
+                    ),
+                },
+            });
+
+            expect(graded(h)).toMatchObject({ accuracy: 100, timing: 63 });
         });
     });
 });

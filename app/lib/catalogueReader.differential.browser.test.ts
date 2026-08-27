@@ -37,6 +37,18 @@ const WANTED = 12;
 // see this into a rubber stamp.
 const KNOWN_DISAGREEMENTS = 3;
 
+// Scores in the sample the engraver throws on outright, so neither reader can be compared
+// and the app cannot draw them either. May only go DOWN, like the budget above: raising it
+// would hide a catalogue that is becoming unplayable.
+//
+// The one in the sample today is YqtzdM86jR2B (Bach, "Herr Christ der einge Gottessohn"
+// BWV 601), and the cause is in the file rather than in the engraver: it carries
+// `<display-step>?</display-step>`, a literal question mark where a note letter belongs.
+// The engraver looks the letter up, gets nothing back and calls toLowerCase on it. Nobody
+// can open that piece in Plinky, which is a catalogue defect — the import should be
+// rejecting a score whose pitch elements are not pitches.
+const UNENGRAVABLE = 1;
+
 type Entry = { id: string; title: string; license: string };
 
 // Scores written as a single `<part>`, which is nearly all of a piano catalogue.
@@ -206,6 +218,7 @@ describe("the file reader on the real catalogue", () => {
         const spread = manifest.filter((_, index) => index % stride === 0);
 
         const disagreements: string[] = [];
+        const unengravable: string[] = [];
         let compared = 0;
         for (const entry of spread) {
             // Enough real scores have been through, so stop walking. Taking a fixed slice
@@ -220,7 +233,20 @@ describe("the file reader on the real catalogue", () => {
             if (!xml || !singlePart(xml) || overrunsItsMetre(xml) || !printsEveryNote(xml)) {
                 continue;
             }
-            const osmd = await engrave(xml);
+            let osmd: OpenSheetMusicDisplay;
+            try {
+                osmd = await engrave(xml);
+            } catch (error) {
+                // The engraver threw on the file itself. Nothing can be compared, because
+                // one of the two readers never ran — but this is not a neutral exclusion
+                // like the three above it: the app draws every score with this engraver,
+                // so a piece it cannot lay out is a piece nobody can play. Counted and
+                // named rather than skipped quietly.
+                host?.remove();
+                host = null;
+                unengravable.push(`${entry.id} (${entry.title}): ${String(error).slice(0, 90)}`);
+                continue;
+            }
             const theirs = throughOsmd(osmd);
             const mine = throughFile(xml);
             host?.remove();
@@ -244,6 +270,15 @@ describe("the file reader on the real catalogue", () => {
         // soon as this is reached, so it fails only if the catalogue genuinely cannot supply
         // that many readable single-part scores — never because of where a stride fell.
         expect(compared).toBeGreaterThanOrEqual(WANTED);
+
+        // Scores the engraver itself throws on. The app draws with the same engraver, so
+        // each one is a piece in the catalogue that nobody can open — a defect in the
+        // catalogue rather than in either reader. Held to a budget for the same reason the
+        // disagreements are: this is the one instrument that can see them.
+        expect(
+            unengravable.length,
+            `scores the engraver cannot lay out:\n  ${unengravable.join("\n  ")}`,
+        ).toBeLessThanOrEqual(UNENGRAVABLE);
 
         // A ratchet, not a clean bill of health. The reader does NOT yet agree with the
         // engraver on every real score, and this is the thing that says so — the fixtures

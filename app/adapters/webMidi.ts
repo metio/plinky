@@ -6,7 +6,10 @@ import type { MidiAccessPort, MidiConnection, MidiInput, MidiOutput } from "../p
 // The Web MIDI implementation of the MIDI seam — the one place the app touches
 // navigator.requestMIDIAccess and the "midi" permission descriptor.
 
-function wrapInput(input: MIDIInput): MidiInput {
+// Exported for its own test. Every note the app ever hears from a real instrument comes
+// through this function, and until it was reachable the tests exercised a fake that
+// disagreed with it about the one thing that matters here — which clock stamps a message.
+export function wrapInput(input: MIDIInput): MidiInput {
     return {
         id: input.id,
         name: input.name ?? "Unknown device",
