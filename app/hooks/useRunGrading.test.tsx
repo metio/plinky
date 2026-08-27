@@ -10,6 +10,7 @@ import { beginHold } from "../../core/takes";
 import { memoryStore } from "../adapters/memoryStore";
 import { type AppServices, createServices } from "../contexts/services";
 import { createActivitySignal } from "../lib/activity";
+import { fakePersistence } from "../testing/fakePersistence";
 import { fakeScheduler } from "../testing/fakeScheduler";
 import { useRunGrading, type RunGradingOptions } from "./useRunGrading";
 
@@ -240,5 +241,44 @@ describe("waiting for the keys to come up", () => {
         finish();
         result.current.gradeIfOwed();
         expect(calls.recordResult).toHaveBeenCalledTimes(1);
+    });
+
+    describe("keeping the device's progress", () => {
+        it("asks the browser to keep the data once a run has been recorded", () => {
+            // Held until there is progress worth keeping: the browsers that decide this
+            // silently weigh how much the player has used the site, and asking on a
+            // first page view is the request most likely to be refused.
+            const persistence = fakePersistence();
+            const h = harness({}, { persistence });
+
+            expect(persistence.asked).toBe(0);
+
+            h.finish();
+
+            expect(persistence.asked).toBe(1);
+        });
+
+        it("asks once a session, not once a run", () => {
+            // The adapter short-circuits on an existing grant, and there is no point
+            // re-asking a player who declined.
+            const persistence = fakePersistence();
+            const h = harness({}, { persistence });
+
+            h.finish();
+            h.finish();
+
+            expect(persistence.asked).toBe(1);
+        });
+
+        it("records the run even when the browser refuses to keep it", () => {
+            // The two are independent: a refused grant means the data is evictable
+            // later, not that this run failed to write now.
+            const persistence = fakePersistence(false);
+            const h = harness({}, { persistence });
+
+            h.finish();
+
+            expect(h.calls.reportProgressSaved).toHaveBeenCalledWith(true);
+        });
     });
 });

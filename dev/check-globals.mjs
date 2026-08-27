@@ -17,6 +17,12 @@ import { join } from "node:path";
 // files are always allowed: they exercise the real thing on purpose.
 const CONFINED = {
     localStorage: ["app/adapters/browserStore.ts", "app/testing/deniedStorage.ts"],
+    // The sentinel for navigator.storage. `persist` itself cannot be confined — two
+    // components already name a local helper that — but every correct use asks
+    // `persisted()` first, both because it is the cheap answer when the grant already
+    // exists and because re-asking nags the player in the browsers that prompt. So a
+    // request made outside the adapter shows up here.
+    persisted: ["app/adapters/webStoragePersistence.ts"],
     DOMParser: ["app/adapters/domXmlCodec.ts"],
     XMLSerializer: ["app/adapters/domXmlCodec.ts"],
     requestMIDIAccess: ["app/adapters/webMidi.ts"],

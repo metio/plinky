@@ -8,6 +8,20 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 27 August 2026 — evening
+
+**Your progress is harder to lose.** Browsers treat ordinary site storage as
+disposable and can clear it when a device runs short of space — which, for an app
+that keeps everything on your own device and nothing on a server, meant months of
+practice could go without warning. Plinky now asks your browser to hold on to what
+you have done, once you have finished a run. Most grant it without asking; a few
+check with you first.
+
+**A run that can't be saved says so.** If the device's storage is full or blocked,
+the result panel tells you before you build a practice history that isn't there.
+Until now the grade, the milestone and the mastered piece all appeared exactly as
+usual and quietly vanished on the next reload.
+
 ## 27 August 2026
 
 **If your piano makes its own sound, Plinky can stop doubling it.** Playing a digital

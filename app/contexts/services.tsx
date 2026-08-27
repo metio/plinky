@@ -4,6 +4,7 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
 import { audioContext, playFromSamples, webAudioEngine } from "../adapters/webAudioEngine";
+import { webStoragePersistence } from "../adapters/webStoragePersistence";
 import { webSampleSource } from "../adapters/webSampleSource";
 import { sampleLookup } from "../lib/sampleVoices";
 import type { SampleSource } from "../ports/sampleSource";
@@ -19,6 +20,7 @@ import { samplesEnabled } from "../../core/sampledPiano";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import type { StoragePersistence } from "../ports/storagePersistence";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
 import type { VideoExporter } from "../ports/videoExporter";
@@ -58,6 +60,8 @@ import { type ActivitySignal, runActivity } from "../lib/activity";
 export type AppServices = {
     // Where persistent state is read and written (see KeyValueStore).
     store: KeyValueStore;
+    // Asking the browser not to evict any of it (see StoragePersistence).
+    persistence: StoragePersistence;
     // The single sources of truth for each family of persistent state, built over
     // `store`.
     prefs: PrefsStore;
@@ -154,6 +158,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     const scheduler = overrides.scheduler ?? browserScheduler;
     return {
         store,
+        persistence: overrides.persistence ?? webStoragePersistence,
         prefs: overrides.prefs ?? createPrefsStore(store),
         mastery: overrides.mastery ?? createMasteryStore(store),
         history: overrides.history ?? createHistoryStore(store),
@@ -195,6 +200,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
 // naming it here (or vice versa) fails to compile — so the provider below can
 // never silently ignore an override.
 const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
+    persistence: true,
     store: true,
     prefs: true,
     mastery: true,
@@ -344,6 +350,10 @@ export function useAudioEngine(): AudioEngine {
 
 export function useSampleSource(): SampleSource {
     return useServices().samples;
+}
+
+export function usePersistence(): StoragePersistence {
+    return useServices().persistence;
 }
 
 export function useXmlCodec(): XmlCodec {

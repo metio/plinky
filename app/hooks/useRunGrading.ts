@@ -94,6 +94,7 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
     const gradedRef = useRef(false);
     const gradeFromRunRef = useRef(false);
     const finishedGradeRef = useRef<Grade | null>(null);
+    const askedToKeep = useRef(false);
 
     // Read through a ref so the effect fires on the run finishing rather than on
     // every change to the twenty things it needs when it does.
@@ -164,6 +165,16 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
             o.publishMilestone,
         );
         o.reportProgressSaved(saved);
+        // Ask the browser to keep this device's progress, now that there is some. Held
+        // until a run has actually finished on purpose: the browsers that decide this
+        // silently weigh how much the player has used the site, and the ones that ask
+        // them outright deserve a moment when the answer is obviously yes. Asked once a
+        // session — the adapter short-circuits on an existing grant, and there is no
+        // point re-asking a player who declined.
+        if (!askedToKeep.current) {
+            askedToKeep.current = true;
+            void o.services.persistence.ensure();
+        }
         if (newGhost) {
             o.adoptOwnRun(newGhost);
         }

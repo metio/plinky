@@ -3,7 +3,7 @@
 
 import { useSyncExternalStore } from "react";
 import { sampleCredit } from "../../../core/sampledPiano";
-import { useSampleSource } from "../../contexts/services";
+import { usePersistence, useSampleSource } from "../../contexts/services";
 import { Button } from "../ui/button";
 import { ConfirmButton } from "../ui/confirmButton";
 import { SwitchField } from "../ui/fields";
@@ -22,6 +22,7 @@ import { m } from "../../paraglide/messages.js";
 // courtesy — and, once anything has arrived, how much of this device it is using.
 export function GrandPianoSetting() {
     const samples = useSampleSource();
+    const persistence = usePersistence();
     const state = useSyncExternalStore(
         samples.subscribe,
         () => samples.state(),
@@ -85,7 +86,10 @@ export function GrandPianoSetting() {
                             onClick={() => {
                                 // Not awaited, like the switch: the figures above move as it
                                 // goes, which is the progress bar.
-                                void samples.fetchAll();
+                                // Eighty-five megabytes makes this origin a fatter
+                                // target for eviction, so ask to be kept before
+                                // asking for the bytes.
+                                void persistence.ensure().then(() => samples.fetchAll());
                             }}
                             disabled={
                                 state.loading || (state.wanted > 0 && state.held >= state.wanted)
