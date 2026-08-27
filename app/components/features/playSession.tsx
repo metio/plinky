@@ -244,21 +244,20 @@ function usePlaySessionValue({
             setShowMine(true);
         }
     }, [hasSaved]);
-    const { prefs: prefsStore } = services;
     const xmlCodec = useXmlCodec();
     // How the score is laid out and read — bars per row, bar numbers, treadmill, on-staff
     // fingering and follow-the-note scrolling — the toggles that feed the OSMD render.
     const reading = useReadingMode();
     const { barsPerRow, barNumbers, treadmill, scrollFollow } = reading;
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
-    const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
+    const [forgiving, setForgiving] = usePref("forgiving");
     const savedNoteLabels = useNoteLabels();
     // Reveal the next note by colour per the player's hint setting — always, only once
     // they've slipped at this position, or never. A wrong key flashes red regardless.
     // Writable from the Practice-tools drawer too, so the hint behaviour can change
     // without leaving the music; usePref persists it as the global setting.
-    const [noteHints, setNoteHints] = usePref(prefsStore, "noteHints");
-    const [keyLightsOn] = usePref(prefsStore, "keyLights");
+    const [noteHints, setNoteHints] = usePref("noteHints");
+    const [keyLightsOn] = usePref("keyLights");
     // Sight-read mode: one cold read of a piece with nothing to lean on. It owns the
     // aids for as long as it is on — turning it on strips them there and then, so what
     // you are about to attempt is visible before you commit to it, and no aid can flip
@@ -299,7 +298,7 @@ function usePlaySessionValue({
     const [fingerStrip, setFingerStrip] = useState(false);
     // Whether the Runs drawer (your saved performances of this piece) is open.
 
-    const [raceGhost, setRaceGhost] = usePref(prefsStore, "raceGhost");
+    const [raceGhost, setRaceGhost] = usePref("raceGhost");
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). The server snapshot treats it as
     // dismissed so the prerendered HTML never flashes it; the portrait layout stays
@@ -516,7 +515,7 @@ function usePlaySessionValue({
     // A metronome on demand: fixed at the chosen tempo, or following the player's own pace
     // when adaptive. Keep-up mode always ticks (a count-in then the beat you're racing),
     // whatever the metronome toggle; a self-paced run honours the toggle.
-    const [metronomeAccent] = usePref(prefsStore, "metronomeAccent");
+    const [metronomeAccent] = usePref("metronomeAccent");
     useMetronome(
         metronomeOn || keepUp.running,
         keepUp.running ? tempo : adaptive ? liveTempo : tempo,
@@ -527,8 +526,8 @@ function usePlaySessionValue({
 
     // Hidden-notes (ear) practice: noteheads start blank and reveal green as they are
     // found, red once the tries budget is spent. Persisted like the other play prefs.
-    const [hiddenNotes, setHiddenNotes] = usePref(prefsStore, "hiddenNotes");
-    const [revealTries, setRevealTries] = usePref(prefsStore, "revealTries");
+    const [hiddenNotes, setHiddenNotes] = usePref("hiddenNotes");
+    const [revealTries, setRevealTries] = usePref("revealTries");
     // The read-ahead drill: bars vanish behind the run so the eyes cannot go back.
     // Armed only while sight-read mode asks for it.
     // Self-paced only: the drill hides the bar you have moved past, which it learns
@@ -1163,7 +1162,10 @@ function usePlaySessionValue({
         // deciding whether they fit an instrument needs.
         sounding,
         hintNotes,
-        holdFractions: holdIndicator.holdFractions,
+        // The feed rather than the fills: one stable object, so a hold no longer
+        // rewrites this value sixty times a second and repaints every panel that
+        // reads it. The keyboard subscribes for itself.
+        holds: holdIndicator.holds,
         noteHints,
         setNoteHints,
         focusXml,

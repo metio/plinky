@@ -3,7 +3,6 @@
 
 import { useMemo } from "react";
 import { readIncipit } from "../../../core/incipit";
-import { usePrefsStore } from "../../contexts/services";
 import { usePref } from "../../hooks/usePref";
 import { useXmlCodec } from "../../contexts/services";
 import { IncipitMark } from "../ui/incipit";
@@ -21,7 +20,7 @@ import { IncipitMark } from "../ui/incipit";
 // score's colours down should not repaint the catalogue.
 export function ScoreIncipit({ xml, title }: { xml: string; title: string }) {
     const codec = useXmlCodec();
-    const [colored] = usePref(usePrefsStore(), "colorNotes");
+    const [colored] = usePref("colorNotes");
     const incipit = useMemo(() => readIncipit(codec, xml), [codec, xml]);
     if (!incipit) {
         return null;

@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 27 August 2026 — later
+
+**The playing surface is lighter while you hold a note.** The fill that drains
+across a key as you hold it was quietly redrawing the whole page sixty times a
+second — every panel, every reading, the lot — to animate one key. Now only the keys
+themselves redraw. It should tell most on a phone, where that work came out of the
+battery.
+
 ## 27 August 2026 — night
 
 **When something breaks quietly, you can now see it.** A crash used to show you a

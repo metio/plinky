@@ -54,14 +54,14 @@ export type ReadingMode = {
 
 export function useReadingMode(): ReadingMode {
     const prefs = usePrefsStore();
-    const [barsPerRow, setBarsPerRow] = usePref(prefs, "barsPerRow");
-    const [noteScale, setNoteScale] = usePref(prefs, "noteScale");
-    const [barNumbers, setBarNumbers] = usePref(prefs, "barNumbers");
-    const [treadmill, setTreadmill] = usePref(prefs, "treadmill");
-    const [highway, setHighway] = usePref(prefs, "highway");
-    const [beams, setBeams] = usePref(prefs, "beams");
-    const [showAccompaniment, setShowAccompaniment] = usePref(prefs, "showAccompaniment");
-    const [colorNotes, setColorNotes] = usePref(prefs, "colorNotes");
+    const [barsPerRow, setBarsPerRow] = usePref("barsPerRow");
+    const [noteScale, setNoteScale] = usePref("noteScale");
+    const [barNumbers, setBarNumbers] = usePref("barNumbers");
+    const [treadmill, setTreadmill] = usePref("treadmill");
+    const [highway, setHighway] = usePref("highway");
+    const [beams, setBeams] = usePref("beams");
+    const [showAccompaniment, setShowAccompaniment] = usePref("showAccompaniment");
+    const [colorNotes, setColorNotes] = usePref("colorNotes");
     // The fingering numbers are always baked into the loaded sheet; this only flips whether
     // OSMD draws them, so it stays session state rather than a persisted preference.
     const [showFingerings, setShowFingerings] = useState(() => prefs.load().showFingerings);

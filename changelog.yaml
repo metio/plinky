@@ -2,6 +2,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-08-27
+  label: later
+  entries:
+    - |-
+      **The playing surface is lighter while you hold a note.** The fill that drains
+      across a key as you hold it was quietly redrawing the whole page sixty times a
+      second — every panel, every reading, the lot — to animate one key. Now only the keys
+      themselves redraw. It should tell most on a phone, where that work came out of the
+      battery.
+
+- date: 2026-08-27
   label: night
   entries:
     - |-

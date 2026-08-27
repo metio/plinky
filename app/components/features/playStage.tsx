@@ -32,7 +32,7 @@ export function PlayStage() {
         fingerStrip,
         hintNotes,
         listenPlayback,
-        holdFractions,
+        holds,
         keyRange,
         id,
         xml,
@@ -129,7 +129,7 @@ export function PlayStage() {
                             // as heard.
                             sounding={listenPlayback.sounding}
                             wrong={matcher.lastWrong}
-                            holds={holdFractions}
+                            holds={holds}
                             from={keyRange.from}
                             to={keyRange.to}
                             // Full screen is the playing surface — let the keys use

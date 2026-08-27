@@ -32,13 +32,13 @@ describe("useHoldIndicator", () => {
         const { scheduler, result } = harness();
 
         act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
-        expect(result.current.holdFractions.get(60)).toBe(1);
+        expect(result.current.holds.get().get(60)).toBe(1);
 
         paint(scheduler, 500);
-        expect(result.current.holdFractions.get(60)).toBeCloseTo(0.5);
+        expect(result.current.holds.get().get(60)).toBeCloseTo(0.5);
 
         paint(scheduler, 500);
-        expect(result.current.holdFractions.has(60)).toBe(false);
+        expect(result.current.holds.get().has(60)).toBe(false);
         // The loop stopped re-arming once nothing was left to shrink.
         expect(scheduler.pending().frames).toBe(0);
     });
@@ -52,9 +52,9 @@ describe("useHoldIndicator", () => {
                 { note: 67, durationMs: 800 },
             ]),
         );
-        expect(result.current.holdFractions.get(60)).toBe(1);
-        expect(result.current.holdFractions.get(64)).toBe(1);
-        expect(result.current.holdFractions.get(67)).toBe(1);
+        expect(result.current.holds.get().get(60)).toBe(1);
+        expect(result.current.holds.get().get(64)).toBe(1);
+        expect(result.current.holds.get().get(67)).toBe(1);
     });
 
     it("drains each key on its own written length, not the position's longest", () => {
@@ -70,8 +70,8 @@ describe("useHoldIndicator", () => {
         );
 
         paint(scheduler, 250);
-        expect(result.current.holdFractions.has(72)).toBe(false);
-        expect(result.current.holdFractions.get(48)).toBeCloseTo(0.875);
+        expect(result.current.holds.get().has(72)).toBe(false);
+        expect(result.current.holds.get().get(48)).toBeCloseTo(0.875);
         // The long hand keeps its own frame loop running.
         expect(scheduler.pending().frames).toBe(1);
     });
@@ -84,24 +84,24 @@ describe("useHoldIndicator", () => {
                 { note: 64, durationMs: 500 },
             ]),
         );
-        expect(result.current.holdFractions.has(60)).toBe(false);
-        expect(result.current.holdFractions.get(64)).toBe(1);
+        expect(result.current.holds.get().has(60)).toBe(false);
+        expect(result.current.holds.get().get(64)).toBe(1);
     });
 
     it("re-arms a note's fill to its full length when it is struck again", () => {
         const { scheduler, result } = harness();
         act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
         paint(scheduler, 800);
-        expect(result.current.holdFractions.get(60)).toBeCloseTo(0.2);
+        expect(result.current.holds.get().get(60)).toBeCloseTo(0.2);
 
         act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
-        expect(result.current.holdFractions.get(60)).toBe(1);
+        expect(result.current.holds.get().get(60)).toBe(1);
     });
 
     it("ignores a non-positive duration", () => {
         const { scheduler, result } = harness();
         act(() => result.current.begin([{ note: 60, durationMs: 0 }]));
-        expect(result.current.holdFractions.has(60)).toBe(false);
+        expect(result.current.holds.get().has(60)).toBe(false);
         expect(scheduler.pending().frames).toBe(0);
     });
 
@@ -116,7 +116,7 @@ describe("useHoldIndicator", () => {
         expect(scheduler.pending().frames).toBe(1);
 
         act(() => result.current.clear());
-        expect(result.current.holdFractions.size).toBe(0);
+        expect(result.current.holds.get().size).toBe(0);
         expect(scheduler.pending().frames).toBe(0);
     });
 
@@ -126,5 +126,51 @@ describe("useHoldIndicator", () => {
         expect(scheduler.pending().frames).toBe(1);
         unmount();
         expect(scheduler.pending().frames).toBe(0);
+    });
+
+    it("tells subscribers on every frame, and lets them go", () => {
+        // The whole point of publishing rather than holding state: the fills reach the
+        // one component that paints them without re-rendering whoever called the hook.
+        const { scheduler, result } = harness();
+        let told = 0;
+        let stop = () => {};
+        act(() => {
+            stop = result.current.holds.subscribe(() => {
+                told += 1;
+            });
+        });
+
+        act(() => result.current.begin([{ note: 60, durationMs: 1000 }]));
+        expect(told).toBe(1);
+
+        paint(scheduler, 250);
+        expect(told).toBe(2);
+
+        act(() => stop());
+        paint(scheduler, 250);
+        expect(told).toBe(2);
+    });
+
+    it("hands back the same empty map rather than a fresh one", () => {
+        // useSyncExternalStore compares snapshots by identity, so an idle keyboard
+        // publishing a new empty map every frame would re-render forever.
+        const { scheduler, result } = harness();
+        const before = result.current.holds.get();
+
+        act(() => result.current.clear());
+        paint(scheduler, 100);
+
+        expect(result.current.holds.get()).toBe(before);
+    });
+
+    it("keeps one stable feed across re-renders", () => {
+        // It goes into the play session's context value; a new object each render would
+        // put the churn back that moving it out was meant to remove.
+        const { result, rerender } = harness();
+        const feed = result.current.holds;
+
+        rerender();
+
+        expect(result.current.holds).toBe(feed);
     });
 });

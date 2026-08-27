@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { usePrefsStore } from "../contexts/services";
 import { usePref } from "./usePref";
 import { type RunCapture, liveTempo as nextLiveTempo } from "../../core/runCapture";
 import { rampedTempo } from "../../core/tempo";
@@ -51,12 +50,11 @@ export function useTempoControls({
     const [tempo, setTempo] = useState(initialTempo);
     const [liveTempo, setLiveTempo] = useState(initialTempo);
     const [metronomeOn, setMetronomeOn] = useState(false);
-    const prefsStore = usePrefsStore();
     // The metronome's voice — how finely each beat divides (1 = beats, 2 =
     // eighths, 3 = triplets, 4 = sixteenths) and whether it follows the player's
     // own pace — is set once in Settings and persists across pieces.
-    const [subdivision, setSubdivision] = usePref(prefsStore, "metronomeSubdivision");
-    const [adaptive, setAdaptive] = usePref(prefsStore, "metronomeAdaptive");
+    const [subdivision, setSubdivision] = usePref("metronomeSubdivision");
+    const [adaptive, setAdaptive] = usePref("metronomeAdaptive");
     // The tempo trainer ramps the tempo up by a step after each completed run, up to
     // a target — practising a piece from comfortable to performance speed.
     const [trainerOn, setTrainerOn] = useState(false);
