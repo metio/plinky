@@ -10,7 +10,10 @@ import { createJsonStore, type JsonStore } from "./jsonStore";
 // Today panel) refreshes without a reload — the practice happens deep in a
 // route, the badge in the layout.
 export type HistoryStore = JsonStore<History> & {
-    record(notes: number, now?: Date): void;
+    // Returns whether the tally is safely on the device — false when the write was
+    // refused, so a caller can tell the player their practice was not recorded. A day
+    // that folds to the tally already held needs no write and reports true.
+    record(notes: number, now?: Date): boolean;
 };
 
 // The pre-paint bootstrap script in the app root reads this key directly (it runs
@@ -40,9 +43,10 @@ export function createHistoryStore(kv: KeyValueStore): HistoryStore {
         ...store,
         record(notes, now = new Date()) {
             const folded = foldPractice(store.load(), notes, now);
-            if (folded !== store.load()) {
-                store.save(folded);
+            if (folded === store.load()) {
+                return true;
             }
+            return store.save(folded);
         },
     };
 }

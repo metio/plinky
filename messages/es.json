@@ -580,6 +580,7 @@
     "takes_save_prompt": "¿Guardar esta toma?",
     "takes_save": "Guardar toma",
     "takes_saved": "Toma guardada",
+    "run_not_recorded": "El almacenamiento de este dispositivo está lleno o bloqueado, así que esta pasada no se ha guardado. Tu nota está aquí ahora, pero no lo estará tras recargar.",
     "takes_save_failed": "No se pudo guardar esta toma: el almacenamiento de este dispositivo está lleno o bloqueado.",
     "takes_share_ghost": "Reta a un amigo con esta toma",
     "takes_link_copied": "Enlace copiado",

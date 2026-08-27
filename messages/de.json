@@ -580,6 +580,7 @@
     "takes_save_prompt": "Diese Aufnahme speichern?",
     "takes_save": "Aufnahme speichern",
     "takes_saved": "Aufnahme gespeichert",
+    "run_not_recorded": "Der Speicher dieses Geräts ist voll oder blockiert, deshalb wurde dieser Durchgang nicht gesichert. Deine Note steht jetzt hier, nach einem Neuladen nicht mehr.",
     "takes_save_failed": "Diese Aufnahme konnte nicht gespeichert werden – der Speicher dieses Geräts ist voll oder blockiert.",
     "takes_share_ghost": "Fordere mit dieser Aufnahme eine Freundin oder einen Freund heraus",
     "takes_link_copied": "Link kopiert",

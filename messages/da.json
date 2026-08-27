@@ -580,6 +580,7 @@
     "takes_save_prompt": "Gem dette gennemløb?",
     "takes_save": "Gem gennemløb",
     "takes_saved": "Gennemløb gemt",
+    "run_not_recorded": "Denne enheds lager er fuldt eller blokeret, så denne gennemspilning blev ikke gemt. Din karakter er her nu, men ikke efter en genindlæsning.",
     "takes_save_failed": "Kunne ikke gemme dette gennemløb — denne enheds lager er fuldt eller blokeret.",
     "takes_share_ghost": "Udfordr en ven med dette gennemløb",
     "takes_link_copied": "Link kopieret",

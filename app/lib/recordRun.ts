@@ -50,12 +50,18 @@ export type RecordedRun = {
 // Returns the run's onsets when they become this score's new ghost (a full, non-ephemeral
 // run), so the caller can mirror them for the share button — or null when the ghost is
 // left as it was.
+//
+// Also returns whether every one of those writes landed. A device with full or blocked
+// storage still grades the run, still sounds the flourish and still paints the panel, so
+// without this the player is shown a grade, a milestone and a mastered piece that exist
+// only until they reload. Each write reports for itself and they are folded together
+// here, because the player does not care which of the nine refused.
 export function recordRun(
     run: RecordedRun,
     services: AppServices,
     now: number,
     publishMilestone: (milestone: Milestone) => void,
-): { ghost: number[] | null } {
+): { ghost: number[] | null; saved: boolean } {
     const {
         id,
         title,
@@ -71,16 +77,21 @@ export function recordRun(
         grid,
         tolerance,
     } = run;
-    services.lifetime.recordRun({
-        accuracy: grade.accuracy,
-        timing: grade.timing,
-        flow: grade.flow,
-    });
+    // Collected rather than short-circuited: a refused write is not a reason to skip the
+    // rest, since the ones that can still land are the player's progress.
+    const verdicts: boolean[] = [];
+    verdicts.push(
+        services.lifetime.recordRun({
+            accuracy: grade.accuracy,
+            timing: grade.timing,
+            flow: grade.flow,
+        }),
+    );
     if (daily != null) {
-        services.daily.recordDone(daily);
-        services.daily.saveResult(daily, { grade, grid, notes, tolerance });
+        verdicts.push(services.daily.recordDone(daily));
+        verdicts.push(services.daily.saveResult(daily, { grade, grid, notes, tolerance }));
     }
-    services.history.record(correct);
+    verdicts.push(services.history.record(correct));
     // How long this run took, folded into the practice diary. Onsets count from the
     // run's first cleared note, so the last one is the run's length; the diary decides
     // for itself whether that extends the sitting in progress or opens a new one.
@@ -88,12 +99,14 @@ export function recordRun(
     // A generated drill still contributes its minutes — time at the keyboard is time at
     // the keyboard — but carries no piece id, because it has no catalogue entry the
     // report could name.
-    services.practiceLog.record({
-        at: now,
-        activeMs: notes.at(-1)?.playedMs ?? 0,
-        notes: correct,
-        pieceId: ephemeral ? undefined : id,
-    });
+    verdicts.push(
+        services.practiceLog.record({
+            at: now,
+            activeMs: notes.at(-1)?.playedMs ?? 0,
+            notes: correct,
+            pieceId: ephemeral ? undefined : id,
+        }),
+    );
     // Which notes this run was slow to find, folded into the running per-note record.
     // Ephemeral runs count: a generated drill reads the staff exactly as a piece does,
     // and it is reading that is being measured.
@@ -103,27 +116,27 @@ export function recordRun(
     // says the drill was too hard, not that the note is hard to find, and folding it in
     // would file that difficulty under whichever pitches the overshoot happened to use.
     if (!assessment) {
-        services.noteStats.record(notes);
+        verdicts.push(services.noteStats.record(notes));
     }
     if (ephemeral) {
-        return { ghost: null };
+        return { ghost: null, saved: verdicts.every(Boolean) };
     }
     // The section-wise best only takes whole, unlooped readings. Sections are cut by
     // position within the run, so a takeover from Listen or a drilled bar range would
     // file a different stretch of music under the same section number and quietly
     // corrupt the record it is compared against.
     if (!partial && !looped) {
-        services.sectionBest.record(id, sections);
+        verdicts.push(services.sectionBest.record(id, sections));
     }
     const ghost = partial ? null : notes.map((note) => note.playedMs);
     if (ghost) {
-        services.ghosts.save(id, ghost);
+        verdicts.push(services.ghosts.save(id, ghost));
     }
     // Fold the run into spaced repetition: a score that clears the threshold becomes
     // learned and schedules (or reschedules) its review.
     const before = services.mastery.load(id);
     const threshold = letterMin(services.prefs.load().masteryThreshold);
-    services.mastery.save(id, applyRun(before, grade.score, threshold, now));
+    verdicts.push(services.mastery.save(id, applyRun(before, grade.score, threshold, now)));
 
     // Surface one earned moment. Grade-up is the biggest, so it wins a tie; the others it
     // pre-empts can still fire on a later run (a flawless run keeps its one-time flag; a
@@ -150,5 +163,5 @@ export function recordRun(
             publishMilestone({ kind: "first-s", songTitle: title });
         }
     });
-    return { ghost };
+    return { ghost, saved: verdicts.every(Boolean) };
 }

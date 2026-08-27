@@ -37,6 +37,7 @@ const base = {
     tempoScale: 1,
     title: "Minuet",
     runSaved: "idle" as const,
+    progressSaved: true,
     onSaveTake: () => {},
 };
 
@@ -90,5 +91,21 @@ describe("RunResult", () => {
         render(<RunResult {...base} grade={grade()} ephemeral />);
         expect(screen.queryByText(m.takes_save())).toBeNull();
         expect(screen.queryByText(m.takes_save_prompt())).toBeNull();
+    });
+
+    it("says so when the run's progress never reached the device", () => {
+        // The grade is real and was earned; it just isn't stored. Saying nothing would
+        // let the player build a practice history that vanishes on the next reload.
+        render(<RunResult {...base} grade={grade()} progressSaved={false} />);
+
+        expect(screen.getByRole("alert").textContent).toBe(m.run_not_recorded());
+        // The grade still shows: what was earned is still worth seeing.
+        expect(screen.getByText("B")).toBeTruthy();
+    });
+
+    it("says nothing about storage on an ordinary run", () => {
+        render(<RunResult {...base} grade={grade()} />);
+
+        expect(screen.queryByRole("alert")).toBeNull();
     });
 });

@@ -35,3 +35,19 @@ describe("historyStore", () => {
         expect(store.load()["2026-06-23"]).toBe(10);
     });
 });
+
+describe("historyStore.record verdicts", () => {
+    it("says so when the tally lands", () => {
+        expect(createHistoryStore(memoryStore()).record(12)).toBe(true);
+    });
+
+    it("says so when the write is refused", () => {
+        const store = createHistoryStore({ ...memoryStore(), set: () => false });
+        expect(store.record(12)).toBe(false);
+    });
+
+    it("reports true when the fold changes nothing, since there is nothing to store", () => {
+        const store = createHistoryStore({ ...memoryStore(), set: () => false });
+        expect(store.record(0)).toBe(true);
+    });
+});

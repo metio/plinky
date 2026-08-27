@@ -580,6 +580,7 @@
     "takes_save_prompt": "Spara den här tagningen?",
     "takes_save": "Spara tagning",
     "takes_saved": "Tagning sparad",
+    "run_not_recorded": "Det här enhetens lagring är full eller blockerad, så den här genomspelningen sparades inte. Ditt betyg finns här nu, men inte efter en omladdning.",
     "takes_save_failed": "Kunde inte spara tagningen — enhetens lagring är full eller blockerad.",
     "takes_share_ghost": "Utmana en vän med den här tagningen",
     "takes_link_copied": "Länk kopierad",

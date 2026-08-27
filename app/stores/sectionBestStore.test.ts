@@ -10,16 +10,17 @@ describe("section best store", () => {
         const store = createSectionBestStore(memoryStore());
 
         store.record("song", [90, 10, 0, 0, 0, 0]);
-        const merged = store.record("song", [20, 80, 50, 0, 0, 0]);
+        store.record("song", [20, 80, 50, 0, 0, 0]);
 
-        expect(merged).toEqual([90, 80, 50, 0, 0, 0]);
         expect(store.load("song")).toEqual([90, 80, 50, 0, 0, 0]);
     });
 
-    it("hands back the record as it now stands", () => {
+    it("holds the record as it now stands", () => {
         const store = createSectionBestStore(memoryStore());
 
-        expect(store.record("song", [10, 20, 30, 40, 50, 60])).toEqual([10, 20, 30, 40, 50, 60]);
+        store.record("song", [10, 20, 30, 40, 50, 60]);
+
+        expect(store.load("song")).toEqual([10, 20, 30, 40, 50, 60]);
     });
 
     it("keeps pieces apart", () => {
@@ -47,5 +48,17 @@ describe("section best store", () => {
 
         // Trusting a short record would drop the sections it never mentioned.
         expect(createSectionBestStore(kv).load("song")).toEqual([50, 60, 0, 0, 0, 0]);
+    });
+});
+
+describe("sectionBestStore.record verdicts", () => {
+    it("says so when the merged record lands", () => {
+        expect(createSectionBestStore(memoryStore()).record("song-1", [80, 70])).toBe(true);
+    });
+
+    it("says so when the write is refused, and keeps nothing", () => {
+        const store = createSectionBestStore({ ...memoryStore(), set: () => false });
+        expect(store.record("song-1", [80, 70])).toBe(false);
+        expect(store.load("song-1")).toBeNull();
     });
 });

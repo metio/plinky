@@ -580,6 +580,7 @@
     "takes_save_prompt": "Bu kayıt kaydedilsin mi?",
     "takes_save": "Kaydı sakla",
     "takes_saved": "Kayıt saklandı",
+    "run_not_recorded": "Bu cihazın depolaması dolu ya da engelli, bu yüzden bu geçiş saklanmadı. Notun şimdi burada, yeniden yükledikten sonra olmayacak.",
     "takes_save_failed": "Bu kayıt saklanamadı — bu cihazın depolaması dolu ya da engellenmiş.",
     "takes_share_ghost": "Bu kayıtla bir arkadaşına meydan oku",
     "takes_link_copied": "Bağlantı kopyalandı",

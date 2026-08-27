@@ -44,6 +44,7 @@ function harness(overrides: Partial<RunGradingOptions> = {}, services?: Partial<
     });
     const calls = {
         recordResult: vi.fn(),
+        reportProgressSaved: vi.fn(),
         playNote: vi.fn(),
         bumpTempo: vi.fn(),
         adoptOwnRun: vi.fn(),
@@ -69,6 +70,7 @@ function harness(overrides: Partial<RunGradingOptions> = {}, services?: Partial<
         playNote: calls.playNote,
         publishMilestone: calls.publishMilestone,
         recordResult: calls.recordResult,
+        reportProgressSaved: calls.reportProgressSaved,
         bumpTempo: calls.bumpTempo,
         adoptOwnRun: calls.adoptOwnRun,
         onGraded: calls.onGraded,

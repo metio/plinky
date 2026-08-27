@@ -146,4 +146,71 @@ describe("recordRun", () => {
             }),
         );
     });
+
+    describe("the verdict", () => {
+        // A device with full or blocked storage still grades the run, still sounds the
+        // flourish and still paints the panel. Without a verdict the player is shown a
+        // grade and a mastered piece that exist only until they reload.
+        const refusing = () => ({ ...memoryStore(), set: () => false });
+
+        it("reports saved when every write lands", () => {
+            const services = createServices({ store: memoryStore() });
+            loadMock.mockResolvedValue([]);
+
+            expect(recordRun(run(), services, 1000, vi.fn()).saved).toBe(true);
+        });
+
+        it("reports not saved when the device refuses writes", () => {
+            const services = createServices({ store: refusing() });
+            loadMock.mockResolvedValue([]);
+
+            expect(recordRun(run(), services, 1000, vi.fn()).saved).toBe(false);
+        });
+
+        it("reports not saved when only one of the writes is refused", () => {
+            // Folded together on purpose: the player does not care which of the nine
+            // refused, only that their run was not fully remembered.
+            const store = memoryStore();
+            const services = createServices({
+                store: {
+                    ...store,
+                    set: (key, value) =>
+                        key.startsWith("plinky:mastery:") ? false : store.set(key, value),
+                },
+            });
+            loadMock.mockResolvedValue([]);
+
+            expect(recordRun(run(), services, 1000, vi.fn()).saved).toBe(false);
+        });
+
+        it("still writes everything it can when a write is refused", () => {
+            // A refusal is not a reason to abandon the rest: the writes that can land
+            // are the player's progress.
+            const store = memoryStore();
+            const services = createServices({
+                store: {
+                    ...store,
+                    set: (key, value) =>
+                        key === "plinky:lifetime" ? false : store.set(key, value),
+                },
+            });
+            loadMock.mockResolvedValue([]);
+
+            const { saved } = recordRun(run(), services, 1000, vi.fn());
+
+            expect(saved).toBe(false);
+            expect(services.mastery.load("song-1")?.bestScore).toBe(86);
+            expect(services.ghosts.load("song-1")).toEqual([10, 515]);
+        });
+
+        it("reports the verdict for an ephemeral run, which returns early", () => {
+            const services = createServices({ store: refusing() });
+            loadMock.mockResolvedValue([]);
+
+            const { ghost, saved } = recordRun(run({ ephemeral: true }), services, 1000, vi.fn());
+
+            expect(ghost).toBeNull();
+            expect(saved).toBe(false);
+        });
+    });
 });

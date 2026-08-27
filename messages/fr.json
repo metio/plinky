@@ -580,6 +580,7 @@
     "takes_save_prompt": "Enregistrer cette prise ?",
     "takes_save": "Enregistrer la prise",
     "takes_saved": "Prise enregistrée",
+    "run_not_recorded": "Le stockage de cet appareil est plein ou bloqué, donc ce passage n'a pas été conservé. Ta note est là maintenant, mais elle ne le sera plus après un rechargement.",
     "takes_save_failed": "Impossible d'enregistrer cette prise — le stockage de cet appareil est plein ou bloqué.",
     "takes_share_ghost": "Défiez un ami avec cette prise",
     "takes_link_copied": "Lien copié",

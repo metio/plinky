@@ -12,10 +12,11 @@ const KEY = "plinky:lifetime";
 
 export type LifetimeStore = {
     load(): Lifetime;
-    // Fold a finished run into the fingerprint and persist it. Returns the
-    // updated lifetime for immediate rendering; a refused write surfaces
-    // through the storage banner.
-    recordRun(run: Skill, now?: Date): Lifetime;
+    // Fold a finished run into the fingerprint and persist it, returning whether it
+    // landed. The fingerprint itself is not returned: every reader reaches it through
+    // load() under a subscription, and handing back the new value while staying silent
+    // about whether it was stored is the wrong half to report.
+    recordRun(run: Skill, now?: Date): boolean;
     subscribe(onChange: () => void): () => void;
 };
 
@@ -26,9 +27,7 @@ export function createLifetimeStore(kv: KeyValueStore): LifetimeStore {
     return {
         load: store.load,
         recordRun(run, now = new Date()) {
-            const next = foldRun(store.load(), run, now);
-            store.save(next);
-            return next;
+            return store.save(foldRun(store.load(), run, now));
         },
         subscribe: store.subscribe,
     };

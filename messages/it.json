@@ -580,6 +580,7 @@
     "takes_save_prompt": "Salvare questa esecuzione?",
     "takes_save": "Salva esecuzione",
     "takes_saved": "Esecuzione salvata",
+    "run_not_recorded": "La memoria di questo dispositivo è piena o bloccata, quindi questa esecuzione non è stata conservata. Il tuo voto è qui ora, ma non ci sarà dopo un ricaricamento.",
     "takes_save_failed": "Impossibile salvare questa esecuzione — la memoria di questo dispositivo è piena o bloccata.",
     "takes_share_ghost": "Sfida un amico con questa esecuzione",
     "takes_link_copied": "Link copiato",

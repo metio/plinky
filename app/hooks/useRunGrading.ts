@@ -64,6 +64,10 @@ export type RunGradingOptions = {
     ) => void;
     publishMilestone: (milestone: Milestone) => void;
     recordResult: (result: RunOutcome & { notes: RunCapture["notes"] }) => void;
+    // Whether recording the finished run reached the device. Reported separately from
+    // the outcome, which is a pure reading of the played notes and says nothing about
+    // storage.
+    reportProgressSaved: (stored: boolean) => void;
     bumpTempo: () => void;
     adoptOwnRun: (onsets: number[]) => void;
     onGraded?: (grade: Grade) => void;
@@ -134,7 +138,7 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
             });
         }
         o.bumpTempo();
-        const { ghost: newGhost } = recordRun(
+        const { ghost: newGhost, saved } = recordRun(
             {
                 id: o.id,
                 title: o.title,
@@ -159,6 +163,7 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
             now(),
             o.publishMilestone,
         );
+        o.reportProgressSaved(saved);
         if (newGhost) {
             o.adoptOwnRun(newGhost);
         }

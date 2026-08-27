@@ -580,6 +580,7 @@
     "takes_save_prompt": "Salvezi această înregistrare?",
     "takes_save": "Salvează înregistrarea",
     "takes_saved": "Înregistrare salvată",
+    "run_not_recorded": "Stocarea acestui dispozitiv este plină sau blocată, așa că această trecere nu a fost păstrată. Nota ta este aici acum, dar nu va mai fi după o reîncărcare.",
     "takes_save_failed": "Nu s-a putut salva înregistrarea — stocarea acestui dispozitiv e plină sau blocată.",
     "takes_share_ghost": "Provoacă un prieten cu această înregistrare",
     "takes_link_copied": "Link copiat",

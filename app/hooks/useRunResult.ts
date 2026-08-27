@@ -32,10 +32,18 @@ export type RunResult = {
     tempoCurve: TempoCurve | null;
     // idle until the player saves the run as a take, then the store's write verdict.
     saved: "idle" | "saved" | "failed";
+    // Whether the run's own progress — grade, mastery, ghost, practice tally — reached
+    // the device. Distinct from `saved`, which is the take the player asks for by hand:
+    // this one is written for them, so a refusal has to be told rather than inferred
+    // from a button that never turned green. True until a run says otherwise, so nothing
+    // is claimed about a device that has not been asked to store anything yet.
+    progressSaved: boolean;
     // Record a finished run's outcome — the grade panel and its readouts follow from it.
     record(outcome: RunOutcome): void;
     // Set the save verdict from the store's write result (a refused write reads "failed").
     markSaved(stored: boolean): void;
+    // Record whether the finished run's progress landed on the device.
+    markProgress(stored: boolean): void;
     // Wipe every surface back to "no result yet" — a fresh run and a keep-up run both
     // call this so a finished result can't linger beneath the next run.
     clear(): void;
@@ -51,6 +59,7 @@ export function useRunResult(seeded?: DailyResult | null): RunResult {
     const [grid, setGrid] = useState<Grid | null>(seeded?.grid ?? null);
     const [tempoCurve, setTempoCurve] = useState<TempoCurve | null>(null);
     const [saved, setSaved] = useState<"idle" | "saved" | "failed">("idle");
+    const [progressSaved, setProgressSaved] = useState(true);
 
     const record = useCallback((outcome: RunOutcome) => {
         setGrade(outcome.grade);
@@ -66,11 +75,24 @@ export function useRunResult(seeded?: DailyResult | null): RunResult {
 
     const clear = useCallback(() => {
         setSaved("idle");
+        setProgressSaved(true);
         setGrade(null);
         setNotes([]);
         setGrid(null);
         setTempoCurve(null);
     }, []);
 
-    return { grade, notes, tolerance, grid, tempoCurve, saved, record, markSaved, clear };
+    return {
+        grade,
+        notes,
+        tolerance,
+        grid,
+        tempoCurve,
+        saved,
+        progressSaved,
+        record,
+        markSaved,
+        markProgress: setProgressSaved,
+        clear,
+    };
 }

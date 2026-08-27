@@ -802,6 +802,7 @@ function usePlaySessionValue({
         playNote: synth.playNote,
         publishMilestone,
         recordResult: runResult.record,
+        reportProgressSaved: runResult.markProgress,
         bumpTempo,
         adoptOwnRun: ghostRace.adoptOwnRun,
         onGraded,

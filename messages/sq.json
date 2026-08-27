@@ -580,6 +580,7 @@
     "takes_save_prompt": "Ta ruaj këtë provë?",
     "takes_save": "Ruaj provën",
     "takes_saved": "Prova u ruajt",
+    "run_not_recorded": "Hapësira e këtij pajisjeje është plot ose e bllokuar, prandaj ky kalim nuk u ruajt. Nota jote është këtu tani, pas një ringarkimi nuk do të jetë.",
     "takes_save_failed": "S'u ruajt dot kjo provë — hapësira e kësaj pajisjeje është plot ose e bllokuar.",
     "takes_share_ghost": "Sfido një shok me këtë provë",
     "takes_link_copied": "Lidhja u kopjua",

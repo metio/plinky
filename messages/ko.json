@@ -580,6 +580,7 @@
     "takes_save_prompt": "이 녹음을 저장할까요?",
     "takes_save": "녹음 저장",
     "takes_saved": "녹음 저장됨",
+    "run_not_recorded": "이 기기의 저장 공간이 가득 찼거나 차단되어 이번 연주는 남지 않았습니다. 지금은 성적이 보이지만 새로 고치면 사라집니다.",
     "takes_save_failed": "이 녹음을 저장하지 못했어요 — 이 기기의 저장 공간이 가득 찼거나 막혀 있어요.",
     "takes_share_ghost": "이 녹음으로 친구에게 도전장을",
     "takes_link_copied": "링크 복사됨",

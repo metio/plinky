@@ -10,6 +10,9 @@ import { RunResult } from "./runResult";
 // story is just a hand-written run — no stores, no clock.
 const meta: Meta<typeof RunResult> = {
     component: RunResult,
+    // The ordinary case for every story below: the run reached the device. Only the
+    // story about a refused write says otherwise.
+    args: { progressSaved: true },
 };
 export default meta;
 
@@ -94,6 +97,21 @@ export const SaveFailed: Story = {
         tempoCurve: null,
         tempoScale: 1,
         runSaved: "failed",
+        onSaveTake: () => {},
+    },
+};
+
+// A device that refused the write. The grade was earned and is shown; the notice above
+// it says it will not survive a reload.
+export const ProgressNotKept: Story = {
+    args: {
+        grade: goodGrade,
+        notes: singleHand,
+        tolerance: 1,
+        tempoCurve: null,
+        tempoScale: 1,
+        runSaved: "idle",
+        progressSaved: false,
         onSaveTake: () => {},
     },
 };

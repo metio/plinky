@@ -580,6 +580,7 @@
     "takes_save_prompt": "Elmented ezt a felvételt?",
     "takes_save": "Felvétel mentése",
     "takes_saved": "Felvétel mentve",
+    "run_not_recorded": "Ennek az eszköznek a tárhelye tele van vagy le van tiltva, ezért ez a menet nem maradt meg. Az osztályzatod most itt van, újratöltés után már nem lesz.",
     "takes_save_failed": "Nem sikerült menteni a felvételt — az eszköz tárhelye megtelt vagy le van tiltva.",
     "takes_share_ghost": "Hívj ki egy barátot ezzel a felvétellel",
     "takes_link_copied": "Link másolva",

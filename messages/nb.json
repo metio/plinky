@@ -580,6 +580,7 @@
     "takes_save_prompt": "Lagre denne gjennomkjøringen?",
     "takes_save": "Lagre gjennomkjøring",
     "takes_saved": "Gjennomkjøring lagret",
+    "run_not_recorded": "Lagringen på denne enheten er full eller blokkert, så denne gjennomspillingen ble ikke tatt vare på. Karakteren din er her nå, men ikke etter en ny innlasting.",
     "takes_save_failed": "Kunne ikke lagre denne gjennomkjøringen — lagringen på denne enheten er full eller blokkert.",
     "takes_share_ghost": "Utfordre en venn med denne gjennomkjøringen",
     "takes_link_copied": "Lenke kopiert",

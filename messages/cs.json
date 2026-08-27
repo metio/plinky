@@ -580,6 +580,7 @@
     "takes_save_prompt": "Uložit tento pokus?",
     "takes_save": "Uložit pokus",
     "takes_saved": "Pokus uložen",
+    "run_not_recorded": "Úložiště tohoto zařízení je plné nebo zablokované, takže tento průchod nebyl uložen. Tvoje známka tu teď je, po načtení znovu už ne.",
     "takes_save_failed": "Tento pokus se nepodařilo uložit — úložiště zařízení je plné nebo blokované.",
     "takes_share_ghost": "Vyzvěte kamaráda tímto pokusem",
     "takes_link_copied": "Odkaz zkopírován",

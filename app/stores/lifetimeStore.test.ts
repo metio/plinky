@@ -17,17 +17,17 @@ function day(n: number): Date {
 describe("lifetimeStore.recordRun", () => {
     it("seeds the average from the first run", () => {
         const store = createLifetimeStore(memoryStore());
-        const lifetime = store.recordRun(PERFECT, day(1));
-        expect(lifetime.days).toHaveLength(1);
-        expect(lifetime.days[0]?.skill).toEqual(PERFECT);
+        store.recordRun(PERFECT, day(1));
+        expect(store.load().days).toHaveLength(1);
+        expect(store.load().days[0]?.skill).toEqual(PERFECT);
     });
 
     it("smooths later runs rather than jumping to them", () => {
         const store = createLifetimeStore(memoryStore());
         store.recordRun(PERFECT, day(1));
-        const lifetime = store.recordRun(POOR, day(2));
+        store.recordRun(POOR, day(2));
         // A single poor run pulls a perfect average only part of the way down.
-        expect(lifetime.days.at(-1)?.skill.accuracy).toBe(75); // 0.25*0 + 0.75*100
+        expect(store.load().days.at(-1)?.skill.accuracy).toBe(75); // 0.25*0 + 0.75*100
     });
 
     it("keeps one snapshot per day, updating within the day", () => {
@@ -75,10 +75,17 @@ describe("lifetimeStore.recordRun", () => {
         expect(createLifetimeStore(kv).load().days).toHaveLength(1);
     });
 
-    it("still returns the folded lifetime when the write is refused", () => {
+    it("says so when the write is refused, and keeps nothing", () => {
+        // The verdict is the whole point: a run folded into a fingerprint that was never
+        // stored has not been remembered, and recordRun tells the player as much.
         const store = createLifetimeStore({ ...memoryStore(), set: () => false });
-        expect(store.recordRun(PERFECT, day(1)).days).toHaveLength(1);
+        expect(store.recordRun(PERFECT, day(1))).toBe(false);
         expect(store.load().days).toHaveLength(0);
+    });
+
+    it("says so when the write lands", () => {
+        const store = createLifetimeStore(memoryStore());
+        expect(store.recordRun(PERFECT, day(1))).toBe(true);
     });
 });
 
@@ -90,9 +97,9 @@ describe("lifetimeStore.load", () => {
         const store = createLifetimeStore(kv);
         expect(store.load().days).toEqual([]);
         // A later run must seed cleanly instead of blending against the bad day.
-        const lifetime = store.recordRun(PERFECT, day(2));
-        expect(lifetime.days).toHaveLength(1);
-        expect(lifetime.days[0]?.skill).toEqual(PERFECT);
+        store.recordRun(PERFECT, day(2));
+        expect(store.load().days).toHaveLength(1);
+        expect(store.load().days[0]?.skill).toEqual(PERFECT);
     });
 
     it("reads corrupt storage as an empty fingerprint", () => {

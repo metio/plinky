@@ -580,6 +580,7 @@
     "takes_save_prompt": "Deze opname opslaan?",
     "takes_save": "Opname opslaan",
     "takes_saved": "Opname opgeslagen",
+    "run_not_recorded": "De opslag van dit apparaat is vol of geblokkeerd, dus deze ronde is niet bewaard. Je cijfer staat er nu, maar niet meer na een herlaadbeurt.",
     "takes_save_failed": "Kon deze opname niet opslaan — de opslag van dit apparaat is vol of geblokkeerd.",
     "takes_share_ghost": "Daag een vriend uit met deze opname",
     "takes_link_copied": "Link gekopieerd",

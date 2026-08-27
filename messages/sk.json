@@ -580,6 +580,7 @@
     "takes_save_prompt": "Uložiť tento pokus?",
     "takes_save": "Uložiť pokus",
     "takes_saved": "Pokus uložený",
+    "run_not_recorded": "Úložisko tohto zariadenia je plné alebo zablokované, takže tento prechod sa neuložil. Tvoja známka tu teraz je, po opätovnom načítaní už nie.",
     "takes_save_failed": "Tento pokus sa nepodarilo uložiť — úložisko tohto zariadenia je plné alebo blokované.",
     "takes_share_ghost": "Vyzvite priateľa týmto pokusom",
     "takes_link_copied": "Odkaz skopírovaný",

@@ -706,6 +706,7 @@
     "takes_save_prompt": "Save this run?",
     "takes_save": "Save run",
     "takes_saved": "Run saved",
+    "run_not_recorded": "This device's storage is full or blocked, so this run wasn't kept. Your grade is here now, and won't be after a reload.",
     "takes_save_failed": "Couldn't save this run — this device's storage is full or blocked.",
     "takes_share_ghost": "Challenge a friend with this run",
     "takes_link_copied": "Link copied",

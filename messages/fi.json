@@ -580,6 +580,7 @@
     "takes_save_prompt": "Tallennetaanko tämä otos?",
     "takes_save": "Tallenna otos",
     "takes_saved": "Otos tallennettu",
+    "run_not_recorded": "Tämän laitteen tallennustila on täynnä tai estetty, joten tätä läpimenoa ei säilytetty. Arvosanasi on nyt tässä, mutta uudelleenlatauksen jälkeen ei enää.",
     "takes_save_failed": "Otosta ei voitu tallentaa — tämän laitteen tallennustila on täynnä tai estetty.",
     "takes_share_ghost": "Haasta ystävä tällä otoksella",
     "takes_link_copied": "Linkki kopioitu",

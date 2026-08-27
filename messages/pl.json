@@ -580,6 +580,7 @@
     "takes_save_prompt": "Zapisać to podejście?",
     "takes_save": "Zapisz podejście",
     "takes_saved": "Podejście zapisane",
+    "run_not_recorded": "Pamięć tego urządzenia jest pełna lub zablokowana, więc to podejście nie zostało zapisane. Twoja ocena jest tu teraz, ale nie będzie po przeładowaniu.",
     "takes_save_failed": "Nie udało się zapisać tego podejścia — pamięć tego urządzenia jest pełna lub zablokowana.",
     "takes_share_ghost": "Rzuć znajomemu wyzwanie tym podejściem",
     "takes_link_copied": "Link skopiowany",

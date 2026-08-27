@@ -9,10 +9,10 @@ import { createKeyedJsonStore } from "./jsonStore";
 
 export type SectionBestStore = {
     load(scoreId: string): number[] | null;
-    // Fold a run's section scores in, keeping whichever reading of each went better.
-    // Returns the record as it now stands, so a caller can report what changed
-    // without reading back.
-    record(scoreId: string, run: number[]): number[];
+    // Fold a run's section scores in, keeping whichever reading of each went better,
+    // and report whether the merged record landed. The record itself is read back
+    // through load() by the one panel that shows it.
+    record(scoreId: string, run: number[]): boolean;
     subscribe(onChange: () => void): () => void;
 };
 
@@ -21,9 +21,7 @@ export function createSectionBestStore(kv: KeyValueStore): SectionBestStore {
     return {
         load: (scoreId) => store.load(scoreId),
         record(scoreId, run) {
-            const merged = mergeBest(store.load(scoreId), run);
-            store.save(scoreId, merged);
-            return merged;
+            return store.save(scoreId, mergeBest(store.load(scoreId), run));
         },
         subscribe: store.subscribe,
     };

@@ -159,6 +159,7 @@ export function PlaySurface() {
                                 tempoScale={runTempoScale}
                                 ephemeral={ephemeral}
                                 runSaved={runResult.saved}
+                                progressSaved={runResult.progressSaved}
                                 onSaveTake={saveCurrentTake}
                             />
                             {/* Only for a real piece: a generated phrase is different

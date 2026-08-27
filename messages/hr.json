@@ -580,6 +580,7 @@
     "takes_save_prompt": "Spremiti ovaj pokušaj?",
     "takes_save": "Spremi pokušaj",
     "takes_saved": "Pokušaj spremljen",
+    "run_not_recorded": "Pohrana ovog uređaja je puna ili blokirana, pa ovaj prolaz nije sačuvan. Tvoja ocjena je sada ovdje, nakon ponovnog učitavanja neće biti.",
     "takes_save_failed": "Nije moguće spremiti ovaj pokušaj — pohrana ovog uređaja je puna ili blokirana.",
     "takes_share_ghost": "Izazovi prijatelja ovim pokušajem",
     "takes_link_copied": "Poveznica kopirana",

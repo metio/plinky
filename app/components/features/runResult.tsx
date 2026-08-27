@@ -27,6 +27,7 @@ export function RunResult({
     tempoScale,
     ephemeral,
     runSaved,
+    progressSaved,
     onSaveTake,
 }: {
     grade: Grade;
@@ -38,6 +39,9 @@ export function RunResult({
     tempoScale: number;
     ephemeral?: boolean;
     runSaved: "idle" | "saved" | "failed";
+    // False when a write was refused while recording the run. The grade below is real
+    // and was earned; it just isn't on the device.
+    progressSaved: boolean;
     onSaveTake: () => void;
 }) {
     // Which hand trailed the other (null on a single-hand run), read at the same tempo
@@ -45,6 +49,14 @@ export function RunResult({
     const handVerdict = laggingHand(notes, { tempoScale });
     return (
         <>
+            {/* Above the grade, because it changes what the grade means. Assertive rather
+                than polite: it appears at the moment the panel does, so a reader already
+                on the page is not told about it only if they happen to move on. */}
+            {!progressSaved && (
+                <p className="text-sm text-danger" role="alert">
+                    {m.run_not_recorded()}
+                </p>
+            )}
             {!ephemeral &&
                 (runSaved === "saved" ? (
                     <p className="text-sm text-success">{m.takes_saved()}</p>
