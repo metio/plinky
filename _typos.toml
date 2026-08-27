@@ -42,6 +42,11 @@ wege = "wege"
 # "tradicional" is the Spanish and Portuguese spelling of "traditional" — a marker in
 # the corpora that names a tradition rather than a person.
 tradicional = "tradicional"
+# "Ges" is the German note name for G flat, and "Fes" for F flat — the -es suffix German
+# spells a flat with (Des, Es, Ges, As). core/noteNaming writes them, because naming B
+# natural "B" rather than "H" told a German reader to play the wrong scale.
+ges = "ges"
+fes = "fes"
 # "ist" is German ("is"), kept verbatim in the machine-translation notice's prevail
 # clause "maßgeblich ist die deutsche Fassung", which every translated legal page —
 # including the checked English base — carries word for word.

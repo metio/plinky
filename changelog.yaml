@@ -5,6 +5,17 @@
   label: later
   entries:
     - |-
+      **German note names.** German notation calls B natural **H** and keeps **B** for B
+      flat, so a scale Plinky called "B-Dur" was asking a German reader to play the wrong
+      one. Scale and arpeggio names on the German site now use the note names German
+      musicians actually write, accidentals included — Fis, Es, As. The other languages
+      that share this convention, among them Polish, Czech, Danish and Swedish, still read
+      letters: each spells its accidentals its own way, and guessing would swap one wrong
+      name for another.
+    - |-
+      **The warm-up card speaks your language.** The scale it offers was named in English
+      whatever language the rest of the page was in.
+    - |-
       **Grades now measure the piano part, not the singer above it.** About half the
       catalogue is written for voice and piano, and the difficulty of those pieces was
       being read off the vocal line — one note at a time, no chords, no left hand — which

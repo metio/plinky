@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { EXERCISE_TILES, type ExerciseConfig, exerciseTitle } from "../../core/exerciseGen";
 import { m } from "../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../paraglide/runtime.js";
 import { exerciseName } from "./exerciseNames";
 
 const base: ExerciseConfig = {
@@ -54,5 +55,39 @@ describe("exerciseName", () => {
             `${m.exercise_title_dom7_arpeggio({ key: "C" })} · ${m.exercise_form_two_octaves()}`,
         );
         expect(exerciseTitle(config)).toBe("C dominant 7th arpeggio · 2 octaves");
+    });
+
+    describe("naming the key the way the language does", () => {
+        // German notation calls B natural H and reserves B for B flat, so naming keys with
+        // English letters did not read oddly to a German student — it told them to play a
+        // different scale, in the one place a beginner has no way to check it.
+        const named = (key: string, locale: "de" | "en" | "fr") => {
+            overwriteGetLocale(() => locale);
+            try {
+                return exerciseName({ ...base, key });
+            } finally {
+                overwriteGetLocale(() => baseLocale);
+            }
+        };
+
+        it("calls B natural H in German", () => {
+            expect(named("b", "de")).toContain("H");
+            expect(named("b", "de")).not.toContain("B-");
+        });
+
+        it("calls B flat B in German, which is what B means there", () => {
+            expect(named("bflat", "de")).toContain("B");
+            expect(named("bflat", "de")).not.toContain("♭");
+        });
+
+        it("spells a German accidental as a word", () => {
+            expect(named("eflat", "de")).toContain("Es");
+            expect(named("fsharp", "de")).toContain("Fis");
+        });
+
+        it("leaves every other language on letters", () => {
+            expect(named("b", "en")).toContain("B");
+            expect(named("eflat", "fr")).toContain("E♭");
+        });
     });
 });

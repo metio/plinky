@@ -3,6 +3,7 @@
 
 import type { ExerciseConfig, ExerciseForm, ExerciseType } from "../../core/exerciseGen";
 import { exerciseTitleParts } from "../../core/exerciseGen";
+import { keyNameIn, noteSystemFor } from "../../core/noteNaming";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 
@@ -37,7 +38,11 @@ const FORMS: Record<ExerciseForm, () => string> = {
 };
 
 export function exerciseName(config: ExerciseConfig): string {
-    const { key, type, forms } = exerciseTitleParts(config);
+    const { type, forms } = exerciseTitleParts(config);
+    // The key named the way this language names notes, not the way English does. German
+    // reads the letter B as B flat and calls B natural H, so "B-Dur-Tonleiter" told a
+    // German student to play the wrong scale.
+    const key = keyNameIn(config.key, noteSystemFor(getLocale()));
     const title = TITLES[type]({ key });
     if (forms.length === 0) {
         return title;

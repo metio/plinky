@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { buildExerciseId, exerciseTitle, parseExerciseId } from "../../../core/exerciseGen";
+import { buildExerciseId, parseExerciseId } from "../../../core/exerciseGen";
 import { warmUpFor } from "../../../core/warmUp";
+import { exerciseName } from "../../lib/exerciseNames";
 import { m } from "../../paraglide/messages.js";
 import { SettingsSection } from "../ui/settingsSection";
 import { NotesIcon } from "../ui/icons";
@@ -23,6 +24,20 @@ import { usePlayPiece } from "./playSession";
 // guess where naming the accidentals is a fact.
 //
 // An offer, never a requirement: nothing is gated behind it and skipping it costs nothing.
+// The exercise the offer points at: a one-octave major scale in the key it names. Built
+// here so the card can hand it to the localised namer, which knows both the language and
+// the note system the reader uses.
+function warmUpExercise(key: string) {
+    return {
+        type: "major-scale",
+        key,
+        octaves: 1,
+        hands: "both",
+        inversion: 0,
+        interval: "single",
+    } as const;
+}
+
 export function WarmUpCard() {
     const { fifths, id, title } = usePlayPiece();
     const warmUp = warmUpFor({
@@ -54,21 +69,9 @@ export function WarmUpCard() {
                     to={to}
                     className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-accent-strong hover:underline"
                 >
-                    {exerciseName(warmUp.key)} →
+                    {exerciseName(warmUpExercise(warmUp.key))} →
                 </Link>
             </div>
         </SettingsSection>
     );
-}
-
-// The scale's own name, from the exercise the offer points at.
-function exerciseName(key: string): string {
-    return exerciseTitle({
-        type: "major-scale",
-        key,
-        octaves: 1,
-        hands: "both",
-        inversion: 0,
-        interval: "single",
-    });
 }
