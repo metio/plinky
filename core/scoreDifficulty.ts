@@ -1,8 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { stavesPerPart } from "./accompaniment";
 import { fingerPositions, positionsCost } from "./fingering";
 import { SEMITONE } from "./notes";
+import { partsOf } from "./parts";
 import type { XmlCodec } from "./xml";
 
 // How hard a score is to *play*, derived from the fingering cost model — the same
@@ -32,8 +34,16 @@ function midiOf(note: Element): number | null {
 }
 
 // Split a score's notes into the two hands' position sequences (a position is a
-// chord, or a single note). Staff 1 is the right hand, staff 2 the left; a note
-// with <chord/> joins the hand's current position instead of starting a new one.
+// chord, or a single note). A note with <chord/> joins the hand's current position
+// instead of starting a new one.
+//
+// Which staves are the player's is read from the score rather than assumed. Taking the
+// first staff for the right hand is right for a grand staff and wrong for everything
+// else: in a song, staff 1 is the singer, so the difficulty of a piano part was being
+// measured against a vocal line the pianist never plays — a melody with no chords, no
+// left hand and none of a keyboard's reach, which reads as far easier than the
+// accompaniment underneath it. core/parts.ts exists for exactly this and the grader was
+// never wired to it.
 export function parsePositions(
     codec: XmlCodec,
     xml: string,
@@ -44,16 +54,68 @@ export function parsePositions(
     if (!doc) {
         return { right, left };
     }
-    for (const note of doc.querySelectorAll("note")) {
-        const midi = midiOf(note);
-        if (midi === null) {
-            continue;
+    const counts = stavesPerPart(doc);
+    const parts = partsOf(counts);
+    const written = Array.from(
+        doc.querySelectorAll("score-partwise > part, score-timewise > part"),
+    );
+    // A document with no <part> at all is not something to grade as silence: fall back to
+    // the whole thing as one part, which is what the plain grand-staff case looks like.
+    const scanned: { notes: Iterable<Element>; staves: number }[] =
+        written.length > 0
+            ? written.map((part, index) => ({
+                  notes: part.querySelectorAll("note"),
+                  staves: counts[index] ?? 1,
+              }))
+            : [{ notes: doc.querySelectorAll("note"), staves: 2 }];
+
+    // <staff> counts from 1 within its own part; partsOf names staves across the whole
+    // score. The running offset of the part a note sits in is what turns one into the
+    // other.
+    let offset = 0;
+    for (const part of scanned) {
+        for (const note of part.notes) {
+            const midi = midiOf(note);
+            if (midi === null) {
+                continue;
+            }
+            const within = Number.parseInt(
+                note.querySelector("staff")?.textContent?.trim() ?? "1",
+                10,
+            );
+            const staff = offset + (Number.isInteger(within) && within > 0 ? within - 1 : 0);
+            if (staff !== parts.right && staff !== parts.left) {
+                // Another instrument's line, or a singer's. Not the player's to read, so
+                // not part of how hard this is to play.
+                continue;
+            }
+            const hand = staff === parts.left ? left : right;
+            if (note.querySelector("chord") && hand.length > 0) {
+                hand[hand.length - 1]!.push(midi);
+            } else {
+                hand.push([midi]);
+            }
         }
-        const hand = note.querySelector("staff")?.textContent?.trim() === "2" ? left : right;
-        if (note.querySelector("chord") && hand.length > 0) {
-            hand[hand.length - 1]!.push(midi);
-        } else {
-            hand.push([midi]);
+        offset += part.staves;
+    }
+    // Nothing on the staves the model chose. Either it chose wrong — a six-staff
+    // orchestral reduction filed as one "Piano" part, where the top two carry nothing —
+    // or this is not keyboard music at all. Either way, reporting no notes would grade
+    // the piece as the easiest thing in the catalogue and put it in front of a beginner,
+    // so fall back to reading every staff, which is what this did before it knew about
+    // parts and can never be worse than that.
+    if (right.length === 0 && left.length === 0) {
+        for (const note of doc.querySelectorAll("note")) {
+            const midi = midiOf(note);
+            if (midi === null) {
+                continue;
+            }
+            const hand = note.querySelector("staff")?.textContent?.trim() === "2" ? left : right;
+            if (note.querySelector("chord") && hand.length > 0) {
+                hand[hand.length - 1]!.push(midi);
+            } else {
+                hand.push([midi]);
+            }
         }
     }
     return { right, left };
@@ -215,7 +277,7 @@ export const MAX_GRADE = 8;
 // `npm run songs:import` if the corpus changes. Scale/arpeggio remain measured
 // against the beginner exercises (scales ~0.6–1.1, arpeggios ~1.3–1.8).
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
-    piece: [2.253, 3.024, 3.662, 4.358, 5.123, 6.208, 7.886],
+    piece: [2.339, 3.167, 3.894, 4.681, 5.645, 6.881, 8.761],
     scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
     arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
 };

@@ -302,3 +302,64 @@ describe("rawDifficulty reads speed and texture", () => {
         expect(positions.right).toEqual([[60, 64]]);
     });
 });
+
+// A voice-and-piano score, which is what half the catalogue actually is: the singer on
+// one staff, the piano on a grand staff underneath.
+const song = (voice: string, pianoRight: string, pianoLeft: string) =>
+    `<?xml version="1.0"?><score-partwise>` +
+    `<part id="P1"><measure number="1"><attributes><staves>1</staves></attributes>${voice}</measure></part>` +
+    `<part id="P2"><measure number="1"><attributes><staves>2</staves></attributes>${pianoRight}${pianoLeft}</measure></part>` +
+    `</score-partwise>`;
+
+describe("parsePositions reads which staves are the player's", () => {
+    it("grades the piano, not the singer standing over it", () => {
+        // Taking the first staff for the right hand is right for a grand staff and wrong
+        // for a song. The singer's line has no chords, no left hand and none of a
+        // keyboard's reach, so measuring it reads as far easier than the accompaniment
+        // the pianist is actually playing.
+        const { right, left } = parsePositions(
+            domXmlCodec,
+            song(note("A", 5, 1), note("C", 4, 1) + note("E", 4, 1, true), note("C", 3, 2)),
+        );
+
+        // A5 is the singer's and belongs to neither hand.
+        expect(right).toEqual([[60, 64]]);
+        expect(left).toEqual([[48]]);
+    });
+
+    it("still reads a plain grand staff as it always did", () => {
+        const { right, left } = parsePositions(
+            domXmlCodec,
+            score(note("C", 4, 1) + note("C", 3, 2)),
+        );
+
+        expect(right).toEqual([[60]]);
+        expect(left).toEqual([[48]]);
+    });
+
+    it("reads a document with no parts at all rather than grading it as silence", () => {
+        // Malformed input is a normal condition here, and a score that reads as empty
+        // would be graded as the easiest thing in the catalogue.
+        const { right } = parsePositions(
+            domXmlCodec,
+            `<?xml version="1.0"?><score-partwise>${note("C", 4)}</score-partwise>`,
+        );
+
+        expect(right).toEqual([[60]]);
+    });
+
+    it("reads every staff when the chosen ones are empty, rather than grading silence", () => {
+        // A six-staff orchestral reduction filed as one "Piano" part: the model names the
+        // top two staves and they carry nothing. Reporting no notes would make this the
+        // easiest piece in the catalogue and put a symphony in front of a beginner.
+        const reduction =
+            `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">` +
+            `<attributes><staves>6</staves></attributes>` +
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><staff>5</staff></note>` +
+            `</measure></part></score-partwise>`;
+
+        const { right, left } = parsePositions(domXmlCodec, reduction);
+
+        expect(right.concat(left)).not.toEqual([]);
+    });
+});

@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 27 August 2026 — later
 
+**Grades now measure the piano part, not the singer above it.** About half the
+catalogue is written for voice and piano, and the difficulty of those pieces was
+being read off the vocal line — one note at a time, no chords, no left hand — which
+made accompaniments look far easier than they are. Around a quarter of the
+catalogue has moved grade as a result, most of it by one, and the pieces that moved
+furthest are the songs whose piano writing was never being looked at.
+
 **A tab left open on an old version won't overwrite your newer progress.** Plinky
 updates itself quietly, so a tab you opened yesterday can still be running
 yesterday's version — and it would happily save over work done since, quietly
