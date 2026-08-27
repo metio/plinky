@@ -8,6 +8,12 @@
 // a rename or removal, which bloats the file and can hide a typo. And it guards the
 // contract's own hygiene: an English key no source file references is dead copy
 // that every future translation pass would still pay 26x for, so it fails too.
+//
+// And it compares the {placeholders} each translation interpolates against the
+// contract's. Nothing else can: paraglide hands the arguments to the string and the
+// string decides what to do with them, so a translation that drops {count} loses the
+// number out of the sentence and one that invents {name} prints the braces at the
+// reader — both silently, in a language the person writing the code cannot read.
 // Pure source analysis over messages/*.json and app/ sources (no build, no
 // dependencies), run via `npm run messages:check` and its own CI job.
 
@@ -22,13 +28,28 @@ const pattern = settings["plugin.inlang.messageFormat"].pathPattern;
 // message, so it never counts as missing or orphaned.
 const META_KEYS = new Set(["$schema"]);
 
-function keysOf(locale) {
+function messagesOf(locale) {
     const path = pattern.replace("{locale}", locale);
     const parsed = JSON.parse(readFileSync(path, "utf8"));
-    return new Set(Object.keys(parsed).filter((key) => !META_KEYS.has(key)));
+    return Object.fromEntries(
+        Object.entries(parsed).filter(
+            ([key]) => !META_KEYS.has(key) && typeof parsed[key] === "string",
+        ),
+    );
 }
 
-const baseKeys = keysOf(baseLocale);
+// The {placeholders} a message interpolates. A translation carries the same set as the
+// contract does, in any order and any number of times: a name the caller never passes
+// renders as literal braces in front of the reader, and one the translation drops takes
+// the number, the piece or the person's name out of the sentence entirely. The runtime
+// cannot catch either — paraglide hands the arguments in and the string decides what to
+// do with them — so it is caught here or not at all.
+function placeholdersIn(text) {
+    return new Set([...text.matchAll(/\{([a-zA-Z_][\w]*)\}/g)].map((match) => match[1]));
+}
+
+const baseMessages = messagesOf(baseLocale);
+const baseKeys = new Set(Object.keys(baseMessages));
 const problems = [];
 
 // Every `m.<key>` reference in the app's own sources (the generated paraglide
@@ -72,11 +93,32 @@ for (const locale of locales) {
     if (locale === baseLocale) {
         continue;
     }
-    const localeKeys = keysOf(locale);
+    const messages = messagesOf(locale);
+    const localeKeys = new Set(Object.keys(messages));
     const missing = [...baseKeys].filter((key) => !localeKeys.has(key));
     const orphan = [...localeKeys].filter((key) => !baseKeys.has(key));
-    if (missing.length > 0 || orphan.length > 0) {
-        problems.push({ locale, missing, orphan });
+
+    const mismatched = [];
+    for (const key of baseKeys) {
+        const translated = messages[key];
+        if (translated === undefined) {
+            continue;
+        }
+        const wanted = placeholdersIn(baseMessages[key] ?? "");
+        const found = placeholdersIn(translated);
+        const dropped = [...wanted].filter((name) => !found.has(name));
+        const invented = [...found].filter((name) => !wanted.has(name));
+        if (dropped.length > 0 || invented.length > 0) {
+            mismatched.push(
+                `${key}: ${dropped.length > 0 ? `dropped {${dropped.join("} {")}}` : ""}` +
+                    `${dropped.length > 0 && invented.length > 0 ? ", " : ""}` +
+                    `${invented.length > 0 ? `invented {${invented.join("} {")}}` : ""}`,
+            );
+        }
+    }
+
+    if (missing.length > 0 || orphan.length > 0 || mismatched.length > 0) {
+        problems.push({ locale, missing, orphan, mismatched });
     }
 }
 
@@ -87,7 +129,7 @@ if (problems.length === 0) {
     process.exit(0);
 }
 
-for (const { locale, missing, orphan } of problems) {
+for (const { locale, missing, orphan, mismatched } of problems) {
     if (missing.length > 0) {
         console.error(`✗ ${locale}: missing ${missing.length} — ${missing.join(", ")}`);
     }
@@ -96,9 +138,16 @@ for (const { locale, missing, orphan } of problems) {
             `✗ ${locale}: orphan ${orphan.length} (not in ${baseLocale}) — ${orphan.join(", ")}`,
         );
     }
+    if (mismatched.length > 0) {
+        console.error(
+            `✗ ${locale}: ${mismatched.length} message(s) interpolate different placeholders ` +
+                `than ${baseLocale}:\n    ${mismatched.join("\n    ")}`,
+        );
+    }
 }
 console.error(
     `\n${problems.length} locale(s) out of sync with ${baseLocale}. Translate the missing keys ` +
-        `into each messages/<locale>.json (or remove orphaned ones), then re-run.`,
+        `into each messages/<locale>.json, remove the orphaned ones, and give every ` +
+        `translation the same {placeholders} its ${baseLocale} message has — then re-run.`,
 );
 process.exit(1);
