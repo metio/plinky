@@ -155,6 +155,12 @@ npm run songs:bake -- --check  # grades, curation, composer index and slices are
                       # fails here rather than shipping
 npm run songs:calibrate  # what the difficulty model scores teaching repertoire at, and
                       # the grade boundaries that implies (a report, not a gate)
+npm run promo:check   # the promo list still names pieces the catalogue can render
+                      # (blocking): resolving, solo piano, CC0. The curation itself
+                      # ("recognisable in three seconds") is a judgement; those three
+                      # are not, and all three had quietly stopped holding
+npm run promo:frame -- <clip.mp4> <out.png> [seconds]  # one frame of a rendered clip,
+                      # through Chromium since this host's ffmpeg has no H.264 decoder
 npm run songs:anchors # the gate half of it (blocking): every collection in
                       # dev/grade-anchors.json still resolves to the catalogue. Reads the
                       # manifest only, so it is instant — a pattern that stops matching

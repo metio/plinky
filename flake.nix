@@ -135,6 +135,10 @@
             # boundaries were calibrated against must still resolve to the catalogue. A
             # pattern that stops matching weakens the calibration without saying so.
             (pkgs.writeShellScriptBin "ci-anchors" ''exec npm run songs:anchors "$@"'')
+            # Reads the manifest only: every piece the promo list names must still
+            # resolve, still be solo piano, and still be CC0. A whole-catalogue render
+            # said each of those once into a log and carried on.
+            (pkgs.writeShellScriptBin "ci-promo" ''exec npm run promo:check "$@"'')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
           ];
         in

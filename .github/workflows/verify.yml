@@ -186,6 +186,17 @@ jobs:
       # stops matching leaves the file claiming nineteen anchors while the next
       # calibration runs on eighteen, and nothing else would say so.
       - run: nix develop --command ci-anchors
+  promo:
+    name: promo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      # Pure source analysis (no dependencies): the hand-curated promo list must name
+      # pieces the catalogue can actually render — resolving, solo piano, CC0. The
+      # curation itself is a judgement; these three are not, and all three had quietly
+      # stopped holding.
+      - run: nix develop --command ci-promo
   ci-parity:
     name: ci-parity
     runs-on: ubuntu-latest
@@ -215,6 +226,7 @@ jobs:
         i18n,
         widths,
         anchors,
+        promo,
         ci-parity,
       ]
     if: always()
