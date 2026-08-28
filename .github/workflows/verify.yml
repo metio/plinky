@@ -156,6 +156,23 @@ jobs:
       # locale must carry every base-locale message, so a new string can't ship
       # untranslated and silently fall back to English.
       - run: nix develop --command ci-messages-check
+  widths:
+    name: widths
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
+      # Every page must fit the phone it is read on, in the language that stresses a
+      # narrow layout hardest rather than in English. One word that cannot be broken
+      # drags the whole document sideways on every page at once, and the translations
+      # are where such a word arrives — English is the language every string in the app
+      # was written to fit. The locale is derived from the messages by the ci-widths
+      # wrapper, so it follows the translations instead of being picked once.
+      #
+      # The story screenshots cannot see this: they render at a fixed 800px, and the
+      # browser tests run without Tailwind.
+      - run: nix develop --command ci-widths
   ci-parity:
     name: ci-parity
     runs-on: ubuntu-latest
@@ -183,6 +200,7 @@ jobs:
         tailwind,
         tokens,
         i18n,
+        widths,
         ci-parity,
       ]
     if: always()

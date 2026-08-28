@@ -103,6 +103,15 @@ machine with rootless Podman and nix-portable, so a gate needing `kind`, a
 privileged container, a system-level nix daemon, or real MIDI/audio hardware
 could not run here at all. Plinky has no such gate today.
 
+**Only English used to be verified, and the deploy ships 26 languages.** The message gate
+compares placeholder parity as well as key sets, and `ci-widths` measures the built site at
+phone widths in the locale whose messages hold the longest unbreakable word — currently
+Danish, derived by `dev/widest-locale.mjs` rather than named, so it follows the
+translations. English is the one language whose layout needs no checking: every string in
+the app was written to fit it, and a word that cannot be broken arrives in translation.
+Still measured in `en` alone: the story screenshots, the a11y sweeps, Lighthouse and the
+size budget.
+
 `ci-build` dies with `EMFILE: too many open files, watch` when this host's inotify
 instances (`fs.inotify.max_user_instances`, 128) are exhausted — an editor plus a few
 builds is enough. `CHOKIDAR_USEPOLLING=true nix develop --command ci-build` polls
@@ -146,6 +155,9 @@ npm run knip          # dead code (blocking)
 npm run lint          # biome lint + format; a WARNING fails it too
                       # (--error-on-warnings), so dead code cannot accumulate
 npm run nav           # navigation-depth budget
+nix develop --command ci-widths  # CI ONLY — every page fits 320/360/390px, in the
+                      # language that stresses a narrow layout hardest (it builds that
+                      # locale first; dev/widest-locale.mjs derives which)
 npm run brand         # regenerates brand/ from app.css + the icon (not a gate)
 npm run icons         # regenerates public/ icons + favicon from icon.svg (not a gate)
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL

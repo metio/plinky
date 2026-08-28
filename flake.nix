@@ -119,6 +119,15 @@
               exec npx --yes @lhci/cli autorun "$@"
             '')
             (pkgs.writeShellScriptBin "ci-size" ''exec npm run size "$@"'')
+            # Builds the language that stresses a narrow layout hardest, then measures it.
+            # English is the one language whose layout needs no checking — every string was
+            # written to fit it — so the locale is derived from the messages rather than
+            # named here, and cannot go stale as the translations change.
+            (pkgs.writeShellScriptBin "ci-widths" ''
+              set -e
+              PLINKY_LOCALE="$(node dev/widest-locale.mjs)" npm run build
+              exec npm run widths "$@"
+            '')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
           ];
         in

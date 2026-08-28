@@ -14,18 +14,24 @@
 // neither can see a narrow-viewport layout at all. This drives the built site at the
 // widths people actually hold.
 //
+// It measures whichever single locale is on disk rather than assuming English, and
+// `ci-widths` builds the one that stresses a narrow layout hardest (dev/widest-locale.mjs
+// names it). English is the language every string in the app was written to fit; a word
+// that cannot be broken arrives in translation, and until this gate stopped assuming en it
+// was the one language whose layout did not need checking.
+//
 // Build-dependent, so it runs where the other build-dependent checks run rather than in
-// the pre-push loop: `npm run build:single && npm run widths`.
+// the pre-push loop: `nix develop --command ci-widths`.
 
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
 import { chromium } from "playwright";
 import { staticPaths } from "./pages.mjs";
+import { builtLocales } from "./single-locale-build.mjs";
 
 // The narrowest phone still in wide use, the common Android width, and the common iPhone.
 const WIDTHS = [320, 360, 390];
-const LOCALE = "en";
 
 const TYPES = {
     ".html": "text/html; charset=utf-8",
@@ -40,10 +46,26 @@ const TYPES = {
 };
 
 const root = "build/client";
-if (!existsSync(join(root, LOCALE))) {
-    console.error("No build to measure. Run npm run build:single first.");
+// Whatever single language is on disk. Two would mean an all-locales `npm run build`,
+// whose pages are the same document twenty-six times over and take that much longer to
+// drive; one is what a visitor downloads and what every other per-visitor gate measures.
+const built = builtLocales();
+if (built.length === 0) {
+    console.error(
+        "No build to measure. Run `nix develop --command ci-widths`, which builds the\n" +
+            "locale that stresses a narrow layout hardest and then runs this.",
+    );
     process.exit(1);
 }
+if (built.length > 1) {
+    console.error(
+        `build/client holds ${built.length} prerendered locales. This measures one, the way a\n` +
+            "visitor reads one. Run `nix develop --command ci-widths`.",
+    );
+    process.exit(1);
+}
+const LOCALE = built[0];
+console.log(`Measuring the ${LOCALE} build.`);
 
 const server = createServer((request, response) => {
     const url = decodeURIComponent((request.url ?? "/").split("?")[0]);
@@ -80,19 +102,42 @@ try {
                     return null;
                 }
                 // Name what is doing it, so the fix does not start with a hunt.
-                const culprits = [...document.querySelectorAll("body *")]
+                //
+                // Reaching past the viewport is the usual shape and the one worth naming
+                // first. It is not the only one: an element clipped by an ancestor's
+                // overflow still widens the document while its own rect stays inside, so
+                // when nothing reaches past, the widest elements on the page are named
+                // instead. Reporting an empty list would be the one outcome that helps
+                // nobody, and that is what this printed the first time it caught a real
+                // overflow.
+                const named = (node) => {
+                    const cls = String(node.className || "")
+                        .trim()
+                        .split(/\s+/)[0];
+                    return `${node.tagName.toLowerCase()}${cls ? `.${cls}` : ""}`;
+                };
+                const all = [...document.querySelectorAll("body *")];
+                const past = all
                     .filter((node) => node.getBoundingClientRect().right > doc.clientWidth + 1)
                     .slice(0, 3)
-                    .map(
-                        (node) =>
-                            `${node.tagName.toLowerCase()}.${String(node.className).split(" ")[0]}`,
-                    );
-                return { spill, culprits };
+                    .map(named);
+                if (past.length > 0) {
+                    return { spill, culprits: past, clipped: false };
+                }
+                const widest = all
+                    .map((node) => ({ node, width: node.scrollWidth }))
+                    .filter((entry) => entry.width > doc.clientWidth)
+                    .sort((a, b) => b.width - a.width)
+                    .slice(0, 3)
+                    .map((entry) => `${named(entry.node)} (${entry.width}px wide)`);
+                return { spill, culprits: widest, clipped: true };
             });
             if (over) {
-                problems.push(
-                    `${width}px ${path}: ${over.spill}px past the screen — ${over.culprits.join(", ")}`,
-                );
+                const blame =
+                    over.culprits.length > 0
+                        ? `${over.clipped ? "widest inside the page" : "reaching past"}: ${over.culprits.join(", ")}`
+                        : "nothing on the page reaches past it — check a fixed or absolutely positioned element";
+                problems.push(`${width}px ${path}: ${over.spill}px past the screen — ${blame}`);
             }
         }
         await page.close();

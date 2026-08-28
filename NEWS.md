@@ -8,7 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
-## 28 August 2026
+## 28 August 2026 — night
+
+**Every page is now checked at phone width in Danish, not English.** A page that
+scrolls sideways on a phone is never a decision somebody made — it is one word that
+cannot be broken, dragging the whole document with it. English was the one language
+that could never show this up, because every label in Plinky was written to fit in
+it; long words arrive in translation. The check now builds whichever language holds
+the longest unbreakable word and measures that, so it follows the translations
+instead of being pointed at one language and left there.
 
 **The books inside the catalogue are assignments now.** A pianist works through a
 book, not a piece — the two-part inventions, Czerny's eight-bar exercises, the

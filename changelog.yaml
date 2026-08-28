@@ -2,7 +2,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-08-28
+  label: night
   entries:
+    - |-
+      **Every page is now checked at phone width in Danish, not English.** A page that
+      scrolls sideways on a phone is never a decision somebody made — it is one word that
+      cannot be broken, dragging the whole document with it. English was the one language
+      that could never show this up, because every label in Plinky was written to fit in
+      it; long words arrive in translation. The check now builds whichever language holds
+      the longest unbreakable word and measures that, so it follows the translations
+      instead of being pointed at one language and left there.
     - |-
       **The books inside the catalogue are assignments now.** A pianist works through a
       book, not a piece — the two-part inventions, Czerny's eight-bar exercises, the
