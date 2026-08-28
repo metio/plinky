@@ -155,6 +155,10 @@ npm run songs:bake -- --check  # grades, curation, composer index and slices are
                       # fails here rather than shipping
 npm run songs:calibrate  # what the difficulty model scores teaching repertoire at, and
                       # the grade boundaries that implies (a report, not a gate)
+npm run songs:anchors # the gate half of it (blocking): every collection in
+                      # dev/grade-anchors.json still resolves to the catalogue. Reads the
+                      # manifest only, so it is instant — a pattern that stops matching
+                      # weakens the calibration without saying so
 npm run people:dupes  # the report: composer pages that might be one person
 npm run people:dupes -- --check  # the gate (blocking) — every candidate pair needs a
                       # ruling in dev/catalog-people-distinct.json, or an alias in
@@ -327,7 +331,10 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
 - **A grade is a fixed mark, not a place in the queue.** `GRADE_THRESHOLDS.piece` in
   `core/scoreDifficulty.ts` holds absolute cost boundaries, calibrated against teaching
   collections whose level is settled (`dev/grade-anchors.json`); `npm run songs:calibrate`
-  measures them and prints the boundaries they imply. They were octiles of the harvest
+  measures them and prints the boundaries they imply. Each anchor carries a `least`, and
+  `npm run songs:anchors` fails when one falls below it — the boundaries were cut from
+  those collections, and a pattern that quietly stops matching leaves the file claiming
+  nineteen of them while the next calibration runs on eighteen. They were octiles of the harvest
   once, which meant every import silently re-graded pieces a player had already worked on.
   Nothing derives them at bake time any more — moving them is a decision, and it re-grades
   the catalogue.

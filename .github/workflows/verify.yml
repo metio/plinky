@@ -173,6 +173,19 @@ jobs:
       # The story screenshots cannot see this: they render at a fixed 800px, and the
       # browser tests run without Tailwind.
       - run: nix develop --command ci-widths
+  anchors:
+    name: anchors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
+      # The grade boundaries in GRADE_THRESHOLDS were calibrated against named teaching
+      # collections, and a piece keeps its grade because those numbers do not move. This
+      # checks the collections still resolve to the catalogue: a pattern that silently
+      # stops matching leaves the file claiming nineteen anchors while the next
+      # calibration runs on eighteen, and nothing else would say so.
+      - run: nix develop --command ci-anchors
   ci-parity:
     name: ci-parity
     runs-on: ubuntu-latest
@@ -201,6 +214,7 @@ jobs:
         tokens,
         i18n,
         widths,
+        anchors,
         ci-parity,
       ]
     if: always()

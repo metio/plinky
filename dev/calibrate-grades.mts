@@ -29,8 +29,21 @@ import {
 } from "../core/scoreDifficulty.ts";
 import { buildExerciseId, type ExerciseConfig } from "../core/exerciseGen.ts";
 
-type Anchor = { grade: number; label: string; composer: string; title: string };
-type Row = { id: string; title: string; composer: string; license: string; scoreKind?: string };
+export type Anchor = {
+    grade: number;
+    label: string;
+    composer: string;
+    title: string;
+    // The fewest pieces this collection may resolve to and still be what it claims.
+    least: number;
+};
+export type Row = {
+    id: string;
+    title: string;
+    composer: string;
+    license: string;
+    scoreKind?: string;
+};
 
 const median = (values: number[]): number =>
     values.length === 0 ? 0 : [...values].sort((a, b) => a - b)[values.length >> 1]!;
@@ -73,7 +86,59 @@ function scoreXml(buffer: Buffer): string {
     return main ? main.data.toString("utf8") : "";
 }
 
+// Which anchors no longer resolve to enough of the catalogue to say what they say.
+//
+// A pattern that stops matching is invisible without this. The report prints "n=0" and
+// carries on, the boundaries are cut from whatever remains, and the file goes on claiming
+// nineteen collections while calibrating against eighteen. That is the same shape as an
+// accessibility sweep passing over pages that were never built.
+export function unresolved(anchors: Anchor[], songs: Row[]): string[] {
+    const piano = songs.filter((song) => song.scoreKind === "solo-piano");
+    const problems: string[] = [];
+    for (const anchor of anchors) {
+        const composer = new RegExp(anchor.composer, "i");
+        const title = new RegExp(anchor.title, "i");
+        const found = piano.filter(
+            (song) => composer.test(song.composer) && title.test(song.title),
+        ).length;
+        if (found < anchor.least) {
+            problems.push(
+                `${anchor.label} resolves to ${found} piece(s), fewer than the ${anchor.least} it needs`,
+            );
+        }
+    }
+    return problems;
+}
+
+// Reports the anchors that have stopped resolving, and stops. Reading only the manifest,
+// so it costs nothing and can gate every push — measuring what they are worth means
+// parsing every score, which is the report's job rather than a gate's.
+async function check(): Promise<never> {
+    const rows: Row[] = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
+    const { anchors }: { anchors: Anchor[] } = JSON.parse(
+        await readFile("dev/grade-anchors.json", "utf8"),
+    );
+    const problems = unresolved(anchors, rows);
+    if (problems.length > 0) {
+        console.error("Grade anchors no longer resolve against the catalogue:");
+        for (const problem of problems) {
+            console.error(`  • ${problem}`);
+        }
+        console.error(
+            "\nThe boundaries in GRADE_THRESHOLDS were calibrated against these collections.\n" +
+                "Either the catalogue lost pieces, or the pattern in dev/grade-anchors.json stopped\n" +
+                "matching how they are titled.",
+        );
+        process.exit(1);
+    }
+    console.log(`Grade anchors resolve: ${anchors.length} collections, all above their floor.`);
+    process.exit(0);
+}
+
 async function main() {
+    if (process.argv.includes("--check")) {
+        await check();
+    }
     const rows: Row[] = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
     const piano = rows.filter((row) => row.scoreKind === "solo-piano");
     const { anchors }: { anchors: Anchor[] } = JSON.parse(
@@ -162,6 +227,16 @@ async function main() {
                 `  g${grade}  n=${String(costs.length).padStart(3)}  median ${median(costs).toFixed(3)}`,
             );
         }
+    }
+
+    const broken = unresolved(anchors, rows);
+    if (broken.length > 0) {
+        console.error("\nGrade anchors no longer resolve against the catalogue:");
+        for (const problem of broken) {
+            console.error(`  • ${problem}`);
+        }
+        console.error("\nBoundaries cut from a broken anchor set would be wrong quietly.");
+        process.exit(1);
     }
 
     console.log("\nboundaries these anchors imply:");

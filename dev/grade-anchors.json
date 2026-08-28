@@ -1,119 +1,138 @@
 {
-  "note": "Teaching repertoire already in the catalogue, with the grade it conventionally sits at in the UK/Canadian graded syllabuses (ABRSM, Trinity, RCM). These are the fixed points the cost model and the grade boundaries are calibrated against: a collection is used rather than a single piece wherever the collection is uniform in level, so one odd edition cannot move the anchor. Grades are the collection's typical level, not a claim about every number in it. A collection that spans several grades anchors nothing and is left out.",
+  "note": "Teaching repertoire already in the catalogue, with the grade it conventionally sits at in the UK/Canadian graded syllabuses (ABRSM, Trinity, RCM). These are the fixed points the cost model and the grade boundaries are calibrated against: a collection is used rather than a single piece wherever the collection is uniform in level, so one odd edition cannot move the anchor. Grades are the collection's typical level, not a claim about every number in it. A collection that spans several grades anchors nothing and is left out. `least` is the fewest pieces a collection may resolve to and still be the thing this file says is graded at that level. Set from what it resolved to when the boundaries were last calibrated, with room for the catalogue to move: half, and never below one. It exists because a pattern that silently stops matching does not weaken the calibration visibly \u2014 it just quietly calibrates against fewer collections than the file claims.",
   "anchors": [
     {
       "grade": 2,
       "label": "Czerny op.821, 160 Eight-Measure Exercises",
       "composer": "czerny",
-      "title": "Eight-Measure"
+      "title": "Eight-Measure",
+      "least": 9
     },
     {
       "grade": 2,
       "label": "Bach, Notebook for Anna Magdalena minuets",
       "composer": "bach",
-      "title": "BWV Anh|3 Minuets|Minuet in F|Minuet in G"
+      "title": "BWV Anh|3 Minuets|Minuet in F|Minuet in G",
+      "least": 1
     },
     {
       "grade": 3,
       "label": "Burgmuller op.100, 25 easy and progressive studies",
       "composer": "burgm|public domain",
-      "title": "Op\\.?\\s*100|faciles et progressives"
+      "title": "Op\\.?\\s*100|faciles et progressives",
+      "least": 1
     },
     {
       "grade": 3,
       "label": "Duvernoy op.176, Ecole primaire",
       "composer": "duvernoy",
-      "title": "."
+      "title": ".",
+      "least": 4
     },
     {
       "grade": 3,
       "label": "Clementi, Sonatinas op.36",
       "composer": "clementi",
-      "title": "sonatin"
+      "title": "sonatin",
+      "least": 1
     },
     {
       "grade": 4,
       "label": "Bach, the Little Preludes",
       "composer": "bach",
-      "title": "Little Prelude|BWV 9(2[4-9]|3[0-9]|4[0-3])"
+      "title": "Little Prelude|BWV 9(2[4-9]|3[0-9]|4[0-3])",
+      "least": 2
     },
     {
       "grade": 4,
       "label": "Satie, Gymnopedies",
       "composer": "satie",
-      "title": "gymnop"
+      "title": "gymnop",
+      "least": 1
     },
     {
       "grade": 5,
       "label": "Kuhlau, Sonatinas op.20/op.55",
       "composer": "kuhlau",
-      "title": "sonatin"
+      "title": "sonatin",
+      "least": 1
     },
     {
       "grade": 5,
       "label": "Bach, Two-part Inventions",
       "composer": "bach",
-      "title": "^Invention"
+      "title": "^Invention",
+      "least": 7
     },
     {
       "grade": 5,
       "label": "Satie, Gnossiennes",
       "composer": "satie",
-      "title": "gnossien"
+      "title": "gnossien",
+      "least": 2
     },
     {
       "grade": 5,
       "label": "Beethoven, Fur Elise",
       "composer": "beethoven",
-      "title": "elise"
+      "title": "elise",
+      "least": 1
     },
     {
       "grade": 6,
       "label": "Mozart, Sonata K.545",
       "composer": "mozart",
-      "title": "545|Facile"
+      "title": "545|Facile",
+      "least": 1
     },
     {
       "grade": 6,
       "label": "Beethoven, Moonlight Sonata first movement",
       "composer": "beethoven",
-      "title": "moonlight|mondschein|quasi una fantasia"
+      "title": "moonlight|mondschein|quasi una fantasia",
+      "least": 1
     },
     {
       "grade": 7,
       "label": "Joplin, the rags",
       "composer": "joplin",
-      "title": "."
+      "title": ".",
+      "least": 7
     },
     {
       "grade": 8,
       "label": "Bach, Well-Tempered Clavier preludes and fugues",
       "composer": "bach",
-      "title": "Prelude and Fugue|Praludium und Fuge|Well.Tempered"
+      "title": "Prelude and Fugue|Praludium und Fuge|Well.Tempered",
+      "least": 3
     },
     {
       "grade": 8,
       "label": "Chopin, Etudes op.10 and op.25",
       "composer": "chopin",
-      "title": "\u00e9tude|etude"
+      "title": "\u00e9tude|etude",
+      "least": 6
     },
     {
       "grade": 8,
       "label": "Debussy, Clair de lune",
       "composer": "debussy",
-      "title": "clair de lune"
+      "title": "clair de lune",
+      "least": 1
     },
     {
       "grade": 8,
       "label": "Rachmaninoff, Prelude op.3 no.2",
       "composer": "rachmanin",
-      "title": "prelude"
+      "title": "prelude",
+      "least": 2
     },
     {
       "grade": 8,
       "label": "Czerny op.740, The Art of Finger Dexterity",
       "composer": "czerny",
-      "title": "740|Finger Dexterity"
+      "title": "740|Finger Dexterity",
+      "least": 3
     }
   ]
 }

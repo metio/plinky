@@ -131,6 +131,10 @@
               PLINKY_LOCALE="$(node dev/locale-stress.mjs --widest)" npm run build
               exec npm run widths "$@"
             '')
+            # Reads the manifest only, so it costs nothing: the collections the grade
+            # boundaries were calibrated against must still resolve to the catalogue. A
+            # pattern that stops matching weakens the calibration without saying so.
+            (pkgs.writeShellScriptBin "ci-anchors" ''exec npm run songs:anchors "$@"'')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
           ];
         in
