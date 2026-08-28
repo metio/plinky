@@ -205,12 +205,27 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
 }
 
 // The provenance line along the foot — a shared file carries its credit.
-function paintCredit(context: Context2D, cfg: ChromeConfig): void {
+//
+// Drawn clear of the keys rather than at a fixed height. The catalogue is credit-required
+// and this line is burnt into every frame so the attribution travels with the video, which
+// makes its legibility the whole point of it: at a fixed 0.95 of the frame it landed inside
+// the keyboard, which ends at 0.96, and a pale line over white keys is a credit nobody can
+// read. `keys` is the band the keyboard occupies, and the line is lifted clear of it only
+// when the foot would land inside — a stage whose keyboard stops higher up keeps its credit
+// at the foot, where it has always sat and reads perfectly well.
+function paintCredit(
+    context: Context2D,
+    cfg: ChromeConfig,
+    keys?: { top: number; bottom: number },
+): void {
     context.textAlign = "left";
     context.textBaseline = "alphabetic";
     context.fillStyle = MUTED;
+    const size = Math.round(cfg.unit * 0.032);
     context.font = fontAt(400, 0.032, cfg.unit);
-    context.fillText(cfg.credit, cfg.margin, cfg.height * 0.95);
+    const floor = cfg.height * 0.95;
+    const overTheKeys = keys !== undefined && floor >= keys.top && floor <= keys.bottom;
+    context.fillText(cfg.credit, cfg.margin, overTheKeys ? keys.top - size * 0.5 : floor);
 }
 
 // A white key's width in pixels — what the key-shape band is judged against. Read off the
@@ -445,6 +460,7 @@ export function takeScenePainter({
         }
 
         if (scoreOnly) {
+            // No keyboard on this stage, so the foot is free.
             paintCredit(context, cfg);
             return;
         }
@@ -456,7 +472,7 @@ export function takeScenePainter({
         const glowOf = (pitch: number) => glows.get(pitch) ?? null;
         paintKeyboard(context, keys, keyLayout, glowOf);
 
-        paintCredit(context, cfg);
+        paintCredit(context, cfg, { top: keyboardTop, bottom: keyboardBottom });
     };
 
     // The notation panel: a light card holding a window of the score image that
@@ -675,6 +691,6 @@ export function takeHighwayPainter({
             paintHex(scheme, { finger: fingers.get(pitch), hand: hands.get(pitch) }, ACCENT);
         paintKeyboard(context, keys, keyLayout, glowOf, litOf);
 
-        paintCredit(context, cfg);
+        paintCredit(context, cfg, { top: keyboardTop, bottom: height * 0.96 });
     };
 }
