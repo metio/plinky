@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { DEFAULT_THEME } from "../../core/keyboardTheme";
 import type { RecordedNote } from "../../core/composition";
 import {
     DEFAULT_KEYBOARD_DEPTH,
@@ -58,12 +59,15 @@ const INK = "#F9F8FC";
 const MUTED = "#EDB2FD";
 const ACCENT = "#AA36FC";
 
-// WHITE_KEY stays a near-white the eye reads as an ivory key; BLACK_KEY is the
-// logo's violet-black rather than a neutral, so the keyboard sits in the same world —
-// and on a black stage it is what keeps the black keys visible at all, being a step
-// lighter than the ground rather than the same colour as it.
-const WHITE_KEY = "#F9F8FC";
-const BLACK_KEY = "#191545";
+// The keys a caller draws when it names no theme of its own.
+//
+// This used to be a pair of constants defined here, and they were not the colours any
+// keyboard in the app is painted in. The export panel passes the player's chosen theme and
+// never saw them; the promo renderer passes nothing and saw only them, so every promo clip
+// was keyed in a palette that exists nowhere else — the one visible difference between two
+// videos drawn by the same painter through the same encoder. Reading the app's default
+// theme instead makes "the same graphics" true by construction rather than by inspection.
+const DEFAULT_KEYS = { white: DEFAULT_THEME.whiteHex, black: DEFAULT_THEME.blackHex };
 
 // The exact family the app registers (see the fontsource import in root.tsx and
 // --font-sans in app.css). A canvas resolves font strings against the loaded
@@ -374,8 +378,8 @@ function keyLayoutFor(
         width,
         keyboardTop,
         keyboardHeight,
-        white: keyColors?.white ?? WHITE_KEY,
-        black: keyColors?.black ?? BLACK_KEY,
+        white: keyColors?.white ?? DEFAULT_KEYS.white,
+        black: keyColors?.black ?? DEFAULT_KEYS.black,
     };
 }
 

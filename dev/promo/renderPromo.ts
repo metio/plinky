@@ -18,6 +18,7 @@ import {
     keyboardDepthFraction,
     noteColorHex,
 } from "../../core/videoLook";
+import { DEFAULT_THEME } from "../../core/keyboardTheme";
 import { webCodecsVideoExporter } from "../../app/adapters/webCodecsVideo";
 import { webSampleSource } from "../../app/adapters/webSampleSource";
 import { playFromSamples } from "../../app/adapters/webAudioEngine";
@@ -142,6 +143,11 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         // that reads either paints each note accordingly — the same mapping in every clip.
         scheme: request.noteColor ?? DEFAULT_NOTE_COLOR,
         keyboardDepth: keyboardDepthFraction(request.keyboardDepth ?? DEFAULT_KEYBOARD_DEPTH),
+        // The keys a player sees, named rather than left to a default. Omitting this was
+        // the one thing that made a promo clip look unlike an export of the same take: the
+        // painter fell back to a palette of its own, and the export panel — which passes
+        // the player's chosen theme — never went near it.
+        keyColors: { white: DEFAULT_THEME.whiteHex, black: DEFAULT_THEME.blackHex },
     });
 
     if (request.samplesBase) {

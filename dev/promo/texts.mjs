@@ -10,8 +10,8 @@
 // from the catalogue the video was rendered from, so they cannot disagree with it.
 //
 // What each description has to carry, in order of why: a sentence saying what the viewer
-// is looking at, the piece's own facts, a link that opens THAT piece to play, and the
-// licence. The link is the point of the whole exercise — a clip that cannot be acted on
+// is looking at, the piece's own facts, a link that opens THAT piece to play, where to
+// follow, and the licence. The link is the point of the whole exercise — a clip that cannot be acted on
 // is an advert, and one that opens the piece under the viewer's hands is an invitation.
 
 import { mkdir, writeFile } from "node:fs/promises";
@@ -71,6 +71,14 @@ function describe(piece, entry) {
         "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
         "",
         SITE,
+        "",
+        // Where somebody who liked the clip goes next. A viewer who watched to the end is
+        // the one person most likely to follow, and YouTube gives them nowhere to do it —
+        // the description is the only place these can be said.
+        "More Plinky:",
+        "Instagram: https://www.instagram.com/plinky.piano",
+        "Facebook: https://www.facebook.com/profile.php?id=61591963944991",
+        "Reddit: https://www.reddit.com/r/plinky_piano/",
         "",
         // No entry means no licence, and a licence is a legal fact about a particular
         // score rather than a default. Guessing CC0 would tell a viewer they may reuse an
