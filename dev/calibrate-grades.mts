@@ -19,7 +19,15 @@
 import { readFile } from "node:fs/promises";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { readZip } from "./repairPitch.mts";
-import { parsePositions, rawDifficulty, readKey, readRange } from "../core/scoreDifficulty.ts";
+import {
+    type Category,
+    categoryOf,
+    parsePositions,
+    rawDifficulty,
+    readKey,
+    readRange,
+} from "../core/scoreDifficulty.ts";
+import { buildExerciseId, type ExerciseConfig } from "../core/exerciseGen.ts";
 
 type Anchor = { grade: number; label: string; composer: string; title: string };
 type Row = { id: string; title: string; composer: string; license: string; scoreKind?: string };
@@ -157,9 +165,41 @@ async function main() {
     }
 
     console.log("\nboundaries these anchors imply:");
-    console.log(`  ${JSON.stringify(boundariesFrom(perLabel))}`);
-    console.log("  Paste into GRADE_THRESHOLDS.piece in core/scoreDifficulty.ts when the");
-    console.log("  anchors have moved enough to be worth re-grading the catalogue for.");
+    console.log(`  piece:     ${JSON.stringify(boundariesFrom(perLabel))}`);
+
+    // Scales and arpeggios have no outside ground truth to calibrate against, and need
+    // none: the shipped tiles are a fixed, complete, deliberately progressive curriculum
+    // rather than a harvest that keeps growing, so cutting them into eight equal bands is
+    // a statement about that curriculum and stays put unless the curriculum itself moves.
+    // Pieces are the opposite case, which is why they are anchored instead.
+    const tiles: { kind: string; cost: number; config?: unknown }[] = JSON.parse(
+        await readFile("public/exercises/manifest.json", "utf8"),
+    );
+    for (const kind of ["scale", "arpeggio"] as const) {
+        const costs = tiles
+            .filter((tile) => tile.kind === "scale-arpeggio" && kindOf(tile) === kind)
+            .map((tile) => tile.cost);
+        if (costs.length > 0) {
+            console.log(`  ${kind}: ${JSON.stringify(octiles(costs))}  (n=${costs.length})`);
+        }
+    }
+    console.log("\n  Paste into GRADE_THRESHOLDS in core/scoreDifficulty.ts when they have");
+    console.log("  moved enough to be worth re-grading for.");
+}
+
+// Which of the two tile scales a row belongs to, read the way gradeOf reads it: off the
+// rebuilt tile id, since the manifest row's own id is a content fingerprint.
+function kindOf(tile: { config?: unknown }): Category | null {
+    const config = tile.config as ExerciseConfig | undefined;
+    return config ? categoryOf(buildExerciseId(config)) : null;
+}
+
+// The seven even octile cuts of a fixed set, rounded to match what the thresholds hold.
+function octiles(costs: number[]): number[] {
+    const sorted = [...costs].sort((a, b) => a - b);
+    return Array.from({ length: 7 }, (_, i) =>
+        Number((sorted[Math.floor(((i + 1) * sorted.length) / 8)] ?? 0).toFixed(3)),
+    );
 }
 
 // The least each grade's centre must sit above the one below it. The anchors cannot

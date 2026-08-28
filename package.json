@@ -17,7 +17,6 @@
         "coverage": "npm run messages && vitest run --coverage --project '!storybook'",
         "dev": "npm run messages && react-router dev",
         "exercises": "tsx dev/gen-exercises.mts",
-        "exercises:incipits": "tsx dev/bake-exercise-incipits.mts",
         "exercises:reid": "tsx dev/reid-exercises.mts",
         "format": "biome check --write .",
         "help:shots": "node dev/help-screenshots.mjs",

@@ -380,11 +380,19 @@ export function categoryOf(id: string): Category {
 
 export const MAX_GRADE = 8;
 
-// The cost breakpoints between grades 1–8, calibrated PER category so each is
-// graded on its own scale — otherwise every finger exercise lands below the
-// easiest piece (scales/arpeggios cost more to finger than a stepwise tune).
-// Scale/arpeggio are measured against the beginner exercises (scales ~0.6–1.1,
-// arpeggios ~1.3–1.8).
+// The cost breakpoints between grades 1–8, calibrated PER category so each is graded on
+// its own scale — otherwise every finger exercise lands below the easiest piece, since
+// scales and arpeggios cost more to finger than a stepwise tune.
+//
+// The two exercise scales are the octiles of the shipped tiles, which is the right cut for
+// them and the wrong one for pieces: the tiles are a fixed, complete, deliberately
+// progressive curriculum, so "in the third eighth of the scales" is a statement about that
+// curriculum and stays put. The piece catalogue is a harvest that keeps growing, where the
+// same cut meant a piece changed grade whenever something else was imported.
+//
+// They do not follow the difficulty model on their own, so `npm run songs:bake` fails when
+// a category's tiles collapse into one grade, and `npm run songs:calibrate` prints the
+// octiles they currently imply.
 //
 // The `piece` breakpoints are fixed numbers, not a cut of the catalogue. They come from
 // `npm run songs:calibrate`, which measures teaching collections whose real-world grade is
@@ -398,8 +406,8 @@ export const MAX_GRADE = 8;
 // only moves when the model that measures it changes.
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
     piece: [5.498, 7.785, 10.513, 13.079, 15.349, 18.984, 22.041],
-    scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
-    arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
+    scale: [0.95, 1.05, 1.75, 2.45, 3.1, 3.25, 3.9],
+    arpeggio: [1.117, 1.817, 1.983, 2.683, 3.336, 3.917, 4.25],
 };
 
 // What the import and bake tooling grades a piece against, so the manifest and the grade

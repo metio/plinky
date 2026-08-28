@@ -131,6 +131,12 @@ npm run tailwind      # every class name compiles against app.css (blocking)
 npm run tokens        # colour is named by role, not hue (blocking)
 npm run messages:check # every locale carries every message (blocking)
 npm run news:check    # NEWS.md still matches changelog.yaml (blocking)
+npm run songs:bake -- --check  # grades, curation, composer index and slices are baked
+                      # (blocking) — it also remeasures a spread of songs and every
+                      # exercise, so a manifest costed under an older difficulty model
+                      # fails here rather than shipping
+npm run songs:calibrate  # what the difficulty model scores teaching repertoire at, and
+                      # the grade boundaries that implies (a report, not a gate)
 npm run people:dupes  # the report: composer pages that might be one person
 npm run people:dupes -- --check  # the gate (blocking) — every candidate pair needs a
                       # ruling in dev/catalog-people-distinct.json, or an alias in
@@ -297,6 +303,30 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   key (or carrying an orphan one), so a string can't ship English-only and
   silently fall back. Then `npm run messages` regenerates the gitignored
   `app/paraglide/`.
+- **A grade is a fixed mark, not a place in the queue.** `GRADE_THRESHOLDS.piece` in
+  `core/scoreDifficulty.ts` holds absolute cost boundaries, calibrated against teaching
+  collections whose level is settled (`dev/grade-anchors.json`); `npm run songs:calibrate`
+  measures them and prints the boundaries they imply. They were octiles of the harvest
+  once, which meant every import silently re-graded pieces a player had already worked on.
+  Nothing derives them at bake time any more — moving them is a decision, and it re-grades
+  the catalogue.
+
+  What *is* derived every bake is **cost**, because cost is whatever the difficulty model
+  currently says. Change `core/scoreDifficulty.ts` or `core/fingering.ts` and every stored
+  cost is stale. `songs:bake` remeasures all exercises outright (both kinds are
+  reproducible from what the repo ships — a tile from its stored config, a study from its
+  `.mxl` — so no PDMX corpus is needed) and probes a spread of songs, failing with the
+  command to run rather than baking grades from numbers the model no longer produces. The
+  songs themselves are remeasured by `npm run songs:cost`, which takes about half an hour
+  and is why it is a probe rather than a full pass. `npm run exercises` needs the PDMX
+  corpus for its Hanon sourcing and so cannot be the thing that keeps costs current.
+
+  Scale and arpeggio tiles are graded on their own scales, since fingering a scale costs
+  more than fingering a stepwise tune. Those boundaries have no outside repertoire to
+  anchor them and need none — the tiles are a fixed curriculum, so their boundaries are
+  its octiles — but they do not follow the model on their own, so `songs:bake` fails when
+  a category's tiles collapse into one grade.
+
 - **A hand-made correction to catalogue metadata goes in `dev/catalog-curation.json`**,
   never straight into `public/songs/manifest.json`. The manifest is written by
   `songs:import` from the harvested corpora, so an edit there survives until the next
