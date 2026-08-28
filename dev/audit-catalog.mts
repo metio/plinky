@@ -9,7 +9,7 @@
 //
 // Run under tsx: `npx tsx dev/audit-catalog.mts`
 
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { strFromU8, unzipSync } from "fflate";
 import { copyrightReason } from "./copyrightSignals.mts";
 import { nonPianoReason } from "./scoreInstrument.mts";

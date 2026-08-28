@@ -26,6 +26,7 @@ export type SongMeta = {
     // Where the piece was sourced from; defaults to PDMX (the whole shipped
     // catalogue) when a manifest entry omits it.
     source?: string;
+    credit?: string;
     tempo: number;
     beatsPerBar: number;
     // How many bars the piece runs to. The app reads it nowhere — it is the catalogue
@@ -113,6 +114,7 @@ export function createSongSource(fetchUrl: Fetcher): SongSource {
                 beatsPerBar: meta.beatsPerBar,
                 license: meta.license,
                 source: meta.source ?? DEFAULT_SONG_SOURCE,
+                credit: meta.credit,
                 bundled: false,
             };
         },

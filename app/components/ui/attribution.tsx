@@ -13,15 +13,19 @@ export function Attribution({
     composer,
     license,
     source,
+    credit,
 }: {
     composer?: string;
     license?: string;
     source?: string;
+    // The named engraver of this edition, when the catalogue has one.
+    credit?: string;
 }) {
     const { license: licenseDetail, source: sourceDetail } = attributionFor({
         composer,
         license,
         source,
+        credit,
     });
     if (!licenseDetail && !sourceDetail) {
         return null;

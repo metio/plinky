@@ -195,10 +195,15 @@ export function attributionFor(piece: {
     composer?: string;
     license?: string;
     source?: string;
+    // Who engraved this particular edition, where the catalogue knows. CC-BY and CC-BY-SA
+    // ask for the creator to be credited, and a source-wide "the CPDL editors" credits
+    // nobody in particular — it is what to say when the edition does not name anyone.
+    credit?: string;
 }): Attribution {
+    const source = sourceInfo(piece.source);
     return {
         composer: piece.composer ?? "",
         license: licenseInfo(piece.license),
-        source: sourceInfo(piece.source),
+        source: source && piece.credit ? { ...source, credit: piece.credit } : source,
     };
 }

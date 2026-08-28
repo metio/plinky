@@ -383,8 +383,12 @@ describe("a credit that names more than one person", () => {
 
     it("canonicalises each name in its own right", () => {
         // "Bach" alone would sort away from himself; each part goes through the same
-        // aliasing a lone credit does.
-        expect(personSlugs("Bach / Marcello")).toEqual(["johann-sebastian-bach", "marcello"]);
+        // aliasing a lone credit does — which is why the bare surname on the other side of
+        // the slash lands on Alessandro Marcello, whose concerto this transcription is of.
+        expect(personSlugs("Bach / Marcello")).toEqual([
+            "johann-sebastian-bach",
+            "alessandro-marcello",
+        ]);
     });
 
     it("leaves alone the credits that only look like two people", () => {

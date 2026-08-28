@@ -144,6 +144,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             composer={score.composer}
                             license={score.license}
                             source={score.source}
+                            credit={score.credit}
                         />
                     </header>
 

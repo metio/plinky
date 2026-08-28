@@ -23,7 +23,7 @@ import { createReadStream, existsSync, readFileSync } from "node:fs";
 import { parse } from "csv-parse";
 import { copyrightReason } from "./copyrightSignals.mts";
 import { isPublicDomain } from "./publicDomain.mts";
-import { legibleTitle } from "./legibleTitle.mts";
+import { legibleTitle, usableTitle } from "./legibleTitle.mts";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { strFromU8, unzipSync } from "fflate";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
@@ -33,6 +33,8 @@ import {
     type ScoreKind,
     scoreKind,
 } from "./scoreInstrument.mts";
+import { encodeIncipit, readIncipit } from "../core/incipit.ts";
+import { repairMxl } from "./repairPitch.mts";
 import { songId } from "../core/songId.ts";
 import { licenseDir, licenseInfo } from "../core/attribution.ts";
 
@@ -122,6 +124,10 @@ type SourceConfig = {
     // sources/<id>. PDMX is a 30 GB corpus indexed by a CSV, so it says for itself which
     // of a quarter of a million files are even candidates.
     candidates?: () => Promise<Candidate[]>;
+    // Who to credit for a given file, when the harvester recorded it and the MusicXML did
+    // not. Returns undefined for a piece it has no name for, which is not an error: an
+    // edition may simply not say.
+    creditFor?: (file: string) => string | undefined;
 };
 
 // A file this source offers, with whatever the source already knows about it. The title
@@ -134,6 +140,35 @@ export type Candidate = { path: string; title?: string; composer?: string };
 // gate, with a per-piece licence bucket encoded in each filename. A NonCommercial source
 // can't be added here: the ingest loop refuses any piece whose licence isn't commercialUse
 // (attribution.ts is the single source of truth), so a paid tier stays clear of NC content.
+// CPDL's harvester writes a plan of every edition it kept, including who engraved it. The
+// reduced files are named from the composer and title, which is what joins them back.
+let cpdlPlan: Map<string, string> | null = null;
+function cpdlCredit(file: string): string | undefined {
+    if (cpdlPlan === null) {
+        cpdlPlan = new Map();
+        const path = `${SOURCES_DIR}/cpdl/plan.json`;
+        if (existsSync(path)) {
+            const state = JSON.parse(readFileSync(path, "utf8"));
+            for (const entry of state.plan ?? state) {
+                if (entry.editor) {
+                    cpdlPlan.set(cpdlSlug(entry.composer, entry.title), entry.editor);
+                }
+            }
+        }
+    }
+    const name = (file.split("/").pop() ?? "").replace(/\.mxl$/, "");
+    // cpdl-<bucket>-<slug>
+    const slug = name.replace(/^cpdl-[a-z0-9]+-/, "");
+    return cpdlPlan.get(slug);
+}
+
+// The same slug dev/cpdl-harvest.py builds its filenames from.
+const cpdlSlug = (composer: string, title: string): string =>
+    `${composer}-${title}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
 const CONFIGS: Record<string, SourceConfig> = {
     "openscore-lieder": {
         // 19th-century art song: a singer over a piano part. Kept deliberately — Plinky
@@ -176,6 +211,7 @@ const CONFIGS: Record<string, SourceConfig> = {
     // Only CC0/CC-BY/CC-BY-SA/PD editions are harvested; the licence varies per edition,
     // so the harvester encodes each one's SPDX bucket in the filename (like Mutopia).
     cpdl: {
+        creditFor: cpdlCredit,
         // Choral editions reduced to a grand staff by dev/cpdl-harvest.py, which drops the
         // vocal part names on the way — so nothing in the file says it was ever choral and
         // only the harvester knows. This is why kind is a property of the source.
@@ -217,6 +253,12 @@ type SongMeta = {
     // What this piece IS (see ScoreKind): what lets the grade ladder ask for solo piano
     // while the library keeps the songs and the choral reductions.
     kind: ScoreKind;
+    // The opening bars, encoded (see core/incipit).
+    incipit?: string;
+    // Who engraved this edition, where the source names them. CC-BY and CC-BY-SA require
+    // crediting the creator, and "the CPDL editors" — the per-source constant that stood
+    // in until now — credits nobody in particular.
+    credit?: string;
     source: string;
     tempo: number;
     beatsPerBar: number;
@@ -233,8 +275,8 @@ const _norm = (value: string): string => (value || "").toLowerCase().trim().repl
 // different composers reuse the same song title ("Ständchen", "Ave Maria"), so the
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
-function readMxl(path: string): string {
-    const entries = unzipSync(new Uint8Array(readFileSync(path)));
+function readMxlFrom(bytes: Buffer): string {
+    const entries = unzipSync(new Uint8Array(bytes));
     const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
     const root =
         container.match(/full-path="([^"]+)"/)?.[1] ??
@@ -287,6 +329,12 @@ function barsOf(xml: string): number {
     return Math.round(measures / parts) || 0;
 }
 
+// How many pieces the catalogue holds right now, for deciding whether a pass changed
+// anything.
+function countSongs(): number {
+    return JSON.parse(readFileSync(`${OUT}/manifest.json`, "utf8")).length;
+}
+
 async function main() {
     const key = process.argv[2] ?? "openscore-lieder";
     const cfg = CONFIGS[key];
@@ -298,9 +346,15 @@ async function main() {
     // stray checkout can't leak in.
     await mkdir(`${SOURCES_DIR}/${key}`, { recursive: true });
     const files: string[] = [];
+    // What a source already knows about a file: PDMX's index names the piece even where
+    // the MusicXML inside does not, and dropping that is what put 178 pieces called
+    // "Untitled" in front of readers.
+    const hints = new Map<string, Candidate>();
     if (cfg.candidates) {
-        const offered = await cfg.candidates();
-        files.push(...offered.map((one) => one.path));
+        for (const candidate of await cfg.candidates()) {
+            hints.set(candidate.path, candidate);
+            files.push(candidate.path);
+        }
     }
     if (cfg.preconverted) {
         const dir = `${SOURCES_DIR}/${key}/_mxl`;
@@ -353,12 +407,21 @@ async function main() {
     // music, properly attributed.
     const takenIds = new Set(kept.filter((song) => song.source).map((song) => song.id));
 
-    const added: (SongMeta & { src: string })[] = [];
-    const dropped = { gate: 0, dup: 0, unreadable: 0, ineligible: 0 };
+    const added: (SongMeta & { src: string; repaired?: Buffer })[] = [];
+    let repairs = 0;
+    const dropped = { gate: 0, dup: 0, unreadable: 0, ineligible: 0, unnamed: 0 };
+    // Cheapest and most eliminating first, expensive work only on what survives.
+    //
+    // Of 1,709 candidates the gate alone rejects 954, so anything done before it is done
+    // more than twice over for nothing. Repair unzips, rewrites and rezips a file, and
+    // grading parses the whole score and fingers every position — neither has any business
+    // running on a piece about to be dropped for being a wind quintet.
     for (const file of files) {
+        let raw: Buffer;
         let xml: string;
         try {
-            xml = readMxl(file);
+            raw = readFileSync(file);
+            xml = readMxlFrom(raw);
         } catch {
             dropped.unreadable++;
             continue;
@@ -367,8 +430,17 @@ async function main() {
             dropped.gate++;
             continue;
         }
-        const title = titleOf(xml, cfg.titleField ?? "movement");
-        const composer = composerOf(xml, cfg.reorderComposer ?? false);
+        // The file first, the source's index second. A notation program writes "Title"
+        // and "Composer" into every new score, so a score that was never named carries
+        // that text rather than nothing — and it is not a name.
+        const hint = hints.get(file);
+        const title = usableTitle(titleOf(xml, cfg.titleField ?? "movement"), hint?.title);
+        if (title === "") {
+            // A piece nobody can name is a piece nobody can find.
+            dropped.unnamed++;
+            continue;
+        }
+        const composer = usableTitle(composerOf(xml, cfg.reorderComposer ?? false), hint?.composer);
         // Per-piece licence when the source encodes a bucket in its filename (Mutopia,
         // CPDL); otherwise the source's single licence. Read from the SOURCE filename — the
         // catalogue id is a content fingerprint that carries no licence.
@@ -403,12 +475,41 @@ async function main() {
             dropped.dup++;
             continue;
         }
+        // A keeper, so it is worth repairing. A harvested transcription occasionally
+        // writes a bass note an octave low, so there is no key for it and a run waits for
+        // that note forever. Done here rather than by a command afterwards, because that
+        // command edits the files in public/songs and the next import copies fresh ones
+        // over the top — the repair undone, with nothing recording it had happened.
+        //
+        // After the fingerprint on purpose: the id is the piece's identity, and moving a
+        // wrong note back where it belongs does not make it a different piece. Fingerprint
+        // first and the id is the same whether or not this ran.
+        let repairedBytes: Buffer | null = null;
+        try {
+            const fixed = repairMxl(raw);
+            if (fixed.moved > 0) {
+                repairedBytes = fixed.buffer;
+                repairs += fixed.moved;
+                xml = readMxlFrom(fixed.buffer);
+            }
+        } catch {
+            // A file that will not rezip is still a perfectly good score to grade as it
+            // came; the repair is an improvement, not a requirement.
+        }
         let cost: number;
         try {
             cost = rawDifficulty(linkedomXmlCodec, xml);
         } catch {
             dropped.unreadable++;
             continue;
+        }
+        let incipit: string | undefined;
+        try {
+            const opening = readIncipit(linkedomXmlCodec, xml);
+            incipit = opening ? encodeIncipit(opening) : undefined;
+        } catch {
+            // A piece whose opening will not read is shown as a plain row, which is what
+            // the absent field already means.
         }
         takenIds.add(id);
         added.push({
@@ -420,20 +521,33 @@ async function main() {
             license,
             source: key,
             kind: typeof cfg.kind === "function" ? cfg.kind(xml) : cfg.kind,
+            credit: cfg.creditFor?.(file),
+            // The opening bars, so a list can draw the mark that names a piece without
+            // fetching its notation. Computed here from the score already in hand and
+            // already repaired, rather than by a pass afterwards that reads every file in
+            // the catalogue a second time to learn what this loop knew.
+            ...(incipit === undefined ? {} : { incipit }),
             tempo: tempoOf(xml),
             beatsPerBar: beatsOf(xml),
             bars: barsOf(xml),
             src: file,
+            ...(repairedBytes ? { repaired: repairedBytes } : {}),
         });
     }
     console.log(
-        `Kept ${added.length}; dropped gate=${dropped.gate} dup=${dropped.dup} unreadable=${dropped.unreadable} ineligible=${dropped.ineligible}.`,
+        `Kept ${added.length}; dropped gate=${dropped.gate} dup=${dropped.dup} unreadable=${dropped.unreadable} ineligible=${dropped.ineligible} unnamed=${dropped.unnamed}; repaired ${repairs} note(s).`,
     );
 
     for (const song of added) {
         const dir = `${OUT}/${licenseDir(song.license)}`;
         await mkdir(dir, { recursive: true });
-        await copyFile(song.src, `${dir}/${song.id}.mxl`);
+        // The repaired bytes when anything moved, the original otherwise — so a file the
+        // importer did not change is stored byte for byte as it was harvested.
+        if (song.repaired) {
+            await writeFile(`${dir}/${song.id}.mxl`, song.repaired);
+        } else {
+            await copyFile(song.src, `${dir}/${song.id}.mxl`);
+        }
     }
 
     // Merge and provisionally grade over the whole catalogue's costs; songs:bake will
@@ -444,7 +558,7 @@ async function main() {
     }
     const merged: SongMeta[] = [
         ...kept.filter((song) => !superseded.has(song.id)),
-        ...added.map(({ src: _src, ...meta }) => meta),
+        ...added.map(({ src: _src, repaired: _repaired, ...meta }) => meta),
     ];
     const boundaries = octileBoundaries(
         merged.map((song) => song.cost),
@@ -469,7 +583,46 @@ async function main() {
         `\nCatalogue now ${merged.length} songs (${kept.length} kept + ${added.length} ${key}).`,
     );
     console.log(`Grades: ${histogram.slice(1).join(" / ")}`);
-    console.log("→ Run `npm run songs:bake` to finalise grade boundaries + seed.");
+
+    // Finish the job rather than telling somebody what to run next.
+    //
+    // These were three more commands and an order to remember, and every gate that
+    // checked them ended by printing the order again. A catalogue is only consistent once
+    // all of them have run, so anything less than all of them is a half-imported
+    // catalogue that looks finished — which is what the gates kept catching.
+    //
+    // Prune first: it decides what stays, and there is no sense drawing an opening mark
+    // for a piece about to be removed. Bake last: it derives the grade boundaries from
+    // whatever survived, so it has to see the final set.
+    // Bake first, then prune, then bake again. It reads like one bake too many and is not:
+    // baking applies dev/catalog-curation.json, which corrects composers and titles, and
+    // prune decides a duplicate by comparing exactly those. Pruning first left twelve
+    // pairs that only became identical once the corrections landed — and the gate then
+    // reported them, on a catalogue that had just been pruned.
+    console.log("\n--- songs:bake (apply corrections before looking for duplicates) ---");
+    execSync("npm run songs:bake", { stdio: "inherit" });
+
+    // Prune runs to a fixed point, not once. It decides a duplicate by comparing a piece
+    // against what is still in the catalogue, so removing one copy can reveal a pair that
+    // was hidden behind it — a single pass left twelve behind.
+    for (let pass = 1; pass <= 8; pass++) {
+        console.log(`\n--- songs:prune + songs:bake (pass ${pass}) ---`);
+        const before = countSongs();
+        execSync("npm run songs:prune", { stdio: "inherit" });
+        // Baked inside the loop, not after it: a correction can merge two spellings of one
+        // composer, and two pieces that were not duplicates under different names are
+        // duplicates under the same one. Pruning without re-applying the corrections
+        // leaves that pair behind, which is what the gate kept reporting.
+        execSync("npm run songs:bake", { stdio: "inherit" });
+        if (countSongs() === before) {
+            break;
+        }
+    }
+    // songs:incipits is deliberately NOT in this chain any more: every row written above
+    // carries its own mark, computed from the score while it was open. The command remains
+    // for backfilling rows imported before that was true.
+    console.log("\n--- songs:bake ---");
+    execSync("npm run songs:bake", { stdio: "inherit" });
 }
 
 main().catch((error) => {

@@ -78,7 +78,10 @@ def spdx_for(kind, arg):
 
 LICENCE = re.compile(r"\{\{(CopyCC|Copy)\|([^}]*)\}\}")
 MEDIA_MXL = re.compile(r"\[\[Media:([^|\]]+?\.mxl)", re.I)
-EDITOR = re.compile(r"\{\{Editor\|")
+# {{Editor|Name|date}} — the name is what CC-BY and CC-BY-SA actually require to be
+# credited. Captured as well as located: the block boundaries are what the parser needed,
+# the name is what the reader is owed.
+EDITOR = re.compile(r"\{\{Editor\|([^|}]*)")
 
 
 def parse_page(title, wikitext):
@@ -88,9 +91,11 @@ def parse_page(title, wikitext):
     if not m:
         return None
     work, composer = m.group(1).strip(), m.group(2).strip()
-    bounds = [e.start() for e in EDITOR.finditer(wikitext)] + [len(wikitext)]
+    found = list(EDITOR.finditer(wikitext))
+    bounds = [e.start() for e in found] + [len(wikitext)]
     for i in range(len(bounds) - 1):
         block = wikitext[bounds[i]:bounds[i + 1]]
+        editor = found[i].group(1).strip() if i < len(found) else ""
         lic = LICENCE.search(block)
         mxl = MEDIA_MXL.search(block)
         if not lic or not mxl:
@@ -98,7 +103,8 @@ def parse_page(title, wikitext):
         spdx = spdx_for(lic.group(1), lic.group(2))
         if spdx:
             return {"page": title, "title": work, "composer": composer,
-                    "spdx": spdx, "file": mxl.group(1).replace("_", " ")}
+                    "spdx": spdx, "file": mxl.group(1).replace("_", " "),
+                    "editor": editor}
     return None
 
 

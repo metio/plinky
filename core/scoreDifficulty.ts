@@ -277,7 +277,13 @@ export const MAX_GRADE = 8;
 // `npm run songs:import` if the corpus changes. Scale/arpeggio remain measured
 // against the beginner exercises (scales ~0.6–1.1, arpeggios ~1.3–1.8).
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
-    piece: [2.263, 3.136, 3.867, 4.664, 5.623, 6.862, 8.76],
+    // These are grade boundaries derived from the catalogue's own cost distribution and
+    // rewritten by songs:bake, so their digits change whenever the corpus does. One landing
+    // near Math.LN10 is a coincidence, and the approximate-constant rule is turned off for
+    // this file in biome.json rather than suppressed on the line: a suppression pinned to a
+    // regenerated number is unused as soon as the number moves, which fails the build just
+    // as loudly.
+    piece: [2.299, 3.153, 3.885, 4.672, 5.628, 6.872, 8.761],
     scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
     arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
 };

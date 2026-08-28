@@ -14,6 +14,15 @@
 const ALIASES: Record<string, string> = {
     // Spellings the corpora arrived with: a typo, an initial, an anglicisation, or an
     // arranger's name run into the composer's. Each names one person already here.
+    "i saw my lady weep - dowland": "John Dowland",
+    "by: henry purcell": "Henry Purcell",
+    lavallée: "Calixa Lavallée",
+    // Both catalogue rows are BWV 974, Bach's transcription of Alessandro Marcello's oboe
+    // concerto, so the bare surname is his here. Ambiguous in principle — his brother
+    // Benedetto was also a composer — in the same way the bare "bach" above is.
+    marcello: "Alessandro Marcello",
+    "a. marcello": "Alessandro Marcello",
+    "notenb?chlein f?r anna magdalena bach johann sebastian bach": "Johann Sebastian Bach",
     "fransisco tárrega": "Francisco Tárrega",
     "belá bartók": "Béla Bartók",
     "george frederick handel": "George Frideric Handel",

@@ -49,18 +49,12 @@ for (const song of manifest) {
     const bytes = await readFile(scorePath(song.id));
     const xml = decompressMxl(new Uint8Array(bytes));
     const cost = xml ? Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3)) : 0;
-    // Keep the field order the import writes, so a re-import yields an identical file.
-    enriched.push({
-        id: song.id,
-        title: song.title,
-        composer: song.composer,
-        grade: song.grade,
-        cost,
-        license: song.license,
-        tempo: song.tempo,
-        beatsPerBar: song.beatsPerBar,
-        bars: song.bars,
-    });
+    // Spread, not a field list. Listing them kept the import's field order and silently
+    // dropped everything the list did not know about: running this erased the baked
+    // incipit from all 2,952 pieces that had one, and would now take `source`, `kind` and
+    // `credit` with it. A script that rewrites every row must carry what it does not
+    // understand — the only field it has any business changing is the one it computes.
+    enriched.push({ ...song, cost });
     if (++done % 500 === 0) {
         console.log(`  ${done}/${manifest.length}`);
     }

@@ -69,19 +69,15 @@ for (const song of manifest) {
         // so the field is left off rather than written empty.
         missing += 1;
     }
-    baked.push({
-        id: song.id,
-        title: song.title,
-        composer: song.composer,
-        grade: song.grade,
-        cost: song.cost,
-        license: song.license,
-        ...(song.source === undefined ? {} : { source: song.source }),
-        tempo: song.tempo,
-        beatsPerBar: song.beatsPerBar,
-        bars: song.bars,
-        ...(incipit === undefined ? {} : { incipit }),
-    });
+    // Spread, not a field list. This one had already been extended once, for `source`,
+    // which is the tell: every field added to the manifest afterwards is dropped silently
+    // by a script that rewrites every row and names them one by one. `kind` went that way
+    // the first time this ran after it existed.
+    //
+    // The old incipit is removed rather than left standing, so a piece whose opening no
+    // longer reads loses its mark instead of keeping a stale one.
+    const { incipit: _previous, ...rest } = song;
+    baked.push({ ...rest, ...(incipit === undefined ? {} : { incipit }) });
 }
 
 // The manifest ships minified: it is fetched by every browsing visitor, and this

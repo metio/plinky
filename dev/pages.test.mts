@@ -3,7 +3,6 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-// @ts-expect-error - plain JS module with a .d.mts declaration; vitest resolves the source
 import { assertPages, noindexPaths, readPages, staticPaths } from "./pages.mjs";
 
 // The page list is derived by reading app/routes.ts as text, because the Lighthouse config

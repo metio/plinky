@@ -119,7 +119,7 @@ Use `nix develop --command <cmd> > /tmp/x.log 2>&1; echo "EXIT: $?"`.
 The repo's own gates:
 
 ```sh
-npm run typecheck
+npm run typecheck   # app + core, AND dev/*.mts via tsconfig.devcheck.json
 npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode) — capped, see above
 npm run test:storybook # CI ONLY as a check; locally only `-- -u` to refresh baselines

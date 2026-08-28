@@ -18,5 +18,9 @@ export type Score = {
     // Provenance id (e.g. "pdmx") resolved to a credited source link; absent for
     // bundled demos and generated exercises, which are our own.
     source?: string;
+    // Who engraved this edition, where the source named them. CC-BY and CC-BY-SA ask for
+    // the creator to be credited; without this the app can only name the project, which
+    // credits nobody in particular.
+    credit?: string;
     bundled: boolean; // true for the shipped scores, which cannot be removed
 };

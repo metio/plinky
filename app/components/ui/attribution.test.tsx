@@ -36,4 +36,27 @@ describe("Attribution", () => {
         const { container } = render(<Attribution composer="Anon." />);
         expect(container.firstChild).toBeNull();
     });
+
+    it("names the engraver when the edition names one", () => {
+        // CC-BY and CC-BY-SA ask for the creator to be credited. "the CPDL editors" is
+        // what to say when nobody is named; saying it when somebody IS named credits the
+        // wrong thing, and it is the licence's whole requirement.
+        render(
+            <Attribution
+                composer="Josquin des Prez"
+                license="CC-BY-SA-4.0"
+                source="cpdl"
+                credit="Sabine Cassola"
+            />,
+        );
+
+        expect(screen.getByText(/Sabine Cassola/)).toBeTruthy();
+        expect(screen.queryByText(/the CPDL editors/)).toBeNull();
+    });
+
+    it("falls back to the project when the edition names nobody", () => {
+        render(<Attribution composer="Anon." license="CC-BY-SA-4.0" source="cpdl" />);
+
+        expect(screen.getByText(/the CPDL editors/)).toBeTruthy();
+    });
 });

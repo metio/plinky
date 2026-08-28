@@ -47,11 +47,6 @@
         "why": "The credit named the arranger or transcriber alongside the composer, so the piece was filed under both as one person."
     },
     {
-        "id": "J6tVnnZbRpn3",
-        "composer": "Jakob Hintze",
-        "why": "The credit named the arranger or transcriber alongside the composer, so the piece was filed under both as one person."
-    },
-    {
         "id": "1PL4YSJROEH9",
         "composer": "Johann Sebastian Bach",
         "why": "The credit named the arranger or transcriber alongside the composer, so the piece was filed under both as one person."
@@ -127,11 +122,6 @@
         "why": "The composer's name ran into the piece's own description with no separator, so the credit read as a name nobody has."
     },
     {
-        "id": "aZSWdZeRKnuA",
-        "composer": "Mildred J. Hill & Patty S. Hill",
-        "why": "The composer's name ran into the piece's own description with no separator, so the credit read as a name nobody has."
-    },
-    {
         "id": "pgfhUZVzn3UG",
         "title": "Happy Birthday",
         "composer": "Mildred J. Hill & Patty S. Hill",
@@ -158,11 +148,6 @@
         "why": "A catalogue number or opus was left in the composer field."
     },
     {
-        "id": "SvMHyl2yF7YS",
-        "composer": "Frédéric Chopin",
-        "why": "A catalogue number or opus was left in the composer field."
-    },
-    {
         "id": "OhCysxbuEJHr",
         "composer": "Sergei Lyapunov",
         "why": "A catalogue number or opus was left in the composer field."
@@ -183,19 +168,9 @@
         "why": "The credit led with the contributor's role rather than their name."
     },
     {
-        "id": "0V4G57sG10ap",
-        "composer": "Johann Sebastian Bach",
-        "why": "The credit arrived with its accents mangled by a bad encoding."
-    },
-    {
         "id": "CyhmaWt9pOWQ",
         "composer": "Pyotr Ilyich Tchaikovsky",
         "why": "The credit arrived with its accents mangled by a bad encoding."
-    },
-    {
-        "id": "tvxEmMwHkXdb",
-        "composer": "Traditional",
-        "why": "The credit names a tradition rather than a person; filing it under Traditional keeps it out of the composer directory."
     },
     {
         "id": "qUznovAnYIEo",
@@ -228,39 +203,6 @@
         "why": "The credit names a tradition rather than a person; filing it under Traditional keeps it out of the composer directory."
     },
     {
-        "id": "QYSdLNSnJvnA",
-        "title": "Beyer No. 8",
-        "composer": "Ferdinand Beyer",
-        "why": "The catalogue writes a numbered piece as 'No.' in a hundred and forty-eight titles; this corpus upload used 'Nro', which is correct Spanish and Finnish for numero but the only three of its kind here. The upload credited nobody, so Beyer had three pieces in the catalogue and no place among the composers."
-    },
-    {
-        "id": "KeBIHcqQGDPd",
-        "title": "Beyer No. 9",
-        "composer": "Ferdinand Beyer",
-        "why": "The catalogue writes a numbered piece as 'No.' in a hundred and forty-eight titles; this corpus upload used 'Nro', which is correct Spanish and Finnish for numero but the only three of its kind here. The upload credited nobody, so Beyer had three pieces in the catalogue and no place among the composers."
-    },
-    {
-        "id": "XBR5ykgctHZg",
-        "title": "Beyer No. 10",
-        "composer": "Ferdinand Beyer",
-        "why": "The catalogue writes a numbered piece as 'No.' in a hundred and forty-eight titles; this corpus upload used 'Nro', which is correct Spanish and Finnish for numero but the only three of its kind here. The upload credited nobody, so Beyer had three pieces in the catalogue and no place among the composers."
-    },
-    {
-        "id": "SicBc6XnnJS3",
-        "composer": "Traditional",
-        "why": "A traditional fiddle tune whose uploader left the composer blank; the title is the tune's name, not a person's. Filed as Traditional so it credits a tradition rather than nobody."
-    },
-    {
-        "id": "byjPRqA0tanr",
-        "composer": "Traditional",
-        "why": "A traditional fiddle tune whose uploader left the composer blank; the title is the tune's name, not a person's. Filed as Traditional so it credits a tradition rather than nobody."
-    },
-    {
-        "id": "hJT8580qxS59",
-        "composer": "Traditional",
-        "why": "A traditional fiddle tune whose uploader left the composer blank; the title is the tune's name, not a person's. Filed as Traditional so it credits a tradition rather than nobody."
-    },
-    {
         "id": "x51U3R1YIluE",
         "title": "Eventide",
         "composer": "William Henry Monk",
@@ -280,18 +222,6 @@
         "id": "9c5MfRLyIROp",
         "title": "School of Velocity, Op. 299 No. 1",
         "why": "'Scool' for 'School', and the opus and number set the way the other hundred and forty-eight numbered titles are."
-    },
-    {
-        "id": "0VUguyrS9Ziu",
-        "title": "Violinkonzert Nr. 4 in A minor",
-        "composer": "Niccolò Paganini",
-        "why": "The title kept the underscores of the file it was exported from, and the credit carried a note about the transcription."
-    },
-    {
-        "id": "a1XnKMmBaLPM",
-        "title": "Study",
-        "composer": "Traditional",
-        "why": "The title was the source's own cataloguing note ('Bezeichnung standardisiert: …'), and its credit said the author is unknown. Named the way the importer names any study it cannot get a title for."
     },
     {
         "id": "Kryso98qv9Xu",

@@ -104,7 +104,7 @@ describe("curate", () => {
             { id: "study-1", composer: "Ferdinand Beyer", why: "uncredited" },
         ];
         const songs = curate(PIECES, study);
-        const exercises = curate([{ id: "study-1", title: "Beyer No. 8" }], study);
+        const exercises = curate([{ id: "study-1", title: "Beyer No. 8", composer: "" }], study);
         expect(unapplied(study, new Set([...songs.applied, ...exercises.applied]))).toEqual([]);
         expect(exercises.pieces[0]?.composer).toBe("Ferdinand Beyer");
     });

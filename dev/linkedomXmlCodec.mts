@@ -14,7 +14,12 @@ export const linkedomXmlCodec: XmlCodec = {
         try {
             // linkedom's Document exposes the query surface core uses; the DOM-lib
             // types differ nominally, so bridge them at this single boundary.
-            return new DOMParser().parseFromString(xml, "application/xml") as unknown as Document;
+            // linkedom parses application/xml but does not list it in the mime union its
+            // types accept, so the argument is widened at the same boundary the return is.
+            return new DOMParser().parseFromString(
+                xml,
+                "application/xml" as "text/xml",
+            ) as unknown as Document;
         } catch {
             return null;
         }

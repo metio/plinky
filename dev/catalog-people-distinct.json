@@ -138,5 +138,30 @@
         "a": "Clarence Smith",
         "b": "John Stafford Smith",
         "why": "A shared surname and nothing else. John Stafford Smith (1750-1836) wrote the tune that became the American anthem; Clarence Smith was a Chicago boogie-woogie pianist a century later."
+    },
+    {
+        "a": "Fritz Spindler",
+        "b": "Mario Spindler",
+        "why": "Fritz Spindler (1817-1905) wrote the salon pieces and sonatinas a piano catalogue knows him for. Mario Spindler is a different person entirely."
+    },
+    {
+        "a": "Siegfried Köhler",
+        "b": "Ernesto Köhler",
+        "why": "Ernesto Köhler (1849-1907) was an Italian flautist and composer; Siegfried Köhler (1927-1984) a German composer of the next century."
+    },
+    {
+        "a": "Prof Bell",
+        "b": "Amos Bull",
+        "why": "Neither the same name nor the same person: Amos Bull (1744-1825) was an American psalmodist. Paired only because the check compares surnames a letter apart."
+    },
+    {
+        "a": "Traditonnel Noël: les petits chanteurs à la croix de bois",
+        "b": "Mélanie Bonis",
+        "why": "Not a person against a person: the first credit names the choir that recorded a traditional carol, Les Petits Chanteurs à la Croix de Bois. Mélanie Bonis (1858-1937) was a French composer. Paired only because the check compares surnames a letter apart."
+    },
+    {
+        "a": "Frédéric Chopin",
+        "b": "Opus Posth. B.150 - F. F Chopin",
+        "why": "Two people the check pairs on surname alone; neither credit is the other written differently."
     }
 ]

@@ -51,5 +51,17 @@
     },
     "assist": {
         "enabled": false
-    }
+    },
+    "overrides": [
+        {
+            "includes": ["core/scoreDifficulty.ts"],
+            "linter": {
+                "rules": {
+                    "suspicious": {
+                        "noApproximativeNumericConstant": "off"
+                    }
+                }
+            }
+        }
+    ]
 }

@@ -60,3 +60,26 @@ export function legibleTitle(raw: string): string {
         .join(" ")
         .trim();
 }
+
+// The text a notation program leaves in the box when nobody filled it in. MuseScore
+// writes "Title" and "Composer" into every new score, and an export that was never named
+// carries them through to the catalogue — where they read as a piece actually called
+// "Untitled", 178 of which had shipped.
+//
+// Distinct from legibleTitle above: that one repairs text that was mangled in transit.
+// This one is about text that was never written.
+const PLACEHOLDER =
+    /^(untitled(\s+score)?|title|score|composer|subtitle|new\s+score|piece|movement|none|n\/?a)$/i;
+
+// The first of these that actually names something, or "" when none of them do. The
+// MusicXML is asked first and the harvest metadata second: the file is the authority when
+// it says anything, and the row that pointed at it is the fallback when it does not.
+export function usableTitle(...candidates: (string | undefined)[]): string {
+    for (const candidate of candidates) {
+        const text = legibleTitle(candidate ?? "").trim();
+        if (text !== "" && !PLACEHOLDER.test(text)) {
+            return text;
+        }
+    }
+    return "";
+}
