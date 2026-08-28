@@ -10,7 +10,8 @@
 // Nothing here is shipped. It is dev tooling that happens to run in a browser.
 
 import { decompressMxl } from "../../core/musicxmlFile";
-import { performanceLengthMs } from "../../core/scorePerformance";
+import { clipCut, gapsIn, LOOKAHEAD_MS, PROMO_WINDOW } from "../../core/clipEnd";
+import type { RecordedNote } from "../../core/composition";
 import { listenPerformanceOf } from "../../core/listenPerformance";
 import {
     DEFAULT_KEYBOARD_DEPTH,
@@ -18,6 +19,7 @@ import {
     keyboardDepthFraction,
     noteColorHex,
 } from "../../core/videoLook";
+import { GLOSSY } from "../../core/keyboardFinish";
 import { DEFAULT_THEME } from "../../core/keyboardTheme";
 import { webCodecsVideoExporter } from "../../app/adapters/webCodecsVideo";
 import { webSampleSource } from "../../app/adapters/webSampleSource";
@@ -59,24 +61,45 @@ export type PromoRequest = {
 // promo that falls back mid-phrase would advertise the wrong instrument. It still falls
 // back per note rather than failing — a recording that will not come is one the synth
 // covers, and no clip is worth losing to it.
+// One sample source for the whole batch, rather than one per clip.
+//
+// The recordings' BYTES are already shared: webSampleSource keeps them in Cache Storage,
+// keyed by URL, and every clip runs in the same page. What was not shared is the decoded
+// audio — `buffers` is a Map inside each instance, so a fresh source per clip re-decoded
+// every region it needed, however many earlier clips had already decoded the same notes.
+// Sixty-four pieces over one keyboard overlap almost completely, and the decoding was
+// costing minutes a clip against eighteen seconds of encoding.
+//
+// Keyed by base URL because that is the only thing that would make an existing source the
+// wrong one to reuse.
+let shared: { base: string; samples: ReturnType<typeof webSampleSource> } | null = null;
+
 async function loadSamples(base: string, notes: { pitch: number; velocity: number }[]) {
-    const samples = webSampleSource({
-        baseUrl: base,
-        enabled: true,
-        remember: () => {},
-        // Decoded straight into the rate the export renders at, so nothing is resampled
-        // between the fetch and the file.
-        context: async () => new OfflineAudioContext(2, 1, 48_000),
-    });
-    playFromSamples(() => ({ source: sampleLookup(samples) }));
-    await samples.prepare(notes);
-    return samples.state();
+    if (shared?.base !== base) {
+        const samples = webSampleSource({
+            baseUrl: base,
+            enabled: true,
+            remember: () => {},
+            // Decoded straight into the rate the export renders at, so nothing is resampled
+            // between the fetch and the file.
+            context: async () => new OfflineAudioContext(2, 1, 48_000),
+        });
+        playFromSamples(() => ({ source: sampleLookup(samples) }));
+        shared = { base, samples };
+    }
+    // Only the regions this piece needs that are not already decoded; prepare skips what
+    // the map already holds.
+    await shared.samples.prepare(notes);
+    return shared.samples.state();
 }
 
-export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
-    if (!(await webCodecsVideoExporter.supported())) {
-        throw new Error("this browser cannot encode; nothing to render");
-    }
+// Reads a catalogue piece into the performance a clip is cut from.
+//
+// Split out from the render so the cut can be reported without encoding anything: an
+// hour of video is a poor way to find out where the clips end, and a report that
+// re-implemented the reading would answer for a different performance than the one that
+// ships.
+export async function readPerformance(request: PromoRequest): Promise<RecordedNote[]> {
     const response = await fetch(request.scoreUrl);
     if (!response.ok) {
         throw new Error(`${request.scoreUrl}: ${response.status}`);
@@ -110,18 +133,33 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
     const startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
     host.remove();
 
-    const notes = listenPerformanceOf(steps, {
+    // Read long enough to choose where to stop, then cut at a silence. A short clip asked
+    // for a flat twenty seconds and got whatever fell there — mid-phrase, mid-chord, on a
+    // note that had only just begun. Read PAST the window's far edge, not to it: a reading
+    // that stops at thirty seconds ends at thirty seconds, and a cut that cannot tell that
+    // from a piece which genuinely ends there awards it a perfect ending and lands every
+    // continuous piece on the same bound.
+    const played = listenPerformanceOf(steps, {
         startBpm,
         speed: request.speed,
         // No window means the whole piece, which is what a full-length upload is.
-        ...(request.clipMs > 0 ? { withinMs: request.clipMs } : {}),
+        ...(request.clipMs > 0 ? { withinMs: PROMO_WINDOW.latestMs + LOOKAHEAD_MS } : {}),
     });
-    if (notes.length === 0) {
+    if (played.length === 0) {
         throw new Error(`${request.scoreUrl}: nothing to play`);
     }
-    // To the end of the last note still sounding, so the clip does not cut the final
-    // chord — plus a breath of silence to let it ring.
-    const durationMs = Math.round(performanceLengthMs(notes) + 700);
+    return played;
+}
+
+export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
+    if (!(await webCodecsVideoExporter.supported())) {
+        throw new Error("this browser cannot encode; nothing to render");
+    }
+    const played = await readPerformance(request);
+    // Which notes to keep and how long to run is the cut, and the cut is pure — it lives in
+    // core so it can be reasoned about and tested away from a browser. A full-length upload
+    // asks for no window and gets the whole piece.
+    const { notes, durationMs } = clipCut(played, request.clipMs > 0 ? PROMO_WINDOW : null);
 
     // The notes waterfall: takeHighwayPainter is the falling-blocks scene. The other
     // exported painter, takeScenePainter, draws the lit keyboard with an optional notation
@@ -148,6 +186,11 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         // painter fell back to a palette of its own, and the export panel — which passes
         // the player's chosen theme — never went near it.
         keyColors: { white: DEFAULT_THEME.whiteHex, black: DEFAULT_THEME.blackHex },
+        // Always glossy, whatever the app's default is. A clip is an advertisement seen by
+        // somebody deciding whether to open Plinky at all, and the instrument should look
+        // like an instrument there; the app itself opens joyful, because the person in
+        // front of it has already arrived and may never have played before.
+        finish: GLOSSY,
     });
 
     if (request.samplesBase) {
@@ -166,4 +209,20 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         notes,
     });
     return new Uint8Array(await blob.arrayBuffer());
+}
+
+// Where a clip of this piece would end, and what the window had to choose among. The
+// report behind `npm run promo:cuts`, which is how a batch's lengths are checked without
+// rendering one.
+export async function reportCut(request: PromoRequest) {
+    const played = await readPerformance(request);
+    const cut = clipCut(played, PROMO_WINDOW);
+    return {
+        endMs: cut.endMs,
+        pauseMs: cut.pauseMs,
+        durationMs: cut.durationMs,
+        gaps: gapsIn(played, PROMO_WINDOW),
+        performanceMs: played.reduce((end, n) => Math.max(end, n.startMs + n.durationMs), 0),
+        noteCount: played.length,
+    };
 }

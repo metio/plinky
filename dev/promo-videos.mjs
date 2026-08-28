@@ -27,9 +27,12 @@ import {
     readFileSync,
     renameSync,
     rmSync,
+    writeFileSync,
 } from "node:fs";
 import { chromium } from "playwright";
 import { folderFor, PIECES } from "./promo/pieces.mjs";
+import { renderStamp } from "./promo/renderStamp.mjs";
+import { collectionPieces } from "./promo/collections.mjs";
 
 const OUT = argValue("--out") ?? "promo";
 const SECONDS = Number(argValue("--seconds") ?? 20);
@@ -37,7 +40,7 @@ const SIZE = Number(argValue("--size") ?? 1080);
 // YouTube wants a landscape frame and the whole piece rather than a feed's twenty seconds.
 // The painter keeps the waterfall over the keyboard at any aspect that is not taller than
 // it is wide, so this is a shape and a length, not a second renderer.
-const YOUTUBE = process.argv.includes("--youtube");
+const YOUTUBE = process.argv.includes("--youtube") || process.argv.includes("--collections");
 // A Short is the same clip stood on its end. YouTube takes the square reel as one, but a
 // phone is 9:16 and a square uses barely half of it — and the painter has a real portrait
 // composition rather than a letterboxed landscape: taller than wide, it drops the keyboard
@@ -72,6 +75,11 @@ const KEYBOARD_DEPTH = "shallow";
 const PORT = 5199;
 // Render only the pieces whose title contains this, for a re-run of one clip.
 const ONLY = argValue("--only");
+// Render the named works instead of the curated shelf: every CC0 piece of every built-in
+// assignment, so each collection can go up as a playlist somebody can work through without
+// ever opening Plinky. Full length only is the point there — a twenty-five-second cut of a
+// study teaches nobody anything — so this implies --youtube.
+const COLLECTIONS = process.argv.includes("--collections");
 // Pick up where a previous run stopped, rather than re-rendering an hour of finished
 // clips. A whole-catalogue batch takes long enough that something will interrupt it —
 // a machine that goes to sleep, a stray edit that trips the dev server's own config
@@ -136,6 +144,33 @@ function fileFor(piece, out) {
     return `${dir}/${YOUTUBE ? "youtube" : SHORTS ? "short" : "reel"}.mp4`;
 }
 
+// What the code that renders a clip currently hashes to. Written beside each finished clip
+// so --resume can tell one it made from one an older version made.
+const STAMP = renderStamp();
+
+function stampFor(piece, out) {
+    return `${fileFor(piece, out)}.stamp`;
+}
+
+// Whether the clip already on disk was rendered by this code.
+//
+// "The file exists" is not that claim, and believing it was expensive: a batch that ran
+// across an edit — or one resumed the next day against a changed cut — kept every clip it
+// already had, and the difference showed up only in the video. Modification times do not
+// settle it either; they say when a file was written, not what wrote it.
+function alreadyRendered(piece, out) {
+    const file = fileFor(piece, out);
+    if (!existsSync(file)) {
+        return false;
+    }
+    try {
+        return readFileSync(stampFor(piece, out), "utf8").trim() === STAMP;
+    } catch {
+        // No stamp at all: rendered before stamping existed, so it cannot be vouched for.
+        return false;
+    }
+}
+
 function argValue(flag) {
     const index = process.argv.indexOf(flag);
     return index > 0 ? process.argv[index + 1] : undefined;
@@ -178,18 +213,25 @@ mkdirSync(OUT, { recursive: true });
 // list going stale is expected, and it is meant to show as a missing piece rather than a
 // silently different one. What it must not do is show forty minutes in, one line at a
 // time, buried under the clips that did work.
-const unresolved = PIECES.map((piece) => {
-    try {
-        scoreUrl(piece.id, manifest);
-        return null;
-    } catch (error) {
-        return `  ${piece.title} (${piece.id}): ${error instanceof Error ? error.message : error}`;
-    }
-}).filter(Boolean);
+// The curated shelf, or every CC0 piece of every named work.
+const chosen = COLLECTIONS ? collectionPieces() : PIECES;
+
+const unresolved = chosen
+    .map((piece) => {
+        try {
+            scoreUrl(piece.id, manifest);
+            return null;
+        } catch (error) {
+            return `  ${piece.title} (${piece.id}): ${error instanceof Error ? error.message : error}`;
+        }
+    })
+    .filter(Boolean);
 if (unresolved.length > 0) {
     console.warn(
-        `${unresolved.length} of ${PIECES.length} pieces cannot be rendered:\n${unresolved.join("\n")}\n` +
-            "Fix dev/promo/pieces.mjs — a pruned piece needs removing, a re-imported one needs its new id.",
+        `${unresolved.length} of ${chosen.length} pieces cannot be rendered:\n${unresolved.join("\n")}\n` +
+            (COLLECTIONS
+                ? "Re-run `npm run songs:bake` — the collections are resolved from the manifest."
+                : "Fix dev/promo/pieces.mjs — a pruned piece needs removing, a re-imported one needs its new id."),
     );
 }
 
@@ -235,12 +277,12 @@ try {
     let filtered = 0;
     // A piece that fails to render is reported and skipped, so one bad score does not cost
     // the whole run.
-    for (const piece of PIECES) {
+    for (const piece of chosen) {
         if (ONLY && !piece.title.toLowerCase().includes(ONLY.toLowerCase())) {
             filtered += 1;
             continue;
         }
-        if (RESUME && existsSync(fileFor(piece, OUT))) {
+        if (RESUME && alreadyRendered(piece, OUT)) {
             skipped += 1;
             continue;
         }
@@ -287,6 +329,9 @@ try {
             await new Promise((done) => sink.end(done));
             sink = null;
             toAac(file);
+            // Only once the clip is complete and recoded: a stamp beside a half-written
+            // file would vouch for it.
+            writeFileSync(stampFor(piece, OUT), `${STAMP}\n`);
             const seconds = ((Date.now() - started) / 1000).toFixed(1);
             console.log(`${(size / 1_000_000).toFixed(1)} MB in ${seconds}s → ${file}`);
             void song;
@@ -299,13 +344,14 @@ try {
                 await new Promise((done) => sink.end(done));
                 sink = null;
                 rmSync(partial, { force: true });
+                rmSync(stampFor(piece, OUT), { force: true });
             }
             console.log(`skipped: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     // Named rather than folded into the total: a run that quietly reports "55/55" after
     // rendering eight of them reads as complete coverage when it is not.
-    const attempted = PIECES.length - skipped - filtered;
+    const attempted = chosen.length - skipped - filtered;
     console.log(
         `${attempted - failed}/${attempted} rendered into ${OUT}/` +
             (skipped > 0 ? `, ${skipped} already there` : "") +

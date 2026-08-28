@@ -161,6 +161,14 @@ npm run promo:check   # the promo list still names pieces the catalogue can rend
                       # are not, and all three had quietly stopped holding
 npm run promo:frame -- <clip.mp4> <out.png> [seconds]  # one frame of a rendered clip,
                       # through Chromium since this host's ffmpeg has no H.264 decoder
+npm run promo:cuts    # where every clip would end and what decided it (a report, not a
+                      # gate). Reads the same performance the renderer reads and applies the
+                      # same core cut, so a batch's lengths are checkable in five minutes
+                      # rather than by encoding an hour of video and measuring the files
+npm run promo:durations -- promo/*/*/reel.mp4  # how long rendered clips actually run.
+                      # Measure the VIDEO track: a piano sample rings on past the picture,
+                      # so the container's own duration is about two seconds longer and
+                      # reading it says a clip is longer than it looks
 npm run songs:anchors # the gate half of it (blocking): every collection in
                       # dev/grade-anchors.json still resolves to the catalogue. Reads the
                       # manifest only, so it is instant — a pattern that stops matching
@@ -370,6 +378,20 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   pattern that has rotted is caught rather than rendering as an empty card. Matching
   happens at bake time on purpose: no pattern table reaches a visitor's bundle. Only
   `solo-piano` pieces are eligible — a set is something to work through at the keyboard.
+
+- **A rendered clip is only as current as its stamp.** `--resume` skips a piece whose clip
+  is already on disk, and "a file is there" says nothing about what produced it. A batch
+  that runs for hours across an edit keeps every clip it already had; so does one resumed
+  the next day against changed code. Modification times do not settle it either — they
+  record when a file was written, not what wrote it, which is how sixty-four clips came to
+  be cut at a flat twenty seconds long after the cut had been rewritten, with timestamps
+  that said otherwise. So each finished clip carries a `.stamp` beside it holding a hash of
+  the module graph the render actually pulls in, walked from `dev/promo/renderPromo.ts`
+  through its relative imports (`dev/promo/renderStamp.mjs`), and `--resume` keeps a clip
+  only when its stamp matches. Nothing to maintain: a module that stops being imported
+  leaves the graph. It over-approximates on purpose — any change anywhere in the render
+  path invalidates every clip — because re-rendering more than strictly necessary is the
+  cheaper mistake.
 
 - **A hand-made correction to catalogue metadata goes in `dev/catalog-curation.json`**,
   never straight into `public/songs/manifest.json`. The manifest is written by

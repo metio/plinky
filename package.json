@@ -71,7 +71,10 @@
         "songs:calibrate": "tsx dev/calibrate-grades.mts",
         "songs:anchors": "tsx dev/calibrate-grades.mts --check",
         "promo:frame": "node dev/grab-frame.mjs",
-        "promo:check": "node dev/check-promo-pieces.mjs"
+        "promo:check": "node dev/check-promo-pieces.mjs",
+        "promo:durations": "node dev/clip-durations.mjs",
+        "promo:collections": "tsx dev/promo/collectionTexts.mjs",
+        "promo:cuts": "node dev/promo-cuts.mjs"
     },
     "dependencies": {
         "@fontsource-variable/comfortaa": "^5.3.0",
