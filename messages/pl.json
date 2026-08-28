@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Same białe klawisze. Zagraj gamę, żeby ręka się ułożyła, i wróć.",
     "warmup_back": "Powrót do {title}",
     "settings_grand_piano_ready_hint": "Nagrania wczytują się, gdy utwór ich potrzebuje, więc liczba zaczyna się od zera przy każdej wizycie i rośnie w trakcie grania. Liczy się to, co jest na urządzeniu — to wczytuje się natychmiast.",
-    "assignments_show_steps": "Pokaż {count} utworów"
+    "assignments_show_steps": "Pokaż {count} utworów",
+    "settings_keyboard_finish": "Wygląd klawiszy",
+    "finish_joyful": "Wesoły",
+    "finish_glossy": "Błyszczący"
 }

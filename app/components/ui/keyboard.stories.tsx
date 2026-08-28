@@ -3,6 +3,7 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, waitFor } from "storybook/test";
+import { GLOSSY, JOYFUL } from "../../../core/keyboardFinish";
 import { Keyboard } from "./keyboard";
 
 const meta: Meta<typeof Keyboard> = {
@@ -79,4 +80,24 @@ export const HoldDuration: Story = {
 // every key, with the black keys reading as the syllable below them raised.
 export const SolfegeLabels: Story = {
     args: { labels: "solfege" },
+};
+
+// The two finishes side by side in the same skin, because the difference between them is
+// the whole point of the setting and neither is described anywhere a screenshot can check.
+
+// The default: flat, bright, friendly. What somebody who has never played sees first.
+export const FinishJoyful: Story = {
+    args: { from: 60, to: 72, finish: JOYFUL },
+};
+
+// The instrument as a photograph of one — a lip across the front, light down the key. What
+// a video is rendered in, and what a player can now ask for on the page too.
+export const FinishGlossy: Story = {
+    args: { from: 60, to: 72, finish: GLOSSY },
+};
+
+// Glossy with keys lit, since the shading has to stay legible under a state colour rather
+// than fighting it.
+export const FinishGlossyLit: Story = {
+    args: { from: 60, to: 72, finish: GLOSSY, lit: new Set([60, 64, 67]) },
 };

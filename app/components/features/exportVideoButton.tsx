@@ -6,7 +6,7 @@ import type { Take } from "../../../core/takes";
 import { fingeredFreely } from "../../../core/scorePerformance";
 import { videoDurationMs } from "../../../core/videoFrames";
 import { useVideoExporter } from "../../contexts/services";
-import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
+import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { downloadBlob } from "../../lib/download";
 import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot";
 import { takeFileStem } from "../../lib/takeFile";
@@ -70,6 +70,7 @@ export function ExportVideoButton({
     const exporter = useVideoExporter();
     // The chosen on-screen keyboard skin, so the exported video's keys match the app.
     const theme = useKeyboardTheme();
+    const finish = useKeyboardFinish();
     const [supported, setSupported] = useState(false);
     const [progress, setProgress] = useState<number | null>(null);
     const [failed, setFailed] = useState(false);
@@ -143,6 +144,7 @@ export function ExportVideoButton({
                           showTitle,
                           showWordmark,
                           keyColors,
+                          finish,
                           accent: noteColorHex(noteColor),
                           scheme: noteColor,
                           keyboardDepth: keyboardDepthFraction(keyboardDepth),
@@ -160,6 +162,7 @@ export function ExportVideoButton({
                           showTitle,
                           showWordmark,
                           keyColors,
+                          finish,
                       });
             const blob = await exporter.export(
                 { width, height, fps, durationMs, paint, notes },

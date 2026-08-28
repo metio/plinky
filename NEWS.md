@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 28 August 2026 — night
 
+**You can choose how the keys look, and every keyboard follows.** Settings already let
+you colour the keys; now it also asks how they should feel. **Joyful** is flat and
+bright — the front page look, and what you start with. **Glossy** lights them like a
+real instrument, with a shine down the key and an edge across the front. Whichever you
+pick reaches the front page, the play screen, Compose, the lessons, the ear trainer and
+the videos you export — they were four slightly different keyboards before, and one of
+them was painted in colours that existed nowhere else.
+
 **The keys in an exported video look like piano keys now.** How tall a key was drawn
 came from the height of the video and nothing else, so the same picture gave you
 squat tiles in a wide frame and thin stripes in a tall one — and the lip and shine

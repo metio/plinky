@@ -24,6 +24,7 @@ import { chordName, scaleName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { EarChoices } from "./earChoices";
+import { useKeyboardFinish } from "../../hooks/useKeyboardTheme";
 import { EarKeyboard } from "./earKeyboard";
 import { EarLadder } from "./earLadder";
 import { EarSequence } from "./earSequence";
@@ -71,6 +72,7 @@ export function EarSession({
     // comes next.
     onComplete?: (itemId: string) => void;
 }) {
+    const finish = useKeyboardFinish();
     const mastery = useMasteryStore();
     const prefs = usePrefsStore();
     const [question, setQuestion] = useState<EarQuestion | null>(null);
@@ -212,6 +214,7 @@ export function EarSession({
                 />
             ) : question.kind === "perfect-pitch" ? (
                 <EarKeyboard
+                    finish={finish}
                     choices={question.choices}
                     answer={settled ? question.answer : null}
                     given={settled ? (given as NoteNameId) : null}

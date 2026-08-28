@@ -69,7 +69,11 @@ export const PIECES = [
     { id: "kaV7eNLi899N", title: "Greensleeves", composer: "Traditional" },
     { id: "uzo6hVxZYnuI", title: "Amazing Grace", composer: "Traditional" },
     { id: "pwhwiOvdnR0K", title: "Danny Boy", composer: "Traditional" },
-    { id: "yHR7cn9MEShM", title: "Moonlight Sonata, 1st movement", composer: "Ludwig van Beethoven" },
+    {
+        id: "yHR7cn9MEShM",
+        title: "Moonlight Sonata, 1st movement",
+        composer: "Ludwig van Beethoven",
+    },
     { id: "rmn0H2s9YNOr", title: "Ode to Joy", composer: "Ludwig van Beethoven" },
     { id: "1fX1CRCi4I78", title: "Rondo alla Turca", composer: "W. A. Mozart" },
     { id: "nvJW4eCw0Hb1", title: "Sonata K. 545", composer: "W. A. Mozart" },
@@ -122,7 +126,9 @@ export function folderForComposer(composer) {
 
 // Internal to the naming above: every path a piece owns is built here, so nothing
 // outside needs to make one.
-function slug(title) {
+// Shared with the collections, which need folder names cut the same way — a set and a
+// piece landing on differently-shaped paths would be two answers to one question.
+export function slug(title) {
     return title
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")

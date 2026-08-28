@@ -3,6 +3,7 @@
 
 import { useSyncExternalStore } from "react";
 import { DEFAULT_THEME, type KeyboardTheme, KEYBOARD_THEMES } from "../../core/keyboardTheme";
+import { finishFor, type KeyboardFinish } from "../../core/keyboardFinish";
 import { DEFAULT_PREFS } from "../../core/prefs";
 import { usePrefsStore } from "../contexts/services";
 
@@ -19,4 +20,18 @@ export function useKeyboardTheme(): KeyboardTheme {
         () => DEFAULT_PREFS.keyboardTheme,
     );
     return KEYBOARD_THEMES.find((theme) => theme.id === id) ?? DEFAULT_THEME;
+}
+
+// The same, for how the keys are shaded. A second hook rather than one returning both,
+// because one returning `{ theme, finish }` would build a new object every render and hand
+// every keyboard a changed prop on every unrelated state change — the thing this file's
+// id-snapshot exists to avoid.
+export function useKeyboardFinish(): KeyboardFinish {
+    const store = usePrefsStore();
+    const id = useSyncExternalStore(
+        store.subscribe,
+        () => store.load().keyboardFinish,
+        () => DEFAULT_PREFS.keyboardFinish,
+    );
+    return finishFor(id);
 }

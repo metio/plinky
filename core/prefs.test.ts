@@ -36,6 +36,7 @@ const BASE: Prefs = {
     metronomeAdaptive: false,
     metronomeGroove: "straight",
     keyboardTheme: "classic",
+    keyboardFinish: "joyful",
     treadmill: false,
     raceGhost: true,
     hiddenNotes: false,
@@ -165,6 +166,8 @@ describe("parsePrefs", () => {
         );
         expect(parsePrefs(stored({ keyboardTheme: "sunset" })).keyboardTheme).toBe("sunset");
         expect(parsePrefs(stored({ keyboardTheme: 5 })).keyboardTheme).toBe("classic");
+        expect(parsePrefs(stored({ keyboardFinish: "glossy" })).keyboardFinish).toBe("glossy");
+        expect(parsePrefs(stored({ keyboardFinish: 5 })).keyboardFinish).toBe("joyful");
     });
 
     it("defaults treadmill off and keeps the stored toggle", () => {

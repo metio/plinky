@@ -2,23 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { m } from "../../paraglide/messages.js";
-import { type Brand, BrandIcon } from "./brandIcons";
+import { BrandIcon } from "./brandIcons";
+import { CHANNELS } from "../../../core/social";
 import { HeartIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
-
-const CHANNELS: { brand: Brand; label: string; href: string }[] = [
-    { brand: "instagram", label: "Instagram", href: "https://www.instagram.com/plinky.piano" },
-    {
-        brand: "facebook",
-        label: "Facebook",
-        href: "https://www.facebook.com/profile.php?id=61591963944991",
-    },
-    // The handle rather than the channel id: it is the same channel, and this form stays
-    // readable in a status bar and survives being renamed.
-    { brand: "youtube", label: "YouTube", href: "https://www.youtube.com/@PlinkyPiano" },
-    { brand: "reddit", label: "Reddit", href: "https://www.reddit.com/r/plinky_piano/" },
-    { brand: "github", label: "GitHub", href: "https://github.com/metio/plinky" },
-];
 
 // The quiet last line of every page: where to follow Plinky. Mirrors the
 // header's hairline-and-max-width frame so the shell reads as one piece, and

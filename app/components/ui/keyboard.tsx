@@ -10,7 +10,7 @@ import type { NoteLabels } from "../../../core/prefs";
 import { isWhite, keybedMaxWidthPx, whiteKeys } from "../../../core/keyboardGeometry";
 import { keyState } from "../../../core/keyState";
 import { m } from "../../paraglide/messages.js";
-import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
+import { finishFor, type KeyboardFinish } from "../../../core/keyboardFinish";
 
 // What a pointer calls itself when it sounds and silences a note. One name, because a
 // note is released by the source that sounded it: the two spelling it differently is the
@@ -51,6 +51,26 @@ const SYLLABLES: Array<() => string> = [
 
 // The typographic sharp a solfège syllable takes when it names a raised note.
 const SHARP_GLYPH = "♯";
+
+// What a key wears in each state that does not depend on the chosen skin. Held at module
+// scope because these are constants: building them per key per render allocated fifty
+// objects a frame on the one render path that runs at sixty frames a second.
+const WHITE_STATE = {
+    wrong: "bg-danger-fill",
+    held: "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held",
+    left: "bg-hand-left-soft",
+    right: "bg-hand-right-soft",
+    next: "bg-accent-surface",
+} as const;
+
+// A black key's `next` is skin-dependent (it is ringed rather than repainted), so it is
+// composed at the call site; everything else here is fixed.
+const BLACK_STATE = {
+    wrong: "bg-danger",
+    held: "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held",
+    left: "bg-hand-left",
+    right: "bg-hand-right",
+} as const;
 
 // Which label the setting calls for, said in the reader's own language: the syllables
 // are translated copy, so core decides what to print and this spells it.
@@ -103,6 +123,7 @@ export function Keyboard({
     sustained = false,
     holds = NO_HOLDS,
     theme = DEFAULT_THEME,
+    finish = finishFor(),
     badge,
     onPress,
     onRelease,
@@ -137,6 +158,9 @@ export function Keyboard({
     // expected and wrong feedback colours ignore it — they carry meaning. Defaults to the
     // classic palette, so an unthemed keyboard renders exactly as before.
     theme?: { white: string; black: string };
+    // How the keys are shaded. Defaults to the joyful finish, which is what a keyboard
+    // rendered in isolation — a story, a test, a lesson diagram — should look like.
+    finish?: KeyboardFinish;
     // An overlay pinned to the keybed's top-right corner — the MIDI-status badge. A
     // slot rather than a built-in so the bare Keyboard stays free of the MIDI context
     // (and rendarable in isolation); the wrappers that have the context pass it in.
@@ -435,15 +459,13 @@ export function Keyboard({
     // than a styling one, and it was written out three times here before.
     const stateOf = (note: number) =>
         keyState(note, { flash: flash?.note ?? null, lit, sounding, expected });
-    const whiteState = (note: number) =>
-        ({
-            wrong: "bg-danger-fill",
-            held: "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held",
-            left: "bg-hand-left-soft",
-            right: "bg-hand-right-soft",
-            next: "bg-accent-surface",
-            rest: theme.white,
-        })[stateOf(note)];
+    // Only `rest` depends on the skin, so the rest of the table is a module constant. It
+    // was rebuilt for every key of every render, and this render happens once an animation
+    // frame for as long as a note is held.
+    const whiteState = (note: number) => {
+        const state = stateOf(note);
+        return state === "rest" ? theme.white : WHITE_STATE[state];
+    };
     // An expected black key is ringed, not repainted. Filling it with the next-note colour
     // stops it being a black key — fine mid-piece, where the key is pointed at rather than
     // named, and wrong in the first lesson of all, which says "press any black key" over a
@@ -452,15 +474,15 @@ export function Keyboard({
     // A sounding black key IS filled, unlike an expected one: the reason an expected black
     // key is only ringed is that "press any black key" must still read as black, and
     // nothing is being asked for here.
-    const blackState = (note: number) =>
-        ({
-            wrong: "bg-danger",
-            held: "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held",
-            left: "bg-hand-left",
-            right: "bg-hand-right",
-            next: `${theme.black} ring-2 ring-inset ring-key-next`,
-            rest: theme.black,
-        })[stateOf(note)];
+    const blackState = (note: number) => {
+        const state = stateOf(note);
+        if (state === "rest") {
+            return theme.black;
+        }
+        return state === "next"
+            ? `${theme.black} ring-2 ring-inset ring-key-next`
+            : BLACK_STATE[state];
+    };
     // A black key's name is pale because the key is nearly black — but every state that
     // means something (wrong, held, play this) fills it with a bright colour, and pale
     // grey on those is well under the contrast floor. The name follows the fill.
@@ -509,7 +531,7 @@ export function Keyboard({
     const flashNote = flash?.note ?? null;
 
     return (
-        <div className={`${KEYBED_WELL} ${well}`}>
+        <div className={`${finish.well} ${well}`}>
             {/* biome-ignore lint/a11y/useSemanticElements: a keybed is a group of piano keys, not a fieldset */}
             <div
                 ref={keysRef}
@@ -530,7 +552,7 @@ export function Keyboard({
                             key={note}
                             {...keyProps(note)}
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
-                            className={`${WHITE_KEY} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
+                            className={`${finish.whiteKey} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
                         >
                             {keyFace(
                                 note,
@@ -558,7 +580,7 @@ export function Keyboard({
                                 width: `${width}%`,
                                 ...(rise ? { animationDelay: `${index * 45}ms` } : {}),
                             }}
-                            className={`${BLACK_KEY} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${blackState(note)}`}
+                            className={`${finish.blackKey} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${blackState(note)}`}
                         >
                             {keyFace(
                                 note,

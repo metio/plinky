@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Kun hvide tangenter. Spil skalaen, så hånden falder på plads, og kom så tilbage.",
     "warmup_back": "Tilbage til {title}",
     "settings_grand_piano_ready_hint": "Optagelser indlæses, når et stykke beder om dem, så tallet starter på nul hvert besøg og vokser, mens du spiller. Det, der ligger på enheden, er det afgørende — det indlæses straks.",
-    "assignments_show_steps": "Vis de {count} stykker"
+    "assignments_show_steps": "Vis de {count} stykker",
+    "settings_keyboard_finish": "Tangenternes look",
+    "finish_joyful": "Legende",
+    "finish_glossy": "Blank"
 }

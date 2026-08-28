@@ -3,7 +3,7 @@
 
 import { holdScaleFor } from "../../../core/midi";
 import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
-import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
+import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
 import { Keyboard } from "../ui/keyboard";
@@ -26,6 +26,7 @@ export function HeroKeyboard() {
     const synth = useSynth();
     const labels = useNoteLabels();
     const theme = useKeyboardTheme();
+    const finish = useKeyboardFinish();
     // The shared input funnel: touch taps and a connected MIDI keyboard both flow through
     // it, and heldNotes is the single source of truth for which keys are down (and lit).
     const { pressKey, releaseKey } = useMidiConnection();
@@ -50,6 +51,7 @@ export function HeroKeyboard() {
     return (
         <>
             <Keyboard
+                finish={finish}
                 from={FROM}
                 to={TO}
                 lit={new Set(heldNotes)}

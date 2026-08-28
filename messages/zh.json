@@ -1321,5 +1321,8 @@
     "warmup_card_white": "全是白键。弹一遍音阶让手安定下来，然后回来。",
     "warmup_back": "返回《{title}》",
     "settings_grand_piano_ready_hint": "录音在乐曲需要时才载入，所以每次访问都从零开始，随着弹奏增加。真正重要的是设备上的数量 —— 那些会立即载入。",
-    "assignments_show_steps": "显示这 {count} 首"
+    "assignments_show_steps": "显示这 {count} 首",
+    "settings_keyboard_finish": "琴键质感",
+    "finish_joyful": "活泼",
+    "finish_glossy": "光泽"
 }

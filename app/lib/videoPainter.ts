@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { finishFor, type KeyboardFinish } from "../../core/keyboardFinish";
 import { DEFAULT_THEME } from "../../core/keyboardTheme";
 import type { RecordedNote } from "../../core/composition";
 import {
@@ -115,6 +116,8 @@ export type ScenePainterInput = {
     // The resting white / black key hex from the chosen keyboard skin, so the video's
     // keys match the app. Absent falls back to the classic palette.
     keyColors?: { white: string; black: string };
+    // How the keys are shaded; the player's choice, or glossy for a promo.
+    finish?: KeyboardFinish;
 };
 
 type Context2D = Pick<
@@ -244,17 +247,11 @@ type KeyLayout = {
     // The resting white / black key hex, from the chosen keyboard skin.
     white: string;
     black: string;
+    // How the key is shaded (core/keyboardFinish). The numbers used to be constants here,
+    // which is why the same key was glossy in a video and flat on the page with no way to
+    // ask for either.
+    finish: KeyboardFinish;
 };
-
-// How much of a white key's height is its front face — the lip you see because a key is a
-// solid thing lying down rather than a painted stripe. Small: a real one is a few
-// millimetres of a long lever, and overdoing it turns a piano into a cartoon.
-const KEY_LIP = 0.09;
-// How far the top of a key is lifted toward white, and the bottom dropped toward its own
-// shadow. A single flat fill reads as a rectangle at any size; at a deep keyboard, where
-// the keys are longest, it reads as a stripe.
-const KEY_SHEEN = 0.22;
-const KEY_SHADE = 0.14;
 
 // A sounding key is the resting colour blended toward the accent by its glow —
 // full at the press, decaying while held — so a repeated press of the same key
@@ -278,27 +275,39 @@ function paintKey(
     const rest = key.black ? l.black : l.white;
     const base = glow === null ? rest : mixHex(rest, lit, glow);
 
-    const face = context.createLinearGradient(0, l.keyboardTop, 0, l.keyboardTop + h);
-    face.addColorStop(0, mixHex(base, "#FFFFFF", KEY_SHEEN));
-    face.addColorStop(key.black ? 0.7 : 0.55, base);
-    face.addColorStop(1, mixHex(base, "#000000", KEY_SHADE));
-    context.fillStyle = face;
+    const { lip, sheen, shade, radius } = l.finish;
+    const corner = Math.max(1, w * radius);
+    // A finish with no sheen and no shade wants one flat colour, not a gradient between
+    // three copies of it — the gradient would be correct and pointless, and this is drawn
+    // for every key of every frame.
+    if (sheen === 0 && shade === 0) {
+        context.fillStyle = base;
+    } else {
+        const face = context.createLinearGradient(0, l.keyboardTop, 0, l.keyboardTop + h);
+        face.addColorStop(0, mixHex(base, "#FFFFFF", sheen));
+        face.addColorStop(key.black ? 0.7 : 0.55, base);
+        face.addColorStop(1, mixHex(base, "#000000", shade));
+        context.fillStyle = face;
+    }
     context.beginPath();
-    context.roundRect(x + w * 0.04, l.keyboardTop, w * 0.92, h, 4);
+    // Rounded at the foot only, the way the page rounds a key (`rounded-b-*`). Rounding all
+    // four put a curve on the top edge, which is where a falling block lands and where the
+    // black keys sit — and made the two renderers of one finish disagree about the shape of
+    // the same key.
+    context.roundRect(x + w * 0.04, l.keyboardTop, w * 0.92, h, [0, 0, corner, corner]);
     context.fill();
 
     // The front face, darker than the key it belongs to, so the eye reads a solid with a
     // near edge. Only the white keys carry it: a black key is already the dark thing.
-    if (!key.black) {
-        context.fillStyle = mixHex(base, "#000000", KEY_SHADE * 2.4);
+    if (!key.black && lip > 0) {
+        context.fillStyle = mixHex(base, "#000000", shade * 2.4);
         context.beginPath();
-        context.roundRect(
-            x + w * 0.04,
-            l.keyboardTop + h * (1 - KEY_LIP),
-            w * 0.92,
-            h * KEY_LIP,
-            [0, 0, 4, 4],
-        );
+        context.roundRect(x + w * 0.04, l.keyboardTop + h * (1 - lip), w * 0.92, h * lip, [
+            0,
+            0,
+            corner,
+            corner,
+        ]);
         context.fill();
     }
 }
@@ -395,6 +404,7 @@ function keyLayoutFor(
     keyboardTop: number,
     keyboardHeight: number,
     keyColors?: { white: string; black: string },
+    finish: KeyboardFinish = finishFor(),
 ): KeyLayout {
     return {
         margin,
@@ -403,6 +413,7 @@ function keyLayoutFor(
         keyboardHeight,
         white: keyColors?.white ?? DEFAULT_KEYS.white,
         black: keyColors?.black ?? DEFAULT_KEYS.black,
+        finish,
     };
 }
 
@@ -419,6 +430,7 @@ export function takeScenePainter({
     showTitle = true,
     showWordmark = true,
     keyColors,
+    finish,
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
     const { keys, margin, unit, cfg } = stageFor({
         title,
@@ -449,7 +461,7 @@ export function takeScenePainter({
     // The run's distinct onsets in playing order — step i of the snapshot sounded
     // at onsets[i], mirroring how the matcher and the take both count steps.
     const onsets = [...new Set(notes.map((note) => note.startMs))].sort((a, b) => a - b);
-    const keyLayout = keyLayoutFor(width, margin, keyboardTop, keyboardHeight, keyColors);
+    const keyLayout = keyLayoutFor(width, margin, keyboardTop, keyboardHeight, keyColors, finish);
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
@@ -603,6 +615,7 @@ export function takeHighwayPainter({
     showTitle = true,
     showWordmark = true,
     keyColors,
+    finish,
     accent = ACCENT,
     scheme = DEFAULT_NOTE_COLOR,
     keyboardDepth = keyboardDepthFraction(DEFAULT_KEYBOARD_DEPTH),
@@ -616,14 +629,13 @@ export function takeHighwayPainter({
     showTitle?: boolean;
     showWordmark?: boolean;
     keyColors?: { white: string; black: string };
+    // How the keys are shaded; the player's choice, or glossy for a promo.
+    finish?: KeyboardFinish;
     // The colour a falling note lands in. Defaults to the app's accent, which is what an
     // exported take uses; a caller rendering for somewhere else can set its own. Only the
     // blocks follow it — the lit key, the progress bar and the chrome keep the accent,
     // since those carry meaning rather than decoration.
     accent?: string;
-    // Colour each note by the finger that plays it instead of by one accent — falling
-    // block and lit key alike, so the two agree. Notes the performance did not finger
-    // keep the accent.
     // How a falling note is coloured: a flat colour, by the finger that plays it, or by
     // the hand. One of `HIGHWAY_SCHEMES` — the same list the practice highway offers, so
     // the two pictures cannot drift apart in what they can be made to look like.
@@ -653,7 +665,7 @@ export function takeHighwayPainter({
     const keyboardTop = height * 0.96 - keyboardHeight;
     const laneTop = height * 0.3;
     const regionHeight = keyboardTop - laneTop;
-    const keyLayout = keyLayoutFor(width, margin, keyboardTop, keyboardHeight, keyColors);
+    const keyLayout = keyLayoutFor(width, margin, keyboardTop, keyboardHeight, keyColors, finish);
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
@@ -675,10 +687,11 @@ export function takeHighwayPainter({
             context.fill();
         }
 
-        // The strike line where blocks meet the keys.
-        // Pale plink, 6.8:1 on the ground, so the landing line stays crisp.
-        context.fillStyle = "#EDB2FD";
-        context.fillRect(margin, keyboardTop - 2, width - margin * 2, 2);
+        // No drawn line where the blocks meet the keys. There was a pale two-pixel rule
+        // across the full width here, and the keyboard reads as its own edge — the line sat
+        // just above the keys as a second, brighter one, and a block landing crossed both.
+        // The moment of landing is carried by the key lighting up, which is the thing worth
+        // watching.
 
         // The keyboard, sounding keys lit by their freshest press.
         const glows = keyGlows(frame.down);

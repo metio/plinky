@@ -29,7 +29,10 @@ import { RecentProblems } from "../components/features/recentProblems";
 import { HandSize } from "../components/features/handSize";
 import { ReadingLevel } from "../components/features/readingLevel";
 import { KeyMapping } from "../components/features/keyMapping";
-import { KeyboardThemePicker } from "../components/features/keyboardThemePicker";
+import {
+    KeyboardFinishPicker,
+    KeyboardThemePicker,
+} from "../components/features/keyboardThemePicker";
 import { LanguageSwitcher } from "../components/ui/languageSwitcher";
 import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
@@ -447,6 +450,13 @@ export default function Settings() {
                 <SettingsSection title={m.settings_keyboard_theme()} level={3}>
                     <FeatureBoundary feature="KeyboardThemePicker">
                         <KeyboardThemePicker />
+                    </FeatureBoundary>
+                </SettingsSection>
+                {/* Colour and shading are two questions about one instrument, so the two
+                choosers sit together — what the keys are made of, then what colour. */}
+                <SettingsSection title={m.settings_keyboard_finish()} level={3}>
+                    <FeatureBoundary feature="KeyboardFinishPicker">
+                        <KeyboardFinishPicker />
                     </FeatureBoundary>
                 </SettingsSection>
             </SettingsSection>

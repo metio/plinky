@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Numai clape albe. Cântă gama ca să-ți așezi mâna, apoi întoarce-te.",
     "warmup_back": "Înapoi la {title}",
     "settings_grand_piano_ready_hint": "Înregistrările se încarcă atunci când o piesă le cere, așa că numărul pornește de la zero la fiecare vizită și crește în timp ce cânți. Contează ce se află pe dispozitiv — acelea se încarcă imediat.",
-    "assignments_show_steps": "Arată cele {count} piese"
+    "assignments_show_steps": "Arată cele {count} piese",
+    "settings_keyboard_finish": "Aspectul clapelor",
+    "finish_joyful": "Jucăuș",
+    "finish_glossy": "Lucios"
 }

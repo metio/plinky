@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Csak fehér billentyűk. Játszd le a skálát, hogy a kéz elhelyezkedjen, aztán gyere vissza.",
     "warmup_back": "Vissza: {title}",
     "settings_grand_piano_ready_hint": "A felvételek akkor töltődnek be, amikor egy darab kéri őket, így ez minden látogatáskor nulláról indul és játék közben nő. Az számít, ami az eszközön van — az azonnal betöltődik.",
-    "assignments_show_steps": "A {count} darab megjelenítése"
+    "assignments_show_steps": "A {count} darab megjelenítése",
+    "settings_keyboard_finish": "Billentyűk stílusa",
+    "finish_joyful": "Játékos",
+    "finish_glossy": "Fényes"
 }

@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Jen bílé klávesy. Zahraj stupnici, ať ruka sedne, a vrať se.",
     "warmup_back": "Zpět na {title}",
     "settings_grand_piano_ready_hint": "Nahrávky se načtou, až si o ně skladba řekne, takže číslo začíná při každé návštěvě na nule a roste během hraní. Důležité je, co je v zařízení — to se načte okamžitě.",
-    "assignments_show_steps": "Zobrazit {count} skladeb"
+    "assignments_show_steps": "Zobrazit {count} skladeb",
+    "settings_keyboard_finish": "Vzhled kláves",
+    "finish_joyful": "Hravý",
+    "finish_glossy": "Lesklý"
 }

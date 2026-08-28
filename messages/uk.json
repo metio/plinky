@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Лише білі клавіші. Зіграйте гаму, щоб рука лягла, і повертайтеся.",
     "warmup_back": "Назад до «{title}»",
     "settings_grand_piano_ready_hint": "Записи завантажуються, коли їх просить п'єса, тож лік починається з нуля щовізиту й зростає, поки ви граєте. Важливо те, що є на пристрої, — воно завантажується миттєво.",
-    "assignments_show_steps": "Показати {count} п'єс"
+    "assignments_show_steps": "Показати {count} п'єс",
+    "settings_keyboard_finish": "Вигляд клавіш",
+    "finish_joyful": "Веселий",
+    "finish_glossy": "Глянцевий"
 }

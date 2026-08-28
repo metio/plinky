@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Yalnızca beyaz tuşlar. Elin yerleşsin diye diziyi çal, sonra geri dön.",
     "warmup_back": "{title} parçasına dön",
     "settings_grand_piano_ready_hint": "Kayıtlar bir parça istediğinde yüklenir, bu yüzden sayı her ziyarette sıfırdan başlar ve sen çaldıkça artar. Önemli olan cihazda ne olduğudur — onlar anında yüklenir.",
-    "assignments_show_steps": "{count} parçayı göster"
+    "assignments_show_steps": "{count} parçayı göster",
+    "settings_keyboard_finish": "Tuşların görünümü",
+    "finish_joyful": "Neşeli",
+    "finish_glossy": "Parlak"
 }

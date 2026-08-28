@@ -1321,5 +1321,8 @@
     "warmup_card_white": "白鍵だけです。手をなじませる音階を弾いてから戻ってきてください。",
     "warmup_back": "{title} に戻る",
     "settings_grand_piano_ready_hint": "録音は曲が必要としたときに読み込まれます。訪れるたびにゼロから始まり、弾くうちに増えます。大事なのは端末にある数で、そちらはすぐ読み込まれます。",
-    "assignments_show_steps": "{count}曲を表示"
+    "assignments_show_steps": "{count}曲を表示",
+    "settings_keyboard_finish": "鍵盤の質感",
+    "finish_joyful": "たのしい",
+    "finish_glossy": "つやあり"
 }

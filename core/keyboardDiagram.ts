@@ -55,6 +55,11 @@ const CAPTION_SIZE = 46;
 const CAPTION_MIN = 24;
 const MARGIN = 48;
 
+// A palette of its own, deliberately, and the only keyboard in Plinky that has one. The
+// app's keyboards follow the player's skin and finish (core/keyboardTheme,
+// core/keyboardFinish); this draws a chord chart to be printed or saved as a picture, where
+// somebody else's berry keys on cream paper help nobody and a gloss is wasted ink. Plain
+// black on plain white is what a diagram is for.
 const INK = "#0f172a";
 const PAPER = "#fdf6ec";
 const WHITE_KEY = "#ffffff";

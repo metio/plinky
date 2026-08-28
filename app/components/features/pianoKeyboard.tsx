@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { NoteLabels } from "../../../core/prefs";
 import type { HoldFeed } from "../../hooks/useHoldIndicator";
 import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
-import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
+import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { Keyboard } from "../ui/keyboard";
 import { MidiBadge } from "./midiBadge";
@@ -58,6 +58,13 @@ export function PianoKeyboard({
     const savedLabels = useNoteLabels();
     const labels = labelsOverride ?? savedLabels;
     const theme = useKeyboardTheme();
+    const finish = useKeyboardFinish();
+    // The held notes as a set, rebuilt only when they change. This component re-renders
+    // once an animation frame for as long as a note is held — that is deliberate, since it
+    // is the one place the hold fills are painted — so what it does per frame should be as
+    // little as possible, and building a set of the same notes sixty times a second is not
+    // that.
+    const lit = useMemo(() => new Set(heldNotes), [heldNotes]);
 
     // Reflect the sustain pedal on the keybed. The held-pedal set lives in a ref (no
     // re-render on change), so subscribe to pedal events and mirror sustain into state,
@@ -82,10 +89,11 @@ export function PianoKeyboard({
 
     return (
         <Keyboard
+            finish={finish}
             from={from}
             to={to}
             well={well}
-            lit={new Set(heldNotes)}
+            lit={lit}
             expected={expected}
             sounding={sounding}
             wrong={wrong}

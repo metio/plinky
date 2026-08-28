@@ -17,12 +17,17 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 import { folderFor, PIECES } from "./pieces.mjs";
+import { FOLLOW_US } from "../../core/social.ts";
+import { FINGER_LEGEND } from "./fingerLegend.mjs";
 
 // Absent and present-but-empty both fall back. indexOf answers -1 for absent, and -1 + 1
 // is 0 — argv[0] is the node binary, so the naive form writes every file inside whatever
 // directory node happens to live in.
 const outAt = process.argv.indexOf("--out");
 const OUT = (outAt >= 0 ? process.argv[outAt + 1] : undefined) ?? "promo";
+// One line per channel, from the single list in core/social.
+const FOLLOW_LINES = FOLLOW_US.map((c) => `${c.label}: ${c.href}`);
+
 const SITE = "https://plinky.fun";
 
 const manifest = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
@@ -68,6 +73,15 @@ function describe(piece, entry) {
         facts.length > 0 ? "" : null,
         `Play this one yourself: ${SITE}/en/play/${piece.id}/`,
         "",
+        // The colours are the one thing on screen a viewer cannot work out for themselves.
+        // They are not decoration and they are not the pitch: each names the finger that
+        // plays the note, so somebody watching can read a fingering off the video without
+        // knowing that is what they are doing. Written out because the mapping is fixed
+        // forever (core/videoLook) — a viewer who learns it once has learned it for every
+        // clip, and that is only worth anything if it is stated somewhere.
+        "The colour of each note is the finger that plays it:",
+        ...FINGER_LEGEND,
+        "",
         "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
         "",
         SITE,
@@ -76,9 +90,7 @@ function describe(piece, entry) {
         // the one person most likely to follow, and YouTube gives them nowhere to do it —
         // the description is the only place these can be said.
         "More Plinky:",
-        "Instagram: https://www.instagram.com/plinky.piano",
-        "Facebook: https://www.facebook.com/profile.php?id=61591963944991",
-        "Reddit: https://www.reddit.com/r/plinky_piano/",
+        ...FOLLOW_LINES,
         "",
         // No entry means no licence, and a licence is a legal fact about a particular
         // score rather than a default. Guessing CC0 would tell a viewer they may reuse an

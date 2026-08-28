@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Nur weiße Tasten. Spiel die Tonleiter, damit die Hand sitzt, und komm dann zurück.",
     "warmup_back": "Zurück zu {title}",
     "settings_grand_piano_ready_hint": "Aufnahmen werden erst geladen, wenn ein Stück sie braucht. Die Zahl beginnt bei jedem Besuch bei null und wächst beim Spielen. Entscheidend ist, was auf dem Gerät liegt – das lädt sofort.",
-    "assignments_show_steps": "Die {count} Stücke zeigen"
+    "assignments_show_steps": "Die {count} Stücke zeigen",
+    "settings_keyboard_finish": "Anmutung der Tasten",
+    "finish_joyful": "Verspielt",
+    "finish_glossy": "Glänzend"
 }

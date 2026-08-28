@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Само беле дирке. Одсвирај лествицу да рука седне па се врати.",
     "warmup_back": "Назад на {title}",
     "settings_grand_piano_ready_hint": "Снимци се учитавају када их комад затражи, па број сваки пут креће од нуле и расте док свираш. Важно је оно што је на уређају — то се учитава одмах.",
-    "assignments_show_steps": "Прикажи {count} комада"
+    "assignments_show_steps": "Прикажи {count} комада",
+    "settings_keyboard_finish": "Изглед дирки",
+    "finish_joyful": "Разиграно",
+    "finish_glossy": "Сјајно"
 }

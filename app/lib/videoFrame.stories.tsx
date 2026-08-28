@@ -4,7 +4,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef } from "react";
 import { LEAD_IN_MS } from "../../core/videoFrames";
-import { takeScenePainter } from "./videoPainter";
+import { takeHighwayPainter, takeScenePainter } from "./videoPainter";
 
 // Golden frames of the exported video: each story paints one exact frame of a
 // fixed take, so the committed baselines pin what a shared video looks like at
@@ -187,3 +187,41 @@ function PortraitFrame({ title = TAKE.title }: { title?: string }) {
     }, [title]);
     return <canvas ref={canvasRef} width={360} height={640} />;
 }
+
+// The falling-blocks format, which had no story at all until a stray rule was drawn across
+// it and nothing could see it. Every other story here paints the notation scene; this is the
+// one the promo clips and a highway export are made of.
+function HighwayFrame({
+    timeMs,
+    width,
+    height,
+}: {
+    timeMs: number;
+    width: number;
+    height: number;
+}) {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    useEffect(() => {
+        const context = canvasRef.current?.getContext("2d");
+        if (context) {
+            takeHighwayPainter({ ...TAKE, width, height })(context, timeMs);
+        }
+    }, [timeMs, width, height]);
+    return <canvas ref={canvasRef} width={width} height={height} />;
+}
+
+// Blocks in flight, and the keyboard reading as its own edge beneath them.
+export const HighwayFalling: Story = {
+    render: () => <HighwayFrame timeMs={LEAD_IN_MS + 300} width={640} height={360} />,
+};
+
+// A block on the keys: the landing is the key lighting up, with nothing drawn over it.
+export const HighwayLanding: Story = {
+    render: () => <HighwayFrame timeMs={LEAD_IN_MS + 500} width={640} height={360} />,
+};
+
+// Portrait, where the key-shape band does the most work — a key here was drawn twelve times
+// its own width before it was held to a shape a piano could have.
+export const HighwayPortrait: Story = {
+    render: () => <HighwayFrame timeMs={LEAD_IN_MS + 500} width={360} height={640} />,
+};

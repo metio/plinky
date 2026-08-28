@@ -21,14 +21,21 @@ import { chromium } from "playwright";
 const [file, out, at] = process.argv.slice(2);
 const b64 = readFileSync(file).toString("base64");
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+// A generous viewport; the video element is then sized to the clip's own dimensions below.
+// Forcing every clip into one shape letterboxed the landscape ones inside black bands and
+// made a correct render look broken — the tool has to take the video's shape, not impose
+// one.
+const page = await browser.newPage({ viewport: { width: 1920, height: 1920 } });
 await page.setContent(
-    `<body style="margin:0;background:#000"><video id="v" style="width:1080px;height:1920px" src="data:video/mp4;base64,${b64}"></video></body>`,
+    `<body style="margin:0;background:#000"><video id="v" src="data:video/mp4;base64,${b64}"></video></body>`,
 );
-await page.waitForFunction(() => {
-    const v = document.querySelector("video");
-    return v && v.readyState >= 2;
-}, { timeout: 30000 });
+await page.waitForFunction(
+    () => {
+        const v = document.querySelector("video");
+        return v && v.readyState >= 2;
+    },
+    { timeout: 30000 },
+);
 await page.evaluate((t) => {
     const v = document.querySelector("video");
     return new Promise((resolve) => {
@@ -36,6 +43,17 @@ await page.evaluate((t) => {
         v.currentTime = t;
     });
 }, Number(at));
+// Native size, so a pixel in the file is a pixel in the picture.
+await page.evaluate(() => {
+    const v = document.querySelector("video");
+    v.style.width = `${v.videoWidth}px`;
+    v.style.height = `${v.videoHeight}px`;
+});
+const shape = await page.evaluate(() => {
+    const v = document.querySelector("video");
+    return `${v.videoWidth}x${v.videoHeight}`;
+});
 await page.locator("#v").screenshot({ path: out });
+console.log(`  ${shape}`);
 await browser.close();
 console.log("wrote", out);

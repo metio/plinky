@@ -19,7 +19,7 @@ import {
 import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../../core/glossaryScore";
 import { holdScaleFor } from "../../../core/midi";
 import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
-import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
+import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
 import { m } from "../../paraglide/messages.js";
@@ -78,6 +78,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     const synth = useSynth();
     const labels = useNoteLabels();
     const theme = useKeyboardTheme();
+    const finish = useKeyboardFinish();
     const { pressKey, releaseKey } = useMidiConnection();
     const heldNotes = useHeldNotes();
 
@@ -143,6 +144,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
             )}
 
             <Keyboard
+                finish={finish}
                 from={MIDDLE_C}
                 to={TOUR_TO}
                 // Lit means a key is down. Only real presses light, or the tour would

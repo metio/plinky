@@ -1321,5 +1321,8 @@
     "warmup_card_white": "Nothing but white keys. Play the scale to settle your hand, then come back.",
     "warmup_back": "Back to {title}",
     "settings_grand_piano_ready_hint": "Recordings are decoded as a piece asks for them, so this starts at nothing each visit and climbs while you play. What is on the device is what matters — those load instantly.",
-    "assignments_show_steps": "Show the {count} pieces"
+    "assignments_show_steps": "Show the {count} pieces",
+    "settings_keyboard_finish": "Keyboard feel",
+    "finish_joyful": "Joyful",
+    "finish_glossy": "Glossy"
 }

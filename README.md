@@ -308,6 +308,14 @@ one-tap **review session** walks you through everything that's fading, and you c
   catalogue at build time, so a set only appears while the pieces that make it up are
   actually there.
 
+- **How the keyboard looks** — two questions in Settings, and both reach every keyboard in
+  Plinky: the front page, the play surface, Compose, the lessons, the ear trainer and a
+  video you export. **Colour** picks the resting keys' skin; **feel** picks how they are
+  shaded — *joyful*, flat and bright, which is what a new player gets, or *glossy*, lit like
+  a real instrument with a lip across the front. Promo clips are always glossy: a clip is
+  seen by somebody deciding whether to open Plinky at all, while the app opens for somebody
+  who has already arrived and may never have played before.
+
 - **Handing an assignment back** — the loop used to run one way: a teacher shares a
   list, and never learns what happened, because progress lives on the student's
   device. Now each assignment offers **Hand your results back**: type a name and the
@@ -807,7 +815,9 @@ one piece is thin whoever is reading it.
 
 Every page ends with a slim footer linking to Plinky's own channels —
 [Instagram](https://www.instagram.com/plinky.piano),
-[Facebook](https://www.facebook.com/profile.php?id=61591963944991) and
+[Facebook](https://www.facebook.com/61591963944991),
+[YouTube](https://www.youtube.com/@PlinkyPiano),
+[Reddit](https://www.reddit.com/r/plinky_piano/) and
 the source itself on [GitHub](https://github.com/metio/plinky).
 
 ## Development

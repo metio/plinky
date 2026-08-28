@@ -126,6 +126,10 @@ export type Prefs = {
     // The chosen on-screen keyboard skin id (see core/keyboardTheme); an unknown or
     // still-locked id renders as classic, so this stays a plain string.
     keyboardTheme: string;
+    // How the keys are shaded (see core/keyboardFinish): flat and friendly, or lit like a
+    // real instrument. Separate from the skin because colour and shading are independent —
+    // a berry keyboard can be either.
+    keyboardFinish: string;
     // Render the piece as one continuous horizontal line that scrolls under a fixed gaze
     // as you play (a notation "treadmill"), instead of wrapping into stacked rows. Off by
     // default — the wrapped score is the familiar reading layout.
@@ -259,6 +263,7 @@ function defaults(): Prefs {
         metronomeAdaptive: false,
         metronomeGroove: "straight",
         keyboardTheme: "classic",
+        keyboardFinish: "joyful",
         treadmill: false,
         highway: true,
         raceGhost: true,
@@ -368,6 +373,10 @@ export function parsePrefs(raw: string | null): Prefs {
                 typeof parsed.keyboardTheme === "string"
                     ? parsed.keyboardTheme
                     : base.keyboardTheme,
+            keyboardFinish:
+                typeof parsed.keyboardFinish === "string"
+                    ? parsed.keyboardFinish
+                    : base.keyboardFinish,
             treadmill: bool(parsed.treadmill, base.treadmill),
             highway: bool(parsed.highway, base.highway),
             raceGhost: bool(parsed.raceGhost, base.raceGhost),
