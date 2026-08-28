@@ -393,6 +393,19 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   path invalidates every clip — because re-rendering more than strictly necessary is the
   cheaper mistake.
 
+- **A render drives the dev server it started, or it does not run.** The browser fetches
+  the app's modules over HTTP, so the server is where the code a clip comes out of actually
+  lives — and Vite answers a taken port by quietly taking the next one and mentioning it in
+  passing. A previous render left running therefore holds the port, the new one's server
+  moves to 5200, and the driver goes on fetching from the old process: every clip comes out
+  of a stale module graph, and each is stamped current, because the stamp reads the files
+  on disk in the driver and never sees which server answered. So `dev/promo/devServer.mjs`
+  refuses a busy port outright and treats Vite's "is in use" line as an error rather than a
+  notice. It doubles as the rule that two renders must never overlap — they regenerate the
+  same `app/paraglide/` under each other. Note that `TaskStop` on a backgrounded render
+  kills the shell, not the `node` and `react-router` processes under it; check for
+  survivors before starting another.
+
 - **A hand-made correction to catalogue metadata goes in `dev/catalog-curation.json`**,
   never straight into `public/songs/manifest.json`. The manifest is written by
   `songs:import` from the harvested corpora, so an edit there survives until the next

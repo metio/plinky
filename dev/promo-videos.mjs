@@ -19,7 +19,7 @@
 // obligations that a social post strips: the credit line is burnt into every frame, but
 // share-alike travels with the video, and a feed is the worst place to argue about it.
 
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import {
     createWriteStream,
     existsSync,
@@ -32,6 +32,7 @@ import {
 import { chromium } from "playwright";
 import { folderFor, PIECES } from "./promo/pieces.mjs";
 import { renderStamp } from "./promo/renderStamp.mjs";
+import { startDevServer } from "./promo/devServer.mjs";
 import { collectionPieces } from "./promo/collections.mjs";
 
 const OUT = argValue("--out") ?? "promo";
@@ -189,21 +190,6 @@ function scoreUrl(id, manifest) {
     return { url: `/songs/${song.license.toLowerCase()}/${id}.mxl`, song };
 }
 
-async function waitForServer(url, attempts = 120) {
-    for (let i = 0; i < attempts; i++) {
-        try {
-            const response = await fetch(url);
-            if (response.ok) {
-                return;
-            }
-        } catch {
-            // not up yet
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    throw new Error(`dev server never came up at ${url}`);
-}
-
 const manifest = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
 mkdirSync(OUT, { recursive: true });
 
@@ -238,14 +224,13 @@ if (unresolved.length > 0) {
 // The dev server is here only to compile modules for the browser; nothing is being edited
 // while a render runs, and a watcher would reload the page mid-frame the moment anything in
 // the tree changed. An hour-long batch should not be hostage to a stray save.
-const server = spawn("npx", ["react-router", "dev", "--port", String(PORT)], {
-    stdio: "inherit",
-    env: { ...process.env, PLINKY_NO_WATCH: "1" },
-});
+//
+// It must be OUR server: the browser gets its code from whichever process holds the port,
+// so a stale one left running renders stale clips under a current stamp.
+const server = await startDevServer(PORT);
 const base = `http://localhost:${PORT}`;
 
 try {
-    await waitForServer(`${base}/en/`);
     const browser = await chromium.launch({
         // WebCodecs' hardware paths are absent in headless; the software encoders are what
         // the flags below keep available.

@@ -19,7 +19,9 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 
-const ENTRY = "dev/promo/renderPromo.ts";
+// Both halves of a render: the module graph the browser runs, and the driver that decides
+// the frame size, the frame rate, the colours and which instrument plays.
+const ENTRIES = ["dev/promo/renderPromo.ts", "dev/promo-videos.mjs"];
 // Bare specifiers are dependencies, pinned by package-lock and covered by it rather than
 // by this. Only the repo's own modules are walked.
 const RELATIVE = /(?:^|[\s;])(?:import|export)[\s\S]*?from\s*["'](\.[^"']+)["']/g;
@@ -41,9 +43,9 @@ function resolveModule(specifier, fromFile) {
 }
 
 // Every repo module the render reaches, entry included.
-export function renderGraph(entry = ENTRY) {
+export function renderGraph(entries = ENTRIES) {
     const seen = new Set();
-    const queue = [resolve(entry)];
+    const queue = entries.map((entry) => resolve(entry));
     while (queue.length > 0) {
         const file = queue.pop();
         if (seen.has(file)) {

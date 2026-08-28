@@ -11,11 +11,11 @@
 //
 // Usage: npm run promo:cuts [-- --only text] [--collections]
 
-import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import { PIECES } from "./promo/pieces.mjs";
 import { collectionPieces } from "./promo/collections.mjs";
+import { startDevServer } from "./promo/devServer.mjs";
 
 const PORT = 5198;
 const ONLY = argValue("--only");
@@ -27,27 +27,13 @@ function argValue(flag) {
 }
 
 const manifest = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
-const server = spawn("npx", ["react-router", "dev", "--port", String(PORT)], {
-    stdio: ["ignore", "ignore", "inherit"],
-    env: { ...process.env, PLINKY_NO_WATCH: "1" },
-});
+// Our own server, on our own port, or nothing: a report that reads a stale module graph
+// answers for code that is not running.
+const server = await startDevServer(PORT);
 const base = `http://localhost:${PORT}`;
-
-async function waitForServer(url, attempts = 120) {
-    for (let i = 0; i < attempts; i++) {
-        try {
-            if ((await fetch(url)).ok) return;
-        } catch {
-            // not up yet
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    throw new Error(`dev server never came up at ${url}`);
-}
 
 const rows = [];
 try {
-    await waitForServer(`${base}/en/`);
     const browser = await chromium.launch({ args: ["--disable-gpu"] });
     const page = await browser.newPage();
     await page.goto(`${base}/en/`, { waitUntil: "domcontentloaded" });
