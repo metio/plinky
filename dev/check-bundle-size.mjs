@@ -16,7 +16,7 @@
 
 import { readdirSync, readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
-import { requireSingleLocaleBuild } from "./single-locale-build.mjs";
+import { builtLocales, requireSingleLocaleBuild } from "./single-locale-build.mjs";
 
 const CLIENT = "build/client";
 const DIR = `${CLIENT}/assets`;
@@ -438,6 +438,15 @@ const BUDGET_VENDOR_KB = 324;
 // and a second banner message, since telling somebody on a stale tab that their storage
 // is full sends them off deleting files that were never the trouble. 0.3 KB, measured at
 // 386.2.
+// 411. Not a regression: the same code, weighed honestly for the first time. Every
+// per-visitor gate built English, which is the one language none of them needed to
+// check — it is the shortest, and every string in the app was written to fit in it. A
+// budget is a claim about what a visitor downloads, and a Greek visitor downloads 2.07
+// times the message bytes an English one does. Measured, that is 21.8 KB nobody had ever
+// weighed: 410.0 against the 388.2 this line was set to. The build now picks the heaviest
+// language (dev/locale-stress.mjs --heaviest), so the claim is that the worst case fits
+// and therefore all twenty-six do. Expect this figure to move when the translations do;
+// the gate prints the locale it weighed so a jump can be read.
 // 389. Two things, both of which the app has to be able to do rather than only the build.
 // The difficulty model learned how much time a player has: movement between positions is
 // discounted by the gap before it, which is what stops a slow wide left hand reading as
@@ -450,7 +459,7 @@ const BUDGET_VENDOR_KB = 324;
 // costs a source method, a card that folds its steps away and mounts them on opening, and
 // one message. Two hundred and sixty piece ids are a fetched file, not bundle. 2.0 KB,
 // measured at 388.2.
-const BUDGET_APP_KB = 389;
+const BUDGET_APP_KB = 411;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
@@ -489,6 +498,10 @@ const onDemand = chunks
 const app = total - vendor - onDemand;
 const kb = (bytes) => (bytes / 1024).toFixed(1);
 
+// Which language was weighed, because the answer moves with the translations and a jump
+// in the figure is otherwise unreadable. The build picks the heaviest, so this is the most
+// any visitor downloads rather than the least.
+console.log(`Measuring the ${builtLocales()[0] ?? "?"} build — the heaviest of the 26.`);
 console.log("Largest client chunks (gzipped):");
 for (const chunk of chunks.slice(0, 8)) {
     console.log(`  ${kb(chunk.gz).padStart(7)} KB  ${chunk.name}`);

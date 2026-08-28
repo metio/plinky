@@ -103,14 +103,23 @@ machine with rootless Podman and nix-portable, so a gate needing `kind`, a
 privileged container, a system-level nix daemon, or real MIDI/audio hardware
 could not run here at all. Plinky has no such gate today.
 
-**Only English used to be verified, and the deploy ships 26 languages.** The message gate
-compares placeholder parity as well as key sets, and `ci-widths` measures the built site at
-phone widths in the locale whose messages hold the longest unbreakable word — currently
-Danish, derived by `dev/widest-locale.mjs` rather than named, so it follows the
-translations. English is the one language whose layout needs no checking: every string in
-the app was written to fit it, and a word that cannot be broken arrives in translation.
-Still measured in `en` alone: the story screenshots, the a11y sweeps, Lighthouse and the
-size budget.
+**Only English used to be verified, and the deploy ships 26 languages.** English is the
+one language none of these gates needed to check: it is the shortest, and every string in
+the app was written to fit it. Both worst cases are now derived by
+`dev/locale-stress.mjs` rather than named, so they follow the translations:
+
+- `--widest` — the longest word a line cannot be broken inside (Danish today). `ci-widths`
+  builds it and measures the site at 320/360/390px.
+- `--heaviest` — the most message text by bytes (Greek today, 2.07× English).
+  `build:single` builds it, so the size budget, both a11y sweeps and `ci-lighthouse` all
+  measure the worst case: if the heaviest language fits, all twenty-six do. Weighed
+  honestly the first time, that was 21.8 KB the size budget had never seen.
+
+Expect both budgets to move when the translations do — the size gate prints which locale
+it weighed so a jump can be read. The a11y sweep now fails when an audited page was never
+built rather than reporting a clean sweep over the SPA shell, which is what a mismatched
+locale produced. Still measured in `en` alone: the story screenshots, which render
+components rather than pages.
 
 `ci-build` dies with `EMFILE: too many open files, watch` when this host's inotify
 instances (`fs.inotify.max_user_instances`, 128) are exhausted — an editor plus a few

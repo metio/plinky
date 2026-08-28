@@ -11,7 +11,7 @@
         "build-storybook": "npm run messages && storybook build",
         "build:client": "npm run messages && node dev/build-retry.mjs",
         "build:locales": "node dev/build-locales.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
-        "build:single": "PLINKY_LOCALE=en npm run build",
+        "build:single": "PLINKY_LOCALE=\"$(node dev/locale-stress.mjs --heaviest)\" npm run build",
         "bytes": "node dev/check-source-bytes.mjs",
         "ci:parity": "node dev/check-ci-parity.mjs",
         "coverage": "npm run messages && vitest run --coverage --project '!storybook'",

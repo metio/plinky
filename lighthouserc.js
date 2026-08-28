@@ -27,12 +27,18 @@
 // assertion turns itself off for those pages without anyone maintaining a list.
 
 import { assertPages, noindexPaths, staticPaths } from "./dev/pages.mjs";
+import { heaviestLocale } from "./dev/locale-stress.mjs";
+import { builtLocales } from "./dev/single-locale-build.mjs";
 
 // Fails loudly if the route-table reading has gone stale, before any of it is trusted.
 assertPages();
 
-// The audit runs against the single-locale build, which is English.
-const LOCALE = "en";
+// The audit runs against whatever single locale is on disk. The build picks the heaviest
+// of the twenty-six, because a budget is a claim about what a visitor downloads and a
+// Greek visitor downloads twice the message bytes an English one does — English being the
+// one language none of these gates needed to check, since every string was written to fit
+// it. Falling back to that same choice keeps this config readable before a build exists.
+const LOCALE = builtLocales()[0] ?? heaviestLocale().locale;
 const url = (path) => `http://localhost/${LOCALE}${path === "/" ? "/" : `${path}/`}`;
 
 // One concrete score page. Any bundled score would do; this one is prerendered.
@@ -78,7 +84,13 @@ const named = [...new Set([...notation, ...noindex])];
 // shelf's filters all live in code every page loads, and the library — the heaviest page
 // under this cap — measured 252,969 with them. Raised deliberately, the way the app
 // bundle's own ratchet is; it still trips on a regression, from a higher floor.
-const SCRIPT_LIGHT = 258048;
+// 252 KiB → 256 KiB: not a regression, the same code weighed in the language it is
+// heaviest in. This audit built English until now — the shortest of the twenty-six, and
+// the one language none of these gates needed to check — so a Greek visitor's download
+// had never been measured at all. Settings, the heaviest page under this cap, came to
+// 258,792 against a limit of 258,048: over by 744 bytes, which is the message text and
+// nothing else. The floor keeps the same headroom above the real figure it had before.
+const SCRIPT_LIGHT = 262144;
 const SCRIPT_NOTATION = 655360;
 
 const common = {

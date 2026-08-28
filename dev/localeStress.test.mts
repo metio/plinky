@@ -5,7 +5,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { widestLocale } from "./widest-locale.mjs";
+import { heaviestLocale, widestLocale } from "./locale-stress.mjs";
 
 const withMessages = (locales: Record<string, Record<string, string>>): string => {
     const dir = mkdtempSync(join(tmpdir(), "plinky-widest-"));
@@ -58,5 +58,37 @@ describe("widestLocale", () => {
 
     it("falls back to English when there is nothing to measure", () => {
         expect(widestLocale(withMessages({ en: {} })).locale).toBe("en");
+    });
+});
+
+describe("heaviestLocale", () => {
+    it("names the language whose messages weigh the most", () => {
+        const dir = withMessages({
+            en: { a: "Settings", b: "Play" },
+            de: { a: "Einstellungen", b: "Spielen" },
+        });
+        expect(heaviestLocale(dir).locale).toBe("de");
+    });
+
+    it("weighs bytes rather than characters, since bytes are what crosses the network", () => {
+        const dir = withMessages({
+            // Nine Latin characters, nine bytes.
+            en: { a: "aaaaaaaaa" },
+            // Five Greek characters, ten bytes.
+            el: { a: "ααααα" },
+        });
+        expect(heaviestLocale(dir).locale).toBe("el");
+        expect(heaviestLocale(dir).bytes).toBe(10);
+    });
+
+    it("leaves the schema key out, which is a URL the app never renders", () => {
+        const dir = withMessages({
+            en: { a: "Settings" },
+            de: {
+                $schema: "https://inlang.com/schema/inlang-message-format-and-then-some",
+                a: "x",
+            },
+        });
+        expect(heaviestLocale(dir).locale).toBe("en");
     });
 });

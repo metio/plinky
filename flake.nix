@@ -108,6 +108,9 @@
             (pkgs.writeShellScriptBin "ci-twip" ''exec npm run twip -- "$@"'')
             # The locale lives in package.json's build:single, which the a11y sweeps and
             # ci-lighthouse also run — so every per-visitor budget measures the same tree.
+            # It is the heaviest language rather than English: a budget is a claim about
+            # what a visitor downloads, and different visitors download different
+            # languages. If the heaviest fits, all twenty-six do.
             (pkgs.writeShellScriptBin "ci-build" ''exec npm run build:single "$@"'')
             # Builds the site it audits, so Lighthouse can never read an all-locales tree
             # left behind by something else. CI uses the pinned lhci action against the
@@ -125,7 +128,7 @@
             # named here, and cannot go stale as the translations change.
             (pkgs.writeShellScriptBin "ci-widths" ''
               set -e
-              PLINKY_LOCALE="$(node dev/widest-locale.mjs)" npm run build
+              PLINKY_LOCALE="$(node dev/locale-stress.mjs --widest)" npm run build
               exec npm run widths "$@"
             '')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')

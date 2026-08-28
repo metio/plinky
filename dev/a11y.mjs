@@ -14,8 +14,10 @@ import lighthouserc from "../lighthouserc.js";
 import { requireSingleLocaleBuild } from "./single-locale-build.mjs";
 
 // The npm script builds the single locale first, so this only fires when the script is
-// run by hand over a tree something else left behind — the audited pages are /en/ only,
-// and an all-locales build serves each of them a bundle no visitor downloads.
+// run by hand over a tree something else left behind — an all-locales build serves each
+// audited page a bundle no visitor downloads. Which locale is audited follows the build
+// (lighthouserc.js reads it off the tree), so this cannot end up auditing a language that
+// was never built.
 requireSingleLocaleBuild("the a11y gate");
 
 const ROOT = "build/client";
@@ -39,6 +41,10 @@ const MIME = {
 
 const axeSrc = readFileSync("node_modules/axe-core/axe.min.js", "utf8");
 
+// Which document each request actually got, so a page that fell through to the SPA shell
+// cannot be audited as though it were the page.
+const served = new Map();
+
 // A static server matching how Cloudflare Pages serves the build: directory URLs map
 // to their index.html, and unknown paths fall back to the SPA shell.
 const server = createServer((req, res) => {
@@ -53,6 +59,13 @@ const server = createServer((req, res) => {
         file = join(file, "index.html");
     }
     if (!existsSync(file)) {
+        // The SPA shell, the way Cloudflare Pages serves an unknown path. Recorded,
+        // because every page in the audited set is prerendered: reaching the shell means
+        // the page was not built, and axe would find nothing wrong with an empty document
+        // and report it as a clean pass. That is exactly what happened when the build
+        // moved to another language while the audited URLs stayed on /en/ — twenty-two
+        // pages, zero violations, none of them real.
+        served.set(path, "fallback");
         file = join(ROOT, "index.html");
     }
     res.writeHead(200, { "content-type": MIME[extname(file)] ?? "application/octet-stream" });
@@ -64,6 +77,7 @@ const browser = await chromium.launch({
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
 });
 let total = 0;
+const unbuilt = [];
 console.log(`axe (${MODE} mode):`);
 for (const path of PAGES) {
     const ctx = await browser.newContext({ colorScheme: MODE });
@@ -87,6 +101,11 @@ for (const path of PAGES) {
     );
     const count = result.violations.reduce((sum, v) => sum + v.nodes.length, 0);
     total += count;
+    // The page's own document, or the shell standing in for one that was never built.
+    const wanted = path.endsWith("/") ? `${path}index.html` : path;
+    if (served.get(wanted) === "fallback") {
+        unbuilt.push(path);
+    }
     console.log(`  ${path} — violations: ${count}`);
     for (const v of result.violations) {
         console.log(`    [${v.id}] ${v.nodes.length}× — ${v.help}`);
@@ -99,4 +118,17 @@ for (const path of PAGES) {
 await browser.close();
 server.close();
 console.log(`TOTAL (${MODE}): ${total}`);
-process.exitCode = total > 0 ? 1 : 0;
+if (unbuilt.length > 0) {
+    console.error(
+        `\n${unbuilt.length} of the ${PAGES.length} audited pages were never built, so axe ` +
+            "read the SPA shell and found nothing wrong with it:",
+    );
+    for (const path of unbuilt) {
+        console.error(`  ${path}`);
+    }
+    console.error(
+        "\nA clean sweep over pages that do not exist is the one result worth nothing. Build\n" +
+            "the site the audit expects: nix develop --command npm run a11y:light\n",
+    );
+}
+process.exitCode = total > 0 || unbuilt.length > 0 ? 1 : 0;

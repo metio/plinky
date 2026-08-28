@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 28 August 2026 — night
 
+**The gates now check the language that stresses the app hardest, not English.**
+English is the one language they never needed to check: it is the shortest, and every
+label in Plinky was written to fit in it. The weight budget, both accessibility
+sweeps and the performance audit now measure Greek, whose text runs to twice the
+bytes — 21.8 KB a Greek reader has always downloaded and nothing had ever weighed.
+Pages are checked at phone width in Danish, which holds the longest word a line
+cannot be broken inside. Neither language is written down anywhere: both are worked
+out from the translations, so they follow them.
+
 **Every page is now checked at phone width in Danish, not English.** A page that
 scrolls sideways on a phone is never a decision somebody made — it is one word that
 cannot be broken, dragging the whole document with it. English was the one language
