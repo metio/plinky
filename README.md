@@ -132,8 +132,10 @@ with is the story of what your ear caught.
 
 Right in full screen, a **finger-positions** button swaps the keyboard for a fingering
 editor: every note arrives pre-fingered with the optimal choice for your measured hand
-span, and you tap a note then one of the **ten fingers** below to override it — saved
-per piece, with the green/amber/red flow feedback always on. While it's open the score
+span and the piece's own tempo — a leap you have a whole beat for doesn't force the
+contorted fingering a leap between two sixteenths would — and you tap a note then one of
+the **ten fingers** below to override it, saved per piece, with the green/amber/red flow
+feedback always on. While it's open the score
 washes its bars red by **fingering difficulty**, a heat-map that shows at a glance
 where the piece actually gets hard — spot the deep-red bars, tap them into a loop, and
 drill exactly there. A genuinely easy piece stays clear (nothing to flag), while a
@@ -325,6 +327,13 @@ one-tap **review session** walks you through everything that's fading, and you c
   ledger lines — and a grade averages that away. The placement test sits this one out:
   it climbs past your level on purpose, so a long pause there says the drill was too
   hard, not that the note is hard for you.
+Grades are **fixed marks on a scale, not a ranking of what's in the library**. A piece's
+difficulty is measured from its own notation — what the hands have to shape, how fast, how
+far they travel, how wide the key signature is, and how much of it there is — and the eight
+grade boundaries are set against teaching collections whose level is settled, from
+Burgmüller's easy studies through the two-part inventions to the Chopin études. So a piece
+keeps its grade as the catalogue grows, and grade 3 means the same thing next month.
+
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the
@@ -392,9 +401,9 @@ to play actually uses, each one a link straight to its glossary entry. A referen
 nobody knows to open teaches nobody: if you meet a curve over two notes you can't look
 up "slur", because not knowing the word is the problem. So the piece names them for you,
 where you're about to read them. It's worked out from the music itself rather than from
-the grade — the grades measure how hard a piece is to *play*, and ties, rests and key
-signatures turn up as often in grade 1 as in grade 8 — so a piece with nothing unusual
-in it says nothing at all.
+the grade — the grades measure how hard a piece is to *play*, and ties and rests turn up
+as often in grade 1 as in grade 8 — so a piece with nothing unusual in it says nothing at
+all.
 
 ## How the music works
 

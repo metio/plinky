@@ -16,6 +16,7 @@ import {
     starTier,
 } from "./gradeProgress";
 import type { Mastery } from "../../core/mastery";
+import type { ScoreKind } from "../../core/scoreKind";
 
 const NOW = 1_700_000_000_000;
 const DAY = 86_400_000;
@@ -164,12 +165,13 @@ describe("skillRating", () => {
     });
 });
 
-const cat = (id: string, grade: number, cost: number): GradeCatalogItem => ({
+const cat = (id: string, grade: number, cost: number, scoreKind?: ScoreKind): GradeCatalogItem => ({
     id,
     title: id,
     kind: "piece",
     grade,
     cost,
+    ...(scoreKind === undefined ? {} : { scoreKind }),
 });
 
 describe("nextStar", () => {
@@ -196,6 +198,23 @@ describe("gradeSuggestions", () => {
         ];
         const suggestions = gradeSuggestions(catalogue, 3, new Set(["done"]), 2);
         expect(suggestions.map((item) => item.id)).toEqual(["easy", "mid"]);
+    });
+
+    it("passes over a song and a choral setting to offer the piano piece", () => {
+        const catalogue = [
+            cat("song", 1, 0.5, "voice-and-piano"),
+            cat("choir", 1, 0.6, "choral-reduction"),
+            cat("ensemble", 1, 0.7, "other"),
+            cat("piano", 1, 2, "solo-piano"),
+        ];
+        const suggestions = gradeSuggestions(catalogue, 1, new Set(), 4);
+        expect(suggestions.map((item) => item.id)).toEqual(["piano"]);
+    });
+
+    it("keeps an item that names no score kind, since exercises and imports are keyboard writing", () => {
+        const catalogue = [cat("drill", 1, 1), cat("song", 1, 0.5, "voice-and-piano")];
+        const suggestions = gradeSuggestions(catalogue, 1, new Set(), 4);
+        expect(suggestions.map((item) => item.id)).toEqual(["drill"]);
     });
 
     it("suggests a measured-easy piece (cost 0) first, since unplayable scores are excluded", () => {

@@ -5,6 +5,7 @@ import { loadBundledScores, loadUserScores, userScoresRaw } from "./catalog";
 import { earCatalogItems } from "./earProgress";
 import { encodeIncipit, readIncipit } from "../../core/incipit";
 import type { ItemKind } from "../../core/practisable";
+import type { ScoreKind } from "../../core/scoreKind";
 import type { Letter } from "../../core/grade";
 import type { XmlCodec } from "../../core/xml";
 import type { KeyValueStore } from "../ports/keyValueStore";
@@ -172,6 +173,10 @@ export type GradeCatalogItem = {
     // The piece's opening bars, encoded — what a row draws to name it. Rides along from
     // the manifest, or is read straight off a bundled or imported score's own notation.
     incipit?: string;
+    // Solo piano, a song with a piano part, a choral setting. Absent for a generated
+    // exercise and for a score held on the device, both of which are keyboard writing by
+    // construction.
+    scoreKind?: ScoreKind;
 };
 
 // Where the fetched manifests come from — structurally the song/exercise
@@ -185,6 +190,9 @@ export type ManifestItem = {
     grade: number;
     cost: number;
     incipit?: string;
+    // What the piece is written for. Absent on an exercise manifest, whose rows carry a
+    // `kind` of their own meaning which drill it is.
+    scoreKind?: ScoreKind;
 };
 
 export type CatalogSources = {
@@ -336,6 +344,19 @@ export function nextStar(
 
 // What to learn next in a grade: its gentlest not-yet-mastered pieces, easiest first
 // by cost, so the climb through a grade stays gradual.
+// Whether this is something to put in front of a player as their next piece.
+//
+// Roughly two thirds of the catalogue is a song with a piano part or a choral setting
+// reduced to a grand staff. Both are playable — Plinky opens the piano part and can sound
+// the rest as accompaniment — and neither is what a grade should be built from: a
+// Schubert accompaniment offered as a first piece is a beginner meeting the wrong music.
+// They stay in the library and out of the ladder.
+//
+// An item with no scoreKind is a generated exercise or a score the player holds on their
+// own device, both keyboard writing by construction.
+const forTheLadder = (item: GradeCatalogItem): boolean =>
+    item.scoreKind === undefined || item.scoreKind === "solo-piano";
+
 export function gradeSuggestions(
     catalogue: GradeCatalogItem[],
     grade: number,
@@ -344,7 +365,7 @@ export function gradeSuggestions(
 ): GradeCatalogItem[] {
     return (
         catalogue
-            .filter((item) => item.grade === grade && !mastered.has(item.id))
+            .filter((item) => item.grade === grade && !mastered.has(item.id) && forTheLadder(item))
             // Easiest first by cost. Unplayable scores are kept out of the catalogue, so
             // a cost of 0 reliably means "gentlest" rather than "couldn't measure" — the
             // beginner-friendly pieces that score 0 lead their grade. An ear item stays in:

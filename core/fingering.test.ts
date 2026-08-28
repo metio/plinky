@@ -8,6 +8,9 @@ import {
     fingerPositions,
     fingerSteps,
     positionsCost,
+    moveEase,
+    MOVE_EASE_FLOOR,
+    MOVE_URGENT_SECONDS,
 } from "./fingering";
 
 describe("fingerPositions", () => {
@@ -152,5 +155,50 @@ describe("positions with no notes", () => {
             [67, 72],
         ];
         expect(positionsCost(solid, fingerPositions(solid, "right"), "right")).toBeGreaterThan(0);
+    });
+});
+
+describe("moveEase", () => {
+    it("charges a movement in full when the next position is already upon the hand", () => {
+        expect(moveEase(0)).toBe(1);
+        expect(moveEase(MOVE_URGENT_SECONDS)).toBe(1);
+        expect(moveEase(MOVE_URGENT_SECONDS / 2)).toBe(1);
+    });
+
+    it("discounts a movement by how much time there is, down to the floor", () => {
+        expect(moveEase(MOVE_URGENT_SECONDS * 2)).toBeCloseTo(0.5);
+        expect(moveEase(MOVE_URGENT_SECONDS * 4)).toBeCloseTo(0.25);
+        expect(moveEase(60)).toBe(MOVE_EASE_FLOOR);
+    });
+
+    it("charges in full when the time is unknown", () => {
+        expect(moveEase(Number.NaN)).toBe(1);
+    });
+});
+
+describe("positionsCost with time", () => {
+    // An octave-and-a-half leap: expensive to make at once, ordinary with a beat to do it.
+    const leap = [[48], [67]];
+
+    it("costs a leap less when the player has time to make it", () => {
+        const fingers = fingerPositions(leap, "left");
+        const atOnce = positionsCost(leap, fingers, "left");
+        const unhurried = positionsCost(leap, fingers, "left", undefined, [0, 2]);
+        expect(unhurried).toBeLessThan(atOnce);
+        expect(unhurried).toBeGreaterThan(0);
+    });
+
+    it("leaves a movement alone when there is no time to spare", () => {
+        const fingers = fingerPositions(leap, "left");
+        expect(positionsCost(leap, fingers, "left", undefined, [0, 0.05])).toBe(
+            positionsCost(leap, fingers, "left"),
+        );
+    });
+
+    it("charges the shape of a chord whatever the tempo, since a stretch is a stretch", () => {
+        const wide = [[48, 60]];
+        expect(positionsCost(wide, [[5, 1]], "left", undefined, [10])).toBe(
+            positionsCost(wide, [[5, 1]], "left"),
+        );
     });
 });

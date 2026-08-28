@@ -6,6 +6,8 @@
 // flag ones that slipped in). Conservative by design: only a confident non-piano
 // signal flags a score, so a real keyboard piece is never dropped.
 
+import type { ScoreKind } from "../core/scoreKind.ts";
+
 const KEYBOARD = /piano|keyboard|klavier|clavier|harpsichord|clavichord|celesta|organ/;
 const OTHER_INSTRUMENT =
     /drum|percussion|cymbal|guitar|\bbass\b|violin|cello|viola|contrabass|flute|trumpet|saxophone|\bsax\b|clarinet|oboe|bassoon|trombone|tuba|\bhorn\b|choir|\bvoice\b|vocal|ukulele|banjo|mandolin|\bharp\b|recorder|piccolo|accordion|\bsynth/;
@@ -129,22 +131,12 @@ export function nonPianoVocalReason(xml: string): string | null {
 // what left the catalogue unable to tell a beginner's solo piece from a Schubert
 // accompaniment: both passed some gate, and nothing recorded which. Keeping the answer is
 // what lets the grade ladder draw only from solo piano while the library keeps the songs.
-export type ScoreKind =
-    // Keyboard alone: what a beginner is graded on.
-    | "solo-piano"
-    // A singer over a piano part. Playable — Plinky opens the piano and can sound the
-    // voice as accompaniment — but not what a first grade should be built from.
-    | "voice-and-piano"
-    // Vocal parts reduced onto a grand staff. Indistinguishable from piano by part name,
-    // because the reduction drops the vocal names, so this is only ever known from the
-    // source that made it.
-    | "choral-reduction"
-    // Anything else that got in: an ensemble, a transcription for another instrument.
-    | "other";
 
 // The kind of a score read from the file itself. Only worth asking for a mixed corpus like
 // PDMX — a curated source knows what it harvested and says so in its config, which is both
 // cheaper and more truthful than re-deriving it here.
+export type { ScoreKind };
+
 export function scoreKind(xml: string): ScoreKind {
     if (nonPianoReason(xml)) {
         return "other";

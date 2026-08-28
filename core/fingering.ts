@@ -48,6 +48,29 @@ function startCost(pitch: number, finger: number): number {
     return finger === 1 && isBlackKey(pitch) ? 2 : 0;
 }
 
+// How much of a movement's geometric cost the player actually pays, given how long they
+// have before the next position must sound.
+//
+// Reach and stretch are properties of the hand and cost what they cost. Movement is not:
+// a twelfth in a slow left-hand accompaniment is a comfortable swing the arm makes at
+// leisure, while the same interval between two sixteenths is a genuine hazard. Charging
+// both alike is what put Satie's Gymnopédies — slow, wide, and reachable in a player's
+// first years — above every Chopin étude in the catalogue.
+//
+// Below MOVE_URGENT_SECONDS there is no preparation time and the movement costs what its
+// geometry says. Beyond it the charge falls off as the reciprocal of the time available,
+// down to MOVE_EASE_FLOOR: however long the player has, the hand still has to arrive on
+// the right key, so time makes a leap cheap and never free.
+export const MOVE_URGENT_SECONDS = 0.25;
+export const MOVE_EASE_FLOOR = 0.1;
+
+export function moveEase(gap: number): number {
+    if (!Number.isFinite(gap) || gap <= MOVE_URGENT_SECONDS) {
+        return 1;
+    }
+    return Math.max(MOVE_EASE_FLOOR, MOVE_URGENT_SECONDS / gap);
+}
+
 function transitionCost(
     p1: number,
     f1: number,
@@ -244,6 +267,10 @@ export function positionsCost(
     fingers: number[][],
     hand: Hand,
     span?: number,
+    // Seconds between position i-1 and position i, where the caller knows them. Omitted,
+    // every movement is charged as though it had to happen at once — which is what the
+    // fingering trainer wants, since it advises on shape rather than on tempo.
+    gaps?: number[],
 ): number {
     if (positions.length === 0) {
         return 0;
@@ -252,22 +279,28 @@ export function positionsCost(
     let cost = chordCost(positions[0]!, fingers[0]!, spread);
     for (let i = 1; i < positions.length; i++) {
         cost += chordCost(positions[i]!, fingers[i]!, spread);
-        cost += moveCost(
-            positions[i - 1]!,
-            fingers[i - 1]!,
-            positions[i]!,
-            fingers[i]!,
-            hand,
-            spread,
-            leap,
-        );
+        cost +=
+            moveCost(
+                positions[i - 1]!,
+                fingers[i - 1]!,
+                positions[i]!,
+                fingers[i]!,
+                hand,
+                spread,
+                leap,
+            ) * (gaps === undefined ? 1 : moveEase(gaps[i] ?? 0));
     }
     return cost;
 }
 
 // The most comfortable fingering for a sequence of positions, via the same DP as
 // the single line but with chord shapes as the per-position states.
-export function fingerPositions(positions: number[][], hand: Hand, span?: number): number[][] {
+export function fingerPositions(
+    positions: number[][],
+    hand: Hand,
+    span?: number,
+    gaps?: number[],
+): number[][] {
     if (positions.length === 0) {
         return [];
     }
@@ -281,13 +314,14 @@ export function fingerPositions(positions: number[][], hand: Hand, span?: number
     for (let i = 1; i < positions.length; i++) {
         const pos = positions[i]!;
         const prevPos = positions[i - 1]!;
+        const ease = gaps === undefined ? 1 : moveEase(gaps[i] ?? 0);
         paths = fingerSets(pos.length, hand).map((fingers) => {
             let best: Path = { fingers, cost: Number.POSITIVE_INFINITY, path: [] };
             for (const previous of paths) {
                 const cost =
                     previous.cost +
                     chordCost(pos, fingers, spread) +
-                    moveCost(prevPos, previous.fingers, pos, fingers, hand, spread, leap);
+                    moveCost(prevPos, previous.fingers, pos, fingers, hand, spread, leap) * ease;
                 if (cost < best.cost) {
                     best = { fingers, cost, path: [...previous.path, fingers] };
                 }

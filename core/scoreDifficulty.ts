@@ -5,6 +5,7 @@ import { stavesPerPart } from "./accompaniment";
 import { fingerPositions, positionsCost } from "./fingering";
 import { SEMITONE } from "./notes";
 import { partsOf } from "./parts";
+import { gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
 import type { XmlCodec } from "./xml";
 
 // How hard a score is to *play*, derived from the fingering cost model — the same
@@ -33,6 +34,13 @@ function midiOf(note: Element): number | null {
     return Number.isFinite(midi) ? midi : null;
 }
 
+// A score's two hands, with the time the player has between one position and the next.
+export type Hands = {
+    right: number[][];
+    left: number[][];
+    gaps: { right: number[]; left: number[] };
+};
+
 // Split a score's notes into the two hands' position sequences (a position is a
 // chord, or a single note). A note with <chord/> joins the hand's current position
 // instead of starting a new one.
@@ -44,15 +52,15 @@ function midiOf(note: Element): number | null {
 // left hand and none of a keyboard's reach, which reads as far easier than the
 // accompaniment underneath it. core/parts.ts exists for exactly this and the grader was
 // never wired to it.
-export function parsePositions(
-    codec: XmlCodec,
-    xml: string,
-): { right: number[][]; left: number[][] } {
+export function parsePositions(codec: XmlCodec, xml: string): Hands {
     const right: number[][] = [];
     const left: number[][] = [];
+    // Seconds from each position's onset to the one before it — how long the player has
+    // to get the hand there. gaps[0] is unused: nothing precedes the first position.
+    const gaps = { right: [] as number[], left: [] as number[] };
     const doc = codec.parse(xml);
     if (!doc) {
-        return { right, left };
+        return { right, left, gaps };
     }
     const counts = stavesPerPart(doc);
     const parts = partsOf(counts);
@@ -61,24 +69,27 @@ export function parsePositions(
     );
     // A document with no <part> at all is not something to grade as silence: fall back to
     // the whole thing as one part, which is what the plain grand-staff case looks like.
-    const scanned: { notes: Iterable<Element>; staves: number }[] =
+    const scanned: { nodes: Iterable<Element>; staves: number }[] =
         written.length > 0
             ? written.map((part, index) => ({
-                  notes: part.querySelectorAll("note"),
+                  nodes: part.querySelectorAll(TIMED_NODES),
                   staves: counts[index] ?? 1,
               }))
-            : [{ notes: doc.querySelectorAll("note"), staves: 2 }];
+            : [{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 2 }];
 
     // <staff> counts from 1 within its own part; partsOf names staves across the whole
     // score. The running offset of the part a note sits in is what turns one into the
     // other.
     let offset = 0;
+    const clock = scoreClock();
+    const timing = { right: gapTracker(), left: gapTracker() };
     for (const part of scanned) {
-        for (const note of part.notes) {
-            const midi = midiOf(note);
-            if (midi === null) {
+        for (const node of part.nodes) {
+            const seconds = clock.read(node);
+            if (node.tagName !== "note") {
                 continue;
             }
+            const note = node;
             const within = Number.parseInt(
                 note.querySelector("staff")?.textContent?.trim() ?? "1",
                 10,
@@ -86,15 +97,25 @@ export function parsePositions(
             const staff = offset + (Number.isInteger(within) && within > 0 ? within - 1 : 0);
             if (staff !== parts.right && staff !== parts.left) {
                 // Another instrument's line, or a singer's. Not the player's to read, so
-                // not part of how hard this is to play.
+                // not part of how hard this is to play — but it still takes time off the
+                // clock, which is shared with the staves that are.
                 continue;
             }
-            const hand = staff === parts.left ? left : right;
+            const side = staff === parts.left ? "left" : "right";
+            const hand = side === "left" ? left : right;
+            const midi = midiOf(note);
+            if (midi === null) {
+                // A rest, or something unpitched: no position, but the clock still runs
+                // and the hand is free to travel.
+                timing[side].skip(seconds);
+                continue;
+            }
             if (note.querySelector("chord") && hand.length > 0) {
                 hand[hand.length - 1]!.push(midi);
-            } else {
-                hand.push([midi]);
+                continue;
             }
+            gaps[side].push(timing[side].start(seconds));
+            hand.push([midi]);
         }
         offset += part.staves;
     }
@@ -105,27 +126,44 @@ export function parsePositions(
     // so fall back to reading every staff, which is what this did before it knew about
     // parts and can never be worse than that.
     if (right.length === 0 && left.length === 0) {
-        for (const note of doc.querySelectorAll("note")) {
-            const midi = midiOf(note);
-            if (midi === null) {
+        const fallbackClock = scoreClock();
+        const fallbackTiming = { right: gapTracker(), left: gapTracker() };
+        for (const node of doc.querySelectorAll(TIMED_NODES)) {
+            const seconds = fallbackClock.read(node);
+            if (node.tagName !== "note") {
                 continue;
             }
-            const hand = note.querySelector("staff")?.textContent?.trim() === "2" ? left : right;
+            const note = node;
+            const side =
+                note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right";
+            const hand = side === "left" ? left : right;
+            const midi = midiOf(note);
+            if (midi === null) {
+                fallbackTiming[side].skip(seconds);
+                continue;
+            }
             if (note.querySelector("chord") && hand.length > 0) {
                 hand[hand.length - 1]!.push(midi);
-            } else {
-                hand.push([midi]);
+                continue;
             }
+            gaps[side].push(fallbackTiming[side].start(seconds));
+            hand.push([midi]);
         }
     }
-    return { right, left };
+    return { right, left, gaps };
 }
 
-function handEffort(positions: number[][], hand: "left" | "right"): number {
+export function handEffort(positions: number[][], hand: "left" | "right", gaps?: number[]): number {
     if (positions.length === 0) {
         return 0;
     }
-    return positionsCost(positions, fingerPositions(positions, hand), hand);
+    return positionsCost(
+        positions,
+        fingerPositions(positions, hand, undefined, gaps),
+        hand,
+        undefined,
+        gaps,
+    );
 }
 
 // The playing effort of already-parsed hands: total fingering cost across both,
@@ -133,12 +171,16 @@ function handEffort(positions: number[][], hand: "left" | "right"): number {
 // outranks a long easy one. Returns 0 for no notes, which callers must read as
 // "nothing to measure" rather than "easiest", since a gentle in-hand line also
 // costs ~0.
-function effortOf(right: number[][], left: number[][]): number {
-    const notes = right.length + left.length;
+function effortOf(hands: Hands): number {
+    const notes = hands.right.length + hands.left.length;
     if (notes === 0) {
         return 0;
     }
-    return (handEffort(right, "right") + handEffort(left, "left")) / notes;
+    return (
+        (handEffort(hands.right, "right", hands.gaps.right) +
+            handEffort(hands.left, "left", hands.gaps.left)) /
+        notes
+    );
 }
 
 // How fast the hands have to move, and how many independent lines they have to keep
@@ -176,7 +218,7 @@ function beatsPerNote(note: Element, divisions: number): number | null {
 }
 
 // The speed and texture of an already-parsed document, in one walk.
-function readPace(doc: Document): { notesPerSecond: number; voices: number } {
+export function readPace(doc: Document): { notesPerSecond: number; voices: number } {
     let divisions = 1;
     let tempo = 0;
     const beats: number[] = [];
@@ -226,6 +268,69 @@ function readPace(doc: Document): { notesPerSecond: number; voices: number } {
     return { notesPerSecond, voices };
 }
 
+// What each sharp or flat in the key signature is worth. Every graded syllabus builds its
+// early years around the key: a first-year piece is in C, F or G, and reading four sharps
+// is a later skill than reading one. Nothing else in the model sees a key signature — a
+// piece transposed from C to E fingers almost identically and is not almost as easy.
+export const KEY_WEIGHT = 0.7;
+
+// What each octave a hand covers beyond its first is worth. A beginner piece keeps the
+// hand in one five-finger position; moving around the keyboard is the next thing asked
+// of them. Fingering effort sees each move as it happens and averages them away, so a
+// piece that ranges widely but gently reads the same as one that never leaves middle C.
+export const RANGE_WEIGHT = 1.0;
+
+// The widest key signature stated anywhere in the score, in sharps or flats.
+export function readKey(doc: Document): number {
+    let widest = 0;
+    for (const node of doc.querySelectorAll("key > fifths")) {
+        const value = Number(node.textContent ?? "");
+        if (Number.isFinite(value)) {
+            widest = Math.max(widest, Math.abs(value));
+        }
+    }
+    return Math.min(widest, 7);
+}
+
+// How far the busier hand travels across the piece, in octaves beyond the first. A hand
+// that stays within an octave asks for no repositioning and costs nothing here.
+export function readRange(hands: Hands): number {
+    const octaves = (positions: number[][]): number => {
+        const pitches = positions.flat();
+        if (pitches.length === 0) {
+            return 0;
+        }
+        return (Math.max(...pitches) - Math.min(...pitches)) / 12;
+    };
+    return Math.max(0, Math.max(octaves(hands.right), octaves(hands.left)) - 1);
+}
+
+// What a doubling of length is worth. Everything else here measures the hardest moment in
+// a piece; this is the only term that answers "how much of it is there".
+//
+// Held deliberately weak and logarithmic. Length is real — a first-year piece is sixteen
+// bars and a diploma piece is several pages, and holding a performance together to the end
+// is part of what a grade certifies — but it is also the most corpus-dependent thing about
+// a score. The harvest contains truncated imports and single movements filed beside whole
+// sonatas, and a linear charge would grade those by how much of the file survived. A
+// doubling being worth a fixed small amount says length matters without letting it decide.
+export const LENGTH_WEIGHT = 2.5;
+
+// The length of a short beginner piece: roughly sixteen bars of two-handed writing. A
+// score this size pays nothing for its length.
+const LENGTH_FLOOR_NOTES = 64;
+
+// Past this many doublings — a piece around sixteen times the length of a short beginner
+// one — more notes say nothing further about difficulty, and the cap is what keeps a
+// truncated import and a complete edition of the same piece within reach of each other.
+const LENGTH_CEILING_DOUBLINGS = 4;
+
+export function readLength(hands: Hands): number {
+    const notes = hands.right.length + hands.left.length;
+    const doublings = Math.log2(Math.max(notes, 1) / LENGTH_FLOOR_NOTES);
+    return Math.min(LENGTH_CEILING_DOUBLINGS, Math.max(0, doublings));
+}
+
 // What speed and texture add to a score's cost. Zero for a slow single line, which is
 // what a beginner piece is, so an easy piece keeps the cost its fingering earned it.
 export function paceCost(pace: { notesPerSecond: number; voices: number }): number {
@@ -241,16 +346,22 @@ export function rawDifficulty(codec: XmlCodec, xml: string): number {
     if (!doc) {
         return 0;
     }
-    const { right, left } = parsePositions(codec, xml);
+    const hands = parsePositions(codec, xml);
     // Nothing FINGERABLE means nothing to measure; callers read 0 that way, and a pace
     // term added to it would dress an unreadable import up as a plausible score. Note
     // that this is emptiness, not cheapness: a real line that happens to cost nothing to
     // finger — a repeated note, a gentle in-hand phrase — still has a speed and a
     // texture, and reading its effort of 0 as "nothing here" would silently drop both.
-    if (right.length + left.length === 0) {
+    if (hands.right.length + hands.left.length === 0) {
         return 0;
     }
-    return effortOf(right, left) + paceCost(readPace(doc));
+    return (
+        effortOf(hands) +
+        paceCost(readPace(doc)) +
+        readKey(doc) * KEY_WEIGHT +
+        readRange(hands) * RANGE_WEIGHT +
+        readLength(hands) * LENGTH_WEIGHT
+    );
 }
 
 export type Category = "scale" | "arpeggio" | "piece";
@@ -271,22 +382,29 @@ export const MAX_GRADE = 8;
 
 // The cost breakpoints between grades 1–8, calibrated PER category so each is
 // graded on its own scale — otherwise every finger exercise lands below the
-// easiest piece (scales/arpeggios cost more to finger than a stepwise tune). The
-// `piece` breakpoints are the octiles of the curated PDMX song corpus (≈3,100
-// pieces), so real pieces spread evenly across grades 1–8; re-derive them with
-// `npm run songs:import` if the corpus changes. Scale/arpeggio remain measured
-// against the beginner exercises (scales ~0.6–1.1, arpeggios ~1.3–1.8).
+// easiest piece (scales/arpeggios cost more to finger than a stepwise tune).
+// Scale/arpeggio are measured against the beginner exercises (scales ~0.6–1.1,
+// arpeggios ~1.3–1.8).
+//
+// The `piece` breakpoints are fixed numbers, not a cut of the catalogue. They come from
+// `npm run songs:calibrate`, which measures teaching collections whose real-world grade is
+// settled — Anna Magdalena, Burgmüller op.100, the two-part inventions, the Chopin études —
+// and puts each boundary halfway between the grades it separates.
+//
+// Fixed is the point. Cutting the corpus into eight equal bins made a grade mean "in the
+// easiest eighth of whatever has been harvested so far", so every import silently re-graded
+// every piece a player had already worked on, and a piece's grade said nothing about a
+// piano student. A grade now means the same thing after an import as before it, and a piece
+// only moves when the model that measures it changes.
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
-    // These are grade boundaries derived from the catalogue's own cost distribution and
-    // rewritten by songs:bake, so their digits change whenever the corpus does. One landing
-    // near Math.LN10 is a coincidence, and the approximate-constant rule is turned off for
-    // this file in biome.json rather than suppressed on the line: a suppression pinned to a
-    // regenerated number is unused as soon as the number moves, which fails the build just
-    // as loudly.
-    piece: [2.299, 3.153, 3.885, 4.672, 5.628, 6.872, 8.761],
+    piece: [5.498, 7.785, 10.513, 13.079, 15.349, 18.984, 22.041],
     scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
     arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
 };
+
+// What the import and bake tooling grades a piece against, so the manifest and the grade
+// chip a player sees can never be read off different numbers.
+export const pieceBoundaries: readonly number[] = GRADE_THRESHOLDS.piece;
 
 const gradeCache = new Map<string, number>();
 
@@ -299,11 +417,11 @@ export function gradeOf(codec: XmlCodec, id: string, xml: string): number {
     if (cached !== undefined) {
         return cached;
     }
-    const { right, left } = parsePositions(codec, xml);
+    const hands = parsePositions(codec, xml);
     // No fingerable notes means an empty or unreadable score, not the gentlest
     // piece — a real in-hand line also costs ~0. Grade it at the top so it can't
     // pad the beginner pools, distinguishing it from a measured-easy cost of 0.
-    if (right.length + left.length === 0) {
+    if (hands.right.length + hands.left.length === 0) {
         gradeCache.set(id, MAX_GRADE);
         return MAX_GRADE;
     }

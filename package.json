@@ -68,7 +68,8 @@
         "mark": "tsx dev/key-mark.mjs",
         "promo:texts": "node dev/promo/texts.mjs",
         "promo:composers": "tsx dev/promo/composers.mjs",
-        "promo:shorts": "node dev/promo-videos.mjs --shorts"
+        "promo:shorts": "node dev/promo-videos.mjs --shorts",
+        "songs:calibrate": "tsx dev/calibrate-grades.mts"
     },
     "dependencies": {
         "@fontsource-variable/comfortaa": "^5.3.0",

@@ -1,6 +1,32 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-08-28
+  entries:
+    - |-
+      **A grade now means the same thing every day.** Until now a piece's grade was its
+      place in a queue: Plinky sorted the whole catalogue by difficulty and cut it into
+      eight equal piles, so a grade meant "in the easiest eighth of everything here so
+      far" — and every time the catalogue grew, pieces you had already worked on quietly
+      changed grade underneath you. Grades are now fixed marks on a scale, set against
+      teaching collections whose level is settled: Burgmüller's easy studies, the Anna
+      Magdalena minuets, Bach's two-part inventions, the Chopin études. A piece keeps its
+      grade whatever else arrives, and grade 3 means grade 3.
+    - |-
+      **Difficulty now knows how much time you have.** A wide left-hand stretch was
+      costed the same whether you had a whole beat to make it or half of a sixteenth,
+      which is why Satie's Gymnopédies — slow, spacious, and within reach in your first
+      years — were sitting at grade 8, above every Chopin étude. Reading how far apart
+      the notes fall puts them at grade 4, where a teacher would. Difficulty also reads
+      the key signature and how far each hand ranges now, so four sharps and a hand that
+      travels count for something. Most of the catalogue has moved, and famous pieces
+      land close to where the graded syllabuses put them.
+    - |-
+      **Suggested fingering follows the tempo too.** The fingering strip used to solve
+      every leap as if it had to happen instantly, contorting a hand to avoid a jump you
+      had a full beat for. It now weighs the clock alongside the stretch, and the
+      green/amber/red marks judge your choice under the same terms as the advice.
+
 - date: 2026-08-27
   label: later
   entries:

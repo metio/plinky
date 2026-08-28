@@ -7,7 +7,7 @@ import { barHeat } from "../../../core/fingerHeat";
 import { fingerQualities } from "../../../core/fingeringScore";
 import { noteName } from "../../../core/midi";
 import type { MeasureBox } from "../../../core/scoreCanvas";
-import { scoreToBars, staffFor } from "../../../core/scoreToBars";
+import { scoreToTimedBars, staffFor } from "../../../core/scoreToBars";
 import { useFingeringStore, usePrefsStore, useXmlCodec } from "../../contexts/services";
 import { clearBarHeat, paintBarHeat } from "../../lib/scoreColor";
 import { m } from "../../paraglide/messages.js";
@@ -85,14 +85,24 @@ export function FingeringStrip({
     // would re-render the strip on every unrelated preference save for a value that
     // cannot have moved.
     const span = prefsStore.load().handSpan[hand] ?? undefined;
-    const bars = useMemo(() => scoreToBars(xmlCodec, xml, staffFor(hand)), [xmlCodec, xml, hand]);
-    const window = useBarWindow(bars, WINDOW);
-    const { positions, cells } = window;
+    const timed = useMemo(
+        () => scoreToTimedBars(xmlCodec, xml, staffFor(hand)),
+        [xmlCodec, xml, hand],
+    );
+    const bars = timed.bars;
+    const window = useBarWindow(bars, WINDOW, timed.gaps);
+    const { positions, cells, gaps } = window;
 
     // The window's fingers: the player's saved choice where one exists, the
     // optimal fingering for their hand span everywhere else — the strip opens
     // already answered, and edits refine rather than start from blank.
-    const optimal = useMemo(() => fingerPositions(positions, hand, span), [positions, hand, span]);
+    // Fingered against the clock as well as the shape: a leap the player has a whole beat
+    // to make should not force the contorted fingering that a leap between two sixteenths
+    // would.
+    const optimal = useMemo(
+        () => fingerPositions(positions, hand, span, gaps),
+        [positions, hand, span, gaps],
+    );
     const fingers = useMemo(
         () =>
             positions.map((chord, i) =>
@@ -106,8 +116,8 @@ export function FingeringStrip({
         [positions, cells, map, hand, optimal],
     );
     const qualities = useMemo(
-        () => fingerQualities(positions, fingers, hand, span),
-        [positions, fingers, hand, span],
+        () => fingerQualities(positions, fingers, hand, span, gaps),
+        [positions, fingers, hand, span, gaps],
     );
 
     // Every note of the window in play order, for tap-to-select and advance.

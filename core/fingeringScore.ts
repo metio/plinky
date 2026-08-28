@@ -76,8 +76,11 @@ export function fingerQualities(
     fingers: (number | null)[][],
     hand: Hand,
     span?: number,
+    // Seconds before each position sounds. Judging a choice against advice given under
+    // different prices would mark a player wrong for the fingering they were shown.
+    gaps?: number[],
 ): (FingerQuality | null)[] {
-    const suggested = fingerPositions(positions, hand, span);
+    const suggested = fingerPositions(positions, hand, span, gaps);
     return positions.map((_, i) => {
         const here = fingers[i];
         if (!filled(here)) {
@@ -94,8 +97,9 @@ export function fingerQualities(
         // Marginal cost of this choice given the (fixed) previous finger: how much the
         // economical finger here would save the move into this position.
         const pair = [positions[i - 1]!, positions[i]!];
-        const withUser = positionsCost(pair, [previous, here], hand, span);
-        const withSuggested = positionsCost(pair, [previous, suggested[i]!], hand, span);
+        const pairGaps = gaps === undefined ? undefined : [0, gaps[i] ?? 0];
+        const withUser = positionsCost(pair, [previous, here], hand, span, pairGaps);
+        const withSuggested = positionsCost(pair, [previous, suggested[i]!], hand, span, pairGaps);
         return withUser - withSuggested > IMPROVE_THRESHOLD ? "bad" : "ok";
     });
 }
@@ -108,10 +112,11 @@ export function scoreFingering(
     fingers: number[][],
     hand: Hand,
     span?: number,
+    gaps?: number[],
 ): FingeringResult {
-    const suggested = fingerPositions(positions, hand, span);
-    const optimalCost = positionsCost(positions, suggested, hand, span);
-    const userCost = positionsCost(positions, fingers, hand, span);
+    const suggested = fingerPositions(positions, hand, span, gaps);
+    const optimalCost = positionsCost(positions, suggested, hand, span, gaps);
+    const userCost = positionsCost(positions, fingers, hand, span, gaps);
     const efficiency = userCost <= optimalCost ? 1 : optimalCost / userCost;
 
     const reconsider: number[] = [];
@@ -120,7 +125,7 @@ export function scoreFingering(
             continue;
         }
         const swapped = fingers.map((tuple, j) => (j === i ? suggested[i]! : tuple));
-        if (userCost - positionsCost(positions, swapped, hand, span) > IMPROVE_THRESHOLD) {
+        if (userCost - positionsCost(positions, swapped, hand, span, gaps) > IMPROVE_THRESHOLD) {
             reconsider.push(i);
         }
     }

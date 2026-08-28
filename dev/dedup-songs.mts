@@ -10,17 +10,15 @@
 // keeps the highest-quality representative of each title (by PDMX rating, then
 // favourites, then views, then a fuller piece) and removes the rest.
 //
-// Removing songs shifts the cost distribution, so it then re-derives the eight even
-// octile cost boundaries over the survivors and re-grades every song — keeping grades
-// 1–8 evenly populated. It rewrites public/songs/manifest.json and deletes
-// the orphaned .mxl. **Bake the printed boundaries into GRADE_THRESHOLDS.piece
-// (core/scoreDifficulty.ts), then run `npm run exercises`** so the studies (graded
-// on the same piece scale) re-grade to match. Run locally: `npm run songs:dedup`.
+// It re-grades the survivors against the calibrated boundaries and rewrites
+// public/songs/manifest.json, deleting the orphaned .mxl. The boundaries do not move:
+// removing pieces changes which grades are populated, not what a grade means. Run
+// locally: `npm run songs:dedup`.
 
 import { createReadStream } from "node:fs";
 import { readFile, rm, writeFile } from "node:fs/promises";
 import { parse } from "csv-parse";
-import { gradeForCost, octileBoundaries } from "./grading.mts";
+import { gradeForCost, pieceBoundaries } from "./grading.mts";
 
 const OUT = "public/songs";
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
@@ -89,16 +87,13 @@ async function main() {
         }
     }
     const keptIds = new Set([...best.values()].map((song) => song.id));
-    // Easiest-first by cost, so the manifest reads gentle → hard and re-grading by the
-    // octile boundaries lands grades in non-decreasing order (the manifest's contract).
+    // Easiest-first by cost, so the manifest reads gentle → hard and re-grading lands
+    // grades in non-decreasing order (the manifest's contract).
     const deduped = manifest.filter((song) => keptIds.has(song.id)).sort((a, b) => a.cost - b.cost);
 
-    // Re-balance: re-derive the eight even octile cost boundaries over the cleaned set,
-    // and re-grade every song so grades 1–8 stay evenly populated after the removals.
-    const boundaries = octileBoundaries(
-        deduped.map((song) => song.cost),
-        MAX_GRADE,
-    );
+    // Re-grade what survived. The boundaries do not move: removing pieces changes which
+    // grades are populated, not what a grade means.
+    const boundaries = [...pieceBoundaries];
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of deduped) {
         song.grade = gradeForCost(song.cost, boundaries);

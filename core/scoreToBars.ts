@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { SEMITONE } from "./notes";
+import { gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
 import type { XmlCodec } from "./xml";
 // Turns a piece's MusicXML into per-bar chord positions for one hand, so a passage
 // can be fingered (or reproduced by ear). Each bar is a list of positions in play
@@ -34,48 +35,70 @@ function midiOf(note: Element): number | null {
     return Number.isFinite(midi) ? midi : null;
 }
 
-// Parse the first part's measures into bars of positions for the given staff. A note
-// marked <chord/> joins the position before it; rests and the other staff are skipped.
-// Returns an empty array for unreadable XML, so callers can fall back gracefully.
-export function scoreToBars(codec: XmlCodec, xml: string, staff: Staff): Bar[] {
+// Parse the first part's measures into bars of positions for the given staff, alongside
+// how long the hand has before each position sounds. A note marked <chord/> joins the
+// position before it; rests and the other staff are skipped as positions but still pass
+// time, because a rest is time the hand can move in. Returns empty for unreadable XML, so
+// callers can fall back gracefully.
+export function scoreToTimedBars(
+    codec: XmlCodec,
+    xml: string,
+    staff: Staff,
+): { bars: Bar[]; gaps: number[][] } {
     const doc = codec.parse(xml);
-    if (!doc) {
-        return [];
-    }
-    const part = doc.getElementsByTagName("part")[0];
-    if (!part) {
-        return [];
+    const part = doc?.getElementsByTagName("part")[0];
+    if (!doc || !part) {
+        return { bars: [], gaps: [] };
     }
     const bars: Bar[] = [];
+    const gaps: number[][] = [];
+    // One clock and one tracker for the whole part: divisions, tempo and the hand's own
+    // waiting all run across bar lines.
+    const clock = scoreClock();
+    const timing = gapTracker();
     for (const measure of Array.from(part.getElementsByTagName("measure"))) {
         const positions: number[][] = [];
-        for (const note of Array.from(measure.getElementsByTagName("note"))) {
-            if (note.getElementsByTagName("rest").length > 0) {
+        const barGaps: number[] = [];
+        for (const node of Array.from(measure.querySelectorAll(TIMED_NODES))) {
+            const seconds = clock.read(node);
+            if (node.tagName !== "note") {
                 continue;
             }
-            const noteStaff = Number(note.getElementsByTagName("staff")[0]?.textContent ?? "1");
-            if (noteStaff !== staff) {
+            const noteStaff = Number(node.getElementsByTagName("staff")[0]?.textContent ?? "1");
+            const midi = node.getElementsByTagName("rest").length > 0 ? null : midiOf(node);
+            if (noteStaff !== staff || midi === null) {
+                timing.skip(seconds);
                 continue;
             }
-            const midi = midiOf(note);
-            if (midi === null) {
-                continue;
-            }
-            if (note.getElementsByTagName("chord").length > 0 && positions.length > 0) {
+            if (node.getElementsByTagName("chord").length > 0 && positions.length > 0) {
                 positions[positions.length - 1]!.push(midi);
-            } else {
-                positions.push([midi]);
+                continue;
             }
+            barGaps.push(timing.start(seconds));
+            positions.push([midi]);
         }
         bars.push(positions);
+        gaps.push(barGaps);
     }
-    return bars;
+    return { bars, gaps };
+}
+
+export function scoreToBars(codec: XmlCodec, xml: string, staff: Staff): Bar[] {
+    return scoreToTimedBars(codec, xml, staff).bars;
 }
 
 // The positions of a window of bars, flattened in play order — what the fingering or
 // ear drill works on. Clamps the range to the available bars.
 export function windowPositions(bars: Bar[], start: number, size: number): number[][] {
     return bars.slice(Math.max(0, start), Math.max(0, start) + size).flat();
+}
+
+// The window's gaps, flattened the same way and so parallel to windowPositions. The first
+// gap in a window is the wait since the position before the window, which is the wrong
+// question here — the hand arrives at a window already in place — so it reads as no time
+// at all, which charges that one movement in full. That is the safe direction.
+export function windowGaps(gaps: number[][], start: number, size: number): number[] {
+    return gaps.slice(Math.max(0, start), Math.max(0, start) + size).flat();
 }
 
 // Where a flattened window position sits in the score: its absolute bar and its index

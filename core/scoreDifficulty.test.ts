@@ -9,8 +9,10 @@ import {
     gradeOf,
     MAX_GRADE,
     paceCost,
+    pieceBoundaries,
     parsePositions,
     rawDifficulty,
+    readLength,
     SPEED_FLOOR_NPS,
     SPEED_WEIGHT,
     TEXTURE_WEIGHT,
@@ -42,7 +44,10 @@ describe("parsePositions", () => {
     });
 
     it("skips rests and survives malformed XML", () => {
-        expect(parsePositions(domXmlCodec, "not xml at all")).toEqual({ right: [], left: [] });
+        expect(parsePositions(domXmlCodec, "not xml at all")).toMatchObject({
+            right: [],
+            left: [],
+        });
         const withRest = score(`${note("C", 4)}<note><rest/><duration>2</duration></note>`);
         expect(parsePositions(domXmlCodec, withRest).right).toEqual([[60]]);
     });
@@ -170,7 +175,7 @@ describe("parsePositions groups and splits precisely", () => {
         const xml = score(
             `<note><pitch><step>C</step><octave>2</octave></pitch><duration>2</duration><staff> 2 </staff></note>`,
         );
-        expect(parsePositions(domXmlCodec, xml)).toEqual({ right: [], left: [[36]] });
+        expect(parsePositions(domXmlCodec, xml)).toMatchObject({ right: [], left: [[36]] });
     });
 
     it("starts a fresh position for a chord marker with nothing before it", () => {
@@ -363,3 +368,113 @@ describe("parsePositions reads which staves are the player's", () => {
         expect(right.concat(left)).not.toEqual([]);
     });
 });
+
+describe("parsePositions reads how long the hand has between positions", () => {
+    // divisions=2, so a <duration>2</duration> note is one beat; at 60bpm that is a second.
+    const timed = (notes: string) =>
+        `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">` +
+        `<attributes><divisions>2</divisions></attributes><sound tempo="60"/>${notes}` +
+        `</measure></part></score-partwise>`;
+
+    it("reads each gap as the previous position's own length", () => {
+        const { gaps } = parsePositions(domXmlCodec, timed(note("C", 4) + note("D", 4)));
+        expect(gaps.right).toEqual([0, 1]);
+    });
+
+    it("counts a rest between two notes as time the hand is free to travel", () => {
+        const rest = `<note><rest/><duration>4</duration></note>`;
+        const { gaps } = parsePositions(domXmlCodec, timed(note("C", 4) + rest + note("C", 6)));
+        expect(gaps.right).toEqual([0, 3]);
+    });
+
+    it("gives a chord member no gap of its own, since it sounds with the note it joins", () => {
+        const { right, gaps } = parsePositions(
+            domXmlCodec,
+            timed(note("C", 4) + note("E", 4, undefined, true) + note("G", 4)),
+        );
+        expect(right).toEqual([[60, 64], [67]]);
+        expect(gaps.right).toEqual([0, 1]);
+    });
+
+    it("keeps each hand's clock to itself", () => {
+        const { gaps } = parsePositions(
+            domXmlCodec,
+            timed(note("C", 5, 1) + note("C", 3, 2) + note("D", 5, 1) + note("D", 3, 2)),
+        );
+        expect(gaps.right).toEqual([0, 1]);
+        expect(gaps.left).toEqual([0, 1]);
+    });
+});
+
+describe("the difficulty terms a fingering cost cannot see", () => {
+    it("charges a wider key signature more", () => {
+        const inKey = (fifths: number) =>
+            `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">` +
+            `<attributes><divisions>2</divisions><key><fifths>${fifths}</fifths></key></attributes>` +
+            `${note("C", 4) + note("D", 4)}</measure></part></score-partwise>`;
+        expect(rawDifficulty(domXmlCodec, inKey(5))).toBeGreaterThan(
+            rawDifficulty(domXmlCodec, inKey(0)),
+        );
+        // Sharps and flats are the same amount of reading.
+        expect(rawDifficulty(domXmlCodec, inKey(-4))).toBeCloseTo(
+            rawDifficulty(domXmlCodec, inKey(4)),
+        );
+    });
+
+    it("charges a hand that ranges across the keyboard more than one that stays put", () => {
+        const near = score(note("C", 4) + note("E", 4) + note("G", 4));
+        const far = score(note("C", 2) + note("E", 4) + note("G", 7));
+        expect(rawDifficulty(domXmlCodec, far)).toBeGreaterThan(rawDifficulty(domXmlCodec, near));
+    });
+
+    it("charges length by doublings, and stops charging it past the ceiling", () => {
+        const hands = (count: number) => ({
+            right: Array.from({ length: count }, () => [60]),
+            left: [],
+            gaps: { right: [], left: [] },
+        });
+        // Nothing for a score at or under the beginner floor.
+        expect(readLength(hands(64))).toBe(0);
+        expect(readLength(hands(32))).toBe(0);
+        // Then one per doubling of it.
+        expect(readLength(hands(128))).toBeCloseTo(1);
+        expect(readLength(hands(512))).toBeCloseTo(3);
+        // And nothing further once the ceiling is reached, so a complete edition and a
+        // truncated import of the same piece stay within reach of each other.
+        expect(readLength(hands(1024))).toBeCloseTo(4);
+        expect(readLength(hands(64_000))).toBeCloseTo(4);
+    });
+});
+
+describe("the calibrated piece boundaries", () => {
+    it("names one fewer boundary than there are grades", () => {
+        expect(pieceBoundaries).toHaveLength(MAX_GRADE - 1);
+    });
+
+    it("rises strictly, so every grade has room of its own", () => {
+        for (let i = 1; i < pieceBoundaries.length; i++) {
+            expect(pieceBoundaries[i]!).toBeGreaterThan(pieceBoundaries[i - 1]!);
+        }
+    });
+
+    it("is what gradeOf grades a piece against, so the manifest and the chip agree", () => {
+        // The import tooling reads these same numbers; a piece costing just under a
+        // boundary belongs to the grade below it, and just over to the grade above.
+        const above = pieceBoundaries[0]! + 0.001;
+        const below = pieceBoundaries[0]! - 0.001;
+        expect(gradeForBoundaries(below)).toBe(1);
+        expect(gradeForBoundaries(above)).toBe(2);
+    });
+});
+
+// Walks the boundaries the way gradeOf does, over a cost rather than a score.
+function gradeForBoundaries(cost: number): number {
+    let grade = 1;
+    for (const boundary of pieceBoundaries) {
+        if (cost <= boundary) {
+            break;
+        }
+        grade += 1;
+    }
+    return grade;
+}

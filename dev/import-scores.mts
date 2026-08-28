@@ -9,7 +9,7 @@
 // Composable and idempotent per source: a run replaces ONLY its own source's manifest
 // entries and .mxl files, never another source's, so `scores:import openscore-lieder`
 // can run repeatedly and alongside `songs:import` (PDMX). It writes provisional grades;
-// run `npm run songs:bake` afterwards to finalise the octile boundaries + seed.
+// run `npm run songs:bake` afterwards to apply the curation and reseed the index.
 //
 // Usage: `npm run scores:import [source-id]` (defaults to openscore-lieder). Each repo is
 // cloned into sources/<id>/<repo> (gitignored) on first run; preconverted sources ingest
@@ -26,7 +26,7 @@ import { isPublicDomain } from "./publicDomain.mts";
 import { legibleTitle, usableTitle } from "./legibleTitle.mts";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { strFromU8, unzipSync } from "fflate";
-import { gradeForCost, octileBoundaries } from "./grading.mts";
+import { gradeForCost, pieceBoundaries } from "./grading.mts";
 import {
     nonPianoVocalReason,
     nonSoloPianoReason,
@@ -251,8 +251,10 @@ type SongMeta = {
     cost: number;
     license: string;
     // What this piece IS (see ScoreKind): what lets the grade ladder ask for solo piano
-    // while the library keeps the songs and the choral reductions.
-    kind: ScoreKind;
+    // while the library keeps the songs and the choral reductions. Spelled out rather
+    // than plain `kind` because an exercise row's `kind` is a different question — which
+    // drill it is — and the two manifests are read through one catalogue.
+    scoreKind: ScoreKind;
     // The opening bars, encoded (see core/incipit).
     incipit?: string;
     // Who engraved this edition, where the source names them. CC-BY and CC-BY-SA require
@@ -520,7 +522,7 @@ async function main() {
             cost,
             license,
             source: key,
-            kind: typeof cfg.kind === "function" ? cfg.kind(xml) : cfg.kind,
+            scoreKind: typeof cfg.kind === "function" ? cfg.kind(xml) : cfg.kind,
             credit: cfg.creditFor?.(file),
             // The opening bars, so a list can draw the mark that names a piece without
             // fetching its notation. Computed here from the score already in hand and
@@ -560,10 +562,8 @@ async function main() {
         ...kept.filter((song) => !superseded.has(song.id)),
         ...added.map(({ src: _src, repaired: _repaired, ...meta }) => meta),
     ];
-    const boundaries = octileBoundaries(
-        merged.map((song) => song.cost),
-        MAX_GRADE,
-    );
+    // Fixed boundaries, so importing does not re-grade the pieces already here.
+    const boundaries = [...pieceBoundaries];
     for (const song of merged) {
         song.grade = gradeForCost(song.cost, boundaries);
     }

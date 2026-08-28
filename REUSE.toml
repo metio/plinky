@@ -81,6 +81,7 @@ path = [
     "dev/catalog-duplicates.json",
     "dev/catalog-excluded.json",
     "dev/catalog-people-distinct.json",
+    "dev/grade-anchors.json",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"

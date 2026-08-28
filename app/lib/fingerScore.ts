@@ -7,6 +7,7 @@ import { type FingerMap, fingerKey } from "../stores/fingeringStore";
 import { scoreToBars } from "../../core/scoreToBars";
 import type { XmlCodec } from "../../core/xml";
 import { SEMITONE } from "../../core/notes";
+import { gapTracker, scoreClock, TIMED_NODES } from "../../core/scoreTiming";
 
 // Suggested fingering belongs on the staff, the way printed music carries it —
 // tied to the note you read, not mapped onto a key. This annotates a score's
@@ -28,7 +29,7 @@ function midiOf(note: Element): number | null {
     return (octave + 1) * 12 + semitone + alter;
 }
 
-type Bucket = { pitches: number[][]; notes: Element[][] };
+type Bucket = { pitches: number[][]; notes: Element[][]; gaps: number[] };
 
 function inject(doc: Document, note: Element, finger: number): void {
     const notations = doc.createElement("notations");
@@ -75,15 +76,31 @@ export function annotateFingerings(
     // right hand and staff 2 the left, keeping a parallel handle on the elements so
     // each note's finger can be written back onto it.
     const staves = new Map<string, Bucket>();
-    for (const note of doc.querySelectorAll("note")) {
-        const midi = midiOf(note);
-        if (midi === null) {
+    // One clock over the whole document, one waiting hand per staff — the same reading of
+    // time the grader uses, so the fingering printed on the staff is chosen under the
+    // prices the piece actually charges.
+    const clock = scoreClock();
+    const timing = new Map<string, ReturnType<typeof gapTracker>>();
+    for (const node of doc.querySelectorAll(TIMED_NODES)) {
+        const seconds = clock.read(node);
+        if (node.tagName !== "note") {
             continue;
         }
+        const note = node;
         const staff = note.querySelector("staff")?.textContent?.trim() === "2" ? "2" : "1";
+        let waiting = timing.get(staff);
+        if (!waiting) {
+            waiting = gapTracker();
+            timing.set(staff, waiting);
+        }
+        const midi = midiOf(note);
+        if (midi === null) {
+            waiting.skip(seconds);
+            continue;
+        }
         let bucket = staves.get(staff);
         if (!bucket) {
-            bucket = { pitches: [], notes: [] };
+            bucket = { pitches: [], notes: [], gaps: [] };
             staves.set(staff, bucket);
         }
         const last = bucket.pitches.length - 1;
@@ -91,6 +108,7 @@ export function annotateFingerings(
             bucket.pitches[last]?.push(midi);
             bucket.notes[last]?.push(note);
         } else {
+            bucket.gaps.push(waiting.start(seconds));
             bucket.pitches.push([midi]);
             bucket.notes.push([note]);
         }
@@ -98,7 +116,7 @@ export function annotateFingerings(
 
     for (const [staff, bucket] of staves) {
         const hand = staff === "2" ? "left" : "right";
-        const fingers = fingerPositions(bucket.pitches, hand, span[hand] ?? undefined);
+        const fingers = fingerPositions(bucket.pitches, hand, span[hand] ?? undefined, bucket.gaps);
         const mine = saved ? savedForStaff(codec, xml, saved, hand) : null;
         bucket.notes.forEach((position, p) => {
             position.forEach((note, i) => {
