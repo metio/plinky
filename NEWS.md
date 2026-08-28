@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 28 August 2026 — night
 
+**The keys in an exported video look like piano keys now.** How tall a key was drawn
+came from the height of the video and nothing else, so the same picture gave you
+squat tiles in a wide frame and thin stripes in a tall one — and the lip and shine
+that make a key look like a solid thing you could press were sized off that height
+too, so at half the width they swamped it. A key is now kept to a shape a piano could
+actually have, whatever shape you export in. Portrait videos change the most.
+
+## 28 August 2026
+
 **The gates now check the language that stresses the app hardest, not English.**
 English is the one language they never needed to check: it is the shortest, and every
 label in Plinky was written to fit in it. The weight budget, both accessibility

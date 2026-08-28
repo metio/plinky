@@ -226,3 +226,31 @@ export function stepCenterAt(
     }
     return centers[centers.length - 1] ?? 0;
 }
+
+// The tallest and shortest a white key may be drawn, as a multiple of its own width.
+//
+// A video keyboard is a piano seen from the player's side, so a key is foreshortened: you
+// read the front of it, not its whole length. Straight on, a real white key is about 23mm
+// by 145 — call it seven to one — and no view of a piano makes a key longer than that.
+// Below about three to one it stops reading as a key at all and becomes a tile.
+//
+// The band exists because key height was a fraction of the FRAME's height and knew nothing
+// about how wide a key had ended up. The same painter drew 1:3.9 in the app's landscape
+// export and 1:12.2 in a portrait promo — the second is not a keyboard, it is a set of
+// stripes, and the lip and sheen that make a key read as a solid object are sized off
+// height, so at a twelfth of their width they overwhelm it.
+export const KEY_LONGEST = 7;
+export const KEY_SHORTEST = 3;
+
+// How tall to draw the keyboard: the depth the caller asked for, held to a key shape a
+// piano could actually have.
+//
+// `whiteWidth` is a white key's width in the same units as the returned height — pixels
+// for a painter — which is what lets the answer depend on how many keys are in range and
+// how wide the frame is rather than on the frame's height alone.
+export function keyboardHeightFor(asked: number, whiteWidth: number): number {
+    if (!(whiteWidth > 0) || !Number.isFinite(asked)) {
+        return asked;
+    }
+    return Math.min(Math.max(asked, whiteWidth * KEY_SHORTEST), whiteWidth * KEY_LONGEST);
+}

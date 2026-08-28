@@ -16,6 +16,7 @@ import {
     highwayBlocks,
     playedStepCount,
     type SceneKey,
+    keyboardHeightFor,
     sceneKeys,
     sceneRange,
     type ScoreBox,
@@ -210,6 +211,13 @@ function paintCredit(context: Context2D, cfg: ChromeConfig): void {
     context.fillStyle = MUTED;
     context.font = fontAt(400, 0.032, cfg.unit);
     context.fillText(cfg.credit, cfg.margin, cfg.height * 0.95);
+}
+
+// A white key's width in pixels — what the key-shape band is judged against. Read off the
+// laid-out keys rather than recomputed, so it cannot disagree with what is drawn.
+function whiteKeyWidth(keys: readonly SceneKey[], width: number, margin: number): number {
+    const white = keys.find((key) => !key.black);
+    return white ? white.width * (width - margin * 2) : 0;
 }
 
 // Where the keyboard sits, so one key-drawing routine serves both formats.
@@ -413,8 +421,16 @@ export function takeScenePainter({
     // on a phone), and the exporter can drop it by choice — but only when a
     // score exists to fill the stage instead.
     const scoreOnly = score !== null && (height > width || !keyboard);
-    const keyboardTop = score ? height * 0.66 : height * 0.42;
-    const keyboardHeight = score ? height * 0.24 : height * 0.4;
+    // The depth this layout wants, held to a key a piano could have (core/videoScene).
+    const keyboardHeight = keyboardHeightFor(
+        score ? height * 0.24 : height * 0.4,
+        whiteKeyWidth(keys, width, margin),
+    );
+    // The keys keep the floor they always stood on and grow upward from it, the way the
+    // highway's do. Anchoring the top instead would push a keyboard the band has made
+    // taller straight off the bottom of the frame, over the credit line.
+    const keyboardBottom = score ? height * 0.9 : height * 0.82;
+    const keyboardTop = keyboardBottom - keyboardHeight;
     // The run's distinct onsets in playing order — step i of the snapshot sounded
     // at onsets[i], mirroring how the matcher and the take both count steps.
     const onsets = [...new Set(notes.map((note) => note.startMs))].sort((a, b) => a - b);
@@ -614,7 +630,10 @@ export function takeHighwayPainter({
     //
     // The keys sit on the floor of the frame whatever depth is chosen, so a deeper
     // keyboard grows upward into the fall region rather than hanging in mid-air.
-    const keyboardHeight = height * keyboardDepth;
+    const keyboardHeight = keyboardHeightFor(
+        height * keyboardDepth,
+        whiteKeyWidth(keys, width, margin),
+    );
     const keyboardTop = height * 0.96 - keyboardHeight;
     const laneTop = height * 0.3;
     const regionHeight = keyboardTop - laneTop;
