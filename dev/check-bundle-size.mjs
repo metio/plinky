@@ -438,7 +438,19 @@ const BUDGET_VENDOR_KB = 324;
 // and a second banner message, since telling somebody on a stale tab that their storage
 // is full sends them off deleting files that were never the trouble. 0.3 KB, measured at
 // 386.2.
-const BUDGET_APP_KB = 387;
+// 389. Two things, both of which the app has to be able to do rather than only the build.
+// The difficulty model learned how much time a player has: movement between positions is
+// discounted by the gap before it, which is what stops a slow wide left hand reading as
+// harder than a fast one, and it also reads the key signature, how far each hand travels
+// and — weakly, capped — how much of the piece there is. That model runs in the browser
+// too, on an imported score and behind every grade chip, so its terms and the shared clock
+// that times a score (core/scoreTiming) are per-visitor weight. The fingering trainer reads
+// the same clock, so its advice and the marks judging that advice are priced alike. The
+// rest is the named works: a set resolved by the bake becomes a built-in assignment, which
+// costs a source method, a card that folds its steps away and mounts them on opening, and
+// one message. Two hundred and sixty piece ids are a fetched file, not bundle. 2.0 KB,
+// measured at 388.2.
+const BUDGET_APP_KB = 389;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
