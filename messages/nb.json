@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} å finne. Spill skalaen med dem, og kom så tilbake.",
     "warmup_card_white": "Bare hvite tangenter. Spill skalaen så hånden setter seg, og kom så tilbake.",
     "warmup_back": "Tilbake til {title}",
-    "settings_grand_piano_ready_hint": "Opptak lastes når et stykke ber om dem, så tallet starter på null hvert besøk og vokser mens du spiller. Det som ligger på enheten er det som teller — det lastes umiddelbart."
+    "settings_grand_piano_ready_hint": "Opptak lastes når et stykke ber om dem, så tallet starter på null hvert besøk og vokser mens du spiller. Det som ligger på enheten er det som teller — det lastes umiddelbart.",
+    "assignments_show_steps": "Vis de {count} stykkene"
 }

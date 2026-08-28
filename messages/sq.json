@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} për t'u gjetur. Luaj shkallën që i përdor, pastaj kthehu.",
     "warmup_card_white": "Vetëm taste të bardha. Luaj shkallën që dora të vendoset, pastaj kthehu.",
     "warmup_back": "Kthehu te {title}",
-    "settings_grand_piano_ready_hint": "Regjistrimet ngarkohen kur një pjesë i kërkon, prandaj numri nis nga zeroja çdo herë dhe rritet ndërsa luan. Rëndësi ka çfarë ndodhet në pajisje — ato ngarkohen menjëherë."
+    "settings_grand_piano_ready_hint": "Regjistrimet ngarkohen kur një pjesë i kërkon, prandaj numri nis nga zeroja çdo herë dhe rritet ndërsa luan. Rëndësi ka çfarë ndodhet në pajisje — ato ngarkohen menjëherë.",
+    "assignments_show_steps": "Shfaq {count} pjesët"
 }

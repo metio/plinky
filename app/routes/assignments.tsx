@@ -33,13 +33,14 @@ import { useAssignmentDraft } from "../hooks/useAssignmentDraft";
 import { useCopied } from "../hooks/useCopied";
 import { useKnownPieces } from "../hooks/useKnownPieces";
 import { loadBundledScores, loadCatalog } from "../lib/catalog";
-import { starterAssignment } from "../../core/starterAssignments";
+import { catalogueAssignment, starterAssignment } from "../../core/starterAssignments";
 import type { ExerciseMeta } from "../stores/exerciseSource";
 import {
     useAssignmentsStore,
     useExerciseSource,
     useMasteryStore,
     useStore,
+    useSongSource,
 } from "../contexts/services";
 import { routeMeta, SITE_URL } from "../../core/site";
 import { trackSteps } from "../../core/tracks";
@@ -57,6 +58,7 @@ export default function AssignmentsRoute() {
     const assignmentsStore = useAssignmentsStore();
     const masteryStore = useMasteryStore();
     const exercises = useExerciseSource();
+    const songs = useSongSource();
     // Whether a step's id resolves anywhere the play page can — indeterminate
     // (never "missing") until every source has loaded.
     const known = useKnownPieces();
@@ -65,7 +67,10 @@ export default function AssignmentsRoute() {
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     // Curated, always-available sets assembled from the shipped catalogue — not stored,
     // so they track the catalogue instead of a snapshot in localStorage.
-    const [builtin, setBuiltin] = useState<Assignment[]>([]);
+    // The starter and the named works are kept apart because they arrive on separate
+    // fetches. Held in one array, whichever resolved second replaced the other.
+    const [starter, setStarter] = useState<Assignment | null>(null);
+    const [namedWorks, setNamedWorks] = useState<Assignment[]>([]);
     const [incoming, setIncoming] = useState<Assignment | null>(null);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -108,16 +113,27 @@ export default function AssignmentsRoute() {
                     return true;
                 }),
             );
-            const starter = starterAssignment({
-                id: "starter-first-steps",
-                name: m.assignments_starter_name(),
-                description: m.assignments_starter_description(),
-                demos: loadBundledScores().map((score) => ({ id: score.id })),
-                exercises,
-            });
-            setBuiltin(starter ? [starter] : []);
+            setStarter(
+                starterAssignment({
+                    id: "starter-first-steps",
+                    name: m.assignments_starter_name(),
+                    description: m.assignments_starter_description(),
+                    demos: loadBundledScores().map((score) => ({ id: score.id })),
+                    exercises,
+                }),
+            );
         });
-    }, [exercises.manifest, store, assignmentsStore.list]);
+        // The named works, after the starter rather than with it: they are a shelf to
+        // browse and the starter is where a first day begins, so it stays at the top and
+        // does not wait on a second fetch to appear.
+        songs.builtins().then((sets) => {
+            setNamedWorks(
+                (sets ?? [])
+                    .map((set) => catalogueAssignment({ set, known: () => true }))
+                    .filter((assignment): assignment is Assignment => assignment !== null),
+            );
+        });
+    }, [exercises.manifest, songs.builtins, store, assignmentsStore.list]);
 
     // A shared assignment arriving by link is offered for import rather than saved
     // silently, so the player chooses to add a stranger's list to their own.
@@ -129,6 +145,9 @@ export default function AssignmentsRoute() {
     // the wider known-pieces set, and an unresolved id falls back to itself.
     const byId = new Map(pool.map((entry) => [entry.id, entry.title]));
     const titleOf = (id: string) => byId.get(id) ?? known.titleOf(id) ?? id;
+
+    // The starter first — where a first day begins — then the named works below it.
+    const builtin = starter ? [starter, ...namedWorks] : namedWorks;
 
     // The steps of an assignment whose ids no longer resolve on this device.
     const missingIn = (assignment: Assignment) =>
@@ -335,7 +354,7 @@ export default function AssignmentsRoute() {
                 <section className="space-y-3">
                     <h2 className={sectionHeadingClasses}>{m.assignments_builtin_heading()}</h2>
                     <ul className="space-y-2">
-                        {builtin.map((assignment) => {
+                        {builtin.map((assignment, index) => {
                             const list = stepsFor(assignment);
                             return (
                                 <AssignmentCard
@@ -346,6 +365,9 @@ export default function AssignmentsRoute() {
                                     onShare={onShare}
                                     onDownload={onDownload}
                                     description={assignment.description}
+                                    // The first is the starter — where a first day begins,
+                                    // so it is open. The named works below it are a shelf.
+                                    foldSteps={index > 0}
                                 >
                                     {steps(list)}
                                     <ReportBack assignment={assignment} />

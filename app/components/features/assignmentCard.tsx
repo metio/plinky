@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { usePrefs } from "../../hooks/usePrefs";
 import type { Assignment } from "../../../core/assignment";
 import { todayKey } from "../../../core/daily";
@@ -84,6 +84,23 @@ export function AssignmentStepList({
     );
 }
 
+// Steps a card keeps folded until they are asked for.
+//
+// Mounted on opening rather than hidden by the fold. A shelf of two dozen named works is
+// two dozen of these, and every step draws its opening bars — kept in the document from
+// the start, that is hundreds of little engravings nobody has looked at.
+function FoldedSteps({ count, children }: { count: number; children: ReactNode }) {
+    const [open, setOpen] = useState(false);
+    return (
+        <details onToggle={(event) => setOpen(event.currentTarget.open)}>
+            <summary className="cursor-pointer text-sm text-muted marker:text-muted">
+                {m.assignments_show_steps({ count })}
+            </summary>
+            {open && <div className="mt-2">{children}</div>}
+        </details>
+    );
+}
+
 // One assignment in a list: name + progress, the Share/Download pair, and the
 // step list. Extra buttons slot in before Share (`actionsBefore`) and after
 // Download (`actionsAfter`); the children are the rendered steps.
@@ -96,6 +113,7 @@ export function AssignmentCard({
     actionsBefore,
     actionsAfter,
     description,
+    foldSteps,
     children,
 }: {
     assignment: Assignment;
@@ -106,6 +124,10 @@ export function AssignmentCard({
     actionsBefore?: ReactNode;
     actionsAfter?: ReactNode;
     description?: string;
+    // Whether the steps start folded away. A set a player chose to keep shows its work;
+    // the built-in ones are a shelf to browse, and two dozen open lists is a page nobody
+    // reads to the end of.
+    foldSteps?: boolean;
     children: ReactNode;
 }) {
     const doneCount = steps.filter((step) => step.status === "done").length;
@@ -147,7 +169,7 @@ export function AssignmentCard({
                     {description}
                 </p>
             )}
-            {children}
+            {foldSteps ? <FoldedSteps count={steps.length}>{children}</FoldedSteps> : children}
         </li>
     );
 }

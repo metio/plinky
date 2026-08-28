@@ -11,11 +11,18 @@ import { loadBundledScores } from "../lib/catalog";
 import { createAssignmentsStore } from "../stores/assignmentsStore";
 import type { ExerciseMeta, ExerciseSource } from "../stores/exerciseSource";
 import type { SongSource } from "../stores/songSource";
+import { m } from "../paraglide/messages.js";
 import { renderWithServices } from "../testing/renderWithServices";
 import AssignmentsRoute from "./assignments";
 
-// Only `manifest` is exercised here; the rest of each source is unused.
-const source = <T,>(manifest: () => Promise<never[] | null>): T => ({ manifest }) as unknown as T;
+// A catalogue source stubbed down to what this page reads. `builtins` answers null — the
+// same thing a failed fetch says, which the page treats as nothing to offer — so a test
+// about a player's own assignments is not also a test of the named works.
+//
+// Cast because SongSource and ExerciseSource share only their manifest, which is also why
+// a missing method shows up as a runtime error rather than a type one.
+const source = <T,>(manifest: () => Promise<never[] | null>): T =>
+    ({ manifest, builtins: () => Promise.resolve(null) }) as unknown as T;
 const emptySources = () => ({
     exercises: source<ExerciseSource>(() => Promise.resolve([])),
     songs: source<SongSource>(() => Promise.resolve([])),
@@ -309,5 +316,48 @@ describe("AssignmentsRoute tabs", () => {
         fireEvent.pointerUp(handle, { pointerId: 1 });
         expect(rows()[0]).toContain("Exercise two");
         expect(rows()[1]).toContain("Exercise one");
+    });
+});
+
+describe("AssignmentsRoute named works", () => {
+    // A song source that also answers with the named works the bake resolves.
+    const withSets = (sets: { id: string; name: string; items: string[] }[]) =>
+        ({
+            manifest: () => Promise.resolve([]),
+            builtins: () => Promise.resolve(sets),
+        }) as unknown as SongSource;
+
+    const sources = (sets: { id: string; name: string; items: string[] }[]) => ({
+        exercises: source<ExerciseSource>(() => Promise.resolve([])),
+        songs: withSets(sets),
+    });
+
+    it("offers a named work beside the starter, without a player having to make it", async () => {
+        mount(
+            sources([
+                {
+                    id: "bach-inventions",
+                    name: "Bach — The two-part inventions",
+                    items: ["a", "b"],
+                },
+            ]),
+        );
+        expect(await screen.findByText("Bach — The two-part inventions")).toBeTruthy();
+    });
+
+    it("folds a named work's pieces away, so a shelf of them stays a shelf", async () => {
+        mount(
+            sources([
+                { id: "satie-gymnopedies", name: "Satie — Gymnopédies", items: ["a", "b", "c"] },
+            ]),
+        );
+        await screen.findByText("Satie — Gymnopédies");
+        expect(screen.getByText(m.assignments_show_steps({ count: 3 }))).toBeTruthy();
+    });
+
+    it("shows only the starter when the named works cannot be fetched", async () => {
+        mount(emptySources());
+        await screen.findByText(m.assignments_builtin_heading());
+        expect(screen.queryByText(/Gymnop/)).toBeNull();
     });
 });

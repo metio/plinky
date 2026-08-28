@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} löydettävänä. Soita asteikko niillä ja palaa sitten.",
     "warmup_card_white": "Pelkkiä valkoisia koskettimia. Soita asteikko, niin käsi asettuu, ja palaa sitten.",
     "warmup_back": "Takaisin: {title}",
-    "settings_grand_piano_ready_hint": "Äänitteet ladataan vasta kun kappale pyytää niitä, joten luku alkaa joka kerta nollasta ja kasvaa soittaessasi. Merkitystä on sillä, mitä laitteella on — se latautuu heti."
+    "settings_grand_piano_ready_hint": "Äänitteet ladataan vasta kun kappale pyytää niitä, joten luku alkaa joka kerta nollasta ja kasvaa soittaessasi. Merkitystä on sillä, mitä laitteella on — se latautuu heti.",
+    "assignments_show_steps": "Näytä {count} kappaletta"
 }

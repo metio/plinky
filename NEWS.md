@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 28 August 2026
 
+**The books inside the catalogue are assignments now.** A pianist works through a
+book, not a piece — the two-part inventions, Czerny's eight-bar exercises, the
+Goldberg variations, Satie's Gymnopédies. Those sets were already in the library and
+invisible in it: three thousand pieces sorted by difficulty, with nothing to say that
+fifteen of them are one work. Twenty-three of them now sit under Assignments beside
+the starter set, each in playing order from the gentlest, so you can work up through
+a book the way you would at a piano lesson. They behave like any assignment — your
+progress, your report, your share link.
+
 **The scales and studies are graded properly again, and drawn again.** The exercise
 shelf grades scales and arpeggios on their own scale, since fingering a scale is not
 the same job as playing a tune — and those marks had not moved with the difficulty

@@ -4,6 +4,7 @@
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
 import type { Fetcher } from "../ports/fetcher";
 import { shardName } from "../../core/catalogShard";
+import type { ScoreKind } from "../../core/scoreKind";
 import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 
 // The curated song catalogue. Unlike the bundled exercises (inlined into the
@@ -38,9 +39,28 @@ export type SongMeta = {
     // that names a piece without fetching its notation. Absent on a piece whose opening
     // would not read, and on any manifest written before it was baked.
     incipit?: string;
+    // What the piece is written for (core/scoreKind). Two thirds of the catalogue is a
+    // song with a piano part or a choral setting reduced to a grand staff; both are
+    // playable and neither is what a grade ladder should offer a beginner, so this is what
+    // lets the ladder ask for piano writing while the library keeps everything.
+    scoreKind?: ScoreKind;
+};
+
+// A named work the catalogue holds enough of to work through as one thing — an opus, a
+// book of studies, a suite — resolved to its piece ids by `npm run songs:bake`. The app
+// turns each into a built-in assignment, so a set is nothing a player has to learn about:
+// it is an assignment that was already there.
+export type BuiltinAssignment = {
+    id: string;
+    // A composer and a work. A proper noun, so it is catalogue data rather than a
+    // translated string.
+    name: string;
+    // The pieces, gentlest first, so working through a set is working up through it.
+    items: string[];
 };
 
 const MANIFEST_URL = "/songs/manifest.json";
+const BUILTIN_ASSIGNMENTS_URL = "/songs/builtin-assignments.json";
 // Where the per-piece slices of that manifest live, written by `npm run songs:bake`.
 const SLICE_DIR = "/songs/index";
 
@@ -59,6 +79,9 @@ export type SongSource = {
     // through to bundled, user or exercise scores; "unavailable" when a fetch
     // failed and the answer is simply unknown.
     resolve(id: string): Promise<ResolvedScore>;
+    // The named works, or null when they could not be fetched — read like the manifest,
+    // and treated as nothing to offer rather than as an error a player should see.
+    builtins(): Promise<BuiltinAssignment[] | null>;
 };
 
 export function createSongSource(fetchUrl: Fetcher): SongSource {
@@ -87,8 +110,11 @@ export function createSongSource(fetchUrl: Fetcher): SongSource {
     const fetchXml = (id: string, license?: string): Promise<string | null> =>
         fetchMxlXml(fetchUrl, `/songs/${licenseDir(license)}/${id}.mxl`);
 
+    const builtins = cachedManifest<BuiltinAssignment>(fetchUrl, BUILTIN_ASSIGNMENTS_URL);
+
     return {
         manifest,
+        builtins,
         fetchXml,
         async resolve(id) {
             const meta = await metaFor(id);

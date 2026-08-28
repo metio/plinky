@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} te vinden. Speel de toonladder ermee en kom dan terug.",
     "warmup_card_white": "Alleen witte toetsen. Speel de toonladder om je hand te laten wennen en kom dan terug.",
     "warmup_back": "Terug naar {title}",
-    "settings_grand_piano_ready_hint": "Opnamen worden pas geladen als een stuk erom vraagt, dus dit begint elk bezoek op nul en loopt op terwijl je speelt. Wat op het apparaat staat telt — dat laadt meteen."
+    "settings_grand_piano_ready_hint": "Opnamen worden pas geladen als een stuk erom vraagt, dus dit begint elk bezoek op nul en loopt op terwijl je speelt. Wat op het apparaat staat telt — dat laadt meteen.",
+    "assignments_show_steps": "Toon de {count} stukken"
 }

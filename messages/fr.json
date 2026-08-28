@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} à trouver. Jouez la gamme qui les utilise, puis revenez.",
     "warmup_card_white": "Rien que des touches blanches. Jouez la gamme pour poser la main, puis revenez.",
     "warmup_back": "Retour à {title}",
-    "settings_grand_piano_ready_hint": "Les enregistrements sont chargés quand un morceau les demande : le compte repart de zéro à chaque visite et monte pendant que vous jouez. Ce qui compte, c'est ce qui est sur l'appareil — cela se charge aussitôt."
+    "settings_grand_piano_ready_hint": "Les enregistrements sont chargés quand un morceau les demande : le compte repart de zéro à chaque visite et monte pendant que vous jouez. Ce qui compte, c'est ce qui est sur l'appareil — cela se charge aussitôt.",
+    "assignments_show_steps": "Voir les {count} morceaux"
 }

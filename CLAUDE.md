@@ -327,6 +327,16 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   its octiles — but they do not follow the model on their own, so `songs:bake` fails when
   a category's tiles collapse into one grade.
 
+- **A named work is a built-in assignment, not a new kind of thing.** Plinky already has
+  assignments — a named, ordered list of pieces — so a book of studies is one, and there is
+  no second concept for a player to learn. `dev/builtin-assignments.json` names the works
+  (composer and title patterns, plus the `least` number of pieces below which the set has
+  stopped being that work); `songs:bake` resolves them against the manifest into
+  `public/songs/builtin-assignments.json` and fails when one drops below its minimum, so a
+  pattern that has rotted is caught rather than rendering as an empty card. Matching
+  happens at bake time on purpose: no pattern table reaches a visitor's bundle. Only
+  `solo-piano` pieces are eligible — a set is something to work through at the keyboard.
+
 - **A hand-made correction to catalogue metadata goes in `dev/catalog-curation.json`**,
   never straight into `public/songs/manifest.json`. The manifest is written by
   `songs:import` from the harvested corpora, so an edit there survives until the next

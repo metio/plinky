@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { starterAssignment } from "./starterAssignments";
+import { catalogueAssignment, starterAssignment } from "./starterAssignments";
 
 const base = { id: "starter", name: "First steps", description: "A first set." };
 
@@ -41,5 +41,29 @@ describe("starterAssignment", () => {
 
     it("returns null when the catalogue has nothing to offer", () => {
         expect(starterAssignment({ ...base, demos: [], exercises: [] })).toBeNull();
+    });
+});
+
+describe("catalogueAssignment", () => {
+    const set = {
+        id: "bach-inventions",
+        name: "Bach — The two-part inventions",
+        items: ["a", "b", "c"],
+    };
+
+    it("keeps the catalogue's order, so a set is worked up through", () => {
+        const assignment = catalogueAssignment({ set, known: () => true });
+        expect(assignment?.items.map((item) => item.id)).toEqual(["a", "b", "c"]);
+        expect(assignment?.name).toBe("Bach — The two-part inventions");
+        expect(assignment?.id).toBe("bach-inventions");
+    });
+
+    it("drops a piece the device cannot open rather than naming it", () => {
+        const assignment = catalogueAssignment({ set, known: (id) => id !== "b" });
+        expect(assignment?.items.map((item) => item.id)).toEqual(["a", "c"]);
+    });
+
+    it("offers nothing at all when none of the set resolves", () => {
+        expect(catalogueAssignment({ set, known: () => false })).toBeNull();
     });
 });

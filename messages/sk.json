@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} na nájdenie. Zahraj stupnicu, ktorá ich používa, a vráť sa.",
     "warmup_card_white": "Len biele klávesy. Zahraj stupnicu, nech ruka sadne, a vráť sa.",
     "warmup_back": "Späť na {title}",
-    "settings_grand_piano_ready_hint": "Nahrávky sa načítajú, keď si ich skladba vyžiada, takže číslo začína pri každej návšteve na nule a rastie počas hrania. Dôležité je, čo je v zariadení — to sa načíta okamžite."
+    "settings_grand_piano_ready_hint": "Nahrávky sa načítajú, keď si ich skladba vyžiada, takže číslo začína pri každej návšteve na nule a rastie počas hrania. Dôležité je, čo je v zariadení — to sa načíta okamžite.",
+    "assignments_show_steps": "Zobraziť {count} skladieb"
 }

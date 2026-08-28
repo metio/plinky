@@ -1,0 +1,28 @@
+{
+  "note": "Named works the catalogue holds enough of to be worth working through as one thing — an opus, a book of studies, a suite. Each becomes a built-in assignment, resolved to piece ids by `npm run songs:bake` and shipped as public/songs/builtin-assignments.json. `name` is a proper noun (a composer and a work) and is deliberately not a translated UI string; the chrome around it is. `least` is how few pieces the catalogue may hold before the set stops being that work: the bake fails below it, so a definition cannot quietly rot into three movements calling themselves a suite.",
+  "sets": [
+    { "id": "czerny-op-821", "name": "Czerny — 160 eight-bar exercises, op. 821", "composer": "czerny", "title": "Eight-Measure", "least": 12 },
+    { "id": "duvernoy-op-176", "name": "Duvernoy — Elementary studies, op. 176", "composer": "duvernoy", "title": ".", "least": 5 },
+    { "id": "bach-little-preludes", "name": "Bach — The little preludes", "composer": "bach", "title": "Little Prelude|BWV 9(2[4-9]|3[0-9]|4[0-3])", "least": 4 },
+    { "id": "schumann-op-68", "name": "Schumann — Album for the young, op. 68", "composer": "schumann", "title": "album|jeunesse|jugend", "least": 8 },
+    { "id": "satie-gymnopedies", "name": "Satie — Gymnopédies", "composer": "satie", "title": "gymnop", "least": 3 },
+    { "id": "satie-gnossiennes", "name": "Satie — Gnossiennes", "composer": "satie", "title": "gnossien", "least": 3 },
+    { "id": "czerny-op-139", "name": "Czerny — 50 melodic studies", "composer": "czerny", "title": "melodische|melodic", "least": 6 },
+    { "id": "bach-inventions", "name": "Bach — The two-part inventions", "composer": "bach", "title": "^Invention", "least": 10 },
+    { "id": "bach-french-suites", "name": "Bach — The French suites", "composer": "bach", "title": "french suite", "least": 6 },
+    { "id": "bach-goldberg", "name": "Bach — The Goldberg variations", "composer": "bach", "title": "goldberg", "least": 12 },
+    { "id": "bach-partitas", "name": "Bach — The six partitas", "composer": "bach", "title": "partita", "least": 6 },
+    { "id": "scarlatti-sonatas", "name": "Scarlatti — Keyboard sonatas", "composer": "scarlatti", "title": "sonata|K\\.\\s*\\d", "least": 6 },
+    { "id": "grieg-holberg", "name": "Grieg — From Holberg's time, op. 40", "composer": "grieg", "title": "holberg", "least": 3 },
+    { "id": "mussorgsky-pictures", "name": "Mussorgsky — Pictures at an exhibition", "composer": "moussorgsky|mussorgsky", "title": "pictures|exhibition", "least": 6 },
+    { "id": "chopin-waltzes", "name": "Chopin — Waltzes", "composer": "chopin", "title": "waltz|valse", "least": 4 },
+    { "id": "chopin-preludes", "name": "Chopin — Preludes", "composer": "chopin", "title": "prelude", "least": 8 },
+    { "id": "joplin-rags", "name": "Joplin — Rags", "composer": "joplin", "title": ".", "least": 8 },
+    { "id": "debussy-bergamasque", "name": "Debussy — Suite bergamasque", "composer": "debussy", "title": "bergamasque|clair de lune|passepied", "least": 3 },
+    { "id": "faure-nocturnes", "name": "Fauré — Nocturnes and barcarolles", "composer": "fauré|faure", "title": "nocturne|barcarolle|berceuse", "least": 4 },
+    { "id": "bach-wtc", "name": "Bach — The Well-Tempered Clavier", "composer": "bach", "title": "wohltemperierte|well.tempered|prelude and fugue", "least": 12 },
+    { "id": "czerny-op-740", "name": "Czerny — The art of finger dexterity, op. 740", "composer": "czerny", "title": "740|Finger Dexterity", "least": 5 },
+    { "id": "chopin-etudes", "name": "Chopin — Études", "composer": "chopin", "title": "étude|etude", "least": 8 },
+    { "id": "rachmaninoff-op-23", "name": "Rachmaninoff — Preludes, op. 23", "composer": "rachmanin", "title": "prelude", "least": 4 }
+  ]
+}

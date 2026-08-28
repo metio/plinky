@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} za pronaći. Odsviraj ljestvicu koja ih koristi pa se vrati.",
     "warmup_card_white": "Samo bijele tipke. Odsviraj ljestvicu da ruka sjedne pa se vrati.",
     "warmup_back": "Natrag na {title}",
-    "settings_grand_piano_ready_hint": "Snimke se učitavaju kad ih skladba zatraži, pa broj svaki put kreće od nule i raste dok sviraš. Važno je ono što je na uređaju — to se učita odmah."
+    "settings_grand_piano_ready_hint": "Snimke se učitavaju kad ih skladba zatraži, pa broj svaki put kreće od nule i raste dok sviraš. Važno je ono što je na uređaju — to se učita odmah.",
+    "assignments_show_steps": "Prikaži {count} skladbi"
 }

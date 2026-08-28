@@ -299,6 +299,15 @@ one-tap **review session** walks you through everything that's fading, and you c
   number and the grade it lands near, so a newcomer starts where they actually read
   rather than where a dropdown guessed. Every drill is generated on the spot, so
   nothing in it can be a piece you already know — it measures reading, not memory.
+- **The catalogue's own books** — a pianist works through a book, not a piece, and the
+  library holds plenty of them: Bach's two-part inventions, Czerny's eight-bar exercises,
+  the Goldberg variations, Satie's Gymnopédies. Twenty-three named works sit under
+  Assignments alongside the starter set, each in playing order from the gentlest, with
+  their pieces folded away so the shelf stays readable. They are ordinary assignments —
+  the same progress, the same report, the same share link — and they are built from the
+  catalogue at build time, so a set only appears while the pieces that make it up are
+  actually there.
+
 - **Handing an assignment back** — the loop used to run one way: a teacher shares a
   list, and never learns what happened, because progress lives on the student's
   device. Now each assignment offers **Hand your results back**: type a name and the

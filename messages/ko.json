@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "찾을 음은 {notes}. 그 음을 쓰는 음계를 치고 돌아오세요.",
     "warmup_card_white": "흰건반뿐입니다. 손이 자리 잡도록 음계를 치고 돌아오세요.",
     "warmup_back": "{title}(으)로 돌아가기",
-    "settings_grand_piano_ready_hint": "녹음은 곡이 필요로 할 때 불러옵니다. 방문할 때마다 0에서 시작해 연주하는 동안 늘어납니다. 중요한 것은 기기에 있는 수이고, 그것들은 즉시 불러옵니다."
+    "settings_grand_piano_ready_hint": "녹음은 곡이 필요로 할 때 불러옵니다. 방문할 때마다 0에서 시작해 연주하는 동안 늘어납니다. 중요한 것은 기기에 있는 수이고, 그것들은 즉시 불러옵니다.",
+    "assignments_show_steps": "{count}곡 보기"
 }

@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} att hitta. Spela skalan med dem och kom sedan tillbaka.",
     "warmup_card_white": "Bara vita tangenter. Spela skalan så handen sätter sig, och kom sedan tillbaka.",
     "warmup_back": "Tillbaka till {title}",
-    "settings_grand_piano_ready_hint": "Inspelningar laddas när ett stycke ber om dem, så siffran börjar på noll varje besök och växer medan du spelar. Det som finns på enheten är det som räknas — det laddas direkt."
+    "settings_grand_piano_ready_hint": "Inspelningar laddas när ett stycke ber om dem, så siffran börjar på noll varje besök och växer medan du spelar. Det som finns på enheten är det som räknas — det laddas direkt.",
+    "assignments_show_steps": "Visa de {count} styckena"
 }

@@ -30,6 +30,7 @@
 // songs:dedup, or whenever the catalogue changes.
 
 import { readFile, writeFile } from "node:fs/promises";
+import { bakeBuiltinAssignments } from "./bake-builtin-assignments.mts";
 import { bakePeopleIndex } from "./bake-people.mts";
 import { bakeShards } from "./bake-shards.mts";
 import { curate, loadCuration, unapplied } from "./curation.mts";
@@ -188,6 +189,12 @@ async function main() {
             console.error("\nRun `npm run songs:bake` to update, then commit the result.");
             process.exit(1);
         }
+        // Also read off the manifest on disk: a set is a list of pieces the catalogue
+        // holds, so it is only right if it agrees with what a player can actually open.
+        if (!(await bakeBuiltinAssignments(true))) {
+            console.error("\nRun `npm run songs:bake` to update, then commit the result.");
+            process.exit(1);
+        }
         console.log("Catalogue grades are baked and consistent.");
         return;
     }
@@ -195,8 +202,11 @@ async function main() {
     await writeFile(`${SONGS}/manifest.json`, JSON.stringify(bakedSongs));
     await writeFile(`${EXERCISES}/manifest.json`, JSON.stringify(bakedExercises));
     await bakePeopleIndex(false);
-    // After the manifest is written, since the slices are cut from the file on disk.
+    // After the manifest is written, since both are read from the file on disk.
     await bakeShards(false);
+    if (!(await bakeBuiltinAssignments(false))) {
+        process.exit(1);
+    }
 
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of bakedSongs) {

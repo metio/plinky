@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} para encontrar. Toca a escala que as usa e volta.",
     "warmup_card_white": "Só teclas brancas. Toca a escala para assentar a mão e volta.",
     "warmup_back": "Voltar a {title}",
-    "settings_grand_piano_ready_hint": "As gravações são carregadas quando uma peça as pede, por isso isto começa a zero em cada visita e sobe enquanto tocas. O que conta é o que está no dispositivo — isso carrega de imediato."
+    "settings_grand_piano_ready_hint": "As gravações são carregadas quando uma peça as pede, por isso isto começa a zero em cada visita e sobe enquanto tocas. O que conta é o que está no dispositivo — isso carrega de imediato.",
+    "assignments_show_steps": "Ver as {count} peças"
 }

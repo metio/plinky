@@ -82,6 +82,7 @@ path = [
     "dev/catalog-excluded.json",
     "dev/catalog-people-distinct.json",
     "dev/grade-anchors.json",
+    "dev/builtin-assignments.json",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
@@ -97,6 +98,14 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 # instead of six hundred. Written by `npm run songs:bake` from the manifest above.
 [[annotations]]
 path = ["public/songs/index/*.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# The named works — an opus, a book of studies, a suite — resolved to the piece ids the
+# catalogue holds. Written by `npm run songs:bake` from dev/builtin-assignments.json.
+[[annotations]]
+path = ["public/songs/builtin-assignments.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

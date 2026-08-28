@@ -1320,5 +1320,6 @@
     "warmup_card_notes": "{notes} da trovare. Suona la scala che le usa, poi torna qui.",
     "warmup_card_white": "Solo tasti bianchi. Suona la scala per assestare la mano, poi torna qui.",
     "warmup_back": "Torna a {title}",
-    "settings_grand_piano_ready_hint": "Le registrazioni si caricano quando un brano le chiede, quindi il numero riparte da zero a ogni visita e sale mentre suoni. Conta quello che è sul dispositivo: quello si carica subito."
+    "settings_grand_piano_ready_hint": "Le registrazioni si caricano quando un brano le chiede, quindi il numero riparte da zero a ogni visita e sale mentre suoni. Conta quello che è sul dispositivo: quello si carica subito.",
+    "assignments_show_steps": "Mostra i {count} brani"
 }
