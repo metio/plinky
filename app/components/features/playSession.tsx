@@ -595,6 +595,12 @@ function usePlaySessionValue({
         // is holding on to. Anything else that paints — a ghost, a keep-up window — draws
         // again on its own next tick.
         onLap: clearPaint,
+        // A written repeat sends the reader back over bars they have already played, and
+        // those bars are still green from the first pass — so the colour stops saying where
+        // they are at the exact moment the score asks them to read the same music twice.
+        // Same wipe, different cause: the lap is the player drilling a range, this is the
+        // page telling them to go round.
+        onRewind: clearPaint,
         onCorrect: (info: CorrectInfo) => {
             // Skip the note-echo under mic input — you hear your own piano.
             if (!micListening) {

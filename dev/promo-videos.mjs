@@ -73,7 +73,11 @@ const SAMPLES = process.argv.includes("--synth")
     ? undefined
     : (argValue("--samples") ?? "https://samples.plinky.fun/v1");
 const KEYBOARD_DEPTH = "shallow";
-const PORT = 5199;
+// The dev server this run drives. Overridable so a one-off clip can be rendered beside a
+// long batch without the two ever sharing a server — which is the thing startDevServer
+// refuses, and rightly: a driver that talks to somebody else's server renders somebody
+// else's code. Separate ports, separate servers, no overlap.
+const PORT = Number(argValue("--port") ?? 5199);
 // Render only the pieces whose title contains this, for a re-run of one clip.
 const ONLY = argValue("--only");
 // Render the named works instead of the curated shelf: every CC0 piece of every built-in

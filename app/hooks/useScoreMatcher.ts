@@ -62,6 +62,7 @@ import {
     staffArrivals,
     type UpcomingStep,
     upcomingSteps,
+    jumpsBack,
 } from "../../core/matcher";
 
 // How many positions ahead the notes-highway look-ahead surfaces. The panel spans a
@@ -438,6 +439,13 @@ export function useScoreMatcher(
         // already coloured green and the trail stops meaning "how far you have got". The
         // surface owns the paint, so it is told rather than reached into.
         onLap?: () => void;
+        // A written repeat has sent the run back to bars it has already played. Same
+        // problem the lap above solves and the same answer — the second pass over those
+        // bars would otherwise start already coloured from the first — but a different
+        // event, because a lap is the player choosing to drill a range and a repeat is the
+        // score asking. Kept apart so a consumer can answer one without answering both:
+        // the lap also bumps the practice tempo, which a repeat must not.
+        onRewind?: () => void;
         // A wrong note at a position: its whole-piece step index and how many wrong
         // attempts that position has absorbed so far (1 on the first slip) — what a
         // tries budget compares against.
@@ -690,6 +698,13 @@ export function useScoreMatcher(
                 // A new position clears the per-position miss flag, so the "reveal
                 // on mistake" hint hides again until the next slip.
                 setMissedHere(false);
+                // And if the position after this one is printed EARLIER than it, a repeat
+                // barline has sent the run back. Announced rather than acted on here, for
+                // the same reason the lap is: the halos belong to the surface.
+                const following = runStepsRef.current[event.ordinal + 1];
+                if (following !== undefined && jumpsBack(event.step, following)) {
+                    optionsRef.current.onRewind?.();
+                }
             }
             if (next.complete && runLoopRef.current) {
                 // Lap the section: rewind the reducer and the cursor to the range's

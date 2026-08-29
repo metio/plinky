@@ -53,6 +53,23 @@ export function isPracticedHand(
 
 // One playable position for the chosen hand, in play order. Hand narrowing
 // happens when the surface collects the steps, so the reducer is hand-agnostic.
+// Whether the music has just been sent back to an earlier place on the page.
+//
+// A written repeat is the only thing that does this: `whole` is where a position is
+// PRINTED, and it rises with the run except where the barline sends the reader back to
+// play the same bars again. That second pass finds those bars already coloured from the
+// first, so the trail stops meaning "how far you have got" — the same thing a section loop
+// does, which is already handled, and which nothing handled here.
+//
+// Compared with a tolerance because `whole` is accumulated in fractions of a whole note,
+// and two positions printed at the same moment must never read as a jump: an ornament
+// carries the onset of the note it decorates, so it shares a value rather than preceding it.
+const SAME_PLACE = 1e-6;
+
+export function jumpsBack(from: MatchStep, to: MatchStep): boolean {
+    return to.whole < from.whole - SAME_PLACE;
+}
+
 export type MatchStep = {
     // The MIDI pitches that sound here — a chord gives several.
     pitches: number[];

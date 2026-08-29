@@ -16,6 +16,7 @@ import {
     type ClearedEvent,
     type MatchStep,
     upcomingSteps,
+    jumpsBack,
 } from "./matcher";
 import { GRAND_STAFF, partsOf } from "./parts";
 
@@ -441,5 +442,39 @@ describe("staffArrivals", () => {
     it("skips a pitch with no arrival rather than counting it as zero", () => {
         const times = staffArrivals({ step, playedPitches: [48, 52], arrivals: [] });
         expect(times).toEqual({});
+    });
+});
+
+describe("a repeat sending the run back", () => {
+    // `whole` is where a position is PRINTED. It rises with the run except across a repeat
+    // barline, which is the one thing that sends a reader back over bars they have already
+    // played — and therefore the one thing that leaves those bars coloured from the first
+    // pass while they are read a second time.
+    const at = (whole: number): MatchStep => step([60], { whole, bar: Math.floor(whole) });
+
+    it("sees the jump when the next position is printed earlier", () => {
+        expect(jumpsBack(at(8), at(4))).toBe(true);
+    });
+
+    it("sees nothing in music that simply carries on", () => {
+        expect(jumpsBack(at(4), at(5))).toBe(false);
+    });
+
+    it("does not read two positions printed at the same moment as a jump", () => {
+        // An ornament carries the onset of the note it decorates, so it shares a value
+        // rather than preceding it. Reading that as a repeat would wipe the trail on every
+        // trill in the piece.
+        expect(jumpsBack(at(4), at(4))).toBe(false);
+    });
+
+    it("is not fooled by the fractions whole notes accumulate in", () => {
+        // A hair below, and a hair that survives: `whole` is summed from note lengths like
+        // a third of a beat, so a position printed at the same moment as the one before it
+        // can land a fraction under rather than exactly on. The drift has to be bigger than
+        // a double can lose at this magnitude — 0.1 + 0.2 - 0.3 is not, which is how this
+        // test first passed while testing nothing.
+        const drift = 1e-12;
+        expect(4 - drift).not.toBe(4);
+        expect(jumpsBack(at(4), at(4 - drift))).toBe(false);
     });
 });
