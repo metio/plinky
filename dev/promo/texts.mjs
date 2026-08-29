@@ -17,6 +17,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 import { folderFor, PIECES } from "./pieces.mjs";
+import { collectionPieces } from "./collections.mjs";
 import { FOLLOW_US } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
 
@@ -105,8 +106,24 @@ function describe(piece, entry) {
         .join("\n");
 }
 
+// The curated shelf and every piece of every named work. A collection's clips are uploaded
+// like any other and need the same words under them — they were the only videos going up
+// with an empty description, because this walked the curated list alone.
+//
+// Deduplicated by where the clip lands rather than by id: a piece can sit in two
+// collections and on the shelf besides, and all three want the one file.
+const seen = new Set();
+const everyPiece = [...PIECES, ...collectionPieces()].filter((piece) => {
+    const at = folderFor(piece);
+    if (seen.has(at)) {
+        return false;
+    }
+    seen.add(at);
+    return true;
+});
+
 let written = 0;
-for (const piece of PIECES) {
+for (const piece of everyPiece) {
     const entry = byId.get(piece.id);
     const dir = `${OUT}/${folderFor(piece)}`;
     await mkdir(dir, { recursive: true });

@@ -15,6 +15,7 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { collections, folderForCollection } from "./collections.mjs";
+import { folderFor } from "./pieces.mjs";
 import { FOLLOW_US } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
 
@@ -36,6 +37,10 @@ function describe(set) {
         "In playing order, gentlest first — the same order Plinky gives them to a player working through the set.",
         short,
         "",
+        // Numbered, so the order survives being read down a screen, and named by the piece
+        // rather than by the file, because that is what YouTube will be showing.
+        ...set.pieces.map((piece, index) => `${index + 1}. ${piece.title}`),
+        "",
         `Work through this set yourself: ${SITE}/en/assignments/`,
         "",
         "The colour of each note is the finger that plays it:",
@@ -54,11 +59,36 @@ function describe(set) {
         .join("\n");
 }
 
+// Which clips make the playlist, in the order they go in.
+//
+// The description above says what the set is; this says what to upload into it. A
+// collection's videos are scattered across the composer folders — a set of Bach inventions
+// sits under Bach, beside pieces belonging to no set at all — so without this there is
+// nothing on disk that says which of them belong together, and the order is the assignment's
+// own, which no folder listing preserves.
+function contents(set) {
+    return [
+        `${set.pieces.length} video${set.pieces.length === 1 ? "" : "s"}, in this order:`,
+        "",
+        ...set.pieces.map(
+            (piece, index) =>
+                `${String(index + 1).padStart(2, " ")}. promo/${folderFor(piece)}/youtube.mp4` +
+                `\n    ${piece.title} — ${piece.composer}`,
+        ),
+    ].join("\n");
+}
+
 let written = 0;
 for (const set of collections()) {
     const dir = `${OUT}/${folderForCollection(set)}`;
     await mkdir(dir, { recursive: true });
-    await writeFile(`${dir}/playlist.txt`, `${set.name} | Plinky\n\n${describe(set)}\n`);
+    // The words that go up with the playlist, exactly as a piece's own youtube.txt carries
+    // the words for its clip.
+    await writeFile(`${dir}/youtube.txt`, `${set.name} | Plinky\n\n${describe(set)}\n`);
+    // And the assembly list, which is for whoever is doing the uploading rather than for
+    // anybody watching. Kept apart from the description so neither has to be read around
+    // the other, and so the description can be pasted into YouTube whole.
+    await writeFile(`${dir}/videos.txt`, `${set.name}\n\n${contents(set)}\n`);
     written += 1;
 }
-console.log(`Wrote ${written} collection playlist.txt files under ${OUT}/.`);
+console.log(`Wrote ${written} collection youtube.txt and videos.txt files under ${OUT}/.`);
