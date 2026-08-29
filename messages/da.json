@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Vis de {count} stykker",
     "settings_keyboard_finish": "Tangenternes look",
     "finish_joyful": "Legende",
-    "finish_glossy": "Blank"
+    "finish_glossy": "Blank",
+    "way_in_thinned": "Niveau {grade} uden mellemtonerne",
+    "way_in_outlined": "Niveau {grade} med kun melodi og bas",
+    "way_in_melody": "Niveau {grade} med kun melodien",
+    "reduction_label": "Tynd satsen ud",
+    "reduction_caption": "Tager mellemtonerne ud af hvert stykke, så et svært kan spilles, mens hænderne følger med. En udtyndet gennemspilning tæller som øvning; stykket er først lært, når du spiller det som skrevet.",
+    "reduction_none": "Som skrevet",
+    "reduction_thinned": "Uden mellemtoner",
+    "reduction_outlined": "Melodi og bas",
+    "reduction_melody": "Kun melodien"
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { isDue, type Mastery } from "./mastery";
+import type { Reach } from "./reach";
 
 // A unified catalogue row, tagged by kind so the library can be filtered into
 // songs, generated scales/arpeggios, and curated studies. Exercises and songs
@@ -20,6 +21,10 @@ export type MusicItem = {
     cost?: number;
     // The opening bars, encoded, where the catalogue carries them.
     incipit?: string;
+    // What this piece grades at with its inner notes taken out, where the catalogue has
+    // measured it (core/simplify). A hard piece whose tune is easy can say so in the list
+    // rather than only reading as out of reach.
+    reach?: Reach;
     removable: boolean;
     kind: MusicKind;
 };

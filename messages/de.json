@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Die {count} Stücke zeigen",
     "settings_keyboard_finish": "Anmutung der Tasten",
     "finish_joyful": "Verspielt",
-    "finish_glossy": "Glänzend"
+    "finish_glossy": "Glänzend",
+    "way_in_thinned": "Stufe {grade} ohne die Mittelstimmen",
+    "way_in_outlined": "Stufe {grade} nur mit Melodie und Bass",
+    "way_in_melody": "Stufe {grade} nur mit der Melodie",
+    "reduction_label": "Satz ausdünnen",
+    "reduction_caption": "Nimmt die Mittelstimmen aus jedem Stück, damit ein schweres spielbar bleibt, bis die Hände nachkommen. Ein ausgedünnter Durchgang zählt als Übung; gelernt ist das Stück erst, wenn du es wie notiert spielst.",
+    "reduction_none": "Wie notiert",
+    "reduction_thinned": "Ohne Mittelstimmen",
+    "reduction_outlined": "Melodie und Bass",
+    "reduction_melody": "Nur Melodie"
 }

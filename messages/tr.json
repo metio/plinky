@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "{count} parçayı göster",
     "settings_keyboard_finish": "Tuşların görünümü",
     "finish_joyful": "Neşeli",
-    "finish_glossy": "Parlak"
+    "finish_glossy": "Parlak",
+    "way_in_thinned": "İç sesler olmadan {grade}. seviye",
+    "way_in_outlined": "Yalnızca ezgi ve bas ile {grade}. seviye",
+    "way_in_melody": "Yalnızca ezgi ile {grade}. seviye",
+    "reduction_label": "Dokuyu inceltir",
+    "reduction_caption": "Her parçadan iç sesleri çıkarır, böylece zor bir parça ellerin yetişene kadar çalınabilir kalır. İnceltilmiş bir çalış alıştırma sayılır; parça ancak yazıldığı gibi çalındığında öğrenilmiş olur.",
+    "reduction_none": "Yazıldığı gibi",
+    "reduction_thinned": "İç sesler olmadan",
+    "reduction_outlined": "Ezgi ve bas",
+    "reduction_melody": "Yalnızca ezgi"
 }

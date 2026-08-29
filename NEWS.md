@@ -8,6 +8,25 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 29 August 2026
+
+**A piece too hard to play can be thinned until it isn't.** Settings has a new reading
+aid: **Thin the texture**, which takes the inner notes out of every piece so a hard one
+is playable while your hands catch up. Three settings, each taking a little more away —
+the inner notes, then everything but the melody and the bass, then the melody alone.
+Nothing is moved or rewritten: every note you see is one the composer wrote, in the
+place they wrote it, so the tune and the rhythm are the real ones.
+
+**The library says when a hard piece has an easy way in.** A grade on its own can only
+say no. Under the grade, a piece now tells you what it comes out at thinned — Chopin's
+Prélude in E minor is Grade 3 as written and Grade 1 with the melody alone — so you can
+see which of the hard pieces are closer than they look.
+
+**What a thinned run counts for.** It counts as practice, at the grade the thinner
+reading actually measures: playing the melody of a hard piece is worth what playing an
+easy piece is worth, because that is what it is. It does not mark the piece learned,
+earn its star, or answer the daily challenge — those belong to the piece as written.
+
 ## 28 August 2026 — night
 
 **You can choose how the keys look, and every keyboard follows.** Settings already let

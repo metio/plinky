@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Показать {count} пьес",
     "settings_keyboard_finish": "Вид клавиш",
     "finish_joyful": "Весёлый",
-    "finish_glossy": "Глянцевый"
+    "finish_glossy": "Глянцевый",
+    "way_in_thinned": "Уровень {grade} без средних голосов",
+    "way_in_outlined": "Уровень {grade} только с мелодией и басом",
+    "way_in_melody": "Уровень {grade} только с мелодией",
+    "reduction_label": "Разредить фактуру",
+    "reduction_caption": "Убирает средние голоса из каждой пьесы, чтобы трудная оставалась играбельной, пока руки догоняют. Разреженное исполнение считается занятием; пьеса выучена только тогда, когда ты играешь её как написано.",
+    "reduction_none": "Как написано",
+    "reduction_thinned": "Без средних голосов",
+    "reduction_outlined": "Мелодия и бас",
+    "reduction_melody": "Только мелодия"
 }

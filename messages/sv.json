@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Visa de {count} styckena",
     "settings_keyboard_finish": "Tangenternas känsla",
     "finish_joyful": "Lekfull",
-    "finish_glossy": "Blank"
+    "finish_glossy": "Blank",
+    "way_in_thinned": "Nivå {grade} utan mellantonerna",
+    "way_in_outlined": "Nivå {grade} med bara melodi och bas",
+    "way_in_melody": "Nivå {grade} med bara melodin",
+    "reduction_label": "Tunna ut satsen",
+    "reduction_caption": "Tar bort mellantonerna ur varje stycke, så att ett svårt går att spela medan händerna hinner ikapp. En uttunnad genomspelning räknas som övning; stycket är inlärt först när du spelar det som det står.",
+    "reduction_none": "Som det står",
+    "reduction_thinned": "Utan mellantoner",
+    "reduction_outlined": "Melodi och bas",
+    "reduction_melody": "Bara melodin"
 }

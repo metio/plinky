@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Voir les {count} morceaux",
     "settings_keyboard_finish": "Aspect des touches",
     "finish_joyful": "Joyeux",
-    "finish_glossy": "Brillant"
+    "finish_glossy": "Brillant",
+    "way_in_thinned": "Niveau {grade} sans les notes intérieures",
+    "way_in_outlined": "Niveau {grade} avec la mélodie et la basse seules",
+    "way_in_melody": "Niveau {grade} avec la mélodie seule",
+    "reduction_label": "Alléger la texture",
+    "reduction_caption": "Retire les notes intérieures de chaque morceau, pour qu'un morceau difficile reste jouable le temps que les mains suivent. Une lecture allégée compte comme travail ; le morceau n'est appris que joué tel qu'il est écrit.",
+    "reduction_none": "Tel qu'écrit",
+    "reduction_thinned": "Sans les notes intérieures",
+    "reduction_outlined": "Mélodie et basse",
+    "reduction_melody": "Mélodie seule"
 }

@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Shfaq {count} pjesët",
     "settings_keyboard_finish": "Pamja e tastave",
     "finish_joyful": "Gazmore",
-    "finish_glossy": "Me shkëlqim"
+    "finish_glossy": "Me shkëlqim",
+    "way_in_thinned": "Niveli {grade} pa notat e brendshme",
+    "way_in_outlined": "Niveli {grade} vetëm me melodinë dhe basin",
+    "way_in_melody": "Niveli {grade} vetëm me melodinë",
+    "reduction_label": "Hollo strukturën",
+    "reduction_caption": "Heq notat e brendshme nga çdo pjesë, që një e vështirë të mbetet e luajtshme derisa duart të vijnë pas. Një luajtje e holluar numërohet si ushtrim; pjesa mësohet vetëm kur e luan siç është shkruar.",
+    "reduction_none": "Siç është shkruar",
+    "reduction_thinned": "Pa notat e brendshme",
+    "reduction_outlined": "Melodia dhe basi",
+    "reduction_melody": "Vetëm melodia"
 }

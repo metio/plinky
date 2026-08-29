@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Прикажи {count} комада",
     "settings_keyboard_finish": "Изглед дирки",
     "finish_joyful": "Разиграно",
-    "finish_glossy": "Сјајно"
+    "finish_glossy": "Сјајно",
+    "way_in_thinned": "Степен {grade} без унутрашњих тонова",
+    "way_in_outlined": "Степен {grade} само са мелодијом и басом",
+    "way_in_melody": "Степен {grade} само са мелодијом",
+    "reduction_label": "Прореди слог",
+    "reduction_caption": "Избацује унутрашње тонове из сваке композиције, да и тешка остане свирљива док руке не стигну. Прорeђено свирање рачуна се као вежба; композиција је научена тек кад је одсвираш како је записана.",
+    "reduction_none": "Како је записано",
+    "reduction_thinned": "Без унутрашњих тонова",
+    "reduction_outlined": "Мелодија и бас",
+    "reduction_melody": "Само мелодија"
 }

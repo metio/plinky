@@ -308,6 +308,16 @@ one-tap **review session** walks you through everything that's fading, and you c
   catalogue at build time, so a set only appears while the pieces that make it up are
   actually there.
 
+- **Thinning a piece you can't play yet** — a reading aid in Settings that takes the inner
+  notes out of every score, so something above your hands is playable today: *inner notes
+  out*, *melody and bass*, or *melody alone*. Notes are only ever removed — never moved,
+  re-timed or invented — so the tune and the rhythm are the ones that were written. The
+  library says where that leads: under a piece's grade sits what it comes out at thinned, so
+  a Grade 5 that is Grade 2 with its melody alone says so instead of just reading as out of
+  reach. A thinned run counts as practice at the grade the thinner reading measures, and
+  earns nothing belonging to the piece as written — it never marks it learned, takes its
+  star, or answers the daily.
+
 - **How the keyboard looks** — two questions in Settings, and both reach every keyboard in
   Plinky: the front page, the play surface, Compose, the lessons, the ear trainer and a
   video you export. **Colour** picks the resting keys' skin; **feel** picks how they are

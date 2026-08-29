@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Arată cele {count} piese",
     "settings_keyboard_finish": "Aspectul clapelor",
     "finish_joyful": "Jucăuș",
-    "finish_glossy": "Lucios"
+    "finish_glossy": "Lucios",
+    "way_in_thinned": "Nivelul {grade} fără notele interioare",
+    "way_in_outlined": "Nivelul {grade} doar cu melodia și basul",
+    "way_in_melody": "Nivelul {grade} doar cu melodia",
+    "reduction_label": "Rărește textura",
+    "reduction_caption": "Scoate notele interioare din fiecare piesă, ca una grea să rămână cântabilă până când mâinile ajung din urmă. O citire rărită contează ca exercițiu; piesa e învățată doar când o cânți așa cum e scrisă.",
+    "reduction_none": "Așa cum e scrisă",
+    "reduction_thinned": "Fără notele interioare",
+    "reduction_outlined": "Melodie și bas",
+    "reduction_melody": "Doar melodia"
 }

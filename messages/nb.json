@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Vis de {count} stykkene",
     "settings_keyboard_finish": "Tangentenes utseende",
     "finish_joyful": "Leken",
-    "finish_glossy": "Blank"
+    "finish_glossy": "Blank",
+    "way_in_thinned": "Nivå {grade} uten mellomtonene",
+    "way_in_outlined": "Nivå {grade} med bare melodi og bass",
+    "way_in_melody": "Nivå {grade} med bare melodien",
+    "reduction_label": "Tynn ut satsen",
+    "reduction_caption": "Tar bort mellomtonene fra hvert stykke, så et vanskelig ett kan spilles mens hendene henger med. En uttynnet gjennomspilling teller som øving; stykket er lært først når du spiller det som skrevet.",
+    "reduction_none": "Som skrevet",
+    "reduction_thinned": "Uten mellomtoner",
+    "reduction_outlined": "Melodi og bass",
+    "reduction_melody": "Bare melodien"
 }

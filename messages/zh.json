@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "显示这 {count} 首",
     "settings_keyboard_finish": "琴键质感",
     "finish_joyful": "活泼",
-    "finish_glossy": "光泽"
+    "finish_glossy": "光泽",
+    "way_in_thinned": "去掉内声部为 {grade} 级",
+    "way_in_outlined": "只弹旋律和低音为 {grade} 级",
+    "way_in_melody": "只弹旋律为 {grade} 级",
+    "reduction_label": "简化织体",
+    "reduction_caption": "从每首曲子里抽掉内声部，让难曲在双手跟上之前也弹得动。简化后的演奏算作练习；只有照谱弹奏，这首曲子才算学会。",
+    "reduction_none": "照谱",
+    "reduction_thinned": "去掉内声部",
+    "reduction_outlined": "旋律和低音",
+    "reduction_melody": "只有旋律"
 }

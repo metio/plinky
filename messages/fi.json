@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Näytä {count} kappaletta",
     "settings_keyboard_finish": "Koskettimien tuntu",
     "finish_joyful": "Leikkisä",
-    "finish_glossy": "Kiiltävä"
+    "finish_glossy": "Kiiltävä",
+    "way_in_thinned": "Taso {grade} ilman sisäääniä",
+    "way_in_outlined": "Taso {grade} pelkällä melodialla ja bassolla",
+    "way_in_melody": "Taso {grade} pelkällä melodialla",
+    "reduction_label": "Ohenna sointia",
+    "reduction_caption": "Ottaa sisä-äänet pois jokaisesta kappaleesta, jotta vaikeakin on soitettavissa käsien ehtiessä mukaan. Ohennettu soitto lasketaan harjoitteluksi; kappale on opittu vasta, kun soitat sen kirjoitetussa muodossaan.",
+    "reduction_none": "Kuten kirjoitettu",
+    "reduction_thinned": "Ilman sisä-ääniä",
+    "reduction_outlined": "Melodia ja basso",
+    "reduction_melody": "Vain melodia"
 }

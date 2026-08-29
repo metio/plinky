@@ -9,7 +9,7 @@ import { ComposerCredit } from "../ui/composerCredit";
 import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../ui/icons";
 import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
-import { GradeChip } from "./scoreGrade";
+import { GradeChip, WayIn } from "./scoreGrade";
 
 type MusicRowProps = {
     item: MusicItem;
@@ -93,7 +93,10 @@ export function MusicRow({
                         />
                     )}
                 </span>
-                <GradeChip grade={item.grade} />
+                <span className="flex flex-col items-end gap-0.5">
+                    <GradeChip grade={item.grade} />
+                    <WayIn reach={item.reach} className="whitespace-nowrap" />
+                </span>
             </div>
             {onRemove && (
                 <ConfirmButton

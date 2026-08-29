@@ -46,7 +46,7 @@ import type { DecayMode } from "../../core/review";
 import type { Beams } from "../../core/beams";
 import { type Groove, GROOVES } from "../../core/groove";
 import { BARS_PER_ROW, METRONOME_SUBDIVISIONS, NOTE_SCALES, REVEAL_TRIES } from "../../core/prefs";
-import { type NoteHints, type NoteLabels, REVIEW_CAPS } from "../../core/prefs";
+import { type NoteHints, type NoteLabels, type Prefs, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
 import { useEffect } from "react";
 import { m } from "../paraglide/messages.js";
@@ -220,6 +220,18 @@ export default function Settings() {
                     checked={prefs.showAccompaniment}
                     onChange={(showAccompaniment) => update({ showAccompaniment })}
                     help={m.accompaniment_hint()}
+                />
+                <ChoiceField
+                    label={m.reduction_label()}
+                    value={prefs.reduction}
+                    onChange={(id) => update({ reduction: id as Prefs["reduction"] })}
+                    options={[
+                        { id: "", label: m.reduction_none() },
+                        { id: "thinned", label: m.reduction_thinned() },
+                        { id: "outlined", label: m.reduction_outlined() },
+                        { id: "melody", label: m.reduction_melody() },
+                    ]}
+                    help={m.reduction_caption()}
                 />
                 <SwitchField
                     label={m.highway_toggle()}

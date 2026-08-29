@@ -6,6 +6,8 @@ import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { stripAccompaniment } from "../../core/accompaniment";
 import { stripBeams } from "../../core/beams";
+import { simplify } from "../../core/simplify";
+import type { Reduction } from "../../core/reduction";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import { type MeasureBox, SCORE_PAGE_MARGIN } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
@@ -93,6 +95,7 @@ export function useOsmdScore(
         treadmill,
         showBeams,
         showAccompaniment,
+        reduction,
         colorNotes,
         focus,
         showFingerings,
@@ -132,6 +135,12 @@ export function useOsmdScore(
         // before OSMD loads the sheet, so the cursor, the matcher and every staff index
         // downstream see the piano's grand staff exactly as a solo piece gives them.
         showAccompaniment: boolean;
+        // A thinner reading of the piece, or null for the piece as written. The score is
+        // reduced before OSMD loads it, so the staff, the cursor and the matcher all see
+        // the same thinner piece — playing along with a reduction you can see is the whole
+        // point, and grading against the notes that are printed is the only honest way to
+        // do it. A run made this way earns nothing; playSession refuses the credit.
+        reduction?: Reduction;
         // Colour the noteheads by note name (the Boomwhacker reading aid), off = black.
         colorNotes: boolean;
         // Whether the printed fingering is drawn — flipped in place without a reload.
@@ -373,7 +382,13 @@ export function useOsmdScore(
                 const played = showAccompaniment
                     ? annotated
                     : stripAccompaniment(xmlCodec, annotated);
-                const source = showBeams ? played : stripBeams(xmlCodec, played);
+                // Thin the texture last among the note-changing steps, so the fingering
+                // above was computed for the notes as written and the reduction inherits
+                // the numbers for the notes it keeps — working out a fingering for a
+                // thinned chord and then thinning it would print advice for a hand
+                // position nobody is in.
+                const reduced = reduction ? simplify(xmlCodec, played, reduction) : played;
+                const source = showBeams ? reduced : stripBeams(xmlCodec, reduced);
                 return osmd.load(source).then(() => {
                     if (cancelled) {
                         return;
@@ -428,6 +443,7 @@ export function useOsmdScore(
         treadmill,
         showBeams,
         showAccompaniment,
+        reduction,
         focus,
     ]);
 

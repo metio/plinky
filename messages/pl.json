@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Pokaż {count} utworów",
     "settings_keyboard_finish": "Wygląd klawiszy",
     "finish_joyful": "Wesoły",
-    "finish_glossy": "Błyszczący"
+    "finish_glossy": "Błyszczący",
+    "way_in_thinned": "Poziom {grade} bez środkowych dźwięków",
+    "way_in_outlined": "Poziom {grade} tylko z melodią i basem",
+    "way_in_melody": "Poziom {grade} tylko z melodią",
+    "reduction_label": "Przerzedź fakturę",
+    "reduction_caption": "Usuwa środkowe dźwięki z każdego utworu, żeby trudny dało się zagrać, zanim ręce nadążą. Przerzedzone wykonanie liczy się jako ćwiczenie; utwór jest opanowany dopiero wtedy, gdy zagrasz go tak, jak zapisano.",
+    "reduction_none": "Jak zapisano",
+    "reduction_thinned": "Bez środkowych dźwięków",
+    "reduction_outlined": "Melodia i bas",
+    "reduction_melody": "Sama melodia"
 }

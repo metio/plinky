@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Show the {count} pieces",
     "settings_keyboard_finish": "Keyboard feel",
     "finish_joyful": "Joyful",
-    "finish_glossy": "Glossy"
+    "finish_glossy": "Glossy",
+    "way_in_thinned": "Grade {grade} with the inner notes out",
+    "way_in_outlined": "Grade {grade} with the melody and bass alone",
+    "way_in_melody": "Grade {grade} with the melody alone",
+    "reduction_label": "Thin the texture",
+    "reduction_caption": "Take the inner notes out of every piece, so a hard one is playable while your hands catch up. A thinned run counts as practice, but the piece itself is only learned when you play it as written.",
+    "reduction_none": "As written",
+    "reduction_thinned": "Inner notes out",
+    "reduction_outlined": "Melody and bass",
+    "reduction_melody": "Melody alone"
 }

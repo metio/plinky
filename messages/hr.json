@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Prikaži {count} skladbi",
     "settings_keyboard_finish": "Izgled tipki",
     "finish_joyful": "Razigrano",
-    "finish_glossy": "Sjajno"
+    "finish_glossy": "Sjajno",
+    "way_in_thinned": "Stupanj {grade} bez unutarnjih tonova",
+    "way_in_outlined": "Stupanj {grade} samo s melodijom i basom",
+    "way_in_melody": "Stupanj {grade} samo s melodijom",
+    "reduction_label": "Prorijedi slog",
+    "reduction_caption": "Izbacuje unutarnje tonove iz svake skladbe, da se i teška može svirati dok ruke ne stignu. Prorijeđeno sviranje broji se kao vježba; skladba je naučena tek kad je odsviraš kako je zapisana.",
+    "reduction_none": "Kako je zapisano",
+    "reduction_thinned": "Bez unutarnjih tonova",
+    "reduction_outlined": "Melodija i bas",
+    "reduction_melody": "Samo melodija"
 }

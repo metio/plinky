@@ -85,6 +85,10 @@ export function useMusicItems() {
                         // Drawn in the row: the catalogue carries one per piece, so a
                         // list of music can look like music without fetching anything.
                         ...(song.incipit ? { incipit: song.incipit } : {}),
+                        // Measured at bake time, and only where a reduction reaches
+                        // somewhere easier — so a row either has a way in to offer or says
+                        // nothing about one.
+                        ...(song.reach ? { reach: song.reach } : {}),
                         removable: false,
                         kind: "song" as const,
                     })),

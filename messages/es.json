@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Ver las {count} piezas",
     "settings_keyboard_finish": "Aspecto de las teclas",
     "finish_joyful": "Alegre",
-    "finish_glossy": "Brillante"
+    "finish_glossy": "Brillante",
+    "way_in_thinned": "Nivel {grade} sin las notas interiores",
+    "way_in_outlined": "Nivel {grade} solo con la melodía y el bajo",
+    "way_in_melody": "Nivel {grade} solo con la melodía",
+    "reduction_label": "Aligerar la textura",
+    "reduction_caption": "Quita las notas interiores de cada pieza, para que una difícil se pueda tocar mientras tus manos se ponen al día. Una lectura aligerada cuenta como práctica; la pieza se aprende solo tocándola como está escrita.",
+    "reduction_none": "Tal como está escrita",
+    "reduction_thinned": "Sin notas interiores",
+    "reduction_outlined": "Melodía y bajo",
+    "reduction_melody": "Solo melodía"
 }

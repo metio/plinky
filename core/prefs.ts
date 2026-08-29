@@ -4,6 +4,7 @@
 import { type Beams, BEAMS } from "./beams";
 import { type Groove, GROOVES } from "./groove";
 import type { Letter } from "./grade";
+import { type Reduction, REDUCTIONS } from "./reduction";
 import {
     cleanChannel,
     defaultChannels,
@@ -56,6 +57,17 @@ export type Prefs = {
     // other parts are printed and sounded as accompaniment, and never demanded of the
     // player — the hand mapping resolves the piano's own staves from the score.
     showAccompaniment: boolean;
+    // How much of a piece to leave on the page: "" for every note as written, or one of
+    // core/simplify's reductions, which take the inner notes out and leave the melody and
+    // bass standing. A reading aid like the ones around it rather than a mode — somebody
+    // beginning may want every piece thinned until their hands catch up, and the setting is
+    // where that belongs, not a per-piece switch they have to find again each time.
+    //
+    // What it costs: a run played this way is not the piece as written, so it never marks
+    // the piece learned, earns its star, or answers the daily. It does count as practice,
+    // at the grade the reduction itself measures — which is honest, because that grade is
+    // read off the notes actually played by the same model that grades everything else.
+    reduction: "" | Reduction;
     // Colour the noteheads by note name (a Boomwhacker reading aid), so a beginner reads
     // pitch by hue. Off by default — standard black notation. The played/heard feedback
     // rides behind the notes as a halo, so the colours stay readable as you play.
@@ -242,6 +254,7 @@ function defaults(): Prefs {
         // chooses otherwise. A test pins the pairing, so moving either side without the
         // other fails.
         showAccompaniment: false,
+        reduction: "",
         colorNotes: true,
         noteHints: "always",
         noteLabels: "all",
@@ -351,6 +364,10 @@ export function parsePrefs(raw: string | null): Prefs {
             showFingerings: bool(parsed.showFingerings, base.showFingerings),
             beams: oneOf(parsed.beams, BEAMS, base.beams),
             showAccompaniment: bool(parsed.showAccompaniment, base.showAccompaniment),
+            // An unknown reduction falls back to the piece as written: a stored value from a
+            // build that knew a level this one does not is a reading we cannot draw, and
+            // showing every note is the safe answer.
+            reduction: oneOf(parsed.reduction, ["", ...REDUCTIONS] as const, base.reduction),
             colorNotes: bool(parsed.colorNotes, base.colorNotes),
             noteHints: oneOf(parsed.noteHints, NOTE_HINT_CYCLE, base.noteHints),
             noteLabels: oneOf(parsed.noteLabels, NOTE_LABEL_CYCLE, base.noteLabels),

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type { Reduction } from "../../core/reduction";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import type { Beams } from "../../core/beams";
 import { usePrefsStore } from "../contexts/services";
@@ -39,6 +40,11 @@ export type ReadingMode = {
     // sheet before it loads, so the score is a plain grand staff throughout.
     showAccompaniment: boolean;
     setShowAccompaniment: (value: boolean) => void;
+    // How much of each piece to leave on the page, remembered per device: "" for every note
+    // as written, or a reduction from core/simplify. Applied to the sheet before it loads,
+    // so the staff, the cursor and the matcher all see the same thinner piece.
+    reduction: "" | Reduction;
+    setReduction: (value: "" | Reduction) => void;
     // Colour the noteheads by note name (the Boomwhacker reading aid), remembered per device.
     colorNotes: boolean;
     setColorNotes: (value: boolean) => void;
@@ -61,6 +67,7 @@ export function useReadingMode(): ReadingMode {
     const [highway, setHighway] = usePref("highway");
     const [beams, setBeams] = usePref("beams");
     const [showAccompaniment, setShowAccompaniment] = usePref("showAccompaniment");
+    const [reduction, setReduction] = usePref("reduction");
     const [colorNotes, setColorNotes] = usePref("colorNotes");
     // The fingering numbers are always baked into the loaded sheet; this only flips whether
     // OSMD draws them, so it stays session state rather than a persisted preference.
@@ -82,6 +89,8 @@ export function useReadingMode(): ReadingMode {
         setBeams,
         showAccompaniment,
         setShowAccompaniment,
+        reduction,
+        setReduction,
         colorNotes,
         setColorNotes,
         showFingerings,

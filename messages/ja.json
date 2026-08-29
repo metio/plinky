@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "{count}曲を表示",
     "settings_keyboard_finish": "鍵盤の質感",
     "finish_joyful": "たのしい",
-    "finish_glossy": "つやあり"
+    "finish_glossy": "つやあり",
+    "way_in_thinned": "内声を抜くとグレード {grade}",
+    "way_in_outlined": "旋律と低音だけならグレード {grade}",
+    "way_in_melody": "旋律だけならグレード {grade}",
+    "reduction_label": "書法を薄くする",
+    "reduction_caption": "どの曲からも内声を抜くので、手が追いつくまで難しい曲も弾けます。薄くした演奏は練習として数えますが、曲を覚えたことになるのは書かれたとおりに弾いたときだけです。",
+    "reduction_none": "書かれたまま",
+    "reduction_thinned": "内声を抜く",
+    "reduction_outlined": "旋律と低音",
+    "reduction_melody": "旋律だけ"
 }

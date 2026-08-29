@@ -14,6 +14,7 @@ const BASE: Prefs = {
     showFingerings: true,
     beams: "auto",
     showAccompaniment: false,
+    reduction: "" as const,
     colorNotes: true,
     noteHints: "always",
     noteLabels: "all",

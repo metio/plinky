@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Toon de {count} stukken",
     "settings_keyboard_finish": "Uitstraling van de toetsen",
     "finish_joyful": "Speels",
-    "finish_glossy": "Glanzend"
+    "finish_glossy": "Glanzend",
+    "way_in_thinned": "Niveau {grade} zonder de binnenstemmen",
+    "way_in_outlined": "Niveau {grade} met alleen melodie en bas",
+    "way_in_melody": "Niveau {grade} met alleen de melodie",
+    "reduction_label": "Zetting uitdunnen",
+    "reduction_caption": "Haalt de binnenstemmen uit elk stuk, zodat een moeilijk stuk speelbaar blijft terwijl je handen bijkomen. Een uitgedunde beurt telt als oefening; het stuk is pas geleerd als je het speelt zoals het genoteerd staat.",
+    "reduction_none": "Zoals genoteerd",
+    "reduction_thinned": "Zonder binnenstemmen",
+    "reduction_outlined": "Melodie en bas",
+    "reduction_melody": "Alleen melodie"
 }

@@ -4,6 +4,7 @@
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
 import type { Fetcher } from "../ports/fetcher";
 import { shardName } from "../../core/catalogShard";
+import type { Reach } from "../../core/reach";
 import type { ScoreKind } from "../../core/scoreKind";
 import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 
@@ -44,6 +45,11 @@ export type SongMeta = {
     // playable and neither is what a grade ladder should offer a beginner, so this is what
     // lets the ladder ask for piano writing while the library keeps everything.
     scoreKind?: ScoreKind;
+    // The grades this piece comes out at with its inner notes taken away — baked by
+    // npm run songs:cost, absent where nothing can be taken out. A piece two grades above
+    // somebody reads as "not yet" and nothing more, when the truth is usually that the tune
+    // is within reach and the filling is not; this is what lets a list say so.
+    reach?: Reach;
 };
 
 // A named work the catalogue holds enough of to work through as one thing — an opus, a

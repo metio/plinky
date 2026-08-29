@@ -373,6 +373,9 @@ function usePlaySessionValue({
         treadmill,
         showBeams: beamsVisible(reading.beams, grade),
         showAccompaniment: reading.showAccompaniment,
+        // "" means the piece as written; the hook takes the absence rather than an empty
+        // string, so there is one way of saying "no reduction" downstream.
+        ...(reading.reduction ? { reduction: reading.reduction } : {}),
         colorNotes: aids.colorNotes,
         focus: focusRange,
         showFingerings: aids.showFingerings,
@@ -794,8 +797,24 @@ function usePlaySessionValue({
         partial: recorder.partial,
         id,
         title,
-        daily,
-        ephemeral,
+        // The daily is one piece for everyone and a grid people compare, so it can only be
+        // answered by playing the notes everyone else is playing. Withheld rather than
+        // recorded-and-ignored, because the daily is marked done before a run's credit is
+        // weighed at all.
+        daily: reading.reduction === "" ? daily : undefined,
+        // A run played on a thinned reading is not a run of the piece that was written, so
+        // it earns nothing that belongs to the piece: it never marks it learned, never takes
+        // its star, never becomes its ghost or its section best, and never answers the
+        // daily. It still counts as practice — the notes were read and played — which is
+        // exactly what an ephemeral run already means here.
+        //
+        // What it does NOT do is refuse the reading credit outright. The reduction has a
+        // grade of its own, measured off the notes actually played by the same model that
+        // grades everything else, so playing the melody of a hard piece is worth what
+        // playing an easy piece is worth, because by that measure it is one. Withholding it
+        // would be the inconsistent choice, and there is nothing to farm: the catalogue is
+        // full of genuinely easy pieces that cost the same effort.
+        ephemeral: ephemeral || reading.reduction !== "",
         assessment,
         looped: loop.on,
         sightReading: sightRead.on,

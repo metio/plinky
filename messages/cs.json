@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Zobrazit {count} skladeb",
     "settings_keyboard_finish": "Vzhled kláves",
     "finish_joyful": "Hravý",
-    "finish_glossy": "Lesklý"
+    "finish_glossy": "Lesklý",
+    "way_in_thinned": "Stupeň {grade} bez vnitřních tónů",
+    "way_in_outlined": "Stupeň {grade} jen s melodií a basem",
+    "way_in_melody": "Stupeň {grade} jen s melodií",
+    "reduction_label": "Prořídit sazbu",
+    "reduction_caption": "Vyjme z každé skladby vnitřní tóny, aby se i těžká dala hrát, než ruce dorostou. Prořídlé hraní se počítá jako cvičení; skladba je naučená, až když ji zahraješ tak, jak je zapsaná.",
+    "reduction_none": "Jak je zapsáno",
+    "reduction_thinned": "Bez vnitřních tónů",
+    "reduction_outlined": "Melodie a bas",
+    "reduction_melody": "Jen melodie"
 }

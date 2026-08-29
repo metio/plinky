@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "A {count} darab megjelenítése",
     "settings_keyboard_finish": "Billentyűk stílusa",
     "finish_joyful": "Játékos",
-    "finish_glossy": "Fényes"
+    "finish_glossy": "Fényes",
+    "way_in_thinned": "{grade}. szint a belső hangok nélkül",
+    "way_in_outlined": "{grade}. szint csak a dallammal és a basszussal",
+    "way_in_melody": "{grade}. szint csak a dallammal",
+    "reduction_label": "Szerkezet ritkítása",
+    "reduction_caption": "Kiveszi a belső hangokat minden darabból, hogy a nehéz is játszható legyen, amíg a kezed felzárkózik. A ritkított játék gyakorlásnak számít; a darabot akkor tudod, ha úgy játszod, ahogy le van írva.",
+    "reduction_none": "Ahogy le van írva",
+    "reduction_thinned": "Belső hangok nélkül",
+    "reduction_outlined": "Dallam és basszus",
+    "reduction_melody": "Csak a dallam"
 }

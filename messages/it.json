@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "Mostra i {count} brani",
     "settings_keyboard_finish": "Aspetto dei tasti",
     "finish_joyful": "Giocoso",
-    "finish_glossy": "Lucido"
+    "finish_glossy": "Lucido",
+    "way_in_thinned": "Livello {grade} senza le note interne",
+    "way_in_outlined": "Livello {grade} con la sola melodia e il basso",
+    "way_in_melody": "Livello {grade} con la sola melodia",
+    "reduction_label": "Alleggerire la tessitura",
+    "reduction_caption": "Toglie le note interne da ogni brano, così uno difficile resta suonabile mentre le mani si abituano. Una lettura alleggerita conta come studio; il brano si impara solo suonandolo come è scritto.",
+    "reduction_none": "Come scritto",
+    "reduction_thinned": "Senza note interne",
+    "reduction_outlined": "Melodia e basso",
+    "reduction_melody": "Solo melodia"
 }

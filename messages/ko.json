@@ -1324,5 +1324,14 @@
     "assignments_show_steps": "{count}곡 보기",
     "settings_keyboard_finish": "건반 느낌",
     "finish_joyful": "경쾌하게",
-    "finish_glossy": "광택"
+    "finish_glossy": "광택",
+    "way_in_thinned": "속음을 빼면 등급 {grade}",
+    "way_in_outlined": "선율과 베이스만이면 등급 {grade}",
+    "way_in_melody": "선율만이면 등급 {grade}",
+    "reduction_label": "짜임새 덜어내기",
+    "reduction_caption": "모든 곡에서 속음을 빼내어, 손이 따라올 때까지 어려운 곡도 칠 수 있게 합니다. 덜어낸 연주는 연습으로 셈하지만, 곡을 익힌 것은 적힌 그대로 쳤을 때뿐입니다.",
+    "reduction_none": "적힌 그대로",
+    "reduction_thinned": "속음 빼기",
+    "reduction_outlined": "선율과 베이스",
+    "reduction_melody": "선율만"
 }

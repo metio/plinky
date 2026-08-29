@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { gradeOf } from "../../../core/scoreDifficulty";
+import { easiestWayIn, type Reach } from "../../../core/reach";
 import { useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 
@@ -39,4 +40,30 @@ export function ScoreGrade({
 }) {
     const xmlCodec = useXmlCodec();
     return <GradeChip grade={gradeOf(xmlCodec, id, xml)} className={className} />;
+}
+
+// The gentlest reading of a piece that is above where somebody is standing.
+//
+// A grade on its own can only say no. A piece two grades out of reach reads as "not yet",
+// when what is usually true is that the tune is well within reach and the filling is not —
+// which is exactly what a teacher does something about, by taking the inner notes out until
+// the piece is playable today. Saying so in the same numbers everything else is graded in
+// turns a closed door into a way in, and costs the piece's own grade nothing.
+//
+// Only the easiest way in is shown. The ladder behind it belongs on the piece's own page,
+// where somebody has already decided to try; in a list it would be three numbers where one
+// answers the question being asked.
+export function WayIn({ reach, className }: { reach?: Reach; className?: string }) {
+    const easiest = easiestWayIn(reach);
+    if (easiest === null) {
+        return null;
+    }
+    const grade = easiest.grade;
+    const label =
+        easiest.level === "thinned"
+            ? m.way_in_thinned({ grade })
+            : easiest.level === "outlined"
+              ? m.way_in_outlined({ grade })
+              : m.way_in_melody({ grade });
+    return <span className={`text-xs text-muted ${className ?? ""}`}>{label}</span>;
 }
