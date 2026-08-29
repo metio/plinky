@@ -90,6 +90,11 @@ describe("a piece opening with the recorded piano on", () => {
         expect(asked.every((note) => note.velocity > 0)).toBe(true);
     });
 
+    // Its own timeout, longer than the poll inside it. A poll may not outlast the test
+    // holding it: the projects cap a test at 60s (vitest.config.ts), so raising the poll to
+    // 90s inside a 60s test made the extra thirty seconds unreachable and turned a clear
+    // failure — "the transposed prefetch had not happened yet" — into a bare test timeout
+    // that says nothing about the thing under test.
     it("asks again for the notes it sounds once the piece moves to another key", async () => {
         // A transposed passage needs the recordings of the notes it now plays. Nothing else
         // asks for them: the piece was prefetched in its written key and the re-engraving
@@ -117,10 +122,10 @@ describe("a piece opening with the recorded piano on", () => {
                 // chain. On a loaded CI runner — where this file's imports alone have taken
                 // twenty minutes and a single browser test twenty seconds — thirty seconds
                 // is not a claim that nothing happened, only that it had not happened yet.
-                { timeout: 90000 },
+                { timeout: 90_000 },
             )
             .toEqual([48, 60, 64, 67, 76, 79]);
-    });
+    }, 150_000);
 
     it("asks for nothing while the player is on the synthesised piano", async () => {
         // The default. Nothing is fetched, so a player who never turns it on never pays
