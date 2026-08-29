@@ -16,7 +16,7 @@
 // writes `cost` too, so this is a one-off to populate the existing manifest.
 
 import { rawDifficulty } from "../core/scoreDifficulty.ts";
-import { reachableGrades, reachOf } from "../core/reach.ts";
+import { reachableGrades, reachOf } from "./measureReach.mts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { existsSync, readdirSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";

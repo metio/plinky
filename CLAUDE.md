@@ -331,7 +331,12 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   offending PNG first**, then `-u` rebuilds it from the current render. A
   deliberate visual change whose diff lands near the threshold is worth pushing
   clearly over or under it, since a borderline baseline can flip between
-  machines on an unrelated commit. Stories must render
+  machines on an unrelated commit. **Refresh baselines from a clean
+  `npm run messages` and never straight after a build.** The size gate, both a11y
+  sweeps and `ci-lighthouse` all build the heaviest locale, which leaves
+  `app/paraglide/` compiled for Greek — and a baseline taken then is a screenshot
+  of Greek copy that CI, building English, rejects. It looks like a rendering
+  difference and is a language one. Stories must render
   deterministically: no live dates, no randomness, no unawaited async — and a
   story whose visible content includes emoji joins the `EMOJI_STORIES` skip
   set in `.storybook/vitest.setup.ts` (emoji glyphs rasterize

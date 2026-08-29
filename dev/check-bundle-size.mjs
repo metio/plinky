@@ -468,7 +468,14 @@ const BUDGET_VENDOR_KB = 324;
 // gradient and a canvas cannot read a class, and neither face can be generated at runtime.
 // On top of that sit the picker, the hook that subscribes to the stored answer, and the
 // pref itself. 0.4 KB, measured at 411.4.
-const BUDGET_APP_KB = 412;
+// 413. Thinning a piece is a reading aid, so the transform ships: the app has to be able to
+// take the inner notes out of a score in the browser, the way it already transposes one and
+// drops its beams. What does NOT ship is the measurement — what each reduction grades at is
+// answered once per piece at bake time and read out of the manifest, so dev/measureReach
+// holds it and no visitor pays for the difficulty model on that path. The rest is the
+// preference, the Settings control and the line under a grade chip saying where a hard piece
+// can be reached from. 0.5 KB, measured at 412.5.
+const BUDGET_APP_KB = 413;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
