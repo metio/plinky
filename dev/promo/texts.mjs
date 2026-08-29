@@ -20,6 +20,7 @@ import { folderFor, PIECES } from "./pieces.mjs";
 import { collectionPieces } from "./collections.mjs";
 import { FOLLOW_US } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
+import { uploadText } from "./uploadText.mjs";
 
 // Absent and present-but-empty both fall back. indexOf answers -1 for absent, and -1 + 1
 // is 0 — argv[0] is the node binary, so the naive form writes every file inside whatever
@@ -130,7 +131,7 @@ for (const piece of everyPiece) {
     // The title carries the word a viewer actually searches for. "Gymnopédie No. 1" alone
     // competes with every recording ever made of it; the instrument is what narrows it.
     const title = `${piece.title} — ${piece.composer} | piano`;
-    await writeFile(`${dir}/youtube.txt`, `${title}\n\n${describe(piece, entry)}\n`);
+    await writeFile(`${dir}/youtube.txt`, uploadText(title, describe(piece, entry)));
     written += 1;
     if (!entry) {
         console.warn(`  ${piece.title}: not in the catalogue, so no grade or licence in its text`);

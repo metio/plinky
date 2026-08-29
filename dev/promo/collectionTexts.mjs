@@ -18,6 +18,7 @@ import { collections, folderForCollection } from "./collections.mjs";
 import { folderFor } from "./pieces.mjs";
 import { FOLLOW_US } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
+import { uploadText } from "./uploadText.mjs";
 
 const OUT = process.argv.includes("--out")
     ? process.argv[process.argv.indexOf("--out") + 1]
@@ -36,10 +37,6 @@ function describe(set) {
         // assignment, gentlest first, and a playlist in the same order is the same lesson.
         "In playing order, gentlest first — the same order Plinky gives them to a player working through the set.",
         short,
-        "",
-        // Numbered, so the order survives being read down a screen, and named by the piece
-        // rather than by the file, because that is what YouTube will be showing.
-        ...set.pieces.map((piece, index) => `${index + 1}. ${piece.title}`),
         "",
         `Work through this set yourself: ${SITE}/en/assignments/`,
         "",
@@ -84,7 +81,7 @@ for (const set of collections()) {
     await mkdir(dir, { recursive: true });
     // The words that go up with the playlist, exactly as a piece's own youtube.txt carries
     // the words for its clip.
-    await writeFile(`${dir}/youtube.txt`, `${set.name} | Plinky\n\n${describe(set)}\n`);
+    await writeFile(`${dir}/youtube.txt`, uploadText(`${set.name} | Plinky`, describe(set)));
     // And the assembly list, which is for whoever is doing the uploading rather than for
     // anybody watching. Kept apart from the description so neither has to be read around
     // the other, and so the description can be pasted into YouTube whole.
