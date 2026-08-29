@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type { Reduction } from "../../../core/reduction";
 import type { Dispatch, SetStateAction } from "react";
 import { type Beams, BEAMS } from "../../../core/beams";
 import type { Hand } from "../../../core/matcher";
@@ -351,6 +352,23 @@ export function RunSetup() {
                             onChange={reading.setHighway}
                             help={m.highway_hint()}
                             disabled={sightRead.on}
+                        />
+                        {/* Thinning belongs beside the other reading aids AND on the piece
+                        being read: the choice is "can I manage this one today", which is
+                        asked at the piece rather than in Settings. Same preference either
+                        way, so a run set thinner here is thinner everywhere until it is
+                        turned back — it is a way in, not a mode. */}
+                        <ChoiceField
+                            label={m.reduction_label()}
+                            value={reading.reduction}
+                            onChange={(id) => reading.setReduction(id as "" | Reduction)}
+                            options={[
+                                { id: "", label: m.reduction_none() },
+                                { id: "thinned", label: m.reduction_thinned() },
+                                { id: "outlined", label: m.reduction_outlined() },
+                                { id: "melody", label: m.reduction_melody() },
+                            ]}
+                            help={m.reduction_caption()}
                         />
                         {/* The switch reports its new position at once and the sheet
                         catches up behind it — on a long piece the redraw is slow enough

@@ -2,6 +2,21 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-08-29
+  label: evening
+  entries:
+    - |-
+      **The library now says which hard pieces have an easy way in.** Under a piece's grade
+      you'll see what it comes out at with its inner notes taken out — a Grade 8 Chopin
+      mazurka that is Grade 5 with the melody alone, a Grade 5 sonata that is Grade 3
+      outlined. 826 pieces have one. It is measured with the same model that grades
+      everything else, so the number under the chip means what the number on it means.
+    - |-
+      **Thinning a piece is on the play screen too, not only in Settings.** It sits with the
+      other reading aids — colour, the notes highway, forgiving — because "can I manage this
+      one today" is a question you ask at the keyboard. Whichever place you set it, it is
+      the same choice: a piece you thinned while playing stays thinned until you turn it
+      back.
+- date: 2026-08-29
   entries:
     - |-
       **A piece too hard to play can be thinned until it isn't.** Settings has a new reading

@@ -62,4 +62,21 @@ describe("useReadingMode", () => {
         // Session-only: the saved default stays as it was.
         expect(prefs.load().showFingerings).toBe(true);
     });
+
+    it("opens on the piece as written, and remembers a thinner reading", () => {
+        // The run panel and Settings both drive this one value: a piece thinned at the
+        // keyboard is thinned in Settings too, because it is a reading aid the player is
+        // shedding rather than a mode they enter for one run.
+        const { prefs, wrapper } = world();
+        const { result } = renderHook(() => useReadingMode(), { wrapper });
+        expect(result.current.reduction).toBe("");
+
+        act(() => result.current.setReduction("melody"));
+        expect(result.current.reduction).toBe("melody");
+        expect(prefs.load().reduction).toBe("melody");
+
+        act(() => result.current.setReduction(""));
+        expect(result.current.reduction).toBe("");
+        expect(prefs.load().reduction).toBe("");
+    });
 });

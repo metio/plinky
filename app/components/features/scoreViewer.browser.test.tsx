@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { choose, reveal, switchOn, toggle } from "../../testing/controls";
+import { choose, chosen, reveal, switchOn, toggle } from "../../testing/controls";
 import { testPrefsStore } from "../../testing/stores";
 import { m } from "../../paraglide/messages.js";
 import { useState } from "react";
@@ -1418,6 +1418,13 @@ describe("ScoreViewer", () => {
 
             reveal(m.run_group_practice_title);
             reveal(m.run_group_sheet_title);
+            // Thinning sits with the other aids on the piece being read, not only in
+            // Settings: "can I manage this one today" is asked at the keyboard.
+            expect(chosen(m.reduction_label)).toBe(m.reduction_none());
+            choose(m.reduction_label, m.reduction_melody());
+            expect(chosen(m.reduction_label)).toBe(m.reduction_melody());
+            choose(m.reduction_label, m.reduction_none());
+
             const aidSwitches = [m.forgiving_toggle, m.color_notes_toggle, m.highway_toggle];
             // Every one of them on first, or the assertion below would pass over a panel
             // that had them off anyway.

@@ -312,9 +312,11 @@ one-tap **review session** walks you through everything that's fading, and you c
   notes out of every score, so something above your hands is playable today: *inner notes
   out*, *melody and bass*, or *melody alone*. Notes are only ever removed — never moved,
   re-timed or invented — so the tune and the rhythm are the ones that were written. The
-  library says where that leads: under a piece's grade sits what it comes out at thinned, so
+  library says where that leads: under a piece's grade sits what it comes out at thinned —
+  826 pieces carry one, measured at build time by the same model that grades them — so
   a Grade 5 that is Grade 2 with its melody alone says so instead of just reading as out of
-  reach. A thinned run counts as practice at the grade the thinner reading measures, and
+  reach. The choice lives in Settings and on the play screen itself, beside the other
+  reading aids. A thinned run counts as practice at the grade the thinner reading measures, and
   earns nothing belonging to the piece as written — it never marks it learned, takes its
   star, or answers the daily.
 
