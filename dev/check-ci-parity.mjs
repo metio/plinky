@@ -12,51 +12,25 @@
 // run via `npm run ci:parity` and its own CI job.
 
 import { readFileSync } from "node:fs";
+import { gatesInWorkflow } from "./ciGates.mjs";
 
 const flake = readFileSync("flake.nix", "utf8");
-const workflow = readFileSync(".github/workflows/verify.yml", "utf8");
 
 // The `ci-*` wrappers the flake defines.
 const defined = new Set(
     [...flake.matchAll(/writeShellScriptBin\s+"(ci-[a-z0-9-]+)"/g)].map((match) => match[1]),
 );
 
-// Environment setup a job may run through nix that is not a gate, so it is exempt
-// from needing a wrapper (installing dependencies, not checking anything).
-const SETUP_COMMANDS = new Set(["npm ci"]);
-
 const problems = [];
 const required = new Set();
-let job = null;
-
-for (const line of workflow.split("\n")) {
-    // Jobs are the 2-space-indented keys under `jobs:`.
-    const jobHeader = line.match(/^ {2}([A-Za-z0-9_-]+):\s*$/);
-    if (jobHeader) {
-        job = jobHeader[1];
-        continue;
-    }
-    // Skip YAML comments: a `#` line may quote `nix develop --command …` as prose
-    // without being a gate step.
-    if (line.trim().startsWith("#")) {
-        continue;
-    }
-    const invocation = line.match(/nix develop --command\s+(.+?)\s*$/);
-    if (!invocation) {
-        continue;
-    }
-    const command = invocation[1].trim();
-    if (SETUP_COMMANDS.has(command)) {
-        continue;
-    }
-    const wrapper = command.match(/^(ci-[a-z0-9-]+)\b/);
-    if (wrapper) {
-        required.add(wrapper[1]);
-    } else {
-        problems.push(
-            `job "${job}" runs a raw command through nix: \`${command}\` — move it into a ci-* wrapper in flake.nix and call that instead`,
-        );
-    }
+const { wrappers, raw } = gatesInWorkflow();
+for (const name of wrappers) {
+    required.add(name);
+}
+for (const { job, command } of raw) {
+    problems.push(
+        `job "${job}" runs a raw command through nix: \`${command}\` — move it into a ci-* wrapper in flake.nix and call that instead`,
+    );
 }
 
 for (const name of required) {

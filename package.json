@@ -74,7 +74,8 @@
         "promo:check": "node dev/check-promo-pieces.mjs",
         "promo:durations": "node dev/clip-durations.mjs",
         "promo:collections": "tsx dev/promo/collectionTexts.mjs",
-        "promo:cuts": "node dev/promo-cuts.mjs"
+        "promo:cuts": "node dev/promo-cuts.mjs",
+        "ci:local": "node dev/run-ci-gates.mjs"
     },
     "dependencies": {
         "@fontsource-variable/comfortaa": "^5.3.0",

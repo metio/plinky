@@ -159,7 +159,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "franz-behr": { name: "Franz Behr", pieces: 1 },
     "franz-liszt": { name: "Franz Liszt", pieces: 12 },
     "franz-schubert": { name: "Franz Schubert", pieces: 103 },
-    "frederic-chopin": { name: "Frédéric Chopin", pieces: 61 },
+    "frederic-chopin": { name: "Frédéric Chopin", pieces: 60 },
     "frederic-hymen-cowen": { name: "Frederic Hymen Cowen", pieces: 4 },
     "frederick-bridge": { name: "Frederick Bridge", pieces: 1 },
     "frederick-corder": { name: "Frederick Corder", pieces: 2 },

@@ -47,10 +47,24 @@ flake only defines the gates that are Plinky's own.
 
 ## The gate
 
-**Run every cheap gate locally before pushing, and check the exit code of each
-one.** Not a subset of those, not "the ones the change looks related to" — a
-cheap gate you skip is a gate CI runs for you, slower and after the push. The
-whole point of the flake is that local and CI resolve identical tools.
+**`nix develop --command npm run ci:local` runs every gate this workflow runs**,
+read out of `.github/workflows/verify.yml` rather than chosen by hand — fifteen
+of them in well under a minute. Use it instead of picking gates that look related
+to a change, because the relation that matters is the workflow's, not the
+diff's: a catalogue curation trips the composer index, a script switched to a
+different runner breaks the one job that installs nothing, a reading aid pushes a
+Lighthouse budget four hundred pages away. None of those look related to their
+change; all of them are.
+
+It skips the heavy gates and names them, and it says plainly that the Frontend
+job delegates to `metio/ci` — so build, size, coverage, story screenshots, both
+a11y sweeps, Lighthouse, the browser projects and the shared lint gate are named
+nowhere in this workflow and therefore nowhere in its list. Run those yourself
+when a change touches what they measure.
+
+**Check the exit code of each one.** A cheap gate you skip is a gate CI runs for
+you, slower and after the push. The whole point of the flake is that local and CI
+resolve identical tools.
 
 **Five gates are heavy, and on this host they run under `capped` — always.**
 They instrument the whole tree or drive a browser over every page, and run loose

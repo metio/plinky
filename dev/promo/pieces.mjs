@@ -36,7 +36,7 @@ export const PIECES = [
     { id: "y93KGmDQoD12", title: "Nocturne in E minor, Op. 72 No. 1", composer: "Frédéric Chopin" },
     { id: "wx8UhU1HozEL", title: "Waltzes, Op. 64", composer: "Frédéric Chopin" },
     { id: "8f3TJUVUEjfo", title: "Waltzes, Op. 69", composer: "Frédéric Chopin" },
-    { id: "SvMHyl2yF7YS", title: "Waltz in A minor, B. 150", composer: "Frédéric Chopin" },
+    { id: "dNxiiBoUHutw", title: "Waltz in A minor", composer: "Frédéric Chopin" },
     { id: "YG1UemgwoxnB", title: "Wedding March", composer: "Felix Mendelssohn" },
     { id: "yxW1jGFJPEcF", title: "Anitra's Dance", composer: "Edvard Grieg" },
     { id: "GGAHdvH4ToTQ", title: "Peer Gynt, Op. 23", composer: "Edvard Grieg" },
