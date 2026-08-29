@@ -145,6 +145,10 @@ function usePlaySessionValue({
     const containerRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
     const gradePanelRef = useRef<HTMLDivElement>(null);
+    // Filled in once the score hook has returned; onRendered reaches the prefetch
+    // through it, which is what lets the announcement flow from the render rather than
+    // from an effect trying to notice one.
+    const prefetchSamplesRef = useRef<() => void>(() => {});
     // Claims the current attempt to start a run: a sight-read's study countdown lets
     // the player act again before the run begins, and only the newest press may start.
     const startPress = useLatestPress();
@@ -394,6 +398,10 @@ function usePlaySessionValue({
             sightRead.cancel();
         },
         onRendered: ({ bars, freshPiece }) => {
+            // The recordings this engraving asks for. A transposed passage needs the notes
+            // it now sounds, and being told a render finished cannot miss the way watching
+            // for one can.
+            prefetchSamplesRef.current();
             // A fresh render carries no in-progress click selection.
             loop.cancelSelection();
             // The hand selection and the bar range belong to the piece, not the layout: a
@@ -578,7 +586,10 @@ function usePlaySessionValue({
 
     // The recordings this piece will ask for, fetched while it is being read. Nothing
     // waits on them: a note whose recording has not landed is played by the synth.
-    useSamplePrefetch({ getOsmd, ready, renderVersion });
+    // Called from onRendered above, through a ref because the callback is written before
+    // the score hook has handed back the getter it needs. Not an effect: see the hook.
+    const prefetchSamples = useSamplePrefetch({ getOsmd });
+    prefetchSamplesRef.current = prefetchSamples;
 
     const matcher = useScoreMatcher(getOsmd, {
         tempo,

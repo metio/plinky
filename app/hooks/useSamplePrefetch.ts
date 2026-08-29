@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect } from "react";
+import { useCallback } from "react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { performanceOf } from "../../core/scorePerformance";
 import { useSampleSource } from "../contexts/services";
@@ -19,30 +19,26 @@ import { collectMatchSteps } from "./useScoreMatcher";
 // Nothing waits on it. A recording that has not arrived is a note the synthesised voice
 // plays, so the worst case for a slow connection is the instrument Plinky always had.
 //
-// It asks again every time the sheet is re-engraved, because a piece in another key is a
-// different set of recordings — a transposed passage needs the notes it now sounds, not the
-// ones it was printed with. The trigger is the counter the score hook raises when a render
-// completes, rather than `ready`: a reload quick enough to set that false and true again
-// inside one commit leaves the dependency list unchanged, and then nothing is ever fetched
-// for the new key. That is not hypothetical — it is what Firefox does, and it left every
-// transposed note falling back to the synthesised voice while Chromium sounded recorded.
-export function useSamplePrefetch({
-    getOsmd,
-    ready,
-    renderVersion,
-}: {
-    getOsmd: () => OpenSheetMusicDisplay | null;
-    ready: boolean;
-    // Raised by the score hook once a render has finished; see useOsmdScore.
-    renderVersion: number;
-}) {
+// IT IS CALLED WHEN A RENDER FINISHES, not by an effect watching for one. That distinction
+// is the whole reliability of it. A piece in another key is a different set of recordings —
+// a transposed passage needs the notes it now sounds, not the ones it was printed with — so
+// this has to run again on every re-engraving. Watching for that with an effect over
+// `ready` and a render counter means observing a state TRANSITION, and an observer that
+// checks a condition and returns early has thrown the transition away: the counter does not
+// rise again until the next render, so that engraving is never fetched for at all. It has
+// gone wrong twice that way. A reload quick enough to set `ready` false and true again
+// inside one commit left the dependency list unchanged, which is what Firefox does and
+// which the counter was added to fix; and the counter can itself land on a commit where
+// `ready` is false, which puts the hole straight back.
+//
+// Being told cannot miss. The score hook already announces a finished render — the same
+// callback that reseeds the hand and the loop — and an announcement is delivered once,
+// whatever the surrounding state happens to be.
+export function useSamplePrefetch({ getOsmd }: { getOsmd: () => OpenSheetMusicDisplay | null }) {
     const samples = useSampleSource();
-    // renderVersion is not read in the body — it is the trigger, standing for "the sheet on
-    // screen changed".
-    // biome-ignore lint/correctness/useExhaustiveDependencies: renderVersion is the render-completed trigger
-    useEffect(() => {
+    return useCallback(() => {
         const osmd = getOsmd();
-        if (!ready || !osmd || !samples.state().enabled) {
+        if (!osmd || !samples.state().enabled) {
             return;
         }
         // The written performance, dynamics and all — the same reading the video export
@@ -50,5 +46,5 @@ export function useSamplePrefetch({
         // the source's question: it holds the manifest, and waiting for one here is what
         // made this never run at all.
         void samples.prepare(performanceOf(collectMatchSteps(osmd, "both")));
-    }, [getOsmd, ready, renderVersion, samples]);
+    }, [getOsmd, samples]);
 }
