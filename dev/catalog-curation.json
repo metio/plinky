@@ -263,5 +263,11 @@
         "id": "enwyT5ojXxVZ",
         "composer": "Luigi Cherubini",
         "why": "The score carries no creator at all - only an engraved title line reading 'Ave Maria - Cherubini', which the import took for the composer. The title was welded onto the surname, so the piece opened a person page called 'Ave Maria Cherubini' and the real composer had none. Luigi Cherubini (1760-1842) is the only Cherubini in the repertoire and set the Ave Maria more than once."
+    },
+    {
+        "id": "SvMHyl2yF7YS",
+        "title": "Waltz in A minor B.150",
+        "composer": "Frédéric Chopin",
+        "why": "The composer field held the work's own catalogue number and a squashed name — 'Opus Posth. B.150 - F. F Chopin' — which canonicalization cannot unpick, because a bare opus number in front of a name is a title, not a credit. Left alone he was his own composer, and the piece sat on a shelf of one."
     }
 ]

@@ -18,6 +18,8 @@
 // differently from the manifest, and that is the point — a title with three seconds to land
 // is not the title a catalogue entry needs. Do not sync them.
 
+import { canonicalComposer, personSlug } from "../../core/person.ts";
+
 export const PIECES = [
     { id: "TOBNVaraGATl", title: "Gymnopédie No. 1", composer: "Erik Satie" },
     { id: "peJ0t6fhDKjp", title: "Gnossienne No. 1", composer: "Erik Satie" },
@@ -103,10 +105,26 @@ export function folderFor(piece) {
 }
 
 // The folder holding everything of one composer's — every piece of theirs, and the playlist
-// text that collects them. Built from the same slug the piece paths are, so a playlist
-// cannot land beside a different composer's clips than the one it names.
+// text that collects them.
+//
+// Canonicalised through core/person, the same table the composer pages use, because a
+// corpus writes one person's name many ways and a folder per spelling is a person split
+// across several. Tchaikovsky had two folders and two playlists; Chopin had five; Bach and
+// Czerny and Joplin and Debussy each had four or more — "J. B. Duvernoy",
+// "Jean-Baptiste Duvernoy" and "Jean-Baptiste Duvernoy (c.1802-c.1880)" are one man with
+// three shelves. Every one of those spellings already resolved correctly in the app; only
+// this was asking the raw string instead.
+//
+// A joint credit lands under the first name it gives — "Bach/Gounod" under Bach — which is
+// what a per-composer playlist wants. The credit burnt into every frame still names both.
 export function folderForComposer(composer) {
-    return slug(composer);
+    const canonical = canonicalComposer(composer);
+    // "Traditional" and "Anonymous" name no person, so they have no person page and
+    // personSlug answers with nothing — right for the app, ruinous here, where an empty
+    // name puts every folk tune in promo// and on top of each other. Falling back to the
+    // canonical name's own slug keeps them apart and still merges the spellings, since
+    // "Trad." canonicalizes to "Traditional" before it is slugged.
+    return personSlug(canonical) || slug(canonical);
 }
 
 // Two pieces landing on one path would have the second overwrite the first, and a folder

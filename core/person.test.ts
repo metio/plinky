@@ -523,3 +523,42 @@ describe("counting the composers a shelf holds", () => {
         expect(personFor(pieces, "johann-sebastian-bach")?.pieces).toHaveLength(1);
     });
 });
+
+describe("life dates welded to a name", () => {
+    // A corpus writes a composer's dates half a dozen ways, and the ones without brackets
+    // are the ones that used to survive canonicalization: the rule took the closing year
+    // and left everything before it, so one man ended up on two shelves.
+    it("strips a circa range that carries no brackets", () => {
+        expect(canonicalComposer("Jean-Baptiste Duvernoy c. 1802 c. 1880")).toBe(
+            "Jean-Baptiste Duvernoy",
+        );
+    });
+
+    it("strips the bracketed circa range too", () => {
+        expect(canonicalComposer("Jean-Baptiste Duvernoy (c.1802-c.1880)")).toBe(
+            "Jean-Baptiste Duvernoy",
+        );
+    });
+
+    it("puts every spelling of one man on one shelf", () => {
+        const spellings = [
+            "J.B.Duvernoy",
+            "J.B. Duvernoy",
+            "Jean-Baptiste Duvernoy",
+            "Jean-Baptiste Duvernoy c. 1802 c. 1880",
+        ];
+        expect(new Set(spellings.map(canonicalComposer)).size).toBe(1);
+    });
+
+    it("does not eat a letter that only looks like circa", () => {
+        // The "c" of circa has to be a word of its own. Without that anchor it matches the
+        // last letter of a word that ends in one, and a 1708 hymnal loses its "a" with the
+        // year — which changed what the public-domain rule read, three files away.
+        expect(canonicalComposer("from Lyra Davidica 1708")).toBe("Traditional");
+    });
+
+    it("leaves a name that never carried dates alone", () => {
+        expect(canonicalComposer("Carl Czerny")).toBe("Carl Czerny");
+        expect(canonicalComposer("Ludwig van Beethoven")).toBe("Ludwig van Beethoven");
+    });
+});

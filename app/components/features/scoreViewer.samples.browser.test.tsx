@@ -111,7 +111,13 @@ describe("a piece opening with the recorded piano on", () => {
                     [...new Set(samples.prepared.flat().map((note) => note.pitch))].sort(
                         (a, b) => a - b,
                     ),
-                { timeout: 30000 },
+                // Longer than the poll above it, and deliberately so. That one waits for a
+                // prefetch on a page that is already engraved; this one waits for the score
+                // to be transposed, re-engraved and read again, which is the whole reload
+                // chain. On a loaded CI runner — where this file's imports alone have taken
+                // twenty minutes and a single browser test twenty seconds — thirty seconds
+                // is not a claim that nothing happened, only that it had not happened yet.
+                { timeout: 90000 },
             )
             .toEqual([48, 60, 64, 67, 76, 79]);
     });

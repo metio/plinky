@@ -366,7 +366,21 @@ function cleaned(raw: string): string {
     if (withoutWork.trim().length > 0) {
         name = withoutWork;
     }
-    name = name.replace(/[\s,]*\d{4}\s*[-–—]?\s*(\d{4})?\s*$/g, "");
+    // Life dates trailing the name, with or without the brackets that would have made them
+    // an aside, and with or without the "c." a corpus writes when it is guessing. Circa has
+    // to be part of the pattern rather than left for the tidy-up afterwards: without it the
+    // rule eats the closing year and leaves the rest standing, so "Jean-Baptiste Duvernoy
+    // c. 1802 c. 1880" became "Jean-Baptiste Duvernoy c. 1802 c" — a partial strip, which
+    // is worse than none, because it invents a person nothing else in the catalogue spells
+    // that way.
+    // Anchored on a word boundary: without it the "c" matches the last letter of a word
+    // that happens to end in one, and "from Lyra Davidica 1708" loses its "a" along with
+    // the year.
+    const CIRCA = "\\b(?:c|ca|circa)\\.?\\s*";
+    name = name.replace(
+        new RegExp(`[\\s,]*(?:${CIRCA})?\\d{4}\\s*[-–—]?\\s*(?:(?:${CIRCA})?\\d{4})?\\s*$`, "g"),
+        "",
+    );
     // Who arranged it, which is not who wrote it. The parenthesised form is already
     // handled; this is the one that arrives welded to the name because the dates between
     // them were stripped — "Gioachino Rossini (1792-1868)arr. E Muirhead".

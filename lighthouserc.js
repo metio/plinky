@@ -90,8 +90,14 @@ const named = [...new Set([...notation, ...noindex])];
 // had never been measured at all. Settings, the heaviest page under this cap, came to
 // 258,792 against a limit of 258,048: over by 744 bytes, which is the message text and
 // nothing else. The floor keeps the same headroom above the real figure it had before.
+// 640 KiB → 648 KiB on the notation pages: thinning a piece is a reading aid, so the
+// transform ships and the play page carries it along with the preference and the control.
+// The play page measured 656,106 against a limit of 655,360 — over by 746 bytes, which is
+// the reduction and nothing else. Raised deliberately, like the app bundle's own ratchet;
+// what does NOT ship is the measurement of what a reduction grades at, which happens once
+// at bake time and is read out of the manifest.
 const SCRIPT_LIGHT = 262144;
-const SCRIPT_NOTATION = 655360;
+const SCRIPT_NOTATION = 663552;
 
 const common = {
     "categories:best-practices": ["error", { minScore: 0.9 }],
