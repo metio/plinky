@@ -167,7 +167,6 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "friedrich-kuhlau": { name: "Friedrich Kuhlau", pieces: 3 },
     "friedrich-silcher": { name: "Friedrich Silcher", pieces: 2 },
     "fritz-spindler": { name: "Fritz Spindler", pieces: 1 },
-    "from-lyra-davidi": { name: "from Lyra Davidi", pieces: 1 },
     "from-morceaux-de-fantaisie": { name: "from Morceaux de Fantaisie", pieces: 1 },
     "gabriel-faure": { name: "Gabriel Fauré", pieces: 21 },
     "gabrielle-ferrari": { name: "Gabrielle Ferrari", pieces: 2 },
