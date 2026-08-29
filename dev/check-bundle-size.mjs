@@ -459,7 +459,16 @@ const BUDGET_VENDOR_KB = 324;
 // costs a source method, a card that folds its steps away and mounts them on opening, and
 // one message. Two hundred and sixty piece ids are a fetched file, not bundle. 2.0 KB,
 // measured at 388.2.
-const BUDGET_APP_KB = 411;
+// 412. The keyboard is one component now. It was four — the front page had a flat bright
+// one, the play surface, Compose and the lessons each had their own, and the canvas painter
+// behind an exported video had its shading baked into three constants, in colours that
+// existed nowhere else. Sharing them costs less than the four did, but the choice they now
+// carry is new weight a visitor downloads: a finish describes itself twice over, as numbers
+// for the canvas and as literal class names for the page, because Tailwind cannot read a
+// gradient and a canvas cannot read a class, and neither face can be generated at runtime.
+// On top of that sit the picker, the hook that subscribes to the stored answer, and the
+// pref itself. 0.4 KB, measured at 411.4.
+const BUDGET_APP_KB = 412;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

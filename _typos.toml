@@ -55,6 +55,10 @@ fes = "fes"
 # clause "maßgeblich ist die deutsche Fassung", which every translated legal page —
 # including the checked English base — carries word for word.
 ist = "ist"
+# "trak" is an MP4 box name, not a misspelling of "track" — the container's four-character
+# codes are fixed by the format (moov, trak, mdia, mdhd), and dev/clip-durations.mjs reads
+# a clip's length straight out of them.
+trak = "trak"
 
 # The translation catalogs and the song catalogue are intentionally in many
 # languages, and the imported PDMX manifest holds real-world titles/composers plus
@@ -78,6 +82,10 @@ ist = "ist"
 # manifest above, and their letter runs read as misspellings ("…jqyY", "6Ue…"). Every
 # entry added would flag a new one — "ikvnpg9wpYUe" did. The cost is that the short "why"
 # notes in them go unchecked, which is the same bargain the manifest already makes.
+#
+# dev/promo/pieces.mjs is the same shape: a hand-kept list pairing those ids with the piece
+# titles and composer names the corpora use, so it carries both the letter runs
+# ("xrKmwOtUbwed") and real-world names in several languages.
 [files]
 extend-exclude = [
     "dev/catalog-curation.json",
@@ -85,6 +93,7 @@ extend-exclude = [
     "dev/catalog-duplicates.json",
     "dev/catalog-flagged.json",
     "dev/catalog-people-distinct.json",
+    "dev/promo/pieces.mjs",
     "messages/*",
     "!messages/en.json",
     "songs/*",
