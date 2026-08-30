@@ -10,10 +10,11 @@
 //
 // Usage: npm run promo:videos [-- --out dir] [--seconds 20] [--size 1080] [--fps 60]
 //        [--youtube] landscape 1920x1080, the whole piece · [--shorts] portrait 1080x1920
+// With no shape flag it renders 1080x1350, the 4:5 both Instagram and Facebook recommend.
 //                             [--youtube] [--only text] [--resume] [--synth]
 //
-// Everything lands under promo/<composer>/<piece>/: reel.mp4 from a plain run, youtube.mp4
-// from --youtube, and thumb.png from npm run promo:thumbs.
+// Everything lands under promo/<composer>/<piece>/: feed.mp4 from a plain run, short.mp4
+// from --shorts, youtube.mp4 from --youtube, and thumb.png from npm run promo:thumbs.
 //
 // Only CC0 pieces are eligible. The catalogue's CC-BY and CC-BY-SA scores carry
 // obligations that a social post strips: the credit line is burnt into every frame, but
@@ -48,13 +49,28 @@ const YOUTUBE = process.argv.includes("--youtube") || process.argv.includes("--c
 // and gives the whole height to the notation, which is what keeps the glyphs readable at
 // arm's length. Feed length rather than the full piece, because a Short is a feed.
 const SHORTS = process.argv.includes("--shorts");
+// The default shape is the one a feed actually wants, 4:5 — there is no flag for it
+// because it is what you get when you ask for neither of the other two.
+//
+// It replaced a square, which was never chosen: the original tooling took a --size and
+// height fell back to the width, so 1:1 is simply what you get when nobody picks an
+// aspect. The name made it worse — reel.mp4 was the one file in the folder that is not a
+// reel shape, while short.mp4 is. And against the four places these are posted, 1:1 is
+// second-best everywhere and first-choice nowhere: Instagram and Facebook both recommend
+// 4:5 for a feed post, Reels and Stories want 9:16, YouTube wants 16:9.
+//
+// The painter needs nothing for it. It drops the keyboard in a tall frame only when a
+// NOTATION PANEL is there to fill the stage instead, and a promo clip carries none, so the
+// keys stay at every aspect.
 // H.264 encodes in 4:2:0, where each chroma sample covers two pixels each way, so both
 // sides have to be even. The defaults are; an odd --size is not, and the portrait height
 // derived from one is odd for its own reasons — 500 gives 889. Rounding down by one is
 // invisible and the alternative is an encoder that refuses the frame.
 const even = (value) => value - (value % 2);
 const WIDTH = even(YOUTUBE ? 1920 : SIZE);
-const HEIGHT = even(YOUTUBE ? 1080 : SHORTS ? Math.round((SIZE * 16) / 9) : SIZE);
+const HEIGHT = even(
+    YOUTUBE ? 1080 : SHORTS ? Math.round((SIZE * 16) / 9) : Math.round((SIZE * 5) / 4),
+);
 // The falling-notes highway is continuous motion, so frames are where its quality lives.
 // 60 is the ceiling rather than a preference: core/videoEncoding.ts tops out at H.264
 // level 4.2, which covers 1080p60 exactly and nothing beyond it — a limit chosen so an
@@ -146,7 +162,7 @@ function toAac(file) {
 function fileFor(piece, out) {
     const dir = `${out}/${folderFor(piece)}`;
     mkdirSync(dir, { recursive: true });
-    return `${dir}/${YOUTUBE ? "youtube" : SHORTS ? "short" : "reel"}.mp4`;
+    return `${dir}/${YOUTUBE ? "youtube" : SHORTS ? "short" : "feed"}.mp4`;
 }
 
 // What the code that renders a clip currently hashes to. Written beside each finished clip

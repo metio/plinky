@@ -475,7 +475,13 @@ const BUDGET_VENDOR_KB = 324;
 // holds it and no visitor pays for the difficulty model on that path. The rest is the
 // preference, the Settings control and the line under a grade chip saying where a hard piece
 // can be reached from. 0.5 KB, measured at 412.5.
-const BUDGET_APP_KB = 413;
+// 414. The glossary and the course each gained the half the other had. The glossary draws
+// its symbol on a keyboard as well as on a stave, which costs the adapter between the two
+// ways they describe the same music, and links an entry to the lesson it leans on. The
+// course gained an index of its fourteen lessons. And counting things now follows each
+// language's own plural rules rather than English's, which compiles to a short chain of
+// comparisons per message instead of a bare string. 0.7 KB, measured at 413.7.
+const BUDGET_APP_KB = 414;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

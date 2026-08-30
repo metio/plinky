@@ -188,7 +188,7 @@ npm run promo:cuts    # where every clip would end and what decided it (a report
                       # gate). Reads the same performance the renderer reads and applies the
                       # same core cut, so a batch's lengths are checkable in five minutes
                       # rather than by encoding an hour of video and measuring the files
-npm run promo:durations -- promo/*/*/reel.mp4  # how long rendered clips actually run.
+npm run promo:durations -- promo/*/*/feed.mp4  # how long rendered clips actually run.
                       # Measure the VIDEO track: a piano sample rings on past the picture,
                       # so the container's own duration is about two seconds longer and
                       # reading it says a clip is longer than it looks

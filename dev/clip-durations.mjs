@@ -18,7 +18,7 @@
 // rendering; the two agreeing is the end-to-end check that the browser ran the code in the
 // tree, which is not something a stamp beside the file can tell you.
 //
-// Usage: npm run promo:durations -- promo/*/*/reel.mp4
+// Usage: npm run promo:durations -- promo/*/*/feed.mp4
 
 import { readFileSync } from "node:fs";
 

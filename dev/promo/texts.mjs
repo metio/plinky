@@ -18,7 +18,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 import { folderFor, PIECES } from "./pieces.mjs";
 import { collectionPieces } from "./collections.mjs";
-import { FOLLOW_US } from "../../core/social.ts";
+import { CHANNELS, FOLLOW_US } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
 import { uploadText } from "./uploadText.mjs";
 
@@ -123,6 +123,42 @@ const everyPiece = [...PIECES, ...collectionPieces()].filter((piece) => {
     return true;
 });
 
+// The same clip, for a surface with no title box and no working links.
+//
+// It is tempting to post the YouTube text everywhere and call the file metadata.txt, and it
+// would be wrong in a way a reader sees. YouTube takes a TITLE and a DESCRIPTION as two
+// fields; Instagram and Facebook take one caption and no title, so the title has to become
+// the caption's first line or it is lost. And an Instagram caption's links ARE NOT
+// CLICKABLE — "Play this one yourself: https://…" is an instruction that does nothing
+// there, which is worse than not offering it. Facebook's are, so the address is written
+// plainly: clickable where it can be, readable and typeable where it cannot.
+//
+// One caption for both rather than one each. The only thing that differs between them is
+// whether the link is live, and a plain address is honest on either.
+function caption(piece, entry) {
+    const grade = entry?.grade;
+    return [
+        `${piece.title}${credit(piece.composer)} — played in Plinky.`,
+        "",
+        "The notes fall as they sound, the keys light under them, and each note is coloured for the finger that plays it.",
+        "",
+        grade ? `${difficulty(grade)}.`.replace(/^./, (first) => first.toUpperCase()) : null,
+        grade ? "" : null,
+        "Finger colours:",
+        ...FINGER_LEGEND,
+        "",
+        "Plinky is a free piano practice app in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run went, hand by hand.",
+        "",
+        SITE,
+        entry?.license ? "" : null,
+        entry?.license
+            ? `Score: ${entry.license}. Every piece in Plinky is Creative Commons — yours to play, share and record.`
+            : null,
+    ]
+        .filter((line) => line !== null)
+        .join("\n");
+}
+
 let written = 0;
 for (const piece of everyPiece) {
     const entry = byId.get(piece.id);
@@ -132,9 +168,42 @@ for (const piece of everyPiece) {
     // competes with every recording ever made of it; the instrument is what narrows it.
     const title = `${piece.title} — ${piece.composer} | piano`;
     await writeFile(`${dir}/youtube.txt`, uploadText(title, describe(piece, entry)));
+    // No labels on this one: it is a single field, so the whole file is what gets pasted.
+    await writeFile(`${dir}/caption.txt`, `${caption(piece, entry)}\n`);
     written += 1;
     if (!entry) {
         console.warn(`  ${piece.title}: not in the catalogue, so no grade or licence in its text`);
     }
 }
-console.log(`Wrote ${written} youtube.txt files under ${OUT}/.`);
+// The channel's own About text, written from the same two sources every clip's
+// description uses: the finger legend and the follow list. Hand-copied, it would be right
+// on the day it was written and wrong the next time a colour or a URL moved — and the
+// channel description is the one piece of text nobody re-reads for years.
+//
+// No YouTube link in it: a reader who is reading this is already there.
+await writeFile(
+    `${OUT}/channel.txt`,
+    uploadText(
+        "Plinky — piano, played by the app",
+        [
+            "Piano pieces played by Plinky, a free practice app that runs in the browser.",
+            "",
+            "Every clip is the app itself playing: the notes falling as they sound, the keys lighting under them, and each note coloured for the finger that plays it. The mapping never moves, so watching two of these teaches it without trying.",
+            "",
+            "The colour of each note is the finger that plays it:",
+            ...FINGER_LEGEND,
+            "",
+            "Every score is Creative Commons, so each piece here is one you are free to play, share and record.",
+            "",
+            "Plinky needs no account and installs nothing. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
+            "",
+            SITE,
+            "",
+            "More Plinky:",
+            ...CHANNELS.filter((channel) => channel.label !== "YouTube").map(
+                (channel) => `${channel.label}: ${channel.href}`,
+            ),
+        ].join("\n"),
+    ),
+);
+console.log(`Wrote ${written} youtube.txt files and the channel description under ${OUT}/.`);
