@@ -27,12 +27,11 @@ import {
 } from "../../core/videoScene";
 import { tittleCircle, WORDMARK, wordmarkText } from "../../core/wordmark";
 
-// Paints one frame of the exported video: a dark stage with the piece's title,
-// a progress rail, the notation (when a snapshot was rendered) with the played
-// notes tinted, the keyboard with the sounding keys lit, and the credit line
-// with the wordmark — so a shared file carries its provenance and origin
-// wherever it's reposted. Pure canvas drawing over the pure scene geometry;
-// the exporter calls it once per frame.
+// Paints one frame of the exported video: a dark stage headed by the piece's title with
+// the composer under it and the wordmark opposite, then the notation (when a snapshot was
+// rendered) with the played notes tinted, and the keyboard with the sounding keys lit — so
+// a shared file carries its provenance and origin wherever it's reposted. Pure canvas
+// drawing over the pure scene geometry; the exporter calls it once per frame.
 
 // Blend two #rrggbb colours; amount 0 gives `from`, 1 gives `to`.
 function mixHex(from: string, to: string, amount: number): string {
@@ -121,7 +120,7 @@ export type ScenePainterInput = {
     // Whether the piece's title is burnt into the top-left. The provenance
     // credit line is never affected — the catalogue is credit-required.
     showTitle?: boolean;
-    // Whether the plinky.fun wordmark rides the top-right.
+    // Whether the Plinky lockup rides the top-right.
     showWordmark?: boolean;
     // The resting white / black key hex from the chosen keyboard skin, so the video's
     // keys match the app. Absent falls back to the classic palette.
@@ -511,7 +510,7 @@ export function takeScenePainter({
     );
     // The keys keep the floor they always stood on and grow upward from it, the way the
     // highway's do. Anchoring the top instead would push a keyboard the band has made
-    // taller straight off the bottom of the frame, over the credit line.
+    // taller straight off the bottom of the frame.
     const keyboardBottom = score ? height * 0.9 : height * 0.82;
     const keyboardTop = keyboardBottom - keyboardHeight;
     // The run's distinct onsets in playing order — step i of the snapshot sounded
@@ -551,7 +550,7 @@ export function takeScenePainter({
         const panelX = margin;
         const panelW = width - margin * 2;
         // Score-only frames give the panel the keyboard's room as well, down to
-        // just above the credit line. A piece shorter than the band shrinks the
+        // the foot of the frame. A piece shorter than the band shrinks the
         // card to the sheet and centres it, instead of trailing blank white. A
         // treadmill sheet is one shallow line: its band height comes from the
         // sheet itself (scaled to the panel's width budget), centred in the band.
