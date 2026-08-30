@@ -9,12 +9,16 @@
 // the answer is no.
 
 import type { RecordedNote } from "../../core/composition";
+import type { VideoQuality } from "../../core/videoEncoding";
 
 export type VideoExportInput = {
     width: number;
     height: number;
     fps: number;
     durationMs: number;
+    // How hard the encoder works, and how big the file is allowed to get. Defaults to
+    // "share" — a take a player sends to somebody. See core/videoEncoding.
+    quality?: VideoQuality;
     // Paint the frame at timeMs (video clock, 0 = first frame) into the given
     // context. Called once per frame in order, so a painter may keep caches.
     paint(context: OffscreenCanvasRenderingContext2D, timeMs: number): void;

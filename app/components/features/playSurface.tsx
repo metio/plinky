@@ -23,7 +23,7 @@ import { RunSetup } from "./runSetup";
 // the layout and the finished-run readouts (the loop bar, the keep-up card, the grade panel
 // and the runs drawer), which are small and site-specific to this arrangement.
 export function PlaySurface() {
-    const { assessment, credit, daily, ephemeral, id, measureCount, ready, title, xml } =
+    const { assessment, credit, daily, ephemeral, id, license, measureCount, ready, title, xml } =
         usePlayPiece();
     const { fullscreen, gradePanelRef, runsView, showScore } = usePlayShell();
     const { hand } = usePlaySetup();
@@ -58,6 +58,7 @@ export function PlaySurface() {
                         takes={takes}
                         title={title}
                         credit={credit}
+                        license={license}
                         activeReplayId={listenPlayback.activeReplayId}
                         playing={listenPlayback.playing}
                         original={{ xml, hand }}

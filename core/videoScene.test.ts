@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 import { keyLane } from "./keyboardGeometry";
 import { attributionFor } from "./attribution";
 import {
-    creditLine,
+    licenseCredit,
+    provenanceLine,
     highwayBlocks,
     playedStepCount,
     sceneKeys,
@@ -51,28 +52,57 @@ describe("sceneKeys", () => {
     });
 });
 
-describe("creditLine", () => {
-    it("carries title, composer, source and licence", () => {
-        const line = creditLine(
-            "Menuet",
+describe("provenanceLine", () => {
+    it("carries composer and source", () => {
+        const line = provenanceLine(
             attributionFor({ composer: "J. S. Bach", license: "cc0-1.0", source: "mutopia" }),
         );
-        expect(line).toContain("Menuet");
         expect(line).toContain("J. S. Bach");
-        expect(line.split(" · ").length).toBeGreaterThanOrEqual(3);
+        expect(line).toContain("Mutopia Project");
+        expect(line.split(" · ").length).toBeGreaterThanOrEqual(2);
+        // The title is drawn above this line, not inside it — the painter puts it there,
+        // and repeating it here is what this function exists to stop.
+        expect(line).not.toContain("Menuet");
     });
 
     it("omits what a piece doesn't have rather than printing blanks", () => {
-        expect(creditLine("Étude", attributionFor({}))).toBe("Étude");
+        // Nothing known about the piece leaves nothing to print; the painter then falls
+        // back to the title so the frame still names what is being played.
+        expect(provenanceLine(attributionFor({}))).toBe("");
     });
 
-    it("prints 'Public domain' for a public-domain licence, the label otherwise", () => {
-        expect(creditLine("Menuet", attributionFor({ license: "CC0-1.0" }))).toContain(
-            "Public domain",
+    it("leaves the licence to its own line", () => {
+        // It used to be the last item here. A spelled-out licence name does not fit beside
+        // a composer, so it moved down a line and this one carries who and where only.
+        expect(provenanceLine(attributionFor({ composer: "Satie", license: "CC0-1.0" }))).toBe(
+            "Satie",
         );
-        const attributed = creditLine("Menuet", attributionFor({ license: "CC-BY-4.0" }));
-        expect(attributed).not.toContain("Public domain");
-        expect(attributed).toMatch(/CC.BY/i);
+    });
+});
+
+describe("licenseCredit", () => {
+    it("spells the licence out rather than printing its code", () => {
+        expect(licenseCredit(attributionFor({ license: "CC-BY-SA-4.0" }))).toEqual({
+            name: "Creative Commons Attribution-ShareAlike 4.0 International",
+            mark: true,
+        });
+        expect(licenseCredit(attributionFor({ license: "CC0-1.0" }))?.name).toBe(
+            "CC0 1.0 Universal Public Domain Dedication",
+        );
+    });
+
+    it("has nothing to say about a piece whose licence is unknown", () => {
+        expect(licenseCredit(attributionFor({}))).toBeNull();
+        expect(licenseCredit(attributionFor({ license: "WTFPL" }))).toBeNull();
+    });
+
+    it("puts the Creative Commons mark only on Creative Commons licences", () => {
+        // Every licence the catalogue admits is one of theirs today, so this pins the
+        // condition rather than the answer — the mark must not follow the first licence
+        // admitted that isn't.
+        for (const id of ["CC0-1.0", "CC-BY-4.0", "CC-BY-NC-SA-4.0"]) {
+            expect(licenseCredit(attributionFor({ license: id }))?.mark).toBe(true);
+        }
     });
 });
 

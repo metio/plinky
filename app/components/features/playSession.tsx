@@ -69,6 +69,7 @@ import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
+import type { LicenseCredit } from "../../../core/videoScene";
 
 // The one-time hint nudging a touch phone sideways for a wider keyboard.
 const ROTATE_HINT_ID = "rotate";
@@ -84,6 +85,9 @@ export type PlaySessionProps = {
     // The provenance line burnt into an exported take video; empty means the
     // piece carries no credit beyond its title (a generated exercise).
     credit?: string;
+    // The licence, spelled out on its own line under that. Absent for a piece with no
+    // licence to name — a generated exercise is ours and carries none.
+    license?: LicenseCredit;
     onRunComplete?: () => void;
     // Every graded run, ephemeral ones included — the placement test needs the score
     // of a drill it deliberately does not keep, which onRunComplete (skipped for an
@@ -127,6 +131,7 @@ function usePlaySessionValue({
     xml,
     title,
     credit,
+    license,
     onRunComplete,
     onGraded,
     options,
@@ -1174,6 +1179,7 @@ function usePlaySessionValue({
             // so it is what the player will actually be reading rather than what the file says.
             fifths: marks.fifths,
             credit: credit ?? "",
+            license,
             daily,
             ephemeral,
             assessment,
@@ -1200,6 +1206,7 @@ function usePlaySessionValue({
             title,
             marks.fifths,
             credit,
+            license,
             daily,
             ephemeral,
             assessment,

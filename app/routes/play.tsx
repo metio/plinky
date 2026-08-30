@@ -8,7 +8,7 @@ import { Button } from "../components/ui/button";
 import { ComposerCredit, composerCreditText } from "../components/ui/composerCredit";
 import { attributionFor } from "../../core/attribution";
 import { canonicalPeople, personSlug } from "../../core/person";
-import { creditLine } from "../../core/videoScene";
+import { licenseCredit, provenanceLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { ExerciseForms } from "../components/features/exerciseForms";
 import { ReturnToPiece } from "../components/features/returnToPiece";
@@ -100,6 +100,14 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.
     const [transpose, setTranspose] = useState(options.transpose ?? 0);
+    // One reading of where the piece came from, feeding both lines burnt into an exported
+    // video: who wrote it, and the licence under that. The composer is cleaned the same way
+    // the heading a reader sees is cleaned.
+    const attribution = attributionFor({
+        composer: composerCreditText(score?.composer ?? ""),
+        license: score?.license,
+        source: score?.source,
+    });
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
@@ -164,16 +172,8 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         id={score.id}
                         xml={score.xml}
                         title={score.title}
-                        credit={creditLine(
-                            score.title,
-                            attributionFor({
-                                // Burnt into an exported video, so it is cleaned like
-                                // everything else that names the composer.
-                                composer: composerCreditText(score.composer),
-                                license: score.license,
-                                source: score.source,
-                            }),
-                        )}
+                        credit={provenanceLine(attribution)}
+                        license={licenseCredit(attribution) ?? undefined}
                         options={options}
                         initialTempo={score.tempo}
                         beatsPerBar={score.beatsPerBar}

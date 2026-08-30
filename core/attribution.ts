@@ -10,6 +10,9 @@ export type LicenseInfo = {
     id: string;
     // Short human label, e.g. "CC BY-SA 4.0".
     label: string;
+    // The licence's own title, spelled out — what a credit line says when it has a
+    // line to itself rather than a corner of one.
+    name: string;
     // The licence deed the badge links to.
     url: string;
     // CC-BY family (incl. NC/ND/SA variants) require crediting the creator; CC0
@@ -34,6 +37,7 @@ const DEED = "https://creativecommons.org/";
 const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     "CC0-1.0": {
         label: "CC0 1.0",
+        name: "CC0 1.0 Universal Public Domain Dedication",
         url: `${DEED}publicdomain/zero/1.0/`,
         requiresAttribution: false,
         publicDomain: true,
@@ -42,6 +46,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-4.0": {
         label: "CC BY 4.0",
+        name: "Creative Commons Attribution 4.0 International",
         url: `${DEED}licenses/by/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -50,6 +55,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-3.0": {
         label: "CC BY 3.0",
+        name: "Creative Commons Attribution 3.0 Unported",
         url: `${DEED}licenses/by/3.0/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -58,6 +64,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-2.5": {
         label: "CC BY 2.5",
+        name: "Creative Commons Attribution 2.5 Generic",
         url: `${DEED}licenses/by/2.5/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -66,6 +73,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-SA-4.0": {
         label: "CC BY-SA 4.0",
+        name: "Creative Commons Attribution-ShareAlike 4.0 International",
         url: `${DEED}licenses/by-sa/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -74,6 +82,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-SA-3.0": {
         label: "CC BY-SA 3.0",
+        name: "Creative Commons Attribution-ShareAlike 3.0 Unported",
         url: `${DEED}licenses/by-sa/3.0/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -82,6 +91,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-SA-2.5": {
         label: "CC BY-SA 2.5",
+        name: "Creative Commons Attribution-ShareAlike 2.5 Generic",
         url: `${DEED}licenses/by-sa/2.5/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -90,6 +100,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-NC-4.0": {
         label: "CC BY-NC 4.0",
+        name: "Creative Commons Attribution-NonCommercial 4.0 International",
         url: `${DEED}licenses/by-nc/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -98,6 +109,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-ND-4.0": {
         label: "CC BY-ND 4.0",
+        name: "Creative Commons Attribution-NoDerivatives 4.0 International",
         url: `${DEED}licenses/by-nd/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -106,6 +118,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
     },
     "CC-BY-NC-SA-4.0": {
         label: "CC BY-NC-SA 4.0",
+        name: "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
         url: `${DEED}licenses/by-nc-sa/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
@@ -206,4 +219,13 @@ export function attributionFor(piece: {
         license: licenseInfo(piece.license),
         source: source && piece.credit ? { ...source, credit: piece.credit } : source,
     };
+}
+
+// Whether the Creative Commons mark belongs in front of this licence's name.
+//
+// Every licence the catalogue admits is a Creative Commons one, so today this is true of
+// all of them — written out rather than assumed, because the mark is CC's and must not
+// follow the first licence admitted that isn't theirs.
+export function isCreativeCommons(license: LicenseInfo): boolean {
+    return license.id.startsWith("CC");
 }

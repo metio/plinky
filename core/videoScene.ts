@@ -5,7 +5,7 @@
 // what the credit line says. The painter applies these to a canvas; keeping the
 // geometry and wording here keeps them testable and the painter thin.
 
-import type { Attribution } from "./attribution";
+import { type Attribution, isCreativeCommons } from "./attribution";
 import { keyLane } from "./keyboardGeometry";
 import { maxOf, minOf } from "./stats";
 
@@ -135,18 +135,33 @@ export function highwayBlocks(
 // The credit line burnt into the video: the composer, the source, and the
 // licence — a shared file must carry the piece's provenance with it, and the
 // wordmark's "plinky.fun" is rendered separately by the painter.
-export function creditLine(title: string, attribution: Attribution): string {
-    const parts = [title];
+export function provenanceLine(attribution: Attribution): string {
+    const parts: string[] = [];
     if (attribution.composer) {
         parts.push(attribution.composer);
     }
     if (attribution.source) {
         parts.push(attribution.source.label);
     }
-    if (attribution.license) {
-        parts.push(attribution.license.publicDomain ? "Public domain" : attribution.license.label);
-    }
     return parts.join(" · ");
+}
+
+// The licence, for the line of its own it now gets.
+//
+// Spelled out rather than abbreviated: "CC BY-SA 4.0" is a code a reader either knows or
+// does not, and the frame has room for the sentence it stands for. `mark` says whether the
+// Creative Commons mark belongs in front of it — theirs to lend, so it goes only on
+// licences that are actually theirs.
+export type LicenseCredit = { name: string; mark: boolean };
+
+export function licenseCredit(attribution: Attribution): LicenseCredit | null {
+    if (!attribution.license) {
+        return null;
+    }
+    return {
+        name: attribution.license.name,
+        mark: isCreativeCommons(attribution.license),
+    };
 }
 
 // A rectangle on the pre-rendered score image, in image pixels — one or more per

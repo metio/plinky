@@ -319,8 +319,11 @@ try {
                     scoreUrl: url,
                     title: piece.title,
                     // No plinky.fun here: the wordmark already rides the top-right corner, and
-                    // the credit line is for what the catalogue owes the source.
-                    credit: `${piece.composer} · CC0`,
+                    // the credit line is for what the catalogue owes the source. The licence
+                    // goes on its own line under it, spelled out, so it travels as words
+                    // rather than as a code a viewer would have to look up.
+                    credit: piece.composer,
+                    licenseId: song.license,
                     width: WIDTH,
                     height: HEIGHT,
                     fps: FPS,

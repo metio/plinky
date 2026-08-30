@@ -20,13 +20,31 @@ const REFERENCE_LOAD = 1280 * 720 * 30;
 const LEVEL_42_LOAD = 3;
 const AUDIO_BITRATE = 192_000;
 
-export type VideoShape = { width: number; height: number; fps: number };
+// What the encoder is asked to spend, and whether it has to spend it.
+//
+// The default rate control is variable, and on this material it undershoots enormously: a
+// promo clip nominally budgeted 19 Mbit/s came out at about one. That is rate control
+// working as designed — the stage is dark and mostly still, so there is little motion to
+// pay for — but the bits it declines to spend are exactly the ones the text edges need,
+// and white-on-black lettering is where ringing shows first.
+//
+// So the mode is the caller's decision, because the two uses want opposite things:
+//
+//   "share"     a player's own take, headed for a chat window. Variable, which settles far
+//               below the nominal budget and keeps the file small enough to send.
+//   "broadcast" a clip headed for a feed that will re-encode it on arrival, where the
+//               first encode has to survive a second one. Constant, so the budget is
+//               actually spent. Files are a great deal larger; an upload does not care.
+export type VideoQuality = "share" | "broadcast";
+
+export type VideoShape = { width: number; height: number; fps: number; quality?: VideoQuality };
 
 export type VideoEncodingConfig = {
     codec: string;
     width: number;
     height: number;
     bitrate: number;
+    bitrateMode: "constant" | "variable";
     framerate: number;
 };
 
@@ -62,6 +80,7 @@ export function videoConfig(input: VideoShape): VideoEncodingConfig {
         // bitrate: below it the encoder is already transparent, and clamping
         // keeps small frames from being starved.
         bitrate: Math.round(VIDEO_BITRATE * Math.max(1, load)),
+        bitrateMode: input.quality === "broadcast" ? "constant" : "variable",
         framerate: input.fps,
     };
 }

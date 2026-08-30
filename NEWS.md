@@ -16,6 +16,14 @@ pieces at last — the site had been telling them every piece in the catalogue w
 dead page, even while the page opened perfectly for you. Nothing about playing
 changes, and the links you already have keep working.
 
+**A video you export says who wrote the piece and what its licence is, in words.**
+The piece's name is set in Plinky's own lettering, the composer sits under it, and the
+licence gets a line of its own written out in full — "CC0 1.0 Universal Public Domain
+Dedication" rather than a code — behind the Creative Commons mark. The credit used to
+run along the bottom edge, where the falling notes crossed it and the keys washed it
+out. Nothing about a piece changes; it is the same music, credited where you can read
+it.
+
 **Two pages no longer run off the side of a small phone in Russian.** The greeting on
 the home page and the title of the privacy page were wider than a 320px screen —
 enough to make the whole page scroll sideways. They break across lines now, in any

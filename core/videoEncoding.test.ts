@@ -18,9 +18,25 @@ describe("videoConfig", () => {
             width: 1280,
             height: 720,
             bitrate: 6_000_000,
+            bitrateMode: "variable",
             framerate: 30,
         });
         expect(videoConfig({ width: 640, height: 360, fps: 30 }).bitrate).toBe(6_000_000);
+    });
+
+    it("only spends the whole budget when the clip is headed for a feed", () => {
+        // Variable rate control settles far under the nominal budget on this material —
+        // a dark, largely still stage — which is right for a take somebody sends to a
+        // friend and wrong for a clip a platform will re-encode, where the bits the
+        // encoder declines to spend are the ones the lettering needs.
+        const shape = { width: 1080, height: 1350, fps: 60 };
+        expect(videoConfig(shape).bitrateMode).toBe("variable");
+        expect(videoConfig({ ...shape, quality: "share" }).bitrateMode).toBe("variable");
+        expect(videoConfig({ ...shape, quality: "broadcast" }).bitrateMode).toBe("constant");
+        // The budget itself is the same either way; what changes is whether it is spent.
+        expect(videoConfig({ ...shape, quality: "broadcast" }).bitrate).toBe(
+            videoConfig(shape).bitrate,
+        );
     });
 
     it("scales the bitrate with the pixel rate", () => {

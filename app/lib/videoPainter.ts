@@ -18,6 +18,7 @@ import {
     playedStepCount,
     type SceneKey,
     keyboardHeightFor,
+    type LicenseCredit,
     sceneKeys,
     sceneRange,
     type ScoreBox,
@@ -78,9 +79,16 @@ const DEFAULT_KEYS = { white: DEFAULT_THEME.whiteHex, black: DEFAULT_THEME.black
 // recording machine happened to install.
 export const FONT_FAMILY = '"Inter Variable", system-ui, sans-serif';
 
+// The wordmark's own letterforms, matching --font-display in app.css and the promo
+// thumbnails, so a clip and the thumbnail above it are recognisably the same thing.
+// Fredoka covers Latin alone; Comfortaa stands behind it for Greek and Cyrillic titles,
+// exactly as the app's own stack does.
+export const DISPLAY_FAMILY =
+    '"Fredoka Variable", "Comfortaa Variable", ui-rounded, system-ui, sans-serif';
+
 // A canvas font string at `unit`-relative size, so text scales with the frame.
-function fontAt(weight: number, scale: number, unit: number): string {
-    return `${weight} ${Math.round(unit * scale)}px ${FONT_FAMILY}`;
+function fontAt(weight: number, scale: number, unit: number, family = FONT_FAMILY): string {
+    return `${weight} ${Math.round(unit * scale)}px ${family}`;
 }
 
 // The pre-rendered notation the frame can carry: the score rasterized once,
@@ -94,8 +102,10 @@ export type SceneScore = {
 
 export type ScenePainterInput = {
     title: string;
-    // The provenance line from core/videoScene's creditLine.
+    // Who wrote it and where the score came from — core/videoScene's provenanceLine.
     credit: string;
+    // The licence, on its own line under that — core/videoScene's licenseCredit.
+    license?: LicenseCredit;
     notes: RecordedNote[];
     durationMs: number;
     width: number;
@@ -132,12 +142,18 @@ type Context2D = Pick<
     | "drawImage"
     | "clip"
     | "measureText"
+    // The Creative Commons ring is the one stroked shape on the stage; everything else
+    // is filled.
+    | "arc"
+    | "stroke"
     // The keys are shaded rather than filled flat, which is what stops a long one reading
     // as a stripe. Narrow on purpose, this list — every entry is something a stand-in
     // context in a test has to answer.
     | "createLinearGradient"
 > & {
     fillStyle: string | CanvasGradient | CanvasPattern;
+    strokeStyle: string | CanvasGradient | CanvasPattern;
+    lineWidth: number;
     font: string;
     textBaseline: CanvasTextBaseline;
     textAlign: CanvasTextAlign;
@@ -157,12 +173,37 @@ function ellipsize(context: Context2D, text: string, room: number): string {
     return `${text.slice(0, keep)}…`;
 }
 
+// The Creative Commons mark: their two letters inside their ring, drawn rather than
+// loaded so the frame owes nothing to an asset that might not be there when a video is
+// exported offline. Sized to sit on the licence line's own baseline box, so the ring's
+// height matches the text beside it and the pair reads as one label.
+function paintCcMark(context: Context2D, x: number, top: number, size: number): void {
+    const radius = size / 2;
+    const centerX = x + radius;
+    const centerY = top + radius;
+    context.save();
+    context.strokeStyle = MUTED;
+    context.lineWidth = Math.max(1, size * 0.08);
+    context.beginPath();
+    context.arc(centerX, centerY, radius - context.lineWidth / 2, 0, Math.PI * 2);
+    context.stroke();
+    context.fillStyle = MUTED;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.font = `600 ${Math.round(size * 0.58)}px ${FONT_FAMILY}`;
+    // Nudged down by a hair: "CC" has no descender, so centring on the glyph box leaves it
+    // sitting visibly high inside the ring.
+    context.fillText("CC", centerX, centerY + size * 0.04);
+    context.restore();
+}
+
 // The stage furniture shared by every format: the piece's title, the wordmark,
 // and the credit line — measured and placed the same way whatever fills the
 // middle (staff or highway).
 type ChromeConfig = {
     title: string;
     credit: string;
+    license?: LicenseCredit;
     width: number;
     height: number;
     unit: number;
@@ -183,13 +224,51 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
     // wordmark off, the title reclaims that room.
     context.font = fontAt(500, 0.035, unit);
     const wordmarkWidth = showWordmark ? context.measureText("plinky.fun").width : 0;
+    const textRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
     if (showTitle) {
         context.textAlign = "left";
         context.textBaseline = "top";
         context.fillStyle = INK;
-        context.font = fontAt(600, 0.06, unit);
-        const titleRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
-        context.fillText(ellipsize(context, title, titleRoom), margin, height * 0.08);
+        context.font = fontAt(600, 0.062, unit, DISPLAY_FAMILY);
+        context.fillText(ellipsize(context, title, textRoom), margin, height * 0.08);
+    }
+    // The provenance sits directly under the title, where a reader looks next — a piece
+    // and who wrote it are one thought, and the licence belongs with them.
+    //
+    // It used to run along the foot, which put it in the keyboard's way: at a fixed height
+    // it landed on the white keys, and lifting it clear only moved it into the path of the
+    // falling notes, where a bar crossing a word is not a legibility problem that lighting
+    // or weight can solve. Up here nothing crosses it. The catalogue is credit-required and
+    // this line is the credit, so where it can be read is not a matter of taste.
+    //
+    // With the title turned off, the credit is the only thing naming the piece, so it takes
+    // the title's place and carries the name — an exported file that names nothing is not
+    // an attribution.
+    let line = height * 0.08 + (showTitle ? unit * 0.088 : 0);
+    const provenance = showTitle ? cfg.credit : [title, cfg.credit].filter(Boolean).join(" · ");
+    if (provenance !== "") {
+        context.textAlign = "left";
+        context.textBaseline = "top";
+        context.fillStyle = MUTED;
+        context.font = fontAt(500, 0.034, unit);
+        context.fillText(ellipsize(context, provenance, textRoom), margin, line);
+        line += unit * 0.052;
+    }
+    // The licence takes a line to itself, which is what lets it be spelled out — "Creative
+    // Commons Attribution-ShareAlike 4.0 International" says what "CC BY-SA 4.0" only
+    // gestures at, and a viewer who has to look a code up will not.
+    if (cfg.license) {
+        const size = Math.round(unit * 0.03);
+        context.font = fontAt(400, 0.03, unit);
+        let x = margin;
+        if (cfg.license.mark) {
+            paintCcMark(context, x, line, size);
+            x += size * 1.35;
+        }
+        context.textAlign = "left";
+        context.textBaseline = "top";
+        context.fillStyle = MUTED;
+        context.fillText(ellipsize(context, cfg.license.name, width - margin - x), x, line);
     }
     if (showWordmark) {
         context.textAlign = "right";
@@ -205,30 +284,6 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
     context.fillRect(margin, railY, width - margin * 2, 4);
     context.fillStyle = ACCENT;
     context.fillRect(margin, railY, (width - margin * 2) * (timeMs / durationMs), 4);
-}
-
-// The provenance line along the foot — a shared file carries its credit.
-//
-// Drawn clear of the keys rather than at a fixed height. The catalogue is credit-required
-// and this line is burnt into every frame so the attribution travels with the video, which
-// makes its legibility the whole point of it: at a fixed 0.95 of the frame it landed inside
-// the keyboard, which ends at 0.96, and a pale line over white keys is a credit nobody can
-// read. `keys` is the band the keyboard occupies, and the line is lifted clear of it only
-// when the foot would land inside — a stage whose keyboard stops higher up keeps its credit
-// at the foot, where it has always sat and reads perfectly well.
-function paintCredit(
-    context: Context2D,
-    cfg: ChromeConfig,
-    keys?: { top: number; bottom: number },
-): void {
-    context.textAlign = "left";
-    context.textBaseline = "alphabetic";
-    context.fillStyle = MUTED;
-    const size = Math.round(cfg.unit * 0.032);
-    context.font = fontAt(400, 0.032, cfg.unit);
-    const floor = cfg.height * 0.95;
-    const overTheKeys = keys !== undefined && floor >= keys.top && floor <= keys.bottom;
-    context.fillText(cfg.credit, cfg.margin, overTheKeys ? keys.top - size * 0.5 : floor);
 }
 
 // A white key's width in pixels — what the key-shape band is judged against. Read off the
@@ -359,6 +414,7 @@ function paintKeyboard(
 function stageFor(input: {
     title: string;
     credit: string;
+    license?: LicenseCredit;
     notes: RecordedNote[];
     durationMs: number;
     width: number;
@@ -385,6 +441,7 @@ function stageFor(input: {
         cfg: {
             title: input.title,
             credit: input.credit,
+            license: input.license,
             width: input.width,
             height: input.height,
             unit,
@@ -420,6 +477,7 @@ function keyLayoutFor(
 export function takeScenePainter({
     title,
     credit,
+    license,
     notes,
     durationMs,
     width,
@@ -435,6 +493,7 @@ export function takeScenePainter({
     const { keys, margin, unit, cfg } = stageFor({
         title,
         credit,
+        license,
         notes,
         durationMs,
         width,
@@ -472,8 +531,6 @@ export function takeScenePainter({
         }
 
         if (scoreOnly) {
-            // No keyboard on this stage, so the foot is free.
-            paintCredit(context, cfg);
             return;
         }
 
@@ -483,8 +540,6 @@ export function takeScenePainter({
         const glows = keyGlows(frame.down);
         const glowOf = (pitch: number) => glows.get(pitch) ?? null;
         paintKeyboard(context, keys, keyLayout, glowOf);
-
-        paintCredit(context, cfg, { top: keyboardTop, bottom: keyboardBottom });
     };
 
     // The notation panel: a light card holding a window of the score image that
@@ -608,6 +663,7 @@ const HIGHWAY_WINDOW_MS = 2_500;
 export function takeHighwayPainter({
     title,
     credit,
+    license,
     notes,
     durationMs,
     width,
@@ -622,6 +678,7 @@ export function takeHighwayPainter({
 }: {
     title: string;
     credit: string;
+    license?: LicenseCredit;
     notes: RecordedNote[];
     durationMs: number;
     width: number;
@@ -646,6 +703,7 @@ export function takeHighwayPainter({
     const { keys, margin, cfg } = stageFor({
         title,
         credit,
+        license,
         notes,
         durationMs,
         width,
@@ -703,7 +761,5 @@ export function takeHighwayPainter({
         const litOf = (pitch: number) =>
             paintHex(scheme, { finger: fingers.get(pitch), hand: hands.get(pitch) }, ACCENT);
         paintKeyboard(context, keys, keyLayout, glowOf, litOf);
-
-        paintCredit(context, cfg, { top: keyboardTop, bottom: height * 0.96 });
     };
 }

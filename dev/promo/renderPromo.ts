@@ -26,6 +26,8 @@ import { webSampleSource } from "../../app/adapters/webSampleSource";
 import { playFromSamples } from "../../app/adapters/webAudioEngine";
 import { sampleLookup } from "../../app/lib/sampleVoices";
 import { takeHighwayPainter } from "../../app/lib/videoPainter";
+import { licenseCredit } from "../../core/videoScene";
+import { attributionFor } from "../../core/attribution";
 import { readScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { NOMINAL_BPM } from "../../core/elapsed";
 import { collectListenSteps } from "../../app/lib/listenSteps";
@@ -37,6 +39,11 @@ export type PromoRequest = {
     title: string;
     // The provenance line, drawn on every frame — the catalogue is credit-required.
     credit: string;
+    // The piece's SPDX licence id. The spelled-out name and whether the Creative Commons
+    // mark belongs in front of it are derived here rather than passed in, so the driver
+    // stays a driver: it says which piece and which shape, and what that licence is called
+    // is the painter's business, decided next to the painting.
+    licenseId?: string;
     // Square for the feed; the painter keeps the waterfall over the keyboard at any
     // aspect it is not taller than it is wide.
     width: number;
@@ -168,6 +175,7 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
     const paint = takeHighwayPainter({
         title: request.title,
         credit: request.credit,
+        license: licenseCredit(attributionFor({ license: request.licenseId })) ?? undefined,
         notes,
         durationMs,
         width: request.width,
@@ -205,6 +213,9 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         height: request.height,
         fps: request.fps,
         durationMs,
+        // Every one of these is uploaded to a feed that re-encodes it on arrival, so this
+        // encode is the first of two and has to leave the second something to work with.
+        quality: "broadcast",
         paint,
         notes,
     });

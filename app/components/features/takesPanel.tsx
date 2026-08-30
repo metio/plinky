@@ -16,6 +16,7 @@ import { PlayIcon, StopIcon, TrashIcon } from "../ui/icons";
 import { ExportVideoButton } from "./exportVideoButton";
 import type { OriginalScore } from "../../lib/scoreSnapshot";
 import { ShareGhostButton } from "./shareGhostButton";
+import type { LicenseCredit } from "../../../core/videoScene";
 
 // The body of the Runs drawer: everything about your own performances of a piece in one
 // place — a top action to share your last run as a ghost (available the moment you've
@@ -27,6 +28,7 @@ export function TakesPanel({
     takes,
     title,
     credit,
+    license,
     activeReplayId,
     playing,
     original = null,
@@ -41,6 +43,7 @@ export function TakesPanel({
     // The provenance line an exported take video carries (title-only when the
     // piece has no composer/licence to credit).
     credit: string;
+    license?: LicenseCredit;
     // The take currently replaying, if any — its row shows a Stop control.
     activeReplayId: string | null;
     // True while anything (a replay or Listen) owns the synth and cursor, so the
@@ -144,6 +147,7 @@ export function TakesPanel({
                                         take={take}
                                         title={title}
                                         credit={credit}
+                                        license={license}
                                         original={original}
                                     />
                                 </div>

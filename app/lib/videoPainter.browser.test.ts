@@ -166,13 +166,22 @@ describe("takeScenePainter title and watermark toggles", () => {
         countPainted(c, 0, bandTop, half, bandHeight);
     const wordmarkRegion = (c: OffscreenCanvasRenderingContext2D) =>
         countPainted(c, half, bandTop, WIDTH - half, bandHeight);
+    // The licence sits on a third line, below the band the title and wordmark share and
+    // clear of the progress rail at 0.26 — a strip holding that line and nothing else, so
+    // what it counts is the licence rather than the furniture around it.
+    const licenseRegion = (c: OffscreenCanvasRenderingContext2D) =>
+        countPainted(c, 0, Math.round(HEIGHT * 0.205), half, Math.round(HEIGHT * 0.05));
 
-    function paint(opts: { showTitle?: boolean; showWordmark?: boolean }) {
+    function paint(opts: {
+        showTitle?: boolean;
+        showWordmark?: boolean;
+        license?: { name: string; mark: boolean };
+    }) {
         const canvas = new OffscreenCanvas(WIDTH, HEIGHT);
         const context = canvas.getContext("2d")!;
         takeScenePainter({
             title: "Menuet",
-            credit: "Menuet · J. S. Bach · CC0",
+            credit: "J. S. Bach · CC0",
             notes: NOTES,
             durationMs: LEAD_IN_MS + 4_000,
             width: WIDTH,
@@ -187,9 +196,12 @@ describe("takeScenePainter title and watermark toggles", () => {
         expect(titleRegion(both)).toBeGreaterThan(30);
         expect(wordmarkRegion(both)).toBeGreaterThan(30);
 
-        // Title off: the left header goes blank, the wordmark stays.
+        // Title off: the credit takes its place on the left — smaller type on one line
+        // where there were two — and the wordmark stays. The band never empties, because
+        // the credit is the piece's attribution and has to be somewhere.
         const noTitle = paint({ showTitle: false });
-        expect(titleRegion(noTitle)).toBe(0);
+        expect(titleRegion(noTitle)).toBeGreaterThan(30);
+        expect(titleRegion(noTitle)).toBeLessThan(titleRegion(both));
         expect(wordmarkRegion(noTitle)).toBeGreaterThan(30);
 
         // Watermark off: the right header goes blank, the title stays.
@@ -198,12 +210,34 @@ describe("takeScenePainter title and watermark toggles", () => {
         expect(titleRegion(noMark)).toBeGreaterThan(30);
     });
 
+    it("gives the licence a line of its own, and none when there is no licence", () => {
+        // The licence sits under the composer, so the header band is taller with one than
+        // without. Counting painted pixels is the only thing a canvas will tell you, and
+        // more of them is exactly what a third line means.
+        const withLicense = paint({
+            license: { name: "CC0 1.0 Universal Public Domain Dedication", mark: true },
+        });
+        expect(licenseRegion(withLicense)).toBeGreaterThan(30);
+        expect(licenseRegion(paint({}))).toBe(0);
+    });
+
+    it("draws the Creative Commons ring only when the licence is theirs", () => {
+        // Same words either way, so any difference in the band is the mark itself.
+        const marked = paint({ license: { name: "A Licence 1.0", mark: true } });
+        const plain = paint({ license: { name: "A Licence 1.0", mark: false } });
+        expect(licenseRegion(marked)).toBeGreaterThan(licenseRegion(plain));
+    });
+
     it("keeps the provenance credit even with both header labels off", () => {
-        // The catalogue is credit-required, so the bottom credit line survives
-        // regardless — the bottom band still carries painted text.
+        // The catalogue is credit-required, so the credit survives whatever else is turned
+        // off. It sits under the title rather than along the foot: at the foot it landed
+        // either on the white keys or in the path of the falling notes, and a credit a
+        // bar is crossing is not one anybody can read.
         const context = paint({ showTitle: false, showWordmark: false });
+        expect(titleRegion(context)).toBeGreaterThan(30);
+        // And the foot is clear, which is the half of the move that matters.
         const bottom = Math.round(HEIGHT * 0.9);
-        expect(countPainted(context, 0, bottom, WIDTH, HEIGHT - bottom)).toBeGreaterThan(30);
+        expect(countPainted(context, 0, bottom, WIDTH, HEIGHT - bottom)).toBe(0);
     });
 });
 
@@ -224,7 +258,7 @@ describe("takeScenePainter with a score panel", () => {
         const context = canvas.getContext("2d")!;
         takeScenePainter({
             title: "Menuet",
-            credit: "Menuet · J. S. Bach · CC0",
+            credit: "J. S. Bach · CC0",
             notes: [{ pitch: 60, startMs: 0, durationMs: 400, velocity: 100 }],
             durationMs: LEAD_IN_MS + 2_000,
             width: WIDTH,
@@ -257,7 +291,7 @@ describe("takeScenePainter with a score panel", () => {
             const context = canvas.getContext("2d")!;
             takeScenePainter({
                 title: "Menuet",
-                credit: "Menuet · J. S. Bach · CC0",
+                credit: "J. S. Bach · CC0",
                 notes: [{ pitch: 60, startMs: 0, durationMs: 400, velocity: 100 }],
                 durationMs: LEAD_IN_MS + 2_000,
                 width: WIDTH,
@@ -304,7 +338,7 @@ describe("takeScenePainter with a score panel", () => {
             const context = canvas.getContext("2d")!;
             takeScenePainter({
                 title: "Menuet",
-                credit: "Menuet · J. S. Bach · CC0",
+                credit: "J. S. Bach · CC0",
                 notes,
                 durationMs: LEAD_IN_MS + 16 * 200,
                 width: WIDTH,
@@ -344,7 +378,7 @@ describe("takeHighwayPainter", () => {
         const context = canvas.getContext("2d")!;
         takeHighwayPainter({
             title: "Menuet",
-            credit: "Menuet · J. S. Bach · CC0",
+            credit: "J. S. Bach · CC0",
             notes: NOTES,
             durationMs: LEAD_IN_MS + 4_000,
             width: WIDTH,
