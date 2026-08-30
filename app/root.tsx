@@ -49,6 +49,7 @@ import "@fontsource-variable/fredoka/wght.css";
 import "@fontsource-variable/comfortaa/wght.css";
 import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
+import { TITTLE, tittleFromBoxTop, WORDMARK } from "../core/wordmark";
 
 // Locales whose UI text is not drawn from Inter's Latin subset: Cyrillic and
 // Greek pages render from a different Inter subset, and CJK pages fall back to
@@ -138,20 +139,23 @@ function Header() {
                             aria-hidden="true"
                             className="font-display text-xl font-semibold tracking-tight text-ink"
                         >
-                            Pl
+                            {WORDMARK.before}
                             <span className="relative">
-                                ı
-                                {/* Sits where Fredoka's own tittle sits, measured rather than
-                                    guessed: rendering "i" against dotless "ı" and diffing the
-                                    two isolates the dot, which is 0.16em across with its
-                                    underside 0.55em above the baseline, centred on the stem.
-                                    The offset here is from the inline box top, which is the
-                                    ascent (0.89em) — hence 0.89 − 0.69 = 0.2em. It holds only
-                                    for this face at this weight; measure again rather than
-                                    carrying the number anywhere else. */}
-                                <span className="absolute left-1/2 top-[0.2em] h-[0.16em] w-[0.16em] -translate-x-1/2 rounded-full bg-plink" />
+                                {WORDMARK.stem}
+                                {/* Where Fredoka's own tittle sits. The geometry is
+                                    core/wordmark's — the same numbers the promo thumbnails
+                                    and an exported video's canvas draw from — anchored here
+                                    to the inline box's top, which is what CSS gives us. */}
+                                <span
+                                    className="absolute left-1/2 -translate-x-1/2 rounded-full bg-plink"
+                                    style={{
+                                        top: `${tittleFromBoxTop()}em`,
+                                        width: `${TITTLE.size}em`,
+                                        height: `${TITTLE.size}em`,
+                                    }}
+                                />
                             </span>
-                            nky
+                            {WORDMARK.after}
                         </span>
                     </Link>
                     <GradeBadge />

@@ -15,9 +15,9 @@ const TAKE = {
     // Provenance alone: the title is drawn above this line, so repeating it here would
     // print the piece's name twice.
     credit: "J. S. Bach · Mutopia Project",
-    // A licence carrying the mark, so the ring is under a baseline rather than only ever
-    // seen in a rendered clip.
-    license: { name: "CC0 1.0 Universal Public Domain Dedication", mark: true },
+    // Spelled out, so the third line is under a baseline rather than only ever seen in a
+    // rendered clip.
+    license: "CC0 1.0 Universal Public Domain Dedication",
     // Middle C held long, then re-pressed; E joins for a chord. The re-press at
     // 2000ms is what the fade makes visible.
     notes: [

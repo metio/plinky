@@ -172,11 +172,7 @@ describe("takeScenePainter title and watermark toggles", () => {
     const licenseRegion = (c: OffscreenCanvasRenderingContext2D) =>
         countPainted(c, 0, Math.round(HEIGHT * 0.205), half, Math.round(HEIGHT * 0.05));
 
-    function paint(opts: {
-        showTitle?: boolean;
-        showWordmark?: boolean;
-        license?: { name: string; mark: boolean };
-    }) {
+    function paint(opts: { showTitle?: boolean; showWordmark?: boolean; license?: string }) {
         const canvas = new OffscreenCanvas(WIDTH, HEIGHT);
         const context = canvas.getContext("2d")!;
         takeScenePainter({
@@ -214,18 +210,9 @@ describe("takeScenePainter title and watermark toggles", () => {
         // The licence sits under the composer, so the header band is taller with one than
         // without. Counting painted pixels is the only thing a canvas will tell you, and
         // more of them is exactly what a third line means.
-        const withLicense = paint({
-            license: { name: "CC0 1.0 Universal Public Domain Dedication", mark: true },
-        });
+        const withLicense = paint({ license: "CC0 1.0 Universal Public Domain Dedication" });
         expect(licenseRegion(withLicense)).toBeGreaterThan(30);
         expect(licenseRegion(paint({}))).toBe(0);
-    });
-
-    it("draws the Creative Commons ring only when the licence is theirs", () => {
-        // Same words either way, so any difference in the band is the mark itself.
-        const marked = paint({ license: { name: "A Licence 1.0", mark: true } });
-        const plain = paint({ license: { name: "A Licence 1.0", mark: false } });
-        expect(licenseRegion(marked)).toBeGreaterThan(licenseRegion(plain));
     });
 
     it("keeps the provenance credit even with both header labels off", () => {

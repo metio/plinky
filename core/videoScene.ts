@@ -5,7 +5,7 @@
 // what the credit line says. The painter applies these to a canvas; keeping the
 // geometry and wording here keeps them testable and the painter thin.
 
-import { type Attribution, isCreativeCommons } from "./attribution";
+import type { Attribution } from "./attribution";
 import { keyLane } from "./keyboardGeometry";
 import { maxOf, minOf } from "./stats";
 
@@ -132,9 +132,9 @@ export function highwayBlocks(
     return blocks;
 }
 
-// The credit line burnt into the video: the composer, the source, and the
-// licence — a shared file must carry the piece's provenance with it, and the
-// wordmark's "plinky.fun" is rendered separately by the painter.
+// The credit line burnt into the video: the composer and the source. A shared file must
+// carry the piece's provenance with it; the licence goes on the line below (licenseLine)
+// and the wordmark's "plinky.fun" is rendered separately by the painter.
 export function provenanceLine(attribution: Attribution): string {
     const parts: string[] = [];
     if (attribution.composer) {
@@ -146,22 +146,13 @@ export function provenanceLine(attribution: Attribution): string {
     return parts.join(" · ");
 }
 
-// The licence, for the line of its own it now gets.
+// The licence, for the line of its own it now gets. Empty when the piece carries a licence
+// the catalogue does not know, and then the line is simply not drawn.
 //
 // Spelled out rather than abbreviated: "CC BY-SA 4.0" is a code a reader either knows or
-// does not, and the frame has room for the sentence it stands for. `mark` says whether the
-// Creative Commons mark belongs in front of it — theirs to lend, so it goes only on
-// licences that are actually theirs.
-export type LicenseCredit = { name: string; mark: boolean };
-
-export function licenseCredit(attribution: Attribution): LicenseCredit | null {
-    if (!attribution.license) {
-        return null;
-    }
-    return {
-        name: attribution.license.name,
-        mark: isCreativeCommons(attribution.license),
-    };
+// does not, and the frame has room for the sentence it stands for.
+export function licenseLine(attribution: Attribution): string {
+    return attribution.license?.name ?? "";
 }
 
 // A rectangle on the pre-rendered score image, in image pixels — one or more per

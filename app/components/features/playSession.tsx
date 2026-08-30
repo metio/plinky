@@ -69,7 +69,6 @@ import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
-import type { LicenseCredit } from "../../../core/videoScene";
 
 // The one-time hint nudging a touch phone sideways for a wider keyboard.
 const ROTATE_HINT_ID = "rotate";
@@ -87,7 +86,7 @@ export type PlaySessionProps = {
     credit?: string;
     // The licence, spelled out on its own line under that. Absent for a piece with no
     // licence to name — a generated exercise is ours and carries none.
-    license?: LicenseCredit;
+    license?: string;
     onRunComplete?: () => void;
     // Every graded run, ephemeral ones included — the placement test needs the score
     // of a drill it deliberately does not keep, which onRunComplete (skipped for an

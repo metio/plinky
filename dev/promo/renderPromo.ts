@@ -26,7 +26,7 @@ import { webSampleSource } from "../../app/adapters/webSampleSource";
 import { playFromSamples } from "../../app/adapters/webAudioEngine";
 import { sampleLookup } from "../../app/lib/sampleVoices";
 import { takeHighwayPainter } from "../../app/lib/videoPainter";
-import { licenseCredit } from "../../core/videoScene";
+import { licenseLine } from "../../core/videoScene";
 import { attributionFor } from "../../core/attribution";
 import { readScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { NOMINAL_BPM } from "../../core/elapsed";
@@ -175,7 +175,7 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
     const paint = takeHighwayPainter({
         title: request.title,
         credit: request.credit,
-        license: licenseCredit(attributionFor({ license: request.licenseId })) ?? undefined,
+        license: licenseLine(attributionFor({ license: request.licenseId })) || undefined,
         notes,
         durationMs,
         width: request.width,

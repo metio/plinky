@@ -8,7 +8,7 @@ import { Button } from "../components/ui/button";
 import { ComposerCredit, composerCreditText } from "../components/ui/composerCredit";
 import { attributionFor } from "../../core/attribution";
 import { canonicalPeople, personSlug } from "../../core/person";
-import { licenseCredit, provenanceLine } from "../../core/videoScene";
+import { licenseLine, provenanceLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { ExerciseForms } from "../components/features/exerciseForms";
 import { ReturnToPiece } from "../components/features/returnToPiece";
@@ -173,7 +173,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         xml={score.xml}
                         title={score.title}
                         credit={provenanceLine(attribution)}
-                        license={licenseCredit(attribution) ?? undefined}
+                        license={licenseLine(attribution) || undefined}
                         options={options}
                         initialTempo={score.tempo}
                         beatsPerBar={score.beatsPerBar}

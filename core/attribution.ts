@@ -220,12 +220,3 @@ export function attributionFor(piece: {
         source: source && piece.credit ? { ...source, credit: piece.credit } : source,
     };
 }
-
-// Whether the Creative Commons mark belongs in front of this licence's name.
-//
-// Every licence the catalogue admits is a Creative Commons one, so today this is true of
-// all of them — written out rather than assumed, because the mark is CC's and must not
-// follow the first licence admitted that isn't theirs.
-export function isCreativeCommons(license: LicenseInfo): boolean {
-    return license.id.startsWith("CC");
-}

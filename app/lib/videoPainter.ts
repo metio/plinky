@@ -18,7 +18,6 @@ import {
     playedStepCount,
     type SceneKey,
     keyboardHeightFor,
-    type LicenseCredit,
     sceneKeys,
     sceneRange,
     type ScoreBox,
@@ -26,6 +25,7 @@ import {
     scoreWindowTop,
     stepCenterAt,
 } from "../../core/videoScene";
+import { tittleCircle, WORDMARK, wordmarkText } from "../../core/wordmark";
 
 // Paints one frame of the exported video: a dark stage with the piece's title,
 // a progress rail, the notation (when a snapshot was rendered) with the played
@@ -104,8 +104,8 @@ export type ScenePainterInput = {
     title: string;
     // Who wrote it and where the score came from — core/videoScene's provenanceLine.
     credit: string;
-    // The licence, on its own line under that — core/videoScene's licenseCredit.
-    license?: LicenseCredit;
+    // The licence, spelled out on its own line under that — core/videoScene's licenseLine.
+    license?: string;
     notes: RecordedNote[];
     durationMs: number;
     width: number;
@@ -142,18 +142,12 @@ type Context2D = Pick<
     | "drawImage"
     | "clip"
     | "measureText"
-    // The Creative Commons ring is the one stroked shape on the stage; everything else
-    // is filled.
-    | "arc"
-    | "stroke"
     // The keys are shaded rather than filled flat, which is what stops a long one reading
     // as a stripe. Narrow on purpose, this list — every entry is something a stand-in
     // context in a test has to answer.
     | "createLinearGradient"
 > & {
     fillStyle: string | CanvasGradient | CanvasPattern;
-    strokeStyle: string | CanvasGradient | CanvasPattern;
-    lineWidth: number;
     font: string;
     textBaseline: CanvasTextBaseline;
     textAlign: CanvasTextAlign;
@@ -173,28 +167,38 @@ function ellipsize(context: Context2D, text: string, room: number): string {
     return `${text.slice(0, keep)}…`;
 }
 
-// The Creative Commons mark: their two letters inside their ring, drawn rather than
-// loaded so the frame owes nothing to an asset that might not be there when a video is
-// exported offline. Sized to sit on the licence line's own baseline box, so the ring's
-// height matches the text beside it and the pair reads as one label.
-function paintCcMark(context: Context2D, x: number, top: number, size: number): void {
-    const radius = size / 2;
-    const centerX = x + radius;
-    const centerY = top + radius;
-    context.save();
-    context.strokeStyle = MUTED;
-    context.lineWidth = Math.max(1, size * 0.08);
+// The wordmark's size against the frame's short side. The title is drawn at 0.062, and the
+// gap between them is the point: on a clip the piece is what somebody is deciding about,
+// and the mark only has to be legible next to it.
+const WORDMARK_SCALE = 0.029;
+
+// The lockup, right-aligned on `rightX` and sitting on `baselineY`.
+//
+// The same mark the header and the thumbnails set, from the same geometry: the name in the
+// display face with a dotless stem, and the plink drawn where the face's own tittle would
+// be. Canvas has no inline boxes to anchor against, so it asks core/wordmark for the
+// circle directly — which is why that module describes the dot from both ends.
+function paintWordmark(context: Context2D, rightX: number, baselineY: number, unit: number): void {
+    const size = Math.round(unit * WORDMARK_SCALE);
+    context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
+    const text = wordmarkText(true);
+    // Placed from the left so the stem can be found by measuring the run before it; drawing
+    // right-aligned would leave nothing to measure against.
+    const left = rightX - context.measureText(text).width;
+    context.textAlign = "left";
+    context.textBaseline = "alphabetic";
+    context.fillStyle = INK;
+    context.fillText(text, left, baselineY);
+
+    const stemLeft = left + context.measureText(WORDMARK.before).width;
+    const stemCenter = stemLeft + context.measureText(WORDMARK.stem).width / 2;
+    const dot = tittleCircle(stemCenter, baselineY, size);
+    context.fillStyle = ACCENT;
     context.beginPath();
-    context.arc(centerX, centerY, radius - context.lineWidth / 2, 0, Math.PI * 2);
-    context.stroke();
-    context.fillStyle = MUTED;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.font = `600 ${Math.round(size * 0.58)}px ${FONT_FAMILY}`;
-    // Nudged down by a hair: "CC" has no descender, so centring on the glyph box leaves it
-    // sitting visibly high inside the ring.
-    context.fillText("CC", centerX, centerY + size * 0.04);
-    context.restore();
+    // A square with a radius of half its side is a circle, which keeps the stage's one
+    // round shape on the same primitive as everything else drawn here.
+    context.roundRect(dot.cx - dot.r, dot.cy - dot.r, dot.r * 2, dot.r * 2, dot.r);
+    context.fill();
 }
 
 // The stage furniture shared by every format: the piece's title, the wordmark,
@@ -203,7 +207,7 @@ function paintCcMark(context: Context2D, x: number, top: number, size: number): 
 type ChromeConfig = {
     title: string;
     credit: string;
-    license?: LicenseCredit;
+    license?: string;
     width: number;
     height: number;
     unit: number;
@@ -222,8 +226,11 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
     // The wordmark measures first so the title knows where it must stop — on a
     // narrow portrait frame a long title would otherwise run under it. With the
     // wordmark off, the title reclaims that room.
-    context.font = fontAt(500, 0.035, unit);
-    const wordmarkWidth = showWordmark ? context.measureText("plinky.fun").width : 0;
+    //
+    // Smaller than the title on purpose, and smaller than it used to be: on a clip the
+    // piece is what a viewer is deciding about, and the mark only has to be legible.
+    context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
+    const wordmarkWidth = showWordmark ? context.measureText(wordmarkText(true)).width : 0;
     const textRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
     if (showTitle) {
         context.textAlign = "left";
@@ -258,24 +265,14 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
     // Commons Attribution-ShareAlike 4.0 International" says what "CC BY-SA 4.0" only
     // gestures at, and a viewer who has to look a code up will not.
     if (cfg.license) {
-        const size = Math.round(unit * 0.03);
-        context.font = fontAt(400, 0.03, unit);
-        let x = margin;
-        if (cfg.license.mark) {
-            paintCcMark(context, x, line, size);
-            x += size * 1.35;
-        }
         context.textAlign = "left";
         context.textBaseline = "top";
         context.fillStyle = MUTED;
-        context.fillText(ellipsize(context, cfg.license.name, width - margin - x), x, line);
+        context.font = fontAt(400, 0.03, unit);
+        context.fillText(ellipsize(context, cfg.license, textRoom), margin, line);
     }
     if (showWordmark) {
-        context.textAlign = "right";
-        context.textBaseline = "top";
-        context.fillStyle = MUTED;
-        context.font = fontAt(500, 0.035, unit);
-        context.fillText("plinky.fun", width - margin, height * 0.09);
+        paintWordmark(context, width - margin, height * 0.08 + unit * 0.049, unit);
     }
     const railY = height * 0.26;
     // The rail's unfilled track: the violet-black, a step down from the ground
@@ -414,7 +411,7 @@ function paintKeyboard(
 function stageFor(input: {
     title: string;
     credit: string;
-    license?: LicenseCredit;
+    license?: string;
     notes: RecordedNote[];
     durationMs: number;
     width: number;
@@ -678,7 +675,7 @@ export function takeHighwayPainter({
 }: {
     title: string;
     credit: string;
-    license?: LicenseCredit;
+    license?: string;
     notes: RecordedNote[];
     durationMs: number;
     width: number;

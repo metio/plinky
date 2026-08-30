@@ -25,6 +25,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { readFile as read } from "node:fs/promises";
 import { chromium } from "playwright";
 import { folderFor, PIECES } from "./pieces.mjs";
+import { DOMAIN, TITTLE as TITTLE_EM, tittleFromBoxBottom, WORDMARK } from "../../core/wordmark.ts";
 
 const OUT = argValue("--out") ?? "promo";
 const ONLY = argValue("--only");
@@ -42,10 +43,9 @@ const STAGE = "#000000";
 const GLOW = "#180a2e";
 const PAPER = "#f9f8fc";
 const PLINK = "#aa36fc";
-// Fredoka puts its tittle 0.55em above the baseline at a diameter of 0.16em, centred on the
-// stem; the inline box drops 0.22em below the baseline, so anchoring from its bottom is
-// 0.55 + 0.22 = 0.77em. See dev/build-icons.mjs.
-const TITTLE = "bottom:.77em;width:.16em;height:.16em";
+// The dot, anchored to the inline box's bottom — the end CSS gives us here. The numbers are
+// core/wordmark's, the same ones the app header and an exported video's canvas draw from.
+const TITTLE = `bottom:${tittleFromBoxBottom()}em;width:${TITTLE_EM.size}em;height:${TITTLE_EM.size}em`;
 
 // The keys alone — no tile, no lockup. A tile would need an edge to read as a tile, and on
 // this ground it has none, so it becomes a smudge behind the keys; the white keys carry
@@ -118,7 +118,7 @@ function card(piece, cut) {
                 is the wordmark's own tail, in the same face, and the address and the name
                 are the same object. -->
            <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:-0.01em;color:${PAPER};line-height:1">
-             Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>nky.fun
+             ${WORDMARK.before}<span style="position:relative">${WORDMARK.stem}<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>${WORDMARK.after}${DOMAIN}
            </div>
          </div>`;
 }

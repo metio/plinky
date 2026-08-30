@@ -25,7 +25,6 @@ import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
 import { Switch } from "../ui/switch";
-import type { LicenseCredit } from "../../../core/videoScene";
 
 // The base 16:9 sizes per quality step; portrait swaps the axes for the
 // vertical feeds (Reels, Shorts, TikTok).
@@ -65,7 +64,7 @@ export function ExportVideoButton({
     take: Take;
     title: string;
     credit: string;
-    license?: LicenseCredit;
+    license?: string;
     // The piece's own notation (and the hand it was practised with), when the
     // page knows it — the recognizable score beats a re-engraving of the take.
     original?: OriginalScore | null;

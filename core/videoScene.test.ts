@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { keyLane } from "./keyboardGeometry";
 import { attributionFor } from "./attribution";
 import {
-    licenseCredit,
+    licenseLine,
     provenanceLine,
     highwayBlocks,
     playedStepCount,
@@ -80,29 +80,21 @@ describe("provenanceLine", () => {
     });
 });
 
-describe("licenseCredit", () => {
+describe("licenseLine", () => {
     it("spells the licence out rather than printing its code", () => {
-        expect(licenseCredit(attributionFor({ license: "CC-BY-SA-4.0" }))).toEqual({
-            name: "Creative Commons Attribution-ShareAlike 4.0 International",
-            mark: true,
-        });
-        expect(licenseCredit(attributionFor({ license: "CC0-1.0" }))?.name).toBe(
+        expect(licenseLine(attributionFor({ license: "CC-BY-SA-4.0" }))).toBe(
+            "Creative Commons Attribution-ShareAlike 4.0 International",
+        );
+        expect(licenseLine(attributionFor({ license: "CC0-1.0" }))).toBe(
             "CC0 1.0 Universal Public Domain Dedication",
         );
     });
 
     it("has nothing to say about a piece whose licence is unknown", () => {
-        expect(licenseCredit(attributionFor({}))).toBeNull();
-        expect(licenseCredit(attributionFor({ license: "WTFPL" }))).toBeNull();
-    });
-
-    it("puts the Creative Commons mark only on Creative Commons licences", () => {
-        // Every licence the catalogue admits is one of theirs today, so this pins the
-        // condition rather than the answer — the mark must not follow the first licence
-        // admitted that isn't.
-        for (const id of ["CC0-1.0", "CC-BY-4.0", "CC-BY-NC-SA-4.0"]) {
-            expect(licenseCredit(attributionFor({ license: id }))?.mark).toBe(true);
-        }
+        // Empty rather than a guess: the painter draws no line, which is the right answer
+        // for a piece whose terms the catalogue cannot vouch for.
+        expect(licenseLine(attributionFor({}))).toBe("");
+        expect(licenseLine(attributionFor({ license: "WTFPL" }))).toBe("");
     });
 });
 
