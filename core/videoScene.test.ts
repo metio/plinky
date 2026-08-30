@@ -301,7 +301,7 @@ describe("wrapTitle", () => {
     it("puts the overflow on the last line when two are not enough", () => {
         const lines = wrapTitle(measure, "one two three four five six seven eight", 60, 60, 2);
         expect(lines).toHaveLength(2);
-        // Nothing is dropped: the painter ellipsises what will not fit when it draws.
+        // Nothing is dropped: the painter trims what will not fit when it draws.
         expect(lines.join(" ")).toBe("one two three four five six seven eight");
     });
 
