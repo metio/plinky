@@ -128,8 +128,18 @@
             # named here, and cannot go stale as the translations change.
             (pkgs.writeShellScriptBin "ci-widths" ''
               set -e
-              PLINKY_LOCALE="$(node dev/locale-stress.mjs --widest)" npm run build
-              exec npm run widths "$@"
+              # One locale per writing system, not one worst case. The widest word is an
+              # argument about LENGTH and a sound one: if the longest fits, every shorter
+              # one does. It says nothing about SHAPE, and shape is what breaks a control —
+              # Korean, Japanese and Chinese are the SHORTEST of the twenty-six by character
+              # count, so they were never the worst case and never swept, while having the
+              # tallest glyphs and entirely different line-breaking. Each build measures the
+              # same pages at the same widths; only the language changes.
+              for locale in $(node dev/locale-stress.mjs --scripts); do
+                echo "── $locale ──"
+                PLINKY_LOCALE="$locale" npm run build
+                npm run widths "$@"
+              done
             '')
             # Reads the manifest only, so it costs nothing: the collections the grade
             # boundaries were calibrated against must still resolve to the catalogue. A

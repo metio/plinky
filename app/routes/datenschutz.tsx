@@ -38,7 +38,10 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 export default function Datenschutz() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <h1 className="font-display text-3xl font-semibold tracking-tight">
+            {/* The title is one long word in several languages — "Политика
+                конфиденциальности", "Datenschutzerklärung" — and wider at this size than a
+                small phone. */}
+            <h1 className="font-display text-3xl font-semibold tracking-tight break-words">
                 {m.datenschutz_title()}
             </h1>
             <p className="text-sm text-muted">{m.datenschutz_updated()}</p>

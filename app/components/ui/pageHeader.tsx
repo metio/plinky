@@ -28,7 +28,14 @@ export function PageHeader({
         <header className="space-y-1">
             {eyebrow ? <p className={sectionLabelClasses}>{eyebrow}</p> : null}
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">{title}</h1>
+                {/* Long single words — "Политика конфиденциальности", "Datenschutzerklärung"
+                    — are wider at this size than a small phone, and a title has nowhere else
+                    to go. Breaking only happens where it must — and min-w-0 is what lets it:
+                    overflow-wrap permits a break during layout without reducing the
+                    min-content width a flex item is sized from, so the pair is needed. */}
+                <h1 className="min-w-0 font-display text-3xl font-semibold tracking-tight break-words">
+                    {title}
+                </h1>
                 {actions}
             </div>
             {hint ? <p className="text-sm text-muted">{hint}</p> : null}

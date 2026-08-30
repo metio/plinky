@@ -481,7 +481,13 @@ export function HomeToday() {
                     "tiistai" — which is correct for the word and wrong for the start of a
                     heading. Lifting the first letter in CSS fixes every language at once,
                     and does nothing at all to a script that has no capitals. */}
-                <h1 className="font-display text-4xl font-semibold tracking-tight first-letter:uppercase sm:text-5xl">
+                {/* break-words only acts when a word would otherwise run off the screen,
+                    so it costs a language that fits nothing at all. Russian's "воскресенье
+                    утром" pushed the home page 42px past a 320px phone; no length check
+                    could have found it, because Russian's longest word is 19 characters
+                    against Danish's 32 — it is the SIZE this heading is set at, beside a
+                    drawing, that leaves nothing to break at. */}
+                <h1 className="font-display text-4xl font-semibold tracking-tight break-words first-letter:uppercase sm:text-5xl">
                     {heading}
                 </h1>
                 {/* Holds its line before the standing resolves, so the day's practice does

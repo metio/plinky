@@ -13,6 +13,15 @@
 //   --widest    the longest word a line cannot be broken inside. This is what drags a
 //               320px page sideways and takes every page with it — a German compound
 //               noun, a Danish authority's name.
+//   --scripts   the hardest locale of EACH WRITING SYSTEM, one per line. The two worst
+//               cases above answer "how long" and "how heavy", and both are sound
+//               arguments about LENGTH: if the longest word fits, every shorter one does.
+//               Neither says anything about SHAPE. Korean, Japanese and Chinese are the
+//               SHORTEST of the twenty-six by character count, so they are never the worst
+//               case and never swept — while having the tallest glyphs, entirely different
+//               line-breaking, and the best chance of falling back to another font. A
+//               Korean label breaking a control ships green today and no length-based proxy
+//               can catch it.
 //   --heaviest  the most message text by bytes, which is what a visitor downloads.
 //               Greek ships 2.07x the English bytes; measured, that is 21.8 KB of real
 //               weight that the size budget never saw because it only ever weighed en.
@@ -39,6 +48,67 @@ const INTERPOLATION = /\{[^}]*\}/g;
 
 // Punctuation a browser will also break after.
 const SEPARATORS = /[\s <>/#.,;:!?()[\]"'’“”—–-]+/;
+
+// Which writing system a locale is actually set in, read off its own text rather than
+// mapped from its name: a language can be written in more than one script, and this repo
+// has already had to fix Serbian being assumed Latin when it ships Cyrillic.
+const SCRIPTS = [
+    ["han", /[\u4e00-\u9fff]/],
+    ["kana", /[\u3040-\u30ff]/],
+    ["hangul", /[\uac00-\ud7af\u1100-\u11ff]/],
+    ["cyrillic", /[\u0400-\u04ff]/],
+    ["greek", /[\u0370-\u03ff]/],
+];
+
+export function scriptOf(text) {
+    const counts = SCRIPTS.map(([name, pattern]) => [
+        name,
+        [...text].filter((character) => pattern.test(character)).length,
+    ]);
+    const [name, count] = counts.reduce((best, one) => (one[1] > best[1] ? one : best));
+    // Below a floor it is a stray glyph in a Latin string — a Greek letter in a music term,
+    // a Cyrillic name in a credit — rather than the language's own script.
+    return count > text.length / 20 ? name : "latin";
+}
+
+// The locale that stresses layout hardest within each writing system: the same longest-word
+// measure, applied per script instead of once across all of them. Sweeping these covers the
+// shapes a page can be asked to hold, which is the thing one worst case cannot.
+export function localesByScript(dir = DIR) {
+    const hardest = new Map();
+    for (const file of readdirSync(dir).filter((name) => name.endsWith(".json"))) {
+        const locale = file.replace(/\.json$/, "");
+        const messages = JSON.parse(readFileSync(`${dir}/${file}`, "utf8"));
+        const text = Object.entries(messages)
+            .filter(([key, value]) => typeof value === "string" && !key.startsWith("$"))
+            .map(([, value]) => value)
+            // The values, and joined with a space rather than with nothing. Keep the keys
+            // and the longest "word" is a message id, which every locale shares, so they all
+            // measure the same; join with nothing and the end of one string fuses to the
+            // start of the next. Both mistakes were made here, and both name the wrong
+            // locale confidently.
+            .join(" ");
+        const script = scriptOf(text);
+        // Within a script that wraps between characters there is no longest word to compare,
+        // so the most text wins: it is the one that fills the most room.
+        const measure = BREAKS_ANYWHERE.test(text)
+            ? text.length
+            : Math.max(
+                  0,
+                  ...text
+                      .replace(INTERPOLATION, " ")
+                      .split(SEPARATORS)
+                      .map((t) => t.length),
+              );
+        const held = hardest.get(script);
+        if (held === undefined || measure > held.measure) {
+            hardest.set(script, { locale, measure });
+        }
+    }
+    return [...hardest.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([script, { locale }]) => ({ script, locale }));
+}
 
 export function widestLocale(dir = DIR) {
     let best = { locale: "en", token: "", length: 0, key: "" };
@@ -82,7 +152,13 @@ export function heaviestLocale(dir = DIR) {
 // Printed bare on stdout so a shell can build with it: PLINKY_LOCALE=$(node …).
 // The reasoning goes to stderr, where it is read by a person and ignored by the shell.
 if (import.meta.url === `file://${process.argv[1]}`) {
-    if (process.argv.includes("--heaviest")) {
+    if (process.argv.includes("--scripts")) {
+        const found = localesByScript();
+        console.error(
+            `One locale per writing system: ${found.map((one) => `${one.locale} (${one.script})`).join(", ")}`,
+        );
+        console.log(found.map((one) => one.locale).join(" "));
+    } else if (process.argv.includes("--heaviest")) {
         const best = heaviestLocale();
         console.error(`Heaviest locale: ${best.locale} — ${best.bytes} bytes of message text`);
         console.log(best.locale);

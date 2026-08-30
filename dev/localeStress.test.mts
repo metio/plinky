@@ -5,7 +5,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { heaviestLocale, widestLocale } from "./locale-stress.mjs";
+import { heaviestLocale, localesByScript, scriptOf, widestLocale } from "./locale-stress.mjs";
 
 const withMessages = (locales: Record<string, Record<string, string>>): string => {
     const dir = mkdtempSync(join(tmpdir(), "plinky-widest-"));
@@ -90,5 +90,44 @@ describe("heaviestLocale", () => {
             },
         });
         expect(heaviestLocale(dir).locale).toBe("en");
+    });
+});
+
+describe("one locale per writing system", () => {
+    it("names a locale for every script the app actually ships", () => {
+        const found = localesByScript();
+        const scripts = found.map((one) => one.script).sort();
+        // Latin, Cyrillic, Greek and the three CJK systems are all in the catalogue of
+        // twenty-six. A script that stopped appearing would mean a locale was dropped.
+        expect(scripts).toEqual(["cyrillic", "greek", "han", "hangul", "kana", "latin"]);
+        expect(new Set(found.map((one) => one.locale)).size).toBe(found.length);
+    });
+
+    it("agrees with the overall widest about which Latin locale is hardest", () => {
+        // The cross-check that matters. Both answer the same question over the same text,
+        // one per script and one across all of them, so for Latin — where the widest word
+        // in the whole catalogue lives — they have to name the same locale. They did not
+        // twice while this was being written: once because the message VALUES were joined
+        // with nothing, fusing the end of one string to the start of the next, and once
+        // because the keys were left in, making the longest "word" a message id that every
+        // locale shares.
+        const byScript = localesByScript().find((one) => one.script === "latin");
+        expect(byScript?.locale).toBe(widestLocale().locale);
+    });
+
+    it("reads a locale's script off its own text, not off its name", () => {
+        // Serbian ships in Cyrillic. A table mapping language to script would have to know
+        // that, and would be wrong the day a locale switched.
+        expect(scriptOf("Плинки клавир")).toBe("cyrillic");
+        expect(scriptOf("Πλίνκι πιάνο")).toBe("greek");
+        expect(scriptOf("プリンキー")).toBe("kana");
+        expect(scriptOf("플링키 피아노")).toBe("hangul");
+        expect(scriptOf("Plinky piano")).toBe("latin");
+    });
+
+    it("does not call a Latin string Greek because one term is", () => {
+        // A stray glyph in an otherwise Latin string — a Greek letter in a music term, a
+        // Cyrillic name in a credit — is not the language's own script.
+        expect(scriptOf("The piece is in A major, marked ♪ and π-adjacent")).toBe("latin");
     });
 });

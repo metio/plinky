@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 30 August 2026
 
+**Two pages no longer run off the side of a small phone in Russian.** The greeting on
+the home page and the title of the privacy page were wider than a 320px screen —
+enough to make the whole page scroll sideways. They break across lines now, in any
+language whose words need it, and change nothing in one whose words fit.
+
 **The glossary shows a symbol on the keys, not only on the page.** Every entry already
 drew the mark on a stave and offered to play it; now the same bar sits under a pair of
 hands as well, so you can see which keys it asks for and how long they are held. A
