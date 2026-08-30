@@ -146,6 +146,53 @@ export function provenanceLine(attribution: Attribution): string {
     return parts.join(" · ");
 }
 
+// The title, broken across at most `maxLines` rows.
+//
+// Only the first row shares its width with the wordmark; the rows under it have the frame
+// to themselves, which is most of why two is enough. Measured rather than counted: a title
+// fits or does not by how wide its letters are, and character count says nothing about that
+// — "Nocturne in C-sharp minor" and "Nocturne in E minor, H 46" are the same length and one
+// of them overflowed.
+//
+// `measure` is the caller's, because the width of a string is a property of the face it is
+// set in and this module knows nothing about canvases.
+//
+// A single word too long for its row is ellipsised rather than broken: a hyphen inserted
+// mid-word into a piece's name invents a spelling.
+export function wrapTitle(
+    measure: (text: string) => number,
+    title: string,
+    firstRoom: number,
+    restRoom: number,
+    maxLines = 2,
+): string[] {
+    const words = title.split(" ").filter(Boolean);
+    const lines: string[] = [];
+    let index = 0;
+    while (index < words.length && lines.length < maxLines) {
+        const room = lines.length === 0 ? firstRoom : restRoom;
+        let line = "";
+        while (index < words.length) {
+            const next = line ? `${line} ${words[index]}` : words[index]!;
+            if (line !== "" && measure(next) > room) {
+                break;
+            }
+            line = next;
+            index++;
+            // A first word already over the room cannot be helped by taking more.
+            if (measure(line) > room) {
+                break;
+            }
+        }
+        lines.push(line);
+    }
+    // Whatever is left has nowhere to go, so the last row says so.
+    if (index < words.length) {
+        lines[lines.length - 1] = `${lines[lines.length - 1]} ${words.slice(index).join(" ")}`;
+    }
+    return lines.length > 0 ? lines : [title];
+}
+
 // The licence, for the line of its own it now gets. Empty when the piece carries a licence
 // the catalogue does not know, and then the line is simply not drawn.
 //

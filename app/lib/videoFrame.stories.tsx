@@ -121,8 +121,9 @@ export const ScorePortrait: Story = {
     render: () => <PortraitFrame />,
 };
 
-// A long title on the narrow portrait frame: it ellipsizes short of the
-// wordmark instead of running under it.
+// A long title on the narrow portrait frame: it takes a second row rather than being cut
+// short of the wordmark. Only the first row shares its width with the mark, so the second
+// runs the full width of the frame.
 export const PortraitLongTitle: Story = {
     render: () => <PortraitFrame title="Twinkle, Twinkle, Little Star (both hands)" />,
 };

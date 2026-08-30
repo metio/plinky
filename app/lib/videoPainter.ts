@@ -24,6 +24,7 @@ import {
     scorePanelRect,
     scoreWindowTop,
     stepCenterAt,
+    wrapTitle,
 } from "../../core/videoScene";
 import { tittleCircle, WORDMARK, wordmarkText } from "../../core/wordmark";
 
@@ -171,6 +172,11 @@ function ellipsize(context: Context2D, text: string, room: number): string {
 // and the mark only has to be legible next to it.
 const WORDMARK_SCALE = 0.029;
 
+// One row of title, against the frame's short side. With the 0.016 gap under the block it
+// puts the composer exactly where a single-line title always put it, so a short title's
+// frame is unchanged and only a long one moves anything.
+const TITLE_ROW = 0.072;
+
 // The lockup, right-aligned on `rightX` and sitting on `baselineY`.
 //
 // The same mark the header and the thumbnails set, from the same geometry: the name in the
@@ -236,12 +242,32 @@ function paintChrome(context: Context2D, cfg: ChromeConfig): void {
     context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
     const wordmarkWidth = showWordmark ? context.measureText(wordmarkText(true)).width : 0;
     const textRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
+    const fullRoom = width - margin * 2;
+    // Where the composer starts, which depends on how many rows the title took.
+    let line = height * 0.08;
     if (showTitle) {
         context.textAlign = "left";
         context.textBaseline = "top";
         context.fillStyle = INK;
         context.font = fontAt(600, 0.062, unit, DISPLAY_FAMILY);
-        context.fillText(ellipsize(context, title, textRoom), margin, height * 0.08);
+        // A truncated name is the worst thing this frame can do: it is the one piece of
+        // information somebody scrolling is deciding on. Fifteen of the sixty-four promo
+        // titles overflowed one row at this size, so the title takes a second when it needs
+        // one — into the band the progress rail used to occupy, which is now empty.
+        //
+        // Only the first row shares its width with the wordmark; the second has the frame.
+        const rows = wrapTitle(
+            (text) => context.measureText(text).width,
+            title,
+            textRoom,
+            fullRoom,
+        );
+        for (const [index, row] of rows.entries()) {
+            const room = index === 0 ? textRoom : fullRoom;
+            context.fillText(ellipsize(context, row, room), margin, line);
+            line += unit * TITLE_ROW;
+        }
+        line += unit * 0.016;
     }
     // The provenance sits directly under the title, where a reader looks next — a piece
     // and who wrote it are one thought, and the licence belongs with them.
@@ -255,7 +281,6 @@ function paintChrome(context: Context2D, cfg: ChromeConfig): void {
     // With the title turned off, the credit is the only thing naming the piece, so it takes
     // the title's place and carries the name — an exported file that names nothing is not
     // an attribution.
-    let line = height * 0.08 + (showTitle ? unit * 0.088 : 0);
     const provenance = showTitle ? cfg.credit : [title, cfg.credit].filter(Boolean).join(" · ");
     if (provenance !== "") {
         context.textAlign = "left";

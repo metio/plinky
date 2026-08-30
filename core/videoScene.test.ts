@@ -7,6 +7,7 @@ import { attributionFor } from "./attribution";
 import {
     licenseLine,
     provenanceLine,
+    wrapTitle,
     highwayBlocks,
     playedStepCount,
     sceneKeys,
@@ -262,5 +263,49 @@ describe("the keyboard the export draws", () => {
             2000,
         );
         expect(blocks[0]).toMatchObject({ finger: 1, hand: "left" });
+    });
+});
+
+describe("wrapTitle", () => {
+    // A stand-in face: every character is ten wide, so the sums are readable.
+    const measure = (text: string) => text.length * 10;
+
+    it("keeps a title that fits on one line", () => {
+        expect(wrapTitle(measure, "Gymnopédie No. 1", 400, 400)).toEqual(["Gymnopédie No. 1"]);
+    });
+
+    it("breaks at a space, and the second line gets the wider room", () => {
+        // 250 on the first row (the wordmark takes the rest), 400 under it.
+        const lines = wrapTitle(measure, "Nocturne in E minor, Op. 72 No. 1", 250, 400);
+        expect(lines).toHaveLength(2);
+        expect(lines.join(" ")).toBe("Nocturne in E minor, Op. 72 No. 1");
+        expect(measure(lines[0]!)).toBeLessThanOrEqual(250);
+        expect(measure(lines[1]!)).toBeLessThanOrEqual(400);
+    });
+
+    it("never splits a word", () => {
+        for (const line of wrapTitle(measure, "Toccata and Fugue in D minor", 200, 300)) {
+            for (const word of line.split(" ")) {
+                expect("Toccata and Fugue in D minor".split(" ")).toContain(word);
+            }
+        }
+    });
+
+    it("keeps a single unbreakable word rather than hyphenating it", () => {
+        // Inserting a hyphen into a piece's name invents a spelling it does not have.
+        expect(wrapTitle(measure, "Supercalifragilistic", 50, 50)).toEqual([
+            "Supercalifragilistic",
+        ]);
+    });
+
+    it("puts the overflow on the last line when two are not enough", () => {
+        const lines = wrapTitle(measure, "one two three four five six seven eight", 60, 60, 2);
+        expect(lines).toHaveLength(2);
+        // Nothing is dropped: the painter ellipsises what will not fit when it draws.
+        expect(lines.join(" ")).toBe("one two three four five six seven eight");
+    });
+
+    it("honours a one-line budget", () => {
+        expect(wrapTitle(measure, "one two three", 60, 60, 1)).toHaveLength(1);
     });
 });
