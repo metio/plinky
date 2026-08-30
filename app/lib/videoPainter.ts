@@ -261,7 +261,9 @@ function paintChrome(context: Context2D, cfg: ChromeConfig): void {
     if (provenance !== "") {
         context.textAlign = "left";
         context.textBaseline = "top";
-        context.fillStyle = MUTED;
+        // The same ink as the title. The composer is part of naming the piece, not a note
+        // about it, and size and weight already say which of the two lines leads.
+        context.fillStyle = INK;
         context.font = fontAt(500, 0.034, unit, DISPLAY_FAMILY);
         context.fillText(ellipsize(context, provenance, textRoom), margin, line);
         line += unit * 0.052;
