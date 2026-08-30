@@ -23,6 +23,8 @@ import { chromium } from "playwright";
 // the keys need the space it was taking. Both come from `npm run mark`.
 const MARK = "brand/plinky-mark.png";
 const ICON = "brand/plinky-icon.png";
+// The keys with no tile under them, for setting on something already violet.
+const KEYS = "brand/plinky-keys.png";
 const PAPER = "#f9f8fc";
 const INK = "#191545";
 const ACCENT = "#4915d2";
@@ -31,6 +33,7 @@ const ACCENT = "#4915d2";
 // depend on where the browser thinks its document lives.
 const mark = `data:image/png;base64,${(await readFile(MARK)).toString("base64")}`;
 const icon = `data:image/png;base64,${(await readFile(ICON)).toString("base64")}`;
+const keys = `data:image/png;base64,${(await readFile(KEYS)).toString("base64")}`;
 // The tagline is set in the app's own display face, so the render has to carry the font
 // with it — a headless browser has no Fredoka installed, and the fallback would not be
 // the face the app ships. Latin only: nothing rendered here is ever translated.
@@ -63,6 +66,32 @@ async function shoot(html, { width, height, path }) {
 const tile = (size) => `<img src="${icon}" alt="" width="${size}" height="${size}">`;
 for (const size of [512, 192, 180, 32]) {
     await shoot(tile(size), { width: size, height: size, path: `public/icon-${size}.png` });
+}
+
+// The maskable form, which is a different picture rather than the same one re-cropped.
+//
+// A launcher that masks does not letterbox: it crops the icon to its own shape — a circle
+// on some Android launchers, a squircle on others — and paints its own ground behind
+// whatever is transparent. The tiles above carry their rounded silhouette in their alpha,
+// which is right where nothing masks them and wrong where something does: installed through
+// Chrome, the transparent corners came back as white and the tile floated in the middle of a
+// white circle with ground showing on all four sides.
+//
+// So the violet reaches every edge here, and the artwork is the keys WITHOUT their tile —
+// a tile on a ground of its own colour has no edge to show and would only read as a smudge.
+// At 0.76 the keys sit inside the circle a mask may cut to, which is the guarantee the
+// format asks for: everything outside the middle 80% is the platform's to take.
+const MASK_SAFE = 0.76;
+const maskable = (size) =>
+    `<div style="width:${size}px;height:${size}px;background:${ACCENT};display:flex;align-items:center;justify-content:center">
+       <img src="${keys}" alt="" style="width:${Math.round(size * MASK_SAFE)}px;height:${Math.round(size * MASK_SAFE)}px;flex:none">
+     </div>`;
+for (const size of [512, 192]) {
+    await shoot(maskable(size), {
+        width: size,
+        height: size,
+        path: `public/icon-maskable-${size}.png`,
+    });
 }
 
 // The favicon: an ICO wrapping the 32px render. The format allows a PNG payload outright,
@@ -117,5 +146,6 @@ await unlink("public/icon-32.png");
 
 console.log(
     "public/: icon-512, icon-192, icon-180 and favicon.ico from brand/plinky-icon.png; " +
+        "icon-maskable-512 and icon-maskable-192 from brand/plinky-keys.png on the accent; " +
         "icon-banner-512 and og.png from brand/plinky-mark.png",
 );

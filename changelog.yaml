@@ -4,6 +4,13 @@
 - date: 2026-08-30
   entries:
     - |-
+      **Installing Plinky gives you a proper app icon.** Added to a phone's home screen or
+      a desktop, the icon was a small tile marooned in a white circle with a band of white
+      all round it. Launchers crop an icon to their own shape and fill whatever is left
+      with their own colour, so Plinky now ships an icon made for that: the violet reaches
+      every edge and the keys sit in the middle, whatever shape your launcher cuts it to.
+      Reinstall to pick it up.
+    - |-
       **Links to a piece work properly when you share them.** Paste one into a chat or a
       post and it shows a preview card instead of nothing, and search engines can find the
       pieces at last — the site had been telling them every piece in the catalogue was a
