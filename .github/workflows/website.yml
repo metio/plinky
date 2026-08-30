@@ -120,10 +120,10 @@ jobs:
         # No npm install: both scripts use only Node built-ins + settings.json.
         run: nix develop --command node dev/stamp-sw.mjs && nix develop --command node dev/gen-sitemap.mjs
       - name: Add SPA fallback
-        # Cloudflare Pages serves 404.html for a path it cannot match, so a deep link
-        # refreshed on an unprerendered route lands on the shell and the client router
-        # takes over.
-        run: cp build/client/__spa-fallback.html build/client/404.html
+        # The shell for a path with no prerendered document, plus the routes where the
+        # middleware corrects its status — Pages would otherwise serve a real page with
+        # a 404. See dev/spa-fallback.mjs.
+        run: nix develop --command node dev/spa-fallback.mjs
       - name: Deploy Website
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

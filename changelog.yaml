@@ -4,6 +4,12 @@
 - date: 2026-08-30
   entries:
     - |-
+      **Links to a piece work properly when you share them.** Paste one into a chat or a
+      post and it shows a preview card instead of nothing, and search engines can find the
+      pieces at last — the site had been telling them every piece in the catalogue was a
+      dead page, even while the page opened perfectly for you. Nothing about playing
+      changes, and the links you already have keep working.
+    - |-
       **Two pages no longer run off the side of a small phone in Russian.** The greeting on
       the home page and the title of the privacy page were wider than a 320px screen —
       enough to make the whole page scroll sideways. They break across lines now, in any

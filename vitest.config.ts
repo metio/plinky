@@ -73,10 +73,13 @@ export default defineConfig({
                     environment: "node",
                     // core/ is the pure domain layer and dev/ the catalogue build tooling
                     // (import filters, grading); both are unit-tested here alongside app/.
+                    // functions/ is the edge middleware the deploy ships, which is plain
+                    // request-in/response-out and so testable in exactly the same way.
                     include: [
                         "app/**/*.test.{ts,tsx}",
                         "core/**/*.test.{ts,tsx}",
                         "dev/**/*.test.mts",
+                        "functions/**/*.test.mts",
                     ],
                     exclude: [
                         "app/**/*.browser.test.*",

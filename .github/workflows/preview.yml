@@ -56,9 +56,10 @@ jobs:
         env:
           PLINKY_LOCALES: en
       - name: Add SPA fallback
-        # Cloudflare Pages serves 404.html for an unmatched path, so a deep-link refresh
-        # (or an unprerendered locale) lands on the shell and the client router takes over.
-        run: cp build/client/__spa-fallback.html build/client/404.html
+        # The shell for a path with no prerendered document, plus the routes where the
+        # middleware corrects its status — Pages would otherwise serve a real page with
+        # a 404. See dev/spa-fallback.mjs.
+        run: nix develop --command node dev/spa-fallback.mjs
       - name: Derive a preview slug from the branch
         id: slug
         # A branch ref isn't a valid DNS label (slashes, case, length), so normalise it:

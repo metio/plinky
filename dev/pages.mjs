@@ -68,6 +68,26 @@ export function staticPaths() {
         .map((page) => page.path);
 }
 
+// The pages that render from data rather than from a document, in canonical (unprefixed)
+// form: "/play/:scoreId", "/person/:slug".
+//
+// Only a handful of these prerender — the bundled scores, the composers above the index
+// floor — so the rest exist only once the client router has run. Cloudflare Pages answers
+// those with a 404 status, which is wrong for a page that is merely undocumented rather
+// than absent, so the deploy has to know which prefixes to correct. Reading them here
+// means a route added to the table is covered the moment it exists.
+export function dynamicPaths() {
+    return readPages()
+        .filter((page) => page.dynamic)
+        .map((page) => page.path);
+}
+
+// The path up to the first parameter — "/play" for "/play/:scoreId". That prefix is what a
+// URL pattern can be written against, since the parameter is whatever the data says.
+export function dynamicPrefixes() {
+    return [...new Set(dynamicPaths().map((path) => path.slice(0, path.indexOf("/:"))))];
+}
+
 // The exact call a route makes to opt out of the index. Matching the call rather than the
 // bare word keeps a comment or a test name from reading as a declaration.
 const NOINDEX_CALL = "noindexMeta()";

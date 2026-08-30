@@ -70,3 +70,7 @@ __pycache__/
 .design-sync/types/
 .ds-sync/
 ds-bundle/
+
+# wrangler pages dev writes a local cache here when the deploy output is served
+# for a check; nothing in it belongs to the repo.
+.wrangler/

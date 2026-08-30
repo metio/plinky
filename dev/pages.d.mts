@@ -18,5 +18,7 @@ export type Page = {
 
 export function readPages(): Page[];
 export function staticPaths(): string[];
+export function dynamicPaths(): string[];
+export function dynamicPrefixes(): string[];
 export function noindexPaths(): string[];
 export function assertPages(): Page[];
