@@ -265,15 +265,18 @@ one-tap **review session** walks you through everything that's fading, and you c
   just as you played it — **download** it as MIDI or MusicXML, **save it as
   a video** (an MP4 of your take: the sheet music of what you played with each note
   tinting as it sounds, above the keyboard where each press lights its key in full
-  and fades while held, so even fast repeats read clearly — with the piece's title, composer
-  and licence burnt in, ready for any chat or feed — offered on browsers that can encode
+  and fades while held, so even fast repeats read clearly — with the piece's title at the
+  head of the frame, the composer under it and the licence written out in full beneath that
+  ("CC0 1.0 Universal Public Domain Dedication" rather than a code), all burnt in and ready
+  for any chat or feed — offered on browsers that can encode
   one, Chrome and friends today — pick **16:9 or 9:16** right beside Save, choose the
   **style** — the **Staff** sheet music or a **notes-highway** of blocks falling onto the
   keys (Synthesia-style, sized by how long each note is held, with a **note colour** that
   can be one shade or **one colour per finger**, thumb to little finger, on both the block
   and the key it lands on) — and switch the
-  **title** or the **plinky.fun watermark** off if you'd rather (the composer-and-licence
-  credit always stays)), **challenge a
+  **title** or the **Plinky mark** in the corner off if you'd rather (the composer-and-licence
+  credit always stays; with the title off it carries the piece's name too, so an exported
+  file never goes out unnamed)), **challenge a
   friend** to race it by link, or delete it. From the top of the tab you can **challenge
   a friend with your last run** straight away, no save needed. Your fastest complete run is
   the **ghost** you race next time — racing is on by default and toggles off under the
