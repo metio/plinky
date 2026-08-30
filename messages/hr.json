@@ -384,8 +384,22 @@
     "progress_backup_heading": "Tvoj napredak",
     "progress_backup_hint": "Sve što si odsvirao nalazi se na ovom uređaju i nigdje drugdje. Sigurnosna kopija nosi sve — ocjene, spremljene snimke, prstomet, postavke i skladbe — na novi telefon ili prijenosnik, ili natrag ovamo ako se ovaj ikad obriše.",
     "progress_backup_holds": "Ovaj uređaj čuva {count}.",
-    "progress_backup_items_one": "{count} stavka",
-    "progress_backup_items_other": "{count} stavki",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stavka",
+                "countPlural=few": "{count} stavke",
+                "countPlural=other": "{count} stavki"
+            }
+        }
+    ],
     "progress_backup_download": "Preuzmi kopiju",
     "progress_backup_restore": "Vrati iz kopije",
     "progress_backup_restore_confirm": "Zamijeni ono što je ovdje",
@@ -654,8 +668,22 @@
     "backup_import": "Uvezi paket skladbi",
     "backup_imported_scores": "Uvezeno {count}",
     "backup_import_error": "Tu datoteku nije moguće uvesti.",
-    "backup_scores_one": "{count} skladba",
-    "backup_scores_other": "{count} skladbi",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba",
+                "countPlural=few": "{count} skladbe",
+                "countPlural=other": "{count} skladbi"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Ponovno poveži",
     "midi_debug_checking": "Provjera podrške preglednika…",
     "midi_debug_requesting": "Traženje pristupa…",
@@ -1333,5 +1361,8 @@
     "reduction_none": "Kako je zapisano",
     "reduction_thinned": "Bez unutarnjih tonova",
     "reduction_outlined": "Melodija i bas",
-    "reduction_melody": "Samo melodija"
+    "reduction_melody": "Samo melodija",
+    "glossary_hear_keys": "Poslušaj na tipkama",
+    "theory_index_label": "Lekcije",
+    "glossary_learn_more": "Nauči na čemu se to temelji"
 }

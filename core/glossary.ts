@@ -557,3 +557,23 @@ export function entriesIn(category: GlossaryCategory): GlossaryEntry[] {
 export function entryById(id: string): GlossaryEntry | null {
     return GLOSSARY.find((entry) => entry.id === id) ?? null;
 }
+
+// The theory lesson that teaches what a symbol assumes you already know.
+//
+// A glossary entry answers "what is this mark". Some of them cannot answer it without
+// leaning on something the course teaches: the dot's gloss says a dotted half note lasts
+// three beats instead of two, which tells a reader nothing unless they know what a half
+// note is — and the course's fourth lesson is exactly that. The link is the honest way to
+// close that, rather than restating a lesson inside a definition.
+//
+// Only where a lesson genuinely covers the ground. An entry with no entry here shows no
+// link, which is better than sending somebody to a lesson that does not mention the thing
+// they looked up.
+export const LESSON_FOR: Readonly<Record<string, string>> = {
+    dotted: "values",
+    tie: "values",
+    rest: "rests",
+    beam: "values",
+    ledger: "staff",
+    accidental: "signature",
+};

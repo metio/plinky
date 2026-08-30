@@ -384,8 +384,21 @@
     "progress_backup_heading": "İlerlemen",
     "progress_backup_hint": "Çaldığın her şey bu cihazda duruyor, başka hiçbir yerde değil. Bir yedek hepsini birden taşır — notlar, kaydedilmiş çalışlar, parmak numaraları, ayarlar ve parçalar — yeni bir telefona ya da dizüstüne, veya bu cihaz bir gün silinirse buraya geri.",
     "progress_backup_holds": "Bu cihazda {count} var.",
-    "progress_backup_items_one": "{count} öğe",
-    "progress_backup_items_other": "{count} öğe",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} öğe",
+                "countPlural=other": "{count} öğe"
+            }
+        }
+    ],
     "progress_backup_download": "Yedek indir",
     "progress_backup_restore": "Yedeği geri yükle",
     "progress_backup_restore_confirm": "Buradakini değiştir",
@@ -654,8 +667,21 @@
     "backup_import": "Bir parça paketi içe aktar",
     "backup_imported_scores": "{count} içe aktarıldı",
     "backup_import_error": "Bu dosya içe aktarılamadı.",
-    "backup_scores_one": "{count} parça",
-    "backup_scores_other": "{count} parça",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} parça",
+                "countPlural=other": "{count} parça"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Yeniden bağlan",
     "midi_debug_checking": "Tarayıcı desteği denetleniyor…",
     "midi_debug_requesting": "Erişim isteniyor…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Yazıldığı gibi",
     "reduction_thinned": "İç sesler olmadan",
     "reduction_outlined": "Ezgi ve bas",
-    "reduction_melody": "Yalnızca ezgi"
+    "reduction_melody": "Yalnızca ezgi",
+    "glossary_hear_keys": "Tuşlarda dinle",
+    "theory_index_label": "Dersler",
+    "glossary_learn_more": "Neye dayandığını öğren"
 }

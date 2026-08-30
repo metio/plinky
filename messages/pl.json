@@ -384,8 +384,23 @@
     "progress_backup_heading": "Twoje postępy",
     "progress_backup_hint": "Wszystko, co zagrałeś, jest na tym urządzeniu i nigdzie indziej. Kopia zabiera całość — oceny, zapisane nagrania, palcowanie, ustawienia i utwory — na nowy telefon lub laptop, albo z powrotem tutaj, gdyby to urządzenie kiedyś zostało wyczyszczone.",
     "progress_backup_holds": "To urządzenie przechowuje {count}.",
-    "progress_backup_items_one": "{count} element",
-    "progress_backup_items_other": "{count} elementów",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} element",
+                "countPlural=few": "{count} elementy",
+                "countPlural=many": "{count} elementów",
+                "countPlural=other": "{count} elementów"
+            }
+        }
+    ],
     "progress_backup_download": "Pobierz kopię",
     "progress_backup_restore": "Przywróć kopię",
     "progress_backup_restore_confirm": "Zastąp to, co tutaj jest",
@@ -654,8 +669,23 @@
     "backup_import": "Zaimportuj pakiet utworów",
     "backup_imported_scores": "Zaimportowano {count}",
     "backup_import_error": "Nie udało się zaimportować tego pliku.",
-    "backup_scores_one": "{count} utwór",
-    "backup_scores_other": "{count} utworów",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} utwór",
+                "countPlural=few": "{count} utwory",
+                "countPlural=many": "{count} utworów",
+                "countPlural=other": "{count} utworów"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Połącz ponownie",
     "midi_debug_checking": "Sprawdzanie obsługi przeglądarki…",
     "midi_debug_requesting": "Żądanie dostępu…",
@@ -1333,5 +1363,8 @@
     "reduction_none": "Jak zapisano",
     "reduction_thinned": "Bez środkowych dźwięków",
     "reduction_outlined": "Melodia i bas",
-    "reduction_melody": "Sama melodia"
+    "reduction_melody": "Sama melodia",
+    "glossary_hear_keys": "Posłuchaj na klawiszach",
+    "theory_index_label": "Lekcje",
+    "glossary_learn_more": "Poznaj podstawy tego"
 }

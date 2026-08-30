@@ -10,10 +10,6 @@ import { Button } from "../ui/button";
 import { linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 
-function pluralScores(count: number): string {
-    return count === 1 ? m.backup_scores_one({ count }) : m.backup_scores_other({ count });
-}
-
 // Back up and restore the local score library as a Plinky score bundle: a "download
 // all" export and an import that accepts a bundle (a backup, or a set shared by a
 // teacher). Scores live only on this device, so this is how users keep them.
@@ -51,7 +47,9 @@ export function ScoreBackup() {
             if (mine !== readSeq.current) {
                 return;
             }
-            setStatus(`${m.backup_imported_scores({ count: pluralScores(result.imported) })}.`);
+            setStatus(
+                `${m.backup_imported_scores({ count: m.backup_scores({ count: result.imported }) })}.`,
+            );
             setCount(loadUserScores(store).length);
         } catch {
             if (mine !== readSeq.current) {
@@ -68,7 +66,9 @@ export function ScoreBackup() {
     return (
         <section className="space-y-3">
             <h2 className={sectionHeadingClasses}>{m.backup_heading()}</h2>
-            <p className="text-sm text-muted">{m.backup_intro({ count: pluralScores(count) })}</p>
+            <p className="text-sm text-muted">
+                {m.backup_intro({ count: m.backup_scores({ count }) })}
+            </p>
             {/* Downloading a score pack reads as "my progress is safe" — it is sheet music
                 and nothing else, and the file that carries the rest lives somewhere else
                 entirely. Saying so here is cheaper than the day somebody finds out. */}

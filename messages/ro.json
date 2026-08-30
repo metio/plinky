@@ -384,8 +384,22 @@
     "progress_backup_heading": "Progresul tău",
     "progress_backup_hint": "Tot ce ai cântat se află pe acest dispozitiv și nicăieri altundeva. O copie ia totul cu ea — notele, înregistrările salvate, digitațiile, setările și piesele — pe un telefon sau laptop nou, ori înapoi aici dacă acesta e vreodată șters.",
     "progress_backup_holds": "Acest dispozitiv păstrează {count}.",
-    "progress_backup_items_one": "{count} element",
-    "progress_backup_items_other": "{count} elemente",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} element",
+                "countPlural=few": "{count} elemente",
+                "countPlural=other": "{count} de elemente"
+            }
+        }
+    ],
     "progress_backup_download": "Descarcă o copie",
     "progress_backup_restore": "Restaurează o copie",
     "progress_backup_restore_confirm": "Înlocuiește ce e aici",
@@ -654,8 +668,22 @@
     "backup_import": "Importă un pachet de partituri",
     "backup_imported_scores": "Importate {count}",
     "backup_import_error": "Fișierul acela n-a putut fi importat.",
-    "backup_scores_one": "{count} partitură",
-    "backup_scores_other": "{count} partituri",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} partitură",
+                "countPlural=few": "{count} partituri",
+                "countPlural=other": "{count} de partituri"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Reconectează",
     "midi_debug_checking": "Se verifică suportul browserului…",
     "midi_debug_requesting": "Se cere acces…",
@@ -1333,5 +1361,8 @@
     "reduction_none": "Așa cum e scrisă",
     "reduction_thinned": "Fără notele interioare",
     "reduction_outlined": "Melodie și bas",
-    "reduction_melody": "Doar melodia"
+    "reduction_melody": "Doar melodia",
+    "glossary_hear_keys": "Ascultă la clape",
+    "theory_index_label": "Lecții",
+    "glossary_learn_more": "Învață pe ce se bazează"
 }

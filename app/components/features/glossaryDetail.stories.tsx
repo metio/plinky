@@ -3,7 +3,10 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { entryById } from "../../../core/glossary";
+import { demoOf } from "../../../core/theoryDemo";
+import { m } from "../../paraglide/messages.js";
 import { GlossaryDetail } from "./glossaryDetail";
+import { SoundingKeyboard } from "./soundingKeyboard";
 
 const meta: Meta<typeof GlossaryDetail> = {
     title: "Features/GlossaryDetail",
@@ -47,4 +50,24 @@ export const SingleReading: Story = {
 // overlap into something neither of them sounds like.
 export const Sounding: Story = {
     args: { entry: STACCATO!, example: <Example />, sounding: true },
+};
+
+// An entry that leans on a lesson, with the mark under a pair of hands beside the
+// engraving of it. The dot's own explanation counts beats without saying what a beat is
+// worth, so the entry offers the lesson that does — and the keyboard shows the length the
+// words are describing.
+const DOTTED = entryById("dotted");
+
+export const KeysAndLesson: Story = {
+    args: {
+        entry: DOTTED!,
+        example: <Example />,
+        keys: (
+            <SoundingKeyboard
+                score={demoOf(DOTTED!.shown)}
+                label={m.glossary_hear_keys()}
+                onPlay={() => {}}
+            />
+        ),
+    },
 };

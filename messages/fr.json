@@ -384,8 +384,22 @@
     "progress_backup_heading": "Ta progression",
     "progress_backup_hint": "Tout ce que tu as joué vit sur cet appareil et nulle part ailleurs. Une sauvegarde emporte l'ensemble — notes obtenues, prises enregistrées, doigtés, réglages et partitions — vers un nouveau téléphone ou ordinateur, ou revient ici si celui-ci est un jour effacé.",
     "progress_backup_holds": "Cet appareil contient {count}.",
-    "progress_backup_items_one": "{count} élément",
-    "progress_backup_items_other": "{count} éléments",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} élément",
+                "countPlural=many": "{count} éléments",
+                "countPlural=other": "{count} éléments"
+            }
+        }
+    ],
     "progress_backup_download": "Télécharger une sauvegarde",
     "progress_backup_restore": "Restaurer une sauvegarde",
     "progress_backup_restore_confirm": "Remplacer ce qu'il y a ici",
@@ -654,8 +668,22 @@
     "backup_import": "Importer un pack de partitions",
     "backup_imported_scores": "{count} importé",
     "backup_import_error": "Ce fichier n'a pas pu être importé.",
-    "backup_scores_one": "{count} partition",
-    "backup_scores_other": "{count} partitions",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} partition",
+                "countPlural=many": "{count} partitions",
+                "countPlural=other": "{count} partitions"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Reconnecter",
     "midi_debug_checking": "Vérification de la prise en charge du navigateur…",
     "midi_debug_requesting": "Demande d'accès…",
@@ -1333,5 +1361,8 @@
     "reduction_none": "Tel qu'écrit",
     "reduction_thinned": "Sans les notes intérieures",
     "reduction_outlined": "Mélodie et basse",
-    "reduction_melody": "Mélodie seule"
+    "reduction_melody": "Mélodie seule",
+    "glossary_hear_keys": "L'entendre sur les touches",
+    "theory_index_label": "Leçons",
+    "glossary_learn_more": "Apprendre ce sur quoi cela repose"
 }

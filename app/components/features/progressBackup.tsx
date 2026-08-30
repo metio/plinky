@@ -11,12 +11,6 @@ import { ConfirmButton } from "../ui/confirmButton";
 import { ArchiveIcon } from "../ui/icons";
 import { SettingsSection } from "../ui/settingsSection";
 
-function pluralItems(count: number): string {
-    return count === 1
-        ? m.progress_backup_items_one({ count })
-        : m.progress_backup_items_other({ count });
-}
-
 // Back up and restore everything this device remembers — grades, review schedule,
 // takes, fingerings, preferences and the score library — as one file.
 //
@@ -106,7 +100,7 @@ export function ProgressBackup() {
                 />
             </div>
             <p className="text-sm text-muted">
-                {m.progress_backup_holds({ count: pluralItems(count) })}{" "}
+                {m.progress_backup_holds({ count: m.progress_backup_items({ count }) })}{" "}
                 {m.progress_backup_restore_hint()}
             </p>
             {error && (

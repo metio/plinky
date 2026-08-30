@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { linkClasses } from "../ui/classes";
+import { LocalizedLink } from "../ui/localizedLink";
+import { LESSON_FOR } from "../../../core/glossary";
 import { type ReactNode, useEffect, useRef } from "react";
 import type { GlossaryEntry } from "../../../core/glossary";
 import { CATEGORY_NAMES, symbolGloss, symbolName } from "../../lib/glossaryLabels";
@@ -16,12 +19,18 @@ import { Button } from "../ui/button";
 export function GlossaryDetail({
     entry,
     example,
+    keys,
     sounding = false,
     onHear,
     onHearPlain,
 }: {
     entry: GlossaryEntry;
     example: ReactNode;
+    // The same bar under a pair of hands. A symbol drawn on a stave says what it looks
+    // like; the keys say what it asks the hands to do, and a reader who has met neither
+    // needs both. Optional so an entry with nothing to press — a clef, a barline — simply
+    // does not show one.
+    keys?: ReactNode;
     // Whether the phrase is still on the speakers. Both buttons rest until it ends, so
     // two readings can't overlap into something neither of them sounds like.
     sounding?: boolean;
@@ -31,6 +40,7 @@ export function GlossaryDetail({
     // isn't there.
     onHearPlain: (() => void) | null;
 }) {
+    const lesson = LESSON_FOR[entry.id];
     const heading = useRef<HTMLHeadingElement>(null);
     // Skip the first render: arriving on the page should not yank focus out of the
     // document flow, only choosing a symbol should.
@@ -68,9 +78,20 @@ export function GlossaryDetail({
                     {symbolName(entry.id)}
                 </h2>
                 <p className="text-sm text-muted">{symbolGloss(entry.id)}</p>
+                {lesson !== undefined && (
+                    // What the gloss above leans on. The dot's explanation counts beats
+                    // without ever saying what a beat is worth; the lesson does.
+                    <p className="text-sm">
+                        <LocalizedLink to={`/theory#${lesson}`} className={linkClasses}>
+                            {m.glossary_learn_more()}
+                        </LocalizedLink>
+                    </p>
+                )}
             </header>
 
             {example}
+
+            {keys}
 
             <div className="flex flex-wrap gap-2">
                 <Button variant="primary" onClick={onHear} disabled={sounding}>

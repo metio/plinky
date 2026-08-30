@@ -384,8 +384,21 @@
     "progress_backup_heading": "Dein Fortschritt",
     "progress_backup_hint": "Alles, was du gespielt hast, liegt auf diesem Gerät und nirgendwo sonst. Ein Backup nimmt alles mit — Bewertungen, gespeicherte Aufnahmen, Fingersätze, Einstellungen und Stücke — auf ein neues Handy oder einen neuen Laptop, oder zurück hierher, falls dieses je geleert wird.",
     "progress_backup_holds": "Auf diesem Gerät liegen {count}.",
-    "progress_backup_items_one": "{count} Eintrag",
-    "progress_backup_items_other": "{count} Einträge",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Eintrag",
+                "countPlural=other": "{count} Einträge"
+            }
+        }
+    ],
     "progress_backup_download": "Backup herunterladen",
     "progress_backup_restore": "Backup einspielen",
     "progress_backup_restore_confirm": "Alles hier ersetzen",
@@ -654,8 +667,21 @@
     "backup_import": "Stückpaket importieren",
     "backup_imported_scores": "{count} importiert",
     "backup_import_error": "Diese Datei konnte nicht importiert werden.",
-    "backup_scores_one": "{count} Stück",
-    "backup_scores_other": "{count} Stücke",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Stück",
+                "countPlural=other": "{count} Stücke"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Neu verbinden",
     "midi_debug_checking": "Browser-Unterstützung wird geprüft…",
     "midi_debug_requesting": "Zugriff wird angefordert…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Wie notiert",
     "reduction_thinned": "Ohne Mittelstimmen",
     "reduction_outlined": "Melodie und Bass",
-    "reduction_melody": "Nur Melodie"
+    "reduction_melody": "Nur Melodie",
+    "glossary_hear_keys": "Auf den Tasten hören",
+    "theory_index_label": "Lektionen",
+    "glossary_learn_more": "Lerne die Grundlage dazu"
 }

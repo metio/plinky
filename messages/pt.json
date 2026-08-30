@@ -384,8 +384,22 @@
     "progress_backup_heading": "O teu progresso",
     "progress_backup_hint": "Tudo o que tocaste vive neste dispositivo e em mais lado nenhum. Uma cópia leva tudo — notas, gravações guardadas, dedilhações, definições e partituras — para um telemóvel ou portátil novo, ou de volta para aqui se este alguma vez for limpo.",
     "progress_backup_holds": "Este dispositivo guarda {count}.",
-    "progress_backup_items_one": "{count} item",
-    "progress_backup_items_other": "{count} itens",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} item",
+                "countPlural=many": "{count} itens",
+                "countPlural=other": "{count} itens"
+            }
+        }
+    ],
     "progress_backup_download": "Transferir uma cópia",
     "progress_backup_restore": "Restaurar uma cópia",
     "progress_backup_restore_confirm": "Substituir o que está aqui",
@@ -654,8 +668,22 @@
     "backup_import": "Importar um pacote de partituras",
     "backup_imported_scores": "Importadas {count}",
     "backup_import_error": "Não consegui importar esse ficheiro.",
-    "backup_scores_one": "{count} partitura",
-    "backup_scores_other": "{count} partituras",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} partitura",
+                "countPlural=many": "{count} partituras",
+                "countPlural=other": "{count} partituras"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Reconectar",
     "midi_debug_checking": "A verificar o suporte do navegador…",
     "midi_debug_requesting": "A solicitar acesso…",
@@ -1333,5 +1361,8 @@
     "reduction_none": "Como está escrita",
     "reduction_thinned": "Sem notas interiores",
     "reduction_outlined": "Melodia e baixo",
-    "reduction_melody": "Só a melodia"
+    "reduction_melody": "Só a melodia",
+    "glossary_hear_keys": "Ouvir nas teclas",
+    "theory_index_label": "Lições",
+    "glossary_learn_more": "Aprende em que assenta"
 }

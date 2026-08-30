@@ -384,8 +384,21 @@
     "progress_backup_heading": "Η πρόοδός σου",
     "progress_backup_hint": "Ό,τι έχεις παίξει βρίσκεται σε αυτή τη συσκευή και πουθενά αλλού. Ένα αντίγραφο τα παίρνει όλα μαζί — βαθμούς, αποθηκευμένες εκτελέσεις, δαχτυλισμούς, ρυθμίσεις και κομμάτια — σε νέο κινητό ή λάπτοπ, ή πίσω εδώ αν αυτή η συσκευή καθαριστεί ποτέ.",
     "progress_backup_holds": "Αυτή η συσκευή κρατά {count}.",
-    "progress_backup_items_one": "{count} στοιχείο",
-    "progress_backup_items_other": "{count} στοιχεία",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} στοιχείο",
+                "countPlural=other": "{count} στοιχεία"
+            }
+        }
+    ],
     "progress_backup_download": "Λήψη αντιγράφου",
     "progress_backup_restore": "Επαναφορά αντιγράφου",
     "progress_backup_restore_confirm": "Αντικατάσταση όσων υπάρχουν εδώ",
@@ -654,8 +667,21 @@
     "backup_import": "Εισαγωγή πακέτου παρτιτουρών",
     "backup_imported_scores": "Εισήχθησαν {count}",
     "backup_import_error": "Αυτό το αρχείο δεν εισήχθη.",
-    "backup_scores_one": "{count} παρτιτούρα",
-    "backup_scores_other": "{count} παρτιτούρες",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} παρτιτούρα",
+                "countPlural=other": "{count} παρτιτούρες"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Επανασύνδεση",
     "midi_debug_checking": "Έλεγχος υποστήριξης browser…",
     "midi_debug_requesting": "Αίτημα πρόσβασης…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Όπως είναι γραμμένο",
     "reduction_thinned": "Χωρίς εσωτερικές νότες",
     "reduction_outlined": "Μελωδία και μπάσο",
-    "reduction_melody": "Μόνο μελωδία"
+    "reduction_melody": "Μόνο μελωδία",
+    "glossary_hear_keys": "Άκουσέ το στα πλήκτρα",
+    "theory_index_label": "Μαθήματα",
+    "glossary_learn_more": "Μάθε πάνω σε τι στηρίζεται"
 }

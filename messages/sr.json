@@ -384,8 +384,22 @@
     "progress_backup_heading": "Твој напредак",
     "progress_backup_hint": "Све што си одсвирао налази се на овом уређају и нигде другде. Резервна копија носи све — оцене, сачуване снимке, прсторед, подешавања и композиције — на нови телефон или лаптоп, или назад овамо ако се овај икада обрише.",
     "progress_backup_holds": "Овај уређај чува {count}.",
-    "progress_backup_items_one": "{count} ставка",
-    "progress_backup_items_other": "{count} ставки",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ставка",
+                "countPlural=few": "{count} ставке",
+                "countPlural=other": "{count} ставки"
+            }
+        }
+    ],
     "progress_backup_download": "Преузми копију",
     "progress_backup_restore": "Врати из копије",
     "progress_backup_restore_confirm": "Замени оно што је овде",
@@ -654,8 +668,22 @@
     "backup_import": "Увези пакет нумера",
     "backup_imported_scores": "Увезено {count}",
     "backup_import_error": "Тај фајл није могуће увести.",
-    "backup_scores_one": "{count} нумера",
-    "backup_scores_other": "{count} нумера",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} нумера",
+                "countPlural=few": "{count} нумере",
+                "countPlural=other": "{count} нумера"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Поново повежи",
     "midi_debug_checking": "Провера подршке прегледача…",
     "midi_debug_requesting": "Тражење приступа…",
@@ -1333,5 +1361,8 @@
     "reduction_none": "Како је записано",
     "reduction_thinned": "Без унутрашњих тонова",
     "reduction_outlined": "Мелодија и бас",
-    "reduction_melody": "Само мелодија"
+    "reduction_melody": "Само мелодија",
+    "glossary_hear_keys": "Послушај на диркама",
+    "theory_index_label": "Лекције",
+    "glossary_learn_more": "Научи на чему се то заснива"
 }

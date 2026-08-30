@@ -384,8 +384,20 @@
     "progress_backup_heading": "你的进度",
     "progress_backup_hint": "你弹过的一切都只存在这台设备上。一份备份能把全部带走——成绩、保存的演奏、指法、设置和曲子——去新手机或新电脑，也能在这台设备被清空后带回来。",
     "progress_backup_holds": "这台设备存有 {count}。",
-    "progress_backup_items_one": "{count} 项",
-    "progress_backup_items_other": "{count} 项",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 项"
+            }
+        }
+    ],
     "progress_backup_download": "下载备份",
     "progress_backup_restore": "恢复备份",
     "progress_backup_restore_confirm": "替换这里的内容",
@@ -654,8 +666,20 @@
     "backup_import": "导入乐谱包",
     "backup_imported_scores": "已导入 {count}",
     "backup_import_error": "该文件无法导入。",
-    "backup_scores_one": "{count} 份乐谱",
-    "backup_scores_other": "{count} 份乐谱",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 份乐谱"
+            }
+        }
+    ],
     "midi_debug_reconnect": "重新连接",
     "midi_debug_checking": "正在检查浏览器支持…",
     "midi_debug_requesting": "正在请求访问权限…",
@@ -1333,5 +1357,8 @@
     "reduction_none": "照谱",
     "reduction_thinned": "去掉内声部",
     "reduction_outlined": "旋律和低音",
-    "reduction_melody": "只有旋律"
+    "reduction_melody": "只有旋律",
+    "glossary_hear_keys": "在琴键上听",
+    "theory_index_label": "课程",
+    "glossary_learn_more": "学习它的基础"
 }

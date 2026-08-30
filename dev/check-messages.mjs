@@ -28,15 +28,26 @@ const pattern = settings["plugin.inlang.messageFormat"].pathPattern;
 // message, so it never counts as missing or orphaned.
 const META_KEYS = new Set(["$schema"]);
 
+// A message is either a plain string or the plugin's complex form — an array whose first
+// element carries the plural variants. Both are messages; a filter that kept only strings
+// let the complex ones out of every check below, which is how two of them sat outside the
+// parity gate entirely while it reported all 26 locales complete.
 function messagesOf(locale) {
     const path = pattern.replace("{locale}", locale);
     const parsed = JSON.parse(readFileSync(path, "utf8"));
     return Object.fromEntries(
         Object.entries(parsed).filter(
-            ([key]) => !META_KEYS.has(key) && typeof parsed[key] === "string",
+            ([key, value]) =>
+                !META_KEYS.has(key) && (typeof value === "string" || isComplex(value)),
         ),
     );
 }
+
+const isComplex = (value) =>
+    Array.isArray(value) && typeof value[0]?.match === "object" && value[0].match !== null;
+
+// The text of every arm, for a check that only wants to read the words.
+const armsOf = (value) => (isComplex(value) ? Object.values(value[0].match) : [value]);
 
 // The {placeholders} a message interpolates. A translation carries the same set as the
 // contract does, in any order and any number of times: a name the caller never passes
@@ -104,8 +115,8 @@ for (const locale of locales) {
         if (translated === undefined) {
             continue;
         }
-        const wanted = placeholdersIn(baseMessages[key] ?? "");
-        const found = placeholdersIn(translated);
+        const wanted = placeholdersIn(armsOf(baseMessages[key] ?? "").join(" "));
+        const found = placeholdersIn(armsOf(translated).join(" "));
         const dropped = [...wanted].filter((name) => !found.has(name));
         const invented = [...found].filter((name) => !wanted.has(name));
         if (dropped.length > 0 || invented.length > 0) {
@@ -114,6 +125,25 @@ for (const locale of locales) {
                     `${dropped.length > 0 && invented.length > 0 ? ", " : ""}` +
                     `${invented.length > 0 ? `invented {${invented.join("} {")}}` : ""}`,
             );
+        }
+    }
+
+    // A plural message must answer for every category its OWN language can produce.
+    // Paraglide compiles the variants into a chain of comparisons and, when none matches,
+    // returns the message key — so a Polish count of five in a message carrying only `one`
+    // and `other` does not read a little oddly, it prints "progress_backup_items" on the
+    // page. The categories are not a matter of taste, so they are asked of Intl rather than
+    // listed here, and they differ per language: Polish needs four, Croatian three, Japanese
+    // one.
+    const needed = new Intl.PluralRules(locale).resolvedOptions().pluralCategories;
+    for (const [key, value] of Object.entries(messages)) {
+        if (!isComplex(value)) {
+            continue;
+        }
+        const arms = new Set(Object.keys(value[0].match).map((arm) => arm.split("=").at(-1)));
+        const absent = needed.filter((category) => !arms.has(category));
+        if (absent.length > 0) {
+            mismatched.push(`${key}: no arm for ${absent.join(", ")} — that count prints the key`);
         }
     }
 

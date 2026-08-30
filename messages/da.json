@@ -384,8 +384,21 @@
     "progress_backup_heading": "Din fremgang",
     "progress_backup_hint": "Alt, hvad du har spillet, ligger på denne enhed og ingen andre steder. En sikkerhedskopi tager det hele med — karakterer, gemte optagelser, fingersætninger, indstillinger og stykker — til en ny telefon eller laptop, eller tilbage hertil, hvis denne nogensinde bliver tømt.",
     "progress_backup_holds": "Denne enhed rummer {count}.",
-    "progress_backup_items_one": "{count} element",
-    "progress_backup_items_other": "{count} elementer",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} element",
+                "countPlural=other": "{count} elementer"
+            }
+        }
+    ],
     "progress_backup_download": "Hent en sikkerhedskopi",
     "progress_backup_restore": "Gendan en sikkerhedskopi",
     "progress_backup_restore_confirm": "Erstat det, der er her",
@@ -654,8 +667,21 @@
     "backup_import": "Importér en stykkepakke",
     "backup_imported_scores": "Importerede {count}",
     "backup_import_error": "Den fil kunne ikke importeres.",
-    "backup_scores_one": "{count} stykke",
-    "backup_scores_other": "{count} stykker",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stykke",
+                "countPlural=other": "{count} stykker"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Tilslut igen",
     "midi_debug_checking": "Tjekker browserunderstøttelse…",
     "midi_debug_requesting": "Anmoder om adgang…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Som skrevet",
     "reduction_thinned": "Uden mellemtoner",
     "reduction_outlined": "Melodi og bas",
-    "reduction_melody": "Kun melodien"
+    "reduction_melody": "Kun melodien",
+    "glossary_hear_keys": "Hør det på tangenterne",
+    "theory_index_label": "Lektioner",
+    "glossary_learn_more": "Lær hvad det bygger på"
 }

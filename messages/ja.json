@@ -384,8 +384,20 @@
     "progress_backup_heading": "あなたの記録",
     "progress_backup_hint": "弾いたものはすべてこの端末だけに残ります。バックアップがあれば、成績も保存した演奏も運指も設定も曲も、まとめて新しいスマホやパソコンへ持っていけますし、この端末が消えてもここへ戻せます。",
     "progress_backup_holds": "この端末には{count}あります。",
-    "progress_backup_items_one": "{count}件",
-    "progress_backup_items_other": "{count}件",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}件"
+            }
+        }
+    ],
     "progress_backup_download": "バックアップをダウンロード",
     "progress_backup_restore": "バックアップから復元",
     "progress_backup_restore_confirm": "ここの内容を置き換える",
@@ -654,8 +666,20 @@
     "backup_import": "楽譜パックを取り込む",
     "backup_imported_scores": "{count} を取り込みました",
     "backup_import_error": "そのファイルはインポートできませんでした。",
-    "backup_scores_one": "{count} 件の楽譜",
-    "backup_scores_other": "{count} 件の楽譜",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 件の楽譜"
+            }
+        }
+    ],
     "midi_debug_reconnect": "再接続",
     "midi_debug_checking": "ブラウザ対応を確認中…",
     "midi_debug_requesting": "アクセスを要求中…",
@@ -1333,5 +1357,8 @@
     "reduction_none": "書かれたまま",
     "reduction_thinned": "内声を抜く",
     "reduction_outlined": "旋律と低音",
-    "reduction_melody": "旋律だけ"
+    "reduction_melody": "旋律だけ",
+    "glossary_hear_keys": "鍵盤で聴く",
+    "theory_index_label": "レッスン",
+    "glossary_learn_more": "この土台を学ぶ"
 }

@@ -384,8 +384,23 @@
     "progress_backup_heading": "Tvoj pokrok",
     "progress_backup_hint": "Všetko, čo si zahral, je v tomto zariadení a nikde inde. Záloha odnesie všetko — známky, uložené nahrávky, prstoklady, nastavenia aj skladby — do nového telefónu alebo notebooku, alebo späť sem, keby sa toto niekedy vymazalo.",
     "progress_backup_holds": "Toto zariadenie uchováva {count}.",
-    "progress_backup_items_one": "{count} položka",
-    "progress_backup_items_other": "{count} položiek",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} položka",
+                "countPlural=few": "{count} položky",
+                "countPlural=many": "{count} položky",
+                "countPlural=other": "{count} položiek"
+            }
+        }
+    ],
     "progress_backup_download": "Stiahnuť zálohu",
     "progress_backup_restore": "Obnoviť zo zálohy",
     "progress_backup_restore_confirm": "Nahradiť, čo je tu",
@@ -654,8 +669,23 @@
     "backup_import": "Importovať balík skladieb",
     "backup_imported_scores": "Importované {count}",
     "backup_import_error": "Tento súbor sa nepodarilo importovať.",
-    "backup_scores_one": "{count} skladba",
-    "backup_scores_other": "{count} skladieb",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba",
+                "countPlural=few": "{count} skladby",
+                "countPlural=many": "{count} skladby",
+                "countPlural=other": "{count} skladieb"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Znovu pripojiť",
     "midi_debug_checking": "Kontrola podpory prehliadača…",
     "midi_debug_requesting": "Vyžiadanie prístupu…",
@@ -1333,5 +1363,8 @@
     "reduction_none": "Ako je zapísané",
     "reduction_thinned": "Bez vnútorných tónov",
     "reduction_outlined": "Melódia a bas",
-    "reduction_melody": "Len melódia"
+    "reduction_melody": "Len melódia",
+    "glossary_hear_keys": "Vypočuť na klávesoch",
+    "theory_index_label": "Lekcie",
+    "glossary_learn_more": "Nauč sa, na čom to stojí"
 }

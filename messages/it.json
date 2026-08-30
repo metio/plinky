@@ -384,8 +384,22 @@
     "progress_backup_heading": "I tuoi progressi",
     "progress_backup_hint": "Tutto quello che hai suonato vive su questo dispositivo e da nessun'altra parte. Un backup porta via tutto — voti, esecuzioni salvate, diteggiature, impostazioni e brani — su un nuovo telefono o portatile, o di nuovo qui se questo dovesse essere svuotato.",
     "progress_backup_holds": "Questo dispositivo contiene {count}.",
-    "progress_backup_items_one": "{count} elemento",
-    "progress_backup_items_other": "{count} elementi",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} elemento",
+                "countPlural=many": "{count} elementi",
+                "countPlural=other": "{count} elementi"
+            }
+        }
+    ],
     "progress_backup_download": "Scarica un backup",
     "progress_backup_restore": "Ripristina un backup",
     "progress_backup_restore_confirm": "Sostituisci quello che c'è qui",
@@ -654,8 +668,22 @@
     "backup_import": "Importa un pacchetto di spartiti",
     "backup_imported_scores": "Importati {count}",
     "backup_import_error": "Impossibile importare quel file.",
-    "backup_scores_one": "{count} spartito",
-    "backup_scores_other": "{count} spartiti",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} spartito",
+                "countPlural=many": "{count} spartiti",
+                "countPlural=other": "{count} spartiti"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Riconnetti",
     "midi_debug_checking": "Verifica del supporto del browser…",
     "midi_debug_requesting": "Richiesta di accesso…",
@@ -1333,5 +1361,8 @@
     "reduction_none": "Come scritto",
     "reduction_thinned": "Senza note interne",
     "reduction_outlined": "Melodia e basso",
-    "reduction_melody": "Solo melodia"
+    "reduction_melody": "Solo melodia",
+    "glossary_hear_keys": "Ascoltarlo sui tasti",
+    "theory_index_label": "Lezioni",
+    "glossary_learn_more": "Impara su cosa si basa"
 }

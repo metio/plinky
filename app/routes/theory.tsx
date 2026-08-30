@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { TheoryIndex } from "../components/features/theoryIndex";
 import { useEffect } from "react";
 
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
@@ -66,6 +67,12 @@ const LESSON_TITLE: Record<string, () => string> = {
     triads: () => m.theory_triads_title(),
     colour: () => m.theory_colour_title(),
 };
+
+// The number a lesson shows, walked once from the same order the page renders, so the
+// index and the card can never disagree about which lesson four is.
+const LESSON_NUMBER = new Map(
+    UNITS.flatMap((unit) => lessonsIn(unit)).map((lesson, at) => [lesson.id, at + 1]),
+);
 
 const LESSON_BODY: Record<string, () => string> = {
     staff: () => m.theory_staff_body(),
@@ -159,20 +166,35 @@ export default function TheoryRoute() {
     }, []);
     let counter = 0;
     return (
-        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+        // Wider than the rest of the app, and two columns, for the same reason the
+        // glossary is: an index down the side needs the room. The course still reads top
+        // to bottom; the index is for coming BACK to a lesson, not for taking them out of
+        // order.
+        <main className="mx-auto max-w-4xl space-y-8 p-6 font-sans">
             <PageHeader title={m.theory_title()} hint={m.theory_intro({ count: LESSONS.length })} />
 
-            {UNITS.map((unit) => (
-                <section key={unit} className="space-y-3">
-                    <h2 className={sectionHeadingClasses}>{UNIT_NAME[unit]()}</h2>
-                    <ul className="space-y-4">
-                        {lessonsIn(unit).map((lesson) => {
-                            counter += 1;
-                            return <LessonCard key={lesson.id} lesson={lesson} index={counter} />;
-                        })}
-                    </ul>
-                </section>
-            ))}
+            <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
+                <TheoryIndex titles={LESSON_TITLE} numbers={LESSON_NUMBER} />
+                <div className="space-y-8">
+                    {UNITS.map((unit) => (
+                        <section key={unit} className="space-y-3">
+                            <h2 className={sectionHeadingClasses}>{UNIT_NAME[unit]()}</h2>
+                            <ul className="space-y-4">
+                                {lessonsIn(unit).map((lesson) => {
+                                    counter += 1;
+                                    return (
+                                        <LessonCard
+                                            key={lesson.id}
+                                            lesson={lesson}
+                                            index={counter}
+                                        />
+                                    );
+                                })}
+                            </ul>
+                        </section>
+                    ))}
+                </div>
+            </div>
 
             <p className="text-sm text-muted">
                 <LinkedText

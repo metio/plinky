@@ -384,8 +384,21 @@
     "progress_backup_heading": "Përparimi yt",
     "progress_backup_hint": "Gjithçka që ke luajtur ndodhet në këtë pajisje dhe askund tjetër. Një kopje ruajtëse i merr të gjitha — notat, regjistrimet e ruajtura, gishtërimet, cilësimet dhe pjesët — te një telefon ose laptop i ri, ose kthehet këtu nëse kjo pajisje fshihet ndonjëherë.",
     "progress_backup_holds": "Kjo pajisje mban {count}.",
-    "progress_backup_items_one": "{count} element",
-    "progress_backup_items_other": "{count} elemente",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} element",
+                "countPlural=other": "{count} elemente"
+            }
+        }
+    ],
     "progress_backup_download": "Shkarko një kopje",
     "progress_backup_restore": "Rikthe një kopje",
     "progress_backup_restore_confirm": "Zëvendëso çfarë është këtu",
@@ -654,8 +667,21 @@
     "backup_import": "Importo një paketë partiturash",
     "backup_imported_scores": "U importuan {count}",
     "backup_import_error": "Ky skedar s'u importua dot.",
-    "backup_scores_one": "{count} partiturë",
-    "backup_scores_other": "{count} partitura",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} partiturë",
+                "countPlural=other": "{count} partitura"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Rilidh",
     "midi_debug_checking": "Po kontrollohet mbështetja e shfletuesit…",
     "midi_debug_requesting": "Po kërkohet qasja…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Siç është shkruar",
     "reduction_thinned": "Pa notat e brendshme",
     "reduction_outlined": "Melodia dhe basi",
-    "reduction_melody": "Vetëm melodia"
+    "reduction_melody": "Vetëm melodia",
+    "glossary_hear_keys": "Dëgjoje në tastet",
+    "theory_index_label": "Mësimet",
+    "glossary_learn_more": "Mëso mbi çfarë mbështetet"
 }

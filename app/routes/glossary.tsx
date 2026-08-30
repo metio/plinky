@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { demoOf } from "../../core/theoryDemo";
+import { SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import {
@@ -156,6 +158,19 @@ export default function Glossary() {
                                     label={symbolName(entry.id)}
                                 />
                             </FeatureBoundary>
+                        }
+                        keys={
+                            // The mark under a pair of hands, beside the engraving of it.
+                            // The keyboard is the theory course's own — one component, so a
+                            // symbol looks the same wherever the app explains it — reading
+                            // the entry through core/theoryDemo, which is what turns a bar
+                            // written for an engraver into positions written for keys.
+                            <SoundingKeyboard
+                                key={entry.id}
+                                score={demoOf(entry.shown)}
+                                label={m.glossary_hear_keys()}
+                                onPlay={() => play(entry.shown)}
+                            />
                         }
                         sounding={sounding}
                         onHear={() => play(entry.shown)}

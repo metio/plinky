@@ -384,8 +384,21 @@
     "progress_backup_heading": "Dina framsteg",
     "progress_backup_hint": "Allt du har spelat finns på den här enheten och ingen annanstans. En säkerhetskopia tar med sig alltihop — betyg, sparade tagningar, fingersättningar, inställningar och stycken — till en ny telefon eller laptop, eller tillbaka hit om den här någon gång töms.",
     "progress_backup_holds": "Den här enheten rymmer {count}.",
-    "progress_backup_items_one": "{count} objekt",
-    "progress_backup_items_other": "{count} objekt",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} objekt",
+                "countPlural=other": "{count} objekt"
+            }
+        }
+    ],
     "progress_backup_download": "Ladda ner en säkerhetskopia",
     "progress_backup_restore": "Återställ en säkerhetskopia",
     "progress_backup_restore_confirm": "Ersätt det som finns här",
@@ -654,8 +667,21 @@
     "backup_import": "Importera ett styckespaket",
     "backup_imported_scores": "Importerade {count}",
     "backup_import_error": "Den filen kunde inte importeras.",
-    "backup_scores_one": "{count} stycke",
-    "backup_scores_other": "{count} stycken",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stycke",
+                "countPlural=other": "{count} stycken"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Återanslut",
     "midi_debug_checking": "Kontrollerar webbläsarstöd…",
     "midi_debug_requesting": "Begär åtkomst…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Som det står",
     "reduction_thinned": "Utan mellantoner",
     "reduction_outlined": "Melodi och bas",
-    "reduction_melody": "Bara melodin"
+    "reduction_melody": "Bara melodin",
+    "glossary_hear_keys": "Hör det på tangenterna",
+    "theory_index_label": "Lektioner",
+    "glossary_learn_more": "Lär dig vad detta bygger på"
 }

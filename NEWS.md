@@ -8,6 +8,27 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 30 August 2026
+
+**The glossary shows a symbol on the keys, not only on the page.** Every entry already
+drew the mark on a stave and offered to play it; now the same bar sits under a pair of
+hands as well, so you can see which keys it asks for and how long they are held. A
+symbol you have never met is easier to place when you can see both.
+
+**A glossary entry points at the lesson it leans on.** The dot's explanation says a
+dotted half note lasts three beats instead of two — which tells you nothing unless you
+already know what a half note is. Entries that build on something now link to the
+lesson that teaches it.
+
+**The theory course has an index.** Fourteen lessons down the side, numbered and
+grouped, so coming back to the one about note values no longer means scrolling past
+nine others. The lessons still read in order; the index is for re-entering them.
+
+**Counting things reads correctly in every language now.** &ldquo;2 items&rdquo; and
+&ldquo;5 items&rdquo; take different words in Polish, Russian, Ukrainian, Czech,
+Slovak, Croatian, Serbian and Romanian, and Plinky was choosing between two forms with
+an English rule. Each language now gets the forms it actually has.
+
 ## 29 August 2026 — evening
 
 **The library now says which hard pieces have an easy way in.** Under a piece's grade

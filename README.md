@@ -308,6 +308,13 @@ one-tap **review session** walks you through everything that's fading, and you c
   catalogue at build time, so a set only appears while the pieces that make it up are
   actually there.
 
+- **A glossary that shows and a course that indexes** — every glossary entry now draws its
+  symbol on the stave *and* under a pair of hands, so you can see which keys it asks for and
+  how long they are held, and an entry that leans on something links to the lesson teaching
+  it: the dot's explanation counts beats without saying what a beat is worth, and lesson
+  four does. The theory course gained the glossary's index in return — fourteen lessons down
+  the side, numbered and grouped, for coming back to one rather than scrolling to it.
+
 - **Thinning a piece you can't play yet** — a reading aid in Settings that takes the inner
   notes out of every score, so something above your hands is playable today: *inner notes
   out*, *melody and bass*, or *melody alone*. Notes are only ever removed — never moved,

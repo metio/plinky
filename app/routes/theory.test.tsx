@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { LESSONS, UNITS } from "../../core/theoryCourse";
@@ -23,8 +23,23 @@ const page = () => (
 describe("TheoryRoute", () => {
     it("renders every lesson under a unit heading", () => {
         renderWithServices(page());
-        expect(screen.getAllByRole("listitem")).toHaveLength(LESSONS.length);
+        // Counted by the heading each lesson card carries rather than by list items on the
+        // page: the index down the side is a list of the same lessons, so counting every
+        // <li> counts each one twice and would read as fourteen extra lessons.
+        expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(LESSONS.length);
         expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(UNITS.length);
+    });
+
+    it("offers an index that names every lesson, for coming back to one", () => {
+        renderWithServices(page());
+        const index = screen.getByRole("navigation", { name: m.theory_index_label() });
+        expect(within(index).getAllByRole("link")).toHaveLength(LESSONS.length);
+        // Anchors, so the course still reads in order and the index only re-enters it.
+        expect(
+            within(index)
+                .getAllByRole("link")
+                .every((link) => link.getAttribute("href")?.includes("#")),
+        ).toBe(true);
     });
 
     it("gives every lesson a title, a paragraph and something to play", () => {

@@ -384,8 +384,23 @@
     "progress_backup_heading": "Твой прогресс",
     "progress_backup_hint": "Всё, что ты сыграл, хранится на этом устройстве и больше нигде. Резервная копия увезёт всё сразу — оценки, сохранённые дубли, аппликатуру, настройки и пьесы — на новый телефон или ноутбук, или обратно сюда, если это устройство когда-нибудь очистят.",
     "progress_backup_holds": "На этом устройстве хранится {count}.",
-    "progress_backup_items_one": "{count} запись",
-    "progress_backup_items_other": "{count} записей",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} запись",
+                "countPlural=few": "{count} записи",
+                "countPlural=many": "{count} записей",
+                "countPlural=other": "{count} записей"
+            }
+        }
+    ],
     "progress_backup_download": "Скачать копию",
     "progress_backup_restore": "Восстановить из копии",
     "progress_backup_restore_confirm": "Заменить то, что здесь",
@@ -654,8 +669,23 @@
     "backup_import": "Импортировать пакет партитур",
     "backup_imported_scores": "Импортировано {count}",
     "backup_import_error": "Этот файл не удалось импортировать.",
-    "backup_scores_one": "{count} партитура",
-    "backup_scores_other": "{count} партитур",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} партитура",
+                "countPlural=few": "{count} партитуры",
+                "countPlural=many": "{count} партитур",
+                "countPlural=other": "{count} партитур"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Переподключить",
     "midi_debug_checking": "Проверка поддержки браузера…",
     "midi_debug_requesting": "Запрос доступа…",
@@ -1333,5 +1363,8 @@
     "reduction_none": "Как написано",
     "reduction_thinned": "Без средних голосов",
     "reduction_outlined": "Мелодия и бас",
-    "reduction_melody": "Только мелодия"
+    "reduction_melody": "Только мелодия",
+    "glossary_hear_keys": "Послушать на клавишах",
+    "theory_index_label": "Уроки",
+    "glossary_learn_more": "Узнай, на чём это основано"
 }

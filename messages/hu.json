@@ -384,8 +384,21 @@
     "progress_backup_heading": "A haladásod",
     "progress_backup_hint": "Minden, amit játszottál, ezen az eszközön van, és sehol máshol. Egy biztonsági mentés mindent magával visz — az osztályzatokat, a mentett felvételeket, az ujjrendeket, a beállításokat és a darabokat — új telefonra vagy laptopra, vagy vissza ide, ha ezt valaha törölnék.",
     "progress_backup_holds": "Ezen az eszközön {count} van.",
-    "progress_backup_items_one": "{count} elem",
-    "progress_backup_items_other": "{count} elem",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} elem",
+                "countPlural=other": "{count} elem"
+            }
+        }
+    ],
     "progress_backup_download": "Mentés letöltése",
     "progress_backup_restore": "Mentés visszaállítása",
     "progress_backup_restore_confirm": "Cseréld le, ami itt van",
@@ -654,8 +667,21 @@
     "backup_import": "Kottacsomag importálása",
     "backup_imported_scores": "{count} importálva",
     "backup_import_error": "Ezt a fájlt nem sikerült importálni.",
-    "backup_scores_one": "{count} kotta",
-    "backup_scores_other": "{count} kotta",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kotta",
+                "countPlural=other": "{count} kotta"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Újracsatlakozás",
     "midi_debug_checking": "Böngészőtámogatás ellenőrzése…",
     "midi_debug_requesting": "Hozzáférés kérése…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Ahogy le van írva",
     "reduction_thinned": "Belső hangok nélkül",
     "reduction_outlined": "Dallam és basszus",
-    "reduction_melody": "Csak a dallam"
+    "reduction_melody": "Csak a dallam",
+    "glossary_hear_keys": "Meghallgatás a billentyűkön",
+    "theory_index_label": "Leckék",
+    "glossary_learn_more": "Tanuld meg, mire épül"
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { buildSnippet } from "./glossaryScore";
+import { buildSnippet, type Snippet, type SnippetNote } from "./glossaryScore";
 import {
     DEMO_BEAT_MS,
     type DemoScore,
@@ -10,6 +10,7 @@ import {
     demoMoments,
     demoNotes,
     demoSnippet,
+    demoOf,
     scoreOf,
 } from "./theoryDemo";
 
@@ -121,5 +122,69 @@ describe("a demonstration built from bare pitches", () => {
 
         expect(moments.map((one) => one.notes)).toEqual([[C], [C + 12]]);
         expect(moments[1]?.atMs).toBeGreaterThan(0);
+    });
+});
+
+describe("reading a glossary entry as a keyboard demonstration", () => {
+    const snippet = (notes: SnippetNote[]): Snippet => ({
+        clef: "treble",
+        fifths: 0,
+        beatsPerBar: 4,
+        notes,
+    });
+
+    it("puts each note under a key, in order", () => {
+        const demo = demoOf(
+            snippet([
+                { step: "C", octave: 4, value: "quarter" },
+                { step: "E", octave: 4, value: "quarter" },
+            ]),
+        );
+        expect(demo.steps.map((step) => step.notes)).toEqual([[60], [64]]);
+    });
+
+    it("keeps a chord a chord", () => {
+        // `chord` means "sounds WITH the note before it", exactly as MusicXML means it.
+        // Read as a sequence, an interval would come out as a melody.
+        const demo = demoOf(
+            snippet([
+                { step: "C", octave: 4, value: "half" },
+                { step: "E", octave: 4, value: "half", chord: true },
+                { step: "G", octave: 4, value: "half", chord: true },
+            ]),
+        );
+        expect(demo.steps).toHaveLength(1);
+        expect(demo.steps[0]?.notes).toEqual([60, 64, 67]);
+    });
+
+    it("carries the dot, which for one entry is the whole subject", () => {
+        const demo = demoOf(snippet([{ step: "C", octave: 5, value: "half", dotted: true }]));
+        expect(demo.steps[0]?.dotted).toBe(true);
+    });
+
+    it("gives a rest no key to press but still its place in time", () => {
+        const demo = demoOf(
+            snippet([
+                { step: "C", octave: 4, value: "quarter" },
+                { step: null, value: "quarter" },
+            ]),
+        );
+        expect(demo.steps.map((step) => step.notes)).toEqual([[60], []]);
+    });
+
+    it("reads a black key the way the key signature spells it", () => {
+        const sharps: Snippet = {
+            clef: "treble",
+            fifths: 1,
+            beatsPerBar: 4,
+            notes: [{ step: "F", octave: 4, value: "quarter" }],
+        };
+        expect(demoOf(sharps).steps[0]?.notes).toEqual([66]);
+    });
+
+    it("keeps the clef and the key, which the keyboard draws around", () => {
+        const demo = demoOf({ clef: "bass", fifths: -2, beatsPerBar: 3, notes: [] });
+        expect(demo.clef).toBe("bass");
+        expect(demo.fifths).toBe(-2);
     });
 });

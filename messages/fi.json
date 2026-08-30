@@ -384,8 +384,21 @@
     "progress_backup_heading": "Edistymisesi",
     "progress_backup_hint": "Kaikki soittamasi on tällä laitteella eikä missään muualla. Varmuuskopio vie mukanaan kaiken — arvosanat, tallennetut otot, sormitukset, asetukset ja kappaleet — uuteen puhelimeen tai läppäriin, tai takaisin tänne, jos tämä joskus tyhjennetään.",
     "progress_backup_holds": "Tällä laitteella on {count}.",
-    "progress_backup_items_one": "{count} kohde",
-    "progress_backup_items_other": "{count} kohdetta",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kohde",
+                "countPlural=other": "{count} kohdetta"
+            }
+        }
+    ],
     "progress_backup_download": "Lataa varmuuskopio",
     "progress_backup_restore": "Palauta varmuuskopio",
     "progress_backup_restore_confirm": "Korvaa se, mitä täällä on",
@@ -654,8 +667,21 @@
     "backup_import": "Tuo nuottipaketti",
     "backup_imported_scores": "Tuotu {count}",
     "backup_import_error": "Tiedostoa ei saatu tuotua.",
-    "backup_scores_one": "{count} nuotti",
-    "backup_scores_other": "{count} nuottia",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nuotti",
+                "countPlural=other": "{count} nuottia"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Yhdistä uudelleen",
     "midi_debug_checking": "Tarkistetaan selaintukea…",
     "midi_debug_requesting": "Pyydetään käyttöoikeutta…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Kuten kirjoitettu",
     "reduction_thinned": "Ilman sisä-ääniä",
     "reduction_outlined": "Melodia ja basso",
-    "reduction_melody": "Vain melodia"
+    "reduction_melody": "Vain melodia",
+    "glossary_hear_keys": "Kuuntele koskettimilla",
+    "theory_index_label": "Oppitunnit",
+    "glossary_learn_more": "Opi, mihin tämä nojaa"
 }

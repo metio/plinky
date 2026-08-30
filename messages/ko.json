@@ -384,8 +384,20 @@
     "progress_backup_heading": "내 기록",
     "progress_backup_hint": "지금까지 연주한 모든 것은 이 기기에만 남아요. 백업 하나면 성적, 저장한 연주, 운지, 설정, 악보까지 전부 새 휴대폰이나 노트북으로 옮길 수 있고, 이 기기가 지워져도 다시 되돌릴 수 있어요.",
     "progress_backup_holds": "이 기기에 {count} 있어요.",
-    "progress_backup_items_one": "{count}개",
-    "progress_backup_items_other": "{count}개",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}개"
+            }
+        }
+    ],
     "progress_backup_download": "백업 내려받기",
     "progress_backup_restore": "백업 복원하기",
     "progress_backup_restore_confirm": "여기 있는 것 바꾸기",
@@ -654,8 +666,20 @@
     "backup_import": "악보 팩 가져오기",
     "backup_imported_scores": "{count}개 가져옴",
     "backup_import_error": "그 파일을 가져오지 못했어요.",
-    "backup_scores_one": "악보 {count}개",
-    "backup_scores_other": "악보 {count}개",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "악보 {count}개"
+            }
+        }
+    ],
     "midi_debug_reconnect": "다시 연결",
     "midi_debug_checking": "브라우저 지원 확인 중…",
     "midi_debug_requesting": "접근 요청 중…",
@@ -1333,5 +1357,8 @@
     "reduction_none": "적힌 그대로",
     "reduction_thinned": "속음 빼기",
     "reduction_outlined": "선율과 베이스",
-    "reduction_melody": "선율만"
+    "reduction_melody": "선율만",
+    "glossary_hear_keys": "건반으로 듣기",
+    "theory_index_label": "레슨",
+    "glossary_learn_more": "바탕이 되는 내용 배우기"
 }

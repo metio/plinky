@@ -17,8 +17,13 @@
 // One timeline fixes all of it by construction: a step is a moment, and the three views
 // are three readings of the same moments rather than three guesses at them.
 
-import type { NoteValue, Snippet, SnippetNote } from "./glossaryScore";
-import { noteQuarters } from "./glossaryScore";
+import {
+    type NoteValue,
+    type Snippet,
+    type SnippetNote,
+    noteQuarters,
+    snippetMidi,
+} from "./glossaryScore";
 import { NATURAL_OF } from "./glossaryScore";
 
 // One moment of a demonstration: what sounds, and for how long. No notes is a silence —
@@ -27,6 +32,10 @@ import { NATURAL_OF } from "./glossaryScore";
 export type DemoStep = {
     notes: number[];
     value: NoteValue;
+    // A dot lengthens the note by half again. Carried because a demonstration built from a
+    // glossary entry may be ABOUT the dot, and a keyboard that held the key for a plain
+    // half note would be illustrating the opposite of what the words say.
+    dotted?: boolean;
 };
 
 // A whole demonstration: the notes in time, and the two things a reader needs around them
@@ -61,7 +70,7 @@ export function demoSnippet(score: DemoScore, beatsPerBar = 4): Snippet {
     const notes: SnippetNote[] = [];
     for (const step of score.steps) {
         if (step.notes.length === 0) {
-            notes.push({ step: null, value: step.value });
+            notes.push({ step: null, value: step.value, dotted: step.dotted });
             continue;
         }
         // Low to high, the way a chord is written and the way it is read.
@@ -75,6 +84,7 @@ export function demoSnippet(score: DemoScore, beatsPerBar = 4): Snippet {
             notes.push({
                 ...spelled,
                 value: step.value,
+                ...(step.dotted === true ? { dotted: true } : {}),
                 // An accidental is written out rather than left to the key signature: the
                 // lesson about semitones is about the black key, and a reader who cannot
                 // see it on the stave is being shown the question without the answer.
@@ -104,7 +114,7 @@ export function demoMoments(score: DemoScore, beatMs = DEMO_BEAT_MS): DemoMoment
     const moments: DemoMoment[] = [];
     let atMs = 0;
     for (const step of score.steps) {
-        const forMs = noteQuarters({ step: null, value: step.value }) * beatMs;
+        const forMs = noteQuarters({ step: null, value: step.value, dotted: step.dotted }) * beatMs;
         // A rest takes its time without sounding, which is the whole of what a rest is.
         if (step.notes.length > 0) {
             moments.push({ notes: step.notes, atMs, forMs });
@@ -124,7 +134,8 @@ export function demoNotes(score: DemoScore): number[] {
 // the shape rather than the moment.
 export function demoDurationMs(score: DemoScore, beatMs = DEMO_BEAT_MS): number {
     return score.steps.reduce(
-        (total, step) => total + noteQuarters({ step: null, value: step.value }) * beatMs,
+        (total, step) =>
+            total + noteQuarters({ step: null, value: step.value, dotted: step.dotted }) * beatMs,
         0,
     );
 }
@@ -143,4 +154,35 @@ export function scoreOf(
             : [{ notes: [...notes], value }],
     );
     return { clef: "treble", fifths: 0, steps };
+}
+
+// A glossary entry read as a keyboard demonstration.
+//
+// The two pages describe the same music in different words: a glossary Snippet is written
+// as a line of notes for an engraver, and a DemoScore is written as positions in time for
+// a keyboard. Neither is wrong and neither converts by assignment, which is why the
+// glossary could draw a symbol and never show it under a pair of hands.
+//
+// The dot travels, because for one entry the dot IS the subject. So does a chord: a
+// SnippetNote flagged `chord` sounds WITH the note before it rather than after it, exactly
+// as MusicXML means it, and flattening that into a sequence would turn an interval into a
+// melody.
+export function demoOf(snippet: Snippet): DemoScore {
+    const steps: DemoStep[] = [];
+    for (const note of snippet.notes) {
+        const midi = snippetMidi(note, snippet.fifths);
+        const sounding = steps.at(-1);
+        if (note.chord === true && sounding !== undefined) {
+            if (midi !== null) {
+                sounding.notes.push(midi);
+            }
+            continue;
+        }
+        steps.push({
+            notes: midi === null ? [] : [midi],
+            value: note.value,
+            ...(note.dotted === true ? { dotted: true } : {}),
+        });
+    }
+    return { clef: snippet.clef, fifths: snippet.fifths, steps };
 }

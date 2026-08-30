@@ -384,8 +384,21 @@
     "progress_backup_heading": "Jouw voortgang",
     "progress_backup_hint": "Alles wat je hebt gespeeld staat op dit apparaat en nergens anders. Een back-up neemt alles mee — cijfers, opgeslagen opnames, vingerzettingen, instellingen en stukken — naar een nieuwe telefoon of laptop, of terug hierheen als dit apparaat ooit wordt gewist.",
     "progress_backup_holds": "Dit apparaat bevat {count}.",
-    "progress_backup_items_one": "{count} item",
-    "progress_backup_items_other": "{count} items",
+    "progress_backup_items": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} item",
+                "countPlural=other": "{count} items"
+            }
+        }
+    ],
     "progress_backup_download": "Back-up downloaden",
     "progress_backup_restore": "Back-up terugzetten",
     "progress_backup_restore_confirm": "Vervang wat hier staat",
@@ -654,8 +667,21 @@
     "backup_import": "Een stukkenpakket importeren",
     "backup_imported_scores": "{count} geïmporteerd",
     "backup_import_error": "Dat bestand kon niet worden geïmporteerd.",
-    "backup_scores_one": "{count} stuk",
-    "backup_scores_other": "{count} stukken",
+    "backup_scores": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stuk",
+                "countPlural=other": "{count} stukken"
+            }
+        }
+    ],
     "midi_debug_reconnect": "Opnieuw verbinden",
     "midi_debug_checking": "Browserondersteuning controleren…",
     "midi_debug_requesting": "Toegang aanvragen…",
@@ -1333,5 +1359,8 @@
     "reduction_none": "Zoals genoteerd",
     "reduction_thinned": "Zonder binnenstemmen",
     "reduction_outlined": "Melodie en bas",
-    "reduction_melody": "Alleen melodie"
+    "reduction_melody": "Alleen melodie",
+    "glossary_hear_keys": "Op de toetsen horen",
+    "theory_index_label": "Lessen",
+    "glossary_learn_more": "Leer waar dit op steunt"
 }
