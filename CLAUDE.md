@@ -57,10 +57,19 @@ Lighthouse budget four hundred pages away. None of those look related to their
 change; all of them are.
 
 It skips the heavy gates and names them, and it says plainly that the Frontend
-job delegates to `metio/ci` — so build, size, coverage, story screenshots, both
-a11y sweeps, Lighthouse, the browser projects and the shared lint gate are named
-nowhere in this workflow and therefore nowhere in its list. Run those yourself
-when a change touches what they measure.
+job delegates to `metio/ci` — so build, **typecheck**, size, coverage, story
+screenshots, both a11y sweeps, Lighthouse, the browser projects and the shared
+lint gate are named nowhere in this workflow and therefore nowhere in its list.
+
+**"All 15 ran green" is not a green build, and reading it as one has already cost
+three red pushes.** The runner prints what it does not cover, and printing it is
+not the same as acting on it. A change that touches a component or a message
+needs `npm run a11y:light` at minimum — a colour token used for the wrong thing
+put fourteen contrast violations on one page, in both themes, and the sweep found
+them in less time than the commit message took to write. A change that touches a
+`dev/*.mjs` with a hand-written `.d.mts` beside it needs `npm run typecheck`,
+because nothing regenerates that file: adding an export to the module without
+declaring it compiles locally and fails the job.
 
 **Check the exit code of each one.** A cheap gate you skip is a gate CI runs for
 you, slower and after the push. The whole point of the flake is that local and CI

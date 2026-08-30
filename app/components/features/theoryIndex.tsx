@@ -37,7 +37,7 @@ export function TheoryIndex({
                                     href={`#${lesson.id}`}
                                     className="block rounded-md px-2 py-1 text-sm text-muted hover:bg-subtle hover:text-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-ring"
                                 >
-                                    <span className="tabular-nums text-faint">
+                                    <span className="tabular-nums text-muted">
                                         {numbers.get(lesson.id)}.
                                     </span>{" "}
                                     {titles[lesson.id]?.() ?? lesson.id}

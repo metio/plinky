@@ -24,3 +24,17 @@ export type HeaviestLocale = {
 };
 
 export function heaviestLocale(dir?: string): HeaviestLocale;
+
+// Which writing system a locale is set in, read off its own text: "latin", "cyrillic",
+// "greek", "han", "kana" or "hangul".
+export function scriptOf(text: string): string;
+
+export type ScriptLocale = {
+    script: string;
+    // The locale that stresses layout hardest within that script.
+    locale: string;
+};
+
+// One locale per writing system, for a sweep that covers the SHAPES a page can be asked to
+// hold rather than only the longest word in the catalogue.
+export function localesByScript(dir?: string): ScriptLocale[];

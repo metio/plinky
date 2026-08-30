@@ -103,39 +103,46 @@ try {
                 }
                 // Name what is doing it, so the fix does not start with a hunt.
                 //
-                // Reaching past the viewport is the usual shape and the one worth naming
-                // first. It is not the only one: an element clipped by an ancestor's
-                // overflow still widens the document while its own rect stays inside, so
-                // when nothing reaches past, the widest elements on the page are named
-                // instead. Reporting an empty list would be the one outcome that helps
-                // nobody, and that is what this printed the first time it caught a real
-                // overflow.
+                // The DEEPEST offender, not the widest. Width propagates upward: a heading
+                // too wide for the screen makes its section too wide, and its main, and its
+                // body, and every one of those is "an element wider than the screen". Naming
+                // them by width names the outermost, which is the one element that cannot be
+                // fixed — `main.mx-auto (362px wide)` is true and tells nobody anything. The
+                // leaf is what to change, so a leaf is what gets printed: over-wide, with no
+                // over-wide descendant, and carrying the text that made it so.
+                //
+                // Two ways to be over-wide, and both count. Reaching past the viewport is the
+                // usual shape; an element clipped by an ancestor's overflow still widens the
+                // document while its own rect stays inside, and reporting nothing at all is
+                // the one outcome that helps nobody — which is what this printed the first
+                // time it caught a real overflow.
                 const named = (node) => {
                     const cls = String(node.className || "")
                         .trim()
-                        .split(/\s+/)[0];
+                        .split(/\s+/)
+                        .slice(0, 2)
+                        .join(".");
                     return `${node.tagName.toLowerCase()}${cls ? `.${cls}` : ""}`;
                 };
                 const all = [...document.querySelectorAll("body *")];
-                const past = all
-                    .filter((node) => node.getBoundingClientRect().right > doc.clientWidth + 1)
-                    .slice(0, 3)
-                    .map(named);
-                if (past.length > 0) {
-                    return { spill, culprits: past, clipped: false };
-                }
-                const widest = all
-                    .map((node) => ({ node, width: node.scrollWidth }))
-                    .filter((entry) => entry.width > doc.clientWidth)
-                    .sort((a, b) => b.width - a.width)
-                    .slice(0, 3)
-                    .map((entry) => `${named(entry.node)} (${entry.width}px wide)`);
-                return { spill, culprits: widest, clipped: true };
+                const reaches = (node) => node.getBoundingClientRect().right > doc.clientWidth + 1;
+                const over = all.filter(
+                    (node) => node.scrollWidth > doc.clientWidth || reaches(node),
+                );
+                const leaves = over.filter(
+                    (node) => !over.some((other) => other !== node && node.contains(other)),
+                );
+                const culprits = leaves.slice(0, 3).map((node) => {
+                    const text = (node.textContent ?? "").trim().replace(/\s+/g, " ");
+                    const shown = text.length > 48 ? `${text.slice(0, 48)}…` : text;
+                    return `${named(node)} (${Math.round(node.scrollWidth)}px${shown ? ` — "${shown}"` : ""})`;
+                });
+                return { spill, culprits, clipped: !leaves.some(reaches) };
             });
             if (over) {
                 const blame =
                     over.culprits.length > 0
-                        ? `${over.clipped ? "widest inside the page" : "reaching past"}: ${over.culprits.join(", ")}`
+                        ? `${over.clipped ? "widest inside the page" : "reaching past"} — ${over.culprits.join("; ")}`
                         : "nothing on the page reaches past it — check a fixed or absolutely positioned element";
                 problems.push(`${width}px ${path}: ${over.spill}px past the screen — ${blame}`);
             }
