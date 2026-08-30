@@ -481,7 +481,13 @@ const BUDGET_VENDOR_KB = 324;
 // course gained an index of its fourteen lessons. And counting things now follows each
 // language's own plural rules rather than English's, which compiles to a short chain of
 // comparisons per message instead of a bare string. 0.7 KB, measured at 413.7.
-const BUDGET_APP_KB = 414;
+// 415. An exported video names its licence in words. The ten licences the catalogue admits
+// each gained their full title — "Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+// International" against "CC BY-NC-SA 4.0" — and those strings ship, because the licence is
+// drawn into the frame in the browser and a code a viewer would have to look up is not an
+// attribution. Alongside them, core/wordmark: the lockup's geometry, which three surfaces
+// had a copy of and none agreed on. 0.5 KB, measured at 414.2.
+const BUDGET_APP_KB = 415;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
