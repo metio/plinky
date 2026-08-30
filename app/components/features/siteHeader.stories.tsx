@@ -53,22 +53,21 @@ export const Narrowest: Story = {
     ),
 };
 
-// Just past the breakpoint, where the inline destinations reappear beside a mark that has
-// not moved.
-export const Tablet: Story = {
+// A middling width, with the inline destinations still shown.
+//
+// Deliberately NOT 768px, which is both the `md` breakpoint and the header's own
+// `max-w-3xl`. Sitting a screenshot exactly where a container stops growing puts it on a
+// sub-pixel boundary, and the two machines that rasterize it disagreed there by the same
+// 615 pixels every run — a difference that is real, reproducible, and about rounding
+// rather than about anything this story exists to show.
+export const Middling: Story = {
     render: () => (
-        <div className="w-[768px]">
+        <div className="w-[700px]">
             <SiteHeader />
         </div>
     ),
 };
 
-// The lockup on its own, large. The tittle is drawn rather than typed — core/wordmark says
-// where — and at this size a wrong offset is obvious where the header's own 20px is not.
-export const Lockup: Story = {
-    render: () => (
-        <div className="bg-raised p-8 text-6xl">
-            <SiteHeader />
-        </div>
-    ),
-};
+// The mark itself is storied in UI/Wordmark, where it can be set at a size that shows the
+// tittle. A story here claiming to do that could not: `text-6xl` on a wrapper cannot scale
+// a header that sets its own `text-xl`, so it drew the same picture as Default.

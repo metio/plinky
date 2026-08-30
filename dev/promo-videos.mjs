@@ -319,11 +319,14 @@ try {
                     scoreUrl: url,
                     title: piece.title,
                     // No plinky.fun here: the wordmark already rides the top-right corner, and
-                    // the credit line is for what the catalogue owes the source. The licence
-                    // goes on its own line under it, spelled out, so it travels as words
-                    // rather than as a code a viewer would have to look up.
+                    // the credit line is for what the catalogue owes the source.
+                    //
+                    // And no licence line. Every promo piece is CC0 — scoreUrl refuses anything
+                    // else — and CC0 asks for no attribution at all, so naming the licence on a
+                    // clip spends a line saying nothing is owed. A player's own export still
+                    // carries it, because their piece may be CC-BY or CC-BY-SA, where the notice
+                    // has to travel with the file.
                     credit: piece.composer,
-                    licenseId: song.license,
                     width: WIDTH,
                     height: HEIGHT,
                     fps: FPS,

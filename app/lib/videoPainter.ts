@@ -217,10 +217,15 @@ type ChromeConfig = {
     showWordmark: boolean;
 };
 
-// The dark background, the optional title (left) and wordmark (right), and the
-// progress rail between them and the stage.
-function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): void {
-    const { title, width, height, unit, margin, durationMs, showTitle, showWordmark } = cfg;
+// The dark background, the optional title (left) with the composer under it, and the
+// wordmark (right).
+//
+// There was a progress rail under all this, an accent bar filling across the frame. It
+// went because a clip already tells you where it is — the notes are falling — and a bar
+// that repeats it spends the one horizontal line between the head and the stage saying
+// something the stage says better.
+function paintChrome(context: Context2D, cfg: ChromeConfig): void {
+    const { title, width, height, unit, margin, showTitle, showWordmark } = cfg;
     context.fillStyle = BACKGROUND;
     context.fillRect(0, 0, width, height);
     // The wordmark measures first so the title knows where it must stop — on a
@@ -257,7 +262,7 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
         context.textAlign = "left";
         context.textBaseline = "top";
         context.fillStyle = MUTED;
-        context.font = fontAt(500, 0.034, unit);
+        context.font = fontAt(500, 0.034, unit, DISPLAY_FAMILY);
         context.fillText(ellipsize(context, provenance, textRoom), margin, line);
         line += unit * 0.052;
     }
@@ -274,13 +279,6 @@ function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): voi
     if (showWordmark) {
         paintWordmark(context, width - margin, height * 0.08 + unit * 0.049, unit);
     }
-    const railY = height * 0.26;
-    // The rail's unfilled track: the violet-black, a step down from the ground
-    // (1.5:1) so it reads as a groove, with the accent-filled part at 3.8:1 on it.
-    context.fillStyle = "#191545";
-    context.fillRect(margin, railY, width - margin * 2, 4);
-    context.fillStyle = ACCENT;
-    context.fillRect(margin, railY, (width - margin * 2) * (timeMs / durationMs), 4);
 }
 
 // A white key's width in pixels — what the key-shape band is judged against. Read off the
@@ -521,7 +519,7 @@ export function takeScenePainter({
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
-        paintChrome(context, cfg, timeMs);
+        paintChrome(context, cfg);
 
         if (score) {
             drawScore(context, score, frame.currentOnsetMs, timeMs);
@@ -725,7 +723,7 @@ export function takeHighwayPainter({
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
         const clock = timeMs - LEAD_IN_MS;
-        paintChrome(context, cfg, timeMs);
+        paintChrome(context, cfg);
 
         // The falling blocks: each note's lane, top at its far (end) edge, bottom
         // at its onset edge clamped to the strike line, brightening as it lands.

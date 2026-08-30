@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { LocalizedLink as Link } from "../ui/localizedLink";
-import { TITTLE, tittleFromBoxTop, WORDMARK } from "../../../core/wordmark";
 import { m } from "../../paraglide/messages.js";
 import { GradeBadge } from "./gradeBadge";
 import { HeaderNav } from "../ui/navBar";
 import { HelpLink } from "./helpLink";
+import { Wordmark } from "../ui/wordmark";
 
 // The bar at the top of every page: the mark, the grade you are working at, the
 // destinations on a wide screen, and the two things you reach for from anywhere — help and
@@ -52,28 +52,7 @@ export function SiteHeader() {
                             artwork's own curve, and one slightly tight leaves a sliver of
                             ground showing all the way round. */}
                         <img src="/icon-192.png" alt="" className="h-8 w-8 shrink-0" />
-                        <span
-                            aria-hidden="true"
-                            className="font-display text-xl font-semibold tracking-tight text-ink"
-                        >
-                            {WORDMARK.before}
-                            <span className="relative">
-                                {WORDMARK.stem}
-                                {/* Where Fredoka's own tittle sits. The geometry is
-                                    core/wordmark's — the same numbers the promo thumbnails
-                                    and an exported video's canvas draw from — anchored here
-                                    to the inline box's top, which is what CSS gives us. */}
-                                <span
-                                    className="absolute left-1/2 -translate-x-1/2 rounded-full bg-plink"
-                                    style={{
-                                        top: `${tittleFromBoxTop()}em`,
-                                        width: `${TITTLE.size}em`,
-                                        height: `${TITTLE.size}em`,
-                                    }}
-                                />
-                            </span>
-                            {WORDMARK.after}
-                        </span>
+                        <Wordmark className="text-xl" />
                     </Link>
                     <GradeBadge />
                 </div>
