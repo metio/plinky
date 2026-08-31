@@ -1114,7 +1114,15 @@ function usePlaySessionValue({
             }
             // With the section loop on, Practice drills the selected bars on repeat, the
             // same range Listen laps, instead of running the whole piece once.
-            matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);
+            matcher.start(
+                from,
+                loop.on ? { from: loop.from, to: loop.to } : null,
+                // Which PASS to resume on. A printed onset names two places on a repeated
+                // piece, so handing over from Listen mid-repeat used to drop the player
+                // back on the pass they had just heard. The lookahead knows which one it is
+                // standing on; it is ignored unless it is standing exactly here.
+                matcher.previewAnchor(),
+            );
         };
         // A sight-read gets its moment to take the piece in first — key, metre, shape —
         // exactly as a real sight-reading test does. Off the mode, the run starts now:

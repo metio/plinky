@@ -538,3 +538,19 @@ describe("previewIndex", () => {
         expect(walked).toEqual([0, 1, 2]);
     });
 });
+
+describe("previewIndex as a resume anchor", () => {
+    const REPEATED = [{ whole: 0 }, { whole: 1 }, { whole: 0 }, { whole: 1 }, { whole: 2 }];
+
+    it("resumes on the pass the anchor is standing on", () => {
+        // Listen is on the second pass, at the bar printed at 0 — position 2, not 0. The
+        // resume asks for that same onset, so the anchor holds and the run continues where
+        // the listening left off rather than replaying bars just heard.
+        expect(previewIndex(REPEATED, 0, 2, 0)).toBe(2);
+        expect(previewIndex(REPEATED, 1, 3, 1)).toBe(3);
+    });
+
+    it("resumes on the first pass when the anchor is standing there", () => {
+        expect(previewIndex(REPEATED, 0, 0, 0)).toBe(0);
+    });
+});
