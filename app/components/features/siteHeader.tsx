@@ -3,6 +3,7 @@
 
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { m } from "../../paraglide/messages.js";
+import type { ReactNode } from "react";
 import { GradeBadge } from "./gradeBadge";
 import { HeaderNav } from "../ui/navBar";
 import { HelpLink } from "./helpLink";
@@ -16,7 +17,12 @@ import { Wordmark } from "../ui/wordmark";
 // while it sat inside the root layout, where nothing could render it in isolation. Every
 // visual decision here — the lockup's tittle, the bouquet's five colours, the slim sticky
 // bar — was going unchecked between releases.
-export function SiteHeader() {
+//
+// The badge is a parameter for the same reason the rest of this moved: GradeBadge reads the
+// mastery store and renders NOTHING until that read resolves, so a screenshot of this bar
+// lands on either side of a badge appearing. The app passes nothing and gets the real one;
+// a story passes a fixed one and gets the same picture every time.
+export function SiteHeader({ badge = <GradeBadge /> }: { badge?: ReactNode }) {
     return (
         // Paper, not a violet slab.
         //
@@ -54,7 +60,7 @@ export function SiteHeader() {
                         <img src="/icon-192.png" alt="" className="h-8 w-8 shrink-0" />
                         <Wordmark className="text-xl" />
                     </Link>
-                    <GradeBadge />
+                    {badge}
                 </div>
                 {/* On wide screens the destinations sit inline; on phones they move to
                     the fixed bottom tab bar (BottomNav), so the header stays slim. */}

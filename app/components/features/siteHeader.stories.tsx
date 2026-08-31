@@ -4,15 +4,21 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { memoryStore } from "../../adapters/memoryStore";
 import { ServicesProvider } from "../../contexts/services";
+import { GradeBadgeView } from "./gradeBadge";
 import { SiteHeader } from "./siteHeader";
+
+// A fixed badge. The real one reads the mastery store and renders nothing until that
+// resolves, which makes a screenshot of this bar a race — it passed here every run and
+// failed on CI by 749 pixels, almost exactly the badge's own ink. Stories pass the
+// presentational half, the same one GradeBadge's own stories use.
+const BADGE = <GradeBadgeView level={3} skill={214} competitive={false} />;
 
 // The bar every page wears. It had no stories at all while it lived inside the root
 // layout, which meant the lockup's tittle, the bouquet's five colours and the slim sticky
 // bar were all going unchecked — and the tittle had in fact drifted from the one the promo
 // thumbnails set.
 //
-// An empty in-memory world on purpose: the grade badge reports nothing until a run has been
-// saved, so this is the header a new player meets.
+// An empty in-memory world, so nothing here depends on stored data.
 const meta: Meta<typeof SiteHeader> = {
     title: "Features/SiteHeader",
     component: SiteHeader,
@@ -30,7 +36,7 @@ type Story = StoryObj<typeof SiteHeader>;
 
 // Wide enough for the inline destinations: the mark on the left, the nav in the middle,
 // help and settings on the right.
-export const Default: Story = {};
+export const Default: Story = { render: () => <SiteHeader badge={BADGE} /> };
 
 // A phone. The destinations move to the fixed bottom bar below `md`, so the header keeps
 // only the mark and the two things reachable from anywhere — this is the state that must
@@ -38,7 +44,7 @@ export const Default: Story = {};
 export const Phone: Story = {
     render: () => (
         <div className="w-[390px]">
-            <SiteHeader />
+            <SiteHeader badge={BADGE} />
         </div>
     ),
 };
@@ -48,9 +54,15 @@ export const Phone: Story = {
 export const Narrowest: Story = {
     render: () => (
         <div className="w-[320px]">
-            <SiteHeader />
+            <SiteHeader badge={BADGE} />
         </div>
     ),
+};
+
+// The header a new player meets: no badge at all, because the real one shows nothing until
+// a run has been saved. Worth a shot of its own — it is what every first visit looks like.
+export const NoGrade: Story = {
+    render: () => <SiteHeader badge={null} />,
 };
 
 // A middling width, with the inline destinations still shown.
@@ -63,7 +75,7 @@ export const Narrowest: Story = {
 export const Middling: Story = {
     render: () => (
         <div className="w-[700px]">
-            <SiteHeader />
+            <SiteHeader badge={BADGE} />
         </div>
     ),
 };
