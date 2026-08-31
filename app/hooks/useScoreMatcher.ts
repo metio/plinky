@@ -61,6 +61,7 @@ import {
     stepRange,
     staffArrivals,
     type UpcomingStep,
+    previewIndex,
     upcomingSteps,
     jumpsBack,
 } from "../../core/matcher";
@@ -70,11 +71,6 @@ import {
 // count: this is generous enough that a run of semiquavers still reaches the top, and
 // the ones that fall off it are dropped without being drawn.
 const HIGHWAY_LOOKAHEAD = 32;
-
-// Whole-note onsets are summed from fractions, so two positions that are the same place in
-// the music can differ in the last bits. A sixty-fourth is 1/64 of a whole; anything this
-// small is rounding rather than music.
-const WHOLE_EPSILON = 1 / 1024;
 
 // The fields upcomingSteps does not read, so a lookahead can be built from steps and an
 // index alone rather than from a run that does not exist.
@@ -529,7 +525,15 @@ export function useScoreMatcher(
     // Collecting walks the cursor, so it is done ONCE and then only re-indexed. A walk per
     // sounded note would reset the cursor Listen is steering, and re-read the whole
     // engraving between two beats.
-    const previewRef = useRef<{ hand: Hand; steps: MatchStep[] } | null>(null);
+    // Where the lookahead last landed, and the onset it was asked for. Carried because a
+    // repeat prints two passes at the same onsets, so "which position is this" cannot be
+    // answered from the onset alone — see previewIndex.
+    const previewRef = useRef<{
+        hand: Hand;
+        steps: MatchStep[];
+        at: number;
+        whole: number;
+    } | null>(null);
 
     // Drop the collected steps: the engraving they were read from is gone (a reload, a
     // transpose), so re-indexing them would point at music no longer on the page.
@@ -550,12 +554,25 @@ export function useScoreMatcher(
                 previewRef.current = {
                     hand,
                     steps: collectMatchSteps(osmd, hand, optionsRef.current.marks),
+                    at: -1,
+                    whole: Number.NEGATIVE_INFINITY,
                 };
             }
             const steps = previewRef.current.steps;
             // The position at or after the asked-for onset, so the note now sounding is the
             // first block on the highway — the same place a run's lookahead starts from.
-            const index = steps.findIndex((step) => step.whole >= fromWhole - WHOLE_EPSILON);
+            //
+            // Resolved forward from wherever the lookahead last was, not by the first match
+            // in the piece: a repeat prints the same onsets twice, and answering from the
+            // top drew the pass that had already gone for as long as the repeat lasted.
+            const index = previewIndex(
+                steps,
+                fromWhole,
+                previewRef.current.at,
+                previewRef.current.whole,
+            );
+            previewRef.current.at = index;
+            previewRef.current.whole = fromWhole;
             setUpcoming(
                 upcomingSteps(
                     { ...EMPTY_STATE, steps, index: index < 0 ? steps.length : index },

@@ -221,6 +221,49 @@ export function expectedPitches(state: MatcherState): number[] {
 // view (the notes highway) shows above the keys. Each carries its whole-run index
 // so a view can key blocks stably as the run advances, and the staves it sits on
 // so a two-hand piece can colour the hands apart. Fewer than `count` near the end.
+// How near two printed onsets must be to count as the same place. A 1024th of a whole
+// note is finer than any notated value and coarser than the accumulated error.
+export const WHOLE_EPSILON = 1 / 1024;
+
+// Which position a printed onset means, when the same onset is printed more than once.
+//
+// A repeat prints two passes over one set of bars, so `whole` alone does not identify a
+// position: on the second pass through bars printed at 0 and 1, the onsets asked for are 0
+// and 1 again. Taking the first match walks the lookahead back to the pass that has already
+// gone — the highway then draws the wrong notes, spaced from the wrong moment, for as long
+// as the repeat lasts.
+//
+// So the search runs FORWARD from wherever it last landed. `from` is that place and
+// `fromWhole` the onset wanted; when the onset has gone backwards the barline has sent the
+// music back, and the answer must be past the current position rather than at it. A caller
+// with no history (a fresh seek, or a jump the walk did not make) passes -1 and gets the
+// first match, which is what an unanchored question deserves.
+export function previewIndex(
+    steps: readonly { whole: number }[],
+    fromWhole: number,
+    from = -1,
+    lastWhole = Number.NEGATIVE_INFINITY,
+): number {
+    const at = (index: number) => steps[index]!.whole >= fromWhole - WHOLE_EPSILON;
+    if (from >= 0) {
+        // Past the current position when the music has been sent back, at it otherwise.
+        const start = fromWhole < lastWhole - WHOLE_EPSILON ? from + 1 : from;
+        for (let index = Math.max(0, start); index < steps.length; index++) {
+            if (at(index)) {
+                return index;
+            }
+        }
+    }
+    // Nothing ahead: either there is no history, or the ask is behind everything left —
+    // a seek rather than a step, and the whole piece is the right place to look.
+    for (let index = 0; index < steps.length; index++) {
+        if (at(index)) {
+            return index;
+        }
+    }
+    return -1;
+}
+
 export type UpcomingStep = {
     index: number;
     pitches: number[];

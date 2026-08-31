@@ -17,6 +17,7 @@ import {
     type MatchStep,
     upcomingSteps,
     jumpsBack,
+    previewIndex,
 } from "./matcher";
 import { GRAND_STAFF, partsOf } from "./parts";
 
@@ -476,5 +477,64 @@ describe("a repeat sending the run back", () => {
         const drift = 1e-12;
         expect(4 - drift).not.toBe(4);
         expect(jumpsBack(at(4), at(4 - drift))).toBe(false);
+    });
+});
+
+describe("previewIndex", () => {
+    // Three bars, the first two inside a repeat: the performance is C D C D E and the
+    // PRINTED onsets rewind, because the second pass reads the same bars.
+    const REPEATED = [{ whole: 0 }, { whole: 1 }, { whole: 0 }, { whole: 1 }, { whole: 2 }];
+
+    it("finds the first position when nothing has been previewed yet", () => {
+        expect(previewIndex(REPEATED, 0)).toBe(0);
+        expect(previewIndex(REPEATED, 2)).toBe(4);
+    });
+
+    it("walks forward through a repeat instead of falling back to the first pass", () => {
+        // Following the performance one position at a time, carrying where it last landed.
+        let at = -1;
+        let last = Number.NEGATIVE_INFINITY;
+        const walked: number[] = [];
+        for (const whole of [0, 1, 0, 1, 2]) {
+            at = previewIndex(REPEATED, whole, at, last);
+            last = whole;
+            walked.push(at);
+        }
+        // Every pass gets its own position. Taking the first match printed at each onset
+        // gives [0, 1, 0, 1, 4] — the second pass drawn from the first pass's place.
+        expect(walked).toEqual([0, 1, 2, 3, 4]);
+    });
+
+    it("stays put when asked for the position it is already on", () => {
+        // The onset has not gone backwards, so the answer is here rather than the next one.
+        expect(previewIndex(REPEATED, 0, 0, 0)).toBe(0);
+    });
+
+    it("treats a jump backwards with no history as a seek", () => {
+        // No anchor means no pass to be on, so the first position printed there is right.
+        expect(previewIndex(REPEATED, 0, -1)).toBe(0);
+    });
+
+    it("falls back to a whole-piece search when nothing lies ahead", () => {
+        // Asked for the top of the piece from the last position: there is nothing at or
+        // after it, so this is a seek back rather than a step on.
+        expect(previewIndex(REPEATED, 0, 4, 2)).toBe(0);
+    });
+
+    it("answers -1 when no position is printed at or after the onset", () => {
+        expect(previewIndex(REPEATED, 99)).toBe(-1);
+    });
+
+    it("is unbothered by a score that never repeats", () => {
+        const plain = [{ whole: 0 }, { whole: 1 }, { whole: 2 }];
+        let at = -1;
+        let last = Number.NEGATIVE_INFINITY;
+        const walked: number[] = [];
+        for (const whole of [0, 1, 2]) {
+            at = previewIndex(plain, whole, at, last);
+            last = whole;
+            walked.push(at);
+        }
+        expect(walked).toEqual([0, 1, 2]);
     });
 });

@@ -10,11 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 31 August 2026
 
-**The colour clears when a repeat sends you back.** On a piece with a repeat, the
-bars you are asked to play a second time were still green from the first time
-through — so the colour stopped telling you where you were at exactly the moment the
-music asked you to read the same bars again. They start clean on the second pass now,
-whether you are playing or listening.
+**Repeats work properly now.** On a piece with a repeat, the bars you are asked to
+play a second time were still green from the first time through — so the colour
+stopped telling you where you were at exactly the moment the music asked you to read
+the same bars again. They start clean on the second pass now, whether you are playing
+or listening. The notes highway had the same fault from the other side: while
+listening through a repeat it showed the notes from the first pass rather than the
+ones actually coming. It follows the pass you are on.
 
 ## 30 August 2026
 
