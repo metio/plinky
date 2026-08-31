@@ -13,18 +13,22 @@ import { useDuet } from "./useDuet";
 // test hands the run a fixed two-hand shape without an engraved OSMD. The right
 // hand plays on whole 0 and 1; the left hand plays with it on 0, halfway through the
 // gap on 0.5, and again on 1.
+//
+// Every step carries `elapsedMs` as well as `whole`, because the real model does and
+// because it is what decides which of your gaps a note of theirs falls in. A fake that
+// left it out put every note in the first gap and passed anyway, which is the whole
+// argument for keeping a fake to the shape of the thing it stands in for. At the score's
+// own 120 a whole note is two seconds.
+const at = (whole: number, pitches: number[]) => ({
+    whole,
+    elapsedMs: whole * 2000,
+    pitches,
+    holdQuarters: 1,
+});
+
 vi.mock("./useScoreMatcher", () => ({
     collectMatchSteps: (_osmd: OpenSheetMusicDisplay, hand: Hand) =>
-        hand === "right"
-            ? [
-                  { whole: 0, pitches: [60], holdQuarters: 1 },
-                  { whole: 1, pitches: [62], holdQuarters: 1 },
-              ]
-            : [
-                  { whole: 0, pitches: [48], holdQuarters: 1 },
-                  { whole: 0.5, pitches: [50], holdQuarters: 1 },
-                  { whole: 1, pitches: [52], holdQuarters: 1 },
-              ],
+        hand === "right" ? [at(0, [60]), at(1, [62])] : [at(0, [48]), at(0.5, [50]), at(1, [52])],
 }));
 
 // A hand-driven scheduler: after() records the pending run and hands back an id;

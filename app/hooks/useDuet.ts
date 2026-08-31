@@ -4,7 +4,7 @@
 import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useRef } from "react";
-import { type AccompanyVoice, accompanimentForGap } from "../../core/duet";
+import { type AccompanyVoice, accompanimentForGap, gapsForRun } from "../../core/duet";
 import type { Hand } from "../../core/matcher";
 import type { Scheduler, SchedulerHandle } from "../ports/scheduler";
 import type { PlayNoteOptions } from "./useSynth";
@@ -41,7 +41,9 @@ export function useDuet({
     // Your notes' onsets, addressed by the whole-piece step index onCorrect reports,
     // and the accompanying hand's notes to place between them.
     const onsetsRef = useRef<number[]>([]);
-    const voicesRef = useRef<AccompanyVoice[]>([]);
+    // The accompanying hand's notes, already grouped by which of your notes opens their
+    // gap — see gapsForRun.
+    const gapsRef = useRef<AccompanyVoice[][]>([]);
     const pendingRef = useRef<SchedulerHandle[]>([]);
     // Read live inside the callbacks so a mid-render toggle or hand change takes
     // effect on the next primed run without re-creating them.
@@ -58,19 +60,28 @@ export function useDuet({
     const prime = useCallback(() => {
         cancel();
         onsetsRef.current = [];
-        voicesRef.current = [];
+        gapsRef.current = [];
         const osmd = getOsmd();
         const chosen = handRef.current;
         if (!osmd || !enabledRef.current || chosen === "both") {
             return;
         }
-        onsetsRef.current = collectMatchSteps(osmd, chosen).map((step) => step.whole);
-        voicesRef.current = collectMatchSteps(osmd, OTHER[chosen]).flatMap((step) =>
-            step.pitches.map((pitch) => ({
-                pitch,
-                whole: step.whole,
-                quarters: step.holdQuarters,
-            })),
+        const mine = collectMatchSteps(osmd, chosen);
+        onsetsRef.current = mine.map((step) => step.whole);
+        // Bucketed once, here, rather than searched per gap: which of your notes a note of
+        // theirs belongs to is a property of the two walks, and it does not change as you
+        // play. It is also the only place both walks are in hand at once, which is what
+        // deciding it on elapsed time needs.
+        gapsRef.current = gapsForRun(
+            mine,
+            collectMatchSteps(osmd, OTHER[chosen]).flatMap((step) =>
+                step.pitches.map((pitch) => ({
+                    pitch,
+                    whole: step.whole,
+                    elapsedMs: step.elapsedMs,
+                    quarters: step.holdQuarters,
+                })),
+            ),
         );
     }, [getOsmd, cancel]);
 
@@ -86,14 +97,7 @@ export function useDuet({
                 return;
             }
             cancel();
-            const to = onsetsRef.current[index + 1] ?? Number.POSITIVE_INFINITY;
-            for (const voice of accompanimentForGap(
-                voicesRef.current,
-                from,
-                to,
-                index === 0,
-                bpm,
-            )) {
+            for (const voice of accompanimentForGap(gapsRef.current[index] ?? [], from, bpm)) {
                 if (voice.delayMs <= 0) {
                     playNote(voice.pitch, { duration: voice.durationSec });
                     continue;

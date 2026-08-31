@@ -14,11 +14,19 @@
 export type AccompanyVoice = {
     pitch: number;
     whole: number;
+    // Where the note falls in TIME, milliseconds from the start of the performance with the
+    // repeats played out. Which gap a note belongs to is decided on this rather than on
+    // `whole`: a repeat prints the same bars twice, so an onset names two moments and a
+    // range between two of them can run backwards.
+    elapsedMs: number;
     quarters: number;
 };
 
 // A note to sound for the accompaniment: how long from now to wait (0 = with your
 // note) and how long to hold it, both already resolved against the live tempo.
+// Two elapsed times this close are the same moment; the walk sums them in fractions.
+const MS_EPSILON = 1e-6;
+
 export type ScheduledVoice = {
     pitch: number;
     delayMs: number;
@@ -34,34 +42,57 @@ export type ScheduledVoice = {
 // `isFirst` sweeps up any pickup the accompanying hand plays before your very first
 // note — those onsets sit before `fromWhole`, so their delay clamps to 0 and they
 // sound as you begin rather than being lost.
+// Which of your gaps each of the accompanying hand's notes belongs to, as one bucket per
+// note of yours.
+//
+// Decided on elapsed time, which rises across the whole run. Deciding it on the printed
+// onset — the range between your note and your next — broke twice over on a repeat: the
+// same bars are printed once and walked twice, so every note of theirs printed in a
+// repeated bar matched BOTH passes' gaps and sounded twice, and the gap spanning the
+// repeat barline ran from a later onset to an earlier one, matched nothing, and fell
+// silent exactly at the turn.
+//
+// Anything the accompaniment plays before your first note is a pickup and belongs to the
+// first gap, where its delay clamps to zero and it sounds as you begin.
+export function gapsForRun(
+    mine: readonly { elapsedMs: number }[],
+    theirs: readonly AccompanyVoice[],
+): AccompanyVoice[][] {
+    const buckets: AccompanyVoice[][] = mine.map(() => []);
+    if (buckets.length === 0) {
+        return buckets;
+    }
+    let at = 0;
+    for (const voice of theirs) {
+        // Both walks are in play order, so this pointer only ever moves forward.
+        while (at + 1 < mine.length && voice.elapsedMs >= mine[at + 1]!.elapsedMs - MS_EPSILON) {
+            at++;
+        }
+        buckets[at]!.push(voice);
+    }
+    return buckets;
+}
+
+// Lay out one gap's notes at your current pace. `fromWhole` is the onset of the note of
+// yours that opened it: a note printed with yours sounds with it, and the rest are spaced
+// by how much later they are written.
+//
+// Which notes are in the gap is settled by gapsForRun, so nothing is filtered here. A note
+// printed before the gap's start — a pickup, or the far side of a repeat barline — clamps
+// to zero and sounds as the gap opens, which is the only sensible reading of "already due".
 export function accompanimentForGap(
-    voices: AccompanyVoice[],
+    voices: readonly AccompanyVoice[],
     fromWhole: number,
-    toWhole: number,
-    isFirst: boolean,
     bpm: number,
 ): ScheduledVoice[] {
-    // A non-positive tempo would divide by zero; the caller clamps the live tempo,
-    // but guard so a stray value can't schedule notes at infinity.
+    // A non-positive tempo would divide by zero; the caller clamps the live tempo, but
+    // guard so a stray value can't schedule notes at infinity.
     const msPerQuarter = 60000 / Math.max(bpm, 1);
-    const eps = 1e-6;
-    const scheduled: ScheduledVoice[] = [];
-    for (const voice of voices) {
-        const belowTop = voice.whole < toWhole - eps;
-        // The first gap reaches back before your first note to catch a pickup; every
-        // later gap starts at the note you just cleared.
-        const aboveBottom = isFirst || voice.whole >= fromWhole - eps;
-        if (!belowTop || !aboveBottom) {
-            continue;
-        }
-        const delayMs = Math.max(0, voice.whole - fromWhole) * 4 * msPerQuarter;
-        scheduled.push({
-            pitch: voice.pitch,
-            delayMs,
-            // A note the score marks with no length still needs an audible tail; fall
-            // back to a quarter so it sounds like a played note, not a click.
-            durationSec: (voice.quarters || 1) * (msPerQuarter / 1000),
-        });
-    }
-    return scheduled;
+    return voices.map((voice) => ({
+        pitch: voice.pitch,
+        delayMs: Math.max(0, voice.whole - fromWhole) * 4 * msPerQuarter,
+        // A note the score marks with no length still needs an audible tail; fall back to a
+        // quarter so it sounds like a played note, not a click.
+        durationSec: (voice.quarters || 1) * (msPerQuarter / 1000),
+    }));
 }

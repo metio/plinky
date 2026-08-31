@@ -524,6 +524,10 @@ function usePlaySessionValue({
         // Through a ref because the matcher is built below this: the call only ever happens
         // while a run is under way, which is long after both exist.
         onPosition: (whole: number) => previewRef.current(whole),
+        // The same wipe the graded run and Listen do at a repeat barline: keep-up paints a
+        // green and red trail as it goes, and a repeat sends it back over bars already
+        // carrying one.
+        onRewind: clearPaint,
         markPainted,
         onFinish: exitFullscreen,
     });

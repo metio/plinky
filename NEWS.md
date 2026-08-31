@@ -16,8 +16,12 @@ stopped telling you where you were at exactly the moment the music asked you to 
 the same bars again. They start clean on the second pass now, whether you are playing
 or listening. The notes highway had the same fault from the other side: while
 listening through a repeat it showed the notes from the first pass rather than the
-ones actually coming. It follows the pass you are on. And taking over from Listen
-partway through a repeat carries on from where you were listening, instead of
+ones actually coming. It follows the pass you are on. The duet was worse: it played
+the other hand twice over on every repeated bar, and fell silent altogether at the
+repeat barline — it now plays each pass once and carries straight through. Keep-up
+clears its green-and-red trail at the barline like everything else. And taking over
+from Listen partway through a repeat carries on from where you were listening,
+instead of
 dropping you back to replay the bars you had just heard.
 
 ## 30 August 2026

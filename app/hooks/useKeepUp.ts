@@ -26,6 +26,7 @@ import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
 import { useTimerChain } from "./useTimerChain";
+import { jumpsBack } from "../../core/matcher";
 
 // A note sink for the guide and the player's own strikes — the slice of the
 // synth the play-along needs.
@@ -109,6 +110,7 @@ export function useKeepUp({
     // to draw what is coming — without it the highway has nothing to advance and simply
     // does not appear, which is what a tempo-locked run looked like until now.
     onPosition,
+    onRewind,
     markPainted,
     onFinish,
 }: {
@@ -123,6 +125,10 @@ export function useKeepUp({
     // to draw what is coming — without it there is nothing to advance and the highway does
     // not appear at all, which is what a tempo-locked run looked like until now.
     onPosition?: (whole: number) => void;
+    // A written repeat has sent the run back over bars it has already painted. Announced
+    // rather than acted on here: the trail belongs to the surface, the same way Listen's
+    // does. Separate from finishing, which a repeat is not.
+    onRewind?: () => void;
     // A run paints the score — the "play now" window, then a green/red hit/miss
     // trail it leaves in place. The surface tracks that something is painted so the
     // next run re-renders to wipe it; without this signal last run's marks persist.
@@ -273,6 +279,13 @@ export function useKeepUp({
             closeStep();
             const current = steps[step];
             if (current) {
+                // Printed EARLIER than the position before it means the barline has sent
+                // the run back over bars it has already coloured green and red, so the
+                // trail stops saying how far this pass has got.
+                const previous = steps[step - 1];
+                if (previous !== undefined && jumpsBack(previous, current)) {
+                    onRewind?.();
+                }
                 onPosition?.(current.whole);
             }
             if (!current) {
