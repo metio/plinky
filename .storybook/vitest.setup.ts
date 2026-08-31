@@ -19,6 +19,9 @@ beforeAll(project.beforeAll);
 // version the machine has. These stories still run (render, play functions,
 // coverage); only the pixel comparison is skipped.
 const EMOJI_STORIES = new Set([
+    // The header wearing a grade badge carries that badge's 🎓 and ⚡. Its other stories
+    // pass no badge, so they stay compared — what they are about is the bar's layout.
+    "siteHeader.stories.tsx > With Grade",
     "gradeBadge.stories.tsx > Starting",
     "gradeBadge.stories.tsx > Earned",
     "gradeBadge.stories.tsx > Competitive Mode",

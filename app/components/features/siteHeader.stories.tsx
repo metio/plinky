@@ -9,8 +9,14 @@ import { SiteHeader } from "./siteHeader";
 
 // A fixed badge. The real one reads the mastery store and renders nothing until that
 // resolves, which makes a screenshot of this bar a race — it passed here every run and
-// failed on CI by 749 pixels, almost exactly the badge's own ink. Stories pass the
-// presentational half, the same one GradeBadge's own stories use.
+// failed on CI. Stories pass the presentational half, the same one GradeBadge's own
+// stories use.
+//
+// Only ONE story wears it, and that story is not pixel-compared: the badge draws 🎓 and ⚡,
+// and emoji rasterize differently on every machine — which is why gradeBadge's own stories
+// are already in EMOJI_STORIES. The width stories below pass `badge={null}` instead, so
+// what they check is the thing they are actually about: how the bar lays out. The badge is
+// covered where it belongs, in its own stories.
 const BADGE = <GradeBadgeView level={3} skill={214} competitive={false} />;
 
 // The bar every page wears. It had no stories at all while it lived inside the root
@@ -36,7 +42,7 @@ type Story = StoryObj<typeof SiteHeader>;
 
 // Wide enough for the inline destinations: the mark on the left, the nav in the middle,
 // help and settings on the right.
-export const Default: Story = { render: () => <SiteHeader badge={BADGE} /> };
+export const Default: Story = { render: () => <SiteHeader badge={null} /> };
 
 // A phone. The destinations move to the fixed bottom bar below `md`, so the header keeps
 // only the mark and the two things reachable from anywhere — this is the state that must
@@ -44,7 +50,7 @@ export const Default: Story = { render: () => <SiteHeader badge={BADGE} /> };
 export const Phone: Story = {
     render: () => (
         <div className="w-[390px]">
-            <SiteHeader badge={BADGE} />
+            <SiteHeader badge={null} />
         </div>
     ),
 };
@@ -54,15 +60,15 @@ export const Phone: Story = {
 export const Narrowest: Story = {
     render: () => (
         <div className="w-[320px]">
-            <SiteHeader badge={BADGE} />
+            <SiteHeader badge={null} />
         </div>
     ),
 };
 
-// The header a new player meets: no badge at all, because the real one shows nothing until
-// a run has been saved. Worth a shot of its own — it is what every first visit looks like.
-export const NoGrade: Story = {
-    render: () => <SiteHeader badge={null} />,
+// The bar as a returning player sees it, badge and all. Not pixel-compared — see BADGE
+// above — but it is the arrangement worth being able to open in Storybook and look at.
+export const WithGrade: Story = {
+    render: () => <SiteHeader badge={BADGE} />,
 };
 
 // A middling width, with the inline destinations still shown.
@@ -75,7 +81,7 @@ export const NoGrade: Story = {
 export const Middling: Story = {
     render: () => (
         <div className="w-[700px]">
-            <SiteHeader badge={BADGE} />
+            <SiteHeader badge={null} />
         </div>
     ),
 };
