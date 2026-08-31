@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 31 August 2026
+
+**The colour clears when a repeat sends you back.** On a piece with a repeat, the
+bars you are asked to play a second time were still green from the first time
+through — so the colour stopped telling you where you were at exactly the moment the
+music asked you to read the same bars again. They start clean on the second pass now,
+whether you are playing or listening.
+
 ## 30 August 2026
 
 **Installing Plinky gives you a proper app icon.** Added to a phone's home screen or

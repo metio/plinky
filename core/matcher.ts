@@ -66,7 +66,10 @@ export function isPracticedHand(
 // carries the onset of the note it decorates, so it shares a value rather than preceding it.
 const SAME_PLACE = 1e-6;
 
-export function jumpsBack(from: MatchStep, to: MatchStep): boolean {
+// Takes the one field it reads rather than a whole step, because both surfaces that walk
+// the music have to ask this and they walk different models: a run reads MatchStep, Listen
+// reads ListenStep, and the repeat sends each of them back over the same printed bars.
+export function jumpsBack(from: { whole: number }, to: { whole: number }): boolean {
     return to.whole < from.whole - SAME_PLACE;
 }
 

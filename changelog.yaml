@@ -1,6 +1,14 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-08-31
+  entries:
+    - |-
+      **The colour clears when a repeat sends you back.** On a piece with a repeat, the
+      bars you are asked to play a second time were still green from the first time
+      through — so the colour stopped telling you where you were at exactly the moment the
+      music asked you to read the same bars again. They start clean on the second pass now,
+      whether you are playing or listening.
 - date: 2026-08-30
   entries:
     - |-

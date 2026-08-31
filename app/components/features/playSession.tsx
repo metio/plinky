@@ -767,6 +767,12 @@ function usePlaySessionValue({
         tempo: readTempo,
         loop: loop.read,
         onLap: bumpTempo,
+        // The same wipe the run does at a repeat barline. Listen colours the bars it has
+        // played with a blue trail, and a written repeat sends it back over them — so
+        // without this the trail stops saying where the music has reached at exactly the
+        // moment the score asks for those bars again. onLap cannot serve: it ramps the
+        // practice tempo, and a repeat is the page's instruction rather than the player's.
+        onRewind: clearPaint,
         centerCursor,
         marks,
         // The notes highway follows Listen too, so choosing that reading mode does not

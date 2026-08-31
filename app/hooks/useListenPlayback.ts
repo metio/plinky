@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { type ListenStep, performListenNote } from "../../core/listenPerformance";
-import type { Hand2 } from "../../core/matcher";
+import { type Hand2, jumpsBack } from "../../core/matcher";
 import { NOMINAL_BPM } from "../../core/elapsed";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
@@ -48,6 +48,7 @@ export function useListenPlayback({
     tempo,
     loop,
     onLap,
+    onRewind,
     centerCursor,
     onPosition,
     marks = NO_SCORE_MARKS,
@@ -69,6 +70,11 @@ export function useListenPlayback({
     // A full pass ended — the natural end of the piece, or a loop lap — the
     // tempo trainer's cue to ramp.
     onLap: () => void;
+    // A written repeat has sent playback back over bars it has already coloured. Separate
+    // from onLap because a lap is the player drilling a range and a repeat is the page
+    // telling the reader to go round — and the lap also ramps the tempo, which a repeat
+    // must not. Announced rather than acted on here: the trail belongs to the surface.
+    onRewind?: () => void;
     // Re-centre the treadmill after each cursor step; a no-op elsewhere.
     centerCursor: () => void;
     // Where the music has reached, as a notated onset in whole notes, before the position
@@ -208,6 +214,14 @@ export function useListenPlayback({
                 return;
             }
             const current = steps[step]!;
+            // A step printed EARLIER than the one before it means the repeat barline has
+            // sent playback back. The bars ahead are still blue from the first pass, so the
+            // trail stops saying where the music has reached at the exact moment the score
+            // asks for the same bars again.
+            const previous = steps[step - 1];
+            if (previous !== undefined && jumpsBack(previous, current)) {
+                onRewind?.();
+            }
             onPosition?.(current.whole);
             setSounding(
                 current.notes.length === 0

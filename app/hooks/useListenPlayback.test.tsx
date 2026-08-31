@@ -69,7 +69,15 @@ function lineOsmd(
     return { cursor, Sheet: { SourceMeasures: [] } } as unknown as OpenSheetMusicDisplay;
 }
 
-function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, volume?: number) {
+// `onsets` overrides the printed position of each step, which is the only way to fake a
+// written repeat: the walk goes forward but the ONSETS rewind, because the barline sends
+// the reader back over bars already played. Left out, onsets march with the walk.
+function fakeOsmd(
+    steps: number,
+    noteOver: Record<string, unknown> = {},
+    volume?: number,
+    onsets?: number[],
+) {
     let position = 0;
     const cursor = {
         reset: vi.fn(() => {
@@ -91,7 +99,7 @@ function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, volume?
             // way a real walk's do. A fake that reported the same onset everywhere would
             // let a caller reading the position pass while reading it wrongly.
             get currentTimeStamp() {
-                return { RealValue: position * 0.25 };
+                return { RealValue: onsets?.[position] ?? position * 0.25 };
             },
         },
         NotesUnderCursor: () => [
@@ -639,5 +647,64 @@ describe("the listening performance", () => {
             [40, 64, 87, 470, false],
             [80, 67, 90, 470, false],
         ]);
+    });
+});
+
+describe("Listen over a written repeat", () => {
+    // The trail Listen leaves is what says how far the music has reached. A repeat sends
+    // playback back over bars it has already coloured, so unless the surface is told to
+    // wipe them the trail means nothing from the barline onward — the same fault the
+    // graded run had, on the surface nobody had checked.
+    //
+    // The walk goes forward through five steps; their PRINTED onsets are 0, ¼, 0, ¼, ½.
+    const REPEATED_ONSETS = [0, 0.25, 0, 0.25, 0.5];
+
+    it("says when the barline has sent it back, once per pass", () => {
+        const onRewind = vi.fn();
+        const osmd = fakeOsmd(5, {}, undefined, REPEATED_ONSETS);
+        const { result } = renderHook(() =>
+            useListenPlayback({
+                getOsmd: () => osmd,
+                synth: { playNote },
+                tempo: () => 120,
+                loop: () => loopState,
+                onLap,
+                onRewind,
+                centerCursor: () => {},
+                markPainted: () => {},
+                isPracticing: () => false,
+            }),
+        );
+        act(() => result.current.start(0));
+        // Walk the whole piece: five quarters at 120 BPM.
+        for (let i = 0; i < 5; i++) {
+            act(() => void vi.advanceTimersByTime(500));
+        }
+        // Exactly once — at the third step, the only place an onset is earlier than the
+        // one before it. The last two steps move forward again and must not re-fire.
+        expect(onRewind).toHaveBeenCalledTimes(1);
+    });
+
+    it("stays quiet on a score that never repeats", () => {
+        const onRewind = vi.fn();
+        const osmd = fakeOsmd(4);
+        const { result } = renderHook(() =>
+            useListenPlayback({
+                getOsmd: () => osmd,
+                synth: { playNote },
+                tempo: () => 120,
+                loop: () => loopState,
+                onLap,
+                onRewind,
+                centerCursor: () => {},
+                markPainted: () => {},
+                isPracticing: () => false,
+            }),
+        );
+        act(() => result.current.start(0));
+        for (let i = 0; i < 4; i++) {
+            act(() => void vi.advanceTimersByTime(500));
+        }
+        expect(onRewind).not.toHaveBeenCalled();
     });
 });
