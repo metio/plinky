@@ -595,6 +595,8 @@
     "takes_stop": "Stopp",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Lyd",
+    "takes_audio_working": "Lagrer…",
     "takes_delete": "Slett gjennomkjøring",
     "takes_save_prompt": "Lagre denne gjennomkjøringen?",
     "takes_save": "Lagre gjennomkjøring",

@@ -263,6 +263,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   back onto the staff in your own timing — on a MIDI piano, even how long you held each key
   and every press of the **sustain pedal**, so a note you pedalled rings on in the replay
   just as you played it — **download** it as MIDI or MusicXML, **save it as
+  audio** (the sound of your take on its own, no picture: an `.m4a` where your browser
+  can compress one and a `.wav` where it cannot, so the button always works and you
+  never have to pick a format), **save it as
   a video** (an MP4 of your take: the sheet music of what you played with each note
   tinting as it sounds, above the keyboard where each press lights its key in full
   and fades while held, so even fast repeats read clearly — with the piece's title at the

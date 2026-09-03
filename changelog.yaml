@@ -4,6 +4,13 @@
 - date: 2026-09-03
   entries:
     - |-
+      **Save a take as sound.** Your takes could already leave as MIDI, as MusicXML, or as
+      a video — but not as the one thing they most obviously are, a recording of you
+      playing. There is now an **Audio** button beside the others: one tap, no options,
+      and out comes the piano exactly as the video export sounds it. The format is
+      whatever your browser makes best, so there is nothing to choose and nothing that
+      fails to work.
+    - |-
       **Four octaves on a computer keyboard.** The letter rows played one octave per hand,
       which is less than most pieces ask for, and reaching past it meant stopping to shift
       the whole layout with the arrow keys. Hold **Shift** and the same keys play two

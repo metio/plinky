@@ -594,6 +594,8 @@
     "takes_stop": "停止",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "音频",
+    "takes_audio_working": "正在保存…",
     "takes_delete": "删除录音",
     "takes_save_prompt": "保存这段录音？",
     "takes_save": "保存录音",

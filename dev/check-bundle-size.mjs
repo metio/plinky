@@ -27,10 +27,18 @@ const DIR = `${CLIENT}/assets`;
 requireSingleLocaleBuild("the size gate");
 
 const VENDOR = /opensheetmusicdisplay/;
-// Chunks fetched only by a rare, deliberate act — the video export's encoder
-// (WebCodecs adapter + mp4-muxer) loads on first use, never on a page visit —
-// so like OSMD they are budgeted apart from the per-visitor app weight.
-const ON_DEMAND = /webCodecsVideo/;
+// Chunks fetched only by a rare, deliberate act — the export encoders (the WebCodecs
+// adapters, the offline render they share, and mp4-muxer under both) load on first use,
+// never on a page visit — so like OSMD they are budgeted apart from the per-visitor app
+// weight.
+//
+// Named by module rather than by one chunk, because which module gives the chunk its name
+// is Rollup's decision and it changes: the moment a second adapter imported the muxer, the
+// machinery moved into a shared chunk called after the render they share, and a pattern
+// naming only the video adapter stopped matching it. Nothing broke loudly — the ten
+// kilobytes simply reappeared inside the app figure and read as a regression in whatever
+// change happened to be in flight. Hence the assertion below.
+const ON_DEMAND = /webCodecsVideo|webAudioFile|offlineAudio/;
 
 // What a single visitor downloads, in two independent measurements. CI builds one
 // locale (`PLINKY_LOCALE=en npm run build`), because the deploy ships a tree-shaken
@@ -520,9 +528,20 @@ const total = chunks.reduce((sum, chunk) => sum + chunk.gz, 0);
 const vendor = chunks
     .filter((chunk) => VENDOR.test(chunk.name))
     .reduce((sum, chunk) => sum + chunk.gz, 0);
-const onDemand = chunks
-    .filter((chunk) => ON_DEMAND.test(chunk.name))
-    .reduce((sum, chunk) => sum + chunk.gz, 0);
+const onDemandChunks = chunks.filter((chunk) => ON_DEMAND.test(chunk.name));
+// A pattern that matches nothing is not a bundle with no encoders in it — the app has
+// exported video for as long as this budget has existed. It is a pattern that has stopped
+// naming them, and the only visible effect is that the app figure quietly absorbs the
+// weight. Said out loud, because the alternative is reading it as a real regression.
+if (onDemandChunks.length === 0) {
+    console.error(
+        "No chunk matched the on-demand pattern. The export encoders are still in the " +
+            "build, so this means they have been renamed and are now counted as " +
+            "per-visitor weight. Update ON_DEMAND in dev/check-bundle-size.mjs.",
+    );
+    process.exit(1);
+}
+const onDemand = onDemandChunks.reduce((sum, chunk) => sum + chunk.gz, 0);
 const app = total - vendor - onDemand;
 const kb = (bytes) => (bytes / 1024).toFixed(1);
 

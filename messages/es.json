@@ -596,6 +596,8 @@
     "takes_stop": "Detener",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Audio",
+    "takes_audio_working": "Guardando…",
     "takes_delete": "Eliminar toma",
     "takes_save_prompt": "¿Guardar esta toma?",
     "takes_save": "Guardar toma",

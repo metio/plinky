@@ -595,6 +595,8 @@
     "takes_stop": "Stopp",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Audio",
+    "takes_audio_working": "Wird gespeichert…",
     "takes_delete": "Aufnahme löschen",
     "takes_save_prompt": "Diese Aufnahme speichern?",
     "takes_save": "Aufnahme speichern",

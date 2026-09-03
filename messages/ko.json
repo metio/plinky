@@ -594,6 +594,8 @@
     "takes_stop": "멈춤",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "오디오",
+    "takes_audio_working": "저장 중…",
     "takes_delete": "녹음 삭제",
     "takes_save_prompt": "이 녹음을 저장할까요?",
     "takes_save": "녹음 저장",

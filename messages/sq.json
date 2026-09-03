@@ -595,6 +595,8 @@
     "takes_stop": "Ndalo",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Audio",
+    "takes_audio_working": "Po ruhet…",
     "takes_delete": "Fshij provën",
     "takes_save_prompt": "Ta ruaj këtë provë?",
     "takes_save": "Ruaj provën",

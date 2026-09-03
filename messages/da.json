@@ -595,6 +595,8 @@
     "takes_stop": "Stop",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Lyd",
+    "takes_audio_working": "Gemmer…",
     "takes_delete": "Slet gennemløb",
     "takes_save_prompt": "Gem dette gennemløb?",
     "takes_save": "Gem gennemløb",

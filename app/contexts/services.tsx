@@ -10,6 +10,7 @@ import { webSampleSource } from "../adapters/webSampleSource";
 import { sampleLookup } from "../lib/sampleVoices";
 import type { SampleSource } from "../ports/sampleSource";
 import { lazyVideoExporter } from "../adapters/lazyVideo";
+import { lazyAudioExporter } from "../adapters/lazyAudio";
 import { micPitch } from "../adapters/micPitch";
 import { webMidi } from "../adapters/webMidi";
 import { browserScheduler } from "../adapters/browserScheduler";
@@ -26,6 +27,7 @@ import type { StoragePersistence } from "../ports/storagePersistence";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
 import type { VideoExporter } from "../ports/videoExporter";
+import type { AudioExporter } from "../ports/audioExporter";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { exerciseName } from "../lib/exerciseNames";
@@ -117,6 +119,10 @@ export type AppServices = {
     // root reads it to hold a service-worker reload until the app is idle.
     // Turns a take into a shareable MP4 where the engine can encode one.
     video: VideoExporter;
+    // Turns a take into an audio file. Always able to: where no encoder exists it writes
+    // the samples themselves, so unlike video there is nothing to ask first. Named for the
+    // file rather than for the sound, since `audio` above is the instrument itself.
+    audioFile: AudioExporter;
     activity: ActivitySignal;
 };
 
@@ -197,6 +203,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         songs: overrides.songs ?? createSongSource(fetcher),
         exercises: overrides.exercises ?? createExerciseSource(fetcher, exerciseName),
         video: overrides.video ?? lazyVideoExporter,
+        audioFile: overrides.audioFile ?? lazyAudioExporter,
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.
         activity: overrides.activity ?? runActivity,
@@ -242,6 +249,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     songs: true,
     exercises: true,
     video: true,
+    audioFile: true,
     activity: true,
 };
 const SERVICE_KEYS = Object.keys(SERVICE_KEY_SET) as readonly (keyof AppServices)[];
@@ -384,6 +392,10 @@ export function useExerciseSource(): ExerciseSource {
 
 export function useVideoExporter(): VideoExporter {
     return useServices().video;
+}
+
+export function useAudioExporter(): AudioExporter {
+    return useServices().audioFile;
 }
 
 export function useScheduler(): Scheduler {

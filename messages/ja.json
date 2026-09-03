@@ -594,6 +594,8 @@
     "takes_stop": "停止",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "オーディオ",
+    "takes_audio_working": "保存中…",
     "takes_delete": "演奏を削除",
     "takes_save_prompt": "この演奏を保存しますか？",
     "takes_save": "演奏を保存",

@@ -595,6 +595,8 @@
     "takes_stop": "Durdur",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Ses",
+    "takes_audio_working": "Kaydediliyor…",
     "takes_delete": "Kaydı sil",
     "takes_save_prompt": "Bu kayıt kaydedilsin mi?",
     "takes_save": "Kaydı sakla",
