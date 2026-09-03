@@ -266,37 +266,211 @@
     },
     {
         "id": "NEjnBDihcwhA",
-        "title": "The Art of Finger Dexterity, Op. 740",
-        "why": "The corpus title misspelled \"of\" as \"Oof\", and a promo clip burns the title into every frame. The opus number replaces the composer's name repeated in front of it, which the credit line already carries."
-    },
-    {
-        "id": "e9jUnAWElNym",
-        "title": "The Art of Finger Dexterity, Op. 740",
-        "why": "The corpus title misspelled \"of\" as \"Oof\", and a promo clip burns the title into every frame. The opus number replaces the composer's name repeated in front of it, which the credit line already carries."
+        "title": "The Art of Finger Dexterity, Op. 740 No. 1: Action of the Fingers, the Hand Quiet",
+        "why": "Seven studies of Op. 740 were all titled with the name of the whole book, and the book's own title misspelled \"of\" as \"Oof\". Each score prints its number and the technique it trains above the first system, which is what Czerny called it and what tells one study from the six beside it."
     },
     {
         "id": "pucOW49yuN4s",
-        "title": "The Art of Finger Dexterity, Op. 740",
-        "why": "The corpus title misspelled \"of\" as \"Oof\", and a promo clip burns the title into every frame. The opus number replaces the composer's name repeated in front of it, which the credit line already carries."
-    },
-    {
-        "id": "nOhxYefFrjl4",
-        "title": "The Art of Finger Dexterity, Op. 740",
-        "why": "The corpus title misspelled \"of\" as \"Oof\", and a promo clip burns the title into every frame. The opus number replaces the composer's name repeated in front of it, which the credit line already carries."
+        "title": "The Art of Finger Dexterity, Op. 740 No. 2: The Passing Under of the Thumb",
+        "why": "Seven studies of Op. 740 were all titled with the name of the whole book, and the book's own title misspelled \"of\" as \"Oof\". Each score prints its number and the technique it trains above the first system, which is what Czerny called it and what tells one study from the six beside it."
     },
     {
         "id": "ndlbwSfNJAHq",
-        "title": "The Art of Finger Dexterity, Op. 740",
-        "why": "The corpus title misspelled \"of\" as \"Oof\", and a promo clip burns the title into every frame. The opus number replaces the composer's name repeated in front of it, which the credit line already carries."
+        "title": "The Art of Finger Dexterity, Op. 740 No. 3: Clearness in Rapidity",
+        "why": "Seven studies of Op. 740 were all titled with the name of the whole book, and the book's own title misspelled \"of\" as \"Oof\". Each score prints its number and the technique it trains above the first system, which is what Czerny called it and what tells one study from the six beside it."
     },
     {
         "id": "2jpUYUJowizc",
-        "title": "The Art of Finger Dexterity, Op. 740",
-        "why": "The corpus title misspelled \"of\" as \"Oof\", and a promo clip burns the title into every frame. The opus number replaces the composer's name repeated in front of it, which the credit line already carries."
+        "title": "The Art of Finger Dexterity, Op. 740 No. 4: Light Motion in Quiet Staccato",
+        "why": "Seven studies of Op. 740 were all titled with the name of the whole book, and the book's own title misspelled \"of\" as \"Oof\". Each score prints its number and the technique it trains above the first system, which is what Czerny called it and what tells one study from the six beside it."
     },
     {
         "id": "pBivxCtzqFZ4",
-        "title": "The Art of Finger Dexterity, Op. 740",
-        "why": "The corpus title misspelled \"of\" as \"Oof\", and a promo clip burns the title into every frame. The opus number replaces the composer's name repeated in front of it, which the credit line already carries."
+        "title": "The Art of Finger Dexterity, Op. 740 No. 6: Clearness in Broken Chords",
+        "why": "Seven studies of Op. 740 were all titled with the name of the whole book, and the book's own title misspelled \"of\" as \"Oof\". Each score prints its number and the technique it trains above the first system, which is what Czerny called it and what tells one study from the six beside it."
+    },
+    {
+        "id": "e9jUnAWElNym",
+        "title": "The Art of Finger Dexterity, Op. 740 No. 7: Changing the Fingers on One and the Same Key",
+        "why": "Seven studies of Op. 740 were all titled with the name of the whole book, and the book's own title misspelled \"of\" as \"Oof\". Each score prints its number and the technique it trains above the first system, which is what Czerny called it and what tells one study from the six beside it."
+    },
+    {
+        "id": "nOhxYefFrjl4",
+        "title": "The Art of Finger Dexterity, Op. 740 No. 8: Light Action of the Left Hand",
+        "why": "Seven studies of Op. 740 were all titled with the name of the whole book, and the book's own title misspelled \"of\" as \"Oof\". Each score prints its number and the technique it trains above the first system, which is what Czerny called it and what tells one study from the six beside it."
+    },
+    {
+        "id": "n3sjV5qj77m4",
+        "title": "Suite bergamasque: I. Prélude",
+        "composer": "Claude Debussy",
+        "why": "Four movements of the suite were filed under the suite's own name. Each score prints its movement above the first system. The score prints the movement above the first system, where the title field carried only the name of the whole work — so six pieces shared one title and a listener had no way to tell which was which."
+    },
+    {
+        "id": "bGGQ8XYckzYR",
+        "title": "Suite bergamasque: II. Menuet",
+        "composer": "Claude Debussy",
+        "why": "Four movements of the suite were filed under the suite's own name. Each score prints its movement above the first system. The score prints the movement above the first system, where the title field carried only the name of the whole work — so six pieces shared one title and a listener had no way to tell which was which."
+    },
+    {
+        "id": "gEDOVp5phrza",
+        "title": "Suite bergamasque: III. Clair de lune",
+        "composer": "Claude Debussy",
+        "why": "Four movements of the suite were filed under the suite's own name. Each score prints its movement above the first system. The score prints the movement above the first system, where the title field carried only the name of the whole work — so six pieces shared one title and a listener had no way to tell which was which."
+    },
+    {
+        "id": "uIMVNT74CMC8",
+        "title": "Suite bergamasque: IV. Passepied",
+        "composer": "Claude Debussy",
+        "why": "Four movements of the suite were filed under the suite's own name. Each score prints its movement above the first system. The score prints the movement above the first system, where the title field carried only the name of the whole work — so six pieces shared one title and a listener had no way to tell which was which."
+    },
+    {
+        "id": "fk4xNzNnOrXF",
+        "title": "Sonata, K. 35",
+        "composer": "Domenico Scarlatti",
+        "why": "Scarlatti wrote over five hundred sonatas and the catalogue held two of them under the bare word \"Sonata\". Each score prints its Kirkpatrick number beside the title, which is how these are told apart everywhere else."
+    },
+    {
+        "id": "FPTtMGqZ8GbD",
+        "title": "Sonata, K. 247",
+        "composer": "Domenico Scarlatti",
+        "why": "Scarlatti wrote over five hundred sonatas and the catalogue held two of them under the bare word \"Sonata\". Each score prints its Kirkpatrick number beside the title, which is how these are told apart everywhere else."
+    },
+    {
+        "id": "VkVOKmZQcCCw",
+        "title": "Holberg Suite, Op. 40: III. Gavotte",
+        "composer": "Edvard Grieg",
+        "why": "Four movements of the suite shared its title. The score prints the movement above the first system, where the title field carried only the name of the whole work — so six pieces shared one title and a listener had no way to tell which was which."
+    },
+    {
+        "id": "u6AYKDgMqYuW",
+        "title": "Holberg Suite, Op. 40: II. Sarabande",
+        "composer": "Edvard Grieg",
+        "why": "Four movements of the suite shared its title. The score prints the movement above the first system, where the title field carried only the name of the whole work — so six pieces shared one title and a listener had no way to tell which was which."
+    },
+    {
+        "id": "MLO8PhzOA9c6",
+        "title": "Holberg Suite, Op. 40: IV. Air",
+        "composer": "Edvard Grieg",
+        "why": "Four movements of the suite shared its title. The score prints the movement above the first system, where the title field carried only the name of the whole work — so six pieces shared one title and a listener had no way to tell which was which."
+    },
+    {
+        "id": "LZJpGlLWRX4t",
+        "title": "Holberg Suite, Op. 40: I. Praeludium",
+        "composer": "Edvard Grieg",
+        "why": "The fourth of the catalogue's Holberg movements prints no movement name, only the suite's. It is the Praeludium: it is marked Allegro vivace and stands in common time, which no other movement of the suite is or does, and the Sarabande, Gavotte and Air beside it name themselves."
+    },
+    {
+        "id": "ELj3D2WlbwLI",
+        "title": "Étude Op. 10 No. 6",
+        "composer": "Frédéric Chopin",
+        "why": "Both were titled \"12 ÉTUDES\", the name of the set rather than the study. Each score prints its opus and number beside that heading, and the catalogue names its other Chopin studies the same way."
+    },
+    {
+        "id": "khTH9nseSCxp",
+        "title": "Étude Op. 10 No. 4",
+        "composer": "Frédéric Chopin",
+        "why": "Both were titled \"12 ÉTUDES\", the name of the set rather than the study. Each score prints its opus and number beside that heading, and the catalogue names its other Chopin studies the same way."
+    },
+    {
+        "id": "xwajTjayqvqL",
+        "title": "Prelude Op. 28 No. 4",
+        "composer": "Frédéric Chopin",
+        "why": "Chopin wrote twenty-four preludes in Op. 28 and seven of the catalogue's rows were titled simply \"Prelude\". Each score prints its opus and number under the heading."
+    },
+    {
+        "id": "LjSYHqrWesj7",
+        "title": "Prelude Op. 28 No. 7",
+        "composer": "Frédéric Chopin",
+        "why": "Chopin wrote twenty-four preludes in Op. 28 and seven of the catalogue's rows were titled simply \"Prelude\". Each score prints its opus and number under the heading."
+    },
+    {
+        "id": "F4qILclRdE4I",
+        "title": "Prelude Op. 28 No. 12",
+        "composer": "Frédéric Chopin",
+        "why": "Chopin wrote twenty-four preludes in Op. 28 and seven of the catalogue's rows were titled simply \"Prelude\". Each score prints its opus and number under the heading."
+    },
+    {
+        "id": "mZEhtxa0eweF",
+        "title": "Prelude Op. 28 No. 16",
+        "composer": "Frédéric Chopin",
+        "why": "Chopin wrote twenty-four preludes in Op. 28 and seven of the catalogue's rows were titled simply \"Prelude\". Each score prints its opus and number under the heading."
+    },
+    {
+        "id": "8zlBdPlvOfVd",
+        "title": "Prelude Op. 28 No. 20",
+        "composer": "Frédéric Chopin",
+        "why": "Chopin wrote twenty-four preludes in Op. 28 and seven of the catalogue's rows were titled simply \"Prelude\". Each score prints its opus and number under the heading."
+    },
+    {
+        "id": "DTimkGFCDhmo",
+        "title": "Prelude Op. 28 No. 23",
+        "composer": "Frédéric Chopin",
+        "why": "Chopin wrote twenty-four preludes in Op. 28 and seven of the catalogue's rows were titled simply \"Prelude\". Each score prints its opus and number under the heading."
+    },
+    {
+        "id": "Ueebh9ybVUPJ",
+        "title": "Dolly, Op. 56: 1. Berceuse",
+        "composer": "Gabriel Fauré",
+        "why": "Five pieces carried the title of the first one, \"1. Berceuse (Lullaby)\", so four of them named a piece they are not. Each score prints its own number and name above the first system. They are the Dolly suite: those six titles are its movements, and the parts are engraved Prima and Seconda, which is the piano duet Fauré wrote it for."
+    },
+    {
+        "id": "xE5KeOdOhOyX",
+        "title": "Dolly, Op. 56: 2. Mi-a-ou",
+        "composer": "Gabriel Fauré",
+        "why": "Five pieces carried the title of the first one, \"1. Berceuse (Lullaby)\", so four of them named a piece they are not. Each score prints its own number and name above the first system. They are the Dolly suite: those six titles are its movements, and the parts are engraved Prima and Seconda, which is the piano duet Fauré wrote it for."
+    },
+    {
+        "id": "UnJHZQPL4Hnc",
+        "title": "Dolly, Op. 56: 4. Kitty-valse",
+        "composer": "Gabriel Fauré",
+        "why": "Five pieces carried the title of the first one, \"1. Berceuse (Lullaby)\", so four of them named a piece they are not. Each score prints its own number and name above the first system. They are the Dolly suite: those six titles are its movements, and the parts are engraved Prima and Seconda, which is the piano duet Fauré wrote it for."
+    },
+    {
+        "id": "Xv1uJPjtq9J3",
+        "title": "Dolly, Op. 56: 5. Tendresse",
+        "composer": "Gabriel Fauré",
+        "why": "Five pieces carried the title of the first one, \"1. Berceuse (Lullaby)\", so four of them named a piece they are not. Each score prints its own number and name above the first system. They are the Dolly suite: those six titles are its movements, and the parts are engraved Prima and Seconda, which is the piano duet Fauré wrote it for."
+    },
+    {
+        "id": "yWERH8NvUd4a",
+        "title": "Dolly, Op. 56: 6. Le Pas espagnol",
+        "composer": "Gabriel Fauré",
+        "why": "Five pieces carried the title of the first one, \"1. Berceuse (Lullaby)\", so four of them named a piece they are not. Each score prints its own number and name above the first system. They are the Dolly suite: those six titles are its movements, and the parts are engraved Prima and Seconda, which is the piano duet Fauré wrote it for."
+    },
+    {
+        "id": "8ea3NKIxHhHQ",
+        "title": "Etude 1, Op 176",
+        "composer": "Jean-Baptiste Duvernoy",
+        "why": "Five studies were titled \"Elementary Studies (op 176)\", the name of the whole set. Each score prints which study it is, spelled as the three the catalogue already names correctly spell it."
+    },
+    {
+        "id": "3Lswl7hE9FIq",
+        "title": "Etude 9, Op 176",
+        "composer": "Jean-Baptiste Duvernoy",
+        "why": "Five studies were titled \"Elementary Studies (op 176)\", the name of the whole set. Each score prints which study it is, spelled as the three the catalogue already names correctly spell it."
+    },
+    {
+        "id": "vtJyQWhigmVP",
+        "title": "Etude 10, Op 176",
+        "composer": "Jean-Baptiste Duvernoy",
+        "why": "Five studies were titled \"Elementary Studies (op 176)\", the name of the whole set. Each score prints which study it is, spelled as the three the catalogue already names correctly spell it."
+    },
+    {
+        "id": "gdowC1dlsYNN",
+        "title": "Etude 11, Op 176",
+        "composer": "Jean-Baptiste Duvernoy",
+        "why": "Five studies were titled \"Elementary Studies (op 176)\", the name of the whole set. Each score prints which study it is, spelled as the three the catalogue already names correctly spell it."
+    },
+    {
+        "id": "qmbyP2U3hx22",
+        "title": "Etude 19, Op 176",
+        "composer": "Jean-Baptiste Duvernoy",
+        "why": "Five studies were titled \"Elementary Studies (op 176)\", the name of the whole set. Each score prints which study it is, spelled as the three the catalogue already names correctly spell it."
+    },
+    {
+        "id": "8EKlMBPOS5dj",
+        "title": "The Entertainer (shortened)",
+        "composer": "Scott Joplin",
+        "why": "Two rows are both The Entertainer. This one is seventy-four bars against the other's hundred and fifty-two, and its score is credited \"(edit)\" — an abridged setting, which the title should say rather than leaving the two indistinguishable."
     }
 ]
