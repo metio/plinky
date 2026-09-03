@@ -47,6 +47,7 @@
         "size": "node dev/check-bundle-size.mjs",
         "songs:audit": "tsx dev/audit-catalog.mts",
         "songs:bake": "tsx dev/bake-grades.mts",
+        "songs:movements": "tsx dev/movement-titles.mts",
         "songs:cost": "tsx dev/backfill-song-cost.mts",
         "songs:dedup": "tsx dev/dedup-songs.mts",
         "songs:import": "tsx dev/import-scores.mts pdmx",
