@@ -596,6 +596,8 @@
     "takes_stop": "Arrêter",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Audio",
+    "takes_audio_working": "Enregistrement…",
     "takes_delete": "Supprimer la prise",
     "takes_save_prompt": "Enregistrer cette prise ?",
     "takes_save": "Enregistrer la prise",

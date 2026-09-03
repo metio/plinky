@@ -595,6 +595,8 @@
     "takes_stop": "Stoppa",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Ljud",
+    "takes_audio_working": "Sparar…",
     "takes_delete": "Ta bort tagning",
     "takes_save_prompt": "Spara den här tagningen?",
     "takes_save": "Spara tagning",

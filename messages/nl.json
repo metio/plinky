@@ -595,6 +595,8 @@
     "takes_stop": "Stoppen",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Audio",
+    "takes_audio_working": "Opslaan…",
     "takes_delete": "Opname verwijderen",
     "takes_save_prompt": "Deze opname opslaan?",
     "takes_save": "Opname opslaan",

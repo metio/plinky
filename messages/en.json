@@ -721,6 +721,8 @@
     "takes_stop": "Stop",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Audio",
+    "takes_audio_working": "Saving…",
     "takes_delete": "Delete run",
     "takes_save_prompt": "Save this run?",
     "takes_save": "Save run",

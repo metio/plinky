@@ -596,6 +596,8 @@
     "takes_stop": "Заустави",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Звук",
+    "takes_audio_working": "Чување…",
     "takes_delete": "Обриши покушај",
     "takes_save_prompt": "Сачувати овај покушај?",
     "takes_save": "Сачувај покушај",

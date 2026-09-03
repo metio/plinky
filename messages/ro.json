@@ -596,6 +596,8 @@
     "takes_stop": "Oprește",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Audio",
+    "takes_audio_working": "Se salvează…",
     "takes_delete": "Șterge înregistrarea",
     "takes_save_prompt": "Salvezi această înregistrare?",
     "takes_save": "Salvează înregistrarea",

@@ -595,6 +595,8 @@
     "takes_stop": "Pysäytä",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Ääni",
+    "takes_audio_working": "Tallennetaan…",
     "takes_delete": "Poista otos",
     "takes_save_prompt": "Tallennetaanko tämä otos?",
     "takes_save": "Tallenna otos",

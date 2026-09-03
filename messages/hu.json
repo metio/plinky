@@ -595,6 +595,8 @@
     "takes_stop": "Leállítás",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Hang",
+    "takes_audio_working": "Mentés…",
     "takes_delete": "Felvétel törlése",
     "takes_save_prompt": "Elmented ezt a felvételt?",
     "takes_save": "Felvétel mentése",

@@ -597,6 +597,8 @@
     "takes_stop": "Zastaviť",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Zvuk",
+    "takes_audio_working": "Ukladá sa…",
     "takes_delete": "Odstrániť pokus",
     "takes_save_prompt": "Uložiť tento pokus?",
     "takes_save": "Uložiť pokus",

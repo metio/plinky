@@ -597,6 +597,8 @@
     "takes_stop": "Zatrzymaj",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Dźwięk",
+    "takes_audio_working": "Zapisywanie…",
     "takes_delete": "Usuń podejście",
     "takes_save_prompt": "Zapisać to podejście?",
     "takes_save": "Zapisz podejście",

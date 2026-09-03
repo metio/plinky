@@ -13,6 +13,7 @@ import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
 import { PlayIcon, StopIcon, TrashIcon } from "../ui/icons";
+import { ExportAudioButton } from "./exportAudioButton";
 import { ExportVideoButton } from "./exportVideoButton";
 import type { OriginalScore } from "../../lib/scoreSnapshot";
 import { ShareGhostButton } from "./shareGhostButton";
@@ -142,6 +143,7 @@ export function TakesPanel({
                                     >
                                         {m.takes_download_musicxml()}
                                     </Button>
+                                    <ExportAudioButton take={take} title={title} />
                                     <ExportVideoButton
                                         take={take}
                                         title={title}

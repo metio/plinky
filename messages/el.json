@@ -595,6 +595,8 @@
     "takes_stop": "Διακοπή",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Ήχος",
+    "takes_audio_working": "Αποθήκευση…",
     "takes_delete": "Διαγραφή εκτέλεσης",
     "takes_save_prompt": "Αποθήκευση αυτής της εκτέλεσης;",
     "takes_save": "Αποθήκευση εκτέλεσης",

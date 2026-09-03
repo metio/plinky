@@ -597,6 +597,8 @@
     "takes_stop": "Стоп",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Аудио",
+    "takes_audio_working": "Сохранение…",
     "takes_delete": "Удалить дубль",
     "takes_save_prompt": "Сохранить этот дубль?",
     "takes_save": "Сохранить дубль",

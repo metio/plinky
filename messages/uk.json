@@ -597,6 +597,8 @@
     "takes_stop": "Зупинити",
     "takes_download_midi": "MIDI",
     "takes_download_musicxml": "MusicXML",
+    "takes_download_audio": "Аудіо",
+    "takes_audio_working": "Збереження…",
     "takes_delete": "Видалити спробу",
     "takes_save_prompt": "Зберегти цю спробу?",
     "takes_save": "Зберегти спробу",
