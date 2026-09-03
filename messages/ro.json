@@ -643,6 +643,7 @@
     "keyboard_hint_customise": "Setează-ți propriile taste →",
     "settings_keyboard": "Tastatura calculatorului",
     "keymap_help": "Nu ai pian? Aceste taste cântă notele. Apasă o notă, apoi apasă tasta pe care o dorești pentru ea — sau păstrează aranjamentul standard cu Resetează.",
+    "keymap_shift_help": "Ține apăsat Shift ca să cânți cu două octave mai sus — cele două rânduri ajung astfel la patru octave.",
     "keymap_press": "Apasă o tastă…",
     "keymap_reset": "Revino la implicit",
     "keymap_rebind": "Reasociază {note}, {hand}",

@@ -89,6 +89,35 @@ describe("keyToNote", () => {
         expect(keyToNote("Q", 0)).toBe(72);
     });
 
+    it("lifts a key two octaves with Shift, so the four octaves run without a gap", () => {
+        // The unshifted rows end at B5; the shifted ones start at the C above it.
+        expect(keyToNote("u", 0)).toBe(83); // B5, the top of the unshifted layout
+        expect(keyToNote("z", 0, DEFAULT_KEY_MAP, true)).toBe(84); // C6, the next note up
+        expect(keyToNote("u", 0, DEFAULT_KEY_MAP, true)).toBe(107); // B7, the top of it
+    });
+
+    it("shifts nothing onto a note the other hand already plays", () => {
+        // The rows stand an octave apart, so a one-octave lift would make the shifted left
+        // hand a duplicate of the right. Two octaves buys two new ones instead.
+        const shiftedLeft = keyToNote("z", 0, DEFAULT_KEY_MAP, true);
+        expect(shiftedLeft).not.toBe(keyToNote("q", 0));
+    });
+
+    it("adds the Shift lift to the octave offset rather than replacing it", () => {
+        expect(keyToNote("z", -2, DEFAULT_KEY_MAP, true)).toBe(60);
+        expect(keyToNote("z", 1, DEFAULT_KEY_MAP, true)).toBe(96);
+    });
+
+    it("keeps a rebound key shiftable", () => {
+        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "a");
+        expect(keyToNote("a", 0, custom, true)).toBe(84);
+    });
+
+    it("drops a shifted note that would land above the piano", () => {
+        // The top row at the top offset is already at the ceiling; Shift cannot go higher.
+        expect(keyToNote("q", 3, DEFAULT_KEY_MAP, true)).toBeNull();
+    });
+
     it("returns null rather than sounding a note above the 88-key piano", () => {
         // The top row at the maximum offset would land past C8 (108); no piano has it.
         expect(keyToNote("u", 3)).toBeNull(); // B5 + 3 octaves = 119

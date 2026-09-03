@@ -746,7 +746,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            const note = keyToNote(key, octaveRef.current, keyMapRef.current);
+            // Shift lifts the note without changing which key plays it, so the reach is
+            // available inside a phrase rather than between them. Read here rather than in
+            // the pedal branch above on purpose: a pedal is bound to a key, and holding
+            // Shift must not stop that key working the pedal.
+            const note = keyToNote(key, octaveRef.current, keyMapRef.current, event.shiftKey);
             // Track the held key by its physical code, not the glyph: a modifier pressed
             // or released mid-hold (or a dead-key layout) can change the glyph the keyup
             // reports, and a glyph-keyed lookup would then miss and strand the note on.

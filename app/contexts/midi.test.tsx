@@ -285,6 +285,37 @@ describe("MidiProvider", () => {
         expect(result.current.octaveOffset).toBe(1);
     });
 
+    it("plays two octaves higher while Shift is held", () => {
+        const { result } = renderHook(() => usePlayingSurface(), {
+            wrapper: wrapperWith(fakeMidi()),
+        });
+        act(() =>
+            window.dispatchEvent(
+                new KeyboardEvent("keydown", { key: "Z", code: "KeyZ", shiftKey: true }),
+            ),
+        );
+        expect(result.current.heldNotes).toContain(84);
+        expect(result.current.heldNotes).not.toContain(60);
+    });
+
+    it("releases a shifted note even when Shift is let go first", () => {
+        const { result } = renderHook(() => usePlayingSurface(), {
+            wrapper: wrapperWith(fakeMidi()),
+        });
+        act(() =>
+            window.dispatchEvent(
+                new KeyboardEvent("keydown", { key: "Z", code: "KeyZ", shiftKey: true }),
+            ),
+        );
+        expect(result.current.heldNotes).toContain(84);
+        // Shift up first, so the keyup reports the unshifted glyph and no modifier. The
+        // note is tracked by its physical code, so the release still finds the pitch that
+        // was actually started — a lookup by glyph or by a recomputed pitch would strand
+        // the note sounding for good.
+        act(() => window.dispatchEvent(new KeyboardEvent("keyup", { key: "z", code: "KeyZ" })));
+        expect(result.current.heldNotes).not.toContain(84);
+    });
+
     it("releases keys still held when the window loses focus", () => {
         const { result } = renderHook(() => usePlayingSurface(), {
             wrapper: wrapperWith(fakeMidi()),

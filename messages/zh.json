@@ -641,6 +641,7 @@
     "keyboard_hint_customise": "设置你自己的按键 →",
     "settings_keyboard": "电脑键盘",
     "keymap_help": "没有钢琴？这些键可弹奏音符。点一个音，再按下你想给它分配的键——或用「重置」保留标准布局。",
+    "keymap_shift_help": "按住 Shift 可高两个八度弹奏——两排键因此共可覆盖四个八度。",
     "keymap_press": "按下一个键…",
     "keymap_reset": "恢复默认",
     "keymap_rebind": "重新分配 {note}，{hand}",

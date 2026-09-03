@@ -644,6 +644,7 @@
     "keyboard_hint_customise": "Nastavte si vlastní klávesy →",
     "settings_keyboard": "Počítačová klávesnice",
     "keymap_help": "Nemáte klavír? Tyto klávesy hrají noty. Klepněte na notu a pak stiskněte klávesu, kterou jí chcete přiřadit — nebo tlačítkem Obnovit ponechte standardní rozložení.",
+    "keymap_shift_help": "Podržte Shift a hrajete o dvě oktávy výš — obě řady tak dosáhnou na čtyři oktávy.",
     "keymap_press": "Stiskněte klávesu…",
     "keymap_reset": "Obnovit výchozí",
     "keymap_rebind": "Přemapovat {note}, {hand}",

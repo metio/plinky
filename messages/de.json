@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Eigene Tasten festlegen →",
     "settings_keyboard": "Computertastatur",
     "keymap_help": "Kein Klavier? Diese Tasten spielen die Noten. Tippe eine Note an und drücke dann die Taste, auf der du sie haben möchtest – oder behalte das Standardlayout mit Zurücksetzen.",
+    "keymap_shift_help": "Halte die Umschalttaste, um zwei Oktaven höher zu spielen — beide Reihen erreichen so insgesamt vier Oktaven.",
     "keymap_press": "Drücke eine Taste…",
     "keymap_reset": "Auf Standard zurücksetzen",
     "keymap_rebind": "{note} neu belegen, {hand}",

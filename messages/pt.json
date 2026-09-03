@@ -643,6 +643,7 @@
     "keyboard_hint_customise": "Define as tuas próprias teclas →",
     "settings_keyboard": "Teclado do computador",
     "keymap_help": "Sem piano? Estas teclas tocam as notas. Toca numa nota e depois pressiona a tecla que queres para ela — ou mantém o layout padrão com Redefinir.",
+    "keymap_shift_help": "Mantém o Shift para tocares duas oitavas acima — assim as duas filas alcançam quatro oitavas ao todo.",
     "keymap_press": "Pressione uma tecla…",
     "keymap_reset": "Redefinir para o padrão",
     "keymap_rebind": "Remapear {note}, {hand}",

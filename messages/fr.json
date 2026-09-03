@@ -643,6 +643,7 @@
     "keyboard_hint_customise": "Configurez vos propres touches →",
     "settings_keyboard": "Clavier d'ordinateur",
     "keymap_help": "Pas de piano ? Ces touches jouent les notes. Touchez une note, puis appuyez sur la touche que vous voulez lui associer — ou gardez la disposition standard avec Réinitialiser.",
+    "keymap_shift_help": "Maintenez Maj pour jouer deux octaves plus haut : les deux rangées couvrent alors quatre octaves.",
     "keymap_press": "Appuyez sur une touche…",
     "keymap_reset": "Rétablir par défaut",
     "keymap_rebind": "Réattribuer {note}, {hand}",

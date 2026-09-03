@@ -173,6 +173,21 @@ export const MAX_OCTAVE_OFFSET = 3;
 const LEFT_HAND_BASE_NOTE = 60; // C4 at octave offset 0
 const RIGHT_HAND_BASE_NOTE = 72; // C5 — one octave above the left hand
 
+// How far Shift lifts the layout: by its own width, so the shifted rows carry on exactly
+// where the unshifted ones stop.
+//
+// Two octaves rather than one. The rows already stand an octave apart, so lifting by one
+// would put the shifted left hand precisely where the right hand already is — a whole row
+// of duplicates bought at the price of a modifier, and only one new octave to show for it.
+// Lifted by two, the four octaves run C4 to B7 with no gap and nothing repeated, and the
+// rule stays sayable: Shift plays the next two octaves up.
+//
+// It exists because the letter rows hold one octave per hand, and two octaves is less than
+// most pieces ask for. The octave keys move the whole layout, which is a decision made
+// between phrases; a modifier is made during one. Both remain: Shift for the reach inside a
+// phrase, the arrows for where the two rows sit.
+const SHIFT_OCTAVES = 2;
+
 // Map a pressed key to its MIDI note for the active octave offset, or null when the
 // key is not part of the layout. The two-row virtual-piano split (a full octave per
 // hand) is the default, but a player can rebind keys (see keyMap), so the live
@@ -185,15 +200,18 @@ export function keyToNote(
     key: string,
     octaveOffset: number,
     keyMap: KeyMap = DEFAULT_KEY_MAP,
+    // Whether Shift was held, which plays the same key SHIFT_OCTAVES higher.
+    shifted = false,
 ): number | null {
     // Lower-case to match how the map is keyed, so a key arriving upper-cased (Shift, or
     // a platform that reports the shifted glyph) still resolves — as pedalForKey does.
     const lower = key.toLowerCase();
+    const lift = (octaveOffset + (shifted ? SHIFT_OCTAVES : 0)) * 12;
     let note: number | null = null;
     if (lower in keyMap.left) {
-        note = LEFT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.left[lower]!;
+        note = LEFT_HAND_BASE_NOTE + lift + keyMap.left[lower]!;
     } else if (lower in keyMap.right) {
-        note = RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.right[lower]!;
+        note = RIGHT_HAND_BASE_NOTE + lift + keyMap.right[lower]!;
     }
     // A high octave offset can push the top row past the keyboard; drop phantom notes
     // rather than sound pitches no piano has.

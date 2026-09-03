@@ -643,6 +643,7 @@
     "keyboard_hint_customise": "Postavi vlastite tipke →",
     "settings_keyboard": "Tipkovnica računala",
     "keymap_help": "Nemaš klavir? Ove tipke sviraju note. Dodirni notu, zatim pritisni tipku na koju je želiš — ili zadrži standardni raspored pomoću Poništi.",
+    "keymap_shift_help": "Drži Shift da sviraš dvije oktave više — dva reda tako dosežu četiri oktave ukupno.",
     "keymap_press": "Pritisni tipku…",
     "keymap_reset": "Vrati na zadano",
     "keymap_rebind": "Ponovno dodijeli {note}, {hand}",

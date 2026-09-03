@@ -670,7 +670,9 @@ where even that is refused, it says so rather than claiming nothing changed.
 - **With your computer keyboard** — the bottom letter row plays the left hand
   (`Z X C V B N M` the white keys, `S D G H J` the black) and the top row the
   right hand an octave up (`Q W E R T Y U` white, `2 3 5 6 7` black), each a full
-  C-to-B octave, with an octave shift to move around; remap any of these keys to
+  C-to-B octave. Hold **Shift** and the same keys play two octaves higher, picking up
+  exactly where the unshifted rows stop, so the letter rows reach four octaves in all;
+  the arrow keys move all four. Remap any of these keys to
   your own layout in **Settings** — where you can also bind a spare key (one no note
   uses, Space included) to each of the three **pedals** (sustain, sostenuto, soft), so a
   computer-keyboard player can hold the sustain pedal just like a pianist. (Two-hand pieces span both staves,
