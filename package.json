@@ -69,6 +69,7 @@
         "promo:composers": "tsx dev/promo/composers.mjs",
         "promo:shorts": "node dev/promo-videos.mjs --shorts",
         "songs:calibrate": "tsx dev/calibrate-grades.mts",
+        "songs:movements": "tsx dev/movement-titles.mts",
         "songs:anchors": "tsx dev/calibrate-grades.mts --check",
         "promo:frame": "node dev/grab-frame.mjs",
         "promo:check": "node dev/check-promo-pieces.mjs",

@@ -10,10 +10,21 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 3 September 2026
 
-**Czerny's Op. 740 is spelled right.** The seven studies from *The Art of Finger
-Dexterity* came out of their source library titled "The Art Oof Finger Dexterity",
-and had carried the typo ever since. They read properly now, and name their opus
-number the way the rest of the catalogue does.
+**Thirty-six pieces now say which one they are.** A library that publishes a suite
+as one file per movement often gives every file the name of the whole suite, and the
+catalogue had taken those names at their word: seven Chopin preludes all called
+"Prelude", four movements of the *Suite bergamasque* all called "Suite bergamasque",
+five of Fauré's *Dolly* all called "1. Berceuse". Every one of those scores prints
+its own movement above the first system, so they are named from what they say —
+"Prelude Op. 28 No. 7", "Suite bergamasque: III. Clair de lune", "Dolly, Op. 56:
+4. Kitty-valse". Czerny's seven studies from *The Art of Finger Dexterity* also
+shed a typo they had carried from their source, and now name the technique each one
+trains.
+
+**Fauré's Dolly is a set you can work through.** Its five movements had been filed
+as nocturnes, which they are not, and the nocturne collection existed only because
+they were. Dolly is its own collection now, and the two genuine nocturnes sit in the
+catalogue on their own.
 
 ## 31 August 2026
 

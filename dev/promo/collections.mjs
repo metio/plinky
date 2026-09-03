@@ -31,11 +31,16 @@ export function folderForCollection(set) {
 //
 // `held` is how many the catalogue has in total, so a caller can say "eleven of the
 // fifteen" rather than quietly publishing eleven and calling it the inventions.
+//
+// The pieces come back already carrying their variants, so a playlist names the file the
+// renderer actually wrote. Doing it in one of the two and not the other would be worse than
+// not doing it at all: the clips would land in folders of their own while every playlist
+// went on pointing at the one path they used to share.
 export function collections() {
     const sets = JSON.parse(readFileSync(SETS, "utf8"));
     const manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
     const byId = new Map(manifest.map((song) => [song.id, song]));
-    return sets
+    const built = sets
         .map((set) => {
             const songs = set.items.map((id) => byId.get(id)).filter(Boolean);
             const postable = songs.filter((song) => song.license === "CC0-1.0");
@@ -58,6 +63,39 @@ export function collections() {
             };
         })
         .filter((set) => set.pieces.length > 0);
+    const shared = sharedFolders(built.flatMap((set) => set.pieces));
+    return built.map((set) => ({
+        ...set,
+        pieces: set.pieces.map((piece) =>
+            shared.has(folderFor(piece)) ? { ...piece, variant: piece.id } : piece,
+        ),
+    }));
+}
+
+// The folder paths more than one piece wants, over every collection at once.
+//
+// Across all of them rather than within each, because a piece may be named by two sets and
+// the answer has to be the same in both — a clip is rendered once and both playlists point
+// at it.
+//
+// It has to be asked at all because the curated shelf is hand-written, where each entry
+// earns a title that tells it from its neighbours, and a collection is whatever the
+// catalogue holds: six movements of the fifth French Suite under six identical titles,
+// seven studies from Op. 740 under one, and every Chopin prelude simply "Prelude". Folder
+// names are cut from the title, so those collapse — a hundred and eighty-two pieces owned a
+// hundred and forty-one folders, and forty-one clips would each have been written over by
+// the next one to render, silently, hours in, by a run that then reported success.
+function sharedFolders(pieces) {
+    const once = new Set();
+    const shared = new Set();
+    for (const piece of pieces) {
+        const path = folderFor(piece);
+        if (once.has(path)) {
+            shared.add(path);
+        }
+        once.add(path);
+    }
+    return shared;
 }
 
 // Every piece to render, once, however many collections name it. A piece in two sets is
@@ -74,36 +112,5 @@ export function collectionPieces() {
             pieces.push(piece);
         }
     }
-    return distinctFolders(pieces);
-}
-
-// The same pieces, with anything that would land on another's folder given its id to sit
-// under.
-//
-// The curated shelf is hand-written and each entry earns a title of its own; a collection
-// is whatever the catalogue holds, and the catalogue holds six movements of the fifth
-// French Suite under six identical titles, seven studies from Op. 740 under one, and every
-// Chopin prelude simply as "Prelude". Folder names are cut from the title, so those
-// collapse: a hundred and eighty-two pieces owned a hundred and forty-one folders, and
-// forty-one clips would each have been written over by the next one to render — silently,
-// hours in, showing as a run that reported success and a shelf missing a quarter of itself.
-//
-// The id is the disambiguator because it is what actually tells the scores apart: a content
-// fingerprint, stable across a re-bake, and the thing every other part of this pipeline
-// already names a piece by. It is not a title and does not read as one, which is the point
-// — the folder has to be unique, and inventing a movement number nobody wrote would be a
-// guess burnt into a path.
-function distinctFolders(pieces) {
-    const shared = new Set();
-    const once = new Set();
-    for (const piece of pieces) {
-        const path = folderFor(piece);
-        if (once.has(path)) {
-            shared.add(path);
-        }
-        once.add(path);
-    }
-    return pieces.map((piece) =>
-        shared.has(folderFor(piece)) ? { ...piece, variant: piece.id } : piece,
-    );
+    return pieces;
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { collectionPieces } from "./promo/collections.mjs";
+import { collectionPieces, collections } from "./promo/collections.mjs";
 import { folderFor, PIECES } from "./promo/pieces.mjs";
 
 // A clip is written to the folder its piece names, so two pieces naming one folder means the
@@ -21,6 +21,15 @@ describe("promo folders", () => {
     it("gives every curated piece a folder of its own", () => {
         const folders = new Set(PIECES.map((piece) => folderFor(piece)));
         expect(folders.size).toBe(PIECES.length);
+    });
+
+    it("gives the playlists the same folders the renderer writes", () => {
+        const rendered = new Set(collectionPieces().map((piece) => folderFor(piece)));
+        for (const set of collections()) {
+            for (const piece of set.pieces) {
+                expect(rendered).toContain(folderFor(piece));
+            }
+        }
     });
 
     it("separates same-titled pieces by their variant", () => {
