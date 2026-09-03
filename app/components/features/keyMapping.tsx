@@ -102,6 +102,10 @@ export function KeyMapping() {
     return (
         <div className="space-y-3">
             <p className="text-xs text-muted">{m.keymap_help()}</p>
+            {/* The reach is invisible otherwise: nothing on the screen suggests a modifier
+            does anything, and the two rows alone are a note short of most pieces. Said next
+            to the layout it applies to, rather than in a tips list nobody opens. */}
+            <p className="text-xs text-muted">{m.keymap_shift_help()}</p>
             {HANDS.map((hand) => (
                 <div key={hand} className="space-y-1">
                     <div className="text-xs font-medium text-muted">{HAND_LABEL[hand]()}</div>

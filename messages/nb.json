@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Sett dine egne tangenter →",
     "settings_keyboard": "Datatastatur",
     "keymap_help": "Ikke noe piano? Disse tangentene spiller tonene. Trykk på en tone, og trykk så tangenten du vil ha den på — eller behold standardoppsettet med Tilbakestill.",
+    "keymap_shift_help": "Hold Shift for å spille to oktaver høyere — de to radene når da fire oktaver til sammen.",
     "keymap_press": "Trykk på en tangent…",
     "keymap_reset": "Tilbakestill til standard",
     "keymap_rebind": "Endre binding {note}, {hand}",

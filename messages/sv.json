@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Ställ in egna tangenter →",
     "settings_keyboard": "Datorns tangentbord",
     "keymap_help": "Inget piano? De här tangenterna spelar tonerna. Tryck på en ton och tryck sedan på tangenten du vill ha den på — eller behåll standardlayouten med Återställ.",
+    "keymap_shift_help": "Håll Shift för att spela två oktaver högre — de två raderna når då fyra oktaver totalt.",
     "keymap_press": "Tryck på en tangent…",
     "keymap_reset": "Återställ till standard",
     "keymap_rebind": "Ändra {note}, {hand}",

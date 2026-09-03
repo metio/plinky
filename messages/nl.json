@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Stel je eigen toetsen in →",
     "settings_keyboard": "Computertoetsenbord",
     "keymap_help": "Geen piano? Deze toetsen spelen de noten. Tik op een noot en druk dan op de toets waarop je hem wilt — of houd de standaardindeling met Resetten.",
+    "keymap_shift_help": "Houd Shift ingedrukt om twee octaven hoger te spelen — samen bereiken de twee rijen zo vier octaven.",
     "keymap_press": "Druk op een toets…",
     "keymap_reset": "Terug naar standaard",
     "keymap_rebind": "{note}, {hand} opnieuw toewijzen",

@@ -768,6 +768,7 @@
     "keyboard_hint_customise": "Set your own keys →",
     "settings_keyboard": "Computer keyboard",
     "keymap_help": "No piano? These keys play the notes. Tap a note, then press the key you'd like it on — or keep the standard layout with Reset.",
+    "keymap_shift_help": "Hold Shift to play two octaves higher, so the two rows reach four octaves in all.",
     "keymap_press": "Press a key…",
     "keymap_press_pedal": "Press a key for this pedal (Space works), or Backspace to clear",
     "keymap_reset": "Reset to default",

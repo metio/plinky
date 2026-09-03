@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 3 September 2026
+
+**Four octaves on a computer keyboard.** The letter rows played one octave per hand,
+which is less than most pieces ask for, and reaching past it meant stopping to shift
+the whole layout with the arrow keys. Hold **Shift** and the same keys play two
+octaves higher — starting exactly where the unshifted rows stop, so the four octaves
+run without a gap or a repeated note. Nothing is rebound and the arrows still work:
+Shift is the reach you take inside a phrase, the arrows the one you take between them.
+
 ## 31 August 2026
 
 **Repeats work properly now.** On a piece with a repeat, the bars you are asked to

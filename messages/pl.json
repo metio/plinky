@@ -644,6 +644,7 @@
     "keyboard_hint_customise": "Ustaw własne klawisze →",
     "settings_keyboard": "Klawiatura komputera",
     "keymap_help": "Nie masz pianina? Te klawisze grają nuty. Dotknij nuty, a potem naciśnij klawisz, na którym ma być — lub zachowaj standardowy układ przyciskiem Resetuj.",
+    "keymap_shift_help": "Przytrzymaj Shift, aby grać dwie oktawy wyżej — oba rzędy sięgają wtedy czterech oktaw.",
     "keymap_press": "Naciśnij klawisz…",
     "keymap_reset": "Przywróć domyślne",
     "keymap_rebind": "Zmień przypisanie {note}, {hand}",

@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Állítsd be a saját billentyűidet →",
     "settings_keyboard": "Számítógép-billentyűzet",
     "keymap_help": "Nincs zongorád? Ezek a billentyűk játsszák a hangokat. Koppints egy hangra, majd nyomd le a billentyűt, amelyre tenni szeretnéd — vagy tartsd meg a normál elrendezést a Visszaállítással.",
+    "keymap_shift_help": "Tartsd nyomva a Shiftet, és két oktávval feljebb játszol — a két sor így négy oktávot ér el.",
     "keymap_press": "Nyomj le egy billentyűt…",
     "keymap_reset": "Visszaállítás alapértelmezettre",
     "keymap_rebind": "Újrarendelés: {note}, {hand}",

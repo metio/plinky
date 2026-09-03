@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Vendos tastet e tua →",
     "settings_keyboard": "Tastiera e kompjuterit",
     "keymap_help": "S'ke piano? Këto taste luajnë notat. Trokit një notë, pastaj shtyp tastin ku e do — ose mbaj paraqitjen standarde me Rivendos.",
+    "keymap_shift_help": "Mbaj Shift për të luajtur dy oktava më lart — kështu të dy rreshtat arrijnë katër oktava gjithsej.",
     "keymap_press": "Shtyp një tast…",
     "keymap_reset": "Rikthe në të paracaktuarën",
     "keymap_rebind": "Ricakto {note}, {hand}",

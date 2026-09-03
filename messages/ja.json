@@ -641,6 +641,7 @@
     "keyboard_hint_customise": "自分のキーを設定 →",
     "settings_keyboard": "パソコンのキーボード",
     "keymap_help": "ピアノがない？これらのキーで音が鳴ります。音符をタップし、割り当てたいキーを押してください — またはリセットで標準配列のまま。",
+    "keymap_shift_help": "Shift を押しながらで 2 オクターブ上を弾けます。2 段のキーで合わせて 4 オクターブ届きます。",
     "keymap_press": "キーを押してください…",
     "keymap_reset": "既定に戻す",
     "keymap_rebind": "{note}、{hand} を再割り当て",

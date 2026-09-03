@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Määritä omat koskettimesi →",
     "settings_keyboard": "Tietokoneen näppäimistö",
     "keymap_help": "Ei pianoa? Nämä näppäimet soittavat nuotit. Napauta nuottia ja paina sitten haluamaasi näppäintä — tai säilytä vakioasettelu Palauta-painikkeella.",
+    "keymap_shift_help": "Pidä Shift pohjassa, niin soitat kaksi oktaavia korkeammalta — kaksi riviä yltää näin neljään oktaaviin.",
     "keymap_press": "Paina näppäintä…",
     "keymap_reset": "Palauta oletukseen",
     "keymap_rebind": "Vaihda näppäin {note}, {hand}",

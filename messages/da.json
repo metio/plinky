@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Indstil dine egne tangenter →",
     "settings_keyboard": "Computertastatur",
     "keymap_help": "Intet klaver? Disse tangenter spiller noderne. Tryk på en node, og tryk så på den tangent, du vil have den på — eller behold standardlayoutet med Nulstil.",
+    "keymap_shift_help": "Hold Shift nede for at spille to oktaver højere — de to rækker når så fire oktaver i alt.",
     "keymap_press": "Tryk på en tangent…",
     "keymap_reset": "Nulstil til standard",
     "keymap_rebind": "Ombind {note}, {hand}",

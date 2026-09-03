@@ -1,6 +1,15 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-09-03
+  entries:
+    - |-
+      **Four octaves on a computer keyboard.** The letter rows played one octave per hand,
+      which is less than most pieces ask for, and reaching past it meant stopping to shift
+      the whole layout with the arrow keys. Hold **Shift** and the same keys play two
+      octaves higher — starting exactly where the unshifted rows stop, so the four octaves
+      run without a gap or a repeated note. Nothing is rebound and the arrows still work:
+      Shift is the reach you take inside a phrase, the arrows the one you take between them.
 - date: 2026-08-31
   entries:
     - |-

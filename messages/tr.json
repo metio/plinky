@@ -642,6 +642,7 @@
     "keyboard_hint_customise": "Kendi tuşlarını ayarla →",
     "settings_keyboard": "Bilgisayar klavyesi",
     "keymap_help": "Piyano yok mu? Bu tuşlar notaları çalar. Bir notaya dokun, sonra onu istediğin tuşa bas — ya da Sıfırla ile standart düzeni koru.",
+    "keymap_shift_help": "İki oktav yukarıdan çalmak için Shift'i basılı tut — iki sıra böylece toplam dört oktava ulaşır.",
     "keymap_press": "Bir tuşa bas…",
     "keymap_reset": "Varsayılana sıfırla",
     "keymap_rebind": "{note}, {hand} yeniden ata",

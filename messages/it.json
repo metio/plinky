@@ -643,6 +643,7 @@
     "keyboard_hint_customise": "Configura i tuoi tasti →",
     "settings_keyboard": "Tastiera del computer",
     "keymap_help": "Niente piano? Questi tasti suonano le note. Tocca una nota, poi premi il tasto su cui la vuoi — oppure mantieni la disposizione standard con Ripristina.",
+    "keymap_shift_help": "Tieni premuto Shift per suonare due ottave sopra — così le due file arrivano a quattro ottave in tutto.",
     "keymap_press": "Premi un tasto…",
     "keymap_reset": "Ripristina i valori predefiniti",
     "keymap_rebind": "Riassegna {note}, {hand}",
