@@ -1,6 +1,24 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-09-03
+  entries:
+    - |-
+      **Thirty-six pieces now say which one they are.** A library that publishes a suite
+      as one file per movement often gives every file the name of the whole suite, and the
+      catalogue had taken those names at their word: seven Chopin preludes all called
+      "Prelude", four movements of the *Suite bergamasque* all called "Suite bergamasque",
+      five of Fauré's *Dolly* all called "1. Berceuse". Every one of those scores prints
+      its own movement above the first system, so they are named from what they say —
+      "Prelude Op. 28 No. 7", "Suite bergamasque: III. Clair de lune", "Dolly, Op. 56:
+      4. Kitty-valse". Czerny's seven studies from *The Art of Finger Dexterity* also
+      shed a typo they had carried from their source, and now name the technique each one
+      trains.
+    - |-
+      **Fauré's Dolly is a set you can work through.** Its five movements had been filed
+      as nocturnes, which they are not, and the nocturne collection existed only because
+      they were. Dolly is its own collection now, and the two genuine nocturnes sit in the
+      catalogue on their own.
 - date: 2026-08-31
   entries:
     - |-

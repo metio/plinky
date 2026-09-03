@@ -19,7 +19,7 @@
     { "id": "chopin-preludes", "name": "Chopin — Preludes", "composer": "chopin", "title": "prelude", "least": 8 },
     { "id": "joplin-rags", "name": "Joplin — Rags", "composer": "joplin", "title": ".", "least": 8 },
     { "id": "debussy-bergamasque", "name": "Debussy — Suite bergamasque", "composer": "debussy", "title": "bergamasque|clair de lune|passepied", "least": 3 },
-    { "id": "faure-nocturnes", "name": "Fauré — Nocturnes and barcarolles", "composer": "fauré|faure", "title": "nocturne|barcarolle|berceuse", "least": 4 },
+    { "id": "faure-dolly", "name": "Fauré — Dolly, op. 56", "composer": "fauré|faure", "title": "dolly", "least": 5 },
     { "id": "bach-wtc", "name": "Bach — The Well-Tempered Clavier", "composer": "bach", "title": "wohltemperierte|well.tempered|prelude and fugue", "least": 12 },
     { "id": "czerny-op-740", "name": "Czerny — The art of finger dexterity, op. 740", "composer": "czerny", "title": "740|Finger Dexterity", "least": 5 },
     { "id": "chopin-etudes", "name": "Chopin — Études", "composer": "chopin", "title": "étude|etude", "least": 8 },

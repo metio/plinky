@@ -100,8 +100,15 @@ export const PIECES = [
 // Accents and punctuation go: "Gymnopédie No. 1" becomes gymnopedie-no-1. Two pieces can
 // share a title — a Schubert Ave Maria and a Bach/Gounod one — but not under the same
 // composer, so the composer segment settles what a flat name could not.
+//
+// `variant` is the escape hatch for where it cannot. The curated shelf is written by hand
+// and each entry is given a title that tells it from its neighbours; a collection is
+// resolved from the catalogue, where six movements of one suite are six rows all titled
+// "French Suite no. 5 in G major", and a title is not available to settle them. Whoever
+// builds such a list says which piece is which by handing one in.
 export function folderFor(piece) {
-    return `${folderForComposer(piece.composer)}/${slug(piece.title)}`;
+    const name = piece.variant ? `${slug(piece.title)}-${slug(piece.variant)}` : slug(piece.title);
+    return `${folderForComposer(piece.composer)}/${name}`;
 }
 
 // The folder holding everything of one composer's — every piece of theirs, and the playlist
