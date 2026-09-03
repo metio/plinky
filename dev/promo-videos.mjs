@@ -12,6 +12,7 @@
 //        [--youtube] landscape 1920x1080, the whole piece · [--shorts] portrait 1080x1920
 // With no shape flag it renders 1080x1350, the 4:5 both Instagram and Facebook recommend.
 //                             [--youtube] [--only text] [--resume] [--synth]
+//                             [--collections] every named work · [--longest-first]
 //
 // Everything lands under promo/<composer>/<piece>/: feed.mp4 from a plain run, short.mp4
 // from --shorts, youtube.mp4 from --youtube, and thumb.png from npm run promo:thumbs.
@@ -106,6 +107,14 @@ const COLLECTIONS = process.argv.includes("--collections");
 // a machine that goes to sleep, a stray edit that trips the dev server's own config
 // watcher — and re-running from the top is a poor answer to any of them.
 const RESUME = process.argv.includes("--resume");
+// Render the long pieces before the short ones.
+//
+// A full-length batch is measured in hours and something always stops it — a machine that
+// sleeps, an edit that invalidates the stamps, an evening that ends. What survives an
+// interruption is whatever finished, so the order decides what a half-run is worth: longest
+// first spends the certain time on the clips that cost the most to come back to, and leaves
+// the two-minute studies as the cheap remainder. Shortest first would do the opposite.
+const LONGEST_FIRST = process.argv.includes("--longest-first");
 
 // Headless Chromium has no AAC encoder — it is licensed, and plain Chromium ships
 // without it — so the app's exporter falls back to Opus, which is legal in an MP4 and
@@ -220,7 +229,27 @@ mkdirSync(OUT, { recursive: true });
 // silently different one. What it must not do is show forty minutes in, one line at a
 // time, buried under the clips that did work.
 // The curated shelf, or every CC0 piece of every named work.
-const chosen = COLLECTIONS ? collectionPieces() : PIECES;
+const chosen = ordered(COLLECTIONS ? collectionPieces() : PIECES);
+
+// Roughly how long a piece plays, in seconds, from what the manifest already records.
+//
+// Only ever compared against another piece's, so the approximation is the right one: bars at
+// the written tempo, ignoring repeats, rubato and the ritardando at the end. Those move a
+// piece's real length by a fraction and its rank against a piece twice its size by nothing.
+// The alternative is reading every score to sort the list, which is the batch itself.
+function playingSeconds(piece) {
+    const song = manifest.find((entry) => entry.id === piece.id);
+    if (!song?.bars || !song.beatsPerBar || !song.tempo) {
+        return 0;
+    }
+    return (song.bars * song.beatsPerBar * 60) / song.tempo;
+}
+
+function ordered(pieces) {
+    return LONGEST_FIRST
+        ? [...pieces].sort((a, b) => playingSeconds(b) - playingSeconds(a))
+        : pieces;
+}
 
 const unresolved = chosen
     .map((piece) => {

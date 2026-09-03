@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 3 September 2026
+
+**Czerny's Op. 740 is spelled right.** The seven studies from *The Art of Finger
+Dexterity* came out of their source library titled "The Art Oof Finger Dexterity",
+and had carried the typo ever since. They read properly now, and name their opus
+number the way the rest of the catalogue does.
+
 ## 31 August 2026
 
 **Repeats work properly now.** On a piece with a repeat, the bars you are asked to
