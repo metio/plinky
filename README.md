@@ -532,6 +532,16 @@ apart. A **tap tempo** reader: tap along and it tells you the number. And a
 **metronome** that takes that number straight from it, so finding a tempo and playing
 at it is one job.
 
+## Just playing
+
+**Piano** (`/piano`) is the instrument and nothing else: no piece, no run, no mode,
+nothing to start. Play it with the mouse, a touchscreen, your computer keyboard or a
+MIDI piano — the same keys, the same recorded piano and the same three pedals the rest
+of the app uses, so what you learn about where the notes are holds everywhere. The
+keyboard shows two octaves at a time and slides to follow you across the full 88 as you
+wander off the end of the window. When you fancy something to play, the way on to the
+catalogue and to Compose sits under the keys.
+
 ## Composing
 
 Play whatever you like — on a MIDI piano, your computer keys, or the on-screen

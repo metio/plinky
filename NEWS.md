@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 3 September 2026
 
+**A piano to just play.** Every other page here wants something of you — a piece to
+practise, a take to record, an interval to name. There is now one that wants
+nothing: **Piano**, linked from the home page, is the instrument and no more. It is
+the same instrument, so a MIDI piano, your computer keyboard, a touch or the mouse
+all play it, the recorded piano sounds it, the pedals work, and the keyboard slides
+to follow you up and down as you wander. When you fancy something to play, the way
+on is at the bottom.
+
 **Save a take as sound.** Your takes could already leave as MIDI, as MusicXML, or as
 a video — but not as the one thing they most obviously are, a recording of you
 playing. There is now an **Audio** button beside the others: one tap, no options,

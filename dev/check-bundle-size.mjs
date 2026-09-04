@@ -495,7 +495,12 @@ const BUDGET_VENDOR_KB = 324;
 // drawn into the frame in the browser and a code a viewer would have to look up is not an
 // attribution. Alongside them, core/wordmark: the lockup's geometry, which three surfaces
 // had a copy of and none agreed on. 0.5 KB, measured at 414.2.
-const BUDGET_APP_KB = 415;
+// 417. A page that is only the piano — /piano, the instrument with nothing asked of it.
+// The route and its component are a kilobyte of the rise; the rest is its copy, six strings
+// that ship in whichever language the visitor gets. Weighed against what it buys: the app
+// had no surface where somebody could simply press a key, and every other page asks for a
+// piece, a run or an answer first. 1.6 KB, measured at 416.5.
+const BUDGET_APP_KB = 417;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
