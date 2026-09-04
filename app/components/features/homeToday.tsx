@@ -657,6 +657,10 @@ export function HomeToday() {
                     {m.today_browse()}
                 </Link>
                 <span aria-hidden="true">·</span>
+                <Link to="/piano" className={linkClasses}>
+                    {m.piano_title()}
+                </Link>
+                <span aria-hidden="true">·</span>
                 <Link to="/compose" className={linkClasses}>
                     {m.play_compose()}
                 </Link>

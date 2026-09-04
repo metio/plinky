@@ -96,7 +96,14 @@ const named = [...new Set([...notation, ...noindex])];
 // the reduction and nothing else. Raised deliberately, like the app bundle's own ratchet;
 // what does NOT ship is the measurement of what a reduction grades at, which happens once
 // at bake time and is read out of the manifest.
-const SCRIPT_LIGHT = 262144;
+// 256 KiB → 260 KiB: message text again, and again on Settings, which is the heaviest page
+// under this cap. Nine strings across three changes — the Shift reach explained beside the
+// key-mapping panel, the audio export's label and its working state, and the free-play
+// page's own copy — and they ship on every page because a locale's messages are one chunk.
+// Settings measured 263,693 against a limit of 262,144: over by 1,549 bytes, which is those
+// nine strings in Greek and nothing else. The floor keeps the headroom the third-party
+// beacon needs, as before.
+const SCRIPT_LIGHT = 266240;
 const SCRIPT_NOTATION = 663552;
 
 const common = {
