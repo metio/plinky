@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useServices } from "../contexts/services";
 import { resolveScore, type Score } from "../lib/catalog";
+import { useAsyncEffect } from "./useAsyncEffect";
 
 // Resolve a score id across every source, the way the play page does. Bundled and
 // user scores resolve synchronously from local storage; exercises and songs fetch
@@ -16,43 +17,42 @@ export function useScore(scoreId: string, attempt = 0): Score | null | undefined
     const { songs, exercises, store } = useServices();
     const [score, setScore] = useState<Score | null | undefined | "unavailable">(undefined);
     // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` is a hook argument; a bump must re-run the resolution
-    useEffect(() => {
-        // Nothing to resolve is answered here, before any source is asked: a caller with
-        // no piece on hand (a review queue still loading, an ear item) would otherwise
-        // send the empty id through the manifest and a catalogue slice to find nothing.
-        if (!scoreId) {
-            setScore(null);
-            return;
-        }
-        const local = resolveScore(store, scoreId);
-        if (local) {
-            setScore(local);
-            return;
-        }
-        setScore(undefined);
-        let cancelled = false;
-        (async () => {
-            const fromExercises = await exercises.resolve(scoreId);
-            if (fromExercises !== null && fromExercises !== "unavailable") {
-                if (!cancelled) {
-                    setScore(fromExercises);
-                }
+    useAsyncEffect(
+        (alive) => {
+            // Nothing to resolve is answered here, before any source is asked: a caller with
+            // no piece on hand (a review queue still loading, an ear item) would otherwise
+            // send the empty id through the manifest and a catalogue slice to find nothing.
+            if (!scoreId) {
+                setScore(null);
                 return;
             }
-            const fromSongs = await songs.resolve(scoreId);
-            const found =
-                fromSongs !== null && fromSongs !== "unavailable"
-                    ? fromSongs
-                    : fromExercises === "unavailable" || fromSongs === "unavailable"
-                      ? ("unavailable" as const)
-                      : null;
-            if (!cancelled) {
-                setScore(found);
+            const local = resolveScore(store, scoreId);
+            if (local) {
+                setScore(local);
+                return;
             }
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, [scoreId, songs, exercises, store, attempt]);
+            setScore(undefined);
+            (async () => {
+                const fromExercises = await exercises.resolve(scoreId);
+                if (fromExercises !== null && fromExercises !== "unavailable") {
+                    if (alive()) {
+                        setScore(fromExercises);
+                    }
+                    return;
+                }
+                const fromSongs = await songs.resolve(scoreId);
+                const found =
+                    fromSongs !== null && fromSongs !== "unavailable"
+                        ? fromSongs
+                        : fromExercises === "unavailable" || fromSongs === "unavailable"
+                          ? ("unavailable" as const)
+                          : null;
+                if (alive()) {
+                    setScore(found);
+                }
+            })();
+        },
+        [scoreId, songs, exercises, store, attempt],
+    );
     return score;
 }

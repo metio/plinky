@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { currentGrade, loadGradedMastery, skillRating } from "../../lib/gradeProgress";
 import { usePrefsStore, useServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { LocalizedLink as Link } from "../ui/localizedLink";
+import { useAsyncEffect } from "../../hooks/useAsyncEffect";
 
 // The current grade beside the logo, and the way to reach the page that explains it.
 // Derived from how much of each grade's pool the player has mastered under their chosen
@@ -23,42 +24,43 @@ export function GradeBadge() {
     const prefsStore = usePrefsStore();
     const services = useServices();
 
-    useEffect(() => {
-        let cancelled = false;
-        const read = () => {
-            loadGradedMastery(services.mastery, services).then((items) => {
-                if (!cancelled) {
-                    const mode = prefsStore.load().decayMode;
-                    const now = Date.now();
-                    setLevel(currentGrade(items));
-                    setSkill(skillRating(items, mode, now));
-                    setCompetitive(mode === "competitive");
-                }
-            });
-        };
-        read();
-        // A finished run saves mastery through the store; both the grade and the
-        // decay-mode mark also shift when preferences change.
-        const unsubscribeMastery = services.mastery.subscribe(read);
-        // Of everything in the preferences this badge reads one field, and it sits in the
-        // app shell — so subscribing to the lot meant re-reading the ladder on every
-        // switch flipped anywhere in the app, including every reading aid toggled from
-        // the play surface mid-piece.
-        let mode = prefsStore.load().decayMode;
-        const unsubscribePrefs = prefsStore.subscribe(() => {
-            const next = prefsStore.load().decayMode;
-            if (next === mode) {
-                return;
-            }
-            mode = next;
+    useAsyncEffect(
+        (alive) => {
+            const read = () => {
+                loadGradedMastery(services.mastery, services).then((items) => {
+                    if (alive()) {
+                        const mode = prefsStore.load().decayMode;
+                        const now = Date.now();
+                        setLevel(currentGrade(items));
+                        setSkill(skillRating(items, mode, now));
+                        setCompetitive(mode === "competitive");
+                    }
+                });
+            };
             read();
-        });
-        return () => {
-            cancelled = true;
-            unsubscribeMastery();
-            unsubscribePrefs();
-        };
-    }, [prefsStore, services]);
+            // A finished run saves mastery through the store; both the grade and the
+            // decay-mode mark also shift when preferences change.
+            const unsubscribeMastery = services.mastery.subscribe(read);
+            // Of everything in the preferences this badge reads one field, and it sits in the
+            // app shell — so subscribing to the lot meant re-reading the ladder on every
+            // switch flipped anywhere in the app, including every reading aid toggled from
+            // the play surface mid-piece.
+            let mode = prefsStore.load().decayMode;
+            const unsubscribePrefs = prefsStore.subscribe(() => {
+                const next = prefsStore.load().decayMode;
+                if (next === mode) {
+                    return;
+                }
+                mode = next;
+                read();
+            });
+            return () => {
+                unsubscribeMastery();
+                unsubscribePrefs();
+            };
+        },
+        [prefsStore, services],
+    );
 
     // Shown at every standing, including none: it is the way to the stats page from
     // anywhere, and a door that appears only once you have earned something is a door a

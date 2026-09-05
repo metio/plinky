@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { useAsyncEffect } from "./useAsyncEffect";
 
 type WakeLockSentinel = { release: () => Promise<void> };
 type WakeLockNavigator = Navigator & {
@@ -44,41 +45,42 @@ export function useFullscreen(ref: RefObject<HTMLElement | null>) {
 
     // Keep the screen awake while playing full screen; release it on exit. Best-effort —
     // the Wake Lock API isn't everywhere, and a denied request is fine.
-    useEffect(() => {
-        if (!fullscreen) {
-            return;
-        }
-        let cancelled = false;
-        const nav = navigator as WakeLockNavigator;
-        const acquire = () => {
-            nav.wakeLock
-                ?.request("screen")
-                .then((lock) => {
-                    if (cancelled) {
-                        lock.release().catch(() => {});
-                    } else {
-                        wakeLock.current = lock;
-                    }
-                })
-                .catch(() => {});
-        };
-        acquire();
-        // The Wake Lock API auto-releases its sentinel whenever the document is hidden
-        // (a tab switch, the phone screen turning off then on). Re-acquire on return so
-        // the screen keeps staying awake for the rest of the piece.
-        const onVisible = () => {
-            if (!cancelled && document.visibilityState === "visible") {
-                acquire();
+    useAsyncEffect(
+        (alive) => {
+            if (!fullscreen) {
+                return;
             }
-        };
-        document.addEventListener("visibilitychange", onVisible);
-        return () => {
-            cancelled = true;
-            document.removeEventListener("visibilitychange", onVisible);
-            wakeLock.current?.release().catch(() => {});
-            wakeLock.current = null;
-        };
-    }, [fullscreen]);
+            const nav = navigator as WakeLockNavigator;
+            const acquire = () => {
+                nav.wakeLock
+                    ?.request("screen")
+                    .then((lock) => {
+                        if (!alive()) {
+                            lock.release().catch(() => {});
+                        } else {
+                            wakeLock.current = lock;
+                        }
+                    })
+                    .catch(() => {});
+            };
+            acquire();
+            // The Wake Lock API auto-releases its sentinel whenever the document is hidden
+            // (a tab switch, the phone screen turning off then on). Re-acquire on return so
+            // the screen keeps staying awake for the rest of the piece.
+            const onVisible = () => {
+                if (alive() && document.visibilityState === "visible") {
+                    acquire();
+                }
+            };
+            document.addEventListener("visibilitychange", onVisible);
+            return () => {
+                document.removeEventListener("visibilitychange", onVisible);
+                wakeLock.current?.release().catch(() => {});
+                wakeLock.current = null;
+            };
+        },
+        [fullscreen],
+    );
 
     const enter = useCallback(() => {
         setFullscreen(true);

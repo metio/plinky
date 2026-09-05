@@ -40,6 +40,7 @@ import { usePrefsStore } from "./services";
 import type { MidiConnection } from "../ports/midiAccess";
 import { useServices } from "./services";
 import { resetDevice } from "../lib/resetDevice";
+import { useAsyncEffect } from "../hooks/useAsyncEffect";
 
 export type NoteListener = {
     // Whether the computer keyboard is an instrument on this surface.
@@ -650,17 +651,16 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // Connect button), so a connected keyboard just works across the app — the
     // landing hero included — without ever prompting on load. While permission is
     // still "prompt" or "denied", do nothing: requesting would pop the dialog.
-    useEffect(() => {
-        let cancelled = false;
-        midi.permissionState().then((state) => {
-            if (!cancelled && state === "granted") {
-                requestAccess();
-            }
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [midi, requestAccess]);
+    useAsyncEffect(
+        (alive) => {
+            midi.permissionState().then((state) => {
+                if (alive() && state === "granted") {
+                    requestAccess();
+                }
+            });
+        },
+        [midi, requestAccess],
+    );
 
     // Computer-keyboard fallback. The active octave and the key→note map are kept in
     // refs so the listeners stay stable while still reading the latest values; the map

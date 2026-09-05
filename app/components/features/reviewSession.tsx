@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { earItemById } from "../../../core/earCatalog";
 import type { ItemKind } from "../../../core/practisable";
 import { useScore } from "../../hooks/useScore";
@@ -16,6 +16,7 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 import { ScoreViewer } from "./scoreViewer";
 import { PageHeader } from "../ui/pageHeader";
 import { EmptyState } from "../ui/emptyState";
+import { useAsyncEffect } from "../../hooks/useAsyncEffect";
 
 const BACK = `text-sm ${linkClasses}`;
 
@@ -37,23 +38,22 @@ export function ReviewSession() {
     // skipped item stays due rather than being silently marked done.
     const [playedCurrent, setPlayedCurrent] = useState(false);
 
-    useEffect(() => {
-        let cancelled = false;
-        loadGradedMastery(services.mastery, services).then((items) => {
-            if (!cancelled) {
-                // The queue is snapshotted with each item's kind, so it drives the right
-                // surface (a score, or an ear drill) even after practising one reschedules
-                // it out of the live due set.
-                const due = dueItems(items, Date.now(), prefsStore.load().reviewCap).map(
-                    (item) => ({ id: item.id, title: item.title, kind: item.kind }),
-                );
-                setQueue(due);
-            }
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [prefsStore.load, services]);
+    useAsyncEffect(
+        (alive) => {
+            loadGradedMastery(services.mastery, services).then((items) => {
+                if (alive()) {
+                    // The queue is snapshotted with each item's kind, so it drives the right
+                    // surface (a score, or an ear drill) even after practising one reschedules
+                    // it out of the live due set.
+                    const due = dueItems(items, Date.now(), prefsStore.load().reviewCap).map(
+                        (item) => ({ id: item.id, title: item.title, kind: item.kind }),
+                    );
+                    setQueue(due);
+                }
+            });
+        },
+        [prefsStore.load, services],
+    );
 
     const current = queue?.[index];
     const resolved = useScore(current?.kind === "piece" ? current.id : "");

@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { m } from "../../paraglide/messages.js";
+import { useAsyncEffect } from "../../hooks/useAsyncEffect";
 
 // A single bar of notation, drawn on the same engine as a real score.
 //
@@ -18,50 +19,51 @@ export function NotationExample({ xml, label }: { xml: string; label: string }) 
     const hostRef = useRef<HTMLDivElement>(null);
     const [failed, setFailed] = useState(false);
 
-    useEffect(() => {
-        let cancelled = false;
-        let display: OpenSheetMusicDisplay | null = null;
-        setFailed(false);
-        import("opensheetmusicdisplay")
-            .then(async ({ OpenSheetMusicDisplay }) => {
-                if (cancelled || !hostRef.current) {
-                    return;
-                }
-                // No autoResize: it registers a window resize listener the engine never
-                // removes, so every mount of an example left one behind for the life of
-                // the tab. The host scrolls sideways, so a static render is the right one.
-                display = new OpenSheetMusicDisplay(hostRef.current, {
-                    autoResize: false,
-                    drawingParameters: "compact",
-                    drawTitle: false,
-                    drawPartNames: false,
-                    drawCredits: false,
-                    followCursor: false,
+    useAsyncEffect(
+        (alive) => {
+            let display: OpenSheetMusicDisplay | null = null;
+            setFailed(false);
+            import("opensheetmusicdisplay")
+                .then(async ({ OpenSheetMusicDisplay }) => {
+                    if (!alive() || !hostRef.current) {
+                        return;
+                    }
+                    // No autoResize: it registers a window resize listener the engine never
+                    // removes, so every mount of an example left one behind for the life of
+                    // the tab. The host scrolls sideways, so a static render is the right one.
+                    display = new OpenSheetMusicDisplay(hostRef.current, {
+                        autoResize: false,
+                        drawingParameters: "compact",
+                        drawTitle: false,
+                        drawPartNames: false,
+                        drawCredits: false,
+                        followCursor: false,
+                    });
+                    await display.load(xml);
+                    if (!alive()) {
+                        return;
+                    }
+                    display.render();
+                })
+                .catch(() => {
+                    if (alive()) {
+                        setFailed(true);
+                    }
                 });
-                await display.load(xml);
-                if (cancelled) {
-                    return;
+            return () => {
+                // OSMD leaves its SVG behind on unmount, and a remount would draw a second
+                // one beside it. Tearing down mid-load reaches an engine part-way through
+                // reading a file, which is its own business to complain about — and a throw
+                // from a cleanup function would take the unmount down with it.
+                try {
+                    display?.clear();
+                } catch {
+                    // Nothing to salvage: the element is going away regardless.
                 }
-                display.render();
-            })
-            .catch(() => {
-                if (!cancelled) {
-                    setFailed(true);
-                }
-            });
-        return () => {
-            cancelled = true;
-            // OSMD leaves its SVG behind on unmount, and a remount would draw a second
-            // one beside it. Tearing down mid-load reaches an engine part-way through
-            // reading a file, which is its own business to complain about — and a throw
-            // from a cleanup function would take the unmount down with it.
-            try {
-                display?.clear();
-            } catch {
-                // Nothing to salvage: the element is going away regardless.
-            }
-        };
-    }, [xml]);
+            };
+        },
+        [xml],
+    );
 
     return (
         // The warm paper field, soft lift and inset hairline are the play surface's

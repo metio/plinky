@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { progressGrid } from "../../core/lifetime";
 import type { Grid } from "../../core/shareCard";
 import { useServices } from "../contexts/services";
@@ -14,6 +14,7 @@ import {
 import { buildStatsData, type StatsData } from "../lib/statsData";
 import { usePracticeSummary } from "./usePracticeSummary";
 import { usePrefs } from "./usePrefs";
+import { useAsyncEffect } from "./useAsyncEffect";
 
 // The "You" page's data, loaded once per mount: mastery and the catalogue arrive
 // async (the personal data is absent from the prerendered shell), while the
@@ -28,17 +29,16 @@ export function useStatsData(): StatsData | null {
     const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
     const [fingerprint, setFingerprint] = useState<Grid | null>(null);
 
-    useEffect(() => {
-        let cancelled = false;
-        setFingerprint(progressGrid(services.lifetime.load()));
-        loadGradedMastery(services.mastery, services).then(
-            (loaded) => !cancelled && setItems(loaded),
-        );
-        loadGradeCatalogue(services).then((loaded) => !cancelled && setCatalogue(loaded));
-        return () => {
-            cancelled = true;
-        };
-    }, [services]);
+    useAsyncEffect(
+        (alive) => {
+            setFingerprint(progressGrid(services.lifetime.load()));
+            loadGradedMastery(services.mastery, services).then(
+                (loaded) => alive() && setItems(loaded),
+            );
+            loadGradeCatalogue(services).then((loaded) => alive() && setCatalogue(loaded));
+        },
+        [services],
+    );
 
     // Read every render, so a milestone reached while the page is open still counts —
     // they are two store reads, and as a number and a boolean they key the memo below by

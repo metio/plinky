@@ -5,6 +5,7 @@ import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
 import { WINDOW_COLOR } from "../../../core/scoreCanvas";
 import { clearAllHalos, focusMeasures } from "../../lib/scoreColor";
+import { useAsyncEffect } from "../../hooks/useAsyncEffect";
 
 // A compact, always-visible strip of the piece pinned just above the on-screen keyboard
 // while practising: it shows the bar you're playing (and its neighbour) big and lit, and
@@ -38,39 +39,38 @@ export function FocusStrip({ xml, bar, label }: { xml: string; bar: number; labe
     // bar and not again when readiness flips after the load already drew it.
     const drawnRef = useRef<number | null>(null);
 
-    useEffect(() => {
-        let cancelled = false;
-        setReady(false);
-        drawnRef.current = null;
-        import("opensheetmusicdisplay")
-            .then(({ OpenSheetMusicDisplay }) => {
-                if (cancelled || !containerRef.current) {
-                    return;
-                }
-                osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
-                    autoResize: true,
-                    drawingParameters: "compact",
-                });
-                const osmd = osmdRef.current;
-                // Two bars per row so the current bar reads large in the short strip.
-                (
-                    osmd as unknown as { rules: { RenderXMeasuresPerLineAkaSystem: number } }
-                ).rules.RenderXMeasuresPerLineAkaSystem = 2;
-                return osmd.load(xml).then(() => {
-                    if (!cancelled) {
-                        drawWindow(osmd, barRef.current);
-                        drawnRef.current = barRef.current;
-                        setReady(true);
-                        setRenders((count) => count + 1);
+    useAsyncEffect(
+        (alive) => {
+            setReady(false);
+            drawnRef.current = null;
+            import("opensheetmusicdisplay")
+                .then(({ OpenSheetMusicDisplay }) => {
+                    if (!alive() || !containerRef.current) {
+                        return;
                     }
-                });
-            })
-            // A render failure just leaves the strip empty; the full score is the fallback.
-            .catch(() => {});
-        return () => {
-            cancelled = true;
-        };
-    }, [xml]);
+                    osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
+                        autoResize: true,
+                        drawingParameters: "compact",
+                    });
+                    const osmd = osmdRef.current;
+                    // Two bars per row so the current bar reads large in the short strip.
+                    (
+                        osmd as unknown as { rules: { RenderXMeasuresPerLineAkaSystem: number } }
+                    ).rules.RenderXMeasuresPerLineAkaSystem = 2;
+                    return osmd.load(xml).then(() => {
+                        if (alive()) {
+                            drawWindow(osmd, barRef.current);
+                            drawnRef.current = barRef.current;
+                            setReady(true);
+                            setRenders((count) => count + 1);
+                        }
+                    });
+                })
+                // A render failure just leaves the strip empty; the full score is the fallback.
+                .catch(() => {});
+        },
+        [xml],
+    );
 
     // Engrave the next two bars as the cursor advances.
     useEffect(() => {

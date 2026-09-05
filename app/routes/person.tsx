@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePrefs } from "../hooks/usePrefs";
 import { useParams } from "react-router";
 import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../core/person";
@@ -16,6 +16,7 @@ import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/person";
 import { PageHeader } from "../components/ui/pageHeader";
 import { GradeChip } from "../components/features/scoreGrade";
+import { useAsyncEffect } from "../hooks/useAsyncEffect";
 
 // A stored score as a person piece.
 const asPiece = (score: {
@@ -107,39 +108,44 @@ export default function PersonPage() {
     // arrives a beat later.
     const known = indexedPerson(slug ?? "");
 
-    useEffect(() => {
-        let cancelled = false;
-        // Re-seed from what is known without the network on a slug change — the name at
-        // minimum — then merge the catalogue and the user's imports.
-        setPerson(knownPerson(slug ?? ""));
-        setLoading(true);
-        (async () => {
-            const [manifest, studies] = await Promise.all([songs.manifest(), exercises.manifest()]);
-            if (cancelled) {
-                return;
-            }
-            const pieces: PersonPiece[] = [
-                ...loadUserScores(store).map(asPiece),
-                ...(manifest ?? []),
-                // A study need not credit anybody; an empty credit belongs to no person,
-                // which is what personSlug already makes of it.
-                ...(studies ?? []).map((study) => ({ ...study, composer: study.composer ?? "" })),
-                ...bundledPieces(),
-            ];
-            const resolved = personFor(pieces, slug ?? "");
-            // Only ever an improvement on what the page opened with. A manifest that
-            // could not be fetched answers null — unreachable, not empty — and taking
-            // that as "this composer has nothing" would replace a name and a piece
-            // count the baked index already gave us with a slug and an empty state.
-            if (resolved) {
-                setPerson(resolved);
-            }
-            setLoading(false);
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, [songs.manifest, exercises.manifest, store, slug]);
+    useAsyncEffect(
+        (alive) => {
+            // Re-seed from what is known without the network on a slug change — the name at
+            // minimum — then merge the catalogue and the user's imports.
+            setPerson(knownPerson(slug ?? ""));
+            setLoading(true);
+            (async () => {
+                const [manifest, studies] = await Promise.all([
+                    songs.manifest(),
+                    exercises.manifest(),
+                ]);
+                if (!alive()) {
+                    return;
+                }
+                const pieces: PersonPiece[] = [
+                    ...loadUserScores(store).map(asPiece),
+                    ...(manifest ?? []),
+                    // A study need not credit anybody; an empty credit belongs to no person,
+                    // which is what personSlug already makes of it.
+                    ...(studies ?? []).map((study) => ({
+                        ...study,
+                        composer: study.composer ?? "",
+                    })),
+                    ...bundledPieces(),
+                ];
+                const resolved = personFor(pieces, slug ?? "");
+                // Only ever an improvement on what the page opened with. A manifest that
+                // could not be fetched answers null — unreachable, not empty — and taking
+                // that as "this composer has nothing" would replace a name and a piece
+                // count the baked index already gave us with a slug and an empty state.
+                if (resolved) {
+                    setPerson(resolved);
+                }
+                setLoading(false);
+            })();
+        },
+        [songs.manifest, exercises.manifest, store, slug],
+    );
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">

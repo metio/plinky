@@ -53,6 +53,7 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
 import { Show, useMidiConnected } from "./conditional";
 import { usePrefs } from "../../hooks/usePrefs";
+import { useAsyncEffect } from "../../hooks/useAsyncEffect";
 
 const ICON: Record<Task["key"], string> = {
     review: "🔁",
@@ -356,106 +357,109 @@ export function HomeToday() {
         return () => scheduler.cancel(handle);
     }, [arrived, scheduler]);
 
-    useEffect(() => {
-        let cancelled = false;
-        Promise.all([
-            loadGradedMastery(services.mastery, services),
-            loadGradeCatalogue(services),
-            // The manifest only feeds the starter assignment; without it the
-            // session still stands, so a fetch failure degrades to no starter
-            // rather than an empty page.
-            exercises.manifest().then((list) => list ?? []),
-        ]).then(([items, catalogue, exerciseList]) => {
-            if (cancelled) {
-                return;
-            }
-            const now = Date.now();
-            const prefs = prefsStore.load();
-            const { level, workingGrade, mastered } = ladderStanding(items);
-            const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
-            const day = dailyNumber(todayKey(new Date(now)));
-            const dailyDoneToday = services.daily.lastDone() === day;
-            // The player's own assignments first — a saved set is a deliberate
-            // path — then the built-in starter, so a fresh device has a guided
-            // path in the panel from day one. Same construction as on
-            // /assignments, so the two views always agree on the steps.
-            const starter = starterAssignment({
-                id: "starter-first-steps",
-                name: m.assignments_starter_name(),
-                description: m.assignments_starter_description(),
-                demos: loadBundledScores().map((score) => ({ id: score.id })),
-                exercises: exerciseList,
-            });
-            const assignment = nextAssignmentStep(
-                [...assignmentsStore.list(), ...(starter ? [starter] : [])],
-                (id) => services.mastery.load(id)?.learned === true,
-                (id) => known.isMissing(id),
-            );
-            setSession({
-                tasks: todayTasks({
-                    // Each due item carries its own kind, so the task knows whether
-                    // opening one means a score or an ear drill.
-                    due: dueItems(items, now, prefs.reviewCap).map((item) => ({
-                        id: item.id,
-                        kind: item.kind,
-                    })),
-                    dailyDoneToday,
-                    assignment,
-                    suggestion: suggestion
-                        ? { id: suggestion.id, title: suggestion.title, kind: suggestion.kind }
-                        : null,
-                }),
-                learn: learnPick({
-                    keyboardMet: onboarding.marked().has("keyboardMet"),
-                    placementTaken: placement.load() !== null,
-                    courseDone: courseProgress(theory.met()) >= 1,
-                    day,
-                }),
-                // Where the course has got to, so offering it opens the lesson you have
-                // not met rather than the top of a page you are halfway down.
-                nextLesson: LESSONS.find((lesson) => !theory.met().has(lesson.id))?.id,
-                // The first arcade rung not yet cleared, read from the same mastery the
-                // play surface records — so clearing a level advances it with nothing
-                // bespoke behind it.
-                arcadeLevel: currentArcadeLevel(
-                    (lv) => masteryStore.load(buildExerciseId(arcadeConfig(lv)))?.learned === true,
-                ),
-                standing: {
-                    level,
-                    skill: skillRating(items, prefs.decayMode, now),
-                    // What is on the stand: everything learned and not shelved — the
-                    // same set the grades count, so the line agrees with the You page.
-                    onStand: mastered.size,
-                    notes: summarizePractice(history.load(), new Date(now)).totalNotes,
-                },
-                titles: new Map(catalogue.map((item) => [item.id, item.title])),
-                bests: new Map(
-                    items.flatMap((item) =>
-                        item.mastery.bestScore > 0 ? [[item.id, item.mastery.bestScore]] : [],
+    useAsyncEffect(
+        (alive) => {
+            Promise.all([
+                loadGradedMastery(services.mastery, services),
+                loadGradeCatalogue(services),
+                // The manifest only feeds the starter assignment; without it the
+                // session still stands, so a fetch failure degrades to no starter
+                // rather than an empty page.
+                exercises.manifest().then((list) => list ?? []),
+            ]).then(([items, catalogue, exerciseList]) => {
+                if (!alive()) {
+                    return;
+                }
+                const now = Date.now();
+                const prefs = prefsStore.load();
+                const { level, workingGrade, mastered } = ladderStanding(items);
+                const suggestion =
+                    gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
+                const day = dailyNumber(todayKey(new Date(now)));
+                const dailyDoneToday = services.daily.lastDone() === day;
+                // The player's own assignments first — a saved set is a deliberate
+                // path — then the built-in starter, so a fresh device has a guided
+                // path in the panel from day one. Same construction as on
+                // /assignments, so the two views always agree on the steps.
+                const starter = starterAssignment({
+                    id: "starter-first-steps",
+                    name: m.assignments_starter_name(),
+                    description: m.assignments_starter_description(),
+                    demos: loadBundledScores().map((score) => ({ id: score.id })),
+                    exercises: exerciseList,
+                });
+                const assignment = nextAssignmentStep(
+                    [...assignmentsStore.list(), ...(starter ? [starter] : [])],
+                    (id) => services.mastery.load(id)?.learned === true,
+                    (id) => known.isMissing(id),
+                );
+                setSession({
+                    tasks: todayTasks({
+                        // Each due item carries its own kind, so the task knows whether
+                        // opening one means a score or an ear drill.
+                        due: dueItems(items, now, prefs.reviewCap).map((item) => ({
+                            id: item.id,
+                            kind: item.kind,
+                        })),
+                        dailyDoneToday,
+                        assignment,
+                        suggestion: suggestion
+                            ? { id: suggestion.id, title: suggestion.title, kind: suggestion.kind }
+                            : null,
+                    }),
+                    learn: learnPick({
+                        keyboardMet: onboarding.marked().has("keyboardMet"),
+                        placementTaken: placement.load() !== null,
+                        courseDone: courseProgress(theory.met()) >= 1,
+                        day,
+                    }),
+                    // Where the course has got to, so offering it opens the lesson you have
+                    // not met rather than the top of a page you are halfway down.
+                    nextLesson: LESSONS.find((lesson) => !theory.met().has(lesson.id))?.id,
+                    // The first arcade rung not yet cleared, read from the same mastery the
+                    // play surface records — so clearing a level advances it with nothing
+                    // bespoke behind it.
+                    arcadeLevel: currentArcadeLevel(
+                        (lv) =>
+                            masteryStore.load(buildExerciseId(arcadeConfig(lv)))?.learned === true,
                     ),
-                ),
-                target: prefs.masteryThreshold,
-                marks: new Map(
-                    catalogue.flatMap((item) => (item.incipit ? [[item.id, item.incipit]] : [])),
-                ),
-                surprise: { catalogue, grade: workingGrade, mastered },
+                    standing: {
+                        level,
+                        skill: skillRating(items, prefs.decayMode, now),
+                        // What is on the stand: everything learned and not shelved — the
+                        // same set the grades count, so the line agrees with the You page.
+                        onStand: mastered.size,
+                        notes: summarizePractice(history.load(), new Date(now)).totalNotes,
+                    },
+                    titles: new Map(catalogue.map((item) => [item.id, item.title])),
+                    bests: new Map(
+                        items.flatMap((item) =>
+                            item.mastery.bestScore > 0 ? [[item.id, item.mastery.bestScore]] : [],
+                        ),
+                    ),
+                    target: prefs.masteryThreshold,
+                    marks: new Map(
+                        catalogue.flatMap((item) =>
+                            item.incipit ? [[item.id, item.incipit]] : [],
+                        ),
+                    ),
+                    surprise: { catalogue, grade: workingGrade, mastered },
+                });
             });
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [
-        prefsStore.load,
-        assignmentsStore.list,
-        exercises.manifest,
-        history.load,
-        masteryStore.load,
-        onboarding.marked,
-        placement.load,
-        theory.met,
-        services,
-        known,
-    ]);
+        },
+        [
+            prefsStore.load,
+            assignmentsStore.list,
+            exercises.manifest,
+            history.load,
+            masteryStore.load,
+            onboarding.marked,
+            placement.load,
+            theory.met,
+            services,
+            known,
+        ],
+    );
 
     const heading = arrived
         ? GREETING[partOfDay(arrived.getHours())]({

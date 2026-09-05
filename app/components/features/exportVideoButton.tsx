@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Take } from "../../../core/takes";
 import { fingeredFreely } from "../../../core/scorePerformance";
 import { videoDurationMs } from "../../../core/videoFrames";
@@ -25,6 +25,7 @@ import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
 import { Switch } from "../ui/switch";
+import { useAsyncEffect } from "../../hooks/useAsyncEffect";
 
 // The base 16:9 sizes per quality step; portrait swaps the axes for the
 // vertical feeds (Reels, Shorts, TikTok).
@@ -94,17 +95,16 @@ export function ExportVideoButton({
     const [noteColor, setNoteColor] = useState(DEFAULT_NOTE_COLOR);
     const [keyboardDepth, setKeyboardDepth] = useState(DEFAULT_KEYBOARD_DEPTH);
 
-    useEffect(() => {
-        let cancelled = false;
-        exporter.supported().then((ok) => {
-            if (!cancelled) {
-                setSupported(ok);
-            }
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [exporter]);
+    useAsyncEffect(
+        (alive) => {
+            exporter.supported().then((ok) => {
+                if (alive()) {
+                    setSupported(ok);
+                }
+            });
+        },
+        [exporter],
+    );
 
     if (!supported) {
         return null;
