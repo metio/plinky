@@ -112,23 +112,30 @@ export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SV
     return collectStepNotes(osmd, hand).map((step) => step.elements);
 }
 
-// Haloes every note in a half-open range of measures (0-based, matching scoreToBars'
-// bar index), leaving the rest untouched — used to light up the active window in a
-// read-only context staff. Walks the cursor, so it leaves it reset+hidden. The caller
-// clears the prior window (clearAllHalos) first.
-export function paintMeasureRange(
+// Lights the active window of a read-only context staff and slides it into view: haloes
+// every note in a half-open range of measures (0-based, matching scoreToBars' bar index)
+// and scrolls the first of them to the vertical centre of its container. The caller clears
+// the prior window (clearAllHalos) first.
+//
+// One walk of the cursor, hidden and stopping at the window's end. On a phone this runs
+// on every bar the player clears, and each cursor step with the cursor shown repositions
+// its element in the DOM, so a visible walk over a long piece is most of the cost. Hidden,
+// a step only moves the iterator, which is all the haloing and the scroll read. The
+// scroll goes to the container directly (not scrollIntoView, which would also scroll the
+// page), and reads its geometry once, after every halo of the walk is written, so no read
+// lands between writes. Leaves the cursor reset and hidden.
+export function focusMeasures(
     osmd: OpenSheetMusicDisplay,
     from: number,
     to: number,
     color: string,
+    container: HTMLElement,
 ): void {
-    osmd.cursor.show();
+    let anchor: SVGGElement | null = null;
+    osmd.cursor.hide();
     osmd.cursor.reset();
     while (!osmd.cursor.iterator.EndReached) {
         const measure = osmd.cursor.iterator.CurrentMeasureIndex;
-        // The walk stops at the window's end: on a phone this runs on every bar the
-        // player clears, and walking on to the end of a long piece to halo nothing is
-        // most of the cost.
         if (measure >= to) {
             break;
         }
@@ -137,13 +144,29 @@ export function paintMeasureRange(
                 const element = svgOf(gNote);
                 if (element) {
                     litHalo(element, color);
+                    anchor ??= element;
                 }
             }
         }
         osmd.cursor.next();
     }
     osmd.cursor.reset();
-    osmd.cursor.hide();
+    if (anchor) {
+        scrollToCentre(anchor, container);
+    }
+}
+
+function scrollToCentre(element: Element, container: HTMLElement): void {
+    const elementRect = element.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const top =
+        elementRect.top -
+        containerRect.top +
+        container.scrollTop -
+        (container.clientHeight - elementRect.height) / 2;
+    // Set scrollTop directly (not scrollTo's smooth, which headless browsers may drop).
+    // The bar only changes a few times a piece, so a jump reads fine.
+    container.scrollTop = Math.max(0, top);
 }
 
 // A measure's rendered box in the SVG's own coordinate space, unioned over every note
@@ -489,40 +512,6 @@ export function restoreNotePaint(osmd: OpenSheetMusicDisplay, colors: (string | 
     osmd.cursor.reset();
     osmd.cursor.hide();
     return painted;
-}
-
-// Scrolls a measure to the vertical centre of its own container — used by the focus
-// strip to slide to the bar being played. Scrolls the container directly (not
-// scrollIntoView, which would also scroll the page). Walks the cursor to the measure to
-// find a rendered note there; leaves the cursor reset and hidden.
-export function scrollMeasureIntoView(
-    osmd: OpenSheetMusicDisplay,
-    measure: number,
-    container: HTMLElement,
-): void {
-    osmd.cursor.show();
-    osmd.cursor.reset();
-    while (!osmd.cursor.iterator.EndReached && osmd.cursor.iterator.CurrentMeasureIndex < measure) {
-        osmd.cursor.next();
-    }
-    for (const gNote of osmd.cursor.GNotesUnderCursor()) {
-        const element = svgOf(gNote);
-        if (element) {
-            const elementRect = element.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            const top =
-                elementRect.top -
-                containerRect.top +
-                container.scrollTop -
-                (container.clientHeight - elementRect.height) / 2;
-            // Set scrollTop directly (not scrollTo's smooth, which headless browsers may
-            // drop). The bar only changes a few times a piece, so a jump reads fine.
-            container.scrollTop = Math.max(0, top);
-            break;
-        }
-    }
-    osmd.cursor.reset();
-    osmd.cursor.hide();
 }
 
 // Haloes the noteheads at the cursor's current position whose pitch was just played,

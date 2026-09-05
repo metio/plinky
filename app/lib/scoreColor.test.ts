@@ -9,7 +9,7 @@ import {
     haloColor,
     highlightCursorNotes,
     paintBarSelection,
-    paintMeasureRange,
+    focusMeasures,
     paintPlayedNotes,
     restoreNotePaint,
     restoreNotes,
@@ -142,33 +142,76 @@ function mount(notes: ReturnType<typeof gNote>[]): void {
     }
 }
 
-describe("paintMeasureRange", () => {
-    it("stops walking at the end of the window rather than the end of the piece", () => {
-        // On a phone this runs on every bar the player clears; walking the rest of a long
-        // piece to halo nothing was most of its cost.
+describe("focusMeasures", () => {
+    // Ten bars of four positions each, with a note at every position, counting how the
+    // cursor is driven: on a phone this runs on every bar the player clears.
+    function strip(positions = 40) {
+        const notes = Array.from({ length: positions }, () => gNote(60));
+        mount(notes);
         let at = 0;
-        let steps = 0;
-        const positions = 40; // ten bars of four positions
+        const driven = { steps: 0, resets: 0, shown: 0, hidden: 0 };
         const osmd = {
             cursor: {
-                show: () => {},
-                hide: () => {},
+                show: () => {
+                    driven.shown += 1;
+                },
+                hide: () => {
+                    driven.hidden += 1;
+                },
                 reset: () => {
                     at = 0;
+                    driven.resets += 1;
                 },
                 next: () => {
                     at += 1;
-                    steps += 1;
+                    driven.steps += 1;
                 },
-                GNotesUnderCursor: () => [],
+                GNotesUnderCursor: () => (at < positions ? [notes[at]] : []),
                 get iterator() {
                     return { EndReached: at >= positions, CurrentMeasureIndex: Math.floor(at / 4) };
                 },
             },
         } as unknown as OpenSheetMusicDisplay;
-        paintMeasureRange(osmd, 2, 4, WINDOW_COLOR);
+        return { osmd, notes, driven };
+    }
+
+    it("haloes exactly the window's notes", () => {
+        const { osmd, notes } = strip();
+        focusMeasures(osmd, 2, 4, WINDOW_COLOR, document.createElement("div"));
+        expect(notes.map((note) => haloColor(note.group) === WINDOW_COLOR)).toEqual(
+            notes.map((_, i) => i >= 8 && i < 16),
+        );
+    });
+
+    it("walks the cursor once, hidden, and stops at the end of the window", () => {
+        // Walking the rest of a long piece to halo nothing was most of the cost, and a
+        // second walk to find the bar to scroll to was the rest of it.
+        const { osmd, driven } = strip();
+        focusMeasures(osmd, 2, 4, WINDOW_COLOR, document.createElement("div"));
         // Positions 0..15 are walked (bars 0-3); bar 4's first position ends the walk.
-        expect(steps).toBeLessThanOrEqual(17);
+        expect(driven.steps).toBeLessThanOrEqual(17);
+        expect(driven.resets).toBe(2);
+        expect(driven.shown).toBe(0);
+        expect(driven.hidden).toBeGreaterThan(0);
+    });
+
+    it("scrolls the container to the window's first note", () => {
+        const { osmd, notes } = strip();
+        const container = document.createElement("div");
+        Object.defineProperty(container, "clientHeight", { value: 100 });
+        container.getBoundingClientRect = () => ({ top: 0, height: 100 }) as DOMRect;
+        notes[8]!.group.getBoundingClientRect = () => ({ top: 300, height: 20 }) as DOMRect;
+        focusMeasures(osmd, 2, 4, WINDOW_COLOR, container);
+        // The note sits 300px down; centring its 20px in a 100px box lands at 260.
+        expect(container.scrollTop).toBe(260);
+    });
+
+    it("leaves the scroll alone when the window holds no rendered note", () => {
+        const { osmd } = strip();
+        const container = document.createElement("div");
+        container.scrollTop = 7;
+        focusMeasures(osmd, 20, 22, WINDOW_COLOR, container);
+        expect(container.scrollTop).toBe(7);
     });
 });
 
