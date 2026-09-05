@@ -3,17 +3,20 @@
 // @vitest-environment jsdom
 
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
+import { readIncipit } from "./incipit";
+import type { XmlCodec } from "./xml";
 import { describe, expect, it } from "vitest";
 import {
-    readPace,
     categoryOf,
     gradeOf,
     MAX_GRADE,
+    measureScore,
     paceCost,
-    pieceBoundaries,
     parsePositions,
+    pieceBoundaries,
     rawDifficulty,
     readLength,
+    readPace,
     SPEED_FLOOR_NPS,
     SPEED_WEIGHT,
     TEXTURE_WEIGHT,
@@ -187,6 +190,54 @@ describe("parsePositions groups and splits precisely", () => {
                 note("E", 4, undefined, true),
         );
         expect(parsePositions(domXmlCodec, xml).right).toEqual([[60, 64]]);
+    });
+});
+
+describe("measureScore", () => {
+    // A codec that counts its parses, so the test can say how many times a score was
+    // opened rather than how long it took.
+    const counting = () => {
+        let parses = 0;
+        const codec: XmlCodec = {
+            parse: (xml) => {
+                parses += 1;
+                return domXmlCodec.parse(xml);
+            },
+            serialize: domXmlCodec.serialize,
+        };
+        return { codec, parses: () => parses };
+    };
+
+    it("reads grade, cost and incipit off one parse", () => {
+        const { codec, parses } = counting();
+        const xml = score([60, 62, 64, 65, 67].map(noteFor).join(""));
+        const measure = measureScore(codec, "measure-once", xml);
+        expect(parses()).toBe(1);
+        expect(measure.grade).toBe(gradeOf(domXmlCodec, "measure-once-again", xml));
+        expect(measure.cost).toBe(rawDifficulty(domXmlCodec, xml));
+        expect(measure.incipit).toEqual(readIncipit(domXmlCodec, xml));
+        expect(measure.notes).toBe(5);
+    });
+
+    it("answers a second ask for the same id without opening the score again", () => {
+        const { codec, parses } = counting();
+        const xml = score([60, 62].map(noteFor).join(""));
+        measureScore(codec, "measure-cached", xml);
+        measureScore(codec, "measure-cached", xml);
+        expect(parses()).toBe(1);
+    });
+
+    it("grades an unreadable or empty score at the top, at no cost, with no mark", () => {
+        expect(measureScore(domXmlCodec, "measure-broken", "<not xml")).toEqual({
+            grade: MAX_GRADE,
+            cost: 0,
+            notes: 0,
+            incipit: null,
+        });
+        const rests = score(`<note><rest/><duration>4</duration></note>`);
+        const measure = measureScore(domXmlCodec, "measure-rests", rests);
+        expect(measure.grade).toBe(MAX_GRADE);
+        expect(measure.notes).toBe(0);
     });
 });
 

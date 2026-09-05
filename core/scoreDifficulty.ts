@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { type Incipit, incipitOf } from "./incipit";
 import { pitchMidiOf } from "./notes";
 import { stavesPerPart } from "./accompaniment";
 import { fingerPositions, positionsCost } from "./fingering";
@@ -41,15 +42,18 @@ export type Hands = {
 // accompaniment underneath it. core/parts.ts exists for exactly this and the grader was
 // never wired to it.
 export function parsePositions(codec: XmlCodec, xml: string): Hands {
+    const doc = codec.parse(xml);
+    return doc ? positionsOf(doc) : { right: [], left: [], gaps: { right: [], left: [] } };
+}
+
+// The same, off a document already open — what measureScore reads, so grade, cost and
+// incipit come off one parse of a score rather than one each.
+export function positionsOf(doc: Document): Hands {
     const right: number[][] = [];
     const left: number[][] = [];
     // Seconds from each position's onset to the one before it — how long the player has
     // to get the hand there. gaps[0] is unused: nothing precedes the first position.
     const gaps = { right: [] as number[], left: [] as number[] };
-    const doc = codec.parse(xml);
-    if (!doc) {
-        return { right, left, gaps };
-    }
     const counts = stavesPerPart(doc);
     const parts = partsOf(counts);
     const written = Array.from(
@@ -360,7 +364,11 @@ export function rawDifficulty(codec: XmlCodec, xml: string): number {
     if (!doc) {
         return 0;
     }
-    const hands = parsePositions(codec, xml);
+    return difficultyOf(doc, positionsOf(doc));
+}
+
+// The effort of a document already open, with its positions already read.
+export function difficultyOf(doc: Document, hands: Hands): number {
     // Nothing FINGERABLE means nothing to measure; callers read 0 that way, and a pace
     // term added to it would dress an unreadable import up as a plausible score. Note
     // that this is emptiness, not cheapness: a real line that happens to cost nothing to
@@ -428,33 +436,60 @@ const GRADE_THRESHOLDS: Record<Category, number[]> = {
 // chip a player sees can never be read off different numbers.
 export const pieceBoundaries: readonly number[] = GRADE_THRESHOLDS.piece;
 
-const gradeCache = new Map<string, number>();
+// Everything the library and the grade ladder want to know about a score held on the
+// device, read off ONE parse of its MusicXML: the grade, the cost it was placed by, and
+// the opening bar. Memoised by id, which MUST be the content fingerprint (songId): the
+// cache trusts the id to identify the notes and never re-reads xml on a hit, so a caller
+// keying by anything else — a title slug, say — makes distinct scores collide onto one
+// measure.
+//
+// One parse matters because the fingering search is the expensive half of the model:
+// remeasuring the catalogue's costs takes about half an hour. Read separately, the grade,
+// the cost and the incipit each opened the document again, and the grade ran the search
+// a second time for a cost it then threw away — six parses and two searches per score,
+// on every visit to the library.
+export type ScoreMeasure = {
+    grade: number;
+    cost: number;
+    // How many fingerable notes the score holds. Zero means empty or unreadable — nothing
+    // to practise, and nothing the cost of 0 beside it says anything about.
+    notes: number;
+    incipit: Incipit | null;
+};
 
-// A score's 1–8 grade: its fingering-cost difficulty placed against its category's
-// thresholds. Memoised by id, which MUST be the content fingerprint (songId): the cache
-// trusts the id to identify the notes and never re-reads xml on a hit, so a caller keying
-// by anything else — a title slug, say — makes distinct scores collide onto one grade.
-export function gradeOf(codec: XmlCodec, id: string, xml: string): number {
-    const cached = gradeCache.get(id);
+const measureCache = new Map<string, ScoreMeasure>();
+
+export function measureScore(codec: XmlCodec, id: string, xml: string): ScoreMeasure {
+    const cached = measureCache.get(id);
     if (cached !== undefined) {
         return cached;
     }
-    const hands = parsePositions(codec, xml);
-    // No fingerable notes means an empty or unreadable score, not the gentlest
-    // piece — a real in-hand line also costs ~0. Grade it at the top so it can't
-    // pad the beginner pools, distinguishing it from a measured-easy cost of 0.
-    if (hands.right.length + hands.left.length === 0) {
-        gradeCache.set(id, MAX_GRADE);
-        return MAX_GRADE;
-    }
-    const cost = rawDifficulty(codec, xml);
+    const doc = codec.parse(xml);
+    const hands = doc ? positionsOf(doc) : { right: [], left: [], gaps: { right: [], left: [] } };
+    const notes = hands.right.length + hands.left.length;
+    // No fingerable notes means an empty or unreadable score, not the gentlest piece — a
+    // real in-hand line also costs ~0. Grade it at the top so it can't pad the beginner
+    // pools, distinguishing it from a measured-easy cost of 0.
+    const cost = doc && notes > 0 ? difficultyOf(doc, hands) : 0;
+    const grade = notes === 0 ? MAX_GRADE : gradeForCost(cost, categoryOf(id));
+    const measure = { grade, cost, notes, incipit: doc ? incipitOf(doc) : null };
+    measureCache.set(id, measure);
+    return measure;
+}
+
+// A score's 1–8 grade: its fingering-cost difficulty placed against its category's
+// thresholds. Memoised by id like measureScore, of which it is one field.
+export function gradeOf(codec: XmlCodec, id: string, xml: string): number {
+    return measureScore(codec, id, xml).grade;
+}
+
+function gradeForCost(cost: number, category: Category): number {
     let grade = 1;
-    for (const threshold of GRADE_THRESHOLDS[categoryOf(id)]) {
+    for (const threshold of GRADE_THRESHOLDS[category]) {
         if (cost <= threshold) {
             break;
         }
         grade += 1;
     }
-    gradeCache.set(id, grade);
     return grade;
 }

@@ -3,7 +3,7 @@
 
 import { loadBundledScores, loadUserScores, userScoresRaw } from "./catalog";
 import { earCatalogItems } from "./earProgress";
-import { encodeIncipit, readIncipit } from "../../core/incipit";
+import { encodeIncipit } from "../../core/incipit";
 import type { ItemKind } from "../../core/practisable";
 import type { ScoreKind } from "../../core/scoreKind";
 import type { Letter } from "../../core/grade";
@@ -11,7 +11,7 @@ import type { XmlCodec } from "../../core/xml";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { type DecayMode, REVIEW_CAP } from "../../core/review";
 import { isDue, isLapsed, letterMin, type Mastery } from "../../core/mastery";
-import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "../../core/scoreDifficulty";
+import { MAX_GRADE, measureScore } from "../../core/scoreDifficulty";
 
 // Plinky's progression: each of the 1–MAX_GRADE difficulty grades is a pool of
 // catalogue items, and you climb by *mastering* items of a grade — not by any single
@@ -314,25 +314,24 @@ async function assembleCatalogue(
         if (index.has(score.id)) {
             continue;
         }
-        const { right, left } = parsePositions(sources.xml, score.xml);
+        // One read of the score for its grade, the cost that places it, and the mark —
+        // which is why a bundled demo and a score you imported yourself carry one just
+        // as a catalogue piece does.
+        const measure = measureScore(sources.xml, score.id, score.xml);
         // A score with no fingerable notes — empty or unreadable — is nothing to
         // practise, so it stays out of the grade pools. Keeping it out also lets a
         // cost of 0 mean "measured as gentlest" everywhere, so the easy real pieces
         // that score 0 lead their grade rather than being mistaken for unmeasured.
-        if (right.length + left.length === 0) {
+        if (measure.notes === 0) {
             continue;
         }
-        // The notation is already open here, so the mark costs one more read of it —
-        // which is why a bundled demo and a score you imported yourself carry one just
-        // as a catalogue piece does.
-        const opening = readIncipit(sources.xml, score.xml);
         index.set(score.id, {
             id: score.id,
             title: score.title,
-            grade: gradeOf(sources.xml, score.id, score.xml),
-            cost: rawDifficulty(sources.xml, score.xml),
+            grade: measure.grade,
+            cost: measure.cost,
             kind: "piece",
-            ...(opening ? { incipit: encodeIncipit(opening) } : {}),
+            ...(measure.incipit ? { incipit: encodeIncipit(measure.incipit) } : {}),
         });
     }
     return { index, complete };

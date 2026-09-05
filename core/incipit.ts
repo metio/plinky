@@ -102,7 +102,12 @@ function noteOf(note: Element, divisions: number): IncipitNote | null {
 // so a piece that will not yield a mark never turns into a broken one.
 export function readIncipit(codec: XmlCodec, xml: string, limit = INCIPIT_NOTES): Incipit | null {
     const doc = codec.parse(xml);
-    const part = doc?.getElementsByTagName("part")[0];
+    return doc ? incipitOf(doc, limit) : null;
+}
+
+// The same, off a document already open.
+export function incipitOf(doc: Document, limit = INCIPIT_NOTES): Incipit | null {
+    const part = doc.getElementsByTagName("part")[0];
     if (!part) {
         return null;
     }
