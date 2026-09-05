@@ -138,6 +138,14 @@ describe("peopleFrom / personFor", () => {
         expect(personFor(pieces, "erik-satie")?.pieces).toHaveLength(1);
         expect(personFor(pieces, "nobody-here")).toBeNull();
     });
+
+    it("answers with the person the slug names when their only piece is shared", () => {
+        // A joint credit puts both people in the group with one piece each; the page for
+        // the second of them must be theirs, not the page of whoever sorts first.
+        const shared = [{ id: "1", title: "Ave Maria", composer: "Arcadelt-Dietsch", grade: 3 }];
+        expect(personFor(shared, "pierre-louis-dietsch")?.slug).toBe("pierre-louis-dietsch");
+        expect(personFor(shared, "jacques-arcadelt")?.slug).toBe("jacques-arcadelt");
+    });
 });
 
 describe("credits the catalogue actually carries", () => {
