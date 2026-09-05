@@ -181,7 +181,10 @@ function stepsAtCursor(
                 continue;
             }
             pitches.push(note.halfTone + 12);
-            pitchStaves.push(staff ?? 0);
+            // The step's staves are hands — 0 the right, 1 the left — whatever page
+            // position the engraver gives the staff: on an art song the piano's staves
+            // are 1 and 2, and reported raw both read as the left hand.
+            pitchStaves.push(handOfStaff(staff, parts) === "left" ? 1 : 0);
             pitchHands.push(handOfStaff(staff, parts));
             // Each key is asked for on its own terms: its own accent over the standing
             // dynamic, and its own sounding length narrowed by its own articulation. The
