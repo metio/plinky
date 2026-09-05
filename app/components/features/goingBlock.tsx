@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
-import type { History, PracticeSummary } from "../../../core/history";
-import { type Scope, SCOPES, scopeDays, scopeSummary } from "../../../core/statsScope";
+import type { History } from "../../../core/history";
+import { type Scope, SCOPES, scopeDays, scopeSummary, weekSeries } from "../../../core/statsScope";
 import { m } from "../../paraglide/messages.js";
 import { SegmentedControl } from "../ui/segmentedControl";
 import { FeatureBoundary } from "./featureBoundary";
@@ -32,13 +32,10 @@ const SCOPE_LABEL: Record<Scope, () => string> = {
 // Month by default, which is the window somebody checking in on themselves means.
 export function GoingBlock({
     history,
-    summary,
     pieceTitle,
     now,
 }: {
     history: History;
-    // The seven-day series the week chart draws, already computed for the page.
-    summary: PracticeSummary | null;
     pieceTitle: (id: string) => string;
     now: Date;
 }) {
@@ -61,12 +58,14 @@ export function GoingBlock({
                 <ScopeTile scope={scope} summary={scopeSummary(history, scope, now)} now={now} />
             )}
 
-            {/* The seven bars answer "which days this week", which is a question only the
-                week has. Over a month or a year the report's own grid says it better, and
-                seven bars would be a chart of the wrong seven days. */}
-            {scope === "week" && summary && (
+            {/* The bars answer "which days this week", which is a question only the week
+                has. Over a month or a year the report's own grid says it better. They are
+                drawn from the same calendar week the tile reports on — Monday to today —
+                because a rolling seven days under a calendar-week tile is a chart of the
+                wrong days on every day but Sunday. */}
+            {scope === "week" && (
                 <FeatureBoundary feature="WeekChart">
-                    <WeekChart recent={summary.recent} />
+                    <WeekChart days={weekSeries(history, now)} />
                 </FeatureBoundary>
             )}
 

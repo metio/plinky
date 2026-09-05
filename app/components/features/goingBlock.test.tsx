@@ -23,19 +23,8 @@ const HISTORY: History = {
     "2026-08-19": 900,
 };
 
-const SUMMARY = {
-    totalNotes: 1840,
-    daysPracticed: 5,
-    recent: Array.from({ length: 7 }, (_, at) => ({
-        date: `2026-08-${13 + at}`,
-        notes: at * 10,
-    })),
-};
-
-const mount = (history: History = HISTORY) =>
-    renderWithServices(
-        <GoingBlock history={history} summary={SUMMARY} pieceTitle={(id) => id} now={NOW} />,
-    );
+const mount = (history: History = HISTORY, now: Date = NOW) =>
+    renderWithServices(<GoingBlock history={history} pieceTitle={(id) => id} now={now} />);
 
 describe("the block behind the period dial", () => {
     it("opens on the month, which is what checking in on yourself means", () => {
@@ -54,13 +43,36 @@ describe("the block behind the period dial", () => {
         expect(screen.getByText("1,840")).toBeTruthy();
     });
 
-    it("shows the seven-day chart only for the week it describes", () => {
-        // Seven bars answer "which days this week", a question only the week has. Over a
-        // month they would be a chart of the wrong seven days.
-        mount();
-        expect(screen.queryByText(m.progress_last_7_days())).toBeNull();
+    it("shows the week's bars only for the week it describes", () => {
+        // The bars answer "which days this week", a question only the week has. Over a
+        // month they would be a chart of the wrong days.
+        const { container } = mount();
+        expect(container.querySelector(".bg-chart-peak")).toBeNull();
         choose(m.scope_label, m.scope_week);
-        expect(screen.getByText(m.progress_last_7_days())).toBeTruthy();
+        // Wednesday: Monday, Tuesday and today.
+        expect(container.querySelectorAll(".bg-chart-peak")).toHaveLength(3);
+    });
+
+    it("draws the same week the tile counts, not the last seven days", () => {
+        // A Monday after six full days: the tile says nothing this week, and the bars
+        // under it must agree rather than show six bars from last week.
+        const history: History = {
+            "2026-08-18": 100,
+            "2026-08-19": 100,
+            "2026-08-20": 100,
+            "2026-08-21": 100,
+            "2026-08-22": 100,
+            "2026-08-23": 100,
+        };
+        const { container } = mount(history, new Date("2026-08-24T10:00:00"));
+        choose(m.scope_label, m.scope_week);
+        const labels = [...container.querySelectorAll("span.text-xs")].map(
+            (span) => span.textContent,
+        );
+        expect(labels.filter((label) => /^\d\d-\d\d$/.test(label ?? ""))).toEqual(["08-24"]);
+        const bars = [...container.querySelectorAll(".bg-chart-peak")] as HTMLElement[];
+        expect(bars).toHaveLength(1);
+        expect(bars[0].style.height).toBe("0%");
     });
 
     it("says nothing at all before anything has been played", () => {

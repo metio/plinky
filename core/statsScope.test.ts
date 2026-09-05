@@ -3,10 +3,30 @@
 
 import { describe, expect, it } from "vitest";
 import type { History } from "./history";
-import { inScope, scopeDays, scopeStart, scopeSummary } from "./statsScope";
+import { inScope, scopeDays, scopeStart, scopeSummary, weekSeries } from "./statsScope";
 
 // A Wednesday, so the week start is a real shift rather than today.
 const NOW = new Date("2026-08-19T10:00:00");
+
+describe("weekSeries", () => {
+    it("runs from Monday to today, one entry a day, with the notes of each", () => {
+        const history: History = { "2026-08-16": 70, "2026-08-17": 40, "2026-08-19": 900 };
+        expect(weekSeries(history, NOW)).toEqual([
+            { date: "2026-08-17", notes: 40 },
+            { date: "2026-08-18", notes: 0 },
+            { date: "2026-08-19", notes: 900 },
+        ]);
+    });
+
+    it("is today alone on a Monday, however full the days before it were", () => {
+        // The rolling seven days would draw six full bars here that the week tile above
+        // them counts as nothing.
+        const history: History = { "2026-08-18": 100, "2026-08-23": 100 };
+        expect(weekSeries(history, new Date("2026-08-24T10:00:00"))).toEqual([
+            { date: "2026-08-24", notes: 0 },
+        ]);
+    });
+});
 
 describe("scopeStart", () => {
     it("runs from the first of the month, not thirty days back", () => {

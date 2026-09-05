@@ -15,15 +15,19 @@ const week = (notes: number[]) =>
 // An ordinary week, with the quiet days a week actually has. Nothing here counts
 // consecutive days — a gap is just a gap.
 export const Ordinary: Story = {
-    render: () => <WeekChart recent={week([40, 0, 120, 90, 0, 60, 150])} />,
+    render: () => <WeekChart days={week([40, 0, 120, 90, 0, 60, 150])} />,
 };
 
 // One busy day among quiet ones. The bars scale to the busiest day, so this is
 // where the scaling either reads or flattens everything else to nothing.
 export const OneBigDay: Story = {
-    render: () => <WeekChart recent={week([8, 4, 0, 900, 6, 0, 12])} />,
+    render: () => <WeekChart days={week([8, 4, 0, 900, 6, 0, 12])} />,
 };
 
 // A week with nothing in it: the floor of 1 keeps the axis from dividing by zero,
 // and the chart still shows its shape rather than collapsing.
-export const Empty: Story = { render: () => <WeekChart recent={week([0, 0, 0, 0, 0, 0, 0])} /> };
+export const Empty: Story = { render: () => <WeekChart days={week([0, 0, 0, 0, 0, 0, 0])} /> };
+
+// A Wednesday: the week so far is three bars, not seven. The chart draws the calendar
+// week up to today rather than padding the days that have not happened yet.
+export const Midweek: Story = { render: () => <WeekChart days={week([40, 120, 90])} /> };

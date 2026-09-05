@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { todayKey } from "./daily";
+import { daysInRange } from "./dateKey";
 import type { History } from "./history";
 
 // Which window of time the You page's figures are about.
@@ -77,6 +78,20 @@ export function scopeDays(scope: Scope, now: Date): number | null {
     const from = new Date(`${start}T00:00:00`);
     const to = new Date(`${todayKey(now)}T00:00:00`);
     return Math.round((to.getTime() - from.getTime()) / 86_400_000) + 1;
+}
+
+export type DaySeries = { date: string; notes: number }[];
+
+// One entry per day of this week, Monday to today, with the notes played on each — the
+// bars under the week tile. Drawn from the same window scopeSummary("week") counts, so
+// the chart and the figures above it never describe two different sets of days; a
+// rolling seven days would disagree with the calendar week on every day but Sunday.
+export function weekSeries(history: History, now: Date): DaySeries {
+    const start = scopeStart("week", now) ?? todayKey(now);
+    return daysInRange(start, todayKey(now)).map((date) => ({
+        date,
+        notes: history[date] ?? 0,
+    }));
 }
 
 export type ScopeSummary = {
