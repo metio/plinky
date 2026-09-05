@@ -5,6 +5,7 @@ import { demoOf } from "../../core/theoryDemo";
 import { SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useSeededState } from "../hooks/useSeededState";
 import {
     entryById,
     GLOSSARY,
@@ -56,8 +57,10 @@ export default function Glossary() {
     // answer is the first thing on screen rather than something to hunt for. An unknown
     // or absent name simply opens the first entry.
     const [params] = useSearchParams();
-    const asked = entryById(params.get("symbol") ?? "");
-    const [selected, setSelected] = useState(asked?.id ?? FIRST.id);
+    const [selected, setSelected] = useSeededState(
+        params.get("symbol"),
+        (symbol) => entryById(symbol ?? "")?.id ?? FIRST.id,
+    );
     const entry = entryById(selected) ?? FIRST;
     const synth = useSynth();
     const scheduler = useScheduler();
@@ -127,8 +130,15 @@ export default function Glossary() {
             scheduler.cancel(until.current);
             until.current = null;
         }
+        // The timer is JS, the strikes are on the audio clock: cancelling the one leaves the
+        // other sounding under the new symbol's reading, which is the mush the rest exists
+        // to prevent.
+        synth.silenceAll();
         setSounding(false);
     };
+
+    // Leaving the page mid-phrase must not let the rest of it play over the next one.
+    useEffect(() => () => synth.silenceAll(), [synth]);
 
     return (
         // Wider than the rest of the app on purpose: this is the one page laid out as

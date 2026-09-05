@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter, useNavigate } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { memoryStore } from "../adapters/memoryStore";
@@ -83,6 +83,37 @@ describe("ear route", () => {
         choose(m.ear_exercise_label, m.ear_exercise_chords);
         // Index 1 is valid for both, so the position is kept — chords name it differently.
         expect(chosen(m.ear_level_label)).toBe(m.ear_chord_level_triads());
+    });
+
+    it("follows the address through history, not only on arrival", () => {
+        function Back() {
+            const navigate = useNavigate();
+            return (
+                <button type="button" onClick={() => navigate(-1)}>
+                    back
+                </button>
+            );
+        }
+        vi.spyOn(Math, "random").mockReturnValue(0);
+        const services = createServices({
+            audio: fakeAudioEngine(),
+            store: memoryStore(),
+            activity: createActivitySignal(),
+        });
+        render(
+            <ServicesProvider services={services}>
+                <MemoryRouter
+                    initialEntries={["/ear?exercise=intervals", "/ear?exercise=perfect-pitch"]}
+                    initialIndex={1}
+                >
+                    <Back />
+                    <Ear />
+                </MemoryRouter>
+            </ServicesProvider>,
+        );
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_perfect_pitch());
+        fireEvent.click(screen.getByRole("button", { name: "back" }));
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_intervals());
     });
 
     it("offers chords and scales, each with its own level names", () => {

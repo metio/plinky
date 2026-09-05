@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useSeededState } from "../hooks/useSeededState";
 import { Button } from "../components/ui/button";
 import { DailyReveal } from "../components/features/dailyReveal";
 import { ExportMenu } from "../components/features/exportMenu";
@@ -49,8 +50,9 @@ export default function DailyRoute() {
     const [today, setToday] = useState<Today | null>(null);
     // ?tab=warmup opens the warm-up directly — Today's warm-up offers a fresh drill,
     // and landing on the day's challenge instead would be a different thing entirely.
-    const [mode, setMode] = useState<"challenge" | "warmup">(
-        searchParams.get("tab") === "warmup" ? "warmup" : "challenge",
+    const [mode, setMode] = useSeededState<"challenge" | "warmup">(
+        searchParams.get("tab"),
+        (tab) => (tab === "warmup" ? "warmup" : "challenge"),
     );
 
     // Warm-up (the old sprint): a fresh generated phrase each run; bumping the
