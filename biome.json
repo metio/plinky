@@ -38,6 +38,11 @@
                             {
                                 "name": "useLatest",
                                 "stableResult": true
+                            },
+                            {
+                                "name": "useAsyncEffect",
+                                "closureIndex": 0,
+                                "dependenciesIndex": 1
                             }
                         ]
                     }

@@ -19,6 +19,7 @@ import {
 import { cursorOrdinal, seekToOrdinal } from "../lib/scoreCursor";
 import type { FingerMap } from "../stores/fingeringStore";
 import { usePrefs } from "./usePrefs";
+import { useAsyncEffect } from "./useAsyncEffect";
 
 // The score-rendering surface: loads a MusicXML piece into OpenSheetMusicDisplay,
 // re-renders it when a reading-mode input changes, and reports what the rest of the
@@ -309,132 +310,133 @@ export function useOsmdScore(
     // playback/practice first (a layout change mid-run would otherwise strand its running
     // state, the Stop label and the ticking metronome, with the timers gone).
     // biome-ignore lint/correctness/useExhaustiveDependencies: onReload/onRendered run through refs
-    useEffect(() => {
-        let cancelled = false;
-        setReady(false);
-        setLoadError(false);
-        paintedRef.current = false;
-        onReloadRef.current();
-        import("opensheetmusicdisplay")
-            .then(({ ColoringModes, OpenSheetMusicDisplay }) => {
-                // Kept for the colour toggle below, which runs long after this import.
-                coloringModesRef.current = ColoringModes;
-                appliedColorRef.current = colorNotesRef.current;
-                if (cancelled || !containerRef.current) {
-                    return;
-                }
-                const osmd = new OpenSheetMusicDisplay(containerRef.current, {
-                    autoResize: true,
-                    drawingParameters: "compact",
-                    // Focus mode: OSMD draws only this range, restating the clef, key
-                    // and metre at its start, so a handful of bars can be read as a
-                    // piece in their own right instead of hunted for on a full page.
-                    ...(focus
-                        ? {
-                              drawFromMeasureNumber: focus.from,
-                              drawUpToMeasureNumber: focus.to,
-                          }
-                        : {}),
-                    // We own follow-the-note scrolling ourselves (centerCursor centres the
-                    // current note in whatever scrolls, in both layouts), so OSMD's own
-                    // follow stays off — two mechanisms would fight over the scroll position.
-                    followCursor: false,
-                    // One continuous horizontal staffline that scrolls right, rather than
-                    // wrapping into rows — the treadmill reading mode.
-                    renderSingleHorizontalStaffline: treadmill,
-                    // The Boomwhacker reading aid: colour each notehead (and its stem) by
-                    // note name so a beginner reads pitch by hue. OSMD's CustomColorSet
-                    // handles hollow vs. solid noteheads itself, and the feedback halos ride
-                    // behind the notes, so this leaves both untouched. Off is the default
-                    // black notation (XML colour).
-                    ...colorOptions(colorNotesRef.current, ColoringModes),
-                });
-                osmdRef.current = osmd;
-                const rules = (
-                    osmd as unknown as {
-                        rules: {
-                            RenderXMeasuresPerLineAkaSystem: number;
-                            RenderMeasureNumbers: boolean;
-                            RenderMeasureNumbersOnlyAtSystemStart: boolean;
-                            RenderFingerings: boolean;
-                            PageLeftMargin: number;
-                            PageRightMargin: number;
-                        };
-                    }
-                ).rules;
-                // The engraver keeps its own margin inside the container, on top of the
-                // page's. Trimmed to a hairline, because the plate it draws on already has
-                // padding and a printed rule of its own, and a second margin inside the
-                // first is width the music never gets.
-                //
-                // Worth only what it lets the layout do: bars per row is a step, not a
-                // slope, so this and the plate's full-bleed width below `sm` are only worth
-                // anything together — see the comment in scoreCanvas.tsx, and
-                // scoreDensity.browser.test.tsx, which pins both.
-                rules.PageLeftMargin = SCORE_PAGE_MARGIN;
-                rules.PageRightMargin = SCORE_PAGE_MARGIN;
-                // Force a fixed number of bars per row when the player picks one, for
-                // bigger, more readable notation on a small screen; 0 fits them to width.
-                rules.RenderXMeasuresPerLineAkaSystem = barsPerRow;
-                // Number the first bar of each row when bar numbers are on, so the same
-                // rows are labelled every render; OSMD's default cadence otherwise moves
-                // the numbers around as the score re-flows.
-                rules.RenderMeasureNumbers = barNumbers;
-                rules.RenderMeasureNumbersOnlyAtSystemStart = true;
-                // Whether the printed fingering is drawn. The numbers are always baked into
-                // the sheet below, so flipping this rule and re-rendering shows or hides them
-                // without a reload — see the fingering-toggle effect. Set from a ref so a
-                // reload driven by another input still honours the live toggle.
-                rules.RenderFingerings = showFingeringsRef.current;
-                // Magnify the whole score for a player who needs bigger glyphs; applied
-                // before render and re-applied on every reload, and it scales the notation
-                // in treadmill mode too, where bars-per-row has no effect.
-                osmd.Zoom = noteScale;
-                // The notes themselves are settled above, once per change of them.
-                return osmd.load(source).then(() => {
-                    if (cancelled) {
+    useAsyncEffect(
+        (alive) => {
+            setReady(false);
+            setLoadError(false);
+            paintedRef.current = false;
+            onReloadRef.current();
+            import("opensheetmusicdisplay")
+                .then(({ ColoringModes, OpenSheetMusicDisplay }) => {
+                    // Kept for the colour toggle below, which runs long after this import.
+                    coloringModesRef.current = ColoringModes;
+                    appliedColorRef.current = colorNotesRef.current;
+                    if (!alive() || !containerRef.current) {
                         return;
                     }
-                    osmd.render();
-                    // Measure every bar's box off the fresh render, for the loop's
-                    // selection overlay and click-to-select. The cursor is free here
-                    // (nothing is playing), and a fresh render carries no selection.
-                    const svg = scoreSvg(containerRef.current);
-                    measureBoxesRef.current = svg ? collectMeasureBoxes(osmd, svg) : [];
-                    // A grand staff (two staves) can be drilled one hand at a
-                    // time; a single-staff score offers no such choice.
-                    setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
-                    const bars = osmd.Sheet?.SourceMeasures?.length ?? 1;
-                    setMeasureCount(bars);
-                    const freshPiece = loadedXmlRef.current !== xml;
-                    loadedXmlRef.current = xml;
-                    onRenderedRef.current({ bars, freshPiece });
-                    setReady(true);
-                    setRenderVersion((version) => version + 1);
+                    const osmd = new OpenSheetMusicDisplay(containerRef.current, {
+                        autoResize: true,
+                        drawingParameters: "compact",
+                        // Focus mode: OSMD draws only this range, restating the clef, key
+                        // and metre at its start, so a handful of bars can be read as a
+                        // piece in their own right instead of hunted for on a full page.
+                        ...(focus
+                            ? {
+                                  drawFromMeasureNumber: focus.from,
+                                  drawUpToMeasureNumber: focus.to,
+                              }
+                            : {}),
+                        // We own follow-the-note scrolling ourselves (centerCursor centres the
+                        // current note in whatever scrolls, in both layouts), so OSMD's own
+                        // follow stays off — two mechanisms would fight over the scroll position.
+                        followCursor: false,
+                        // One continuous horizontal staffline that scrolls right, rather than
+                        // wrapping into rows — the treadmill reading mode.
+                        renderSingleHorizontalStaffline: treadmill,
+                        // The Boomwhacker reading aid: colour each notehead (and its stem) by
+                        // note name so a beginner reads pitch by hue. OSMD's CustomColorSet
+                        // handles hollow vs. solid noteheads itself, and the feedback halos ride
+                        // behind the notes, so this leaves both untouched. Off is the default
+                        // black notation (XML colour).
+                        ...colorOptions(colorNotesRef.current, ColoringModes),
+                    });
+                    osmdRef.current = osmd;
+                    const rules = (
+                        osmd as unknown as {
+                            rules: {
+                                RenderXMeasuresPerLineAkaSystem: number;
+                                RenderMeasureNumbers: boolean;
+                                RenderMeasureNumbersOnlyAtSystemStart: boolean;
+                                RenderFingerings: boolean;
+                                PageLeftMargin: number;
+                                PageRightMargin: number;
+                            };
+                        }
+                    ).rules;
+                    // The engraver keeps its own margin inside the container, on top of the
+                    // page's. Trimmed to a hairline, because the plate it draws on already has
+                    // padding and a printed rule of its own, and a second margin inside the
+                    // first is width the music never gets.
+                    //
+                    // Worth only what it lets the layout do: bars per row is a step, not a
+                    // slope, so this and the plate's full-bleed width below `sm` are only worth
+                    // anything together — see the comment in scoreCanvas.tsx, and
+                    // scoreDensity.browser.test.tsx, which pins both.
+                    rules.PageLeftMargin = SCORE_PAGE_MARGIN;
+                    rules.PageRightMargin = SCORE_PAGE_MARGIN;
+                    // Force a fixed number of bars per row when the player picks one, for
+                    // bigger, more readable notation on a small screen; 0 fits them to width.
+                    rules.RenderXMeasuresPerLineAkaSystem = barsPerRow;
+                    // Number the first bar of each row when bar numbers are on, so the same
+                    // rows are labelled every render; OSMD's default cadence otherwise moves
+                    // the numbers around as the score re-flows.
+                    rules.RenderMeasureNumbers = barNumbers;
+                    rules.RenderMeasureNumbersOnlyAtSystemStart = true;
+                    // Whether the printed fingering is drawn. The numbers are always baked into
+                    // the sheet below, so flipping this rule and re-rendering shows or hides them
+                    // without a reload — see the fingering-toggle effect. Set from a ref so a
+                    // reload driven by another input still honours the live toggle.
+                    rules.RenderFingerings = showFingeringsRef.current;
+                    // Magnify the whole score for a player who needs bigger glyphs; applied
+                    // before render and re-applied on every reload, and it scales the notation
+                    // in treadmill mode too, where bars-per-row has no effect.
+                    osmd.Zoom = noteScale;
+                    // The notes themselves are settled above, once per change of them.
+                    return osmd.load(source).then(() => {
+                        if (!alive()) {
+                            return;
+                        }
+                        osmd.render();
+                        // Measure every bar's box off the fresh render, for the loop's
+                        // selection overlay and click-to-select. The cursor is free here
+                        // (nothing is playing), and a fresh render carries no selection.
+                        const svg = scoreSvg(containerRef.current);
+                        measureBoxesRef.current = svg ? collectMeasureBoxes(osmd, svg) : [];
+                        // A grand staff (two staves) can be drilled one hand at a
+                        // time; a single-staff score offers no such choice.
+                        setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
+                        const bars = osmd.Sheet?.SourceMeasures?.length ?? 1;
+                        setMeasureCount(bars);
+                        const freshPiece = loadedXmlRef.current !== xml;
+                        loadedXmlRef.current = xml;
+                        onRenderedRef.current({ bars, freshPiece });
+                        setReady(true);
+                        setRenderVersion((version) => version + 1);
+                    });
+                })
+                // A failed chunk import or MusicXML that OSMD can't load would otherwise
+                // leave ready false forever — a silently dead viewer with disabled
+                // controls and no explanation. Surface it instead.
+                .catch(() => {
+                    if (alive()) {
+                        setLoadError(true);
+                    }
                 });
-            })
-            // A failed chunk import or MusicXML that OSMD can't load would otherwise
-            // leave ready false forever — a silently dead viewer with disabled
-            // controls and no explanation. Surface it instead.
-            .catch(() => {
-                if (!cancelled) {
-                    setLoadError(true);
-                }
-            });
-        return () => {
-            cancelled = true;
-            // The effect body stops every playback mode before loading; the timer chains
-            // also clear themselves on unmount, so nothing here can fire into a torn-down
-            // score. A change of layout (bars-per-row, treadmill, transpose) re-runs this
-            // effect, building a fresh OSMD on the same container. OSMD renders into a
-            // new SVG rather than replacing the old one, so without removing the previous
-            // render its SVG stays behind and each switch stacks another copy. clear()
-            // frees OSMD's own state but leaves its <svg> in the DOM, so empty the
-            // container too.
-            osmdRef.current?.clear();
-            containerRef.current?.replaceChildren();
-        };
-    }, [source, xml, barsPerRow, noteScale, barNumbers, treadmill, focus]);
+            return () => {
+                // The effect body stops every playback mode before loading; the timer chains
+                // also clear themselves on unmount, so nothing here can fire into a torn-down
+                // score. A change of layout (bars-per-row, treadmill, transpose) re-runs this
+                // effect, building a fresh OSMD on the same container. OSMD renders into a
+                // new SVG rather than replacing the old one, so without removing the previous
+                // render its SVG stays behind and each switch stacks another copy. clear()
+                // frees OSMD's own state but leaves its <svg> in the DOM, so empty the
+                // container too.
+                osmdRef.current?.clear();
+                containerRef.current?.replaceChildren();
+            };
+        },
+        [source, xml, barsPerRow, noteScale, barNumbers, treadmill, focus],
+    );
 
     // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet
     // and any run in progress survive — the player can switch fingering on and off mid-play.

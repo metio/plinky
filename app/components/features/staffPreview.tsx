@@ -3,6 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef } from "react";
+import { useAsyncEffect } from "../../hooks/useAsyncEffect";
 
 // A read-only staff: loads MusicXML into OpenSheetMusicDisplay and renders it, with
 // none of the playback or matching the full viewer carries. OSMD needs a real DOM
@@ -23,35 +24,34 @@ export function StaffPreview({
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
 
-    useEffect(() => {
-        let cancelled = false;
-        import("opensheetmusicdisplay")
-            .then(({ OpenSheetMusicDisplay }) => {
-                if (cancelled || !containerRef.current) {
-                    return;
-                }
-                // Reuse one instance and reload it on each drill. A fresh instance per
-                // render leaves the previous staff in the container and draws the new
-                // one beneath it, so the staves pile up as the drill changes.
-                osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
-                    autoResize: true,
-                    drawingParameters: "compact",
-                });
-                const osmd = osmdRef.current;
-                return osmd.load(xml).then(() => {
-                    if (!cancelled) {
-                        osmd.render();
-                        onRendered?.();
+    useAsyncEffect(
+        (alive) => {
+            import("opensheetmusicdisplay")
+                .then(({ OpenSheetMusicDisplay }) => {
+                    if (!alive() || !containerRef.current) {
+                        return;
                     }
-                });
-            })
-            // A render failure leaves the chip picker below as the usable fallback,
-            // so a broken staff need not be surfaced.
-            .catch(() => {});
-        return () => {
-            cancelled = true;
-        };
-    }, [xml, onRendered]);
+                    // Reuse one instance and reload it on each drill. A fresh instance per
+                    // render leaves the previous staff in the container and draws the new
+                    // one beneath it, so the staves pile up as the drill changes.
+                    osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
+                        autoResize: true,
+                        drawingParameters: "compact",
+                    });
+                    const osmd = osmdRef.current;
+                    return osmd.load(xml).then(() => {
+                        if (alive()) {
+                            osmd.render();
+                            onRendered?.();
+                        }
+                    });
+                })
+                // A render failure leaves the chip picker below as the usable fallback,
+                // so a broken staff need not be surfaced.
+                .catch(() => {});
+        },
+        [xml, onRendered],
+    );
 
     // Release OSMD (and its resize listener) when the preview unmounts.
     useEffect(() => () => osmdRef.current?.clear(), []);
