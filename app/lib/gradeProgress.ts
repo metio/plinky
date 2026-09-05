@@ -51,6 +51,30 @@ function counts(mastery: Mastery, mode: DecayMode, now: number): boolean {
     return mode === "gentle" || !isLapsed(mastery, now);
 }
 
+// Where the player stands on the ladder, for choosing what to offer next: the grade held,
+// the grade being worked toward, and the pieces already mastered that no offer should
+// repeat. The Home panel's suggestion and the Stats page's up-next list are one shortlist
+// read at different lengths, so both derive it here rather than each on its own.
+//
+// Mastered is read without the decay mode on purpose: a lapsed piece is still a learned
+// one — it is due a refresh, not a first learning — so it is never offered as new.
+export function ladderStanding(items: GradedMastery[]): {
+    level: number;
+    workingGrade: number;
+    mastered: Set<string>;
+} {
+    const level = currentGrade(items);
+    return {
+        level,
+        workingGrade: Math.min(level + 1, MAX_GRADE),
+        mastered: new Set(
+            items
+                .filter((item) => item.mastery.learned && !item.mastery.backlog)
+                .map((item) => item.id),
+        ),
+    };
+}
+
 // The pieces of one grade that still count as mastered under the chosen decay. Written once
 // because the two readings below have to agree about what "in this grade" means: a count
 // that disagrees with the list it is a count of is the kind of thing nobody notices.
