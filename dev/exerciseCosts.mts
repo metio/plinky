@@ -17,10 +17,10 @@
 // exercise losing its incipit. Deriving them inside the bake leaves nothing to remember.
 
 import { readFileSync } from "node:fs";
-import { strFromU8, unzipSync } from "fflate";
+import { decompressMxl } from "../core/musicxmlFile.ts";
 import { gradeOf, pieceBoundaries, rawDifficulty } from "../core/scoreDifficulty.ts";
 import { encodeIncipit, readIncipit } from "../core/incipit.ts";
-import { gradeForCost } from "./grading.mts";
+import { gradeForScore } from "./grading.mts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import type { ExerciseConfig } from "../core/exerciseGen.ts";
 
@@ -32,15 +32,7 @@ export type CostableExercise = { id: string; kind: string; config?: ExerciseConf
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
 function readMusicXml(path: string): string {
-    const zip = unzipSync(new Uint8Array(readFileSync(path)));
-    const container = strFromU8(zip["META-INF/container.xml"] ?? new Uint8Array());
-    const named = /full-path="([^"]+)"/.exec(container)?.[1];
-    const entry =
-        (named ? zip[named] : undefined) ??
-        Object.entries(zip).find(
-            ([name]) => !name.startsWith("META-INF") && /\.(xml|musicxml)$/i.test(name),
-        )?.[1];
-    return entry ? strFromU8(entry) : "";
+    return decompressMxl(new Uint8Array(readFileSync(path))) ?? "";
 }
 
 // The exercise's notation, or null when the repository cannot produce it — a study whose
@@ -80,7 +72,7 @@ export function exerciseMeasure(
         cost,
         grade: entry.config
             ? gradeOf(linkedomXmlCodec, buildExerciseId(entry.config), xml)
-            : gradeForCost(cost, [...pieceBoundaries]),
+            : gradeForScore(linkedomXmlCodec, xml, cost, [...pieceBoundaries]),
         // Absent rather than empty when the opening cannot be read, so a row never carries
         // a field that decodes to nothing.
         ...(incipit === undefined ? {} : { incipit }),

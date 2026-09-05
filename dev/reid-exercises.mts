@@ -9,7 +9,7 @@
 
 import { readFileSync } from "node:fs";
 import { readFile, rename, writeFile } from "node:fs/promises";
-import { strFromU8, unzipSync } from "fflate";
+import { decompressMxl } from "../core/musicxmlFile.ts";
 import { songId } from "../core/songId.ts";
 
 const { parseExerciseId, generateExercise } = await import("../core/exerciseGen.ts");
@@ -20,15 +20,11 @@ const STUDIES = `${DIR}/studies`;
 type ExerciseMeta = { id: string; kind: "scale-arpeggio" | "study"; [key: string]: unknown };
 
 function readMxl(path: string): string {
-    const entries = unzipSync(new Uint8Array(readFileSync(path)));
-    const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
-    const root =
-        container.match(/full-path="([^"]+)"/)?.[1] ??
-        Object.keys(entries).find((name) => name.endsWith(".xml") && !name.startsWith("META-INF"));
-    if (!root || !entries[root]) {
-        throw new Error("no rootfile");
+    const xml = decompressMxl(new Uint8Array(readFileSync(path)));
+    if (xml === null) {
+        throw new Error(`no rootfile in ${path}`);
     }
-    return strFromU8(entries[root]);
+    return xml;
 }
 
 async function main() {

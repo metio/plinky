@@ -16,7 +16,7 @@ import { gradeOf, rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { parse } from "csv-parse/sync";
-import { strFromU8, unzipSync } from "fflate";
+import { decompressMxl } from "../core/musicxmlFile.ts";
 import { songId } from "../core/songId.ts";
 import type { ExerciseConfig } from "../core/exerciseGen.ts";
 
@@ -56,15 +56,11 @@ for (const tile of EXERCISE_TILES) {
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
 function readMusicXml(path: string): string {
-    const zip = unzipSync(new Uint8Array(readFileSync(path)));
-    const container = strFromU8(zip["META-INF/container.xml"] ?? new Uint8Array());
-    const root =
-        container.match(/full-path="([^"]+)"/)?.[1] ??
-        Object.keys(zip).find((name) => name.endsWith(".xml") && !name.startsWith("META-INF"));
-    if (!root || !zip[root]) {
-        throw new Error("no rootfile");
+    const xml = decompressMxl(new Uint8Array(readFileSync(path)));
+    if (xml === null) {
+        throw new Error(`no rootfile in ${path}`);
     }
-    return strFromU8(zip[root]);
+    return xml;
 }
 
 // The classic public-domain study composers (Hanon, Czerny, Burgmüller, …).
