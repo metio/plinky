@@ -85,6 +85,19 @@ export function foldForSearch(text: string): string {
     );
 }
 
+// An item's title and composer folded for search, once per item: folding is a unicode
+// normalisation and a regex over the string, and the shelf re-filters three thousand
+// items on every keystroke. Keyed weakly, so a list that goes away takes its folds along.
+const FOLDED = new WeakMap<MusicItem, { title: string; composer: string }>();
+export function searchFields(item: MusicItem): { title: string; composer: string } {
+    let fields = FOLDED.get(item);
+    if (!fields) {
+        fields = { title: foldForSearch(item.title), composer: foldForSearch(item.composer) };
+        FOLDED.set(item, fields);
+    }
+    return fields;
+}
+
 export function filterMusic(
     items: readonly MusicItem[],
     filter: MusicFilter,
@@ -118,10 +131,8 @@ export function filterMusic(
         if (!needle) {
             return true;
         }
-        return (
-            foldForSearch(item.title).includes(needle) ||
-            foldForSearch(item.composer).includes(needle)
-        );
+        const folded = searchFields(item);
+        return folded.title.includes(needle) || folded.composer.includes(needle);
     });
 }
 
