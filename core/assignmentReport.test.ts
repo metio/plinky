@@ -10,6 +10,7 @@ import {
     decodeReport,
     encodeReport,
     groupReports,
+    MAX_REPORT_ID_LENGTH,
     MAX_REPORT_ITEMS,
     MAX_WHO_LENGTH,
     NOT_PLAYED,
@@ -414,8 +415,13 @@ describe("what a crafted code may not do to the table", () => {
     });
 
     it("bounds a column heading arriving off the wire", () => {
-        const long = makeAssignment({ id: "x", name: "N", items: [{ id: "p".repeat(5000) }] });
+        // An assignment link refuses such an id, so the report is built from an assignment
+        // shaped by hand: the report codec bounds it on its own, whatever produced it.
+        const long: Assignment = {
+            ...makeAssignment({ id: "x", name: "N", items: [{ id: "p" }] }),
+            items: [{ id: "p".repeat(5000) }],
+        };
         const decoded = decodeReport(encodeReport(buildReport(long, scores({}), "A", 0)));
-        expect(decoded?.items[0]?.id.length).toBeLessThan(5000);
+        expect(decoded?.items[0]?.id.length).toBe(MAX_REPORT_ID_LENGTH);
     });
 });

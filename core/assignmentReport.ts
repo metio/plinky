@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { type Assignment, MAX_ITEMS, MAX_NAME_LENGTH } from "./assignment";
+import { type Assignment, MAX_ITEMS, MAX_NAME_LENGTH, MAX_ID_LENGTH } from "./assignment";
 import { toCsv } from "./csv";
 import { letterFor } from "./grade";
 import { isRecord } from "./guards";
@@ -44,7 +44,7 @@ export const MAX_WHO_LENGTH = 60;
 // each. MAX_REPORT_ITEMS matches the assignment's own MAX_ITEMS: a report answers a
 // list, so it can never honestly be longer than the longest list.
 export const MAX_REPORT_ITEMS = MAX_ITEMS;
-export const MAX_REPORT_ID_LENGTH = 200;
+export const MAX_REPORT_ID_LENGTH = MAX_ID_LENGTH;
 // A piece the device has no score for. Distinct from zero, which is a run that
 // happened and went badly — a teacher reads those differently.
 export const NOT_PLAYED = -1;

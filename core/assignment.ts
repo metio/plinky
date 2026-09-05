@@ -102,8 +102,18 @@ function cleanOrigin(value: unknown): string | undefined {
     return trimmed.length > 0 ? trimmed.slice(0, MAX_ORIGIN_LENGTH) : undefined;
 }
 
+// A piece id is twelve characters of base62; two hundred is room for any id scheme and
+// still a bound. Every other string a link carries is sliced, and an item id was the one
+// left unbounded — the one thing a crafted link could grow to the codec's ceiling.
+export const MAX_ID_LENGTH = 200;
+
 function cleanItem(value: unknown): AssignmentItem | null {
-    if (!isRecord(value) || typeof value.id !== "string" || value.id.length === 0) {
+    if (
+        !isRecord(value) ||
+        typeof value.id !== "string" ||
+        value.id.length === 0 ||
+        value.id.length > MAX_ID_LENGTH
+    ) {
         return null;
     }
     const tempo = cleanTempo(value.tempo);

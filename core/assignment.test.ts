@@ -41,6 +41,16 @@ const sample = (): Assignment =>
     });
 
 describe("makeAssignment", () => {
+    it("refuses an item id longer than any real one, as every other string is bounded", () => {
+        // Every other string a link carries is sliced; the item id was the one left
+        // unbounded, and a crafted link could grow it to the codec's ceiling.
+        const long = makeAssignment({ id: "set", name: "Set", items: [{ id: "x".repeat(300) }] });
+        const decoded = decodeAssignmentLink(encodeAssignmentLink(long));
+        expect(decoded?.items ?? []).toHaveLength(0);
+        const fine = makeAssignment({ id: "set", name: "Set", items: [{ id: "abc123" }] });
+        expect(decodeAssignmentLink(encodeAssignmentLink(fine))?.items).toHaveLength(1);
+    });
+
     it("drops malformed items and keeps the valid ones in order", () => {
         const assignment = makeAssignment({
             name: "Mixed",
