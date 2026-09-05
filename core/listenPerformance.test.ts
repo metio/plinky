@@ -131,6 +131,22 @@ describe("spellOutGlissando", () => {
     });
 });
 
+describe("spellOutGlissando with another hand under it", () => {
+    it("keeps the other hand's chord on the first sub-step and sweeps inside the advance", () => {
+        // A right-hand sweep opening on a beat where the left hand strikes a chord: the
+        // chord sounds once, with the sweep's first note, and the sweep fits the shortest
+        // length at the position rather than the gliding note's own.
+        const figure = spellOutGlissando(
+            step([60, 48], { lengths: [4, 1] }),
+            { from: 0, to: 1, arrivesAt: 72 },
+            0,
+        );
+        expect(figure[0]?.notes.map((one) => one.pitch)).toContain(48);
+        expect(figure.slice(1).every((one) => !one.notes.some((n) => n.pitch === 48))).toBe(true);
+        expect(figure.reduce((total, one) => total + (one.lengths[0] ?? 0), 0)).toBeCloseTo(1);
+    });
+});
+
 describe("rollChord", () => {
     it("spreads the roll inside the position's own advance, the shortest length at it", () => {
         // A rolled minim over a quaver in the other hand: the clock moves on when the

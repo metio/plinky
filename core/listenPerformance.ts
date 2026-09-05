@@ -191,7 +191,9 @@ export function spellOutGlissando(
     // The sweep fills the note it is written FROM. The note it arrives on is a position of
     // its own and sounds by itself afterwards, so the sweep stops short of it — otherwise
     // the arrival is struck twice, once ending the gesture and once on its own.
-    const quarters = (step.lengths[0] ?? from.soundQuarters) as number;
+    // The sweep takes the gliding note's own time, inside the position's advance — the
+    // shortest length at it, whichever staff that is on.
+    const quarters = Math.min(from.soundQuarters, ...step.lengths);
     // arrivesAt is a MIDI number read off the file, in the same space as the step's pitch.
     const swept = glissandoNotes(from.pitch, span.arrivesAt, quarters, fifths).slice(0, -1);
     if (swept.length < 2) {
@@ -200,9 +202,15 @@ export function spellOutGlissando(
     // Stretched back over the whole time, since dropping the arrival left a gap at the end.
     const each = quarters / swept.length;
     const figure = swept.map((one) => ({ ...one, quarters: each }));
+    // Whatever else the position strikes — the other hand's chord under the sweep — is
+    // struck with the sweep's first note and rings on; the sweep alone is what moves.
+    const others = step.notes.slice(1);
     return figure.map((one, index) => ({
         ...step,
-        notes: [{ ...from, pitch: one.pitch, soundQuarters: one.quarters }],
+        notes: [
+            ...(index === 0 ? others : []),
+            { ...from, pitch: one.pitch, soundQuarters: one.quarters },
+        ],
         lengths: [one.quarters],
         advancesCursor: index === figure.length - 1 && step.advancesCursor,
     }));
