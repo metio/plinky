@@ -468,6 +468,14 @@ async function main() {
         // catalogue id is a content fingerprint that carries no licence.
         const sourceName = file.split("/").pop() ?? file;
         const bucket = cfg.bucketLicense && sourceName.match(/^[a-z-]+-([a-z0-9]+)-/)?.[1];
+        // A source that names each piece's licence in its filename gets no default: a file
+        // whose bucket is missing or unknown is a piece whose licence nobody stated, and
+        // stating one for it — CC0, of all things — is how a licence gets invented.
+        if (cfg.bucketLicense && !(bucket && cfg.bucketLicense[bucket])) {
+            console.error(`  ${file}: no known licence bucket in the filename, skipped`);
+            dropped.ineligible++;
+            continue;
+        }
         const license = (bucket && cfg.bucketLicense?.[bucket]) || cfg.license;
         // The catalogue admits only commercially usable, derivative-friendly pieces: a paid
         // tier can't ship NonCommercial scores, and the fingering/grading we add is a
