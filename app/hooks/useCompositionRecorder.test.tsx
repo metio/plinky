@@ -190,6 +190,30 @@ describe("useCompositionRecorder in step entry", () => {
         expect(notes[1]!.startMs).toBeGreaterThanOrEqual(first.startMs + first.durationMs);
     });
 
+    it("writes a key held across the switch into step entry as one step", () => {
+        // The press lives only in the live state's open map, and the step side has no
+        // hold to close: without this the note that was audibly played never appears.
+        const view = renderHook(
+            ({ stepMs }: { stepMs: number | null }) => ({
+                recorder: useCompositionRecorder({ stepMs }),
+                midi: useMidiConnection(),
+            }),
+            { wrapper, initialProps: { stepMs: null as number | null } },
+        );
+        act(() => {
+            view.result.current.midi.pressKey(64);
+        });
+        expect(view.result.current.recorder.notes).toHaveLength(0);
+        view.rerender({ stepMs: 500 });
+        expect(view.result.current.recorder.notes).toEqual([
+            { pitch: 64, startMs: 0, durationMs: 500, velocity: expect.any(Number) },
+        ]);
+        act(() => {
+            view.result.current.midi.releaseKey(64);
+        });
+        expect(view.result.current.recorder.notes).toHaveLength(1);
+    });
+
     it("clears both ways of writing at once", () => {
         const { result } = mount({ stepMs: QUARTER });
         strike(result, 60);
