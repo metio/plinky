@@ -51,9 +51,16 @@ function section(from, to) {
     }
     return css.slice(start, end);
 }
+// Every token the block declares, with what it resolves to: the palette step named
+// inside `var(--color-…)` where there is one, else the literal value. Reading only the
+// var()-valued tokens let the literal ones — the surface, the ink, the accents — escape
+// both the both-themes check and the unused check.
 const declared = (src) =>
     new Map(
-        [...src.matchAll(/--color-([\w-]+):\s*var\(--color-([\w-]+)\)/g)].map((m) => [m[1], m[2]]),
+        [...src.matchAll(/--color-([\w-]+):\s*([^;]+);/g)].map((m) => [
+            m[1],
+            m[2].match(/^var\(--color-([\w-]+)\)/)?.[1] ?? m[2].trim(),
+        ]),
     );
 
 const light = declared(section("/* ── The colour tokens", "/* The dark half"));
