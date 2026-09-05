@@ -128,9 +128,6 @@ function stepsAtCursor(
     // The dynamic in force at this position, read once: it is a property of where the
     // cursor sits, not of any one note under it.
     const dynamicVolume = volumeAt(marks.dynamics, whole);
-    // Likewise the arch: a slur is a span, and every note under it is joined onward
-    // whether or not the engraving hung a mark on that particular note.
-    const slurredOnward = slurredOnwardAt(marks.slurs, whole);
     // A fermata belongs to the position too: it holds whatever is sounding, and a rest can
     // carry one. So it is read across everything under the cursor, including the notes the
     // practised hand does not play.
@@ -192,8 +189,9 @@ function stepsAtCursor(
                         articulation: expression.articulation,
                         // From the span: a note in the middle of an arch carries no slur of
                         // its own, and reading it as unslurred would grade a phrase played
-                        // legato as one played staccato.
-                        slurred: slurredOnward,
+                        // legato as one played staccato. On the note's own staff: an arch
+                        // over the tune says nothing about the bass under it.
+                        slurred: slurredOnwardAt(marks.slurs, whole, staff),
                     }),
                 // The same length before articulation narrows it: what this one key is
                 // written to last, which is what its hold indicator draws. A whole note

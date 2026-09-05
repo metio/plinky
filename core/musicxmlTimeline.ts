@@ -34,6 +34,9 @@ export type XmlNote = {
     voice: string;
     // 1-based, as the file writes it.
     staff: number;
+    // 0-based across every part, counted in part order — the same numbering the engraver
+    // gives its staves, so a span read from the file can be matched to an engraved note.
+    staffId: number;
     // Sounds together with the note before it rather than after it.
     chord: boolean;
     grace: boolean;
@@ -250,7 +253,13 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
         return { notes, measureStarts, directions, end, bars, keys };
     }
 
+    // Where each part's staves start in the score-wide numbering.
+    let staffOffset = 0;
     for (const part of partsOf(root, wanted)) {
+        const stavesDeclared = part.getElementsByTagName("staves")[0] ?? null;
+        const staves = Math.max(1, numberOf(stavesDeclared, 1));
+        const partStaffOffset = staffOffset;
+        staffOffset += staves;
         // Divisions are ticks per crotchet, declared in the first measure and changeable
         // later; a file that never declares them is broken, and one tick per crotchet at
         // least keeps the arithmetic finite.
@@ -352,6 +361,8 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     midi: rest ? null : midiOf(element),
                     voice: text(child(element, "voice")) || "1",
                     staff: Math.max(1, numberOf(child(element, "staff"), 1)),
+                    staffId:
+                        partStaffOffset + Math.max(1, numberOf(child(element, "staff"), 1)) - 1,
                     chord,
                     grace,
                     tie: tieOf(element),

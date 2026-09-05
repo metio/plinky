@@ -90,8 +90,9 @@ export function collectListenSteps(
                         marcato: expression.marcato,
                         // From the span, not the note: the engraving hangs a slur on its
                         // two end notes only, so a note in the middle of an arch reports
-                        // none of its own and would play detached.
-                        slurred: slurredOnwardAt(slurs, whole),
+                        // none of its own and would play detached. On the note's own
+                        // staff: an arch over the tune says nothing about the bass.
+                        slurred: slurredOnwardAt(slurs, whole, note.ParentStaff?.idInMusicSheet),
                         hand: handOfStaff(note.ParentStaff?.idInMusicSheet, parts),
                     });
                 }

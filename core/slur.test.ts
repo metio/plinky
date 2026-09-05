@@ -37,6 +37,17 @@ describe("where a slur joins notes", () => {
         expect(slurredOnwardAt(SPAN, 2 - 1e-9)).toBe(false);
     });
 
+    it("joins only the staff the arch is drawn on", () => {
+        // A slur over the right hand's tune says nothing about the left hand's staccato
+        // bass under it; a span that names no staff, or a note that reports none, still
+        // matches on time alone.
+        const spans = [{ from: 0, to: 1, staff: 0 }];
+        expect(slurredOnwardAt(spans, 0.5, 0)).toBe(true);
+        expect(slurredOnwardAt(spans, 0.5, 1)).toBe(false);
+        expect(slurredOnwardAt(spans, 0.5)).toBe(true);
+        expect(slurredOnwardAt([{ from: 0, to: 1 }], 0.5, 1)).toBe(true);
+    });
+
     it("joins a note covered by any of several arches", () => {
         const spans = [
             { from: 0, to: 0.5 },
