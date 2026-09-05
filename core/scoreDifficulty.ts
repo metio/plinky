@@ -223,37 +223,63 @@ export function readPace(doc: Document): { notesPerSecond: number; voices: numbe
     let tempo = 0;
     const beats: number[] = [];
     // Distinct voice numbers seen per staff — two lines in one hand, not two hands.
-    const voicesByStaff = new Map<string, Set<string>>();
-    for (const node of doc.querySelectorAll("divisions, sound, note")) {
-        if (node.tagName === "divisions") {
-            const value = Number(node.textContent ?? "");
-            if (Number.isFinite(value) && value > 0) {
-                divisions = value;
+    const voicesByStaff = new Map<number, Set<string>>();
+    // The player's staves, as parsePositions names them: on an art song the singer's
+    // line is not the pianist's to read, and its notes would otherwise set the speed and
+    // its voice would count as a third hand.
+    const counts = stavesPerPart(doc);
+    const parts = partsOf(counts);
+    const written = Array.from(
+        doc.querySelectorAll("score-partwise > part, score-timewise > part"),
+    );
+    const scanned: { nodes: Iterable<Element>; staves: number }[] =
+        written.length > 0
+            ? written.map((part, index) => ({
+                  nodes: part.querySelectorAll("divisions, sound, note"),
+                  staves: counts[index] ?? 1,
+              }))
+            : [{ nodes: doc.querySelectorAll("divisions, sound, note"), staves: 2 }];
+    let offset = 0;
+    for (const part of scanned) {
+        for (const node of part.nodes) {
+            if (node.tagName === "divisions") {
+                const value = Number(node.textContent ?? "");
+                if (Number.isFinite(value) && value > 0) {
+                    divisions = value;
+                }
+                continue;
             }
-            continue;
-        }
-        if (node.tagName === "sound") {
-            const value = Number(node.getAttribute("tempo") ?? "");
-            if (Number.isFinite(value) && value > 0 && tempo === 0) {
-                tempo = value;
+            if (node.tagName === "sound") {
+                const value = Number(node.getAttribute("tempo") ?? "");
+                if (Number.isFinite(value) && value > 0 && tempo === 0) {
+                    tempo = value;
+                }
+                continue;
             }
-            continue;
+            if (node.querySelector("rest")) {
+                continue;
+            }
+            const within = Number.parseInt(
+                node.querySelector("staff")?.textContent?.trim() ?? "1",
+                10,
+            );
+            const staff = offset + (Number.isInteger(within) && within > 0 ? within - 1 : 0);
+            if (staff !== parts.right && staff !== parts.left) {
+                continue;
+            }
+            const voice = node.querySelector("voice")?.textContent?.trim() ?? "1";
+            let seen = voicesByStaff.get(staff);
+            if (!seen) {
+                seen = new Set();
+                voicesByStaff.set(staff, seen);
+            }
+            seen.add(voice);
+            const beat = beatsPerNote(node, divisions);
+            if (beat !== null) {
+                beats.push(beat);
+            }
         }
-        if (node.querySelector("rest")) {
-            continue;
-        }
-        const staff = node.querySelector("staff")?.textContent?.trim() ?? "1";
-        const voice = node.querySelector("voice")?.textContent?.trim() ?? "1";
-        let seen = voicesByStaff.get(staff);
-        if (!seen) {
-            seen = new Set();
-            voicesByStaff.set(staff, seen);
-        }
-        seen.add(voice);
-        const beat = beatsPerNote(node, divisions);
-        if (beat !== null) {
-            beats.push(beat);
-        }
+        offset += part.staves;
     }
     // A score that states no tempo is read at a moderate one rather than assumed still.
     const played = tempo > 0 ? tempo : 100;
