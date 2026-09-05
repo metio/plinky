@@ -17,7 +17,7 @@ describe("note stats store", () => {
         store.record(run);
         store.record(run);
 
-        expect(store.load()["62"]).toEqual({ plays: 2, wrongs: 2, totalMs: 1200 });
+        expect(store.load()["62"]).toEqual({ plays: 2, wrongs: 2, totalMs: 1200, timed: 2 });
     });
 
     it("reads an unplayed device as no stats", () => {
