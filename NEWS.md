@@ -120,6 +120,29 @@ in front of it, the run read the next gap as a jump and stopped following the
 printed timing there. The ornament's little note no longer counts as the beat's
 length.
 
+**A tempo change partway through a piece is followed.** The timing behind a piece's
+grade read the whole piece at its opening tempo, so a slow coda counted as fast as
+the allegro before it. Every tempo mark counts now, and a handful of pieces have
+moved a little on the cost scale as a result.
+
+**The recorded piano plays on a device whose storage is full.** When the browser
+refused to keep a copy of a recording, the recording itself was thrown away with the
+refusal and the synthesised voice stood in. A recording that arrived is played
+whether or not it could be kept.
+
+**Slowest notes are measured over the readings that could be measured.** A note that
+opens a piece has no reading time on its first appearance, and that nothing was
+being averaged in — so the notes you meet first looked quicker to find than they
+are.
+
+**A link that lost its language keeps its details.** An address with no language in
+front of it is sent to one that has, and on the way it used to lose what came after
+the question mark and the hash — the hand a link asked for, the heading a help page
+was opened at. Both travel with it now.
+
+**The keyboard's note-name button says "Do re mi" when that is what it shows.** For
+a screen reader it announced "Off" instead.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to

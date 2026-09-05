@@ -27,8 +27,11 @@ export function NotationExample({ xml, label }: { xml: string; label: string }) 
                 if (cancelled || !hostRef.current) {
                     return;
                 }
+                // No autoResize: it registers a window resize listener the engine never
+                // removes, so every mount of an example left one behind for the life of
+                // the tab. The host scrolls sideways, so a static render is the right one.
                 display = new OpenSheetMusicDisplay(hostRef.current, {
-                    autoResize: true,
+                    autoResize: false,
                     drawingParameters: "compact",
                     drawTitle: false,
                     drawPartNames: false,
