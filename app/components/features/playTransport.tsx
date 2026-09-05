@@ -12,6 +12,7 @@ import { Button, IconButton } from "../ui/button";
 import { CloseIcon, FingersIcon, PlayIcon, RotateIcon, SpeakerIcon, StopIcon } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
 import { usePlayPiece, usePlayShell, usePlaySetup, usePlayRun } from "./playSession";
+import { TEMPO_MIN } from "../../../core/playback";
 
 // The play controls. Full screen keeps only what you reach for WHILE playing — Listen,
 // Practice/Stop, progress, restart, tempo, and the fingering-editor workspace. Settings
@@ -182,7 +183,7 @@ function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: nu
                     <span className="flex items-center gap-2">
                         <input
                             type="range"
-                            min={40}
+                            min={TEMPO_MIN}
                             max={180}
                             value={tempo}
                             onChange={(event) => setTempo(Number(event.target.value))}

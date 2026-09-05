@@ -69,6 +69,7 @@ import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
+import { TEMPO_MIN } from "../../../core/playback";
 
 // The one-time hint nudging a touch phone sideways for a wider keyboard.
 const ROTATE_HINT_ID = "rotate";
@@ -185,8 +186,11 @@ function usePlaySessionValue({
     const [focusRange, setFocusRange] = useState<{ from: number; to: number } | null>(null);
     // A link asks for a SPEED, not a tempo: "slowly" has to mean the same thing on a piece
     // marked 60 and one marked 160, so it scales the piece's own marking rather than
-    // replacing it. The floor of 20 is the slowest the tempo control itself goes.
-    const openingTempo = Math.max(20, Math.round((initialTempo ?? 100) * (options?.speed ?? 1)));
+    // replacing it. The floor is the slowest the tempo control itself goes.
+    const openingTempo = Math.max(
+        TEMPO_MIN,
+        Math.round((initialTempo ?? 100) * (options?.speed ?? 1)),
+    );
     // The tempo settings — the slider, the adaptive live pace, the metronome toggles and
     // the tempo trainer — held together. The metronome *effect* stays at its call site
     // below: it reads keepUp.running, which is created after this.
@@ -766,7 +770,12 @@ function usePlaySessionValue({
     // The listening transport — Listen and take-replay share one cursor walk, one clock,
     // one stop. It reads the loop range and tempo live, marks the score as painted when its
     // trail lands, and leaves the cursor shown if the matcher owns it.
-    const isPracticing = useCallback(() => matcher.practicing, [matcher.practicing]);
+    // Read live, like every other reader Listen is handed: Listen started from a run
+    // captures this in the closure it ends with, and by then the run it stopped has long
+    // since committed as stopped — a value snapshot would still say practising and leave
+    // the cursor parked on the last note.
+    const practicingRef = useLatest(matcher.practicing);
+    const isPracticing = useCallback(() => practicingRef.current, []);
     const listenPlayback = useListenPlayback({
         getOsmd,
         synth,
