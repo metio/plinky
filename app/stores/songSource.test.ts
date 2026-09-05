@@ -82,6 +82,43 @@ describe("songSource.resolve", () => {
         expect(asked.some((url) => url.endsWith("/songs/manifest.json"))).toBe(false);
     });
 
+    it("reads a slice once for the session, however often its pieces are opened", async () => {
+        // Opening a piece, leaving and opening it again — or two callers asking at once —
+        // must not fetch its slice again: the slice is memoised like the manifest is.
+        const asked: string[] = [];
+        const source = sourceOver((url) => {
+            asked.push(url);
+            return Promise.resolve(
+                url.includes("/songs/index/")
+                    ? Response.json([{ id: "s1", license: "CC0-1.0" }])
+                    : new Response(null, { status: 404 }),
+            );
+        });
+        await source.resolve("s1");
+        await source.resolve("s1");
+        await Promise.all([source.resolve("s1"), source.resolve("s1")]);
+        const slice = `/songs/index/${shardName("s1")}.json`;
+        expect(asked.filter((url) => url === slice)).toHaveLength(1);
+    });
+
+    it("asks for a slice again after a failure rather than remembering the gap", async () => {
+        let sliceCalls = 0;
+        const source = sourceOver((url) => {
+            if (!url.includes("/songs/index/")) {
+                return Promise.resolve(new Response(null, { status: 404 }));
+            }
+            sliceCalls++;
+            return Promise.resolve(
+                sliceCalls === 1
+                    ? new Response(null, { status: 500 })
+                    : Response.json([{ id: "s1", license: "CC0-1.0" }]),
+            );
+        });
+        await source.resolve("s1");
+        await source.resolve("s1");
+        expect(sliceCalls).toBe(2);
+    });
+
     it("is null — not unavailable — for an id its slice loaded and does not hold", async () => {
         // A slice that answered is an answer: the piece is not in the catalogue, so the
         // caller should fall through to the bundled and imported scores rather than
