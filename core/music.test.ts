@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    searchFields,
     dueCount,
     EMPTY_MUSIC_FILTER,
     filterMusic,
@@ -39,6 +40,21 @@ const mastery = (parts: Partial<Mastery>): Mastery => ({
 const emptyContext = { favorites: new Set<string>(), mastery: {}, now: NOW };
 
 describe("filterMusic", () => {
+    it("folds an item's title and composer once and hands back the same fold", () => {
+        // The shelf re-filters three thousand items on every keystroke; the folding is
+        // the expensive part and belongs to the item, not to the keystroke.
+        const item = {
+            id: "a",
+            title: "Étude",
+            composer: "Fauré",
+            grade: 1,
+            kind: "song" as const,
+        };
+        const first = searchFields(item as never);
+        expect(first.title).toBe("etude");
+        expect(searchFields(item as never)).toBe(first);
+    });
+
     it("keeps only the first occurrence of a duplicated id", () => {
         const items = [
             item({ id: "dup", title: "Imported copy" }),
