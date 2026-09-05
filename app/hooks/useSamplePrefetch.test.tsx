@@ -6,6 +6,7 @@ import { renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { NO_SCORE_MARKS } from "../../core/musicxmlMarks";
 import { fakeSampleSource } from "../adapters/fakeSampleSource";
 import { ServicesProvider } from "../contexts/services";
 import { useSamplePrefetch } from "./useSamplePrefetch";
@@ -22,18 +23,24 @@ describe("useSamplePrefetch", () => {
         // A player on the synthesised piano never pays for the recorded one — not a byte,
         // not a request.
         const samples = fakeSampleSource(null);
-        const { result } = renderHook(() => useSamplePrefetch({ getOsmd: () => null }), {
-            wrapper: world(samples),
-        });
+        const { result } = renderHook(
+            () => useSamplePrefetch({ getOsmd: () => null, marks: NO_SCORE_MARKS }),
+            {
+                wrapper: world(samples),
+            },
+        );
         result.current();
         expect(samples.prepared).toEqual([]);
     });
 
     it("asks for nothing when there is no engraving to read", () => {
         const samples = fakeSampleSource(null);
-        const { result } = renderHook(() => useSamplePrefetch({ getOsmd: () => null }), {
-            wrapper: world(samples),
-        });
+        const { result } = renderHook(
+            () => useSamplePrefetch({ getOsmd: () => null, marks: NO_SCORE_MARKS }),
+            {
+                wrapper: world(samples),
+            },
+        );
         result.current();
         expect(samples.prepared).toEqual([]);
     });
@@ -46,9 +53,12 @@ describe("useSamplePrefetch", () => {
         // own: the fetch belongs to the render finishing, and the render says so.
         const samples = fakeSampleSource(null);
         await samples.enable();
-        const { result } = renderHook(() => useSamplePrefetch({ getOsmd: () => null }), {
-            wrapper: world(samples),
-        });
+        const { result } = renderHook(
+            () => useSamplePrefetch({ getOsmd: () => null, marks: NO_SCORE_MARKS }),
+            {
+                wrapper: world(samples),
+            },
+        );
         expect(samples.prepared).toEqual([]);
         expect(typeof result.current).toBe("function");
     });
@@ -56,9 +66,12 @@ describe("useSamplePrefetch", () => {
     it("keeps the same callback across renders, so a caller may hold it in a ref", () => {
         const samples = fakeSampleSource(null);
         const getOsmd = () => null as OpenSheetMusicDisplay | null;
-        const { result, rerender } = renderHook(() => useSamplePrefetch({ getOsmd }), {
-            wrapper: world(samples),
-        });
+        const { result, rerender } = renderHook(
+            () => useSamplePrefetch({ getOsmd, marks: NO_SCORE_MARKS }),
+            {
+                wrapper: world(samples),
+            },
+        );
         const first = result.current;
         rerender();
         expect(result.current).toBe(first);

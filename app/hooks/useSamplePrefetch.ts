@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
+import type { ScoreMarks } from "../../core/musicxmlMarks";
 import { performanceOf } from "../../core/scorePerformance";
 import { useSampleSource } from "../contexts/services";
 import { collectMatchSteps } from "./useScoreMatcher";
@@ -34,8 +35,21 @@ import { collectMatchSteps } from "./useScoreMatcher";
 // Being told cannot miss. The score hook already announces a finished render — the same
 // callback that reseeds the hand and the loop — and an announcement is delivered once,
 // whatever the surrounding state happens to be.
-export function useSamplePrefetch({ getOsmd }: { getOsmd: () => OpenSheetMusicDisplay | null }) {
+export function useSamplePrefetch({
+    getOsmd,
+    marks,
+}: {
+    getOsmd: () => OpenSheetMusicDisplay | null;
+    // The score's own markings — the dynamics above all. Without them every note costs the
+    // even velocity, one recording layer is fetched, and a piece marked piano is played by
+    // the synthesised voice while the panel says the recordings are ready.
+    marks: ScoreMarks;
+}) {
     const samples = useSampleSource();
+    // Read at call time through a ref: the callback is held in a ref by its caller and
+    // must keep its identity, while the marks change with every piece.
+    const marksRef = useRef(marks);
+    marksRef.current = marks;
     return useCallback(() => {
         const osmd = getOsmd();
         if (!osmd || !samples.state().enabled) {
@@ -45,6 +59,6 @@ export function useSamplePrefetch({ getOsmd }: { getOsmd: () => OpenSheetMusicDi
         // plays from, so what is fetched is what will sound. Which recordings that means is
         // the source's question: it holds the manifest, and waiting for one here is what
         // made this never run at all.
-        void samples.prepare(performanceOf(collectMatchSteps(osmd, "both")));
+        void samples.prepare(performanceOf(collectMatchSteps(osmd, "both", marksRef.current)));
     }, [getOsmd, samples]);
 }

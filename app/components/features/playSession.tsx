@@ -596,7 +596,7 @@ function usePlaySessionValue({
     // waits on them: a note whose recording has not landed is played by the synth.
     // Called from onRendered above, through a ref because the callback is written before
     // the score hook has handed back the getter it needs. Not an effect: see the hook.
-    const prefetchSamples = useSamplePrefetch({ getOsmd });
+    const prefetchSamples = useSamplePrefetch({ getOsmd, marks });
     prefetchSamplesRef.current = prefetchSamples;
 
     const matcher = useScoreMatcher(getOsmd, {
