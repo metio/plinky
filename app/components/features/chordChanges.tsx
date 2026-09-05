@@ -32,6 +32,9 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
 
     const from = chordPitches(rootNote + Number(fromRoot), fromQuality);
     const to = chordPitches(rootNote + Number(toRoot), toQuality);
+    // Two octaves from the root, or as far as the chords reach: a ninth on a high root
+    // climbs past the top of two octaves and would lose its top note off the picture.
+    const top = Math.max(rootNote + 24, ...from, ...to);
     const motion = smoothestMotion(from, to);
 
     const noteText = (pitchClass: PitchClass) => NOTE_TEXT[noteNameOf(pitchClass)];
@@ -88,10 +91,10 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
             </dl>
 
             {/* Both chords in turn, so the ear gets the change the numbers describe. */}
-            <SoundingKeyboard score={scoreOf([from, to])} label={m.tools_hear_it()} />
+            <SoundingKeyboard score={scoreOf([from, to])} label={m.tools_hear_it()} to={top} />
             <SavePictureButton
                 from={rootNote}
-                to={rootNote + 24}
+                to={top}
                 keys={to.map((note) => ({ note }))}
                 caption={`${label(fromRoot, fromQuality)} → ${label(toRoot, toQuality)}`}
                 filename="plinky-chord-change"
