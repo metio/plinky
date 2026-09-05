@@ -167,6 +167,26 @@ describe("encode/decode round-trip", () => {
         expect(decodeComposition(encodeComposition(composition([], 120, 0)))).toBeNull();
     });
 
+    it("refuses a pitch that is not a key or a velocity that is not a level", () => {
+        // Finite is not playable: every voice that sounds a note indexes by its pitch,
+        // and a crafted link with a pitch of a thousand would throw its way through them.
+        const note = { startMs: 0, durationMs: 200, velocity: 90 };
+        expect(
+            decodeComposition(encodeComposition(composition([{ ...note, pitch: 1000 }]))),
+        ).toBeNull();
+        expect(
+            decodeComposition(encodeComposition(composition([{ ...note, pitch: -1 }]))),
+        ).toBeNull();
+        expect(
+            decodeComposition(
+                encodeComposition(composition([{ ...note, pitch: 60, velocity: 300 }])),
+            ),
+        ).toBeNull();
+        expect(
+            decodeComposition(encodeComposition(composition([{ ...note, pitch: 60 }]))),
+        ).not.toBeNull();
+    });
+
     it("returns null for a malformed code", () => {
         expect(decodeComposition("not-a-real-code")).toBeNull();
         expect(decodeComposition("")).toBeNull();
