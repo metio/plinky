@@ -3,7 +3,7 @@
 
 import { useLatest } from "./useLatest";
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { type ListenStep, performListenNote } from "../../core/listenPerformance";
@@ -309,5 +309,24 @@ export function useListenPlayback({
         tick();
     };
 
-    return { playing, activeReplayId, active, start, replay, stop, sounding };
+    // Stable entry points over the closures above, which are rebuilt every render so they
+    // read the live props: a consumer memoised on this hook's result must be able to hold,
+    // or the play session's contexts change value on every note.
+    const api = useLatest({ active, start, replay, stop });
+    const activeNow = useCallback(() => api.current.active(), []);
+    const startAt = useCallback((from: number) => api.current.start(from), []);
+    const replayTake = useCallback((take: Take) => api.current.replay(take), []);
+    const stopNow = useCallback(() => api.current.stop(), []);
+    return useMemo(
+        () => ({
+            playing,
+            activeReplayId,
+            sounding,
+            active: activeNow,
+            start: startAt,
+            replay: replayTake,
+            stop: stopNow,
+        }),
+        [playing, activeReplayId, sounding, activeNow, startAt, replayTake, stopNow],
+    );
 }

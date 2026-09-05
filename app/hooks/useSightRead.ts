@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AidPrefs } from "../../core/readingLevel";
 import {
     DEFAULT_STUDY_SECONDS,
@@ -99,16 +99,22 @@ export function useSightRead(saved: AidPrefs): SightRead {
         });
     }, [on, studySeconds, scheduler, stopTicking]);
 
-    return {
-        on,
-        setOn,
-        studySeconds,
-        setStudySeconds,
-        vanish,
-        setVanish,
-        countdown,
-        study,
-        cancel,
-        aids: on ? sightReadAids() : saved,
-    };
+    // The aids in force, one object for as long as the mode and the saved aids hold — a
+    // fresh one per render was what kept the play session's setup context from holding.
+    const aids = useMemo(() => (on ? sightReadAids() : saved), [on, saved]);
+    return useMemo(
+        () => ({
+            on,
+            setOn,
+            studySeconds,
+            setStudySeconds,
+            vanish,
+            setVanish,
+            countdown,
+            study,
+            cancel,
+            aids,
+        }),
+        [on, studySeconds, vanish, countdown, study, cancel, aids],
+    );
 }

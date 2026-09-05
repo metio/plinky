@@ -164,4 +164,12 @@ describe("what a sight-read takes away", () => {
         act(() => read().setOn(false));
         expect(read().aids).toEqual(SAVED);
     });
+
+    it("hands back the same object, and the same aids, across a render that changes nothing", () => {
+        const { read, view } = mount();
+        const before = read();
+        view.rerender(view.container.firstChild as never);
+        expect(read()).toBe(before);
+        expect(read().aids).toBe(before.aids);
+    });
 });

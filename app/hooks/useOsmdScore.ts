@@ -594,20 +594,40 @@ export function useOsmdScore(
         });
     }, [colorNotes, redrawInPlace]);
 
-    return {
-        getOsmd,
-        ready,
-        loadError,
-        staffCount,
-        measureCount,
-        measureBoxes,
-        centerCursor,
-        markPainted,
-        clearPaint,
-        painted,
-        resetPaint,
-        wipePaint,
-        renderVersion,
-        redrawing,
-    };
+    // One object for as long as nothing in it changes: every reader is a stable
+    // callback, so the piece context memoised on this can hold between renders.
+    return useMemo(
+        () => ({
+            getOsmd,
+            ready,
+            loadError,
+            staffCount,
+            measureCount,
+            measureBoxes,
+            centerCursor,
+            markPainted,
+            clearPaint,
+            painted,
+            resetPaint,
+            wipePaint,
+            renderVersion,
+            redrawing,
+        }),
+        [
+            getOsmd,
+            ready,
+            loadError,
+            staffCount,
+            measureCount,
+            measureBoxes,
+            centerCursor,
+            markPainted,
+            clearPaint,
+            painted,
+            resetPaint,
+            wipePaint,
+            renderVersion,
+            redrawing,
+        ],
+    );
 }
