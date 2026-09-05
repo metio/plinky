@@ -142,4 +142,10 @@ describe("buildSitemaps", () => {
 
         expect(() => build({ entries: many, noindex: [] })).toThrow(/50000/);
     });
+
+    it("refuses a child that would weigh more than a sitemap may", () => {
+        // Every URL carries the whole hreflang cluster, so the byte cap arrives long
+        // before the URL cap on a site with many locales.
+        expect(() => build({ maxBytes: 200 })).toThrow(/over the 200/);
+    });
 });

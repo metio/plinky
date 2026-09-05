@@ -23,27 +23,14 @@
 // Build-dependent, so it runs where the other build-dependent checks run rather than in
 // the pre-push loop: `nix develop --command ci-widths`.
 
-import { createReadStream, existsSync, statSync } from "node:fs";
-import { createServer } from "node:http";
-import { extname, join, normalize } from "node:path";
 import { chromium } from "playwright";
 import { staticPaths } from "./pages.mjs";
+import { pageUrl } from "./sitemap.mjs";
 import { builtLocales } from "./single-locale-build.mjs";
+import { serveStatic } from "./staticServer.mjs";
 
 // The narrowest phone still in wide use, the common Android width, and the common iPhone.
 const WIDTHS = [320, 360, 390];
-
-const TYPES = {
-    ".html": "text/html; charset=utf-8",
-    ".js": "text/javascript",
-    ".css": "text/css",
-    ".json": "application/json",
-    ".png": "image/png",
-    ".webp": "image/webp",
-    ".svg": "image/svg+xml",
-    ".woff2": "font/woff2",
-    ".mxl": "application/octet-stream",
-};
 
 const root = "build/client";
 // Whatever single language is on disk. Two would mean an all-locales `npm run build`,
@@ -67,22 +54,7 @@ if (built.length > 1) {
 const LOCALE = built[0];
 console.log(`Measuring the ${LOCALE} build.`);
 
-const server = createServer((request, response) => {
-    const url = decodeURIComponent((request.url ?? "/").split("?")[0]);
-    let file = join(root, normalize(url));
-    if (existsSync(file) && statSync(file).isDirectory()) {
-        file = join(file, "index.html");
-    }
-    if (!existsSync(file)) {
-        response.writeHead(404);
-        response.end();
-        return;
-    }
-    response.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream" });
-    createReadStream(file).pipe(response);
-});
-await new Promise((resolve) => server.listen(0, resolve));
-const port = server.address().port;
+const { port, close } = await serveStatic(root);
 
 const paths = staticPaths();
 const browser = await chromium.launch();
@@ -91,7 +63,7 @@ try {
     for (const width of WIDTHS) {
         const page = await browser.newPage({ viewport: { width, height: 720 } });
         for (const path of paths) {
-            const url = `http://localhost:${port}/${LOCALE}${path === "/" ? "/" : `${path}/`}`;
+            const url = pageUrl(`http://localhost:${port}`, LOCALE, path);
             await page.goto(url, { waitUntil: "domcontentloaded" });
             // Let anything that arrives after mount settle into its place first.
             await page.waitForTimeout(600);
@@ -152,7 +124,7 @@ try {
     }
 } finally {
     await browser.close();
-    server.close();
+    await close();
 }
 
 if (problems.length > 0) {
