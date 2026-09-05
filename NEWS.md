@@ -18,6 +18,13 @@ reviews and suggestions came up empty until you reloaded. Plinky now asks again 
 the next look, so the pieces and your progress on them are back the moment the
 connection is.
 
+**Key lights follow a channel change properly.** With a lighted keyboard, changing
+a navigation channel in Settings and pressing **Test the lights** again sent
+nothing at all — the app thought the same keys were already lit — and **Lights
+off** after a channel change put the lights out on the new channel while the
+instrument kept them burning on the old one. Every light now goes out on the
+channel that lit it, and the test chord lights again on the channels you just set.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to
