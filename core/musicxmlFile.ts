@@ -20,7 +20,23 @@ const MAX_UNPACKED_BYTES = 32 * 1024 * 1024;
 
 export function decompressMxl(bytes: Uint8Array): string | null {
     try {
-        const entries = unzipSync(bytes);
+        // Refused before inflating, off the sizes the zip's own directory declares — a
+        // bomb announces itself there — and again after, since a header can lie.
+        let declared = 0;
+        let refused = false;
+        const entries = unzipSync(bytes, {
+            filter: (file) => {
+                declared += file.originalSize;
+                if (file.originalSize > MAX_UNPACKED_BYTES || declared > MAX_UNPACKED_BYTES) {
+                    refused = true;
+                    return false;
+                }
+                return true;
+            },
+        });
+        if (refused) {
+            return null;
+        }
         const unpacked = Object.values(entries).reduce((total, entry) => total + entry.length, 0);
         if (unpacked > MAX_UNPACKED_BYTES) {
             return null;
