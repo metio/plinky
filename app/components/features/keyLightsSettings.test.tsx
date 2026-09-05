@@ -131,4 +131,19 @@ describe("KeyLightsSettings", () => {
         toggle(m.lights_enable);
         expect(prefsNow().lightProfile).toBe(DEFAULT_PREFS.lightProfile);
     });
+
+    it("does not bump the channel readouts when an unrelated preference changes", () => {
+        // Every preference change re-renders the panel; a readout handed a fresh element
+        // each time read as changed each time and scaled up for nothing.
+        const { view, prefsNow } = mount({ keyLights: true });
+        view.rerender(
+            <KeyLightsSettings
+                prefs={{ ...prefsNow(), sound: !prefsNow().sound }}
+                update={() => true}
+                keyLights={fakeKeyLights()}
+                deviceNames={[]}
+            />,
+        );
+        expect(document.querySelector(".scale-110")).toBeNull();
+    });
 });
