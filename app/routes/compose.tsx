@@ -101,7 +101,14 @@ export default function Compose() {
 
     // Click through the count-in and, once armed, through the take, so the player stays
     // in time and the captured onsets line up with the grid the staff is drawn on.
-    useMetronome(metronomeOn || transport.countingIn, tempo, beatsPerBar);
+    useMetronome(
+        metronomeOn || transport.countingIn,
+        tempo,
+        beatsPerBar,
+        1,
+        true,
+        transport.anchor,
+    );
 
     // A shared composition arrives as ?c=<code>; load it once so it can be viewed,
     // played, extended, re-exported and re-shared.

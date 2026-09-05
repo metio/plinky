@@ -20,16 +20,20 @@ function harness(
     beatsPerBar: number,
     subdivision = 1,
     prefsPatch: Partial<Prefs> = {},
+    anchor: number | null = null,
+    time = 0,
 ) {
     const audio = fakeAudioEngine();
+    audio.time = time;
     const prefs = createPrefsStore(memoryStore());
     prefs.save({ ...prefs.load(), ...prefsPatch });
     const wrapper = ({ children }: { children: ReactNode }) => (
         <ServicesProvider services={{ prefs, audio }}>{children}</ServicesProvider>
     );
-    const hook = renderHook(() => useMetronome(enabled, bpm, beatsPerBar, subdivision), {
-        wrapper,
-    });
+    const hook = renderHook(
+        () => useMetronome(enabled, bpm, beatsPerBar, subdivision, true, anchor),
+        { wrapper },
+    );
     return { audio, unmount: hook.unmount };
 }
 
@@ -44,6 +48,26 @@ describe("useMetronome", () => {
         expect(audio.clicks[0]?.kind).toBe("accent");
         expect(audio.clicks[0]?.time).toBeCloseTo(0.1);
         expect(audio.resumed).toBe(1);
+    });
+
+    it("lays its grid from the anchor it is handed, accent and all", () => {
+        // The count-in laid a grid at 0.1 s and the recorder's zero sits on it; started
+        // 0.37 s later, the clicks must fall on that grid's next point — 0.6 s, the second
+        // beat — rather than a fresh grid a tenth of a second from now.
+        const { audio } = harness(true, 120, 4, 1, {}, 0.1, 0.55);
+        expect(audio.clicks[0]?.time).toBeCloseTo(0.6);
+        expect(audio.clicks[0]?.kind).toBe("beat");
+        // Four beats on from the anchor is the next bar's downbeat, on the same grid.
+        audio.time = 2.0;
+        vi.advanceTimersByTime(25);
+        const downbeat = audio.clicks.find((click) => Math.abs(click.time - 2.1) < 1e-6);
+        expect(downbeat?.kind).toBe("accent");
+    });
+
+    it("waits for an anchor still ahead of it", () => {
+        const { audio } = harness(true, 120, 4, 1, {}, 0.1, 0);
+        expect(audio.clicks[0]?.time).toBeCloseTo(0.1);
+        expect(audio.clicks[0]?.kind).toBe("accent");
     });
 
     it("queues more ticks as the clock advances", () => {

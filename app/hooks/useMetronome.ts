@@ -24,6 +24,12 @@ export function useMetronome(
     // Accent the downbeat louder than the other beats; off makes every beat equal
     // — the Settings-page voice control.
     accent = true,
+    // An audio-clock time the grid is laid from, so the clicks fall where something
+    // else already decided a beat is: the compose count-in anchors the recording clock
+    // on its downbeat and hands the same moment here, or the clicks a player follows
+    // land a tenth of a second and a render behind the grid their notes are placed on.
+    // Null lays the grid from now.
+    anchor: number | null = null,
 ): void {
     const bpmRef = useLatest(bpm);
     const prefsStore = usePrefsStore();
@@ -44,6 +50,13 @@ export function useMetronome(
         const subs = Math.max(1, subdivision);
         let tick = 0; // counts subdivisions, so tick / subs is the beat
         let next = start + 0.1;
+        if (anchor !== null) {
+            // The first grid point not yet behind us, counted from the anchor so the
+            // accent falls on the anchor's beat and every bar after it.
+            const spacing = 60 / Math.max(1, bpmRef.current) / subs;
+            tick = Math.max(0, Math.ceil((start - anchor) / spacing - 1e-9));
+            next = anchor + tick * spacing;
+        }
 
         // Queue every subdivision tick inside the lookahead window, spacing each
         // from the tempo current at the moment it is queued.
@@ -85,5 +98,5 @@ export function useMetronome(
         schedule();
         const timer = scheduler.every(25, schedule);
         return () => scheduler.cancel(timer);
-    }, [enabled, beatsPerBar, subdivision, accent, audio, prefsStore, scheduler]);
+    }, [enabled, beatsPerBar, subdivision, accent, anchor, audio, prefsStore, scheduler]);
 }
