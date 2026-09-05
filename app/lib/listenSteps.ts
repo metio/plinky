@@ -4,19 +4,23 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { interpretedWeight } from "../../core/interpretation";
 import {
+    fitGraces,
     type ListenNote,
     type ListenStep,
     openingGlissando,
-    tremoloAt,
-    tremoloCarrier,
     rollChord,
     shapedByContour,
     spellOutGlissando,
     spellOutOrnament,
     spellOutTremolo,
+    tremoloAt,
+    tremoloCarrier,
 } from "../../core/listenPerformance";
 import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import { pedalledAt, ringUntil, softAt } from "../../core/pedal";
+import type { PositionNote } from "./scorePosition";
+
+const expression = (entry: PositionNote) => entry.expression;
 import { slurredOnwardAt } from "../../core/slur";
 import { readPosition } from "./scorePosition";
 import type { TremoloSpan } from "../../core/tremolo";
@@ -35,7 +39,6 @@ export function collectListenSteps(
     const cursor = osmd.cursor;
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it belongs to the position's place in the piece, not to the position.
-    const _dynamics = marks.dynamics;
     // Where the score asks for the sustain pedal: under it the harmony pools, and a note
     // keeps sounding past its written length until the pedal comes up.
     const pedals = marks.pedals;
@@ -57,9 +60,22 @@ export function collectListenSteps(
         const position = readPosition(osmd, parts, marks);
         const { whole, dynamicVolume } = position;
         const groups = position.groups;
+        // The beat's own advance is the shortest length among what falls ON the beat; the
+        // grace groups ahead of it take their time out of that rather than adding to it.
+        const beatGroup = groups[groups.length - 1] ?? [];
+        const beatLengths = beatGroup.map((entry) => entry.expression.notatedQuarters);
+        const fitted = fitGraces(
+            groups
+                .slice(0, -1)
+                .map((group) =>
+                    Math.max(0, ...group.map((entry) => entry.expression.notatedQuarters)),
+                ),
+            beatLengths.length > 0 ? Math.min(...beatLengths) : 0,
+        );
         for (const [order, group] of groups.entries()) {
             const notes: ListenNote[] = [];
             const lengths: number[] = [];
+            const isBeat = order === groups.length - 1;
             for (const entry of group) {
                 const { expression } = entry;
                 if (entry.sounds && expression.strike) {
@@ -80,10 +96,18 @@ export function collectListenSteps(
                 // advances by the notated rhythm regardless of what sounds.
                 lengths.push(expression.notatedQuarters);
             }
+            // The graces' time, out of the beat's: a beat group's lengths are trimmed by
+            // what its graces took, a grace group's is what it was given.
+            const graceTaken = fitted.graces.reduce((sum, one) => sum + one, 0);
+            const timed = isBeat
+                ? graceTaken > 0
+                    ? lengths.map((length) => Math.max(0, length - graceTaken))
+                    : lengths
+                : [fitted.graces[order] ?? 0];
             const step: ListenStep = {
                 notes,
                 dynamicVolume,
-                lengths,
+                lengths: timed,
                 whole,
                 measureIndex: position.measureIndex,
                 bpm: position.bpm,
@@ -103,7 +127,20 @@ export function collectListenSteps(
             // instruction to play a short figure in its place. Printed but not played, the
             // page and the sound disagree about what the bar contains, and a reader
             // learning to recognise the sign hears nothing happen where it is written.
-            const ornament = group.length === 1 ? readOrnament(group[0]?.note) : null;
+            // An ornament over one note is spelled out while the other hand's note under it
+            // sounds once; an ornament over one note of a chord in the same hand is not — the
+            // figure would have to be woven against the notes held under it, and a chord
+            // played as a run of single notes would be a worse lie than a chord played plainly.
+            const ornamented = group.find(
+                (entry) => entry.sounds && expression(entry).strike && readOrnament(entry.note),
+            );
+            const alone =
+                ornamented !== undefined &&
+                !group.some(
+                    (entry) =>
+                        entry !== ornamented && entry.sounds && entry.hand === ornamented.hand,
+                );
+            const ornament = alone && ornamented ? readOrnament(ornamented.note) : null;
             // A tremolo and a glissando are the same kind of instruction as an ornament —
             // shorthand for a figure — so they are spelled out the same way, and the graded
             // run still asks for the written notes. Taken in this order because a note can
@@ -122,8 +159,13 @@ export function collectListenSteps(
                 steps.push(...spellOutTremolo(step, tremolo, carrier));
             } else if (gliss) {
                 steps.push(...spellOutGlissando(step, gliss, fifthsAt(keys, whole)));
-            } else if (ornament) {
-                steps.push(...spellOutOrnament(step, ornament, fifthsAt(keys, whole)));
+            } else if (ornament && ornamented) {
+                steps.push(
+                    ...spellOutOrnament(step, ornament, fifthsAt(keys, whole), {
+                        pitch: ornamented.pitch,
+                        written: ornamented.expression.notatedQuarters,
+                    }),
+                );
             } else if (group.some((entry) => readArpeggio(entry.note))) {
                 steps.push(...rollChord(step));
             } else {

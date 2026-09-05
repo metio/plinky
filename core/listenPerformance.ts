@@ -117,22 +117,40 @@ export function spellOutOrnament(
     step: ListenStep,
     kind: OrnamentKind,
     fifths: number,
+    // The note carrying the sign and its own WRITTEN length — not the sounding one: a pedal
+    // may ring the note on past the bar, but the figure has only the note's time to fit
+    // into. Defaults to the position's first note, for a position that strikes one.
+    carrier: { pitch: number; written: number } = {
+        pitch: step.notes[0]?.pitch ?? 0,
+        written: step.lengths[0] ?? step.notes[0]?.soundQuarters ?? 0,
+    },
 ): ListenStep[] {
-    const note = step.notes[0];
+    const note = step.notes.find((one) => one.pitch === carrier.pitch);
     if (!note) {
         return [step];
     }
-    // The written length, not the sounding one: a pedal may ring the note on past the bar,
-    // but the figure has only the note's own time to fit into.
-    const written = step.lengths[0] ?? note.soundQuarters;
-    const figure = ornamentNotes(note.pitch, written, kind, fifths);
+    const figure = ornamentNotes(note.pitch, carrier.written, kind, fifths);
     if (figure.length < 2) {
         return [step];
     }
+    // Whatever else the position strikes — the other hand's note under the trill — is
+    // struck with the figure's first note and rings its own length.
+    const others = step.notes.filter((one) => one !== note);
+    // The figure fills the ornamented note's time; the position's own advance is the
+    // shortest length at it, and the last sub-step carries what is left of it.
+    const advance = step.lengths.length > 0 ? Math.min(...step.lengths) : carrier.written;
+    const figureTime = figure.reduce((sum, one) => sum + one.quarters, 0);
     return figure.map((one, index) => ({
         ...step,
-        notes: [{ ...note, pitch: one.pitch, soundQuarters: one.quarters }],
-        lengths: [one.quarters],
+        notes: [
+            { ...note, pitch: one.pitch, soundQuarters: one.quarters },
+            ...(index === 0 ? others : []),
+        ],
+        lengths: [
+            index === figure.length - 1
+                ? Math.max(one.quarters, advance - (figureTime - one.quarters))
+                : one.quarters,
+        ],
         advancesCursor: index === figure.length - 1 && step.advancesCursor,
     }));
 }
@@ -223,7 +241,10 @@ export function spellOutGlissando(
     span: GlissandoSpan,
     fifths: number,
 ): ListenStep[] {
-    const from = step.notes[0];
+    const from =
+        (span.pitch === undefined
+            ? undefined
+            : step.notes.find((one) => one.pitch === span.pitch)) ?? step.notes[0];
     if (!from) {
         return [step];
     }
@@ -243,7 +264,7 @@ export function spellOutGlissando(
     const figure = swept.map((one) => ({ ...one, quarters: each }));
     // Whatever else the position strikes — the other hand's chord under the sweep — is
     // struck with the sweep's first note and rings on; the sweep alone is what moves.
-    const others = step.notes.slice(1);
+    const others = step.notes.filter((one) => one !== from);
     return figure.map((one, index) => ({
         ...step,
         notes: [
@@ -304,7 +325,9 @@ export function performListenNote(
 ): { durationSeconds: number; velocity: number; voiced: number } {
     const { durationSeconds, velocity } = performNote(
         {
-            quarters: note.soundQuarters,
+            // Held as long as the position is: under a fermata the note rings through the
+            // pause rather than ending at its written length with silence after.
+            quarters: note.soundQuarters * step.stretch,
             articulation: note.articulation,
             accent: note.accent,
             marcato: note.marcato,
@@ -398,4 +421,25 @@ export function listenPerformanceOf(
     // with silence in a video that is only seconds long.
     const first = notes[0]?.startMs ?? 0;
     return notes.map((note) => ({ ...note, startMs: note.startMs - first }));
+}
+
+// How much of a position's time its grace notes may take. A grace note is written with a
+// length it does not have — it borrows from the note it decorates — so a walk that dwelt
+// each grace for its written length and then the beat for its own put every beat after
+// an ornament late, and Listen drifted from the onsets the graded run measures against.
+const GRACE_MAX_SHARE = 0.5;
+
+// The time each grace group takes and what the beat keeps, all within the position's own
+// advance: the graces lean on the beat they decorate, squeezed when there are more of
+// them than half the beat can carry.
+export function fitGraces(
+    graceQuarters: readonly number[],
+    advanceQuarters: number,
+): { graces: number[]; beat: number } {
+    const wanted = graceQuarters.reduce((sum, one) => sum + Math.max(0, one), 0);
+    const room = Math.max(0, advanceQuarters) * GRACE_MAX_SHARE;
+    const scale = wanted > room && wanted > 0 ? room / wanted : 1;
+    const graces = graceQuarters.map((one) => Math.max(0, one) * scale);
+    const taken = graces.reduce((sum, one) => sum + one, 0);
+    return { graces, beat: Math.max(0, advanceQuarters - taken) };
 }

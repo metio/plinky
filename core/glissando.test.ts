@@ -87,7 +87,7 @@ const note = (
 describe("readGlissandos", () => {
     it("reads the sweep and the note it arrives on", () => {
         expect(readGlissandos([note(0, 60, "start"), note(0.5, 72, "stop")])).toEqual([
-            { from: 0, to: 1, arrivesAt: 72 },
+            { from: 0, to: 1, arrivesAt: 72, pitch: 60 },
         ]);
     });
 

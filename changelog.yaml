@@ -4,6 +4,15 @@
 - date: 2026-09-05
   entries:
     - |-
+      **Listen plays the page more faithfully.** A grace note took its own written length
+      and then the note it decorates took its own, so every beat after an ornament arrived
+      late and a piece full of them drifted; the grace now borrows from the beat, as it is
+      played. A note under a fermata rang its written length and then stopped, leaving the
+      pause silent; it holds through the pause now. A trill over the other hand's note was
+      played plain; it is trilled, with the other hand sounding once beneath it. And a
+      glissando written on the upper note of a two-hand position sometimes swept the lower
+      one; the note carrying the mark is the one that slides.
+    - |-
       **A piece that speeds up is graded at the speed it reaches.** The difficulty
       model read a piece's pace off its opening tempo alone, so a study that starts
       slowly and then flies was graded as slow. It now reads each note at the tempo in

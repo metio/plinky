@@ -4,17 +4,18 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_VELOCITY } from "./expression";
 import {
+    fitGraces,
     type ListenNote,
-    type ListenStep,
     listenPerformanceOf,
+    type ListenStep,
     openingGlissando,
-    tremoloAt,
     performListenNote,
     rollChord,
     shapedByContour,
     spellOutGlissando,
     spellOutOrnament,
     spellOutTremolo,
+    tremoloAt,
 } from "./listenPerformance";
 import { SOFT_SCALE } from "./pedal";
 
@@ -377,5 +378,67 @@ describe("what a rendered performance carries", () => {
         const [under, open] = listenPerformanceOf([both], { startBpm: 120 });
         expect(under?.pedalled).toBe(true);
         expect(open?.pedalled).toBe(false);
+    });
+});
+
+describe("fitGraces", () => {
+    it("takes the graces' time out of the beat they decorate", () => {
+        // A written-eighth grace before a quarter: the beat keeps what the grace left.
+        expect(fitGraces([0.5], 1)).toEqual({ graces: [0.5], beat: 0.5 });
+    });
+
+    it("squeezes a run of graces into half the beat at most", () => {
+        const fitted = fitGraces([0.5, 0.5, 0.5], 1);
+        expect(fitted.graces.reduce((sum, one) => sum + one, 0)).toBeCloseTo(0.5);
+        expect(fitted.beat).toBeCloseTo(0.5);
+    });
+
+    it("gives a position with no graces its whole advance", () => {
+        expect(fitGraces([], 1)).toEqual({ graces: [], beat: 1 });
+    });
+});
+
+describe("a fermata", () => {
+    it("holds the note as long as it holds the position", () => {
+        const held = step([60], { stretch: 2 });
+        const plain = step([60]);
+        const long = performListenNote(held, held.notes[0]!, 120).durationSeconds;
+        const short = performListenNote(plain, plain.notes[0]!, 120).durationSeconds;
+        expect(long).toBeCloseTo(short * 2);
+    });
+});
+
+describe("which note glides", () => {
+    it("sweeps the note carrying the mark, whichever order the position lists it in", () => {
+        // The left hand's C2 is listed first; the glissando is written on the C5 above it.
+        const figure = spellOutGlissando(
+            step([36, 72], { lengths: [4, 4] }),
+            {
+                from: 0,
+                to: 1,
+                arrivesAt: 84,
+                pitch: 72,
+            },
+            0,
+        );
+        expect(figure[0]?.notes.map((note) => note.pitch)).toContain(36);
+        expect(figure.slice(1).every((one) => one.notes.every((note) => note.pitch > 72))).toBe(
+            true,
+        );
+        expect(figure.slice(1).some((one) => one.notes.some((note) => note.pitch === 36))).toBe(
+            false,
+        );
+    });
+});
+
+describe("an ornament over the other hand's note", () => {
+    it("spells the figure while the other hand's note sounds once beneath it", () => {
+        const both = step([48, 72], { lengths: [2, 1] });
+        const figure = spellOutOrnament(both, "trill", 0, { pitch: 72, written: 1 });
+        expect(figure.length).toBeGreaterThan(2);
+        expect(figure[0]?.notes.map((note) => note.pitch)).toEqual([72, 48]);
+        expect(figure.slice(1).every((one) => one.notes.length === 1)).toBe(true);
+        // The figure fills the trilled note's time and no more.
+        expect(figure.reduce((sum, one) => sum + (one.lengths[0] ?? 0), 0)).toBeCloseTo(1);
     });
 });
