@@ -3,16 +3,12 @@
 
 import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { stripAccompaniment } from "../../core/accompaniment";
-import { stripBeams } from "../../core/beams";
-import { simplify } from "../../core/simplify";
+import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Reduction } from "../../core/reduction";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import { type MeasureBox, SCORE_PAGE_MARGIN } from "../../core/scoreCanvas";
-import { transposeMusicXml } from "../../core/transpose";
-import { usePrefsStore, useScheduler, useXmlCodec } from "../contexts/services";
-import { annotateFingerings } from "../lib/fingerScore";
+import { useScheduler, useXmlCodec } from "../contexts/services";
+import { prepareScoreSource } from "../lib/scoreSource";
 import {
     collectMeasureBoxes,
     restoreNotePaint,
@@ -22,6 +18,7 @@ import {
 } from "../lib/scoreColor";
 import { seekToWhole } from "../lib/scoreCursor";
 import type { FingerMap } from "../stores/fingeringStore";
+import { usePrefs } from "./usePrefs";
 
 // The score-rendering surface: loads a MusicXML piece into OpenSheetMusicDisplay,
 // re-renders it when a reading-mode input changes, and reports what the rest of the
@@ -160,8 +157,10 @@ export function useOsmdScore(
         onFingeringRedraw: () => void;
     },
 ): OsmdScore {
-    const prefsStore = usePrefsStore();
     const xmlCodec = useXmlCodec();
+    // The player's reach, read live: a change of hand span is a change of the printed
+    // fingering, so it reloads the sheet like any other input to the notes.
+    const { handSpan } = usePrefs().prefs;
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     // The engraver's colouring enum, kept from the on-demand import for the toggle below.
     const coloringModesRef = useRef<ColoringModesEnum | null>(null);
@@ -278,10 +277,38 @@ export function useOsmdScore(
         );
     }, [treadmill, containerRef]);
 
+    // The MusicXML the engraver loads, derived once per change of what decides the notes.
+    // A layout-only reload — zoom, bars per row, bar numbers, the treadmill, a focus range
+    // — reuses it, rather than paying the pipeline's parses and the whole-piece fingering
+    // search again for notes that have not changed.
+    const source = useMemo(
+        () =>
+            prepareScoreSource(xmlCodec, {
+                xml,
+                transpose,
+                handSpan,
+                saved: showMine ? saved : undefined,
+                showAccompaniment,
+                reduction,
+                showBeams,
+            }),
+        [
+            xmlCodec,
+            xml,
+            transpose,
+            handSpan,
+            showMine,
+            saved,
+            showAccompaniment,
+            reduction,
+            showBeams,
+        ],
+    );
+
     // Reload OSMD whenever the score or a reading-mode input changes, stopping any
     // playback/practice first (a layout change mid-run would otherwise strand its running
     // state, the Stop label and the ticking metronome, with the timers gone).
-    // biome-ignore lint/correctness/useExhaustiveDependencies: onReload/onRendered run through refs; prefsStore/xmlCodec are stable
+    // biome-ignore lint/correctness/useExhaustiveDependencies: onReload/onRendered run through refs
     useEffect(() => {
         let cancelled = false;
         setReady(false);
@@ -363,32 +390,7 @@ export function useOsmdScore(
                 // before render and re-applied on every reload, and it scales the notation
                 // in treadmill mode too, where bars-per-row has no effect.
                 osmd.Zoom = noteScale;
-                // Suggested fingering belongs on the staff, personalised to the player's
-                // reach, so the suggestion sits on the note being read, not mapped onto a
-                // key. Transpose first, then annotate, so the printed fingering is computed
-                // for the key actually being played. It is always baked in — drawn or not
-                // per the rule above — so the toggle can redraw rather than reload.
-                const transposed =
-                    transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
-                const annotated = annotateFingerings(
-                    xmlCodec,
-                    transposed,
-                    prefsStore.load().handSpan,
-                    showMine ? saved : undefined,
-                );
-                // Drop the beams last, so short notes render with flags instead of
-                // beat groups — an easier read for a beginner. Notes and durations are
-                // untouched, so playback, timing and matching are unaffected.
-                const played = showAccompaniment
-                    ? annotated
-                    : stripAccompaniment(xmlCodec, annotated);
-                // Thin the texture last among the note-changing steps, so the fingering
-                // above was computed for the notes as written and the reduction inherits
-                // the numbers for the notes it keeps — working out a fingering for a
-                // thinned chord and then thinning it would print advice for a hand
-                // position nobody is in.
-                const reduced = reduction ? simplify(xmlCodec, played, reduction) : played;
-                const source = showBeams ? reduced : stripBeams(xmlCodec, reduced);
+                // The notes themselves are settled above, once per change of them.
                 return osmd.load(source).then(() => {
                     if (cancelled) {
                         return;
@@ -432,20 +434,7 @@ export function useOsmdScore(
             osmdRef.current?.clear();
             containerRef.current?.replaceChildren();
         };
-    }, [
-        xml,
-        transpose,
-        showMine,
-        saved,
-        barsPerRow,
-        noteScale,
-        barNumbers,
-        treadmill,
-        showBeams,
-        showAccompaniment,
-        reduction,
-        focus,
-    ]);
+    }, [source, xml, barsPerRow, noteScale, barNumbers, treadmill, focus]);
 
     // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet
     // and any run in progress survive — the player can switch fingering on and off mid-play.
