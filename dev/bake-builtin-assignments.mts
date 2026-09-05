@@ -16,9 +16,10 @@
 // `--check` is the CI guard.
 
 import { readFile, writeFile } from "node:fs/promises";
+import type { SongMeta } from "../core/catalogMeta.ts";
+import { readSongs } from "./manifest.mts";
 
 const DEFINITIONS = "dev/builtin-assignments.json";
-const SONGS = "public/songs/manifest.json";
 const OUT = "public/songs/builtin-assignments.json";
 
 export type Definition = {
@@ -30,14 +31,8 @@ export type Definition = {
     least: number;
 };
 
-export type Song = {
-    id: string;
-    title: string;
-    composer: string;
-    cost: number;
-    scoreKind?: string;
-};
-
+// What resolving a definition reads off a catalogue row.
+export type Song = Pick<SongMeta, "id" | "title" | "composer" | "cost" | "scoreKind">;
 // What ships: a name and its pieces, gentlest first, so working through a set is also
 // working up through it.
 export type BuiltinAssignment = { id: string; name: string; items: string[] };
@@ -91,7 +86,7 @@ async function resolveBuiltinAssignments(): Promise<{
     problems: string[];
 }> {
     const { sets }: { sets: Definition[] } = JSON.parse(await readFile(DEFINITIONS, "utf8"));
-    return resolveSets(sets, JSON.parse(await readFile(SONGS, "utf8")));
+    return resolveSets(sets, await readSongs());
 }
 
 // Writes the resolved sets, or with `check` reports whether what is on disk matches.

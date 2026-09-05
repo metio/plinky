@@ -19,25 +19,15 @@ import { rawDifficulty } from "../core/scoreDifficulty.ts";
 import { reachableGrades, reachOf } from "./measureReach.mts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { existsSync, readdirSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import type { SongMeta } from "../core/catalogMeta.ts";
+import { readSongs, writeSongs } from "./manifest.mts";
 
 const { decompressMxl } = await import("../core/musicxmlFile.ts");
 
 const DIR = "public/songs";
 
-type Entry = {
-    id: string;
-    title: string;
-    composer: string;
-    grade: number;
-    license: string;
-    tempo: number;
-    beatsPerBar: number;
-    bars: number;
-    scoreKind?: string;
-};
-
-const manifest: Entry[] = JSON.parse(await readFile(`${DIR}/manifest.json`, "utf8"));
+const manifest = await readSongs();
 
 // Measure a handful and print them, writing nothing. The full pass rewrites every row of a
 // file the rest of the tooling reads, so there has to be a way to see what it would produce
@@ -74,7 +64,7 @@ if (sample > 0) {
     process.exit(0);
 }
 
-const enriched = [];
+const enriched: SongMeta[] = [];
 let done = 0;
 for (const song of manifest) {
     const bytes = await readFile(scorePath(song.id));
@@ -99,5 +89,5 @@ for (const song of manifest) {
     }
 }
 
-await writeFile(`${DIR}/manifest.json`, JSON.stringify(enriched));
+await writeSongs(enriched);
 console.log(`Backfilled cost for ${enriched.length} songs.`);

@@ -16,6 +16,7 @@
 
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { SHARD_COUNT, shardOf } from "../core/catalogShard.ts";
+import { readSongs } from "./manifest.mts";
 
 const DIR = "public/songs/index";
 
@@ -43,7 +44,7 @@ function sliced(rows: readonly Row[]): Map<string, string> {
 // Returns whether the slices on disk already match the manifest. In write mode it makes
 // them match and returns true.
 export async function bakeShards(check: boolean): Promise<boolean> {
-    const manifest = JSON.parse(await readFile("public/songs/manifest.json", "utf8")) as Row[];
+    const manifest = await readSongs();
     const wanted = sliced(manifest);
 
     if (check) {

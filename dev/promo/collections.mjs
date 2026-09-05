@@ -16,9 +16,9 @@
 
 import { readFileSync } from "node:fs";
 import { folderFor, slug } from "./pieces.mjs";
+import { readSongsSync } from "../manifest.mts";
 
 const SETS = "public/songs/builtin-assignments.json";
-const MANIFEST = "public/songs/manifest.json";
 
 // A collection's folder, beside the per-composer ones. Prefixed so a set called "Preludes"
 // cannot land on a composer of the same slug.
@@ -32,7 +32,7 @@ export function folderForCollection(set) {
 // fifteen" rather than quietly publishing eleven and calling it the inventions.
 export function collections() {
     const sets = JSON.parse(readFileSync(SETS, "utf8"));
-    const manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
+    const manifest = readSongsSync();
     const byId = new Map(manifest.map((song) => [song.id, song]));
     return sets
         .map((set) => {

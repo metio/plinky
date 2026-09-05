@@ -11,11 +11,11 @@
 //
 // Usage: npm run promo:cuts [-- --only text] [--collections]
 
-import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import { PIECES } from "./promo/pieces.mjs";
 import { collectionPieces } from "./promo/collections.mjs";
 import { startDevServer } from "./promo/devServer.mjs";
+import { readSongsSync } from "./manifest.mts";
 
 const PORT = 5198;
 const ONLY = argValue("--only");
@@ -26,7 +26,7 @@ function argValue(flag) {
     return index > 0 ? process.argv[index + 1] : undefined;
 }
 
-const manifest = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
+const manifest = readSongsSync();
 // Our own server, on our own port, or nothing: a report that reads a stale module graph
 // answers for code that is not running.
 const server = await startDevServer(PORT);

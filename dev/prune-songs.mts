@@ -37,13 +37,15 @@
 // Removing songs shifts the grade boundaries, so run `npm run songs:bake` afterwards.
 
 import { midiOf } from "../core/notes.ts";
-import { readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { readdir, readFile, rm } from "node:fs/promises";
 import { sameOpening } from "../core/incipit.ts";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { canonicalComposer } from "../core/person.ts";
 import { BEYOND_REPAIR, beyondThePiano } from "../core/pianoRange.ts";
 import { quantiserMarks } from "../core/transcriptionQuality.ts";
 import { sameWork, workTitle } from "../core/workTitle.ts";
+import type { SongMeta } from "../core/catalogMeta.ts";
+import { readSongs, writeSongs } from "./manifest.mts";
 
 const OUT = "public/songs";
 // Duplicates a person found that the automatic test cannot: two copies of one work whose
@@ -58,8 +60,6 @@ const PAIRS = "dev/catalog-duplicates.json";
 // above. Data for the same reason the pairs are: an import rewrites the manifest, so a
 // deletion made by hand would come back with the next one.
 const EXCLUDED = "dev/catalog-excluded.json";
-
-type Song = { id: string; title: string; composer: string; incipit?: string; bars: number };
 
 // Where each .mxl actually lives. The manifest names a licence and the files sit in a
 // directory per licence — an earlier version of this deleted `public/songs/<id>.mxl`, which
@@ -99,10 +99,10 @@ function phantomVoice(xml: string): boolean {
 
 async function main() {
     const check = process.argv.includes("--check");
-    const manifest: Song[] = JSON.parse(await readFile(`${OUT}/manifest.json`, "utf8"));
+    const manifest = await readSongs();
     const at = await locate();
 
-    const machine: Song[] = [];
+    const machine: SongMeta[] = [];
     for (const song of manifest) {
         const path = at.get(song.id);
         if (!path) {
@@ -123,7 +123,7 @@ async function main() {
         title: workTitle(song.title),
         composer: canonicalComposer(song.composer || ""),
     }));
-    const extra: Song[] = [];
+    const extra: SongMeta[] = [];
     const taken = new Set<string>();
     for (const row of rows) {
         if (taken.has(row.song.id)) {
@@ -202,10 +202,7 @@ async function main() {
         return;
     }
 
-    await writeFile(
-        `${OUT}/manifest.json`,
-        JSON.stringify(manifest.filter((song) => !goneIds.has(song.id))),
-    );
+    await writeSongs(manifest.filter((song) => !goneIds.has(song.id)));
     for (const id of goneIds) {
         const path = at.get(id);
         if (path) {

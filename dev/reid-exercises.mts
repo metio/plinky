@@ -8,16 +8,16 @@
 // reads the existing manifest. Run: `npm run exercises:reid`.
 
 import { readFileSync } from "node:fs";
-import { readFile, rename, writeFile } from "node:fs/promises";
+import { rename } from "node:fs/promises";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { songId } from "../core/songId.ts";
+import type { ExerciseMeta } from "../core/catalogMeta.ts";
+import { readExercises, writeExercises } from "./manifest.mts";
 
 const { parseExerciseId, generateExercise } = await import("../core/exerciseGen.ts");
 
 const DIR = "public/exercises";
 const STUDIES = `${DIR}/studies`;
-
-type ExerciseMeta = { id: string; kind: "scale-arpeggio" | "study"; [key: string]: unknown };
 
 function readMxl(path: string): string {
     const xml = decompressMxl(new Uint8Array(readFileSync(path)));
@@ -28,7 +28,7 @@ function readMxl(path: string): string {
 }
 
 async function main() {
-    const manifest: ExerciseMeta[] = JSON.parse(await readFile(`${DIR}/manifest.json`, "utf8"));
+    const manifest = await readExercises();
     const out: ExerciseMeta[] = [];
     for (const exercise of manifest) {
         if (exercise.kind === "scale-arpeggio") {
@@ -46,7 +46,7 @@ async function main() {
             out.push({ ...exercise, id });
         }
     }
-    await writeFile(`${DIR}/manifest.json`, JSON.stringify(out));
+    await writeExercises(out);
     console.log(`Re-ided ${out.length} exercises.`);
 }
 

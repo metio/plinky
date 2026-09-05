@@ -10,9 +10,9 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { CREDIT_OVERRIDES } from "./creditOverrides.mjs";
+import { readSongsSync, writeSongsSync } from "./manifest.mts";
 
-const manifestPath = "public/songs/manifest.json";
-const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+const manifest = readSongsSync();
 
 let patchedManifest = 0;
 let patchedFiles = 0;
@@ -69,7 +69,7 @@ for (const song of manifest) {
     }
 }
 
-writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 0)}\n`);
+writeSongsSync(manifest);
 console.log(
     `enrich-credits: ${patchedManifest} manifest entries updated, ${patchedFiles} .mxl files rewritten (${Object.keys(CREDIT_OVERRIDES).length} overrides).`,
 );

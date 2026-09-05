@@ -28,6 +28,8 @@ import {
     readRange,
 } from "../core/scoreDifficulty.ts";
 import { buildExerciseId, type ExerciseConfig } from "../core/exerciseGen.ts";
+import type { SongMeta } from "../core/catalogMeta.ts";
+import { readExercises, readSongs } from "./manifest.mts";
 
 export type Anchor = {
     grade: number;
@@ -37,13 +39,8 @@ export type Anchor = {
     // The fewest pieces this collection may resolve to and still be what it claims.
     least: number;
 };
-export type Row = {
-    id: string;
-    title: string;
-    composer: string;
-    license: string;
-    scoreKind?: string;
-};
+// What the calibration reads off a catalogue row.
+export type Row = Pick<SongMeta, "id" | "title" | "composer" | "license" | "scoreKind">;
 
 const median = (values: number[]): number =>
     values.length === 0 ? 0 : [...values].sort((a, b) => a - b)[values.length >> 1]!;
@@ -114,7 +111,7 @@ export function unresolved(anchors: Anchor[], songs: Row[]): string[] {
 // so it costs nothing and can gate every push — measuring what they are worth means
 // parsing every score, which is the report's job rather than a gate's.
 async function check(): Promise<never> {
-    const rows: Row[] = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
+    const rows: Row[] = await readSongs();
     const { anchors }: { anchors: Anchor[] } = JSON.parse(
         await readFile("dev/grade-anchors.json", "utf8"),
     );
@@ -139,7 +136,7 @@ async function main() {
     if (process.argv.includes("--check")) {
         await check();
     }
-    const rows: Row[] = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
+    const rows: Row[] = await readSongs();
     const piano = rows.filter((row) => row.scoreKind === "solo-piano");
     const { anchors }: { anchors: Anchor[] } = JSON.parse(
         await readFile("dev/grade-anchors.json", "utf8"),
@@ -247,9 +244,7 @@ async function main() {
     // rather than a harvest that keeps growing, so cutting them into eight equal bands is
     // a statement about that curriculum and stays put unless the curriculum itself moves.
     // Pieces are the opposite case, which is why they are anchored instead.
-    const tiles: { kind: string; cost: number; config?: unknown }[] = JSON.parse(
-        await readFile("public/exercises/manifest.json", "utf8"),
-    );
+    const tiles = await readExercises();
     for (const kind of ["scale", "arpeggio"] as const) {
         const costs = tiles
             .filter((tile) => tile.kind === "scale-arpeggio" && kindOf(tile) === kind)

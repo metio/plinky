@@ -15,12 +15,12 @@
 // is an advert, and one that opens the piece under the viewer's hands is an invitation.
 
 import { mkdir, writeFile } from "node:fs/promises";
-import { readFile } from "node:fs/promises";
 import { folderFor, PIECES } from "./pieces.mjs";
 import { collectionPieces } from "./collections.mjs";
 import { CHANNELS, FOLLOW_US } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
 import { uploadText } from "./uploadText.mjs";
+import { readSongsSync } from "../manifest.mts";
 
 // Absent and present-but-empty both fall back. indexOf answers -1 for absent, and -1 + 1
 // is 0 — argv[0] is the node binary, so the naive form writes every file inside whatever
@@ -32,9 +32,7 @@ const FOLLOW_LINES = FOLLOW_US.map((c) => `${c.label}: ${c.href}`);
 
 const SITE = "https://plinky.fun";
 
-const manifest = JSON.parse(await readFile("public/songs/manifest.json", "utf8"));
-const items = Array.isArray(manifest) ? manifest : manifest.items;
-const byId = new Map(items.map((item) => [item.id, item]));
+const byId = new Map(readSongsSync().map((item) => [item.id, item]));
 
 // What a grade means to somebody reading a video description, who has never seen the
 // ladder. The number alone is jargon; this is the sentence it stands for.
