@@ -101,17 +101,33 @@ export function readTremolos(
         whole: number;
         wholes: number;
         midi: number | null;
+        // The staff and voice the note sits in: a tremolo rocks the chord that carries the
+        // mark, and the other hand's note struck at the same onset is not part of it.
+        staff?: number;
+        voice?: string;
         marks: { tremolo: { beams: number; part: "single" | "start" | "stop" } | null };
     }[],
 ): TremoloSpan[] {
     const spans: TremoloSpan[] = [];
-    const chordAt = (whole: number) =>
+    const chordAt = (whole: number, staff?: number, voice?: string) =>
         notes
-            .filter((one) => one.whole === whole && one.midi !== null)
+            .filter(
+                (one) =>
+                    one.whole === whole &&
+                    one.midi !== null &&
+                    one.staff === staff &&
+                    one.voice === voice,
+            )
             .map((one) => one.midi as number);
     // A tremolo opened and waiting for the note it rocks against. Held rather than paired by
     // position, because every note of a chord carries the mark and only one figure is meant.
-    let open: { at: number; wholes: number; beams: number } | null = null;
+    let open: {
+        at: number;
+        wholes: number;
+        beams: number;
+        staff?: number;
+        voice?: string;
+    } | null = null;
     for (const note of notes) {
         const mark = note.marks.tremolo;
         if (!mark || note.midi === null) {
@@ -128,11 +144,17 @@ export function readTremolos(
                 pair: null,
             });
         } else if (mark.part === "start") {
-            open ??= { at: note.whole, wholes: note.wholes, beams: mark.beams };
+            open ??= {
+                at: note.whole,
+                wholes: note.wholes,
+                beams: mark.beams,
+                staff: note.staff,
+                voice: note.voice,
+            };
         } else if (open !== null && note.whole > open.at) {
             const pair = [
-                { at: open.at, pitches: chordAt(open.at) },
-                { at: note.whole, pitches: chordAt(note.whole) },
+                { at: open.at, pitches: chordAt(open.at, open.staff, open.voice) },
+                { at: note.whole, pitches: chordAt(note.whole, note.staff, note.voice) },
             ];
             // One span per written note, each over its own time, both spelling the same
             // alternation — so the two run together into one unbroken figure.
