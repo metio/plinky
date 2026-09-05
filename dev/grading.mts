@@ -10,9 +10,27 @@
 // not a cut of whatever has been harvested: a grade has to mean the same thing before and
 // after an import, or every import re-grades pieces a player has already worked on.
 
-import { pieceBoundaries } from "../core/scoreDifficulty.ts";
+import { MAX_GRADE, parsePositions, pieceBoundaries } from "../core/scoreDifficulty.ts";
+import type { XmlCodec } from "../core/xml.ts";
 
 export { pieceBoundaries };
+
+// The grade of a score in hand, read the way the app's gradeOf reads it: a score with no
+// fingerable notes — empty or unreadable — is graded at the top so it cannot pad the
+// beginner pools, and everything else off its cost. Baking such a score at grade 1 from
+// its cost of 0 put a study in the library at grade 1 that the play page's chip called 8.
+export function gradeForScore(
+    codec: XmlCodec,
+    xml: string,
+    cost: number,
+    boundaries: number[],
+): number {
+    const hands = parsePositions(codec, xml);
+    if (hands.right.length + hands.left.length === 0) {
+        return MAX_GRADE;
+    }
+    return gradeForCost(cost, boundaries);
+}
 
 // Walk the boundaries exactly as the in-app gradeOf does, so the manifest grade and the
 // grade chip agree.
