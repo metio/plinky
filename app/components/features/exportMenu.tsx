@@ -60,23 +60,27 @@ export function ExportMenu({
         const source = prefs.showFingerings
             ? annotateFingerings(xmlCodec, transposed(), prefs.handSpan)
             : transposed();
-        // An off-screen host OSMD renders into; removed once the markup is captured.
+        // An off-screen host OSMD renders into; removed once the markup is captured —
+        // or once anything between here and there has failed, the engraver's own chunk
+        // not arriving included, so a press that prints nothing leaves nothing behind.
         const host = document.createElement("div");
         host.style.position = "absolute";
         host.style.left = "-99999px";
         host.style.top = "0";
         host.style.width = "1000px";
         document.body.appendChild(host);
-        // OSMD is heavy and browser-only; load it only on a print click so it stays
-        // out of this module's graph (and off the server bundle).
-        const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
-        const osmd = new OpenSheetMusicDisplay(host, {
-            autoResize: false,
-            drawingParameters: "compact",
-        });
+        let osmd: { clear(): void } | null = null;
         try {
-            await osmd.load(source);
-            osmd.render();
+            // OSMD is heavy and browser-only; load it only on a print click so it stays
+            // out of this module's graph (and off the server bundle).
+            const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
+            const engraver = new OpenSheetMusicDisplay(host, {
+                autoResize: false,
+                drawingParameters: "compact",
+            });
+            osmd = engraver;
+            await engraver.load(source);
+            engraver.render();
             const svg = host.querySelector("svg");
             if (!svg) {
                 return;
@@ -95,7 +99,7 @@ export function ExportMenu({
         } catch {
             // A score OSMD can't render simply doesn't print.
         } finally {
-            osmd.clear();
+            osmd?.clear();
             host.remove();
         }
     };

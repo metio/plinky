@@ -9,11 +9,14 @@ import { ExportMenu } from "./exportMenu";
 
 // OSMD is heavy and browser-only; print only needs it to leave an SVG in the
 // off-screen host, so the fake renders one and records the lifecycle calls.
-const osmdCalls = vi.hoisted(() => ({ load: 0, cleared: 0 }));
+const osmdCalls = vi.hoisted(() => ({ load: 0, cleared: 0, refuse: false }));
 vi.mock("opensheetmusicdisplay", () => ({
     OpenSheetMusicDisplay: class {
         private host: HTMLElement;
         constructor(host: HTMLElement) {
+            if (osmdCalls.refuse) {
+                throw new Error("no engraver");
+            }
             this.host = host;
         }
         async load() {
@@ -146,6 +149,21 @@ describe("ExportMenu", () => {
         // remain — only the -99999px staging div must be gone).
         expect(osmdCalls.cleared).toBeGreaterThan(0);
         expect(document.querySelector('div[style*="-99999"]')).toBeNull();
+    });
+
+    it("leaves nothing behind when the engraver cannot be had", async () => {
+        // Offline, or after a deploy rotated the chunks: the engraver never arrives. The
+        // off-screen host was already on the page, and every press used to leave another.
+        osmdCalls.refuse = true;
+        try {
+            openMenu();
+            fireEvent.click(screen.getByRole("button", { name: /Print/ }));
+            await waitFor(() => expect(screen.queryByRole("button", { name: /Print/ })).toBeNull());
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            expect(document.querySelector('div[style*="-99999"]')).toBeNull();
+        } finally {
+            osmdCalls.refuse = false;
+        }
     });
 
     it("falls back to a hidden iframe when the pop-up is blocked", async () => {
