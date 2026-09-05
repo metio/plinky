@@ -76,5 +76,11 @@
         "title": "O sacred Head now wounded",
         "composer": "Misc Traditional",
         "why": "Credited to \"Misc Traditional\", which is one of the corpora's filing buckets rather than anybody who wrote it. A composer field naming a category tells a reader nothing and gives the piece no page to belong to. The chorale is Hassler's melody as Bach set it, and the catalogue already holds it properly credited elsewhere; this copy names nobody at all. The import now refuses any credit beginning \"Misc\", so this is the last of them."
+    },
+    {
+        "id": "yazJ1B7TbQsf",
+        "title": "50 Simple piano Pieces, No. 46",
+        "composer": "A.Goedicke",
+        "why": "Alexander Goedicke died in 1957, so under the life+70 rule the importer applies his music enters the public domain on 1 January 2028, not yet. The row was admitted because the licence allowlist carried his surname as if it had; the surname is off the list until then, and this removes the piece that came in on it. It may return in 2028."
     }
 ]
