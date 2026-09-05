@@ -68,9 +68,15 @@ export function renderGraph(entries = ENTRIES) {
     return [...seen].sort();
 }
 
-// What every clip rendered by this code should be stamped with.
-export function renderStamp() {
+// What every clip rendered by this code, under these settings, should be stamped with.
+//
+// The settings are part of it: a clip rendered with the synthesised piano, at another
+// frame rate or another size, is a different clip from one this code would render now,
+// and a stamp that hashed the source alone let --resume keep it as current.
+export function renderStamp(settings = null) {
     const hash = createHash("sha256");
+    hash.update(JSON.stringify(settings));
+    hash.update("\0");
     for (const file of renderGraph()) {
         hash.update(relative(process.cwd(), file));
         hash.update("\\0");

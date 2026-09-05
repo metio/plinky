@@ -141,11 +141,9 @@ export function scoreKind(xml: string): ScoreKind {
     if (nonPianoReason(xml)) {
         return "other";
     }
-    const names = [
-        ...xml.matchAll(
-            /<(?:part-name|instrument-name)[^>]*>([^<]*)<\/(?:part-name|instrument-name)>/gi,
-        ),
-    ].map((match) => match[1]!.trim().toLowerCase());
+    // The same names nonPianoReason reads, with the staff labels a converted piano score
+    // gives its two staves already dropped: a "bass" staff is not a bass singer.
+    const names = instrumentNames(xml).split(" | ").filter(Boolean);
     let keyboard = false;
     let vocal = false;
     for (const name of names) {

@@ -167,7 +167,17 @@ function fileFor(piece, out) {
 
 // What the code that renders a clip currently hashes to. Written beside each finished clip
 // so --resume can tell one it made from one an older version made.
-const STAMP = renderStamp();
+const STAMP = renderStamp({
+    WIDTH,
+    HEIGHT,
+    FPS,
+    SECONDS,
+    NOTE_COLOR,
+    KEYBOARD_DEPTH,
+    SAMPLES,
+    YOUTUBE,
+    SHORTS,
+});
 
 function stampFor(piece, out) {
     return `${fileFor(piece, out)}.stamp`;

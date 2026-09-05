@@ -20,6 +20,11 @@ describe("scoreKind", () => {
         expect(scoreKind(score("Piano", "Piano"))).toBe("solo-piano");
     });
 
+    it("reads treble and bass staff labels as a piano, not as a bass singer", () => {
+        // A converted piano score names its two staves the way LilyPond does.
+        expect(scoreKind(score("Treble", "Bass"))).toBe("solo-piano");
+    });
+
     it("separates a singer over a piano from the piano alone", () => {
         // The distinction the catalogue could not make: both pass a gate, and nothing
         // recorded which, so Schubert accompaniments were graded as beginner pieces.
