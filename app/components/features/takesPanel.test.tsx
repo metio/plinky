@@ -89,9 +89,17 @@ describe("TakesPanel", () => {
     });
 
     it("copies a share link when challenging a friend with a take", async () => {
-        render(<TakesPanel {...base} takes={[mk("1")]} />);
-        fireEvent.click(screen.getByRole("button", { name: /challenge a friend/i }));
-        expect(await screen.findByText(/link copied/i)).toBeTruthy();
+        // A clipboard that takes the write: only a landed copy is confirmed.
+        const writeText = vi.fn(async () => {});
+        Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+        try {
+            render(<TakesPanel {...base} takes={[mk("1")]} />);
+            fireEvent.click(screen.getByRole("button", { name: /challenge a friend/i }));
+            expect(await screen.findByText(/link copied/i)).toBeTruthy();
+            expect(writeText).toHaveBeenCalledTimes(1);
+        } finally {
+            Reflect.deleteProperty(navigator, "clipboard");
+        }
     });
 
     it("replays the clicked take", () => {

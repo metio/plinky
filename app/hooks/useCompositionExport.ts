@@ -12,6 +12,7 @@ import { downloadMidi as saveMidi, downloadMusicXml as saveMusicXml } from "../l
 import { fileStem } from "../lib/printScore";
 import { useCopied } from "./useCopied";
 import { localizedHref } from "../components/ui/href";
+import { copyText } from "../lib/clipboard";
 
 // The three ways a take leaves the page: a share link on the clipboard (with the
 // transient "copied" flash), a Standard MIDI File, and MusicXML. Each reports a
@@ -23,13 +24,12 @@ export function useCompositionExport(composition: Composition, title: string) {
     const share = useCallback(() => {
         const code = encodeComposition(composition);
         const url = `${window.location.origin}${localizedHref("/compose")}?c=${code}`;
-        navigator.clipboard
-            ?.writeText(url)
-            // Only a landed clipboard write counts as a share.
-            .then(() => {
+        // Only a landed clipboard write counts as a share.
+        void copyText(url).then((landed) => {
+            if (landed) {
                 flashCopied();
-            })
-            .catch(() => {});
+            }
+        });
     }, [composition, flashCopied]);
 
     const downloadMidi = useCallback(() => {
