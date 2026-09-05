@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { pitchMidiOf } from "./notes";
 import type { XmlCodec } from "./xml";
 import type { Composition, RecordedNote } from "./composition";
 import { cleanBeatsPerBar } from "./meter";
-import { SEMITONE } from "./notes";
 
 // Reads MusicXML back into a composition, the inverse of the toMusicXml sketch, so a
 // score downloaded on one device — or exported from notation software — can be loaded
@@ -31,16 +31,7 @@ function durationOf(parent: Element): number {
 }
 
 function midiOf(pitch: Element): number | null {
-    const step = text(pitch, "step");
-    const octave = text(pitch, "octave");
-    if (step === null || octave === null || SEMITONE[step] === undefined) {
-        return null;
-    }
-    const alter = Number(text(pitch, "alter") ?? "0");
-    const midi = (Number(octave) + 1) * 12 + SEMITONE[step]! + alter;
-    // A non-numeric <octave> or <alter> yields NaN, which would slip through a later
-    // `!== null` check and poison the timeline; treat it as an unreadable pitch.
-    return Number.isFinite(midi) ? midi : null;
+    return pitchMidiOf(pitch);
 }
 
 // Parses MusicXML text into a composition, or null if it holds no readable score. The

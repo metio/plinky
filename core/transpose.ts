@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { midiOf } from "./notes";
 import { SEMITONE } from "./notes";
 import type { XmlCodec } from "./xml";
 import { LETTERS } from "./notes";
@@ -101,7 +102,7 @@ export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: numbe
         }
         const octave = Number(pitch.querySelector("octave")?.textContent ?? "4");
         const alter = Number(pitch.querySelector("alter")?.textContent ?? "0");
-        const midi = (octave + 1) * 12 + semitone + alter;
+        const midi = midiOf(step, octave, alter);
 
         const movedLetter = letter + stepShift;
         // The index is reduced into 0–6, so a letter is always found; the ?? only

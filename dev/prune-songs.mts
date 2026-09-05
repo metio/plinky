@@ -36,6 +36,7 @@
 //
 // Removing songs shifts the grade boundaries, so run `npm run songs:bake` afterwards.
 
+import { midiOf } from "../core/notes.ts";
 import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { sameOpening } from "../core/incipit.ts";
 import { decompressMxl } from "../core/musicxmlFile.ts";
@@ -88,10 +89,7 @@ function phantomVoice(xml: string): boolean {
     for (const [, step, alterText, octave] of xml.matchAll(
         /<pitch>\s*<step>([A-G])<\/step>\s*(?:<alter>(-?\d+)<\/alter>\s*)?<octave>(-?\d+)<\/octave>/g,
     )) {
-        const midi =
-            (Number(octave) + 1) * 12 +
-            ([0, 2, 4, 5, 7, 9, 11]["CDEFGAB".indexOf(step as string)] as number) +
-            Number(alterText ?? 0);
+        const midi = midiOf(step as string, Number(octave), Number(alterText ?? 0));
         if (beyondThePiano(midi) > BEYOND_REPAIR) {
             return true;
         }

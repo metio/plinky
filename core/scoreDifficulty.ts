@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { pitchMidiOf } from "./notes";
 import { stavesPerPart } from "./accompaniment";
 import { fingerPositions, positionsCost } from "./fingering";
-import { SEMITONE } from "./notes";
 import { partsOf } from "./parts";
 import { gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
 import type { XmlCodec } from "./xml";
@@ -18,20 +18,8 @@ import type { XmlCodec } from "./xml";
 
 function midiOf(note: Element): number | null {
     const pitch = note.querySelector("pitch");
-    if (!pitch) {
-        return null; // a rest, or an unpitched note — nothing to finger
-    }
-    const step = pitch.querySelector("step")?.textContent?.trim() ?? "";
-    const semitone = SEMITONE[step];
-    if (semitone === undefined) {
-        return null;
-    }
-    const octave = Number(pitch.querySelector("octave")?.textContent ?? "4");
-    const alter = Number(pitch.querySelector("alter")?.textContent ?? "0");
-    const midi = (octave + 1) * 12 + semitone + alter;
-    // A non-numeric <octave> or <alter> yields NaN; skip it rather than fingering
-    // a note that has no real pitch.
-    return Number.isFinite(midi) ? midi : null;
+    // A rest, or an unpitched note — nothing to finger.
+    return pitch ? pitchMidiOf(pitch) : null;
 }
 
 // A score's two hands, with the time the player has between one position and the next.
