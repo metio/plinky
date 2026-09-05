@@ -48,7 +48,7 @@ function ChannelStepper({
         <div className="flex flex-wrap items-center gap-3">
             <span className="text-sm text-body">{label}</span>
             <Stepper
-                value={<span className="tabular-nums">{value}</span>}
+                value={value}
                 onDecrement={() => onChange(value - 1)}
                 onIncrement={() => onChange(value + 1)}
                 canDecrement={value > MIN_CHANNEL}
