@@ -17,14 +17,14 @@ import {
 } from "../../core/keepUp";
 import { useScheduler } from "../contexts/services";
 import type { Hand } from "../../core/matcher";
-import { NOMINAL_BPM } from "../../core/elapsed";
+import { NOMINAL_BPM, advanceQuarters } from "../../core/elapsed";
 import { readParts, readStartTempo } from "../lib/scoreExpression";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalos } from "../lib/scoreColor";
 import { useLatest } from "./useLatest";
 import { useTimerChain } from "./useTimerChain";
-import { readPosition } from "../lib/scorePosition";
+import { readPosition, type ScorePosition } from "../lib/scorePosition";
 import { NO_SCORE_MARKS } from "../../core/musicxmlMarks";
 import { jumpsBack } from "../../core/matcher";
 
@@ -40,16 +40,28 @@ type NoteSink = {
 // cursor reset. The clock then reads its beats from this array, so the run reads
 // no musical data off the live cursor — the cursor only mirrors the position and
 // carries the notes the painter recolours.
+// The lengths at a position, with the other voice's next onset among them when it
+// arrives before the shortest note here ends — so the beat dwells to the next onset.
+function withAdvance(lengths: number[], whole: number, nextWhole: number | undefined): number[] {
+    const shortest = lengths.length > 0 ? Math.min(...lengths) : 0;
+    const advance = advanceQuarters(whole, nextWhole, shortest);
+    return advance < shortest ? [...lengths, advance] : lengths;
+}
+
 export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): KeepUpStep[] {
     const cursor = osmd.cursor;
     const parts = readParts(osmd);
     cursor.reset();
     const steps: KeepUpStep[] = [];
+    // The ornament split, the tie, which hand a note is — the same reading the matcher
+    // and Listen make, through the same reader. No marks: keep-up keeps the engraver's
+    // tempo. Walked first, then read: how long a beat lasts is the distance to the next.
+    const positions: ScorePosition[] = [];
     while (!cursor.iterator.EndReached) {
-        // The ornament split, the tie, which hand a note is — the same reading the
-        // matcher and Listen make, through the same reader. No marks: keep-up keeps the
-        // engraver's tempo.
-        const position = readPosition(osmd, parts, NO_SCORE_MARKS, hand);
+        positions.push(readPosition(osmd, parts, NO_SCORE_MARKS, hand));
+        cursor.next();
+    }
+    for (const [at, position] of positions.entries()) {
         const { whole } = position;
         for (const [order, group] of position.groups.entries()) {
             const play: KeepUpStep["play"] = [];
@@ -78,13 +90,12 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                 whole,
                 play,
                 accompany,
-                lengths,
+                lengths: withAdvance(lengths, whole, positions[at + 1]?.whole),
                 bpm: position.bpm,
                 stretch: position.stretch,
                 advancesCursor: order === position.groups.length - 1,
             });
         }
-        cursor.next();
     }
     cursor.reset();
     return steps;

@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
 import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import type { Take } from "../../core/takes";
+import { listenPerformanceOf } from "../../core/listenPerformance";
 import { collectListenSteps } from "../lib/listenSteps";
 import { useListenPlayback } from "./useListenPlayback";
 
@@ -215,6 +216,17 @@ describe("collectListenSteps", () => {
 
         const dry = collectListenSteps(fakeOsmd(2));
         expect(dry[0]?.notes[0]?.pedalled).toBe(false);
+    });
+
+    it("dwells a position until the next onset, not until its own shortest note ends", () => {
+        // Crotchets at every position, but the third arrives a quaver after the second —
+        // the other voice's note under a held one. The second position lasts a quaver;
+        // read off its own note it would overstay by a quaver, and every bar with such a
+        // figure came out longer than written.
+        const steps = collectListenSteps(fakeOsmd(3, {}, undefined, [0, 0.25, 0.375]));
+        expect(steps.map((step) => Math.min(...step.lengths))).toEqual([1, 0.5, 1]);
+        const played = listenPerformanceOf(steps, { startBpm: NOMINAL_BPM, shaped: false });
+        expect(played.map((note) => note.startMs)).toEqual([0, 1000, 1500]);
     });
 
     it("shakes a tremolo instead of holding one long note", () => {

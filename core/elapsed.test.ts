@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    advanceQuarters,
     FERMATA_STRETCH,
     NOMINAL_BPM,
     type Position,
@@ -105,5 +106,22 @@ describe("quartersMs", () => {
 
     it("refuses to divide by a stopped clock", () => {
         expect(Number.isFinite(quartersMs(1, 0))).toBe(true);
+    });
+});
+
+describe("advanceQuarters", () => {
+    it("dwells to the next printed onset when the other voice moves on sooner", () => {
+        // A semiquaver under a dotted semiquaver: the demisemiquaver arrives first.
+        expect(advanceQuarters(9.3125, 9.34375, 0.25)).toBeCloseTo(0.125);
+    });
+
+    it("dwells the shortest length where the next onset is where it ends, or beyond", () => {
+        expect(advanceQuarters(0, 0.0625, 0.25)).toBeCloseTo(0.25);
+        expect(advanceQuarters(0, 0.5, 0.25)).toBe(0.25);
+    });
+
+    it("dwells the shortest length across a jump back, and at the end", () => {
+        expect(advanceQuarters(2, 0.5, 0.25)).toBe(0.25);
+        expect(advanceQuarters(2, undefined, 0.25)).toBe(0.25);
     });
 });

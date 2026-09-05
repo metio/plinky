@@ -26,7 +26,7 @@ type Voice =
 // A cursor over a fixed sequence of positions, standing in for the OSMD graphic.
 // EndReached turns true once the walk steps past the last position, so the
 // upfront collection terminates.
-function fakeOsmd(positions: Voice[][]) {
+function fakeOsmd(positions: Voice[][], onsets?: number[]) {
     let idx = 0;
     const cursor = {
         reset: () => {
@@ -63,7 +63,7 @@ function fakeOsmd(positions: Voice[][]) {
                 // Each position a crotchet on from the last, so onsets advance the way a
                 // real walk's do. A fake reporting the same onset everywhere would let a
                 // caller reading the position pass while reading it wrongly.
-                currentTimeStamp: { RealValue: idx * 0.25 },
+                currentTimeStamp: { RealValue: onsets?.[idx] ?? idx * 0.25 },
             };
         },
     };
@@ -127,6 +127,16 @@ describe("collectKeepUpSteps", () => {
             stretch: 1,
             advancesCursor: true,
         });
+    });
+
+    it("dwells a beat until the next onset when the other voice moves on sooner", () => {
+        const osmd = fakeOsmd(
+            [[{ midi: 60, staff: 0 }], [{ midi: 48, staff: 1 }], [{ midi: 62, staff: 0 }]],
+            [0, 0.25, 0.375],
+        );
+        expect(collectKeepUpSteps(osmd, "both").map((step) => Math.min(...step.lengths))).toEqual([
+            1, 0.5, 1,
+        ]);
     });
 
     it("asks for no re-strike of a tie's later note, but still dwells its length", () => {

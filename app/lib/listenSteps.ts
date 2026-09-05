@@ -23,7 +23,8 @@ import type { PositionNote } from "./scorePosition";
 const expression = (entry: PositionNote) => entry.expression;
 import { slurredOnwardAt } from "../../core/slur";
 import { phraseProgress } from "../../core/touch";
-import { readPosition } from "./scorePosition";
+import { advanceQuarters } from "../../core/elapsed";
+import { readPosition, type ScorePosition } from "./scorePosition";
 import type { TremoloSpan } from "../../core/tremolo";
 import { readArpeggio, readOrnament, readParts } from "./scoreExpression";
 
@@ -57,21 +58,30 @@ export function collectListenSteps(
         span: null,
         carrier: null,
     };
+    // Walked first, then read: how long a position lasts is the distance to the next one,
+    // which the cursor only knows once it has moved on.
+    const positions: ScorePosition[] = [];
     while (!cursor.iterator.EndReached) {
-        const position = readPosition(osmd, parts, marks);
+        positions.push(readPosition(osmd, parts, marks));
+        cursor.next();
+    }
+    for (const [at, position] of positions.entries()) {
         const { whole, dynamicVolume } = position;
         const groups = position.groups;
-        // The beat's own advance is the shortest length among what falls ON the beat; the
-        // grace groups ahead of it take their time out of that rather than adding to it.
+        // The beat's own advance: the time to the next printed onset, or the shortest
+        // length among what falls ON the beat where the page jumps. The grace groups ahead
+        // of it take their time out of that rather than adding to it.
         const beatGroup = groups[groups.length - 1] ?? [];
         const beatLengths = beatGroup.map((entry) => entry.expression.notatedQuarters);
+        const shortest = beatLengths.length > 0 ? Math.min(...beatLengths) : 0;
+        const advance = advanceQuarters(whole, positions[at + 1]?.whole, shortest);
         const fitted = fitGraces(
             groups
                 .slice(0, -1)
                 .map((group) =>
                     Math.max(0, ...group.map((entry) => entry.expression.notatedQuarters)),
                 ),
-            beatLengths.length > 0 ? Math.min(...beatLengths) : 0,
+            advance,
         );
         for (const [order, group] of groups.entries()) {
             const notes: ListenNote[] = [];
@@ -96,6 +106,11 @@ export function collectListenSteps(
                 // Rests count too, so a written gap dwells its own length — the cursor
                 // advances by the notated rhythm regardless of what sounds.
                 lengths.push(expression.notatedQuarters);
+            }
+            // The other voice moving on under what is struck here: a length at this
+            // position like any other, and the shortest of them when it is.
+            if (isBeat && advance < shortest) {
+                lengths.push(advance);
             }
             // The graces' time, out of the beat's: a beat group's lengths are trimmed by
             // what its graces took, a grace group's is what it was given.
@@ -174,7 +189,6 @@ export function collectListenSteps(
                 steps.push(step);
             }
         }
-        cursor.next();
     }
     cursor.reset();
     return shapedByContour(steps);

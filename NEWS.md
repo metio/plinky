@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 6 September 2026
+
+**A held note no longer stretches the bar under it.** Where one hand moves on
+inside the other's note — triplets against quavers, a syncopation, a semiquaver
+under a dotted semiquaver — Listen and Keep up waited for the longer note to end
+before the next one, so the note after it landed late and the bar came out longer
+than written. From the F major section of *Für Elise* onward that was every bar, and
+two in three pieces in the catalogue have such a place somewhere. Both now move on
+at the next written note, the way the graded run already counted it.
+
 ## 5 September 2026
 
 **Keep up gives a beat some room.** A note struck a hair before the beat, or a hair

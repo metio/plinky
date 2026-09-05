@@ -54,11 +54,32 @@ export const FERMATA_STRETCH = 2;
 // printed onsets where the music runs on, and what the earlier one was going to last
 // where it jumps.
 function gapWholes(previous: Position, current: Position): number {
-    const printed = current.whole - previous.whole;
-    const advance = previous.advanceQuarters / 4;
-    // A gap that does not move forward on the page is a jump, and so is one that outruns
-    // what the previous position could possibly have lasted.
-    return printed > 0 && printed <= advance + EPSILON ? printed : advance;
+    return advanceQuarters(previous.whole, current.whole, previous.advanceQuarters) / 4;
+}
+
+// How long a position lasts before the next one, in quarter notes: the gap to the next
+// printed onset where the music runs on, and the shortest note or rest starting here
+// where it jumps, or where there is no next position.
+//
+// The two differ whenever a voice is still holding a longer note while the other voice
+// moves on: at a position where the left hand strikes a semiquaver under a held
+// crotchet, the next onset is the semiquaver away, but at one where the left hand's
+// semiquaver falls under a dotted semiquaver in the right, the right hand's demisemiquaver
+// arrives BEFORE this semiquaver ends. Read off the shortest length here alone, that
+// position overstays by the difference, and every bar with such a figure in it comes out
+// longer than written with its ornamental notes landing on the wrong side of the beat.
+// A gap that does not move forward on the page is a jump (a repeat sends the reader
+// back), and so is one that outruns what the position could possibly have lasted.
+export function advanceQuarters(
+    whole: number,
+    nextWhole: number | undefined,
+    shortestQuarters: number,
+): number {
+    if (nextWhole === undefined) {
+        return shortestQuarters;
+    }
+    const printed = (nextWhole - whole) * 4;
+    return printed > 0 && printed <= shortestQuarters + EPSILON * 4 ? printed : shortestQuarters;
 }
 
 // Elapsed milliseconds at each position, index-aligned with the input, counted from the
