@@ -52,6 +52,25 @@ describe("foldSession", () => {
         expect(session.activeMs).toBe(5 * MINUTE);
     });
 
+    it("extends the measured sitting past a hand-logged entry for later in the day", () => {
+        // A manual entry for today is anchored at noon; logged in the morning it sorts after
+        // the morning's runs, and read as "the last row" it made each of them a session of
+        // its own. The runs fold into one measured session; the manual row stands apart.
+        const manual = addManualSession([], {
+            date: "2026-06-23",
+            minutes: 30,
+            label: "",
+        } as Parameters<typeof addManualSession>[1]);
+        const first = foldSession(manual, ping(-3 * 60 * MINUTE, 5 * MINUTE));
+        // The log is read back sorted on every load, which puts the noon entry last.
+        const reloaded = parsePracticeLog(JSON.stringify(first));
+        const log = foldSession(reloaded, ping(-3 * 60 * MINUTE + 5 * MINUTE, 4 * MINUTE));
+        const measured = log.filter((session) => !session.manual);
+        expect(measured).toHaveLength(1);
+        expect(measured[0]?.activeMs).toBe(9 * MINUTE);
+        expect(log.filter((session) => session.manual)).toHaveLength(1);
+    });
+
     it("extends the sitting in progress rather than appending a row per run", () => {
         const first = foldSession([], ping(0, 5 * MINUTE, 40, "alpha"));
         const log = foldSession(first, ping(10 * MINUTE, 4 * MINUTE, 30, "beta"));
