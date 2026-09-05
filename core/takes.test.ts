@@ -284,3 +284,18 @@ describe("compositionFromRun durations", () => {
         expect(composition.notes[0]?.durationMs).toBe(800);
     });
 });
+
+describe("the hand a take was played with", () => {
+    it("survives storage", () => {
+        const stored = takeToStored(take("1", { hand: "left" }));
+        expect(stored.hand).toBe("left");
+        expect(takeFromStored(stored)?.hand).toBe("left");
+    });
+
+    it("is absent on a take saved before it was recorded, or with nonsense in it", () => {
+        expect(takeFromStored(takeToStored(take("1")))).not.toHaveProperty("hand");
+        expect(takeFromStored({ ...takeToStored(take("1")), hand: "feet" })).not.toHaveProperty(
+            "hand",
+        );
+    });
+});

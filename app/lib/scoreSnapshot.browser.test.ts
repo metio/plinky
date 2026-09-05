@@ -78,6 +78,39 @@ describe("buildScoreSnapshot with the original score", () => {
     });
 });
 
+describe("buildScoreSnapshot for a take of one hand", () => {
+    it("tints the hand the take was played with, not the hand the surface is set to", async () => {
+        // A grand staff: two treble notes, one bass note. A left-hand take exported
+        // after the surface was switched to the right hand still walks the bass.
+        const { buildScore } = await import("../../core/musicxmlBuild");
+        const xml = buildScore({
+            title: "Hands",
+            fifths: 0,
+            beatsPerBar: 4,
+            treble: [
+                { pitch: { step: "C", octave: 5, alter: 0 }, value: "half" },
+                { pitch: { step: "E", octave: 5, alter: 0 }, value: "half" },
+            ],
+            bass: [{ pitch: { step: "C", octave: 3, alter: 0 }, value: "half" }],
+        });
+        const left: Take = {
+            ...take,
+            hand: "left",
+            composition: {
+                ...take.composition,
+                notes: [{ pitch: 48, startMs: 0, durationMs: 400, velocity: 90 }],
+            },
+        };
+        const snapshot = await buildScoreSnapshot(left, { xml, hand: "right" });
+        expect(snapshot!.steps).toHaveLength(1);
+        const unknown = await buildScoreSnapshot(
+            { ...left, hand: undefined },
+            { xml, hand: "right" },
+        );
+        expect(unknown!.steps).toHaveLength(2);
+    });
+});
+
 describe("treadmill snapshot", () => {
     it("engraves one horizontal line — wider and shallower than the page layout", async () => {
         // A long line of notes, enough to wrap into several systems on the page
