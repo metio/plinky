@@ -132,6 +132,13 @@ describe("spellOutGlissando", () => {
 });
 
 describe("rollChord", () => {
+    it("spreads the roll inside the position's own advance, the shortest length at it", () => {
+        // A rolled minim over a quaver in the other hand: the clock moves on when the
+        // quaver ends, so the roll must fit inside that half beat, not the minim.
+        const rolled = rollChord(step([60, 64, 67], { lengths: [2, 2, 2, 0.5] }));
+        expect(rolled.reduce((total, one) => total + (one.lengths[0] ?? 0), 0)).toBeCloseTo(0.5);
+    });
+
     it("spreads the notes from the bottom up, keeping the position's total length", () => {
         const rolled = rollChord(step([67, 60, 64], { lengths: [1] }));
         expect(rolled.map((one) => one.notes[0]?.pitch)).toEqual([60, 64, 67]);

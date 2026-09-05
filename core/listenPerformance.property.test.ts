@@ -152,8 +152,15 @@ describe("the listening performance, whatever the page says", () => {
         fc.assert(
             fc.property(listenStep, (step) => {
                 const rolled = rollChord(step);
-                const filled = rolled.reduce((total, one) => total + (one.lengths[0] ?? 0), 0);
-                expect(filled).toBeCloseTo(step.lengths[0] ?? 0, 6);
+                // A chord of one note is nothing to roll and comes back untouched; a rolled one
+                // fits inside the position's advance, which ends with its shortest note,
+                // whichever staff that note is on.
+                if (rolled.length > 1) {
+                    const filled = rolled.reduce((total, one) => total + (one.lengths[0] ?? 0), 0);
+                    expect(filled).toBeCloseTo(Math.min(...step.lengths), 6);
+                } else {
+                    expect(rolled[0]).toBe(step);
+                }
                 expect(rolled.flatMap((one) => one.notes.map((note) => note.pitch)).sort()).toEqual(
                     step.notes.map((note) => note.pitch).sort(),
                 );

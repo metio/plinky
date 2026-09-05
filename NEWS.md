@@ -100,6 +100,15 @@ accidental — an F natural in G major came out as E sharp, and D natural in D f
 major as E double flat. They are written the way a reader expects now, and no drill
 shows a double accidental.
 
+**A rolled chord keeps time with the other hand.** Listen spread a rolled chord over
+its own note's length even when the other hand had something shorter under it, so
+the clock lingered on the chord and everything after it came late. The roll now fits
+inside the beat the position actually lasts.
+
+**Saving the share picture works on Firefox.** The save let go of the picture a
+moment too early, and Firefox could drop the download with nothing to show for it.
+It goes out the same way every other export does now.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to

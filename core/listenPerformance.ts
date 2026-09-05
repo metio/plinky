@@ -225,7 +225,11 @@ export function rollChord(step: ListenStep): ListenStep[] {
     if (step.notes.length < 2) {
         return [step];
     }
-    const total = step.lengths[0] ?? 0;
+    // The position's own advance is the shortest length at it — every note's length is
+    // listed, the other staff's included, and the clock moves on when the shortest ends.
+    // Spreading the roll over the first note's length instead held a rolled minim over a
+    // quaver in the other hand for the whole minim, and every note after it came late.
+    const total = step.lengths.length > 0 ? Math.min(...step.lengths) : 0;
     const ordered = [...step.notes].sort((one, other) => one.pitch - other.pitch);
     // Never let the spread swallow the position: a rolled chord on a semiquaver stays a
     // chord, just a tighter one.
