@@ -41,7 +41,9 @@ export function scoreClock(): ScoreClock {
             }
             if (node.tagName === "sound") {
                 const value = Number(node.getAttribute("tempo") ?? "");
-                if (Number.isFinite(value) && value > 0 && tempo === 0) {
+                // Every tempo mark counts, not only the first: the notes after a change are
+                // read at the tempo in force where they stand.
+                if (Number.isFinite(value) && value > 0) {
                     tempo = value;
                 }
                 return 0;

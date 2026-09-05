@@ -35,6 +35,16 @@ describe("scoreClock", () => {
         expect(seconds.filter((value) => value > 0)).toEqual([1, 0.5]);
     });
 
+    it("follows a tempo change partway through", () => {
+        // The notes after a change are read at the tempo in force where they stand; a
+        // clock that kept the opening tempo timed a slow coda at the allegro's pace.
+        const clock = scoreClock();
+        const seconds = walk(
+            `<attributes><divisions>4</divisions></attributes><sound tempo="120"/>${note(4)}<sound tempo="60"/>${note(4)}`,
+        ).map((node) => clock.read(node));
+        expect(seconds.filter((one) => one > 0)).toEqual([0.5, 1]);
+    });
+
     it("reads a score that names no tempo at a moderate one", () => {
         const clock = scoreClock();
         const seconds = walk(`<attributes><divisions>1</divisions></attributes>${note(1)}`).map(
