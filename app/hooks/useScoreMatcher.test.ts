@@ -49,7 +49,10 @@ function midiToHalfTone(midi: number): number {
 function fakeOsmd(
     positions: Position[],
     wholes?: number[],
-): { osmd: OpenSheetMusicDisplay; shown: () => boolean } {
+    // The bar of each position, where a repeat revisits one: left out, four positions
+    // make a bar.
+    bars?: number[],
+): { osmd: OpenSheetMusicDisplay; shown: () => boolean; at: () => number } {
     let index = 0;
     let shown = false;
     const cursor = {
@@ -58,7 +61,7 @@ function fakeOsmd(
                 EndReached: index >= positions.length,
                 currentTimeStamp: { RealValue: wholes?.[index] ?? index * 0.25 },
                 // Four quarter-note positions per 4/4 bar.
-                CurrentMeasureIndex: Math.floor(index / 4),
+                CurrentMeasureIndex: bars?.[index] ?? Math.floor(index / 4),
             };
         },
         NotesUnderCursor() {
@@ -127,6 +130,7 @@ function fakeOsmd(
     return {
         osmd: { cursor, sheet } as unknown as OpenSheetMusicDisplay,
         shown: () => shown,
+        at: () => index,
     };
 }
 
@@ -424,6 +428,43 @@ describe("whole-piece step indexing (the reveal/ghost address space)", () => {
         act(() => result.current.start(0, { from: 2, to: 2 }));
         act(() => result.current.registerNote(64));
         expect(correct[0]?.index).toBe(4);
+    });
+});
+
+describe("a run over a repeat", () => {
+    // Bars 1–2 inside a written repeat, then bar 3: two positions to a bar, and the
+    // second pass prints the same onsets and bars again.
+    const PASSES: Position[] = [[60], [62], [64], [65], [60], [62], [64], [65], [67], [69]];
+    const WHOLES = [0, 0.125, 0.25, 0.375, 0, 0.125, 0.25, 0.375, 0.5, 0.625];
+    const BARS = [0, 0, 1, 1, 0, 0, 1, 1, 2, 2];
+
+    it("names each step of a looped bar among the whole piece's, on both passes", () => {
+        // A loop over bar 2 keeps its positions from both passes, which is not one
+        // contiguous run of the piece: the second pass's steps are 6 and 7, not the
+        // bar-1 positions that follow 2 and 3.
+        const { osmd } = fakeOsmd(PASSES, WHOLES, BARS);
+        const correct: CorrectInfo[] = [];
+        const { result } = renderHook(() =>
+            useScoreMatcher(() => osmd, { onCorrect: (info) => correct.push(info) }),
+        );
+        act(() => result.current.start(0, { from: 2, to: 2 }));
+        for (const pitch of [64, 65, 64, 65]) {
+            act(() => result.current.registerNote(pitch));
+        }
+        expect(correct.map((info) => info.index)).toEqual([2, 3, 6, 7]);
+    });
+
+    it("puts the cursor on the second pass when a run resumes there", () => {
+        // Handed over from Listen partway through the second pass: the lookahead stands
+        // on step 5, so the reducer starts there, and the cursor has to stand on that
+        // pass's bar too — the printed onset alone names the first pass, and seeking
+        // by it walks cursor and reducer apart at the repeat barline for the rest of
+        // the run.
+        const handle = fakeOsmd(PASSES, WHOLES, BARS);
+        const { result } = renderHook(() => useScoreMatcher(() => handle.osmd));
+        act(() => result.current.start(0.125, null, { at: 5, whole: 0.125 }));
+        expect(handle.at()).toBe(5);
+        expect(result.current.total).toBe(5);
     });
 });
 

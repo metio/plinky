@@ -16,7 +16,7 @@ import {
     scoreSvg,
     snapshotNotePaint,
 } from "../lib/scoreColor";
-import { seekToWhole } from "../lib/scoreCursor";
+import { cursorOrdinal, seekToOrdinal } from "../lib/scoreCursor";
 import type { FingerMap } from "../stores/fingeringStore";
 import { usePrefs } from "./usePrefs";
 
@@ -454,7 +454,10 @@ export function useOsmdScore(
             // it resumes on the same note: updateGraphic() re-initialises it to the start.
             const cursor = osmd.cursor;
             const wasVisible = !cursor.hidden;
-            const at = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
+            // By cursor position rather than printed onset: an onset names two places on
+            // a repeated piece, and a run on the second pass must come back to it.
+            cursor.hide();
+            const at = cursorOrdinal(cursor);
             // Capture the run's paint before the render drops every halo, to re-apply after —
             // the green cleared notes and the blue Listen trail record how far the piece has
             // been played, and would otherwise vanish on a mid-run toggle.
@@ -471,7 +474,7 @@ export function useOsmdScore(
             // Step the reset cursor back to where it stood — OSMD has no direct seek — and
             // show it again where a run or Listen was using it, re-centring the treadmill.
             if (wasVisible) {
-                seekToWhole(cursor, at);
+                seekToOrdinal(cursor, at);
                 cursor.show();
                 centerCursor();
             }

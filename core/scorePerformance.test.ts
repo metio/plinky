@@ -21,6 +21,7 @@ const step = (elapsedMs: number, pitches: number[], holdMs = 500, holds?: number
     bar: 0,
     holdQuarters: 1,
     advancesCursor: true,
+    position: 0,
     slackMs: 0,
     pedalled: false,
     expected: holds?.map((h) => ({ velocity: null, holdMs: h, writtenHoldMs: h })),
