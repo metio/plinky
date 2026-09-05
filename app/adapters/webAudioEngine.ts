@@ -131,14 +131,20 @@ const PARTIALS: { ratio: number; gain: number; type: OscillatorType }[] = [
 // log-frequency scale between a long bass tail and a short treble one, clamped past
 // the ~A2..~A6 endpoints. Exported so the envelope's ring-out is unit-testable.
 export function releaseTail(frequency: number): number {
+    return byRegister(frequency, 0.9, 0.35);
+}
+
+// A value that depends on register: `bass` at A2 and below, `treble` at A6 and above,
+// interpolated on a log-frequency scale between. Both ends were measured off the
+// recorded instrument, so anything that scales with register is cut from the same
+// two endpoints.
+function byRegister(frequency: number, bass: number, treble: number): number {
     const lowHz = 110; // ~A2
     const highHz = 1760; // ~A6
-    const bassTail = 0.9;
-    const trebleTail = 0.35;
     const span = Math.log2(highHz) - Math.log2(lowHz);
     const t = (Math.log2(frequency) - Math.log2(lowHz)) / span;
     const clamped = Math.max(0, Math.min(1, t));
-    return bassTail + (trebleTail - bassTail) * clamped;
+    return bass + (treble - bass) * clamped;
 }
 
 // How long a synthesised voice rings before it falls silent on its own, with nothing
@@ -157,14 +163,7 @@ export function releaseTail(frequency: number): number {
 // Clamped past the endpoints like the release tail, so the deepest bass rings A2's length
 // rather than the pack's full 25 seconds — a bound this errs under rather than over.
 export function sustainRing(frequency: number): number {
-    const lowHz = 110; // ~A2
-    const highHz = 1760; // ~A6
-    const bassRing = 16;
-    const trebleRing = 7;
-    const span = Math.log2(highHz) - Math.log2(lowHz);
-    const t = (Math.log2(frequency) - Math.log2(lowHz)) / span;
-    const clamped = Math.max(0, Math.min(1, t));
-    return bassRing + (trebleRing - bassRing) * clamped;
+    return byRegister(frequency, 16, 7);
 }
 
 // The tail is capped by the fraction of a note it warrants below, so a short note keeps a
