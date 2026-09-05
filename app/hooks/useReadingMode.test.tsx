@@ -79,4 +79,14 @@ describe("useReadingMode", () => {
         expect(result.current.reduction).toBe("");
         expect(prefs.load().reduction).toBe("");
     });
+
+    it("hands back the same object across a render that changes nothing", () => {
+        const { wrapper } = world();
+        const { result, rerender } = renderHook(() => useReadingMode(), { wrapper });
+        const before = result.current;
+        rerender();
+        expect(result.current).toBe(before);
+        act(() => result.current.setBarNumbers(!before.barNumbers));
+        expect(result.current).not.toBe(before);
+    });
 });

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { type KeepUpResult, scoreKeepUp } from "../../core/grade";
 import {
     type KeepUpState,
@@ -19,6 +19,7 @@ import { readParts, readStartTempo } from "../lib/scoreExpression";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalos } from "../lib/scoreColor";
+import { useLatest } from "./useLatest";
 import { useTimerChain } from "./useTimerChain";
 import { readPosition } from "../lib/scorePosition";
 import { NO_SCORE_MARKS } from "../../core/musicxmlMarks";
@@ -316,16 +317,41 @@ export function useKeepUp({
         }
     };
 
-    return {
-        running,
-        progress,
-        result,
-        expected,
-        active,
-        start,
-        stop,
-        clearResult,
-        registerNote,
-        stepMs,
-    };
+    // Stable entry points over the closures above, which read the live props: a consumer
+    // memoised on this hook's result must be able to hold.
+    const api = useLatest({ active, start, stop, clearResult, registerNote });
+    const activeNow = useCallback(() => api.current.active(), []);
+    const startRun = useCallback(
+        (options: Parameters<typeof start>[0]) => api.current.start(options),
+        [],
+    );
+    const stopNow = useCallback(() => api.current.stop(), []);
+    const clearResultNow = useCallback(() => api.current.clearResult(), []);
+    const registerNoteNow = useCallback((note: number) => api.current.registerNote(note), []);
+    return useMemo(
+        () => ({
+            running,
+            progress,
+            result,
+            expected,
+            active: activeNow,
+            start: startRun,
+            stop: stopNow,
+            clearResult: clearResultNow,
+            registerNote: registerNoteNow,
+            stepMs,
+        }),
+        [
+            running,
+            progress,
+            result,
+            expected,
+            activeNow,
+            startRun,
+            stopNow,
+            clearResultNow,
+            registerNoteNow,
+            stepMs,
+        ],
+    );
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Reduction } from "../../core/reduction";
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 import type { Beams } from "../../core/beams";
 import { usePrefsStore } from "../contexts/services";
 import { usePref } from "./usePref";
@@ -74,28 +74,54 @@ export function useReadingMode(): ReadingMode {
     const [showFingerings, setShowFingerings] = useState(() => prefs.load().showFingerings);
     const [scrollFollow, setScrollFollow] = useState(true);
 
-    return {
-        barsPerRow,
-        setBarsPerRow,
-        noteScale,
-        setNoteScale,
-        barNumbers,
-        setBarNumbers,
-        treadmill,
-        setTreadmill,
-        highway,
-        setHighway,
-        beams,
-        setBeams,
-        showAccompaniment,
-        setShowAccompaniment,
-        reduction,
-        setReduction,
-        colorNotes,
-        setColorNotes,
-        showFingerings,
-        setShowFingerings,
-        scrollFollow,
-        setScrollFollow,
-    };
+    // One object for as long as nothing in it changes: the play session hands this to a
+    // context memoised on it.
+    return useMemo(
+        () => ({
+            barsPerRow,
+            setBarsPerRow,
+            noteScale,
+            setNoteScale,
+            barNumbers,
+            setBarNumbers,
+            treadmill,
+            setTreadmill,
+            highway,
+            setHighway,
+            beams,
+            setBeams,
+            showAccompaniment,
+            setShowAccompaniment,
+            reduction,
+            setReduction,
+            colorNotes,
+            setColorNotes,
+            showFingerings,
+            setShowFingerings,
+            scrollFollow,
+            setScrollFollow,
+        }),
+        [
+            barsPerRow,
+            setBarsPerRow,
+            noteScale,
+            setNoteScale,
+            barNumbers,
+            setBarNumbers,
+            treadmill,
+            setTreadmill,
+            highway,
+            setHighway,
+            beams,
+            setBeams,
+            showAccompaniment,
+            setShowAccompaniment,
+            reduction,
+            setReduction,
+            colorNotes,
+            setColorNotes,
+            showFingerings,
+            scrollFollow,
+        ],
+    );
 }

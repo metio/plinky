@@ -255,4 +255,21 @@ describe("useKeepUp", () => {
         expect(played).not.toContain(60);
         result.current.stop();
     });
+
+    it("hands back the same object across a render that changes nothing", () => {
+        const osmd = fakeOsmd([[{ midi: 60, staff: 0 }]]);
+        const options = {
+            getOsmd: () => osmd,
+            synth: { playNote: () => {} },
+            tempo: () => 240,
+            beatsPerBar: 1,
+            centerCursor: () => {},
+            markPainted: () => {},
+            onFinish: () => {},
+        };
+        const { result, rerender } = renderHook(() => useKeepUp(options));
+        const before = result.current;
+        rerender();
+        expect(result.current).toBe(before);
+    });
 });

@@ -128,4 +128,16 @@ describe("useOsmdScore", () => {
         await waitFor(() => expect(hook.result.current.ready).toBe(true));
         expect(parses()).toBeGreaterThan(readings);
     });
+
+    it("hands back the same object across a render that changes nothing", async () => {
+        // The play session builds a context value on this; a fresh object per render
+        // would re-render every consumer on every note.
+        const { hook } = mount();
+        await waitFor(() =>
+            expect(hook.result.current.loadError || hook.result.current.ready).toBe(true),
+        );
+        const before = hook.result.current;
+        hook.rerender(layout);
+        expect(hook.result.current).toBe(before);
+    });
 });

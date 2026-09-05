@@ -754,4 +754,22 @@ describe("Listen over a written repeat", () => {
         }
         expect(onRewind).not.toHaveBeenCalled();
     });
+
+    it("hands back the same object across a render that changes nothing", () => {
+        const options = {
+            getOsmd: () => fakeOsmd(2),
+            synth: { playNote: () => {} },
+            tempo: () => 120,
+            loop: () => loopState,
+            onLap,
+            centerCursor: () => {},
+            marks: NO_SCORE_MARKS,
+            markPainted: () => {},
+            isPracticing: () => false,
+        };
+        const { result, rerender } = renderHook(() => useListenPlayback(options));
+        const before = result.current;
+        rerender();
+        expect(result.current).toBe(before);
+    });
 });
