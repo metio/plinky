@@ -3,7 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type Hand, isPracticedHand } from "../../core/matcher";
-import { playOrder, readParts } from "./scoreExpression";
+import { playOrder, readParts, readScoreExpression } from "./scoreExpression";
 import { type MeasureBox, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
 
 // OSMD's graphical notes expose their rendered SVG only on the VexFlow subclass; the
