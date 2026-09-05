@@ -4,7 +4,13 @@
 
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
-import { scoreToBars, staffFor, windowCells, windowPositions } from "./scoreToBars";
+import {
+    scoreToBars,
+    scoreToTimedBars,
+    staffFor,
+    windowCells,
+    windowPositions,
+} from "./scoreToBars";
 
 const note = (step: string, octave: number, staff: number, chord = false) =>
     `<note>${chord ? "<chord/>" : ""}<pitch><step>${step}</step><octave>${octave}</octave></pitch><staff>${staff}</staff></note>`;
@@ -27,6 +33,23 @@ describe("scoreToBars", () => {
 
     it("reads the bass hand from the other staff", () => {
         expect(scoreToBars(domXmlCodec, XML, 2)).toEqual([[[48]], []]);
+    });
+
+    it("measures a hand's gaps off its own staff, not the other hand's bar", () => {
+        // Four treble quarters over a bass whole note written after a backup. At 60 bpm a
+        // quarter is a second, so the gap into bar 2's first treble note is one second —
+        // the last quarter's length — and not that plus the whole bass bar.
+        const timed = (step: string, octave: number, staff: number, ticks: number) =>
+            `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>${ticks}</duration><staff>${staff}</staff></note>`;
+        const xml = `<score-partwise><part id="P1">
+  <measure number="1"><attributes><divisions>1</divisions></attributes><sound tempo="60"/>
+    ${timed("C", 4, 1, 1)}${timed("D", 4, 1, 1)}${timed("E", 4, 1, 1)}${timed("F", 4, 1, 1)}
+    <backup><duration>4</duration></backup>${timed("C", 3, 2, 4)}
+  </measure>
+  <measure number="2">${timed("G", 4, 1, 1)}</measure>
+</part></score-partwise>`;
+        const { gaps } = scoreToTimedBars(domXmlCodec, xml, 1);
+        expect(gaps[1]?.[0]).toBeCloseTo(1);
     });
 
     it("maps hands to the grand-staff split", () => {
