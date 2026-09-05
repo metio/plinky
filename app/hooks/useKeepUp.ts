@@ -17,13 +17,14 @@ import {
 } from "../../core/keepUp";
 import { useScheduler } from "../contexts/services";
 import type { Hand } from "../../core/matcher";
-import { NOMINAL_BPM, advanceQuarters } from "../../core/elapsed";
+import { NOMINAL_BPM, positionAdvances } from "../../core/elapsed";
 import { readParts, readStartTempo } from "../lib/scoreExpression";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalos } from "../lib/scoreColor";
 import { useLatest } from "./useLatest";
 import { useTimerChain } from "./useTimerChain";
+import { shortestAt } from "../lib/listenSteps";
 import { readPosition, type ScorePosition } from "../lib/scorePosition";
 import { NO_SCORE_MARKS } from "../../core/musicxmlMarks";
 import { jumpsBack } from "../../core/matcher";
@@ -42,9 +43,8 @@ type NoteSink = {
 // carries the notes the painter recolours.
 // The lengths at a position, with the other voice's next onset among them when it
 // arrives before the shortest note here ends — so the beat dwells to the next onset.
-function withAdvance(lengths: number[], whole: number, nextWhole: number | undefined): number[] {
+function withAdvance(lengths: number[], advance: number): number[] {
     const shortest = lengths.length > 0 ? Math.min(...lengths) : 0;
-    const advance = advanceQuarters(whole, nextWhole, shortest);
     return advance < shortest ? [...lengths, advance] : lengths;
 }
 
@@ -61,6 +61,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
         positions.push(readPosition(osmd, parts, NO_SCORE_MARKS, hand));
         cursor.next();
     }
+    const advances = positionAdvances(positions.map(shortestAt));
     for (const [at, position] of positions.entries()) {
         const { whole } = position;
         for (const [order, group] of position.groups.entries()) {
@@ -90,7 +91,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                 whole,
                 play,
                 accompany,
-                lengths: withAdvance(lengths, whole, positions[at + 1]?.whole),
+                lengths: withAdvance(lengths, advances[at] ?? 0),
                 bpm: position.bpm,
                 stretch: position.stretch,
                 advancesCursor: order === position.groups.length - 1,

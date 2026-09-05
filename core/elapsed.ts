@@ -50,11 +50,16 @@ export const NOMINAL_BPM = 60;
 // who lingers is not marked down for it.
 export const FERMATA_STRETCH = 2;
 
-// The notes between two positions adjacent in the performance: the difference in their
-// printed onsets where the music runs on, and what the earlier one was going to last
-// where it jumps.
-function gapWholes(previous: Position, current: Position): number {
-    return advanceQuarters(previous.whole, current.whole, previous.advanceQuarters) / 4;
+// How long each of a walk's positions lasts, in quarter notes, index-aligned with the
+// walk. The one clock every surface that walks a score keeps time by: the graded run's
+// onsets, Listen's dwell at each position and Keep up's beats all come from here, so
+// none of them can come to hold a position longer than the others do.
+export function positionAdvances(
+    positions: readonly { whole: number; advanceQuarters: number }[],
+): number[] {
+    return positions.map((position, at) =>
+        advanceQuarters(position.whole, positions[at + 1]?.whole, position.advanceQuarters),
+    );
 }
 
 // How long a position lasts before the next one, in quarter notes: the gap to the next
@@ -86,20 +91,14 @@ export function advanceQuarters(
 // first position and at the tempi the score writes. Scale by the ratio between the
 // player's dial and the opening tempo to get the run's own clock.
 export function writtenOnsetsMs(positions: readonly Position[]): number[] {
+    const advances = positionAdvances(positions);
     const onsets: number[] = [];
     let running = 0;
-    let previous: Position | undefined;
-    for (const position of positions) {
-        if (previous !== undefined) {
-            // The stretch belongs to the position being left: a fermata delays what
-            // follows it, and nothing before it.
-            running += quartersMs(
-                gapWholes(previous, position) * 4 * previous.stretch,
-                previous.bpm,
-            );
-        }
+    for (const [at, position] of positions.entries()) {
         onsets.push(running);
-        previous = position;
+        // The stretch belongs to the position being left: a fermata delays what follows
+        // it, and nothing before it.
+        running += quartersMs((advances[at] ?? 0) * position.stretch, position.bpm);
     }
     return onsets;
 }

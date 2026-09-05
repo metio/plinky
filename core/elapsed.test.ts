@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
     advanceQuarters,
+    positionAdvances,
     FERMATA_STRETCH,
     NOMINAL_BPM,
     type Position,
@@ -123,5 +124,18 @@ describe("advanceQuarters", () => {
     it("dwells the shortest length across a jump back, and at the end", () => {
         expect(advanceQuarters(2, 0.5, 0.25)).toBe(0.25);
         expect(advanceQuarters(2, undefined, 0.25)).toBe(0.25);
+    });
+});
+
+describe("positionAdvances", () => {
+    it("is the one clock: each position lasts to the next onset, the last its own length", () => {
+        const walk = [
+            { whole: 0, advanceQuarters: 1 },
+            { whole: 0.25, advanceQuarters: 1 },
+            { whole: 0.375, advanceQuarters: 0.5 },
+            { whole: 0.5, advanceQuarters: 0.25 },
+        ];
+        expect(positionAdvances(walk)).toEqual([1, 0.5, 0.5, 0.25]);
+        expect(positionAdvances([])).toEqual([]);
     });
 });

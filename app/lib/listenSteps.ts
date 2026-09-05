@@ -23,7 +23,7 @@ import type { PositionNote } from "./scorePosition";
 const expression = (entry: PositionNote) => entry.expression;
 import { slurredOnwardAt } from "../../core/slur";
 import { phraseProgress } from "../../core/touch";
-import { advanceQuarters } from "../../core/elapsed";
+import { positionAdvances } from "../../core/elapsed";
 import { readPosition, type ScorePosition } from "./scorePosition";
 import type { TremoloSpan } from "../../core/tremolo";
 import { readArpeggio, readOrnament, readParts } from "./scoreExpression";
@@ -33,6 +33,17 @@ import { readArpeggio, readOrnament, readParts } from "./scoreExpression";
 // the lengths for the beat. Leaves the cursor reset. The clock then reads its
 // notes from this array, so playback reads no musical data off the live cursor —
 // the cursor only mirrors the position and carries the notes the trail colours.
+// A position on the clock's terms: where it is printed, and the shortest length among
+// what falls on its beat — what it lasts where the page jumps.
+export function shortestAt(position: ScorePosition): { whole: number; advanceQuarters: number } {
+    const beat = position.groups[position.groups.length - 1] ?? [];
+    const lengths = beat.map((entry) => entry.expression.notatedQuarters);
+    return {
+        whole: position.whole,
+        advanceQuarters: lengths.length > 0 ? Math.min(...lengths) : 0,
+    };
+}
+
 export function collectListenSteps(
     osmd: OpenSheetMusicDisplay,
     // Read from the file rather than off the engraver — see core/musicxmlMarks.
@@ -65,16 +76,15 @@ export function collectListenSteps(
         positions.push(readPosition(osmd, parts, marks));
         cursor.next();
     }
+    const advances = positionAdvances(positions.map(shortestAt));
     for (const [at, position] of positions.entries()) {
         const { whole, dynamicVolume } = position;
         const groups = position.groups;
         // The beat's own advance: the time to the next printed onset, or the shortest
         // length among what falls ON the beat where the page jumps. The grace groups ahead
         // of it take their time out of that rather than adding to it.
-        const beatGroup = groups[groups.length - 1] ?? [];
-        const beatLengths = beatGroup.map((entry) => entry.expression.notatedQuarters);
-        const shortest = beatLengths.length > 0 ? Math.min(...beatLengths) : 0;
-        const advance = advanceQuarters(whole, positions[at + 1]?.whole, shortest);
+        const shortest = shortestAt(position).advanceQuarters;
+        const advance = advances[at] ?? shortest;
         const fitted = fitGraces(
             groups
                 .slice(0, -1)

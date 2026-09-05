@@ -104,8 +104,14 @@ const named = [...new Set([...notation, ...noindex])];
 // Settings measured 263,693 against a limit of 262,144: over by 1,549 bytes, which is those
 // nine strings in Greek and nothing else. The floor keeps the headroom the third-party
 // beacon needs, as before.
-const SCRIPT_LIGHT = 266240;
-const SCRIPT_NOTATION = 663552;
+// 260 KiB → 264 KiB, and 648 KiB → 652 KiB: the audit branch. Settings measured 266,418
+// against 266,240 — over by 178 bytes, which is the settings index's four group labels
+// and the human-touch switch's copy, in Greek. The play page measured 664,009 against
+// 663,552 — over by 457 bytes, the touch model and Keep up's beat windows. Both raised
+// deliberately, in step with the app bundle's own ratchet (dev/check-bundle-size.mjs),
+// which weighed the same change at four kilobytes gzipped over a hundred and thirty commits.
+const SCRIPT_LIGHT = 270336;
+const SCRIPT_NOTATION = 667648;
 
 const common = {
     "categories:best-practices": ["error", { minScore: 0.9 }],
