@@ -101,7 +101,9 @@ export const PIECES = [
 // share a title — a Schubert Ave Maria and a Bach/Gounod one — but not under the same
 // composer, so the composer segment settles what a flat name could not.
 export function folderFor(piece) {
-    return `${folderForComposer(piece.composer)}/${slug(piece.title)}`;
+    // A piece may carry its own folder — the collections give one to the movements of a
+    // work that share a title, which would otherwise all want the same path.
+    return piece.folder ?? `${folderForComposer(piece.composer)}/${slug(piece.title)}`;
 }
 
 // The folder holding everything of one composer's — every piece of theirs, and the playlist
