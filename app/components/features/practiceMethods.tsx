@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { Link } from "react-router";
+import type { MusicItem } from "../../../core/music";
 import { pickForGrade } from "../../../core/pickForGrade";
 import { playOptionsQuery } from "../../../core/playOptions";
 import { type MethodId, METHODS, type PracticeMethod } from "../../../core/practiceMethods";
@@ -64,9 +65,15 @@ const ICONS: Record<MethodId, (props: { className?: string }) => React.JSX.Eleme
 //
 // No button at all when the grade holds nothing to offer — a dead button that says "try
 // this" and lands nowhere is worse than the reading alone.
-function MethodAction({ method, grade }: { method: PracticeMethod; grade: number }) {
-    const { items } = useMusicItems();
-
+function MethodAction({
+    method,
+    grade,
+    items,
+}: {
+    method: PracticeMethod;
+    grade: number;
+    items: MusicItem[];
+}) {
     if (method.route) {
         return (
             <Link
@@ -102,6 +109,10 @@ export function PracticeMethods() {
     // Read every render rather than memoised — a grade reached while the page is open
     // should change what the buttons offer.
     const grade = Math.max(1, services.milestones.reachedGrade());
+    // One catalogue for the six buttons. Assembling it parses every score held on the
+    // device and maps three thousand manifest rows, so it is read here once and handed
+    // down rather than rebuilt by each method for itself.
+    const { items } = useMusicItems();
     // Each card sounds its note as a mouse crosses it, so running an eye down the six plays
     // a scale. The Learn hub's own idea, reached through the card they now share.
     const synth = useSynth();
@@ -138,7 +149,7 @@ export function PracticeMethods() {
                                     </span>{" "}
                                     {HOW[method.id]()}
                                 </p>
-                                <MethodAction method={method} grade={grade} />
+                                <MethodAction method={method} grade={grade} items={items} />
                             </div>
                         </HubCard>
                     </li>

@@ -4,8 +4,9 @@
 
 import { cleanup, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { METHODS } from "../../../core/practiceMethods";
+import type { AppServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { PracticeMethods } from "./practiceMethods";
@@ -20,6 +21,27 @@ const mount = () =>
 afterEach(cleanup);
 
 describe("PracticeMethods", () => {
+    it("assembles the catalogue once for all six buttons", async () => {
+        // Each button picks from the same catalogue; a hook per button would parse every
+        // held score and map three thousand rows six times over on every home visit.
+        const songs = { manifest: vi.fn(() => Promise.resolve([])) };
+        const exercises = { manifest: vi.fn(() => Promise.resolve([])) };
+        renderWithServices(
+            <MemoryRouter>
+                <PracticeMethods />
+            </MemoryRouter>,
+            {
+                songs: songs as unknown as AppServices["songs"],
+                exercises: exercises as unknown as AppServices["exercises"],
+            },
+        );
+        await waitFor(() => {
+            expect(screen.getAllByRole("link").length).toBeGreaterThanOrEqual(2);
+        });
+        expect(songs.manifest).toHaveBeenCalledTimes(1);
+        expect(exercises.manifest).toHaveBeenCalledTimes(1);
+    });
+
     it("names every method with its dose", () => {
         mount();
         expect(screen.getByRole("heading", { name: m.methods_title() })).toBeTruthy();
