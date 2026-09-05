@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { createEmitter } from "../../core/emitter";
+import { jsonOf, NOT_JSON, parseJson } from "../../core/json";
 import type { KeyValueStore } from "../ports/keyValueStore";
 
 // The one JSON-over-KeyValueStore idiom, shared by every store: parse defensively,
@@ -10,6 +11,10 @@ import type { KeyValueStore } from "../ports/keyValueStore";
 // notify subscribers only about writes that landed. Each concrete store (prefs,
 // mastery, …) is a thin instantiation, so a caching or notification bug is fixed
 // here once instead of once per store.
+//
+// The parse guard itself lives in core beside the parsers it serves; every store reads
+// through the same one.
+export { parseJson };
 
 // The parsed value stored under `key`, or null when absent or corrupt — corrupt
 // data reads as missing rather than crashing the caller. The caller validates the
@@ -20,11 +25,8 @@ export function readJson(kv: KeyValueStore, key: string): unknown {
     if (raw === null) {
         return null;
     }
-    try {
-        return JSON.parse(raw);
-    } catch {
-        return null;
-    }
+    const value = jsonOf(raw);
+    return value === NOT_JSON ? null : value;
 }
 
 // Persist `value` as JSON; false when it cannot be serialized or the store
@@ -34,20 +36,6 @@ export function writeJson(kv: KeyValueStore, key: string, value: unknown): boole
         return kv.set(key, JSON.stringify(value));
     } catch {
         return false;
-    }
-}
-
-// The defensive half of a parse callback: absent or corrupt raw data reads as
-// the fallback, and only valid JSON reaches `coerce` — so each store's parse
-// only has to shape a successfully parsed value, not guard the parsing.
-export function parseJson<T>(raw: string | null, fallback: T, coerce: (parsed: unknown) => T): T {
-    if (raw === null) {
-        return fallback;
-    }
-    try {
-        return coerce(JSON.parse(raw));
-    } catch {
-        return fallback;
     }
 }
 
@@ -234,12 +222,17 @@ export function createKeyedJsonStore<T>(
         if (hit && hit.raw === raw) {
             return hit.value;
         }
+        const parsed = jsonOf(raw);
+        if (parsed === NOT_JSON) {
+            // A corrupt entry reads as missing rather than crashing the caller.
+            return null;
+        }
         try {
-            const value = normalize(JSON.parse(raw));
+            const value = normalize(parsed);
             cache.set(id, { raw, value });
             return value;
         } catch {
-            // A corrupt entry reads as missing rather than crashing the caller.
+            // So does one the store's own shaping refuses.
             return null;
         }
     };

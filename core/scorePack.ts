@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { isRecord } from "./guards";
+import { jsonOf, NOT_JSON } from "./json";
 
 // The Plinky score-bundle format: a JSON document with MusicXML embedded, used to
 // back up a library and to share or mass-import a set of scores. Each score carries
@@ -71,10 +72,8 @@ export function serializePack(scores: PackScore[]): string {
 // core has no language, and the surface that catches these says so in the reader's own
 // (see app/components/features/scoreBackup.tsx).
 export function parsePack(json: string): ScorePack {
-    let data: unknown;
-    try {
-        data = JSON.parse(json);
-    } catch {
+    const data = jsonOf(json);
+    if (data === NOT_JSON) {
         throw new Error("That file is not valid JSON.");
     }
     if (!isRecord(data) || data.format !== FORMAT) {
