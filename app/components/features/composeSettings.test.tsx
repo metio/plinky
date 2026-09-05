@@ -37,16 +37,35 @@ describe("ComposeSettings", () => {
         expect(onTitle).toHaveBeenCalledWith("Nocturne");
     });
 
-    it("clamps the tempo into the 40–240 range and defaults garbage to 120", () => {
+    it("lets a tempo be typed digit by digit", () => {
+        // Selecting "120" and typing "96": the "9" on its own is not a tempo and must not
+        // be clamped to 40 before the "6" arrives.
         const onTempo = vi.fn();
         mount({ onTempo });
-        const field = screen.getByLabelText("Tempo");
+        const field = screen.getByLabelText("Tempo") as HTMLInputElement;
+        fireEvent.change(field, { target: { value: "9" } });
+        expect(onTempo).not.toHaveBeenCalled();
+        expect(field.value).toBe("9");
+        fireEvent.change(field, { target: { value: "96" } });
+        expect(onTempo).toHaveBeenLastCalledWith(96);
+    });
+
+    it("settles what was typed into the 40–240 range on leaving the field", () => {
+        const onTempo = vi.fn();
+        mount({ onTempo });
+        const field = screen.getByLabelText("Tempo") as HTMLInputElement;
         fireEvent.change(field, { target: { value: "999" } });
+        expect(onTempo).not.toHaveBeenCalled();
+        fireEvent.blur(field);
         expect(onTempo).toHaveBeenLastCalledWith(240);
         fireEvent.change(field, { target: { value: "3" } });
+        fireEvent.blur(field);
         expect(onTempo).toHaveBeenLastCalledWith(40);
         fireEvent.change(field, { target: { value: "" } });
+        fireEvent.blur(field);
         expect(onTempo).toHaveBeenLastCalledWith(120);
+        // Settled, the field shows the take's tempo again rather than the stray text.
+        expect(field.value).toBe("120");
     });
 
     it("selects a meter as a number", () => {
