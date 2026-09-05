@@ -20,6 +20,7 @@ const BASE: Prefs = {
     noteLabels: "all",
     instrumentSounds: false,
     midiEcho: false,
+    listenShaping: true,
     keyLights: false,
     lightProfile: "casio",
     lightLeftChannel: 3,

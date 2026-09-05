@@ -371,6 +371,8 @@
     "settings_language": "Lingua",
     "settings_sound": "Audio",
     "settings_play_sounds": "Riproduci il suono delle note",
+    "settings_listen_shaping": "Suonare con tocco umano",
+    "settings_listen_shaping_help": "All'ascolto, Plinky lascia che una frase si posi, dà respiro all'ultima battuta e fa emergere la melodia un soffio prima dell'accompagnamento, come farebbe un pianista. Disattivato, ogni nota cade esattamente sul tempo.",
     "settings_grand_piano": "Pianoforte a coda registrato",
     "settings_grand_piano_caption": "Registrazioni vere di un pianoforte da concerto, al posto del suono che Plinky produce da sé. Arrivano mentre suoni — qualche centinaio di kilobyte per brano — e restano su questo dispositivo.",
     "settings_grand_piano_arriving": "Recupero dello strumento…",

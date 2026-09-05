@@ -69,6 +69,15 @@ describe("Settings", () => {
         expect(switchOn(m.settings_play_sounds)).toBe(false);
     });
 
+    it("turns the human touch off through the prefs store, and on by default", () => {
+        const { services } = mount();
+        expect(services.prefs.load().listenShaping).toBe(true);
+        expect(switchOn(m.settings_listen_shaping)).toBe(true);
+
+        toggle(m.settings_listen_shaping);
+        expect(services.prefs.load().listenShaping).toBe(false);
+    });
+
     it("persists a segmented choice and marks it selected", () => {
         const { services } = mount();
 

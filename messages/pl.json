@@ -371,6 +371,8 @@
     "settings_language": "Język",
     "settings_sound": "Dźwięk",
     "settings_play_sounds": "Odtwarzaj dźwięki nut",
+    "settings_listen_shaping": "Graj z ludzkim wyczuciem",
+    "settings_listen_shaping_help": "Podczas słuchania Plinky łagodnie wycisza koniec frazy, daje ostatniemu taktowi oddech i wysuwa melodię odrobinę przed akompaniament – tak jak robi to pianista. Wyłączone: każda nuta trafia dokładnie w takt.",
     "settings_grand_piano": "Nagrany fortepian",
     "settings_grand_piano_caption": "Prawdziwe nagrania fortepianu koncertowego zamiast dźwięku, który Plinky wytwarza sam. Dochodzą w trakcie grania — po kilkaset kilobajtów na utwór — i zostają na tym urządzeniu.",
     "settings_grand_piano_arriving": "Pobieranie instrumentu…",

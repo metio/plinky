@@ -4,12 +4,15 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_VELOCITY } from "./expression";
 import {
+    finalBarProgress,
     fitGraces,
     type ListenNote,
     listenPerformanceOf,
     type ListenStep,
     openingGlissando,
     performListenNote,
+    performListenStep,
+    type PlayedNote,
     rollChord,
     shapedByContour,
     spellOutGlissando,
@@ -43,6 +46,7 @@ const step = (pitches: number[], over: Partial<ListenStep> = {}): ListenStep => 
     contour: 1,
     advancesCursor: true,
     interpretation: 1,
+    phrase: 0,
     ...over,
 });
 
@@ -281,7 +285,75 @@ describe("performListenNote", () => {
     });
 });
 
+describe("performListenStep", () => {
+    const opening = step([48, 72]);
+    const closing = step([50, 74], { phrase: 1, measureIndex: 1 });
+    const steps = [opening, closing];
+    const literal = (of: ListenStep, at: number) =>
+        performListenNote(of, of.notes[at] as ListenNote, 120);
+
+    it("lands every note on the grid at the reading's own weight when unshaped", () => {
+        const { played, advanceMs } = performListenStep(steps, 0, 120, false);
+        expect(played.map((one) => one.delayMs)).toEqual([0, 0]);
+        expect(played.map((one) => one.voiced)).toEqual(
+            opening.notes.map((_, at) => literal(opening, at).voiced),
+        );
+        expect(advanceMs).toBe(500);
+    });
+
+    it("strikes the tune a hair before the note under it", () => {
+        const { played } = performListenStep(steps, 0, 120);
+        const [under, tune] = played as [PlayedNote, PlayedNote];
+        expect(tune.note.pitch).toBe(72);
+        expect(tune.delayMs).toBeLessThan(5);
+        expect(under.delayMs).toBeGreaterThan(15);
+        expect(under.delayMs).toBeLessThan(25);
+    });
+
+    it("weights each note within a few percent of the reading, never outside 1..127", () => {
+        const { played } = performListenStep(steps, 0, 120);
+        for (const [at, one] of played.entries()) {
+            const asked = literal(opening, at).voiced;
+            expect(one.voiced).toBeGreaterThanOrEqual(Math.floor(asked * 0.97));
+            expect(one.voiced).toBeLessThanOrEqual(Math.ceil(asked * 1.03));
+            expect(one.voiced).toBeGreaterThanOrEqual(1);
+            expect(one.voiced).toBeLessThanOrEqual(127);
+        }
+    });
+
+    it("broadens the end of a phrase in the piece's last bar, notes and advance alike", () => {
+        const { played, advanceMs } = performListenStep(steps, 1, 120);
+        // The phrase's ending eases by 6% and the final bar's end broadens by 25%.
+        expect(advanceMs).toBeCloseTo(500 * 1.06 * 1.25);
+        expect(played[0]?.durationSeconds).toBeCloseTo(
+            literal(closing, 0).durationSeconds * 1.06 * 1.25,
+        );
+    });
+
+    it("plays the same position the same way every time", () => {
+        expect(performListenStep(steps, 0, 120)).toEqual(performListenStep(steps, 0, 120));
+    });
+});
+
+describe("finalBarProgress", () => {
+    it("is null before the last bar and runs 0 to 1 across it", () => {
+        const steps = [
+            step([60]),
+            step([62], { measureIndex: 1 }),
+            step([64], { measureIndex: 1 }),
+            step([65], { measureIndex: 1 }),
+        ];
+        expect(finalBarProgress(steps, 0)).toBeNull();
+        expect(finalBarProgress(steps, 1)).toBe(0);
+        expect(finalBarProgress(steps, 2)).toBe(0.5);
+        expect(finalBarProgress(steps, 3)).toBe(1);
+        expect(finalBarProgress([step([60])], 0)).toBe(1);
+    });
+});
+
 describe("listenPerformanceOf", () => {
+    // Read on the literal clock: the touch has its own tests, and every figure here is
+    // about where the transport puts a position.
     const line = (count: number) =>
         Array.from({ length: count }, (_, index) =>
             step([60 + index], { whole: index * 0.25, measureIndex: index }),
@@ -294,12 +366,29 @@ describe("listenPerformanceOf", () => {
             step([], { lengths: [2], whole: 0, measureIndex: 0 }),
             ...line(3).map((one) => ({ ...one, whole: 0.5 + one.whole, measureIndex: 1 })),
         ];
-        const played = listenPerformanceOf(steps, { startBpm: 120, withinMs: 1000 });
+        const played = listenPerformanceOf(steps, { startBpm: 120, withinMs: 1000, shaped: false });
         expect(played.map((one) => one.startMs)).toEqual([0, 500]);
     });
 
+    it("keeps the touch off the clock when asked to play unshaped", () => {
+        const steps = [step([48, 72]), step([50, 74], { measureIndex: 1, phrase: 1 })];
+        const literal = listenPerformanceOf(steps, { startBpm: 120, shaped: false });
+        expect(literal.map((one) => one.startMs)).toEqual([0, 0, 500, 500]);
+        const shaped = listenPerformanceOf(steps, { startBpm: 120 });
+        // The tune lands on the beat, the note under it a hair later, and the phrase's last
+        // position settles: its advance is what the next position would wait for.
+        const at = (pitch: number) => shaped.find((one) => one.pitch === pitch)?.startMs ?? -1;
+        expect(at(72)).toBeLessThan(5);
+        expect(at(48)).toBeGreaterThan(15);
+        expect(at(74)).toBeGreaterThanOrEqual(500);
+        expect(at(50)).toBeGreaterThan(515);
+        expect(shaped.map((one) => one.pitch).sort()).toEqual(
+            literal.map((one) => one.pitch).sort(),
+        );
+    });
+
     it("lays the positions out on one clock at the score's own tempo", () => {
-        const played = listenPerformanceOf(line(3), { startBpm: 120 });
+        const played = listenPerformanceOf(line(3), { startBpm: 120, shaped: false });
         expect(played.map((one) => one.startMs)).toEqual([0, 500, 1000]);
         expect(played.map((one) => one.pitch)).toEqual([60, 61, 62]);
     });
@@ -308,19 +397,19 @@ describe("listenPerformanceOf", () => {
         const steps = line(3);
         steps[1]!.bpm = 60;
         steps[2]!.bpm = 60;
-        const played = listenPerformanceOf(steps, { startBpm: 120 });
+        const played = listenPerformanceOf(steps, { startBpm: 120, shaped: false });
         expect(played.map((one) => one.startMs)).toEqual([0, 500, 1500]);
     });
 
     it("holds a position at a fermata", () => {
         const steps = line(2);
         steps[0]!.stretch = 2;
-        expect(listenPerformanceOf(steps, { startBpm: 120 })[1]?.startMs).toBe(1000);
+        expect(listenPerformanceOf(steps, { startBpm: 120, shaped: false })[1]?.startMs).toBe(1000);
     });
 
     it("plays the whole piece faster without changing what it plays", () => {
-        const written = listenPerformanceOf(line(3), { startBpm: 120 });
-        const quick = listenPerformanceOf(line(3), { startBpm: 120, speed: 2 });
+        const written = listenPerformanceOf(line(3), { startBpm: 120, shaped: false });
+        const quick = listenPerformanceOf(line(3), { startBpm: 120, speed: 2, shaped: false });
         expect(quick.map((one) => one.pitch)).toEqual(written.map((one) => one.pitch));
         expect(quick.map((one) => one.startMs)).toEqual([0, 250, 500]);
         expect(quick[0]?.durationMs).toBeCloseTo((written[0]?.durationMs ?? 0) / 2);
@@ -329,39 +418,42 @@ describe("listenPerformanceOf", () => {
     it("cuts a clip on a position boundary, never halfway into a chord", () => {
         const steps = line(4);
         steps[2]!.notes = [note(72), note(76)];
-        const clip = listenPerformanceOf(steps, { startBpm: 120, withinMs: 1200 });
+        const clip = listenPerformanceOf(steps, { startBpm: 120, withinMs: 1200, shaped: false });
         expect(clip.map((one) => one.startMs)).toEqual([0, 500, 1000, 1000]);
     });
 
     it("anchors the clock on the first note, so an opening rest is not silence", () => {
         const steps = line(3);
         steps[0]!.notes = [];
-        expect(listenPerformanceOf(steps, { startBpm: 120 })[0]?.startMs).toBe(0);
+        expect(listenPerformanceOf(steps, { startBpm: 120, shaped: false })[0]?.startMs).toBe(0);
     });
 
     it("fingers every note, so a clip coloured by finger has one to read", () => {
         const steps = line(4);
         steps[1]!.notes = [note(48, { hand: "left" })];
-        const played = listenPerformanceOf(steps, { startBpm: 120 });
+        const played = listenPerformanceOf(steps, { startBpm: 120, shaped: false });
         expect(played.every((one) => one.finger !== undefined)).toBe(true);
         expect(played.every((one) => (one.finger ?? 0) >= 1 && (one.finger ?? 0) <= 5)).toBe(true);
         expect(played[1]?.hand).toBe("left");
     });
 
     it("gives a chord's members different fingers of the same hand", () => {
-        const played = listenPerformanceOf([step([60, 64, 67])], { startBpm: 120 });
+        const played = listenPerformanceOf([step([60, 64, 67])], { startBpm: 120, shaped: false });
         expect(new Set(played.map((one) => one.finger)).size).toBe(3);
     });
 
     it("carries the page's own dynamic through", () => {
-        const marked = listenPerformanceOf([step([60], { dynamicVolume: 40 })], { startBpm: 120 });
-        const unmarked = listenPerformanceOf([step([60])], { startBpm: 120 });
+        const marked = listenPerformanceOf([step([60], { dynamicVolume: 40 })], {
+            startBpm: 120,
+            shaped: false,
+        });
+        const unmarked = listenPerformanceOf([step([60])], { startBpm: 120, shaped: false });
         expect(marked[0]?.velocity).toBe(40);
         expect(unmarked[0]?.velocity).toBe(DEFAULT_VELOCITY);
     });
 
     it("plays nothing from nothing", () => {
-        expect(listenPerformanceOf([], { startBpm: 120 })).toEqual([]);
+        expect(listenPerformanceOf([], { startBpm: 120, shaped: false })).toEqual([]);
     });
 });
 
@@ -375,7 +467,7 @@ describe("what a rendered performance carries", () => {
         // One position, two notes: one struck under the pedal and one not.
         const both = step([60, 64]);
         both.notes = [note(60, { pedalled: true }), note(64, { pedalled: false })];
-        const [under, open] = listenPerformanceOf([both], { startBpm: 120 });
+        const [under, open] = listenPerformanceOf([both], { startBpm: 120, shaped: false });
         expect(under?.pedalled).toBe(true);
         expect(open?.pedalled).toBe(false);
     });

@@ -371,6 +371,8 @@
     "settings_language": "Kieli",
     "settings_sound": "Ääni",
     "settings_play_sounds": "Toista nuottiäänet",
+    "settings_listen_shaping": "Soita inhimillisellä otteella",
+    "settings_listen_shaping_help": "Kuunnellessa Plinky antaa fraasin laskeutua, viimeisen tahdin hengittää ja melodian soida hiuksenhienosti säestyksen edellä – kuten pianisti tekee. Pois päältä jokainen nuotti osuu tarkalleen iskulle.",
     "settings_grand_piano": "Äänitetty flyygeli",
     "settings_grand_piano_caption": "Aitoja äänityksiä konserttiflyygelistä sen sijaan, että Plinky tekisi äänen itse. Ne kertyvät soittaessasi — muutama sata kilotavua kappaletta kohti — ja jäävät tälle laitteelle.",
     "settings_grand_piano_arriving": "Haetaan soitinta…",

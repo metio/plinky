@@ -22,6 +22,7 @@ import type { PositionNote } from "./scorePosition";
 
 const expression = (entry: PositionNote) => entry.expression;
 import { slurredOnwardAt } from "../../core/slur";
+import { phraseProgress } from "../../core/touch";
 import { readPosition } from "./scorePosition";
 import type { TremoloSpan } from "../../core/tremolo";
 import { readArpeggio, readOrnament, readParts } from "./scoreExpression";
@@ -114,6 +115,7 @@ export function collectListenSteps(
                 stretch: position.stretch,
                 advancesCursor: order === groups.length - 1,
                 interpretation: interpretedWeight(marks.bars, slurs, whole),
+                phrase: phraseProgress(marks.bars, slurs, whole),
                 // Under the soft pedal the hammers strike fewer strings. Kept separate from
                 // the interpretation weight, which is about where a note sits in its bar and
                 // its phrase — this is a thing the player's foot is doing, and it applies on

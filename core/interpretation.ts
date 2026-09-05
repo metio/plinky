@@ -20,6 +20,8 @@
 // would be indefensible — the same line `legatoOverlap` sits on.
 
 import type { XmlBar } from "./musicxmlTimeline";
+
+export type { XmlBar };
 import type { SlurSpan } from "./slur";
 
 // The bar a position falls in, and how far into it the position sits, in beats.

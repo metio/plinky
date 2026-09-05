@@ -371,6 +371,8 @@
     "settings_language": "Gjuha",
     "settings_sound": "Zëri",
     "settings_play_sounds": "Luaj tingujt e notave",
+    "settings_listen_shaping": "Luaj me prekje njerëzore",
+    "settings_listen_shaping_help": "Gjatë dëgjimit, Plinky e lë frazën të qetësohet, i jep masës së fundit frymë dhe e nxjerr melodinë një fije para shoqërimit – siç bën një pianist. Fikur, çdo notë bie saktësisht në kohë.",
     "settings_grand_piano": "Piano me bisht e regjistruar",
     "settings_grand_piano_caption": "Regjistrime të vërteta të një pianoje koncerti, në vend të tingullit që Plinky e bën vetë. Vijnë ndërsa luan — nja disa qindra kilobajt për copë — dhe rrinë në këtë pajisje.",
     "settings_grand_piano_arriving": "Po merret instrumenti…",

@@ -371,6 +371,8 @@
     "settings_language": "语言",
     "settings_sound": "声音",
     "settings_play_sounds": "播放音符声音",
+    "settings_listen_shaping": "以人的触感演奏",
+    "settings_listen_shaping_help": "聆听时，Plinky 让乐句轻轻收尾，让最后一小节喘口气，并让旋律比伴奏稍稍领先——如同钢琴家那样。关闭后，每个音都精确落在拍点上。",
     "settings_grand_piano": "录制的三角钢琴",
     "settings_grand_piano_caption": "用真实录制的音乐会三角钢琴，代替 Plinky 自己合成的声音。它们会在你弹奏的过程中陆续到达——每首几百 KB——并保存在这台设备上。",
     "settings_grand_piano_arriving": "正在获取乐器…",

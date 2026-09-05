@@ -371,6 +371,8 @@
     "settings_language": "Jezik",
     "settings_sound": "Zvuk",
     "settings_play_sounds": "Sviraj zvukove nota",
+    "settings_listen_shaping": "Sviraj s ljudskim dodirom",
+    "settings_listen_shaping_help": "Pri slušanju Plinky pusti frazu da se smiri, zadnjem taktu da diše, a melodiju izvuče dlaku ispred pratnje – kao što to čini pijanist. Isključeno: svaka nota pada točno na dobu.",
     "settings_grand_piano": "Snimljeni koncertni klavir",
     "settings_grand_piano_caption": "Prave snimke koncertnog klavira umjesto zvuka koji Plinky proizvodi sam. Stižu dok sviraš — nekoliko stotina kilobajta po skladbi — i ostaju na ovom uređaju.",
     "settings_grand_piano_arriving": "Dohvaćam instrument…",

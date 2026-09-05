@@ -371,6 +371,8 @@
     "settings_language": "Dil",
     "settings_sound": "Ses",
     "settings_play_sounds": "Nota seslerini çal",
+    "settings_listen_shaping": "İnsan dokunuşuyla çal",
+    "settings_listen_shaping_help": "Dinlerken Plinky bir cümlenin sonunu yumuşakça bırakır, son ölçüye nefes verir ve ezgiyi eşlikten bir tutam önce duyurur – bir piyanistin yaptığı gibi. Kapalıyken her nota tam vuruşa düşer.",
     "settings_grand_piano": "Kayıtlı kuyruklu piyano",
     "settings_grand_piano_caption": "Plinky'nin kendi ürettiği sesin yerine gerçek bir konser piyanosunun kayıtları. Sen çaldıkça geliyorlar — parça başına birkaç yüz kilobayt — ve bu cihazda kalıyorlar.",
     "settings_grand_piano_arriving": "Çalgı getiriliyor…",

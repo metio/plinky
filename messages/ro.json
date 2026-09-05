@@ -371,6 +371,8 @@
     "settings_language": "Limbă",
     "settings_sound": "Sunet",
     "settings_play_sounds": "Redă sunetul notelor",
+    "settings_listen_shaping": "Cântă cu o tușă umană",
+    "settings_listen_shaping_help": "La ascultare, Plinky lasă o frază să se așeze, dă aer ultimei măsuri și scoate melodia cu un fir înaintea acompaniamentului – așa cum face un pianist. Dezactivat, fiecare notă cade exact pe timp.",
     "settings_grand_piano": "Pian de concert înregistrat",
     "settings_grand_piano_caption": "Înregistrări reale ale unui pian de concert, în locul sunetului pe care Plinky îl face singur. Sosesc pe măsură ce cânți — câteva sute de kilobytes pe piesă — și rămân pe acest dispozitiv.",
     "settings_grand_piano_arriving": "Se aduce instrumentul…",

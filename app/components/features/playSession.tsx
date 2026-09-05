@@ -29,7 +29,13 @@ import { transposeFifths } from "../../../core/ornament";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
-import { useHintsStore, useScheduler, useServices, useXmlCodec } from "../../contexts/services";
+import {
+    useHintsStore,
+    usePrefsStore,
+    useScheduler,
+    useServices,
+    useXmlCodec,
+} from "../../contexts/services";
 import { useFullscreen } from "../../hooks/useFullscreen";
 import { useDuet } from "../../hooks/useDuet";
 import { useGhostRace } from "../../hooks/useGhostRace";
@@ -313,6 +319,7 @@ function usePlaySessionValue({
     // dismissed so the prerendered HTML never flashes it; the portrait layout stays
     // fully usable, so this never forces an orientation (WCAG 1.3.4).
     const hints = useHintsStore();
+    const prefsStore = usePrefsStore();
     const rotateDismissed = useSyncExternalStore(
         hints.subscribe,
         () => hints.seen(ROTATE_HINT_ID),
@@ -776,6 +783,7 @@ function usePlaySessionValue({
         getOsmd,
         synth,
         tempo: readTempo,
+        shaped: () => prefsStore.load().listenShaping,
         loop: loop.read,
         onLap: bumpTempo,
         // The same wipe the run does at a repeat barline. Listen colours the bars it has

@@ -371,6 +371,8 @@
     "settings_language": "Nyelv",
     "settings_sound": "Hang",
     "settings_play_sounds": "Hangok lejátszása",
+    "settings_listen_shaping": "Emberi érintéssel játszik",
+    "settings_listen_shaping_help": "Meghallgatáskor a Plinky hagyja leülni a frázist, levegőt ad az utolsó ütemnek, és a dallamot egy leheletnyivel a kíséret elé hozza – ahogy egy zongorista teszi. Kikapcsolva minden hang pontosan az ütésre esik.",
     "settings_grand_piano": "Felvett hangversenyzongora",
     "settings_grand_piano_caption": "Egy hangversenyzongora valódi felvételei a helyett a hang helyett, amit a Plinky maga állít elő. Játék közben érkeznek — darabonként pár száz kilobájt — és ezen az eszközön maradnak.",
     "settings_grand_piano_arriving": "Hangszer letöltése…",

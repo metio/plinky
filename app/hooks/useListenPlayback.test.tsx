@@ -153,6 +153,8 @@ function mount(osmd: OpenSheetMusicDisplay | null, marks: ScoreMarks = NO_SCORE_
             marks,
             markPainted: () => {},
             isPracticing: () => false,
+            // On the grid: the touch is the subject of its own test.
+            shaped: () => false,
         }),
     );
 }
@@ -194,6 +196,7 @@ describe("collectListenSteps", () => {
             stretch: 1,
             advancesCursor: true,
             interpretation: 1,
+            phrase: 0,
         });
     });
 
@@ -424,6 +427,7 @@ describe("useListenPlayback", () => {
             duration: 0.5 * 0.94,
             velocity: 90,
             pedalled: false,
+            delay: 0,
         });
 
         // Each quarter at 120 BPM is 500ms; after both entries the walk ends.
@@ -537,6 +541,7 @@ describe("useListenPlayback", () => {
             duration: 0.25,
             velocity: 90,
             pedalled: false,
+            delay: 0,
         });
         act(() => staccato.result.current.stop());
         playNote.mockClear();
@@ -561,6 +566,7 @@ describe("useListenPlayback", () => {
             duration: 0.5 * 0.94,
             velocity: 40,
             pedalled: false,
+            delay: 0,
         });
         act(() => soft.result.current.stop());
     });
@@ -674,6 +680,8 @@ function heard(osmd: OpenSheetMusicDisplay, marks: ScoreMarks = NO_SCORE_MARKS) 
             marks,
             markPainted: () => {},
             isPracticing: () => false,
+            // On the grid: the touch is the subject of its own test.
+            shaped: () => false,
         }),
     );
     act(() => result.current.start(0));
@@ -681,6 +689,46 @@ function heard(osmd: OpenSheetMusicDisplay, marks: ScoreMarks = NO_SCORE_MARKS) 
     act(() => result.current.stop());
     return struck;
 }
+
+describe("the human touch", () => {
+    it("hands the synth the accompaniment a hair after the tune, and holds the last bar", () => {
+        const delays: Array<[number, number]> = [];
+        const ticks: number[] = [];
+        const started = Date.now();
+        const { result } = renderHook(() =>
+            useListenPlayback({
+                getOsmd: () =>
+                    lineOsmd([
+                        [48, 72],
+                        [50, 74],
+                    ]),
+                synth: {
+                    playNote: (pitch, options) => {
+                        delays.push([pitch, Math.round((options?.delay ?? 0) * 1000)]);
+                        ticks.push(Date.now() - started);
+                    },
+                },
+                tempo: () => 120,
+                loop: () => loopState,
+                onLap,
+                centerCursor: () => {},
+                markPainted: () => {},
+                isPracticing: () => false,
+            }),
+        );
+        act(() => result.current.start(0));
+        act(() => void vi.advanceTimersByTime(30_000));
+        act(() => result.current.stop());
+        const delayOf = (pitch: number) => delays.find(([one]) => one === pitch)?.[1] ?? -1;
+        expect(delayOf(84)).toBeLessThan(5);
+        expect(delayOf(60)).toBeGreaterThan(15);
+        expect(delayOf(60)).toBeLessThan(25);
+        // The first position is a bar before the last, so it holds its written length and
+        // the second position arrives on the beat.
+        expect(ticks[0]).toBe(0);
+        expect(ticks[2]).toBe(500);
+    });
+});
 
 describe("the listening performance", () => {
     it("plays a marked line exactly as pinned", () => {

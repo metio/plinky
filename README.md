@@ -508,6 +508,15 @@ slur settles at its end instead of stopping dead. It is slight on purpose, and i
 plays a note louder than the page asks — what is printed is a ceiling, and interpretation
 lives underneath it.
 
+Time gets the same treatment, because a performance that lands every note exactly on the
+grid sounds like a machine before it sounds like anything else. A phrase eases into its
+ending, the last bar of the piece broadens the way every player's does whether or not a
+*rit.* is printed, the tune is struck a hair before the accompaniment beneath it, and no
+two notes carry quite the same weight. All of it is small, and all of it is the same every
+time — the piece does not play differently on Tuesday. **Play with a human touch** in
+Settings turns it off, and then every note lands on the beat, which is what you want when
+you are counting against it.
+
 That shaping is in what you **hear**, and nowhere else. A run is graded against what the
 score actually says, so nobody is ever marked down for missing an accent that was never
 written.

@@ -371,6 +371,8 @@
     "settings_language": "Sprog",
     "settings_sound": "Lyd",
     "settings_play_sounds": "Afspil nodelyde",
+    "settings_listen_shaping": "Spil med menneskelig berøring",
+    "settings_listen_shaping_help": "Når du lytter, lader Plinky en frase lande blødt, giver sidste takt luft og lægger melodien en anelse foran akkompagnementet – som en pianist gør. Slået fra lander hver tone præcis på slaget.",
     "settings_grand_piano": "Indspillet flygel",
     "settings_grand_piano_caption": "Rigtige optagelser af et koncertflygel i stedet for den lyd, Plinky selv laver. De kommer, mens du spiller — et par hundrede kilobyte pr. stykke — og bliver på denne enhed.",
     "settings_grand_piano_arriving": "Henter instrumentet …",

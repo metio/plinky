@@ -496,6 +496,8 @@
     "settings_language": "Language",
     "settings_sound": "Sound",
     "settings_play_sounds": "Play note sounds",
+    "settings_listen_shaping": "Play with a human touch",
+    "settings_listen_shaping_help": "Listen eases into the end of a phrase, lets the last bar breathe, and brings the tune out a hair ahead of the accompaniment — the way a pianist does. Off, every note lands exactly on the beat.",
     "settings_grand_piano": "Recorded grand piano",
     "settings_grand_piano_caption": "Real recordings of a concert grand, instead of the sound Plinky makes itself. They arrive as you play — a few hundred kilobytes a piece — and are kept on this device.",
     "settings_grand_piano_arriving": "Fetching the instrument…",

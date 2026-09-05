@@ -371,6 +371,8 @@
     "settings_language": "Sprache",
     "settings_sound": "Ton",
     "settings_play_sounds": "Notentöne abspielen",
+    "settings_listen_shaping": "Mit menschlicher Note spielen",
+    "settings_listen_shaping_help": "Beim Anhören lässt Plinky eine Phrase sanft ausklingen, gibt dem letzten Takt Luft und setzt die Melodie einen Hauch vor der Begleitung – so wie es ein Pianist tut. Ausgeschaltet landet jede Note genau auf dem Schlag.",
     "settings_grand_piano": "Aufgenommener Flügel",
     "settings_grand_piano_caption": "Echte Aufnahmen eines Konzertflügels statt des Klangs, den Plinky selbst erzeugt. Sie kommen beim Spielen dazu — ein paar hundert Kilobyte pro Stück — und bleiben auf diesem Gerät.",
     "settings_grand_piano_arriving": "Das Instrument wird geholt …",

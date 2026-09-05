@@ -6,10 +6,10 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
-import { type ListenStep, performListenNote } from "../../core/listenPerformance";
+import { type ListenStep, performListenStep } from "../../core/listenPerformance";
 import { type Hand2, jumpsBack } from "../../core/matcher";
 import { NOMINAL_BPM } from "../../core/elapsed";
-import { effectiveTempo, listenStepMs } from "../../core/playback";
+import { effectiveTempo } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import type { Take } from "../../core/takes";
 import { collectListenSteps } from "../lib/listenSteps";
@@ -28,7 +28,7 @@ import { useTimerChain } from "./useTimerChain";
 type NoteSink = {
     playNote(
         note: number,
-        options?: { duration?: number; velocity?: number; pedalled?: boolean },
+        options?: { duration?: number; velocity?: number; pedalled?: boolean; delay?: number },
     ): void;
 };
 
@@ -59,6 +59,7 @@ export function useListenPlayback({
     // reached for a provider could not be used — or tested — outside one.
     echoNote = () => {},
     silenceEcho = () => {},
+    shaped = () => true,
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
     synth: NoteSink;
@@ -94,6 +95,9 @@ export function useListenPlayback({
     // Release everything the echo is still holding — playback stopping is a request
     // for silence on the instrument too, not only in the browser.
     silenceEcho?: () => void;
+    // Whether to play with the human touch. Read on every position, since it is a
+    // preference the player can flip while the piece plays.
+    shaped?: () => boolean;
 }) {
     const chain = useTimerChain();
     // Through a ref: the walk is set up inside a callback that must not be rebuilt every
@@ -234,18 +238,21 @@ export function useListenPlayback({
             trailNotes(highlightRef.current, LISTENED_COLOR);
             markPainted();
             highlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
-            for (const note of current.notes) {
-                // How the note sounds: its written length and touch at this position's
-                // tempo, less what the texture, the line and the soft pedal take off it.
-                const { durationSeconds, velocity, voiced } = performListenNote(
-                    current,
-                    note,
-                    localTempo(current),
-                );
+            // How each note sounds: its written length and touch at this position's tempo,
+            // less what the texture, the line and the soft pedal take off it, and — with
+            // the touch on — when it lands relative to the others struck with it.
+            const { played, advanceMs } = performListenStep(
+                steps,
+                step,
+                localTempo(current),
+                shaped(),
+            );
+            for (const { note, delayMs, durationSeconds, velocity, voiced } of played) {
                 synth.playNote(note.pitch, {
                     duration: durationSeconds,
                     velocity: voiced,
                     pedalled: note.pedalled,
+                    delay: delayMs / 1000,
                 });
                 // …and light the same note on a connected instrument, so the piece
                 // can be watched as well as heard. Inert unless asked for.
@@ -256,7 +263,7 @@ export function useListenPlayback({
             }
             step += 1;
             centerCursor();
-            chain.push(tick, listenStepMs(current.lengths, localTempo(current), current.stretch));
+            chain.push(tick, advanceMs);
         };
         tick();
     };

@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**Listen plays with a human touch.** Every note used to land exactly on the beat at
+exactly its weight, which is how a machine plays and not how a pianist does. Now a
+phrase eases into its ending, the last bar of the piece broadens, the tune is struck
+a hair before the accompaniment under it, and no two notes carry quite the same
+weight — all of it slight, and all of it the same every time you press Listen.
+Prefer the metronome-exact reading? *Play with a human touch* in Settings turns it
+off.
+
 **Listen plays the page more faithfully.** A grace note took its own written length
 and then the note it decorates took its own, so every beat after an ornament arrived
 late and a piece full of them drifted; the grace now borrows from the beat, as it is

@@ -88,6 +88,9 @@ export type Prefs = {
     instrumentSounds: boolean;
     // Echo what Plinky plays to a connected instrument, lighting its keys.
     midiEcho: boolean;
+    // Whether Listen plays with the human touch — the phrase settling, the last bar
+    // broadening, the tune leading — or lands every note on the grid.
+    listenShaping: boolean;
     // Light the keys you are about to play on an instrument that illuminates them —
     // Casio's MIDI In Navigate, Yamaha's Light Guide. Distinct from midiEcho, which
     // shows what Plinky HAS played: this shows what comes next, which is the point.
@@ -261,6 +264,7 @@ function defaults(): Prefs {
         noteLabels: "all",
         instrumentSounds: false,
         midiEcho: false,
+        listenShaping: true,
         keyLights: false,
         lightProfile: "casio",
         lightLeftChannel: defaultChannels("casio").left,
@@ -356,6 +360,7 @@ export function parsePrefs(raw: string | null): Prefs {
             sound: bool(parsed.sound, base.sound),
             instrumentSounds: bool(parsed.instrumentSounds, base.instrumentSounds),
             midiEcho: bool(parsed.midiEcho, base.midiEcho),
+            listenShaping: bool(parsed.listenShaping, base.listenShaping),
             keyLights: bool(parsed.keyLights, base.keyLights),
             lightProfile: oneOf(parsed.lightProfile, LIGHT_PROFILE_IDS, base.lightProfile),
             lightLeftChannel: cleanChannel(parsed.lightLeftChannel, base.lightLeftChannel),

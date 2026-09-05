@@ -371,6 +371,8 @@
     "settings_language": "Idioma",
     "settings_sound": "Sonido",
     "settings_play_sounds": "Reproducir el sonido de las notas",
+    "settings_listen_shaping": "Tocar con toque humano",
+    "settings_listen_shaping_help": "Al escuchar, Plinky deja que una frase se asiente, da aire al último compás y adelanta la melodía un suspiro sobre el acompañamiento, como haría un pianista. Desactivado, cada nota cae exactamente en el tiempo.",
     "settings_grand_piano": "Piano de cola grabado",
     "settings_grand_piano_caption": "Grabaciones reales de un piano de concierto, en lugar del sonido que Plinky genera. Llegan mientras tocas —unos cientos de kilobytes por pieza— y se quedan en este dispositivo.",
     "settings_grand_piano_arriving": "Trayendo el instrumento…",

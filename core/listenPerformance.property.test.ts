@@ -5,9 +5,10 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
     type ListenNote,
-    type ListenStep,
     listenPerformanceOf,
+    type ListenStep,
     performListenNote,
+    performListenStep,
     rollChord,
     shapedByContour,
     spellOutOrnament,
@@ -42,6 +43,7 @@ const listenStep: fc.Arbitrary<ListenStep> = fc.record({
     contour: fc.double({ min: 0.5, max: 1, noNaN: true }),
     advancesCursor: fc.boolean(),
     interpretation: fc.double({ min: 0.5, max: 1, noNaN: true }),
+    phrase: fc.double({ min: 0, max: 1, noNaN: true }),
 });
 
 describe("the listening performance, whatever the page says", () => {
@@ -56,6 +58,32 @@ describe("the listening performance, whatever the page says", () => {
                     );
                     for (const [index, onset] of onsets.entries()) {
                         expect(onset).toBeGreaterThanOrEqual(onsets[index - 1] ?? 0);
+                    }
+                },
+            ),
+        );
+    });
+
+    it("strikes every note of a position within the position, touch or no touch", () => {
+        fc.assert(
+            fc.property(
+                fc.array(listenStep, { minLength: 1, maxLength: 20 }),
+                fc.integer({ min: 20, max: 300 }),
+                fc.boolean(),
+                (steps, tempo, shaped) => {
+                    for (const index of steps.keys()) {
+                        const { played, advanceMs } = performListenStep(
+                            steps,
+                            index,
+                            tempo,
+                            shaped,
+                        );
+                        for (const one of played) {
+                            expect(one.delayMs).toBeGreaterThanOrEqual(0);
+                            expect(one.delayMs).toBeLessThanOrEqual(Math.max(0, advanceMs / 2));
+                            expect(one.voiced).toBeGreaterThanOrEqual(1);
+                            expect(one.voiced).toBeLessThanOrEqual(127);
+                        }
                     }
                 },
             ),

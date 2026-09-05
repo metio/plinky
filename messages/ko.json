@@ -371,6 +371,8 @@
     "settings_language": "언어",
     "settings_sound": "소리",
     "settings_play_sounds": "음 소리 재생",
+    "settings_listen_shaping": "사람의 손길로 연주",
+    "settings_listen_shaping_help": "들을 때 프레이즈의 끝을 부드럽게 마무리하고, 마지막 마디에 숨을 주며, 반주보다 살짝 앞서 선율을 냅니다. 피아니스트가 하듯이요. 끄면 모든 음이 정확히 박에 맞춰 울립니다.",
     "settings_grand_piano": "녹음된 그랜드 피아노",
     "settings_grand_piano_caption": "Plinky가 직접 만들어 내는 소리 대신, 콘서트 그랜드를 실제로 녹음한 소리입니다. 연주하는 동안 곡당 수백 킬로바이트씩 도착하고, 이 기기에 남습니다.",
     "settings_grand_piano_arriving": "악기를 가져오는 중…",

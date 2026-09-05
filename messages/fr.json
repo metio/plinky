@@ -371,6 +371,8 @@
     "settings_language": "Langue",
     "settings_sound": "Son",
     "settings_play_sounds": "Jouer le son des notes",
+    "settings_listen_shaping": "Jouer avec une touche humaine",
+    "settings_listen_shaping_help": "À l'écoute, Plinky laisse une phrase se poser, donne de l'air à la dernière mesure et fait ressortir la mélodie un souffle avant l'accompagnement – comme le ferait un pianiste. Désactivé, chaque note tombe exactement sur le temps.",
     "settings_grand_piano": "Piano à queue enregistré",
     "settings_grand_piano_caption": "De vrais enregistrements d'un piano de concert, à la place du son que Plinky fabrique lui-même. Ils arrivent au fil du jeu — quelques centaines de kilooctets par morceau — et restent sur cet appareil.",
     "settings_grand_piano_arriving": "Récupération de l'instrument…",

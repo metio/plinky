@@ -10,6 +10,7 @@ import { type OrnamentKind, ornamentNotes } from "./ornament";
 import { SOFT_SCALE } from "./pedal";
 import { effectiveTempo, listenStepMs } from "./playback";
 import { fingeringOfHands } from "./scorePerformance";
+import { noteDelayMs, rubatoStretch, touchVelocity } from "./touch";
 import { type TremoloSpan, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
 
 // The listening performance: the model Listen sounds a score from, and everything that
@@ -80,6 +81,8 @@ export type ListenStep = {
     // What fraction of its written loudness this position is played at, from where it sits
     // in the bar and in its phrase. One where the score gives nothing to read.
     interpretation: number;
+    // How far into its phrase the position is, 0 to 1 — what the touch settles time by.
+    phrase: number;
 };
 
 // The contour pass. Done over the finished walk rather than during it, because how high a
@@ -351,6 +354,70 @@ export function performListenNote(
     return { durationSeconds, velocity, voiced: Math.max(1, Math.round(voiced)) };
 }
 
+// One note of one position, ready to sound: when after the position's moment, for how
+// long, and how hard — the page's ask in `velocity`, what the synth is handed in `voiced`.
+export type PlayedNote = {
+    note: ListenNote;
+    delayMs: number;
+    durationSeconds: number;
+    velocity: number;
+    voiced: number;
+};
+
+// How far through the piece's last bar a step is, 0 to 1, or null anywhere before it.
+export function finalBarProgress(steps: readonly ListenStep[], index: number): number | null {
+    const last = steps[steps.length - 1]?.measureIndex;
+    const step = steps[index];
+    if (last === undefined || !step || step.measureIndex !== last) {
+        return null;
+    }
+    let first = index;
+    while (first > 0 && steps[first - 1]?.measureIndex === last) {
+        first -= 1;
+    }
+    let count = 0;
+    for (let at = first; at < steps.length && steps[at]?.measureIndex === last; at++) {
+        count += 1;
+    }
+    return count <= 1 ? 1 : (index - first) / (count - 1);
+}
+
+// One position performed: every note with its own moment, length and touch, and how long
+// the position holds before the next. The one function Listen, the clip renderer and the
+// video export sound a step through, so they cannot come to play three performances.
+//
+// `shaped` is the human touch — the phrase settling, the last bar broadening, the tune
+// leading, the grain on every note. Off, every note lands on the grid at the reading's
+// own weight, which is what the pinned performances and a metronome-exact export want.
+export function performListenStep(
+    steps: readonly ListenStep[],
+    index: number,
+    tempo: number,
+    shaped = true,
+): { played: PlayedNote[]; advanceMs: number } {
+    const step = steps[index] as ListenStep;
+    const rubato = shaped ? rubatoStretch(step.phrase, finalBarProgress(steps, index)) : 1;
+    const advanceMs = listenStepMs(step.lengths, tempo, step.stretch * rubato);
+    const tune = Math.max(...step.notes.map((note) => note.pitch));
+    const played = step.notes.map((note) => {
+        const { durationSeconds, velocity, voiced } = performListenNote(step, note, tempo);
+        const grain = shaped ? touchVelocity(index, note.pitch) : 1;
+        // The lead never reaches past the position: in a run too quick for it, the
+        // accompaniment lands within the first half of the beat rather than under the next.
+        const delayMs = shaped
+            ? Math.min(noteDelayMs(index, note.pitch, note.pitch === tune), advanceMs / 2)
+            : 0;
+        return {
+            note,
+            delayMs,
+            durationSeconds: durationSeconds * rubato,
+            velocity,
+            voiced: Math.max(1, Math.min(127, Math.round(voiced * grain))),
+        };
+    });
+    return { played, advanceMs };
+}
+
 export type ListenPerformanceOptions = {
     // The tempo the piece opens at, in crotchets per minute. Every position is counted in
     // the same proportion to it that the score's mark there stands in — so a piece that
@@ -362,6 +429,8 @@ export type ListenPerformanceOptions = {
     // piece rather than the whole of it. The cut lands on a position boundary, so the
     // performance never ends halfway into a chord.
     withinMs?: number;
+    // The human touch on the timing and the weight; on unless asked otherwise.
+    shaped?: boolean;
 };
 
 // A listening timeline as a performance: every note with when it is struck, how long it
@@ -372,7 +441,7 @@ export type ListenPerformanceOptions = {
 // rather than two.
 export function listenPerformanceOf(
     steps: readonly ListenStep[],
-    { startBpm, speed = 1, withinMs }: ListenPerformanceOptions,
+    { startBpm, speed = 1, withinMs, shaped = true }: ListenPerformanceOptions,
 ): RecordedNote[] {
     // Faster or slower is the dial, not a second clock over the top of one: the notes
     // shorten with the beat exactly as they do when a player moves the tempo.
@@ -394,16 +463,16 @@ export function listenPerformanceOf(
             break;
         }
         const tempo = effectiveTempo(dial, step.bpm, startBpm);
+        const { played, advanceMs } = performListenStep(steps, index, tempo, shaped);
         // A chord's members take their fingers in the order the hand's position lists them.
         const taken: Record<Hand2, number> = { left: 0, right: 0 };
-        for (const note of step.notes) {
-            const { durationSeconds, voiced } = performListenNote(step, note, tempo);
+        for (const { note, delayMs, durationSeconds, voiced } of played) {
             const finger = fingering.get(note.hand)?.[index]?.[taken[note.hand]];
             taken[note.hand] += 1;
             firstNoteMs ??= elapsedMs;
             notes.push({
                 pitch: note.pitch,
-                startMs: elapsedMs,
+                startMs: elapsedMs + delayMs,
                 durationMs: Math.max(1, durationSeconds * 1000),
                 velocity: voiced,
                 hand: note.hand,
@@ -415,12 +484,18 @@ export function listenPerformanceOf(
                 ...(finger === undefined ? {} : { finger }),
             });
         }
-        elapsedMs += listenStepMs(step.lengths, tempo, step.stretch);
+        elapsedMs += advanceMs;
     }
-    // The first note anchors the clock: a piece that opens with a rest should not begin
-    // with silence in a video that is only seconds long.
-    const first = notes[0]?.startMs ?? 0;
-    return notes.map((note) => ({ ...note, startMs: note.startMs - first }));
+    // The first position with a note anchors the clock: a piece that opens with a rest
+    // should not begin with silence in a video that is only seconds long. The position
+    // rather than the first note, since with the touch on the first note struck may be the
+    // tune's accompaniment, a hair after the moment the position lands on.
+    // In the order struck: with the touch on, the tune lands before the notes under it
+    // whatever order the position lists them in, and a consumer walks a timeline.
+    const first = firstNoteMs ?? 0;
+    return notes
+        .map((note) => ({ ...note, startMs: note.startMs - first }))
+        .sort((one, other) => one.startMs - other.startMs);
 }
 
 // How much of a position's time its grace notes may take. A grace note is written with a

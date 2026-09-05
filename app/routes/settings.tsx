@@ -167,6 +167,12 @@ export default function Settings() {
                     checked={prefs.sound}
                     onChange={(sound) => update({ sound })}
                 />
+                <SwitchField
+                    label={m.settings_listen_shaping()}
+                    help={m.settings_listen_shaping_help()}
+                    checked={prefs.listenShaping}
+                    onChange={(listenShaping) => update({ listenShaping })}
+                />
                 <FeatureBoundary feature="GrandPianoSetting">
                     <GrandPianoSetting />
                 </FeatureBoundary>

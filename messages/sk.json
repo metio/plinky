@@ -371,6 +371,8 @@
     "settings_language": "Jazyk",
     "settings_sound": "Zvuk",
     "settings_play_sounds": "Prehrávať zvuky nôt",
+    "settings_listen_shaping": "Hrať s ľudským citom",
+    "settings_listen_shaping_help": "Pri počúvaní Plinky nechá frázu dosadnúť, dá poslednému taktu nadýchnuť a melódiu posunie o vlások pred sprievod – tak ako klavirista. Vypnuté: každá nota dopadne presne na dobu.",
     "settings_grand_piano": "Nahrané krídlo",
     "settings_grand_piano_caption": "Skutočné nahrávky koncertného krídla namiesto zvuku, ktorý si Plinky vyrába sám. Pribúdajú počas hrania — pár sto kilobajtov na skladbu — a zostávajú v tomto zariadení.",
     "settings_grand_piano_arriving": "Sťahujem nástroj…",

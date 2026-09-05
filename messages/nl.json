@@ -371,6 +371,8 @@
     "settings_language": "Taal",
     "settings_sound": "Geluid",
     "settings_play_sounds": "Notengeluiden afspelen",
+    "settings_listen_shaping": "Spelen met een menselijke toets",
+    "settings_listen_shaping_help": "Bij het luisteren laat Plinky een frase zachtjes landen, geeft de laatste maat lucht en laat de melodie een fractie vóór de begeleiding klinken – zoals een pianist dat doet. Uit, dan valt elke noot precies op de tel.",
     "settings_grand_piano": "Opgenomen vleugel",
     "settings_grand_piano_caption": "Echte opnamen van een concertvleugel, in plaats van het geluid dat Plinky zelf maakt. Ze komen binnen terwijl je speelt — een paar honderd kilobyte per stuk — en blijven op dit apparaat.",
     "settings_grand_piano_arriving": "Het instrument wordt opgehaald…",
