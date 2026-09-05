@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { shareOrCopy } from "../lib/shareOrCopy";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button } from "../components/ui/button";
 import { ReportBack } from "../components/features/reportBack";
@@ -143,7 +143,9 @@ export default function AssignmentsRoute() {
 
     // The picker pool covers the catalogue and exercises; songs are labelled from
     // the wider known-pieces set, and an unresolved id falls back to itself.
-    const byId = new Map(pool.map((entry) => [entry.id, entry.title]));
+    // Built once per pool, not once per keystroke in the builder: the pool is the whole
+    // catalogue plus the exercises.
+    const byId = useMemo(() => new Map(pool.map((entry) => [entry.id, entry.title])), [pool]);
     const titleOf = (id: string) => byId.get(id) ?? known.titleOf(id) ?? id;
 
     // The starter first — where a first day begins — then the named works below it.
@@ -351,37 +353,39 @@ export default function AssignmentsRoute() {
             )}
 
             <Show when={tab === "list" && builtin.length > 0}>
-                <section className="space-y-3">
-                    <h2 className={sectionHeadingClasses}>{m.assignments_builtin_heading()}</h2>
-                    <ul className="space-y-2">
-                        {builtin.map((assignment, index) => {
-                            const list = stepsFor(assignment);
-                            return (
-                                <AssignmentCard
-                                    key={assignment.id}
-                                    assignment={assignment}
-                                    steps={list}
-                                    copiedShare={copiedShare}
-                                    onShare={onShare}
-                                    onDownload={onDownload}
-                                    description={assignment.description}
-                                    // The first is the starter — where a first day begins,
-                                    // so it is open. The named works below it are a shelf.
-                                    foldSteps={index > 0}
-                                >
-                                    {steps(list)}
-                                    <ReportBack assignment={assignment} />
-                                </AssignmentCard>
-                            );
-                        })}
-                    </ul>
-                    <p className="text-sm text-muted">
-                        {m.assignments_collect_hint()}{" "}
-                        <LocalizedLink to="/collect" className={linkClasses}>
-                            {m.collect_title()}
-                        </LocalizedLink>
-                    </p>
-                </section>
+                {() => (
+                    <section className="space-y-3">
+                        <h2 className={sectionHeadingClasses}>{m.assignments_builtin_heading()}</h2>
+                        <ul className="space-y-2">
+                            {builtin.map((assignment, index) => {
+                                const list = stepsFor(assignment);
+                                return (
+                                    <AssignmentCard
+                                        key={assignment.id}
+                                        assignment={assignment}
+                                        steps={list}
+                                        copiedShare={copiedShare}
+                                        onShare={onShare}
+                                        onDownload={onDownload}
+                                        description={assignment.description}
+                                        // The first is the starter — where a first day begins,
+                                        // so it is open. The named works below it are a shelf.
+                                        foldSteps={index > 0}
+                                    >
+                                        {steps(list)}
+                                        <ReportBack assignment={assignment} />
+                                    </AssignmentCard>
+                                );
+                            })}
+                        </ul>
+                        <p className="text-sm text-muted">
+                            {m.assignments_collect_hint()}{" "}
+                            <LocalizedLink to="/collect" className={linkClasses}>
+                                {m.collect_title()}
+                            </LocalizedLink>
+                        </p>
+                    </section>
+                )}
             </Show>
 
             {tab === "list" && (
