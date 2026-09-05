@@ -39,12 +39,24 @@ const STAVE = {
 };
 
 function needsLedger(xml: string): boolean {
-    const lines = /<sign>F<\/sign>/.test(xml) ? STAVE.bass : STAVE.treble;
-    const pitches = xml.matchAll(
-        /<step>\s*([A-G])\s*<\/step>[\s\S]*?<octave>\s*(-?\d+)\s*<\/octave>/g,
-    );
-    for (const [, step, octave] of pitches) {
-        const index = Number(octave) * 7 + STEPS.indexOf(step ?? "C");
+    // Each staff's own clef: on a grand staff the treble is judged against the treble
+    // lines and the bass against the bass, or every treble note above the bass stave
+    // read as a ledger line. A clef with no number belongs to the first staff.
+    const clefs = new Map<number, { low: number; high: number }>();
+    for (const [, number, sign] of xml.matchAll(
+        /<clef(?:\s[^>]*?number="(\d+)")?[^>]*>\s*<sign>\s*([A-Za-z]+)\s*<\/sign>/g,
+    )) {
+        clefs.set(Number(number ?? "1"), sign === "F" ? STAVE.bass : STAVE.treble);
+    }
+    for (const [, body] of xml.matchAll(/<note[\s>]([\s\S]*?)<\/note>/g)) {
+        const step = /<step>\s*([A-G])\s*<\/step>/.exec(body ?? "")?.[1];
+        const octave = /<octave>\s*(-?\d+)\s*<\/octave>/.exec(body ?? "")?.[1];
+        if (step === undefined || octave === undefined) {
+            continue;
+        }
+        const staff = Number(/<staff>\s*(\d+)\s*<\/staff>/.exec(body ?? "")?.[1] ?? "1");
+        const lines = clefs.get(staff) ?? STAVE.treble;
+        const index = Number(octave) * 7 + STEPS.indexOf(step);
         if (index <= lines.low - 2 || index >= lines.high + 2) {
             return true;
         }
