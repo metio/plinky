@@ -4,16 +4,9 @@
 import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
-import {
-    FERMATA_STRETCH,
-    NOMINAL_BPM,
-    type Position,
-    quartersMs,
-    writtenOnsetsMs,
-} from "../../core/elapsed";
+import { NOMINAL_BPM, type Position, quartersMs, writtenOnsetsMs } from "../../core/elapsed";
 import { graceOnsetsMs } from "../../core/grace";
 import { pedalledAt } from "../../core/pedal";
-import { volumeAt } from "../../core/dynamics";
 
 // How many notes the practised hand has to play at the cursor. Only whether a position is
 // worth stopping at is asked here, so it needs neither dynamics nor timing: seeking is
@@ -39,19 +32,17 @@ import { slurredOnwardAt } from "../../core/slur";
 import type { ScoreParts } from "../../core/parts";
 import {
     isGraceNote,
-    playOrder,
     readParts,
     readScoreExpression,
     readStartTempo,
-    readTempo,
 } from "../lib/scoreExpression";
 import { seekToOrdinal } from "../lib/scoreCursor";
+import { readPosition } from "../lib/scorePosition";
 import {
     currentBar,
     expectedPitches,
     type Hand,
     type Hand2,
-    handOfStaff,
     type MatcherState,
     type MatchStep,
     matchNote,
@@ -138,30 +129,14 @@ function stepsAtCursor(
     parts: ScoreParts,
     marks: ScoreMarks,
 ): PositionSteps {
-    const whole = osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0;
-    // The dynamic in force at this position, read once: it is a property of where the
-    // cursor sits, not of any one note under it.
-    const dynamicVolume = volumeAt(marks.dynamics, whole);
-    // A fermata belongs to the position too: it holds whatever is sounding, and a rest can
-    // carry one. So it is read across everything under the cursor, including the notes the
-    // practised hand does not play.
-    let fermata = false;
-    for (const note of osmd.cursor.NotesUnderCursor()) {
-        fermata ||= readScoreExpression(note).fermata;
-    }
+    const position = readPosition(osmd, parts, marks, hand);
+    const { whole, dynamicVolume } = position;
 
     const groups: StepGroup[] = [];
-    for (const group of playOrder([...osmd.cursor.NotesUnderCursor()], (note) => note)) {
+    for (const group of position.groups) {
         const pitches: number[] = [];
-        // One entry per pitch, in the same order. A note whose staff the engraver does
-        // not report reads as the treble, which is where a single-staff piece is played.
         const pitchStaves: number[] = [];
-        // Which hand plays each pitch, worked out from the score's parts rather than from
-        // the raw staff index — on an art song the piano's staves are 1 and 2.
         const pitchHands: Hand2[] = [];
-        // What each pitch is asked for, pushed alongside `pitches` so the two stay
-        // aligned. Kept in quarter notes here and turned into milliseconds once the
-        // position's tempo is known, which is where the chord's own hold is converted.
         const expected: {
             velocity: number | null;
             soundQuarters: number;
@@ -169,34 +144,16 @@ function stepsAtCursor(
         }[] = [];
         let holdQuarters = 0;
         let graceQuarters = 0;
-        for (const note of group) {
-            if (note.isRest() || note.halfTone <= 0) {
+        for (const entry of group) {
+            // Only what sounds, is the practised hand's, and is struck rather than held
+            // over from a tie.
+            if (!entry.sounds || !entry.practised || !entry.expression.strike) {
                 continue;
             }
-            const staff = note.ParentStaff?.idInMusicSheet;
-            if (!isPracticedHand(staff, hand, parts)) {
-                continue;
-            }
-            const expression = readScoreExpression(note);
-            // A tie's later notes are the same sound continuing, not a note to play
-            // again: the key is already down and the score is asking for it to stay
-            // down. Demanding a re-strike contradicts what the page says, and
-            // contradicts Listen, which honours the tie — the two would ask for
-            // different performances of one bar. A group whose notes are ALL
-            // continuations collects no pitches and is dropped, which is right: there
-            // is nothing to do there.
-            if (!expression.strike) {
-                continue;
-            }
-            pitches.push(note.halfTone + 12);
-            // The step's staves are hands — 0 the right, 1 the left — whatever page
-            // position the engraver gives the staff: on an art song the piano's staves
-            // are 1 and 2, and reported raw both read as the left hand.
-            pitchStaves.push(handOfStaff(staff, parts) === "left" ? 1 : 0);
-            pitchHands.push(handOfStaff(staff, parts));
-            // Each key is asked for on its own terms: its own accent over the standing
-            // dynamic, and its own sounding length narrowed by its own articulation. The
-            // sounding length, not the written one — a tied minim is held for the tie.
+            const { expression, staff } = entry;
+            pitches.push(entry.pitch);
+            pitchStaves.push(entry.hand === "left" ? 1 : 0);
+            pitchHands.push(entry.hand);
             expected.push({
                 velocity:
                     dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
@@ -204,23 +161,12 @@ function stepsAtCursor(
                     expression.soundQuarters *
                     lengthScaleOf({
                         articulation: expression.articulation,
-                        // From the span: a note in the middle of an arch carries no slur of
-                        // its own, and reading it as unslurred would grade a phrase played
-                        // legato as one played staccato. On the note's own staff: an arch
-                        // over the tune says nothing about the bass under it.
                         slurred: slurredOnwardAt(marks.slurs, whole, staff),
                     }),
-                // The same length before articulation narrows it: what this one key is
-                // written to last, which is what its hold indicator draws. A whole note
-                // under a quaver is the ordinary case for two hands, and one length for
-                // the whole position would drain the quaver's fill at the whole note's
-                // pace long after that hand had moved on.
                 writtenQuarters: expression.soundQuarters,
             });
-            // The group's own length is its longest note: how long the position keeps
-            // ringing, which is not the same as how long any one key is held.
             holdQuarters = Math.max(holdQuarters, expression.soundQuarters);
-            if (isGraceNote(note)) {
+            if (entry.grace) {
                 graceQuarters = Math.max(graceQuarters, expression.notatedQuarters);
             }
         }
@@ -246,8 +192,8 @@ function stepsAtCursor(
         // is written against rather than one average for the whole score.
         // From the file, so a tempo written mid-bar takes effect where it is written
         // rather than at the barline before it — which is what the engraver could only do.
-        bpm: tempoAt(marks.tempi, whole) ?? readTempo(osmd.cursor.iterator) ?? NOMINAL_BPM,
-        stretch: fermata ? FERMATA_STRETCH : 1,
+        bpm: position.bpm,
+        stretch: position.stretch,
         groups,
     };
 }

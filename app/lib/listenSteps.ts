@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { volumeAt } from "../../core/dynamics";
-import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
 import { interpretedWeight } from "../../core/interpretation";
 import {
     type ListenNote,
@@ -17,19 +15,12 @@ import {
     spellOutOrnament,
     spellOutTremolo,
 } from "../../core/listenPerformance";
-import { handOfStaff } from "../../core/matcher";
-import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import { pedalledAt, ringUntil, softAt } from "../../core/pedal";
 import { slurredOnwardAt } from "../../core/slur";
+import { readPosition } from "./scorePosition";
 import type { TremoloSpan } from "../../core/tremolo";
-import {
-    playOrder,
-    readArpeggio,
-    readOrnament,
-    readParts,
-    readScoreExpression,
-    readTempo,
-} from "./scoreExpression";
+import { readArpeggio, readOrnament, readParts } from "./scoreExpression";
 
 // Walk the engraved score once and lift the listening timeline into the pure step
 // model: every cursor position with its striking notes, the dynamic in force, and
@@ -44,7 +35,7 @@ export function collectListenSteps(
     const cursor = osmd.cursor;
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it belongs to the position's place in the piece, not to the position.
-    const dynamics = marks.dynamics;
+    const _dynamics = marks.dynamics;
     // Where the score asks for the sustain pedal: under it the harmony pools, and a note
     // keeps sounding past its written length until the pedal comes up.
     const pedals = marks.pedals;
@@ -63,43 +54,26 @@ export function collectListenSteps(
         carrier: null,
     };
     while (!cursor.iterator.EndReached) {
-        // The dynamic in force is the same for every note under the cursor, so read
-        // it once per position.
-        const dynamicVolume = volumeAt(dynamics, cursor.iterator.currentTimeStamp?.RealValue ?? 0);
-        // A fermata holds whatever is sounding, so it is a property of the position —
-        // read across every note under the cursor, rests included.
-        let fermata = false;
-        for (const note of cursor.NotesUnderCursor()) {
-            fermata ||= readScoreExpression(note).fermata;
-        }
-        // An ornament sounds before the note it decorates, not with it — the same split
-        // the matcher makes, through the same rule, so Listen and the graded run ask for
-        // one performance rather than two.
-        const groups = playOrder([...cursor.NotesUnderCursor()], (note) => note);
+        const position = readPosition(osmd, parts, marks);
+        const { whole, dynamicVolume } = position;
+        const groups = position.groups;
         for (const [order, group] of groups.entries()) {
             const notes: ListenNote[] = [];
             const lengths: number[] = [];
-            const whole = cursor.iterator.currentTimeStamp?.RealValue ?? 0;
-            for (const note of group) {
-                const expression = readScoreExpression(note);
-                // A tie's later notes are already sounding from the tie start, so skip
-                // the re-strike; rests never sound.
-                if (!note.isRest() && note.halfTone > 0 && expression.strike) {
+            for (const entry of group) {
+                const { expression } = entry;
+                if (entry.sounds && expression.strike) {
                     notes.push({
-                        pitch: note.halfTone + 12,
-                        // Under the pedal the damper holds the note, so it rings on
-                        // whether or not the written value is up.
+                        pitch: entry.pitch,
                         soundQuarters: ringUntil(pedals, whole, expression.soundQuarters / 4) * 4,
                         pedalled: pedalledAt(pedals, whole),
                         articulation: expression.articulation,
                         accent: expression.accent,
                         marcato: expression.marcato,
-                        // From the span, not the note: the engraving hangs a slur on its
-                        // two end notes only, so a note in the middle of an arch reports
-                        // none of its own and would play detached. On the note's own
+                        // Whether a slur carries this note onward, judged on its own
                         // staff: an arch over the tune says nothing about the bass.
-                        slurred: slurredOnwardAt(slurs, whole, note.ParentStaff?.idInMusicSheet),
-                        hand: handOfStaff(note.ParentStaff?.idInMusicSheet, parts),
+                        slurred: slurredOnwardAt(slurs, whole, entry.staff),
+                        hand: entry.hand,
                     });
                 }
                 // Rests count too, so a written gap dwells its own length — the cursor
@@ -111,11 +85,9 @@ export function collectListenSteps(
                 dynamicVolume,
                 lengths,
                 whole,
-                measureIndex: cursor.iterator.CurrentMeasureIndex,
-                // From the file, so a tempo written mid-bar takes effect where it is
-                // written rather than at the barline before it.
-                bpm: tempoAt(marks.tempi, whole) ?? readTempo(cursor.iterator) ?? NOMINAL_BPM,
-                stretch: fermata ? FERMATA_STRETCH : 1,
+                measureIndex: position.measureIndex,
+                bpm: position.bpm,
+                stretch: position.stretch,
                 advancesCursor: order === groups.length - 1,
                 interpretation: interpretedWeight(marks.bars, slurs, whole),
                 // Under the soft pedal the hammers strike fewer strings. Kept separate from
@@ -131,7 +103,7 @@ export function collectListenSteps(
             // instruction to play a short figure in its place. Printed but not played, the
             // page and the sound disagree about what the bar contains, and a reader
             // learning to recognise the sign hears nothing happen where it is written.
-            const ornament = group.length === 1 ? readOrnament(group[0]) : null;
+            const ornament = group.length === 1 ? readOrnament(group[0]?.note) : null;
             // A tremolo and a glissando are the same kind of instruction as an ornament —
             // shorthand for a figure — so they are spelled out the same way, and the graded
             // run still asks for the written notes. Taken in this order because a note can
@@ -152,7 +124,7 @@ export function collectListenSteps(
                 steps.push(...spellOutGlissando(step, gliss, fifthsAt(keys, whole)));
             } else if (ornament) {
                 steps.push(...spellOutOrnament(step, ornament, fifthsAt(keys, whole)));
-            } else if (group.some((note) => readArpeggio(note))) {
+            } else if (group.some((entry) => readArpeggio(entry.note))) {
                 steps.push(...rollChord(step));
             } else {
                 steps.push(step);
