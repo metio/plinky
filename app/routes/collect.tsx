@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useId, useMemo, useState } from "react";
+import { useStore } from "../contexts/services";
+import { useKnownPieces } from "../hooks/useKnownPieces";
+import { loadCatalog } from "../lib/catalog";
 import { slugifyName } from "../../core/assignment";
 import {
     type AssignmentReport,
@@ -14,8 +17,6 @@ import {
 } from "../../core/assignmentReport";
 import { noindexMeta, routeMeta } from "../../core/site";
 import { Button } from "../components/ui/button";
-import { useStore } from "../contexts/services";
-import { loadCatalog } from "../lib/catalog";
 import { downloadBlob } from "../lib/download";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/collect";
@@ -31,15 +32,18 @@ export function meta(_args: Route.MetaArgs) {
 // blank column nobody can identify.
 function usePieceTitles(): (id: string) => string {
     const store = useStore();
-    // One pass over the catalogue, not one per lookup. Resolving a score by id reads and
-    // parses the whole stored library each time, and this is called once per column while
-    // the page re-renders on every keystroke in the paste box — so a class list of ten
-    // steps rebuilt the catalogue ten times per letter typed.
-    const titles = useMemo(
+    // Every piece this device can name. The catalogue's songs and exercises arrive with
+    // the manifests — a teacher builds an assignment from the catalogue, so resolving
+    // from the local library alone labelled every column with the piece's hash — and
+    // the local library names the rest at once, before and without any network.
+    const known = useKnownPieces();
+    // One pass over the local library, not one per lookup: this is called once per
+    // column while the page re-renders on every keystroke in the paste box.
+    const local = useMemo(
         () => new Map(loadCatalog(store).map((score) => [score.id, score.title])),
         [store],
     );
-    return useCallback((id: string) => titles.get(id) ?? id, [titles]);
+    return useCallback((id: string) => known.titleOf(id) ?? local.get(id) ?? id, [known, local]);
 }
 
 // The other end of a handed-back assignment: paste in whatever arrived and read it
