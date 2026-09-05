@@ -46,10 +46,14 @@ export function ProgressBackup() {
             return;
         }
         const mine = ++readSeq.current;
-        const result = importProgress(store, await file.text());
+        // Read first, then check the pick is still the latest, then import: the guard
+        // has to stand between the slow read and the write, or a slower earlier pick
+        // still replaces the whole device store after a later one was chosen.
+        const text = await file.text();
         if (mine !== readSeq.current) {
             return;
         }
+        const result = importProgress(store, text);
         if (result.ok) {
             window.location.reload();
             return;

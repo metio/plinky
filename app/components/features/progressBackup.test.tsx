@@ -5,6 +5,7 @@
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { memoryStore } from "../../adapters/memoryStore";
+import { exportProgress } from "../../lib/progressBackup";
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { ProgressBackup } from "./progressBackup";
@@ -121,5 +122,34 @@ describe("ProgressBackup", () => {
         releaseSlow();
         await new Promise((resolve) => setTimeout(resolve, 0));
         expect(screen.getAllByRole("alert")).toHaveLength(1);
+    });
+
+    it("does not let a slower earlier pick replace the device once a newer one landed", async () => {
+        // The earlier pick is a valid bundle from another device. Its read finishes after
+        // the newer pick was chosen; the guard has to stand before the write, or the whole
+        // device store is replaced by a file the player had moved on from.
+        const { container, services } = renderWithServices(<ProgressBackup />, {
+            store: memoryStore(device),
+        });
+        const foreign = exportProgress(
+            memoryStore({ "plinky:foreign": "1" }),
+            "2026-01-01T00:00:00.000Z",
+        );
+        let releaseSlow = () => {};
+        const slow = {
+            name: "a.json",
+            text: () =>
+                new Promise<string>((resolve) => {
+                    releaseSlow = () => resolve(foreign);
+                }),
+        };
+        const fast = { name: "b.json", text: () => Promise.resolve("{}") };
+        const input = fileInput(container);
+        fireEvent.change(input, { target: { files: [slow] } });
+        fireEvent.change(input, { target: { files: [fast] } });
+        await screen.findByRole("alert");
+        releaseSlow();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        expect(services.store.get("plinky:foreign")).toBeNull();
     });
 });

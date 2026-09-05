@@ -43,10 +43,11 @@ export function ScoreBackup() {
         }
         const mine = ++readSeq.current;
         try {
-            const result = importScoresPack(store, xmlCodec, await file.text());
+            const text = await file.text();
             if (mine !== readSeq.current) {
                 return;
             }
+            const result = importScoresPack(store, xmlCodec, text);
             setStatus(
                 `${m.backup_imported_scores({ count: m.backup_scores({ count: result.imported }) })}.`,
             );
