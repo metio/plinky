@@ -5,16 +5,17 @@ import { describe, expect, it } from "vitest";
 import { keyLane } from "./keyboardGeometry";
 import { attributionFor } from "./attribution";
 import {
-    licenseLine,
-    provenanceLine,
-    wrapTitle,
+    boxInWindow,
     highwayBlocks,
+    licenseLine,
     playedStepCount,
+    provenanceLine,
     sceneKeys,
     sceneRange,
     scorePanelRect,
     scoreWindowTop,
     stepCenterAt,
+    wrapTitle,
 } from "./videoScene";
 
 describe("sceneRange", () => {
@@ -307,5 +308,18 @@ describe("wrapTitle", () => {
 
     it("honours a one-line budget", () => {
         expect(wrapTitle(measure, "one two three", 60, 60, 1)).toHaveLength(1);
+    });
+});
+
+describe("boxInWindow", () => {
+    const window = { left: 100, top: 0, width: 200, height: 50 };
+    it("keeps a box that overlaps the window, however slightly", () => {
+        expect(boxInWindow({ x: 150, y: 10, width: 10, height: 10 }, window)).toBe(true);
+        expect(boxInWindow({ x: 90, y: 10, width: 10, height: 10 }, window)).toBe(true);
+        expect(boxInWindow({ x: 300, y: 10, width: 10, height: 10 }, window)).toBe(true);
+    });
+    it("drops a box wholly outside it", () => {
+        expect(boxInWindow({ x: 50, y: 10, width: 10, height: 10 }, window)).toBe(false);
+        expect(boxInWindow({ x: 150, y: 80, width: 10, height: 10 }, window)).toBe(false);
     });
 });
