@@ -52,13 +52,8 @@ export function gatesInWorkflow(path = ".github/workflows/verify.yml") {
 // The gates that need a built site, a browser fleet, or an instrumented run of the whole
 // tree. Named rather than guessed, and NAMED IN THE OUTPUT when skipped: a runner that
 // quietly leaves five gates out reads as "everything passed" when it is not.
-export const HEAVY = new Set([
-    "ci-build",
-    "ci-lighthouse",
-    "ci-widths",
-    "ci-a11y-light",
-    "ci-a11y-dark",
-    "ci-coverage",
-    "ci-storybook",
-    "ci-browser",
-]);
+// The wrappers `npm run ci:local` leaves to CI or to a deliberate `--all` under `capped`:
+// each builds the site or drives a browser over it. Named as flake.nix defines them, and
+// the parity gate checks that every name here is one the flake defines — a heavy gate
+// listed under a name the flake never had would run loose on the first job that added it.
+export const HEAVY = new Set(["ci-build", "ci-lighthouse", "ci-widths", "ci-test-browser"]);
