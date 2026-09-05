@@ -97,18 +97,15 @@ describe("spellOutTremolo", () => {
     });
 
     it("rocks between the two written chords of an alternating pair", () => {
-        const figure = spellOutTremolo(
-            step([60]),
-            {
-                from: 0,
-                to: 0.5,
-                beams: 2,
-                pair: [
-                    { at: 0, pitches: [36] },
-                    { at: 0.5, pitches: [43] },
-                ],
-            },
-        );
+        const figure = spellOutTremolo(step([60]), {
+            from: 0,
+            to: 0.5,
+            beams: 2,
+            pair: [
+                { at: 0, pitches: [36] },
+                { at: 0.5, pitches: [43] },
+            ],
+        });
         // The pair's pitches are MIDI numbers as read from the file, and sound as such.
         const sounded = figure.slice(0, 4).map((one) => one.notes[0]?.pitch);
         expect(sounded[0]).toBe(36);

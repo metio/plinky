@@ -24,18 +24,22 @@ describe("midi key lights, over any sequence of pictures and channel changes", (
     it("lights nothing twice, puts out only what is lit, and leaves nothing lit", () => {
         fc.assert(
             fc.property(steps, (sequence) => {
-                let current: LightChannels = sequence[0].channels;
+                let current: LightChannels = sequence[0]?.channels ?? { left: 1, right: 1 };
                 const lit = new Set<string>();
-                const lights = createMidiKeyLights(([status, note]) => {
-                    const key = `${status & 0x0f}:${note}`;
-                    if ((status & 0xf0) === 0x90) {
-                        expect(lit.has(key)).toBe(false);
-                        lit.add(key);
-                    } else {
-                        expect(lit.has(key)).toBe(true);
-                        lit.delete(key);
-                    }
-                }, () => current);
+                const lights = createMidiKeyLights(
+                    (data) => {
+                        const status = data[0] ?? 0;
+                        const key = `${status & 0x0f}:${data[1] ?? 0}`;
+                        if ((status & 0xf0) === 0x90) {
+                            expect(lit.has(key)).toBe(false);
+                            lit.add(key);
+                        } else {
+                            expect(lit.has(key)).toBe(true);
+                            lit.delete(key);
+                        }
+                    },
+                    () => current,
+                );
                 for (const step of sequence) {
                     current = step.channels;
                     lights.show(step.picture);

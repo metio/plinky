@@ -3,7 +3,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { reveal } from "../testing/controls";
-import { MemoryRouter } from "react-router";
+import { Link, MemoryRouter, Route as RouterRoute, Routes, useParams } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { fakeMidi } from "../adapters/fakeMidi";
@@ -45,23 +45,30 @@ describe("Play", () => {
     it("opens the next piece clean of what the address asked for the last one", async () => {
         // One route serves every piece and moving between them re-renders it rather than
         // remounting: a transposition asked for on one piece must not carry to the next.
-        const first = { params: { scoreId: bundledId("ode to joy") } } as unknown as Route.ComponentProps;
-        const second = { params: { scoreId: bundledId("twinkle") } } as unknown as Route.ComponentProps;
-        const page = (props: Route.ComponentProps) => (
-            <MemoryRouter initialEntries={["/en/play/x/?transpose=2"]}>
+        // The route is driven the way the app drives it: one Play under a :scoreId
+        // segment, and a link to the next piece with a plain address.
+        const PlayAt = () => {
+            const { scoreId = "" } = useParams();
+            const props = { params: { scoreId } } as unknown as Route.ComponentProps;
+            return <Play {...props} />;
+        };
+        render(
+            <MemoryRouter initialEntries={[`/en/play/${bundledId("ode to joy")}/?transpose=2`]}>
                 <ServicesProvider services={midiFake}>
                     <MidiProvider>
-                        <Play {...props} />
+                        <Link to={`/en/play/${bundledId("twinkle")}/`}>next piece</Link>
+                        <Routes>
+                            <RouterRoute path="/en/play/:scoreId/" element={<PlayAt />} />
+                        </Routes>
                     </MidiProvider>
                 </ServicesProvider>
-            </MemoryRouter>
+            </MemoryRouter>,
         );
-        const view = render(page(first));
         expect(await screen.findByText("Ode to Joy")).toBeTruthy();
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
         expect(screen.getByText("+2 st")).toBeTruthy();
 
-        view.rerender(page(second));
+        fireEvent.click(screen.getByRole("link", { name: "next piece" }));
         expect(await screen.findByText(/twinkle/i)).toBeTruthy();
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
         expect(screen.getByText("0 st")).toBeTruthy();

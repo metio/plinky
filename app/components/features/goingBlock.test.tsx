@@ -72,7 +72,7 @@ describe("the block behind the period dial", () => {
         expect(labels.filter((label) => /^\d\d-\d\d$/.test(label ?? ""))).toEqual(["08-24"]);
         const bars = [...container.querySelectorAll(".bg-chart-peak")] as HTMLElement[];
         expect(bars).toHaveLength(1);
-        expect(bars[0].style.height).toBe("0%");
+        expect(bars[0]?.style.height).toBe("0%");
     });
 
     it("says nothing at all before anything has been played", () => {

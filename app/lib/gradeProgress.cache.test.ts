@@ -85,7 +85,10 @@ describe("the catalogue cache", () => {
             },
         };
         await Promise.all([
-            loadGradedMastery({ loadAll: () => [{ id: "mine", value: markLearned(null, 0) }] }, counting),
+            loadGradedMastery(
+                { loadAll: () => [{ id: "mine", value: markLearned(null, 0) }] },
+                counting,
+            ),
             loadGradeCatalogue(counting),
             loadGradeCatalogue(counting),
         ]);

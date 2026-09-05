@@ -7,7 +7,7 @@ import { collectSteps } from "../hooks/useScoreMatcher";
 import { DEFAULT_DRILL, generateDrill } from "../../core/drill";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import { PLAYED_COLOR } from "../../core/scoreCanvas";
-import { collectNoteElements, paintPlayedNotes } from "./scoreColor";
+import { collectNoteElements, collectStepNotes, paintPlayedNotes } from "./scoreColor";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
 const containers: HTMLElement[] = [];
@@ -82,7 +82,7 @@ describe("collectNoteElements", () => {
         // that the matcher does not have puts every later reveal, ghost marker and
         // video tint one note behind.
         const osmd = await renderOsmd(TIED);
-        const steps = collectNoteElements(osmd, "both");
+        const steps = collectStepNotes(osmd, "both");
         expect(collectSteps(osmd, "both").length).toBe(2);
         expect(steps.length).toBe(2);
         expect(steps.map((step) => step.measure)).toEqual([0, 1]);

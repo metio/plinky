@@ -175,7 +175,9 @@ describe("ScoreViewer", () => {
         const practice = await awaitReady();
         fireEvent.click(practice);
         await expect
-            .poll(() => screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"))
+            .poll(() =>
+                screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"),
+            )
             .toBe("true");
     });
 

@@ -15,10 +15,19 @@ const DEFAULT_TEMPO = 120;
 // typing "9" on the way to "96" is clamped to 40 before the "6" arrives. So the text
 // lives here while the field has focus, the take's tempo moves only when the text is a
 // tempo in range, and leaving the field settles anything else to the nearest one.
-function TempoField({ tempo, onTempo }: { tempo: number; onTempo: (tempo: number) => void }) {
+function TempoField({
+    id,
+    tempo,
+    onTempo,
+}: {
+    id: string;
+    tempo: number;
+    onTempo: (tempo: number) => void;
+}) {
     const [typed, setTyped] = useState<string | null>(null);
     return (
         <input
+            id={id}
             type="number"
             min={MIN_TEMPO}
             max={MAX_TEMPO}
@@ -91,9 +100,9 @@ export function ComposeSettings({
                     className={fieldClasses}
                 />
             </label>
-            <label className="space-y-1">
+            <label htmlFor="compose-tempo" className="space-y-1">
                 <span className={LABEL}>{m.compose_tempo_label()}</span>
-                <TempoField tempo={tempo} onTempo={onTempo} />
+                <TempoField id="compose-tempo" tempo={tempo} onTempo={onTempo} />
             </label>
             <label className="space-y-1">
                 <span className={LABEL}>{m.compose_beats_label()}</span>

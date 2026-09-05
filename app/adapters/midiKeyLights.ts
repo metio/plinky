@@ -59,7 +59,10 @@ export function createMidiKeyLights(
             // channels it was lit on, and start over on the new ones. Diffing across the
             // change would leave the old lights burning and, for an unchanged picture,
             // send nothing at all on the channels the player just corrected.
-            if (shownOn !== null && (shownOn.left !== current.left || shownOn.right !== current.right)) {
+            if (
+                shownOn !== null &&
+                (shownOn.left !== current.left || shownOn.right !== current.right)
+            ) {
                 emit(shown, NOTE_OFF, 0, shownOn);
                 shown = NOTHING_LIT;
             }
