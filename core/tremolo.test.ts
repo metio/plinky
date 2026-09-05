@@ -70,6 +70,15 @@ describe("tremoloNotes", () => {
         expect(tremoloNotes([60], null, 0, 2)).toEqual([]);
     });
 
+    it("carries on from the chord a stretch had reached", () => {
+        // A rock resumed part-way through its span, one repetition in, opens on the second
+        // chord — the alternation is unbroken across the positions that split it.
+        expect(tremoloNotes([36], [43], 1, 2, 1).map((one) => one.pitches[0])).toEqual([
+            43, 36, 43, 36,
+        ]);
+        expect(tremoloNotes([36], [43], 1, 2, 2)[0]?.pitches).toEqual([36]);
+    });
+
     it("treats an empty second chord as a single-note tremolo", () => {
         // A file that opens an alternating tremolo and never gives the other chord: repeat
         // the note we do have rather than alternating it with silence.
@@ -90,7 +99,7 @@ const note = (
 describe("readTremolos", () => {
     it("reads a single-note tremolo over its own note", () => {
         const spans = readTremolos([note(0, 60, { beams: 3, part: "single" }, 1)]);
-        expect(spans).toEqual([{ from: 0, to: 1, beams: 3, pair: null }]);
+        expect(spans).toEqual([{ from: 0, to: 1, beams: 3, pitches: [60], pair: null }]);
     });
 
     it("gives an alternating tremolo one span per written note, both the same figure", () => {
@@ -130,6 +139,25 @@ describe("readTremolos", () => {
             note(0.5, 43, { beams: 2, part: "stop" }, 0.5, 2, "5"),
         ]);
         expect(spans[0]?.pair?.map((chord) => chord.pitches)).toEqual([[36], [43]]);
+    });
+
+    it("names the notes a single-note tremolo rocks, and not the other hand's", () => {
+        // A left-hand chord tremolo under a right-hand tune: the span carries the chord,
+        // so what spells it out can rock those two notes and let the tune sound once.
+        const spans = readTremolos([
+            note(0, 36, { beams: 3, part: "single" }, 0.5, 2, "5"),
+            note(0, 43, { beams: 3, part: "single" }, 0.5, 2, "5"),
+            note(0, 76, null, 0.125, 1, "1"),
+        ]);
+        expect(spans.map((span) => span.pitches)).toEqual([[36, 43]]);
+    });
+
+    it("gives each span of a pair the chord written at its own position", () => {
+        const spans = readTremolos([
+            note(0, 48, { beams: 2, part: "start" }),
+            note(0.5, 55, { beams: 2, part: "stop" }),
+        ]);
+        expect(spans.map((span) => span.pitches)).toEqual([[48], [55]]);
     });
 
     it("opens one figure per position however many notes carry the mark", () => {

@@ -8,7 +8,7 @@ import {
     type ListenStep,
     listenPerformanceOf,
     openingGlissando,
-    openingTremolo,
+    tremoloAt,
     performListenNote,
     rollChord,
     shapedByContour,
@@ -89,9 +89,66 @@ describe("spellOutOrnament", () => {
     });
 });
 
+const SINGLE = { from: 0, to: 0.5, beams: 2, pitches: [60], pair: null };
+
 describe("spellOutTremolo", () => {
+    it("lets the other hand's note at the onset sound once while the chord shakes", () => {
+        // A left-hand minim tremolo on C2 under a right-hand quaver on E5, struck together:
+        // the E sounds with the first repetition and is not rocked eight times a beat.
+        const figure = spellOutTremolo(step([36, 76], { lengths: [2, 0.5] }), {
+            ...SINGLE,
+            pitches: [36],
+        });
+        expect(figure[0]?.notes.map((note) => note.pitch)).toEqual([36, 76]);
+        expect(figure.slice(1).every((one) => one.notes.every((note) => note.pitch === 36))).toBe(
+            true,
+        );
+        // The tune's note keeps its own written length rather than the repetition's.
+        expect(figure[0]?.notes[1]?.soundQuarters).toBe(step([76]).notes[0]?.soundQuarters);
+        expect(figure[0]?.notes[0]?.soundQuarters).toBe(figure[0]?.lengths[0]);
+    });
+
+    it("fits the figure to the position's advance, not the whole span", () => {
+        // The right hand moves again half a beat in; the bar must not wait for two beats
+        // of shake before it may. That later position gets its own stretch of the rock.
+        const figure = spellOutTremolo(step([36, 76], { lengths: [2, 0.5] }), {
+            ...SINGLE,
+            pitches: [36],
+        });
+        const total = figure.reduce((sum, one) => sum + (one.lengths[0] ?? 0), 0);
+        expect(total).toBeCloseTo(0.5);
+    });
+
+    it("carries the shake on under a position inside the span", () => {
+        // The right hand's quaver half a beat in: the C2 is not on the page there, so the
+        // figure is modelled on the note that carries the mark, found at the opening.
+        const carrier = step([36]).notes[0] ?? null;
+        const inside = step([76], { lengths: [0.5], whole: 0.125 });
+        const figure = spellOutTremolo(inside, { ...SINGLE, pitches: [36] }, carrier);
+        expect(figure[0]?.notes.map((note) => note.pitch)).toEqual([36, 76]);
+        expect(figure.length).toBeGreaterThan(1);
+        expect(figure.slice(1).every((one) => one.notes[0]?.pitch === 36)).toBe(true);
+    });
+
+    it("resumes an alternating pair on the chord it had reached", () => {
+        const span = {
+            from: 0,
+            to: 0.5,
+            beams: 2,
+            pitches: [36],
+            pair: [
+                { at: 0, pitches: [36] },
+                { at: 0.5, pitches: [43] },
+            ],
+        };
+        // A semiquaver rock, resumed after one semiquaver: the second chord is due.
+        const inside = step([76], { lengths: [0.25], whole: 1 / 16 });
+        const figure = spellOutTremolo(inside, span, step([36]).notes[0] ?? null);
+        expect(figure[0]?.notes[0]?.pitch).toBe(43);
+    });
+
     it("shakes one written note rather than holding it", () => {
-        const figure = spellOutTremolo(step([60]), { from: 0, to: 0.5, beams: 2, pair: null });
+        const figure = spellOutTremolo(step([60]), SINGLE);
         expect(figure.length).toBeGreaterThan(1);
         expect(figure.every((one) => one.notes[0]?.pitch === 60)).toBe(true);
     });
@@ -101,6 +158,7 @@ describe("spellOutTremolo", () => {
             from: 0,
             to: 0.5,
             beams: 2,
+            pitches: [36],
             pair: [
                 { at: 0, pitches: [36] },
                 { at: 0.5, pitches: [43] },
@@ -174,9 +232,13 @@ describe("rollChord", () => {
 
 describe("the opening span at a position", () => {
     it("finds the span that starts here and nothing else", () => {
-        const tremolos = [{ from: 0.5, to: 1, beams: 2, pair: null }];
-        expect(openingTremolo(tremolos, 0.5)).toBe(tremolos[0]);
-        expect(openingTremolo(tremolos, 0.75)).toBeNull();
+        const tremolos = [{ from: 0.5, to: 1, beams: 2, pitches: [60], pair: null }];
+        expect(tremoloAt(tremolos, 0.5)).toBe(tremolos[0]);
+        // A position inside the span is under the same shake: the note carrying the mark
+        // holds through it.
+        expect(tremoloAt(tremolos, 0.75)).toBe(tremolos[0]);
+        expect(tremoloAt(tremolos, 0.25)).toBeNull();
+        expect(tremoloAt(tremolos, 1)).toBeNull();
         const glissandos = [{ from: 0.25, to: 0.5, arrivesAt: 72 }];
         expect(openingGlissando(glissandos, 0.25)).toBe(glissandos[0]);
         expect(openingGlissando(glissandos, 0)).toBeNull();

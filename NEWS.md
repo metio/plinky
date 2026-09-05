@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**Listen keeps the other hand in time under a tremolo.** A rocking tremolo in the
+left hand with a moving line above it used to take its whole length before the right
+hand was allowed on, so the tune arrived late and the bar stretched; and the shake
+stopped the moment the tune moved. Every note now sounds where it is written, and the
+tremolo carries on beneath them for as long as the page says.
+
 **Your progress no longer vanishes when the catalogue fails to load once.** If the
 list of pieces could not be fetched the moment Plinky opened — a poor connection, a
 hiccup right after an update — everything you had learned read as nothing for the

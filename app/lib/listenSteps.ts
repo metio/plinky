@@ -9,7 +9,8 @@ import {
     type ListenNote,
     type ListenStep,
     openingGlissando,
-    openingTremolo,
+    tremoloAt,
+    tremoloCarrier,
     rollChord,
     shapedByContour,
     spellOutGlissando,
@@ -20,6 +21,7 @@ import { handOfStaff } from "../../core/matcher";
 import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { pedalledAt, ringUntil, softAt } from "../../core/pedal";
 import { slurredOnwardAt } from "../../core/slur";
+import type { TremoloSpan } from "../../core/tremolo";
 import {
     playOrder,
     readArpeggio,
@@ -56,6 +58,10 @@ export function collectListenSteps(
     const parts = readParts(osmd);
     cursor.reset();
     const steps: ListenStep[] = [];
+    const rocking: { span: TremoloSpan | null; carrier: ListenNote | null } = {
+        span: null,
+        carrier: null,
+    };
     while (!cursor.iterator.EndReached) {
         // The dynamic in force is the same for every note under the cursor, so read
         // it once per position.
@@ -131,10 +137,17 @@ export function collectListenSteps(
             // run still asks for the written notes. Taken in this order because a note can
             // carry only one of them, and the tremolo's span is what decides whether this
             // position opens one.
-            const tremolo = openingTremolo(marks.tremolos, whole);
+            const tremolo = tremoloAt(marks.tremolos, whole);
             const gliss = openingGlissando(marks.glissandos, whole);
             if (tremolo) {
-                steps.push(...spellOutTremolo(step, tremolo));
+                // The note carrying the mark is struck where the span opens and holds
+                // through the positions inside it, so the figure at each of those is
+                // modelled on the one found at the opening.
+                const carrier =
+                    rocking.span === tremolo ? rocking.carrier : tremoloCarrier(step, tremolo);
+                rocking.span = tremolo;
+                rocking.carrier = carrier;
+                steps.push(...spellOutTremolo(step, tremolo, carrier));
             } else if (gliss) {
                 steps.push(...spellOutGlissando(step, gliss, fifthsAt(keys, whole)));
             } else if (ornament) {
