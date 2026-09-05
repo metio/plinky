@@ -64,6 +64,14 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                 if (note.isRest() || note.halfTone <= 0) {
                     continue;
                 }
+                // A tie's later notes are the same sound continuing: the key is already
+                // down and the score asks for it to stay down. The beat still dwells its
+                // written length (the length is kept above), but there is nothing to
+                // catch there and nothing for the guide to strike again — the self-paced
+                // matcher and Listen read the tie the same way.
+                if (!readScoreExpression(note).strike) {
+                    continue;
+                }
                 const entry = { pitch: note.halfTone + 12, quarters };
                 // The practised hand's notes are yours to catch; the other hand's are the
                 // accompaniment a duet sounds for you. A both-hands run has no other hand.
