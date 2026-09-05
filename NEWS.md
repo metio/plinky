@@ -109,6 +109,17 @@ inside the beat the position actually lasts.
 moment too early, and Firefox could drop the download with nothing to show for it.
 It goes out the same way every other export does now.
 
+**The count-in and the recording agree about where the beat is.** In Compose, the
+recorder's zero was set from the moment you pressed Count in, while the clicks you
+heard started a fraction later and kept their own grid — so a note played exactly
+on the click was recorded a little late, for the whole take. The clicks and the
+recording now share one grid, laid on the audio clock.
+
+**A run's clock follows the page past an ornament.** After a note with a grace note
+in front of it, the run read the next gap as a jump and stopped following the
+printed timing there. The ornament's little note no longer counts as the beat's
+length.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to

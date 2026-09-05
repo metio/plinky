@@ -70,8 +70,12 @@ describe("useCompositionTransport", () => {
         expect(result.current.countingIn).toBe(true);
         // Arming twice must not schedule a second downbeat.
         act(() => result.current.countIn());
-        // One 4/4 bar at 120bpm = 2000ms.
-        act(() => vi.advanceTimersByTime(1_999));
+        // The grid is laid on the audio clock a tenth of a second out, where the
+        // metronome's first click lands, and the downbeat is one 4/4 bar at 120 bpm —
+        // 2000 ms — after that click, so the recorder's zero is the click the player
+        // counted on rather than the moment the button was pressed.
+        expect(result.current.anchor).toBeCloseTo(0.1);
+        act(() => vi.advanceTimersByTime(2_099));
         expect(onDownbeat).not.toHaveBeenCalled();
         act(() => vi.advanceTimersByTime(1));
         expect(onDownbeat).toHaveBeenCalledTimes(1);
