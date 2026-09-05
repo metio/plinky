@@ -220,13 +220,66 @@ describe("collectListenSteps", () => {
         // the sign hears nothing happen where it is written.
         const steps = collectListenSteps(fakeOsmd(2), {
             ...NO_SCORE_MARKS,
-            tremolos: [{ from: 0, to: 0.5, beams: 2, pair: null }],
+            tremolos: [{ from: 0, to: 0.5, beams: 2, pitches: [], pair: null }],
         });
         expect(steps.length).toBeGreaterThan(2);
         expect(
             steps.every((step) =>
                 step.notes.every((note) => note.pitch === steps[0]?.notes[0]?.pitch),
             ),
+        ).toBe(true);
+    });
+
+    it("keeps the other hand in time under a tremolo, and the shake going under it", () => {
+        // A left-hand minim tremolo under four right-hand quavers. The bar is still two
+        // beats long, each quaver sounds once where it is written, and the shake carries on
+        // beneath every one of them rather than stopping after the first.
+        let position = 0;
+        const onsets = [0, 0.125, 0.25, 0.375];
+        const cursor = {
+            reset: vi.fn(() => {
+                position = 0;
+            }),
+            show: vi.fn(),
+            hide: vi.fn(),
+            next: vi.fn(() => {
+                position++;
+            }),
+            iterator: {
+                get EndReached() {
+                    return position >= onsets.length;
+                },
+                get CurrentMeasureIndex() {
+                    return 0;
+                },
+                get currentTimeStamp() {
+                    return { RealValue: onsets[position] ?? 0 };
+                },
+            },
+            NotesUnderCursor: () => [
+                ...(position === 0
+                    ? [{ Length: { RealValue: 0.5 }, isRest: () => false, halfTone: 24 }]
+                    : []),
+                { Length: { RealValue: 0.125 }, isRest: () => false, halfTone: 64 },
+            ],
+        };
+        const osmd = { cursor, Sheet: { SourceMeasures: [] } } as unknown as OpenSheetMusicDisplay;
+        const steps = collectListenSteps(osmd, {
+            ...NO_SCORE_MARKS,
+            tremolos: [{ from: 0, to: 0.5, beams: 3, pitches: [36], pair: null }],
+        });
+        const advance = steps.reduce((sum, step) => sum + Math.min(...step.lengths), 0);
+        expect(advance).toBeCloseTo(2);
+        const tunes = steps.flatMap((step) => step.notes.filter((note) => note.pitch === 76));
+        expect(tunes).toHaveLength(4);
+        const shakes = steps.filter((step) => step.notes.some((note) => note.pitch === 36));
+        expect(shakes.length).toBeGreaterThan(4);
+        // The shake goes on after the second quaver has been struck.
+        const secondQuaver = steps.findIndex(
+            (step, index) => index > 0 && step.notes.some((note) => note.pitch === 76),
+        );
+        expect(
+            steps.slice(secondQuaver + 1).some((step) => step.notes.some((n) => n.pitch === 36)),
         ).toBe(true);
     });
 
@@ -238,6 +291,7 @@ describe("collectListenSteps", () => {
                     from: 0,
                     to: 0.5,
                     beams: 2,
+                    pitches: [36],
                     pair: [
                         { at: 0, pitches: [36] },
                         { at: 0.5, pitches: [43] },
@@ -591,7 +645,7 @@ describe("the listening performance", () => {
         expect(
             heard(fakeOsmd(3), {
                 ...NO_SCORE_MARKS,
-                tremolos: [{ from: 0, to: 0.25, beams: 2, pair: null }],
+                tremolos: [{ from: 0, to: 0.25, beams: 2, pitches: [], pair: null }],
                 glissandos: [{ from: 0.25, to: 0.5, arrivesAt: 72 }],
                 tempi: [{ whole: 0, bpm: 90 }],
             }),

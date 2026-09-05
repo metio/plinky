@@ -10,7 +10,7 @@ import { type OrnamentKind, ornamentNotes } from "./ornament";
 import { SOFT_SCALE } from "./pedal";
 import { effectiveTempo, listenStepMs } from "./playback";
 import { fingeringOfHands } from "./scorePerformance";
-import { type TremoloSpan, tremoloNotes } from "./tremolo";
+import { type TremoloSpan, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
 
 // The listening performance: the model Listen sounds a score from, and everything that
 // turns it into notes with times and touches on them.
@@ -137,11 +137,19 @@ export function spellOutOrnament(
     }));
 }
 
-// The tremolo or glissando this position OPENS, if any. A span is spelled out once, at its
-// first note; the notes inside it are swallowed, since the figure already contains them.
-export function openingTremolo(spans: readonly TremoloSpan[], whole: number): TremoloSpan | null {
-    return spans.find((span) => near(span.from, whole)) ?? null;
+// The tremolo sounding at this position, if any: the one it opens, or the one it falls
+// inside — the note carrying the mark holds through, so the shake carries on under
+// whatever the other hand plays there.
+export function tremoloAt(spans: readonly TremoloSpan[], whole: number): TremoloSpan | null {
+    return (
+        spans.find((span) => near(span.from, whole)) ??
+        spans.find((span) => span.from < whole && whole < span.to && !near(span.to, whole)) ??
+        null
+    );
 }
+
+// The glissando this position OPENS, if any. A span is spelled out once, at its first
+// note; the notes inside it are swallowed, since the sweep already contains them.
 
 export function openingGlissando(
     spans: readonly GlissandoSpan[],
@@ -153,29 +161,60 @@ export function openingGlissando(
 const NEAR = 1 / 1024;
 const near = (one: number, other: number) => Math.abs(one - other) < NEAR;
 
-// A tremolo, spelled out as the notes it shakes. The figure fills the whole span — for an
-// alternating one that is both written notes' time, because the pair is one gesture.
-export function spellOutTremolo(step: ListenStep, span: TremoloSpan): ListenStep[] {
-    const model = step.notes[0];
+// A tremolo, spelled out as the notes it shakes, over one position of the walk.
+//
+// The figure rocks the chord that carries the mark, and fits the position's advance — the
+// shortest length at it, whichever staff that is on. Where the tremolo is the only thing
+// moving, that is its own written length and the figure fills the span; where the other
+// hand moves inside the span, each of its positions gets its own stretch of the rock
+// (tremoloAt names them), so the accompaniment keeps its place in the bar and the shake
+// carries on under it. Whatever else is struck at the position sounds once, with the first
+// note of the figure, for its own written length.
+//
+// `carrier` is the note carrying the mark, which the figure's notes are modelled on — the
+// hand, the articulation. It is at the opening position and not at the later ones inside
+// the span, so a collector hands over the one it found at the opening.
+export function spellOutTremolo(
+    step: ListenStep,
+    span: TremoloSpan,
+    carrier: ListenNote | null = tremoloCarrier(step, span),
+): ListenStep[] {
+    const model = carrier ?? step.notes[0];
     if (!model) {
         return [step];
     }
-    const quarters = (span.to - span.from) * 4;
+    const own = new Set(
+        span.pitches.length > 0 ? span.pitches : step.notes.map((note) => note.pitch),
+    );
+    const others = step.notes.filter((note) => !own.has(note.pitch));
+    const quarters =
+        step.lengths.length > 0 ? Math.min(...step.lengths) : (span.to - span.from) * 4;
     // The pair's own pitches, already MIDI numbers read off the file. Both written notes
     // spell the same alternation in the same order, so the two halves run together into
-    // one unbroken rock.
+    // one unbroken rock — and a stretch resumed inside a span picks up the chord it had
+    // reached.
     const chords = span.pair?.map((chord) => chord.pitches);
-    const first = chords?.[0] ?? step.notes.map((note) => note.pitch);
-    const figure = tremoloNotes(first, chords?.[1] ?? null, quarters, span.beams);
+    const first = chords?.[0] ?? [...own];
+    const phase = Math.round(((step.whole - span.from) * 4) / tremoloUnitQuarters(span.beams));
+    const figure = tremoloNotes(first, chords?.[1] ?? null, quarters, span.beams, phase);
     if (figure.length < 2) {
         return [step];
     }
     return figure.map((one, index) => ({
         ...step,
-        notes: one.pitches.map((pitch) => ({ ...model, pitch, soundQuarters: one.quarters })),
+        notes: [
+            ...one.pitches.map((pitch) => ({ ...model, pitch, soundQuarters: one.quarters })),
+            ...(index === 0 ? others : []),
+        ],
         lengths: [one.quarters],
         advancesCursor: index === figure.length - 1 && step.advancesCursor,
     }));
+}
+
+// The note at a position that carries the tremolo mark, or the first note there when the
+// span names none of them.
+export function tremoloCarrier(step: ListenStep, span: TremoloSpan): ListenNote | null {
+    return step.notes.find((note) => span.pitches.includes(note.pitch)) ?? step.notes[0] ?? null;
 }
 
 // A glissando, spelled out as the keys the hand travels over.

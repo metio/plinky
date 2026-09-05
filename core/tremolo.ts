@@ -43,11 +43,15 @@ export type TremoloNote = { pitches: number[]; quarters: number };
 // `second` is the other chord of an alternating tremolo, and null for a single-note one.
 // Both chords keep all their pitches: a tremolo between two octaves is two octaves rocking,
 // not two single notes.
+// `phase` is how many repetitions of the figure have already sounded before this stretch of
+// it, so a rock resumed part-way through a span carries on from the chord it had reached
+// rather than starting over on the first.
 export function tremoloNotes(
     first: readonly number[],
     second: readonly number[] | null,
     quarters: number,
     beams: number,
+    phase = 0,
 ): TremoloNote[] {
     if (first.length === 0 || quarters <= 0) {
         return [];
@@ -64,7 +68,7 @@ export function tremoloNotes(
     const each = quarters / count;
     const alternate = second !== null && second.length > 0;
     return Array.from({ length: count }, (_, index) => ({
-        pitches: [...(alternate && index % 2 === 1 ? second : first)],
+        pitches: [...(alternate && (index + phase) % 2 === 1 ? second : first)],
         quarters: each,
     }));
 }
@@ -85,6 +89,10 @@ export type TremoloSpan = {
     from: number;
     to: number;
     beams: number;
+    // The chord that carries the mark where the span opens — the notes the tremolo rocks,
+    // as MIDI numbers. Another staff's note struck at the same onset is not among them, and
+    // sounds once while these shake.
+    pitches: number[];
     // The two chords being rocked between, in the order the score writes them, or null for a
     // single-note tremolo. Both spans of a pair carry the same value, so both spell the same
     // figure.
@@ -141,6 +149,7 @@ export function readTremolos(
                 from: note.whole,
                 to: note.whole + note.wholes,
                 beams: mark.beams,
+                pitches: chordAt(note.whole, note.staff, note.voice),
                 pair: null,
             });
         } else if (mark.part === "start") {
@@ -152,17 +161,23 @@ export function readTremolos(
                 voice: note.voice,
             };
         } else if (open !== null && note.whole > open.at) {
-            const pair = [
-                { at: open.at, pitches: chordAt(open.at, open.staff, open.voice) },
-                { at: note.whole, pitches: chordAt(note.whole, note.staff, note.voice) },
-            ];
+            const start = { at: open.at, pitches: chordAt(open.at, open.staff, open.voice) };
+            const stop = { at: note.whole, pitches: chordAt(note.whole, note.staff, note.voice) };
+            const pair = [start, stop];
             // One span per written note, each over its own time, both spelling the same
             // alternation — so the two run together into one unbroken figure.
-            spans.push({ from: open.at, to: open.at + open.wholes, beams: open.beams, pair });
+            spans.push({
+                from: open.at,
+                to: open.at + open.wholes,
+                beams: open.beams,
+                pitches: start.pitches,
+                pair,
+            });
             spans.push({
                 from: note.whole,
                 to: note.whole + note.wholes,
                 beams: open.beams,
+                pitches: stop.pitches,
                 pair,
             });
             open = null;
