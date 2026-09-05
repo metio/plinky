@@ -18,6 +18,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import type { SongMeta } from "../core/catalogMeta.ts";
 import { readSongs } from "./manifest.mts";
+import { matchWork } from "./works.mts";
 
 const DEFINITIONS = "dev/builtin-assignments.json";
 const OUT = "public/songs/builtin-assignments.json";
@@ -45,16 +46,10 @@ export function resolveSets(
 ): { sets: BuiltinAssignment[]; problems: string[] } {
     // Only what a pianist plays alone. A set is something to work through at the keyboard,
     // and an art song's piano part is not that even when its composer wrote the book.
-    const piano = songs.filter((song) => song.scoreKind === "solo-piano");
-
     const resolved: (BuiltinAssignment & { level: number })[] = [];
     const problems: string[] = [];
     for (const definition of definitions) {
-        const composer = new RegExp(definition.composer, "i");
-        const title = new RegExp(definition.title, "i");
-        const members = piano
-            .filter((song) => composer.test(song.composer) && title.test(song.title))
-            .sort((a, b) => a.cost - b.cost);
+        const members = matchWork(songs, definition).sort((a, b) => a.cost - b.cost);
         if (members.length < definition.least) {
             problems.push(
                 `${definition.name} resolves to ${members.length} pieces, fewer than the ${definition.least} it needs`,
