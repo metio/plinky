@@ -52,8 +52,11 @@ export function scoreToTimedBars(
     }
     const bars: Bar[] = [];
     const gaps: number[][] = [];
-    // One clock and one tracker for the whole part: divisions, tempo and the hand's own
-    // waiting all run across bar lines.
+    // One clock for the whole part — divisions and tempo run across bar lines — and one
+    // tracker for this staff alone: the hand's waiting is measured off its own notes and
+    // rests, and the other staff's notes, written after a <backup> over the same time,
+    // are no time this hand spends. Skipping them into the gap charged the whole of the
+    // bass bar into every first-of-bar gap of the treble.
     const clock = scoreClock();
     const timing = gapTracker();
     for (const measure of Array.from(part.getElementsByTagName("measure"))) {
@@ -65,8 +68,11 @@ export function scoreToTimedBars(
                 continue;
             }
             const noteStaff = Number(node.getElementsByTagName("staff")[0]?.textContent ?? "1");
+            if (noteStaff !== staff) {
+                continue;
+            }
             const midi = node.getElementsByTagName("rest").length > 0 ? null : midiOf(node);
-            if (noteStaff !== staff || midi === null) {
+            if (midi === null) {
                 timing.skip(seconds);
                 continue;
             }
