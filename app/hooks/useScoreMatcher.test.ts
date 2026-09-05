@@ -655,3 +655,16 @@ describe("a position's advance", () => {
         expect(at(64) - at(62)).toBeCloseTo(2000);
     });
 });
+
+describe("a step's staves", () => {
+    it("are hands, not the engraver's staff positions", () => {
+        // On an art song the piano's staves are 1 and 2 behind the singer's 0; reported
+        // raw, both would read as the left hand and the share grid would show two of them.
+        const { osmd } = fakeOsmd([[{ midi: 72, staff: 1 }], [{ midi: 48, staff: 2 }]]);
+        (osmd as unknown as { sheet: unknown }).sheet = {
+            Instruments: [{ Staves: [{}] }, { Staves: [{}, {}] }],
+        };
+        const steps = collectMatchSteps(osmd, "both");
+        expect(steps.map((step) => step.staves)).toEqual([[0], [1]]);
+    });
+});
