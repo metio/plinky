@@ -15,7 +15,7 @@ import type { Hand } from "../../core/matcher";
 import { GHOST_COLOR, PLAYED_COLOR } from "../../core/scoreCanvas";
 import { fastestTakeOnsets } from "../../core/takes";
 import { useServices } from "../contexts/services";
-import { clearHalo, collectNoteElements, litHalo } from "../lib/scoreColor";
+import { clearHalo, collectNoteElements, litHalos } from "../lib/scoreColor";
 
 // The ghost race: a previous run's note onsets replayed against the clock while
 // you practice, shown as a moving marker on the staff and a position on the race
@@ -131,13 +131,11 @@ export function useGhostRace({
         // position away before the player has found it.
         const concealed = (element: SVGGElement) => element.getAttribute("visibility") === "hidden";
         const restore = (step: number) => {
-            for (const element of steps[step] ?? []) {
-                if (concealed(element)) {
-                    continue;
-                }
-                if (done > step) {
-                    litHalo(element, PLAYED_COLOR);
-                } else {
+            const shown = (steps[step] ?? []).filter((element) => !concealed(element));
+            if (done > step) {
+                litHalos(shown.map((element) => ({ element, color: PLAYED_COLOR })));
+            } else {
+                for (const element of shown) {
                     clearHalo(element);
                 }
             }
@@ -158,11 +156,11 @@ export function useGhostRace({
         if (previous >= 0) {
             restore(previous);
         }
-        for (const element of steps[target] ?? []) {
-            if (!concealed(element)) {
-                litHalo(element, GHOST_COLOR);
-            }
-        }
+        litHalos(
+            (steps[target] ?? [])
+                .filter((element) => !concealed(element))
+                .map((element) => ({ element, color: GHOST_COLOR })),
+        );
         ghostMarkRef.current = target;
     }, [ghostDone, ghost, practicing, complete, done]);
 

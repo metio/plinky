@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import {
     clearBarSelection,
     haloColor,
+    litHalos,
     highlightCursorNotes,
     paintBarSelection,
     focusMeasures,
@@ -212,6 +213,32 @@ describe("focusMeasures", () => {
         container.scrollTop = 7;
         focusMeasures(osmd, 20, 22, WINDOW_COLOR, container);
         expect(container.scrollTop).toBe(7);
+    });
+});
+
+describe("litHalos", () => {
+    it("reads every notehead's box before it writes any halo", () => {
+        // A halo inserted into the SVG invalidates its layout, so a box read after one
+        // lays the whole engraving out again. For a chord, a lit bar or a restored run,
+        // all the reads come first and cost one layout between them.
+        const notes = [gNote(60), gNote(64), gNote(67)];
+        mount(notes);
+        const svg = notes[0]!.group.ownerSVGElement!;
+        const order: string[] = [];
+        for (const note of notes) {
+            note.group.getBoundingClientRect = () => {
+                order.push("read");
+                return new DOMRect();
+            };
+        }
+        const insert = svg.insertBefore.bind(svg);
+        svg.insertBefore = ((node: Node, before: Node | null) => {
+            order.push("write");
+            return insert(node, before);
+        }) as typeof svg.insertBefore;
+        litHalos(notes.map((note) => ({ element: note.group, color: WINDOW_COLOR })));
+        expect(order).toEqual(["read", "read", "read", "write", "write", "write"]);
+        expect(notes.every((note) => haloColor(note.group) === WINDOW_COLOR)).toBe(true);
     });
 });
 
