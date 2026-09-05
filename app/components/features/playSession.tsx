@@ -1062,7 +1062,10 @@ function usePlaySessionValue({
         // A completed run whose auto-take-save is still pending — the player pressed Practice
         // or Restart while still holding the final note, before its release fired the deferred
         // save — would be lost once the capture and completion latch are replaced below. Save
-        // it first, closing its hold at this instant, exactly as leaving the surface does.
+        // it first, closing its hold at this instant, exactly as leaving the surface does —
+        // and grade it first, since the grade waits for the keys to come up and the take
+        // reads the grade at the moment it is saved.
+        grading.gradeIfOwed();
         takes.saveIfOwed();
         // Take over at the cursor's current position when resuming (handing over from
         // Listen, or continuing a run stopped partway); Restart passes resume=false to
