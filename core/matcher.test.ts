@@ -236,9 +236,12 @@ describe("matchNote", () => {
     it("forgiving: skips ahead crediting only what was played, and clears a single-note next", () => {
         let state = startMatch([step([60, 64]), step([62]), step([65])]);
         state = matchNote(state, 60, 0, true).state; // half the chord
-        const result = matchNote(state, 62, 0, true); // the NEXT position's note
+        const result = matchNote(state, 62, 0, true, 90); // the NEXT position's note
         const clears = cleared(result.events);
         expect(clears).toHaveLength(2);
+        // The note that completed the next position was struck, at its own velocity: 0
+        // is reserved for a pitch nobody played, and this one was.
+        expect(clears[1]?.velocities).toEqual([90]);
         // The forgiven position credits only the pitch actually played…
         expect(clears[0]?.playedPitches).toEqual([60]);
         expect(clears[0]?.ordinal).toBe(0);

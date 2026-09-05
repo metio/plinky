@@ -411,7 +411,16 @@ export function matchNote(
             const nextExpected = expectedPitches(next);
             if (nextExpected.includes(note)) {
                 if (nextExpected.every((pitch) => pitch === note)) {
-                    next = clear(next, nextExpected, events, at);
+                    // The note that completes the next position was struck, here and now:
+                    // its arrival goes on the record before the position clears, or the
+                    // cleared event reports it at velocity 0 — the value reserved for a
+                    // pitch nobody played.
+                    next = clear(
+                        { ...next, hit: [{ note, at, velocity }] },
+                        nextExpected,
+                        events,
+                        at,
+                    );
                 } else {
                     events.push({ kind: "hit", note });
                     next = { ...next, hit: [{ note, at, velocity }] };
