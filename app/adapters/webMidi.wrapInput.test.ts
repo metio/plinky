@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it, vi } from "vitest";
-import { wrapInput } from "./webMidi";
+import { stampOf, wrapInput } from "./webMidi";
 
 // Every note the app hears from a real instrument passes through wrapInput, and no test
 // reached it: the browser-midi project injects a fake before this point, and the fake
@@ -91,11 +91,10 @@ describe("wrapInput", () => {
         expect([...(heard[1] ?? [])]).toEqual([0xb0, 64, 127]);
     });
 
-    it("stamps on receipt rather than carrying the driver's own clock", () => {
-        // The decision this function exists to make. A rogue origin mixed with the
-        // performance-clock stamps that CLOSE a note yields a hold length of roughly
-        // time-since-page-load: the first held note records as sustained for the whole
-        // uptime.
+    it("stamps on receipt when the driver's clock is not the page's", () => {
+        // A rogue origin mixed with the performance-clock stamps that CLOSE a note yields
+        // a hold length of roughly time-since-page-load: the first held note records as
+        // sustained for the whole uptime.
         const port = fakePort();
         const stamps: number[] = [];
 
@@ -106,6 +105,38 @@ describe("wrapInput", () => {
         expect(stamps[0]).not.toBe(ROGUE);
         expect(Number.isFinite(stamps[0])).toBe(true);
         expect(stamps[0]).toBeGreaterThanOrEqual(0);
+    });
+
+    it("carries the driver's stamp when it is on the page's clock", () => {
+        // The stamp is taken when the key went down; receipt waits behind whatever the
+        // main thread was doing, and rhythm is graded to the tens of milliseconds.
+        const port = fakePort();
+        const stamps: number[] = [];
+        wrapInput(asInput(port)).onMessage((_data, at) => stamps.push(at));
+
+        const struck = performance.now() - 40;
+        port.onmidimessage?.({
+            data: new Uint8Array([0x90, 60, 100]),
+            timeStamp: struck,
+        } as unknown as MIDIMessageEvent);
+
+        expect(stamps[0]).toBe(struck);
+    });
+});
+
+describe("stampOf", () => {
+    it("reads a stamp a moment behind or a hair ahead of receipt as the same clock", () => {
+        expect(stampOf(9_960, 10_000)).toBe(9_960);
+        expect(stampOf(10_003, 10_000)).toBe(10_003);
+    });
+
+    it("falls back to receipt for a stamp on another epoch, a zero, or nothing", () => {
+        expect(stampOf(ROGUE, 10_000)).toBe(10_000);
+        expect(stampOf(0, 10_000)).toBe(10_000);
+        expect(stampOf(10_000 - 5_000, 10_000)).toBe(10_000);
+        expect(stampOf(10_000 + 500, 10_000)).toBe(10_000);
+        expect(stampOf(undefined, 10_000)).toBe(10_000);
+        expect(stampOf(Number.NaN, 10_000)).toBe(10_000);
     });
 
     it("drops a message that carries no payload", () => {

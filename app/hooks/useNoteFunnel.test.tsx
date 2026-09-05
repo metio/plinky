@@ -53,7 +53,7 @@ describe("useNoteFunnel", () => {
             const { on, calls } = harness({ keepUpActive: () => true });
             on(PIANO);
 
-            expect(calls.registerKeepUp).toHaveBeenCalledWith(60);
+            expect(calls.registerKeepUp).toHaveBeenCalledWith(60, 1_000, PIANO);
             expect(calls.registerNote).not.toHaveBeenCalled();
             expect(calls.markImprecise).not.toHaveBeenCalled();
         });

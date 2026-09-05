@@ -26,6 +26,10 @@ export type PlayNoteOptions = {
     // lengthening notes rather than by pressing the engine's pedal, so this is how the
     // engine learns that the dampers are off and the rest of the instrument is ringing.
     pedalled?: boolean;
+    // What the player struck this note on, when it is the player's own note being echoed
+    // back — a keep-up run sounds each strike over the guide. An instrument that makes
+    // its own sound is not answered with a second one; see pressNote.
+    device?: string;
 };
 
 export type UseSynthResult = {
@@ -73,8 +77,21 @@ export function useSynth(): UseSynthResult {
         [prefsStore, audio],
     );
 
+    // Whether the player's own instrument is already making this sound, so Plinky must not
+    // make it again. Only a note from a real instrument: a drawn key and a computer key
+    // have no voice of their own and would go silent. A caller that names no device is not
+    // an instrument path and always sounds.
+    const ownVoice = useCallback(
+        (device: string | undefined) =>
+            prefsStore.load().instrumentSounds && device !== undefined && isInstrumentInput(device),
+        [prefsStore],
+    );
+
     const playNote = useCallback(
         (note: number, options: PlayNoteOptions = {}) => {
+            if (ownVoice(options.device)) {
+                return;
+            }
             const gain = gainFor(options.velocity ?? 90);
             if (gain === null) {
                 return;
@@ -97,20 +114,12 @@ export function useSynth(): UseSynthResult {
                 delay: Math.max(0, options.delay ?? 0),
             });
         },
-        [gainFor, audio],
+        [gainFor, audio, ownVoice],
     );
 
     const pressNote = useCallback(
         (note: number, options: { velocity?: number; device?: string } = {}) => {
-            // The player's own instrument is making this sound already, so Plinky does not
-            // make it again. Only for a note from a real instrument: a drawn key and a
-            // computer key have no voice of their own and would go silent. A caller that
-            // names no device is not an instrument path and always sounds.
-            if (
-                prefsStore.load().instrumentSounds &&
-                options.device !== undefined &&
-                isInstrumentInput(options.device)
-            ) {
+            if (ownVoice(options.device)) {
                 return;
             }
             const gain = gainFor(options.velocity ?? 90);
@@ -120,7 +129,7 @@ export function useSynth(): UseSynthResult {
             audio.resume();
             audio.press(note, gain, options.velocity ?? 90);
         },
-        [gainFor, audio, prefsStore],
+        [gainFor, audio, ownVoice],
     );
 
     // Release and pedal always reach the engine — a muted session opened no voice, so they

@@ -32,6 +32,13 @@ export type RunCapture = {
     // Pitches whose key has lifted but which are still sounding because the pedal is
     // down; their hold stays open until the pedal lifts or the note is re-struck.
     pedalHeld: Set<number>;
+    // Keys that came up before the position they belong to cleared, each with when. A
+    // chord is rolled, or a hand lands ahead of the other: its first key can be struck
+    // and released before the last pitch completes the position, and the matcher only
+    // reports the position once complete. The release is kept here so that the hold the
+    // clear then opens can be closed at the moment the key actually lifted, rather than
+    // left open to the end of the run.
+    earlyReleases: Map<number, number>;
     // Wall-clock of the run's first cleared note — the run clock's zero, and the
     // ghost race's starting gun. 0 until that note lands.
     startedAt: number;
@@ -48,6 +55,7 @@ export function startCapture(): RunCapture {
         holds: new Map(),
         pedalDown: false,
         pedalHeld: new Set(),
+        earlyReleases: new Map(),
         startedAt: 0,
         baseOffsetMs: 0,
         imprecise: false,
@@ -81,6 +89,9 @@ export type ClearedNote = {
     staves: number[];
     // When each staff's part of this position landed, on the same clock as `timestamp`.
     staffTimes?: Record<number, number>;
+    // When each of `pitches` was struck, index-aligned and on the same clock: a rolled
+    // chord's keys go down one by one, and each hold runs from its own key.
+    pitchTimes?: number[];
     // What the score asked for at this position, carried through so the expressive
     // reading can compare intention with performance without a second walk of the
     // engraved score. Absent for a run with no score behind it.
@@ -133,23 +144,39 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
         keyHoldsMs: info.pitches.map(() => 0),
     });
     const index = capture.notes.length - 1;
-    for (const pitch of info.pitches) {
+    for (const [at, pitch] of info.pitches.entries()) {
+        const onMs = info.pitchTimes?.[at] ?? info.timestamp;
         // Re-striking a pitch the pedal was still holding ends that earlier instance
         // here — its ring lasted until this re-strike — before the new hold opens.
         if (capture.pedalHeld.delete(pitch)) {
-            closeHold(capture, pitch, info.timestamp);
+            closeHold(capture, pitch, onMs);
         }
-        beginHold(capture.holds, pitch, index, info.timestamp);
+        beginHold(capture.holds, pitch, index, onMs);
+        // A key that already came up since it was struck closes its hold now, at the
+        // moment it lifted. A release from before this strike belongs to an earlier
+        // sounding of the pitch — a wrong note, or a previous position — and is dropped.
+        const offMs = capture.earlyReleases.get(pitch);
+        capture.earlyReleases.delete(pitch);
+        if (offMs !== undefined && offMs >= onMs) {
+            captureRelease(capture, pitch, offMs);
+        }
     }
 }
 
 // A released key fills in its note's real hold length. A chord's pitches release
 // one by one; the longest is kept so the note's recorded length is how long the
-// chord actually rang. A stray release (untracked pitch) records nothing. While the
+// chord actually rang. A release for a pitch with no hold open is remembered for the
+// position that may still be assembling it, and otherwise records nothing. While the
 // sustain pedal is down the key release doesn't end the note — the damper is up, so it
 // rings on; its hold is left open and marked pedal-held until the pedal lifts.
 export function captureRelease(capture: RunCapture, pitch: number, offMs: number): void {
-    if (capture.pedalDown && capture.holds.has(pitch)) {
+    if (!capture.holds.has(pitch)) {
+        // Nothing open for it yet: either a stray key, or one of a position still being
+        // assembled. Kept until the position clears, which tells the two apart.
+        capture.earlyReleases.set(pitch, offMs);
+        return;
+    }
+    if (capture.pedalDown) {
         // The key is up but the damper is off, so the note rings on and its heldMs must
         // run to the pedal lift for the replay to sound like the playing did. How long
         // the KEY was down is settled here, though, and that is the figure articulation

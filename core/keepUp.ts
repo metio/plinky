@@ -1,100 +1,158 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// The tempo-locked play-along scorer: a pure reducer over the steps the clock
-// opens and closes. The rendering surface walks the cursor on its timer, feeds
-// each step's expected pitches in as it opens and the player's strikes as they
-// land, and closes the step when the cursor moves on; everything about what
-// counts as catching a beat lives here, testable without a score renderer.
-// (The self-paced twin is core/matcher.ts, where the player's input drives the
-// advance; here the clock does.)
+// The keep-up reducer: a tempo-locked run where the clock, not the player, advances the
+// cursor. Each beat opens with the pitches the practised hand owes it; a strike that lands
+// while the beat is open counts toward it, and the beat is a hit once every pitch is in.
+//
+// A beat is not a knife edge. A player who is with the music strikes a hair before or
+// after the beat — that is what being in time sounds like — and a strike a few tens of
+// milliseconds early lands while the PREVIOUS beat is still open, one a few tens late
+// after the beat has closed. So a beat accepts the next beat's pitches for a moment before
+// it ends, and stays open to strikes for a moment after; what it was owed is settled only
+// once that moment has passed.
 
-// One position on the play-along timeline, in cursor order — collected once when
-// a run starts so the clock reads its beats off this model, not the live cursor.
-// Every position appears, rests and the silent hand included (empty `play`), so a
-// step's index stays lock-step with the visual cursor the surface still advances.
+// The two halves of the window, roughly the "good" rhythm tolerance the self-paced grade
+// allows. Symmetric on purpose: rushing and dragging are the same size of fault.
+export const KEEP_UP_EARLY_MS = 100;
+export const KEEP_UP_LATE_MS = 100;
+
 export type KeepUpStep = {
-    // The notated onset in whole notes, so the surface can say where the music has reached
-    // — the notes highway draws what is coming from it.
     whole: number;
-    // The pitches to catch here, narrowed to the practised hand, each with its
-    // written length in quarter notes so the guide can sound it for that long.
-    // Empty at a rest or the other hand's turn (an unscored position).
+    // What the practised hand strikes here, and what the other hand plays for it.
     play: { pitch: number; quarters: number }[];
-    // The other hand's pitches here — the ones you are NOT catching this run. Empty for a
-    // both-hands run (nothing is left over). A duet sounds these on the clock so the app
-    // plays the accompanying hand while you play yours; a plain run ignores them.
     accompany: { pitch: number; quarters: number }[];
-    // Every note's written length here in quarter notes, both hands and rests —
-    // the beat's duration comes from the shortest, so the clock advances in step
-    // with the notation regardless of which hand is being practised.
+    // Every notated length at the position, for the clock to dwell the shortest of.
     lengths: number[];
-    // The tempo in force here and how much longer than written the position is held, so
-    // the clock follows a tempo change and waits at a fermata rather than running the
-    // whole piece at one speed.
     bpm: number;
     stretch: number;
-    // Whether this beat moves the visual cursor on. False for an ornament, which is
-    // printed on the very note it decorates.
     advancesCursor: boolean;
 };
 
+// A beat that has closed but whose late window has not passed: strikes still count.
+type ClosingBeat = { expected: number[]; struck: number[]; until: number };
+
 export type KeepUpState = {
-    // The pitches expected at the currently-open step, and which of them have
-    // been struck so far. Empty between steps, so a strike landing in the gap
-    // (or after the run ends) scores nothing.
+    // The open beat: what it owes, what has landed.
     expected: number[];
     struck: number[];
-    // Each closed scoreable step in order: true = every expected pitch was
-    // struck before the cursor moved on. Unscored positions (rests, the other
-    // hand's turn) never appear — closing an empty step records nothing.
+    // When the open beat ends, and what the beat after it owes — an early strike is told
+    // from a wrong one by these two.
+    closesAt: number;
+    next: number[];
+    // The next beat's pitches struck ahead of it, credited when it opens.
+    early: number[];
+    closing: ClosingBeat | null;
+    // One verdict per beat the practised hand owed something at, in order.
     hits: boolean[];
 };
 
 export function startKeepUp(): KeepUpState {
-    return { expected: [], struck: [], hits: [] };
-}
-
-// The clock reaches a new step: what must be caught before it closes. The
-// surface collects the pitches from the cursor (already narrowed to the
-// practised hand), so the reducer is hand-agnostic like the matcher.
-export function openKeepUpStep(state: KeepUpState, pitches: number[]): KeepUpState {
-    return { ...state, expected: [...pitches], struck: [] };
-}
-
-// A played note lands while a step is open. `expected` says whether it counted
-// toward the step at all; `caught` turns true on the strike that completes the
-// set — the surface's cue to turn the step green before the clock closes it.
-export function strikeKeepUp(
-    state: KeepUpState,
-    note: number,
-): { state: KeepUpState; expected: boolean; caught: boolean } {
-    if (!state.expected.includes(note)) {
-        return { state, expected: false, caught: false };
-    }
-    const struck = state.struck.includes(note) ? state.struck : [...state.struck, note];
-    const caught = state.expected.every((pitch) => struck.includes(pitch));
-    return { state: { ...state, struck }, expected: true, caught };
-}
-
-// The clock moves on: resolve the open step as a hit or a miss. `hit` is null
-// for an unscored position (nothing was expected), which records nothing — the
-// guard that keeps a hands-separate run from counting the other hand's turns.
-export function closeKeepUpStep(state: KeepUpState): {
-    state: KeepUpState;
-    hit: boolean | null;
-} {
-    if (state.expected.length === 0) {
-        return { state, hit: null };
-    }
-    const hit = state.expected.every((pitch) => state.struck.includes(pitch));
     return {
-        state: { expected: [], struck: [], hits: [...state.hits, hit] },
-        hit,
+        expected: [],
+        struck: [],
+        closesAt: Number.POSITIVE_INFINITY,
+        next: [],
+        early: [],
+        closing: null,
+        hits: [],
     };
 }
 
-// How the run stands: beats caught in time out of beats closed so far.
+export type BeatTiming = {
+    // When the beat opens and how long it dwells, on the strike clock.
+    at: number;
+    dwellMs: number;
+    // The beat after this one, so a strike for it a hair early is not a wrong note.
+    next: readonly number[];
+};
+
+// A beat opens with what the hand owes it, already crediting any of its pitches struck
+// early in the beat before.
+export function openKeepUpStep(
+    state: KeepUpState,
+    pitches: readonly number[],
+    timing?: BeatTiming,
+): KeepUpState {
+    return {
+        ...state,
+        expected: [...pitches],
+        struck: state.early.filter((note) => pitches.includes(note)),
+        closesAt: timing ? timing.at + timing.dwellMs : Number.POSITIVE_INFINITY,
+        next: timing ? [...timing.next] : [],
+        early: [],
+    };
+}
+
+function complete(expected: readonly number[], struck: readonly number[]): boolean {
+    return expected.every((pitch) => struck.includes(pitch));
+}
+
+// A strike: for the beat still closing if it is owed there, else for the open beat, else
+// for the next beat if it is nearly here. `expected` says the strike was owed somewhere;
+// `caught` that it completed the open beat, so the step can turn green early.
+export function strikeKeepUp(
+    state: KeepUpState,
+    note: number,
+    at = 0,
+): { state: KeepUpState; expected: boolean; caught: boolean } {
+    const { closing } = state;
+    if (
+        closing !== null &&
+        at <= closing.until &&
+        closing.expected.includes(note) &&
+        !closing.struck.includes(note)
+    ) {
+        return {
+            state: { ...state, closing: { ...closing, struck: [...closing.struck, note] } },
+            expected: true,
+            caught: false,
+        };
+    }
+    if (state.expected.includes(note)) {
+        const struck = state.struck.includes(note) ? state.struck : [...state.struck, note];
+        return {
+            state: { ...state, struck },
+            expected: true,
+            caught: complete(state.expected, struck),
+        };
+    }
+    if (state.next.includes(note) && state.closesAt - at <= KEEP_UP_EARLY_MS) {
+        const early = state.early.includes(note) ? state.early : [...state.early, note];
+        return { state: { ...state, early }, expected: true, caught: false };
+    }
+    return { state, expected: false, caught: false };
+}
+
+// The beat ends: whatever was still closing before it is settled, and this beat begins
+// its own late window. A beat that owed nothing — the other hand's turn — settles to no
+// verdict at all. `settled` is the verdict of the beat BEFORE this one, when its window
+// had not yet been settled on its own.
+export function closeKeepUpStep(
+    state: KeepUpState,
+    at = 0,
+): { state: KeepUpState; settled: boolean | null } {
+    const { state: after, hit } = settleKeepUp(state);
+    const closing: ClosingBeat | null =
+        after.expected.length === 0
+            ? null
+            : { expected: after.expected, struck: after.struck, until: at + KEEP_UP_LATE_MS };
+    return {
+        state: { ...after, expected: [], struck: [], closesAt: Number.POSITIVE_INFINITY, closing },
+        settled: hit,
+    };
+}
+
+// The late window of the last closed beat has passed: its verdict is final.
+export function settleKeepUp(state: KeepUpState): { state: KeepUpState; hit: boolean | null } {
+    const { closing } = state;
+    if (closing === null) {
+        return { state, hit: null };
+    }
+    const hit = complete(closing.expected, closing.struck);
+    return { state: { ...state, closing: null, hits: [...state.hits, hit] }, hit };
+}
+
 export function keepUpProgress(state: KeepUpState): { inTime: number; done: number } {
     return {
         inTime: state.hits.filter(Boolean).length,

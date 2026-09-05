@@ -51,6 +51,58 @@ describe("runCapture", () => {
         expect(capture.notes[0]?.heldMs).toBeUndefined();
     });
 
+    it("runs each hold from its own key, so a rolled chord's first note is not shortened", () => {
+        const capture = startCapture();
+        captureCleared(
+            capture,
+            cleared({ pitches: [60, 64], timestamp: 1200, pitchTimes: [1000, 1200] }),
+        );
+        captureRelease(capture, 60, 1500);
+        captureRelease(capture, 64, 1500);
+        expect(capture.notes[0]?.keyHoldsMs).toEqual([500, 300]);
+        expect(capture.notes[0]?.heldMs).toBe(500);
+    });
+
+    it("closes a key that came up before its position cleared at the moment it lifted", () => {
+        // A hand lands ahead of the other, or a chord is rolled: the first key can be
+        // struck and released before the last pitch completes the position, and the
+        // position is only reported once complete.
+        const capture = startCapture();
+        captureRelease(capture, 60, 1150);
+        captureCleared(
+            capture,
+            cleared({ pitches: [60, 64], timestamp: 1200, pitchTimes: [1000, 1200] }),
+        );
+        expect(capture.holds.has(60)).toBe(false);
+        expect(capture.notes[0]?.keyHoldsMs).toEqual([150, 0]);
+        captureRelease(capture, 64, 1400);
+        flushHolds(capture, 9000);
+        expect(capture.notes[0]?.heldMs).toBe(200);
+    });
+
+    it("drops a release from before the strike, which belonged to an earlier sounding", () => {
+        const capture = startCapture();
+        captureRelease(capture, 60, 900);
+        captureCleared(capture, cleared({ pitches: [60], timestamp: 1000, pitchTimes: [1000] }));
+        expect(capture.holds.has(60)).toBe(true);
+        captureRelease(capture, 60, 1300);
+        expect(capture.notes[0]?.heldMs).toBe(300);
+    });
+
+    it("keeps an early-released key ringing when the pedal is down", () => {
+        const capture = startCapture();
+        capturePedal(capture, true, 500);
+        captureRelease(capture, 60, 1100);
+        captureCleared(
+            capture,
+            cleared({ pitches: [60, 64], timestamp: 1200, pitchTimes: [1000, 1200] }),
+        );
+        expect(capture.pedalHeld.has(60)).toBe(true);
+        expect(capture.notes[0]?.keyHoldsMs).toEqual([100, 0]);
+        capturePedal(capture, false, 2000);
+        expect(capture.notes[0]?.heldMs).toBe(1000);
+    });
+
     it("keeps a note ringing when the key lifts under the sustain pedal", () => {
         const capture = startCapture();
         captureCleared(capture, cleared({ timestamp: 1000 }));

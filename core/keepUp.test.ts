@@ -4,145 +4,186 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
+    KEEP_UP_EARLY_MS,
+    KEEP_UP_LATE_MS,
     type KeepUpState,
     closeKeepUpStep,
     keepUpProgress,
     openKeepUpStep,
+    settleKeepUp,
     startKeepUp,
     strikeKeepUp,
 } from "./keepUp";
 
-// Run a sequence of strikes through an open step and close it.
+// Run a sequence of strikes through an open beat, close it and let its window pass.
 function playStep(
     state: KeepUpState,
     expected: number[],
     strikes: number[],
-): ReturnType<typeof closeKeepUpStep> {
+): ReturnType<typeof settleKeepUp> {
     let current = openKeepUpStep(state, expected);
     for (const note of strikes) {
         current = strikeKeepUp(current, note).state;
     }
-    return closeKeepUpStep(current);
+    return settleKeepUp(closeKeepUpStep(current).state);
 }
 
 describe("keep-up reducer", () => {
-    it("scores a step as a hit once every expected pitch is struck, in any order", () => {
+    it("scores a beat as a hit once every expected pitch is struck, in any order", () => {
         const { state, hit } = playStep(startKeepUp(), [60, 64, 67], [67, 60, 64]);
         expect(hit).toBe(true);
         expect(state.hits).toEqual([true]);
     });
 
-    it("scores a step as a miss when an expected pitch is still outstanding", () => {
-        const { hit, state } = playStep(startKeepUp(), [60, 64], [60]);
+    it("scores a beat as a miss when an expected pitch is still outstanding", () => {
+        const { state, hit } = playStep(startKeepUp(), [60, 64], [60]);
         expect(hit).toBe(false);
         expect(state.hits).toEqual([false]);
     });
 
     it("records nothing for an unscored position, so the other hand's turns don't count", () => {
-        const { hit, state } = playStep(startKeepUp(), [], [60, 62]);
+        const { state, hit } = playStep(startKeepUp(), [], [60]);
         expect(hit).toBeNull();
         expect(state.hits).toEqual([]);
     });
 
     it("flags the strike that completes the chord so the step can turn green early", () => {
-        const state = openKeepUpStep(startKeepUp(), [60, 64]);
+        let state = openKeepUpStep(startKeepUp(), [60, 64]);
         const first = strikeKeepUp(state, 60);
-        expect(first.expected).toBe(true);
         expect(first.caught).toBe(false);
-        const second = strikeKeepUp(first.state, 64);
-        expect(second.caught).toBe(true);
+        state = first.state;
+        expect(strikeKeepUp(state, 64).caught).toBe(true);
     });
 
     it("ignores a strike the step does not expect", () => {
         const state = openKeepUpStep(startKeepUp(), [60]);
-        const { state: after, expected, caught } = strikeKeepUp(state, 99);
+        const { state: after, expected, caught } = strikeKeepUp(state, 61);
         expect(expected).toBe(false);
         expect(caught).toBe(false);
         expect(after).toBe(state);
     });
 
     it("scores nothing for a strike landing between steps", () => {
-        const closed = playStep(startKeepUp(), [60], [60]).state;
-        const { state, expected } = strikeKeepUp(closed, 60);
+        const state = closeKeepUpStep(openKeepUpStep(startKeepUp(), [])).state;
+        const { expected } = strikeKeepUp(state, 60);
         expect(expected).toBe(false);
-        expect(state.hits).toEqual([true]);
+        expect(state.hits).toEqual([]);
     });
 
     it("reports progress as beats caught out of beats closed", () => {
         let state = playStep(startKeepUp(), [60], [60]).state;
         state = playStep(state, [62], []).state;
-        state = playStep(state, [], []).state;
-        expect(keepUpProgress(state)).toEqual({ inTime: 1, done: 2 });
+        state = playStep(state, [64], [64]).state;
+        expect(keepUpProgress(state)).toEqual({ inTime: 2, done: 3 });
     });
 });
 
-const pitches = fc.uniqueArray(fc.integer({ min: 21, max: 108 }), { minLength: 1, maxLength: 6 });
+describe("the beat's window", () => {
+    const timing = { at: 1000, dwellMs: 500, next: [62] };
+
+    it("credits the next beat's pitch struck a hair before its beat", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], timing);
+        state = strikeKeepUp(state, 60, 1010).state;
+        const early = strikeKeepUp(state, 62, 1500 - KEEP_UP_EARLY_MS + 10);
+        expect(early.expected).toBe(true);
+        state = closeKeepUpStep(early.state, 1500).state;
+        state = openKeepUpStep(state, [62], { at: 1500, dwellMs: 500, next: [] });
+        expect(state.struck).toEqual([62]);
+        expect(settleKeepUp(closeKeepUpStep(state, 2000).state).hit).toBe(true);
+    });
+
+    it("reads the next beat's pitch struck well before its beat as a wrong note", () => {
+        const state = openKeepUpStep(startKeepUp(), [60], timing);
+        const { expected } = strikeKeepUp(state, 62, 1500 - KEEP_UP_EARLY_MS - 10);
+        expect(expected).toBe(false);
+    });
+
+    it("credits a beat's pitch struck a hair after the beat has closed", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], timing);
+        state = closeKeepUpStep(state, 1500).state;
+        state = openKeepUpStep(state, [62], { at: 1500, dwellMs: 500, next: [] });
+        const late = strikeKeepUp(state, 60, 1500 + KEEP_UP_LATE_MS - 10);
+        expect(late.expected).toBe(true);
+        const settled = settleKeepUp(late.state);
+        expect(settled.hit).toBe(true);
+        expect(settled.state.hits).toEqual([true]);
+    });
+
+    it("reads a beat's pitch struck long after it closed as a wrong note", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], timing);
+        state = closeKeepUpStep(state, 1500).state;
+        state = openKeepUpStep(state, [62], { at: 1500, dwellMs: 500, next: [] });
+        expect(strikeKeepUp(state, 60, 1500 + KEEP_UP_LATE_MS + 10).expected).toBe(false);
+    });
+
+    it("settles a beat still closing when the next one closes, keeping the verdicts in order", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], timing);
+        state = strikeKeepUp(state, 60, 1100).state;
+        state = closeKeepUpStep(state, 1500).state;
+        state = openKeepUpStep(state, [62], { at: 1500, dwellMs: 50, next: [] });
+        const closed = closeKeepUpStep(state, 1550);
+        expect(closed.settled).toBe(true);
+        expect(closed.state.hits).toEqual([true]);
+        expect(settleKeepUp(closed.state).state.hits).toEqual([true, false]);
+    });
+
+    it("gives a repeated pitch to the beat still owed it, then to the open one", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], { at: 1000, dwellMs: 500, next: [60] });
+        state = closeKeepUpStep(state, 1500).state;
+        state = openKeepUpStep(state, [60], { at: 1500, dwellMs: 500, next: [] });
+        state = strikeKeepUp(state, 60, 1520).state;
+        expect(state.closing?.struck).toEqual([60]);
+        expect(state.struck).toEqual([]);
+        state = strikeKeepUp(state, 60, 1540).state;
+        expect(state.struck).toEqual([60]);
+    });
+});
 
 describe("keep-up reducer properties", () => {
+    const pitches = fc.uniqueArray(fc.integer({ min: 21, max: 108 }), { maxLength: 6 });
+
     it("hits exactly when the strikes cover the expected pitches, whatever the order or noise", () => {
         fc.assert(
-            fc.property(
-                pitches,
-                fc.array(fc.integer({ min: 21, max: 108 }), { maxLength: 20 }),
-                (expected, strikes) => {
-                    const { hit } = playStep(startKeepUp(), expected, strikes);
-                    const covered = expected.every((pitch) => strikes.includes(pitch));
-                    return hit === covered;
-                },
-            ),
+            fc.property(pitches, pitches, (expected, strikes) => {
+                const { hit } = playStep(startKeepUp(), expected, strikes);
+                const covered = expected.every((pitch) => strikes.includes(pitch));
+                expect(hit).toBe(expected.length === 0 ? null : covered);
+            }),
         );
     });
 
     it("unexpected strikes never change the step's outcome", () => {
         fc.assert(
-            fc.property(
-                pitches,
-                fc.array(fc.integer({ min: 21, max: 108 }), { maxLength: 10 }),
-                fc.array(fc.integer({ min: 21, max: 108 }), { maxLength: 10 }),
-                (expected, strikes, noise) => {
-                    const clean = playStep(startKeepUp(), expected, strikes);
-                    const noisy = playStep(startKeepUp(), expected, [
-                        ...noise.filter((note) => !expected.includes(note)),
-                        ...strikes,
-                    ]);
-                    return clean.hit === noisy.hit;
-                },
-            ),
+            fc.property(pitches, pitches, (expected, noise) => {
+                const stray = noise.filter((pitch) => !expected.includes(pitch));
+                const clean = playStep(startKeepUp(), expected, expected);
+                const noisy = playStep(startKeepUp(), expected, [...stray, ...expected, ...stray]);
+                expect(noisy.hit).toBe(clean.hit);
+            }),
         );
     });
 
     it("duplicate strikes are idempotent", () => {
         fc.assert(
             fc.property(pitches, (expected) => {
-                const doubled = expected.flatMap((pitch) => [pitch, pitch]);
-                const { state, hit } = playStep(startKeepUp(), expected, doubled);
-                return hit === true && state.hits.length === 1;
+                const once = playStep(startKeepUp(), expected, expected);
+                const twice = playStep(startKeepUp(), expected, [...expected, ...expected]);
+                expect(twice.state.hits).toEqual(once.state.hits);
             }),
         );
     });
 
     it("progress always matches the recorded hits", () => {
         fc.assert(
-            fc.property(
-                fc.array(fc.record({ expected: pitches, catchIt: fc.boolean() }), {
-                    maxLength: 12,
-                }),
-                (steps) => {
-                    let state = startKeepUp();
-                    for (const step of steps) {
-                        state = playStep(
-                            state,
-                            step.expected,
-                            step.catchIt ? step.expected : [],
-                        ).state;
-                    }
-                    const { inTime, done } = keepUpProgress(state);
-                    return (
-                        done === steps.length &&
-                        inTime === steps.filter((step) => step.catchIt).length
-                    );
-                },
-            ),
+            fc.property(fc.array(fc.tuple(pitches, pitches), { maxLength: 12 }), (beats) => {
+                let state = startKeepUp();
+                for (const [expected, strikes] of beats) {
+                    state = playStep(state, expected, strikes).state;
+                }
+                const { inTime, done } = keepUpProgress(state);
+                expect(done).toBe(state.hits.length);
+                expect(inTime).toBe(state.hits.filter(Boolean).length);
+            }),
         );
     });
 });

@@ -53,6 +53,20 @@ describe("useSynth", () => {
         expect(audio.resumed).toBe(1);
     });
 
+    it("does not sound a strike an instrument is already making, and always one from a stand-in", () => {
+        const { audio, playNote } = harness({ instrumentSounds: true });
+        playNote(60, { device: "Yamaha P-125" });
+        playNote(62, { device: ON_SCREEN_DEVICE });
+        playNote(64);
+        expect(audio.strikes.map((one) => one.note)).toEqual([62, 64]);
+    });
+
+    it("sounds an instrument's strike when the instrument is silent", () => {
+        const { audio, playNote } = harness({ instrumentSounds: false });
+        playNote(60, { device: "Yamaha P-125" });
+        expect(audio.strikes).toHaveLength(1);
+    });
+
     it("scales the strike gain with velocity and the volume preference", () => {
         const { audio, playNote } = harness({ volume: 50 });
         playNote(60, { velocity: 127 });

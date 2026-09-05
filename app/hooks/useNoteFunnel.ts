@@ -35,7 +35,7 @@ type NoteHandlers = Required<Omit<NoteListener, "keys">>;
 export type NoteFunnelOptions = {
     // A play-along is running and owns the input.
     keepUpActive: () => boolean;
-    registerKeepUp: (note: number) => void;
+    registerKeepUp: (note: number, at: number, device: string) => void;
     // The self-paced matcher, for every note a play-along did not claim.
     registerNote: (note: number, at: number, velocity: number) => void;
     // The recording.
@@ -79,7 +79,7 @@ export function useNoteFunnel(options: NoteFunnelOptions): NoteFunnel {
             onNoteOn: (event: MidiNoteEvent) => {
                 const o = latest.current;
                 if (o.keepUpActive()) {
-                    o.registerKeepUp(event.note);
+                    o.registerKeepUp(event.note, event.timestamp, event.device);
                     return;
                 }
                 if (!isPreciseInput(event.device)) {

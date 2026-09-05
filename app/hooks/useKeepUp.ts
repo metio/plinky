@@ -5,14 +5,17 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { type KeepUpResult, scoreKeepUp } from "../../core/grade";
 import {
+    KEEP_UP_LATE_MS,
     type KeepUpState,
     type KeepUpStep,
     closeKeepUpStep,
     keepUpProgress,
     openKeepUpStep,
+    settleKeepUp,
     startKeepUp,
     strikeKeepUp,
 } from "../../core/keepUp";
+import { useScheduler } from "../contexts/services";
 import type { Hand } from "../../core/matcher";
 import { NOMINAL_BPM } from "../../core/elapsed";
 import { readParts, readStartTempo } from "../lib/scoreExpression";
@@ -27,7 +30,9 @@ import { jumpsBack } from "../../core/matcher";
 
 // A note sink for the guide and the player's own strikes — the slice of the
 // synth the play-along needs.
-type NoteSink = { playNote(note: number, options?: { duration?: number }): void };
+type NoteSink = {
+    playNote(note: number, options?: { duration?: number; device?: string }): void;
+};
 
 // Walk the engraved score once and lift the play-along timeline into the pure
 // step model: every cursor position in order, each carrying the practised hand's
@@ -130,6 +135,7 @@ export function useKeepUp({
     onFinish: () => void;
 }) {
     const chain = useTimerChain();
+    const scheduler = useScheduler();
     // Live during a play-along run, then the result once it finishes.
     const [running, setRunning] = useState(false);
     const [progress, setProgress] = useState({ inTime: 0, done: 0 });
@@ -149,6 +155,9 @@ export function useKeepUp({
     const stateRef = useRef<KeepUpState>(startKeepUp());
     // The open step's rendered note groups, to paint green on a hit, red on a miss.
     const notesRef = useRef<SVGElement[]>([]);
+    // The noteheads of the beat that has closed but is still open to a late strike, so
+    // its verdict can colour them once the window has passed.
+    const closingNotesRef = useRef<SVGElement[]>([]);
 
     // Whether a run currently owns the note input — synchronous, for the router.
     const active = () => activeRef.current;
@@ -200,17 +209,38 @@ export function useKeepUp({
         setProgress({ inTime: 0, done: 0 });
         setRunning(true);
 
-        // Resolve the step that just closed — the reducer scores it (or skips an
-        // unscored position); the notes paint green or red to trail your run.
-        const closeStep = () => {
-            const { state, hit } = closeKeepUpStep(stateRef.current);
-            stateRef.current = state;
+        // A closed beat's verdict is final: the notes paint green or red to trail the
+        // run. Reached either when its late window passes or, on a beat shorter than the
+        // window, when the beat after it closes.
+        const paintVerdict = (hit: boolean | null, state: KeepUpState) => {
             if (hit === null) {
                 return;
             }
             const color = hit ? PLAYED_COLOR : SELECT_COLOR;
-            litHalos(notesRef.current.map((element) => ({ element, color })));
+            litHalos(closingNotesRef.current.map((element) => ({ element, color })));
             setProgress(keepUpProgress(state));
+        };
+        const settle = () => {
+            if (!activeRef.current) {
+                return;
+            }
+            const { state, hit } = settleKeepUp(stateRef.current);
+            stateRef.current = state;
+            paintVerdict(hit, state);
+        };
+
+        // Close the open beat. It stays open to a late strike for a moment, so its
+        // verdict comes with the settle scheduled here; a beat still waiting for that
+        // moment when the next one closes is settled first, so verdicts stay in order.
+        const closeStep = () => {
+            const { state, settled } = closeKeepUpStep(stateRef.current, scheduler.now());
+            stateRef.current = state;
+            paintVerdict(settled, state);
+            closingNotesRef.current = notesRef.current;
+            notesRef.current = [];
+            if (state.closing !== null) {
+                chain.push(settle, KEEP_UP_LATE_MS);
+            }
         };
 
         // Open a collected step: feed its expected pitches to the reducer — only
@@ -218,7 +248,7 @@ export function useKeepUp({
         // hands-separate run would demand the other hand's notes too and every step
         // would score a miss — highlight them as "play now", and sound them if the
         // guide is on.
-        const openStep = (current: KeepUpStep) => {
+        const openStep = (current: KeepUpStep, dwellMs: number, next: KeepUpStep | undefined) => {
             const pitches = current.play.map((entry) => entry.pitch);
             // Light the on-screen keys for this beat too, so the keyboard follows the
             // clock the way the score does — the run drives the input, not the matcher,
@@ -238,7 +268,11 @@ export function useKeepUp({
                     synth.playNote(entry.pitch, { duration: seconds(entry.quarters) });
                 }
             }
-            stateRef.current = openKeepUpStep(stateRef.current, pitches);
+            stateRef.current = openKeepUpStep(stateRef.current, pitches, {
+                at: scheduler.now(),
+                dwellMs,
+                next: next?.play.map((entry) => entry.pitch) ?? [],
+            });
             // Light "play now" only when this step has notes for the practised hand. A
             // hands-separate run leaves the other hand's positions unscored (closeStep
             // skips an empty step), so highlighting them would strand a mark the trail
@@ -280,10 +314,16 @@ export function useKeepUp({
                 onPosition?.(current.whole);
             }
             if (!current) {
-                finish();
+                // The last beat is still open to a late strike; its verdict, and the
+                // result built from every verdict, wait for that moment to pass.
+                chain.push(() => {
+                    settle();
+                    finish();
+                }, KEEP_UP_LATE_MS);
                 return;
             }
-            openStep(current);
+            const dwell = listenStepMs(current.lengths, localTempo(current), current.stretch);
+            openStep(current, dwell, steps[step + 1]);
             // Mirror the reducer's position onto the visual cursor, in lock-step
             // with the collected steps, so the painter recolours the right notes — an
             // ornament leaves it where it is, being printed on the note it decorates.
@@ -292,7 +332,6 @@ export function useKeepUp({
             }
             step += 1;
             centerCursor();
-            const dwell = listenStepMs(current.lengths, localTempo(current), current.stretch);
             setStepMs(dwell);
             chain.push(tick, dwell);
         };
@@ -303,14 +342,15 @@ export function useKeepUp({
     };
 
     // A struck pitch that the open step expects counts toward catching it; once all
-    // are in, the step goes green early. The note sounds so a MIDI player hears
-    // their own playing over the guide.
-    const registerNote = (note: number) => {
+    // are in, the step goes green early. The note sounds so a player hears their own
+    // playing over the guide — unless the instrument they struck it on already makes
+    // its own sound, which the synth knows by the device.
+    const registerNote = (note: number, at: number, device?: string) => {
         if (!activeRef.current) {
             return;
         }
-        synth.playNote(note);
-        const { state, caught } = strikeKeepUp(stateRef.current, note);
+        synth.playNote(note, { device });
+        const { state, caught } = strikeKeepUp(stateRef.current, note, at);
         stateRef.current = state;
         if (caught) {
             litHalos(notesRef.current.map((element) => ({ element, color: PLAYED_COLOR })));
@@ -327,7 +367,10 @@ export function useKeepUp({
     );
     const stopNow = useCallback(() => api.current.stop(), []);
     const clearResultNow = useCallback(() => api.current.clearResult(), []);
-    const registerNoteNow = useCallback((note: number) => api.current.registerNote(note), []);
+    const registerNoteNow = useCallback(
+        (note: number, at: number, device?: string) => api.current.registerNote(note, at, device),
+        [],
+    );
     return useMemo(
         () => ({
             running,

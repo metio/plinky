@@ -367,6 +367,8 @@ export type CorrectInfo = {
     // hand got there first — and on hands-together music, which is most of it, that
     // difference is the whole of a per-hand verdict.
     staffTimes: Record<number, number>;
+    // When each of `pitches` was struck, index-aligned with it.
+    pitchTimes: number[];
 };
 
 // Drives note-by-note practice of an OSMD score. The pure matcher in core owns
@@ -688,6 +690,7 @@ export function useScoreMatcher(
                     wrongBefore: event.wrongBefore,
                     staves: event.step.staves,
                     staffTimes: staffArrivals(event),
+                    pitchTimes: event.arrivals,
                 });
                 // Mirror the reducer's advance onto the visual cursor — unless the step
                 // just cleared was an ornament, which is printed on the very note it

@@ -30,21 +30,39 @@ export function wrapInput(input: MIDIInput): MidiInput {
             input.onmidimessage = (event) => {
                 // A message without payload carries nothing to parse.
                 if (event.data) {
-                    // Stamp on receipt with performance.now() rather than carrying
-                    // event.timeStamp. The spec ties timeStamp to the page time origin,
-                    // but real MIDI drivers don't reliably honour that — some stamp on a
-                    // system/subsystem epoch or emit 0. Mixing that rogue origin with the
-                    // performance-clock stamps the capture uses to CLOSE a note (the
-                    // end-of-run flush, a blur/disconnect force-release) yields a hold
-                    // length ≈ time-since-page-load: the first held note (or a note left
-                    // ringing under the sustain pedal) records as sustained for the whole
-                    // uptime. Stamping every message on the one clock the flush also reads
-                    // keeps open and close on the same origin.
-                    handler(event.data, performance.now());
+                    handler(event.data, stampOf(event.timeStamp, performance.now()));
                 }
             };
         },
     };
+}
+
+// How far the driver's stamp may sit from the moment the message is handled and still be
+// read as the same clock. A message waits at most a few frames behind a busy main thread;
+// a stamp on another epoch is off by hours.
+const STAMP_LAG_MS = 2000;
+const STAMP_LEAD_MS = 5;
+
+// When a message happened, on the performance clock. The driver's stamp is preferred: it
+// is taken when the key went down, where receipt is delayed by whatever the main thread
+// was doing — a score repainting after a cleared chord holds the next note's stamp back by
+// the paint — and rhythm is graded on these stamps to the tens of milliseconds. The spec
+// ties timeStamp to the page's time origin, but not every driver honours that: some stamp
+// on a system epoch or emit 0. A stamp that is not within a moment of receipt is therefore
+// not on this clock, and the receipt is used instead — mixing a rogue origin with the
+// performance-clock stamps the capture uses to CLOSE a note (the end-of-run flush, a
+// blur/disconnect force-release) would record the first held note as sustained for the
+// whole uptime. Exported for its own test.
+export function stampOf(driverStamp: number | undefined, now: number): number {
+    if (
+        driverStamp === undefined ||
+        !Number.isFinite(driverStamp) ||
+        driverStamp > now + STAMP_LEAD_MS ||
+        driverStamp < now - STAMP_LAG_MS
+    ) {
+        return now;
+    }
+    return driverStamp;
 }
 
 function wrapOutput(output: MIDIOutput): MidiOutput {

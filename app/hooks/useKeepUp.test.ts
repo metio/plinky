@@ -226,6 +226,63 @@ describe("useKeepUp", () => {
         expect(result.current.expected).toEqual([]);
     });
 
+    it("counts a strike a hair before or after the beat, and a wrong one as a miss", () => {
+        const osmd = fakeOsmd([
+            [{ midi: 60, staff: 0 }],
+            [{ midi: 62, staff: 0 }],
+            [{ midi: 64, staff: 0 }],
+        ]);
+        const onFinish = vi.fn();
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote: () => {} },
+                tempo: () => 240,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                markPainted: () => {},
+                onFinish,
+            }),
+        );
+        const now = () => performance.now();
+
+        act(() => result.current.start({ hand: "both", guideNotes: false, accompany: false }));
+        // Count-in 250 ms, then beats of 250 ms each: 60 at 250, 62 at 500, 64 at 750.
+        act(() => vi.advanceTimersByTime(250));
+        // The first beat's note, struck late: 30 ms after the second beat opened.
+        act(() => vi.advanceTimersByTime(280));
+        act(() => result.current.registerNote(60, now()));
+        // The third beat's note, struck early: 40 ms before its beat.
+        act(() => vi.advanceTimersByTime(180));
+        act(() => result.current.registerNote(64, now()));
+        // The second beat's note never comes; let the run play out and settle.
+        act(() => vi.advanceTimersByTime(1000));
+
+        expect(onFinish).toHaveBeenCalled();
+        expect(result.current.result).toMatchObject({ inTime: 2, total: 3 });
+    });
+
+    it("hands the synth the device a strike came from, so a piano is not doubled", () => {
+        const osmd = fakeOsmd([[{ midi: 60, staff: 0 }]]);
+        const playNote = vi.fn();
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote },
+                tempo: () => 240,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                markPainted: () => {},
+                onFinish: () => {},
+            }),
+        );
+        act(() => result.current.start({ hand: "both", guideNotes: false, accompany: false }));
+        act(() => vi.advanceTimersByTime(300));
+        act(() => result.current.registerNote(60, performance.now(), "Yamaha P-125"));
+        expect(playNote).toHaveBeenCalledWith(60, { device: "Yamaha P-125" });
+        act(() => result.current.stop());
+    });
+
     it("plays the other hand as accompaniment in a duet run", () => {
         const osmd = fakeOsmd([
             [

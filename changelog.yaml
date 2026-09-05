@@ -4,6 +4,25 @@
 - date: 2026-09-05
   entries:
     - |-
+      **Keep up gives a beat some room.** A note struck a hair before the beat, or a hair
+      after it, is what being in time sounds like — and Keep up was counting both as
+      wrong, since a beat opened and closed on the tick with no room either side. Each
+      beat now takes a strike up to a tenth of a second early or late, and a beat is only
+      judged once that moment has passed. The last beat waits for it too, so a final
+      note played a touch late still counts.
+    - |-
+      **A rolled chord records what each key did.** Every key of a chord used to be timed
+      from the moment the chord completed, and a key lifted before the last one landed
+      was held open to the end of the run — so a take of a rolled chord replayed with its
+      first note clipped short or ringing on for minutes. Each key's hold now runs from
+      its own strike to its own lift.
+    - |-
+      **A piano's own notes are timed by the piano.** Notes from a MIDI instrument are now
+      stamped when the key went down rather than when the browser got round to reading
+      them, so a busy page repainting a score no longer nudges your timing. And in Keep
+      up, a digital piano that makes its own sound is no longer echoed by Plinky as well
+      — the same rule the rest of the app already follows.
+    - |-
       **Settings has an index down the side.** The page had grown to a dozen sections and
       a long scroll to find one; the list beside it now names every section under four
       headings — your instrument, while you play, learning, this device — and jumps
