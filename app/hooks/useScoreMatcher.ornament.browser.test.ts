@@ -4,6 +4,7 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { NO_SCORE_MARKS, readScoreMarks, type ScoreMarks } from "../../core/musicxmlMarks";
+import { performanceOf } from "../../core/scorePerformance";
 import { collectListenSteps } from "../lib/listenSteps";
 import { collectMatchSteps } from "./useScoreMatcher";
 import { readArpeggio, readOrnament } from "../lib/scoreExpression";
@@ -193,6 +194,27 @@ describe("a chord the score rolls", () => {
                 expect(steps.at(-1)?.advancesCursor).toBe(true);
             },
         );
+    });
+});
+
+describe("what the recordings are fetched for", () => {
+    const soft = `<direction placement="below"><direction-type><dynamics><p/></dynamics></direction-type></direction>`;
+
+    it("costs a piece marked piano at its written dynamic, not the even velocity", () => {
+        // The prefetch reads the same step model as the run. Without the score's marks
+        // every note costs the even velocity, one recording layer is fetched, and a soft
+        // piece is played by the synthesised voice while the panel says it is ready.
+        return load(
+            score(
+                `<measure number="1">${attr(0)}${soft}${plain("C", 5)}${plain("D", 5)}</measure>`,
+            ),
+        ).then((osmd) => {
+            const marked = performanceOf(collectMatchSteps(osmd, "both", marks));
+            const unmarked = performanceOf(collectMatchSteps(osmd, "both"));
+            expect(marked.length).toBe(2);
+            expect(marked.every((note) => note.velocity < 88)).toBe(true);
+            expect(unmarked.every((note) => note.velocity === 88)).toBe(true);
+        });
     });
 });
 
