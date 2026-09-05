@@ -51,6 +51,29 @@ No. 46* is not yet in the public domain — he died in 1957, so his music clears
 seventy-year rule on 1 January 2028 — and it should not have been here. The name
 that let it in has been taken off the list until then.
 
+**Passages under an 8va sound, and are graded, in the right octave.** A score
+writes down the pitch that sounds; the dotted line above the staff only says where
+the notes are drawn. Plinky was reading the line as a correction and moving every
+note under it by an octave — Listen played the passage an octave low, and playing it
+as printed was marked wrong. Tremolos and glissandos read from the score had a
+similar slip and sounded an octave high. All three now sound the pitch the score
+says, which is the one under your fingers.
+
+**A one-hand link on a one-staff piece plays.** Opening a piece written on a single
+staff with a link that asked for the left hand — the practice-methods page hands
+out exactly that — left Practice doing nothing, with no hand switch on screen to
+change it. A single staff is played with both hands whatever the link says.
+
+**Going from one piece to the next starts the next one clean.** Following the
+warm-up scale a piece offers, or the way back, kept the first piece's
+transposition, hand, loop and tempo and applied them to the second — so a piece
+transposed up a tone offered a warm-up in the right key and then played it a tone
+higher still. Each piece now opens with only what its own address asks for.
+
+**The Piano page's links stay in your language.** The way on to the music and to
+Compose left the language prefix behind, so a reader in French landed on an
+unlocalised address and was bounced by way of a guess at their language.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to

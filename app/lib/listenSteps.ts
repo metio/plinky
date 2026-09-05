@@ -18,7 +18,6 @@ import {
 } from "../../core/listenPerformance";
 import { handOfStaff } from "../../core/matcher";
 import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
-import { octaveShiftAt } from "../../core/octaveShift";
 import { pedalledAt, ringUntil, softAt } from "../../core/pedal";
 import { slurredOnwardAt } from "../../core/slur";
 import {
@@ -55,8 +54,6 @@ export function collectListenSteps(
     // Which staves belong to the practised instrument — on an art song the piano is staves
     // 1 and 2 and the singer is staff 0, so a hand cannot be read off the raw staff index.
     const parts = readParts(osmd);
-    // Where the score prints 8va, the drawn pitch is deliberately not the played one.
-    const shifts = marks.octaveShifts;
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -83,7 +80,7 @@ export function collectListenSteps(
                 // the re-strike; rests never sound.
                 if (!note.isRest() && note.halfTone > 0 && expression.strike) {
                     notes.push({
-                        pitch: note.halfTone + 12 + octaveShiftAt(shifts, whole),
+                        pitch: note.halfTone + 12,
                         // Under the pedal the damper holds the note, so it rings on
                         // whether or not the written value is up.
                         soundQuarters: ringUntil(pedals, whole, expression.soundQuarters / 4) * 4,
@@ -136,7 +133,7 @@ export function collectListenSteps(
             const tremolo = openingTremolo(marks.tremolos, whole);
             const gliss = openingGlissando(marks.glissandos, whole);
             if (tremolo) {
-                steps.push(...spellOutTremolo(step, tremolo, shifts));
+                steps.push(...spellOutTremolo(step, tremolo));
             } else if (gliss) {
                 steps.push(...spellOutGlissando(step, gliss, fifthsAt(keys, whole)));
             } else if (ornament) {

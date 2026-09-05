@@ -6,7 +6,6 @@ import { contourWeights, voicingWeight } from "./contour";
 import { type Articulation, performNote } from "./expression";
 import { type GlissandoSpan, glissandoNotes } from "./glissando";
 import type { Hand2 } from "./matcher";
-import { type OctaveShiftSpan, octaveShiftAt } from "./octaveShift";
 import { type OrnamentKind, ornamentNotes } from "./ornament";
 import { SOFT_SCALE } from "./pedal";
 import { effectiveTempo, listenStepMs } from "./playback";
@@ -156,22 +155,16 @@ const near = (one: number, other: number) => Math.abs(one - other) < NEAR;
 
 // A tremolo, spelled out as the notes it shakes. The figure fills the whole span — for an
 // alternating one that is both written notes' time, because the pair is one gesture.
-export function spellOutTremolo(
-    step: ListenStep,
-    span: TremoloSpan,
-    shifts: readonly OctaveShiftSpan[],
-): ListenStep[] {
+export function spellOutTremolo(step: ListenStep, span: TremoloSpan): ListenStep[] {
     const model = step.notes[0];
     if (!model) {
         return [step];
     }
     const quarters = (span.to - span.from) * 4;
-    // The pair's own written pitches, each moved by whatever octave line is in force where
-    // IT sits. Both written notes spell the same alternation in the same order, so the two
-    // halves run together into one unbroken rock.
-    const chords = span.pair?.map((chord) =>
-        chord.pitches.map((pitch) => pitch + 12 + octaveShiftAt(shifts, chord.at)),
-    );
+    // The pair's own pitches, already MIDI numbers read off the file. Both written notes
+    // spell the same alternation in the same order, so the two halves run together into
+    // one unbroken rock.
+    const chords = span.pair?.map((chord) => chord.pitches);
     const first = chords?.[0] ?? step.notes.map((note) => note.pitch);
     const figure = tremoloNotes(first, chords?.[1] ?? null, quarters, span.beams);
     if (figure.length < 2) {
@@ -199,7 +192,8 @@ export function spellOutGlissando(
     // its own and sounds by itself afterwards, so the sweep stops short of it — otherwise
     // the arrival is struck twice, once ending the gesture and once on its own.
     const quarters = (step.lengths[0] ?? from.soundQuarters) as number;
-    const swept = glissandoNotes(from.pitch, span.arrivesAt + 12, quarters, fifths).slice(0, -1);
+    // arrivesAt is a MIDI number read off the file, in the same space as the step's pitch.
+    const swept = glissandoNotes(from.pitch, span.arrivesAt, quarters, fifths).slice(0, -1);
     if (swept.length < 2) {
         return [step];
     }

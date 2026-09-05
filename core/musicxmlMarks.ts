@@ -12,7 +12,6 @@
 import { child, text } from "./musicxmlDom";
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
-import type { OctaveShiftSpan } from "./octaveShift";
 import { type GlissandoSpan, readGlissandos } from "./glissando";
 import type { PedalSpan, SoftSpan } from "./pedal";
 import { readTremolos, type TremoloSpan } from "./tremolo";
@@ -90,7 +89,6 @@ export type XmlDirections = {
     dynamics: DynamicPoint[];
     pedals: PedalSpan[];
     softs: SoftSpan[];
-    octaveShifts: OctaveShiftSpan[];
 };
 
 export function readDirections(timeline: XmlTimeline): XmlDirections {
@@ -100,23 +98,21 @@ export function readDirections(timeline: XmlTimeline): XmlDirections {
     // not hold anything — it changes how a note is struck, which is a different question
     // from how long one rings.
     const softs: SoftSpan[] = [];
-    const octaveShifts: OctaveShiftSpan[] = [];
     // What is currently open. One object rather than a handful of variables, so the
     // per-direction reader below can be a plain function instead of a closure over this one.
     const open: OpenSpans = {
         pedal: null,
         soft: null,
-        shift: null,
         end: timeline.end,
         volume: DEFAULT_VELOCITY,
     };
 
     for (const { element, whole } of timeline.directions) {
-        readDirection(element, whole, { dynamics, pedals, softs, octaveShifts }, open);
+        readDirection(element, whole, { dynamics, pedals, softs }, open);
     }
 
     // A line the engraving opens and never closes runs to the end of the music, rather than
-    // being dropped — dropping it un-pedals (or un-shifts) the rest of the piece silently.
+    // being dropped — dropping it un-pedals the rest of the piece silently.
     if (open.pedal !== null) {
         pedals.push({
             from: open.pedal.at,
@@ -127,21 +123,13 @@ export function readDirections(timeline: XmlTimeline): XmlDirections {
     if (open.soft !== null) {
         softs.push({ from: open.soft, to: Math.max(open.soft, open.end) });
     }
-    if (open.shift !== null) {
-        octaveShifts.push({
-            from: open.shift.at,
-            to: Math.max(open.shift.at, open.end),
-            semitones: open.shift.semitones,
-        });
-    }
-    return { dynamics, pedals, softs, octaveShifts };
+    return { dynamics, pedals, softs };
 }
 
 type OpenSpans = {
     pedal: { at: number; kind: "sustain" | "sostenuto" } | null;
     // Where the soft pedal went down, if it is still down.
     soft: number | null;
-    shift: { at: number; semitones: number } | null;
     end: number;
     // The loudness in force, so a hairpin knows what it is swelling from.
     volume: number;
@@ -208,24 +196,11 @@ function readDirection(direction: Element, at: number, out: XmlDirections, open:
                 open.pedal = kind === "change" ? { at, kind: open.pedal.kind } : null;
             }
         }
-        const shift = child(type, "octave-shift");
-        if (shift) {
-            const kind = shift.getAttribute("type");
-            const size = Number(shift.getAttribute("size") ?? "8");
-            // size 8 is one octave, 15 is two — the numbers name the interval, counting
-            // inclusively, which is why they are not 7 and 14.
-            const octaves = size >= 15 ? 2 : 1;
-            if ((kind === "up" || kind === "down") && open.shift === null) {
-                open.shift = { at, semitones: (kind === "up" ? 12 : -12) * octaves };
-            } else if (kind === "stop" && open.shift !== null) {
-                out.octaveShifts.push({
-                    from: open.shift.at,
-                    to: at,
-                    semitones: open.shift.semitones,
-                });
-                open.shift = null;
-            }
-        }
+        // An octave line (8va, 8vb, 15ma) is deliberately not read. MusicXML writes the
+        // SOUNDING pitch in <pitch>; the line only says where the engraver draws the notes,
+        // and the engraving applies it to the drawing alone. Reading it as a shift and
+        // adding it to the pitch put every passage under one an octave out — and asked the
+        // player to play what the page does not say.
     }
 }
 
@@ -430,7 +405,6 @@ export function readFifths(doc: Document): number {
 export type ScoreMarks = {
     slurs: SlurSpan[];
     pedals: PedalSpan[];
-    octaveShifts: OctaveShiftSpan[];
     dynamics: DynamicPoint[];
     tempi: TempoPoint[];
     // Each bar's start and metre, for the weighting a bar gives its own beats.
@@ -453,7 +427,6 @@ export type ScoreMarks = {
 export const NO_SCORE_MARKS: ScoreMarks = {
     slurs: [],
     pedals: [],
-    octaveShifts: [],
     dynamics: [],
     tempi: [],
     bars: [],
@@ -473,7 +446,6 @@ export function readScoreMarks(doc: Document | null): ScoreMarks {
     return {
         slurs: slurSpans(timeline.notes),
         pedals: directions.pedals,
-        octaveShifts: directions.octaveShifts,
         dynamics: directions.dynamics,
         tempi: readTempoPoints(timeline),
         softs: directions.softs,

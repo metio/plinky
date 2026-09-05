@@ -200,24 +200,24 @@ describe("a score with an 8va over it", () => {
     const shift = (type: string) =>
         `<direction placement="above"><direction-type><octave-shift type="${type}" size="8"/></direction-type></direction>`;
 
-    it("sounds the notes where they are played, not where they are drawn", () => {
-        // An 8va draws the notes an octave lower than they sound, to keep them on the
-        // staff. Whether the engraving hands back the written pitch or the sounding one is
-        // a contract, and getting it wrong puts a whole passage in the wrong octave — so
-        // this asks rather than assumes.
+    it("sounds the pitch the file writes: an 8va moves the drawing, never the sound", () => {
+        // MusicXML writes the SOUNDING pitch in <pitch>; the octave line says only where
+        // the engraver draws the notes. MuseScore, which wrote the catalogue, encodes 8va
+        // as type="down" (the drawing is shifted down from the sound) and 8vb as "up".
+        // Whether the engraver hands back the written pitch or the sounding one is a
+        // contract, and getting it wrong puts a whole passage in the wrong octave — so
+        // this asks rather than assumes: a C6 under 8va sounds C6, before and after the
+        // line closes, whichever way the line points.
         return load(
             score(
-                `<measure number="1">${attr(0)}${shift("up")}${plain("C", 5)}${plain("D", 5)}${shift("stop")}</measure>
-                 <measure number="2">${plain("C", 5)}</measure>`,
+                `<measure number="1">${attr(0)}${shift("down")}${plain("C", 6)}${plain("D", 6)}${shift("stop")}</measure>
+                 <measure number="2">${plain("C", 6)}</measure>`,
             ),
         ).then((osmd) => {
             const sounded = collectListenSteps(osmd, marks).flatMap((step) =>
                 step.notes.map((note) => note.pitch),
             );
-            // Whatever OSMD's answer is, the third note is outside the 8va and must differ
-            // from the first two by exactly the octave if the shift is being applied at all.
-            // Under the line an octave up; after it, at written pitch.
-            expect(sounded).toEqual([84, 86, 72]);
+            expect(sounded).toEqual([84, 86, 84]);
         });
     });
 
@@ -226,7 +226,7 @@ describe("a score with an 8va over it", () => {
         // third. A player following the line would be marked wrong for doing as told.
         return load(
             score(
-                `<measure number="1">${attr(0)}${shift("up")}${plain("C", 5)}${plain("D", 5)}${shift("stop")}</measure>`,
+                `<measure number="1">${attr(0)}${shift("down")}${plain("C", 6)}${plain("D", 6)}${shift("stop")}</measure>`,
             ),
         ).then((osmd) => {
             expect(collectMatchSteps(osmd, "both", marks).map((step) => step.pitches)).toEqual([
@@ -236,28 +236,17 @@ describe("a score with an 8va over it", () => {
         });
     });
 
-    it("shifts a line the engraving never closes to the end of the music", () => {
+    it("leaves an 8vb line alone the same way", () => {
         return load(
             score(
-                `<measure number="1">${attr(0)}${shift("up")}${plain("C", 5)}</measure>
-                 <measure number="2">${plain("D", 5)}</measure>`,
+                `<measure number="1">${attr(0)}${shift("up")}${plain("C", 3)}</measure>
+                 <measure number="2">${plain("D", 3)}</measure>`,
             ),
         ).then((osmd) => {
             const sounded = collectListenSteps(osmd, marks).flatMap((step) =>
                 step.notes.map((note) => note.pitch),
             );
-            expect(sounded).toEqual([84, 86]);
-        });
-    });
-
-    it("leaves a score with no octave line at written pitch", () => {
-        return load(
-            score(`<measure number="1">${attr(0)}${plain("C", 5)}${plain("D", 5)}</measure>`),
-        ).then((osmd) => {
-            const sounded = collectListenSteps(osmd, marks).flatMap((step) =>
-                step.notes.map((note) => note.pitch),
-            );
-            expect(sounded).toEqual([72, 74]);
+            expect(sounded).toEqual([48, 50]);
         });
     });
 });

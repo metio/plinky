@@ -113,7 +113,7 @@ for (const path of all) {
             }
             previous = one.whole;
         }
-        for (const span of [...slurs, ...directions.pedals, ...directions.octaveShifts]) {
+        for (const span of [...slurs, ...directions.pedals]) {
             if (!Number.isFinite(span.from) || !Number.isFinite(span.to) || span.to < span.from) {
                 note(path, "span-inverted", `${span.from}..${span.to}`);
                 break;
