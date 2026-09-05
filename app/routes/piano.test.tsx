@@ -85,6 +85,6 @@ describe("piano route", () => {
     it("offers a way on to the music without asking for it first", () => {
         mount();
         const onward = screen.getByRole("link", { name: m.today_browse() });
-        expect(onward.getAttribute("href")).toBe("/music");
+        expect(onward.getAttribute("href")).toBe("/en/music/");
     });
 });
