@@ -111,21 +111,27 @@ function transitionCost(
 
 // Finger a single melodic line, returning a finger (1..5) per pitch. An optional
 // hand span (semitones) personalizes the cost to the player's reach.
+//
+// A Viterbi search: at each pitch the cheapest way of arriving on each finger, and which
+// finger it came from. The path is read back off those pointers at the end rather than
+// carried along, so a line of n notes costs n steps of work and not n² of copying. Ties
+// go to the earlier finger at every choice, which is what decides between two fingerings
+// of equal comfort — and the catalogue's costs were measured with exactly that choice.
 export function fingerLine(pitches: number[], hand: Hand, span?: number): number[] {
     if (pitches.length === 0) {
         return [];
     }
     const { spread, leap } = handModel(span);
-    let paths = FINGERS.map((finger) => ({
-        cost: startCost(pitches[0]!, finger),
-        path: [finger],
-    }));
+    let costs = FINGERS.map((finger) => startCost(pitches[0]!, finger));
+    const from: number[][] = [];
     for (let i = 1; i < pitches.length; i++) {
-        paths = FINGERS.map((finger) => {
-            let best = { cost: Number.POSITIVE_INFINITY, path: [] as number[] };
-            paths.forEach((previous, index) => {
+        const back: number[] = [];
+        costs = FINGERS.map((finger, at) => {
+            let best = Number.POSITIVE_INFINITY;
+            back[at] = 0;
+            costs.forEach((previous, index) => {
                 const cost =
-                    previous.cost +
+                    previous +
                     transitionCost(
                         pitches[i - 1]!,
                         FINGERS[index]!,
@@ -135,14 +141,30 @@ export function fingerLine(pitches: number[], hand: Hand, span?: number): number
                         spread,
                         leap,
                     );
-                if (cost < best.cost) {
-                    best = { cost, path: [...previous.path, finger] };
+                if (cost < best) {
+                    best = cost;
+                    back[at] = index;
                 }
             });
             return best;
         });
+        from.push(back);
     }
-    return paths.reduce((best, candidate) => (candidate.cost < best.cost ? candidate : best)).path;
+    return readBack(costs, from).map((state) => FINGERS[state]!);
+}
+
+// The states along the cheapest path, first to last, given each step's back pointers.
+function readBack(finalCosts: number[], from: number[][]): number[] {
+    let state = finalCosts.reduce(
+        (best, cost, index) => (cost < finalCosts[best]! ? index : best),
+        0,
+    );
+    const states = [state];
+    for (let i = from.length - 1; i >= 0; i--) {
+        state = from[i]![state]!;
+        states.push(state);
+    }
+    return states.reverse();
 }
 
 // The comfort cost of a specific finger assignment for a line — the same effort
@@ -293,7 +315,7 @@ export function positionsCost(
     return cost;
 }
 
-// The most comfortable fingering for a sequence of positions, via the same DP as
+// The most comfortable fingering for a sequence of positions, via the same search as
 // the single line but with chord shapes as the per-position states.
 export function fingerPositions(
     positions: number[][],
@@ -305,29 +327,36 @@ export function fingerPositions(
         return [];
     }
     const { spread, leap } = handModel(span);
-    type Path = { fingers: number[]; cost: number; path: number[][] };
-    let paths: Path[] = fingerSets(positions[0]!.length, hand).map((fingers) => ({
-        fingers,
-        cost: chordCost(positions[0]!, fingers, spread),
-        path: [fingers],
-    }));
+    let shapes = fingerSets(positions[0]!.length, hand);
+    let costs = shapes.map((fingers) => chordCost(positions[0]!, fingers, spread));
+    const chosen: number[][][] = [shapes];
+    const from: number[][] = [];
     for (let i = 1; i < positions.length; i++) {
         const pos = positions[i]!;
         const prevPos = positions[i - 1]!;
         const ease = gaps === undefined ? 1 : moveEase(gaps[i] ?? 0);
-        paths = fingerSets(pos.length, hand).map((fingers) => {
-            let best: Path = { fingers, cost: Number.POSITIVE_INFINITY, path: [] };
-            for (const previous of paths) {
+        const previousShapes = shapes;
+        const previousCosts = costs;
+        const back: number[] = [];
+        shapes = fingerSets(pos.length, hand);
+        costs = shapes.map((fingers, at) => {
+            let best = Number.POSITIVE_INFINITY;
+            back[at] = 0;
+            previousCosts.forEach((previous, index) => {
                 const cost =
-                    previous.cost +
+                    previous +
                     chordCost(pos, fingers, spread) +
-                    moveCost(prevPos, previous.fingers, pos, fingers, hand, spread, leap) * ease;
-                if (cost < best.cost) {
-                    best = { fingers, cost, path: [...previous.path, fingers] };
+                    moveCost(prevPos, previousShapes[index]!, pos, fingers, hand, spread, leap) *
+                        ease;
+                if (cost < best) {
+                    best = cost;
+                    back[at] = index;
                 }
-            }
+            });
             return best;
         });
+        chosen.push(shapes);
+        from.push(back);
     }
-    return paths.reduce((best, candidate) => (candidate.cost < best.cost ? candidate : best)).path;
+    return readBack(costs, from).map((state, i) => chosen[i]![state]!);
 }
