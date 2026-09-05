@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type Beams, BEAMS } from "./beams";
+import { parseJson } from "./json";
 import { type Groove, GROOVES } from "./groove";
 import type { Letter } from "./grade";
 import { type Reduction, REDUCTIONS } from "./reduction";
@@ -347,8 +348,10 @@ export const DEFAULT_PREFS: Readonly<Prefs> = Object.freeze({
 // never leak an out-of-range value into the app.
 export function parsePrefs(raw: string | null): Prefs {
     const base = defaults();
-    try {
-        const parsed = JSON.parse(raw ?? "{}");
+    return parseJson(raw, base, (value) => {
+        // A stored value of the wrong kind — null, a number — throws on the first read
+        // below and lands on the defaults, as a corrupt one does.
+        const parsed = value as Record<string, unknown>;
         return {
             sound: bool(parsed.sound, base.sound),
             instrumentSounds: bool(parsed.instrumentSounds, base.instrumentSounds),
@@ -402,9 +405,7 @@ export function parsePrefs(raw: string | null): Prefs {
             micCalibration: cleanCalibration(parsed.micCalibration),
             instrumentRange: cleanInstrumentRange(parsed.instrumentRange),
         };
-    } catch {
-        return base;
-    }
+    });
 }
 
 // The staff and the keyboard as they really are, with every aid off. Two surfaces want

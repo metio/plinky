@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { toCsv } from "./csv";
+import { parseJson } from "./json";
 import { todayKey } from "./daily";
 import { daysBetween, daysInRange, isDateKey } from "./dateKey";
 
@@ -122,8 +123,7 @@ function sortSessions(sessions: PracticeSession[]): PracticeLog {
 }
 
 export function parsePracticeLog(raw: string | null): PracticeLog {
-    try {
-        const parsed = JSON.parse(raw ?? "[]");
+    return parseJson(raw, [], (parsed) => {
         if (!Array.isArray(parsed)) {
             return [];
         }
@@ -132,9 +132,7 @@ export function parsePracticeLog(raw: string | null): PracticeLog {
                 .map(normalizeSession)
                 .filter((session): session is PracticeSession => session !== null),
         );
-    } catch {
-        return [];
-    }
+    });
 }
 
 function withPiece(pieces: string[], pieceId: string | undefined): string[] {

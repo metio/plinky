@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { isRecord } from "./guards";
+import { jsonOf, NOT_JSON } from "./json";
 
 // The Plinky progress-bundle format: every value this device holds — mastery,
 // review schedule, lifetime fingerprint, takes, ghosts, fingerings, preferences,
@@ -54,10 +55,8 @@ export function serializeProgress(entries: Record<string, string>, savedAt: stri
 // failing the whole restore — one unreadable value must not cost a player every
 // other thing they had.
 export function parseProgressPack(json: string): ProgressParseResult {
-    let data: unknown;
-    try {
-        data = JSON.parse(json);
-    } catch {
+    const data = jsonOf(json);
+    if (data === NOT_JSON) {
         return { ok: false, problem: "json" };
     }
     if (!isRecord(data) || data.format !== PROGRESS_FORMAT) {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { todayKey } from "./daily";
+import { parseJson } from "./json";
 import { shiftDay } from "./dateKey";
 
 // Notes practiced per day, keyed by local calendar date (YYYY-MM-DD), matching todayKey.
@@ -23,8 +24,7 @@ export type PracticeSummary = {
 // Only finite-number values are kept: a corrupt entry whose value is a string would
 // otherwise turn `count + notes` into string concatenation and every total to gibberish.
 export function parseHistory(raw: string | null): History {
-    try {
-        const parsed = JSON.parse(raw ?? "{}");
+    return parseJson(raw, {}, (parsed) => {
         if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
             return {};
         }
@@ -35,9 +35,7 @@ export function parseHistory(raw: string | null): History {
             }
         }
         return history;
-    } catch {
-        return {};
-    }
+    });
 }
 
 // Folds a finished run's note count onto today's tally. Zero or negative counts
