@@ -12,7 +12,6 @@ import {
     tempoAt,
 } from "./musicxmlMarks";
 import { readTimeline } from "./musicxmlTimeline";
-import { octaveShiftAt } from "./octaveShift";
 import { pedalledAt } from "./pedal";
 import { slurredOnwardAt } from "./slur";
 
@@ -137,24 +136,6 @@ describe("the marks that cover a stretch of music", () => {
         expect(pedals[0]?.to).toBeGreaterThanOrEqual(pedals[0]?.from ?? 0);
     });
 
-    it("reads an octave line, up and down and at both sizes", () => {
-        const up = read(
-            `<measure number="1">${ATTR}${direction('<octave-shift type="up" size="8"/>')}${note("C", 8)}${direction('<octave-shift type="stop" size="8"/>')}${note("D", 8)}</measure>`,
-        ).octaveShifts;
-        expect(octaveShiftAt(up, 0)).toBe(12);
-        expect(octaveShiftAt(up, 0.75)).toBe(0);
-
-        const down = read(
-            `<measure number="1">${ATTR}${direction('<octave-shift type="down" size="8"/>')}${note("C", 16)}</measure>`,
-        ).octaveShifts;
-        expect(octaveShiftAt(down, 0)).toBe(-12);
-
-        const twoOctaves = read(
-            `<measure number="1">${ATTR}${direction('<octave-shift type="up" size="15"/>')}${note("C", 16)}</measure>`,
-        ).octaveShifts;
-        expect(octaveShiftAt(twoOctaves, 0)).toBe(24);
-    });
-
     it("reads the key signature, and calls a score without one C major", () => {
         expect(readFifths(score(`<measure number="1">${ATTR}</measure>`, 3))).toBe(3);
         expect(readFifths(score(`<measure number="1">${ATTR}</measure>`, -3))).toBe(-3);
@@ -171,14 +152,8 @@ describe("the marks that cover a stretch of music", () => {
     });
 
     it("answers a document with no marks with empty lists rather than throwing", () => {
-        const { dynamics, pedals, octaveShifts } = read(
-            `<measure number="1">${ATTR}${note("C", 16)}</measure>`,
-        );
-        expect({ dynamics, pedals, octaveShifts }).toEqual({
-            dynamics: [],
-            pedals: [],
-            octaveShifts: [],
-        });
+        const { dynamics, pedals } = read(`<measure number="1">${ATTR}${note("C", 16)}</measure>`);
+        expect({ dynamics, pedals }).toEqual({ dynamics: [], pedals: [] });
     });
 });
 

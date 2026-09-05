@@ -34,7 +34,6 @@ function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreP
 }
 import { lengthScaleOf, velocityOf } from "../../core/expression";
 import { interpretedWeight } from "../../core/interpretation";
-import { octaveShiftAt } from "../../core/octaveShift";
 import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { slurredOnwardAt } from "../../core/slur";
 import type { ScoreParts } from "../../core/parts";
@@ -178,7 +177,7 @@ function stepsAtCursor(
             if (!expression.strike) {
                 continue;
             }
-            pitches.push(note.halfTone + 12 + octaveShiftAt(marks.octaveShifts, whole));
+            pitches.push(note.halfTone + 12);
             pitchStaves.push(staff ?? 0);
             pitchHands.push(handOfStaff(staff, parts));
             // Each key is asked for on its own terms: its own accent over the standing

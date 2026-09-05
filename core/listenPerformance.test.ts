@@ -91,7 +91,7 @@ describe("spellOutOrnament", () => {
 
 describe("spellOutTremolo", () => {
     it("shakes one written note rather than holding it", () => {
-        const figure = spellOutTremolo(step([60]), { from: 0, to: 0.5, beams: 2, pair: null }, []);
+        const figure = spellOutTremolo(step([60]), { from: 0, to: 0.5, beams: 2, pair: null });
         expect(figure.length).toBeGreaterThan(1);
         expect(figure.every((one) => one.notes[0]?.pitch === 60)).toBe(true);
     });
@@ -108,12 +108,12 @@ describe("spellOutTremolo", () => {
                     { at: 0.5, pitches: [43] },
                 ],
             },
-            [],
         );
+        // The pair's pitches are MIDI numbers as read from the file, and sound as such.
         const sounded = figure.slice(0, 4).map((one) => one.notes[0]?.pitch);
-        expect(sounded[0]).toBe(48);
-        expect(sounded[1]).toBe(55);
-        expect(sounded[2]).toBe(48);
+        expect(sounded[0]).toBe(36);
+        expect(sounded[1]).toBe(43);
+        expect(sounded[2]).toBe(36);
     });
 });
 
@@ -121,12 +121,15 @@ describe("spellOutGlissando", () => {
     it("sweeps upward and stops short of the note it arrives on", () => {
         const figure = spellOutGlissando(
             step([60], { lengths: [4] }),
-            { from: 0, to: 1, arrivesAt: 60 },
+            { from: 0, to: 1, arrivesAt: 72 },
             0,
         );
+        // The sweep runs from the note it is written on toward the MIDI number it arrives
+        // at, and stops short of it: the arrival is a note of its own.
         const swept = figure.map((one) => one.notes[0]?.pitch ?? 0);
         expect(swept.length).toBeGreaterThan(2);
         expect(swept).toEqual([...swept].sort((one, other) => one - other));
+        expect(swept[0]).toBe(60);
         expect(swept.at(-1)).toBeLessThan(72);
     });
 });
