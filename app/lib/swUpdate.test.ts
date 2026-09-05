@@ -239,6 +239,21 @@ describe("createSwUpdateWatcher", () => {
         expect(reloads.count).toBe(0);
     });
 
+    it("reloads a first-install tab when another tab applies a later update", async () => {
+        // The first install's claim is not an update; the next new controller is one,
+        // whichever tab applied it, and this tab must not go on running the old HTML over
+        // a cache that install has evicted.
+        const { container, reloads } = setup({ controller: null });
+        const registration = fakeRegistration();
+        registration.waiting = fakeWorker();
+        container.resolveRegister(registration);
+        await tick();
+        container.fireControllerChange();
+        expect(reloads.count).toBe(0);
+        container.fireControllerChange();
+        expect(reloads.count).toBe(1);
+    });
+
     it("offers a build that installs after registration", async () => {
         const { container, watcher } = setup();
         const registration = fakeRegistration();
@@ -483,9 +498,10 @@ describe("createSwUpdateWatcher", () => {
             watcher.applyUpdate();
             container.fireControllerChange();
             expect(reloads.count).toBe(1);
-            // The flag resets: a later, unrelated claim leaves the page alone.
+            // Once controlled, every later new controller is an update this page must
+            // follow — whichever tab applied it — so a second claim reloads again.
             container.fireControllerChange();
-            expect(reloads.count).toBe(1);
+            expect(reloads.count).toBe(2);
         });
     });
 });
