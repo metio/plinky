@@ -58,6 +58,26 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             listener();
         }
     };
+    // How many fetches are under way. `loading` says whether any is: two that overlap —
+    // a piece opened and transposed within a second, the first visit's manifest and the
+    // first piece's recordings — must not read as idle when the earlier one finishes
+    // while the later is still arriving.
+    let fetching = 0;
+    const begin = (): (() => void) => {
+        fetching += 1;
+        settle({ loading: true });
+        let ended = false;
+        return () => {
+            if (ended) {
+                return;
+            }
+            ended = true;
+            fetching -= 1;
+            if (fetching === 0) {
+                settle({ loading: false });
+            }
+        };
+    };
     const settle = (next: Partial<SampleState>) => {
         state = { ...state, ...next };
         announce();
@@ -181,8 +201,8 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
     // so without this the panel would sit claiming to fetch something nothing had started,
     // and the first piece would pay for a round trip already owed.
     if (state.enabled) {
-        settle({ loading: true });
-        void Promise.all([loadManifest(), countHeld()]).finally(() => settle({ loading: false }));
+        const done = begin();
+        void Promise.all([loadManifest(), countHeld()]).finally(done);
     }
 
     return {
@@ -203,7 +223,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             if (!found) {
                 return;
             }
-            settle({ loading: true });
+            const done = begin();
             try {
                 // The struck notes first and on their own, because they are the ones a
                 // player is waiting for: a note with no recording is played by the synth,
@@ -222,16 +242,17 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
                 );
                 await countHeld();
             } finally {
-                settle({ loading: false });
+                done();
             }
         },
         async enable() {
             options.remember(true);
-            settle({ enabled: true, loading: true });
+            settle({ enabled: true });
+            const done = begin();
             try {
                 await Promise.all([loadManifest(), countHeld()]);
             } finally {
-                settle({ loading: false });
+                done();
             }
         },
         // The whole pack, on request. In small batches rather than six hundred requests at
@@ -246,7 +267,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             if (!found) {
                 return;
             }
-            settle({ loading: true });
+            const done = begin();
             try {
                 const files = packFiles(found);
                 for (let at = 0; at < files.length; at += BATCH) {
@@ -257,7 +278,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
                     await countHeld();
                 }
             } finally {
-                settle({ loading: false });
+                done();
             }
         },
         // The space back, without giving up the instrument. `forget` turns it off as well;

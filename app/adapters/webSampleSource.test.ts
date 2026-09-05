@@ -165,6 +165,32 @@ describe("webSampleSource", () => {
         expect(source.state().loading).toBe(false);
     });
 
+    it("keeps saying so while a later fetch is still arriving after an earlier one landed", async () => {
+        // A piece opened and transposed within a second asks for two sets of recordings;
+        // the first set landing must not read as idle while the second is still coming.
+        const { source, decodeAudioData } = world();
+        await vi.waitFor(() => expect(source.manifest()).not.toBeNull());
+        const gates: (() => void)[] = [];
+        decodeAudioData.mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    gates.push(() => resolve({ duration: 1 } as AudioBuffer));
+                }),
+        );
+        const first = source.prepare([{ pitch: 60, velocity: 80 }]);
+        const second = source.prepare([{ pitch: 72, velocity: 80 }]);
+        await vi.waitFor(() => expect(gates.length).toBeGreaterThanOrEqual(2));
+        expect(source.state().loading).toBe(true);
+        gates[0]?.();
+        await first;
+        expect(source.state().loading).toBe(true);
+        for (const open of gates.slice(1)) {
+            open();
+        }
+        await second;
+        expect(source.state().loading).toBe(false);
+    });
+
     it("maps a note to its recording itself, so a caller needs no manifest first", async () => {
         // The port takes notes rather than recordings for exactly this reason: on any page
         // load the manifest is not here yet, and a caller made to fetch it before it can
