@@ -168,7 +168,17 @@ describe("webSampleSource", () => {
     it("keeps saying so while a later fetch is still arriving after an earlier one landed", async () => {
         // A piece opened and transposed within a second asks for two sets of recordings;
         // the first set landing must not read as idle while the second is still coming.
-        const { source, decodeAudioData } = world();
+        // Two recordings, so the two pieces ask for different files rather than one
+        // fetch the second waits on.
+        const { source, decodeAudioData } = world({
+            manifest: {
+                ...MANIFEST,
+                notes: [
+                    REGION,
+                    { ...REGION, file: "C5v4.opus", keyCentre: 72, lowKey: 71, highKey: 73 },
+                ],
+            },
+        });
         await vi.waitFor(() => expect(source.manifest()).not.toBeNull());
         const gates: (() => void)[] = [];
         decodeAudioData.mockImplementation(

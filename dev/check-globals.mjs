@@ -34,9 +34,13 @@ const CONFINED = {
     ],
     OfflineAudioContext: ["app/adapters/offlineAudio.ts"],
     VideoEncoder: ["app/adapters/webCodecsVideo.ts"],
-    AudioEncoder: ["app/adapters/webCodecsVideo.ts", "app/adapters/webAudioFile.ts"],
+    AudioEncoder: [
+        "app/adapters/webCodecsVideo.ts",
+        "app/adapters/webAudioFile.ts",
+        "app/adapters/webCodecsAudio.ts",
+    ],
     VideoFrame: ["app/adapters/webCodecsVideo.ts"],
-    AudioData: ["app/adapters/webCodecsVideo.ts", "app/adapters/webAudioFile.ts"],
+    AudioData: ["app/adapters/webCodecsAudio.ts"],
     OffscreenCanvas: ["app/adapters/webCodecsVideo.ts"],
     // The monotonic clock reads through the Scheduler's now(), for the same
     // reason its timers do: a hook that takes the capability and then reads the
