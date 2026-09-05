@@ -116,8 +116,8 @@ export function FingeringStrip({
         [positions, cells, map, hand, optimal],
     );
     const qualities = useMemo(
-        () => fingerQualities(positions, fingers, hand, span, gaps),
-        [positions, fingers, hand, span, gaps],
+        () => fingerQualities(positions, fingers, hand, span, gaps, optimal),
+        [positions, fingers, hand, span, gaps, optimal],
     );
 
     // Every note of the window in play order, for tap-to-select and advance.

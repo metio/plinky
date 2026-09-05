@@ -62,6 +62,16 @@ describe("reasonFor", () => {
 });
 
 describe("fingerQualities", () => {
+    it("judges against the suggestion it is handed rather than running the optimiser again", () => {
+        const best = fingerPositions(LINE, "right");
+        const other = best.map((fingers, i) =>
+            i === 0 ? fingers.map((f) => (f === 1 ? 2 : 1)) : fingers,
+        );
+        const judged = fingerQualities(LINE, best, "right", undefined, undefined, other);
+        expect(judged[0]).not.toBe("good");
+        expect(judged.slice(1).every((q) => q === "good")).toBe(true);
+    });
+
     it("greens the economical fingering and leaves unfingered notes uncoloured", () => {
         const best = fingerPositions(LINE, "right");
         expect(fingerQualities(LINE, best, "right")).toEqual(LINE.map(() => "good"));
