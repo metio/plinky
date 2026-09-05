@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { pitchMidiOf } from "./notes";
 import { child, numberOf, text } from "./musicxmlDom";
-import { SEMITONE } from "./notes";
 
 // Reading the music out of a MusicXML document, rather than out of the engraver.
 //
@@ -193,20 +193,10 @@ export type XmlBar = {
     beatType: number;
 };
 
-// A note's sounding pitch. MusicXML writes the letter, the octave and any alteration
-// separately, and octave 4 is the one middle C sits in.
+// A note's sounding pitch, read off its <pitch> by the one reader every walk shares.
 function midiOf(note: Element): number | null {
     const pitch = child(note, "pitch");
-    if (!pitch) {
-        return null;
-    }
-    const step = SEMITONE[text(child(pitch, "step")).toUpperCase()];
-    if (step === undefined) {
-        return null;
-    }
-    const octave = numberOf(child(pitch, "octave"), 4);
-    const alter = numberOf(child(pitch, "alter"), 0);
-    return (octave + 1) * 12 + step + alter;
+    return pitch ? pitchMidiOf(pitch) : null;
 }
 
 function tieOf(note: Element): XmlNote["tie"] {

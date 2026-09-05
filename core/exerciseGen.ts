@@ -7,7 +7,8 @@
 // links, and mastery keep working; the canonical form (1 octave, right hand, root
 // position) keeps its plain id (scale-c-major) for backward compatibility.
 
-import { LETTERS, SEMITONE, alterFor, spellMidi } from "./notes";
+import { midiOf as noteMidiOf } from "./notes";
+import { LETTERS, alterFor, spellMidi } from "./notes";
 
 export type ExerciseType =
     | "major-scale"
@@ -95,8 +96,7 @@ export const keyName = (slug: string): string =>
 
 const degreeOf = (letter: string, tonic: string): number =>
     (LETTERS.indexOf(letter) - LETTERS.indexOf(tonic) + 7) % 7;
-const midiOf = (note: Note): number =>
-    (note.octave + 1) * 12 + (SEMITONE[note.letter] ?? 0) + note.alter;
+const midiOf = (note: Note): number => noteMidiOf(note.letter, note.octave, note.alter);
 
 // Diatonic letters from the tonic, ascending or descending, `octaves` octaves plus
 // the closing tonic. The octave number ticks at C (scientific pitch).

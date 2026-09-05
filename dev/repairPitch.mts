@@ -9,19 +9,16 @@
 // lives only in a script that edits files in place is undone by the next import, and
 // nothing records that it ever happened.
 
+import { midiOf } from "../core/notes.ts";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { onThePiano, ontoThePiano } from "../core/pianoRange.ts";
 
-const STEPS: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+const _STEPS: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 const _LETTERS = ["C", "C", "D", "D", "E", "F", "F", "G", "G", "A", "A", "B"];
 
 // The one `<pitch>` shape, matched whole so a rewrite can put the octave back where it was.
 const PITCH =
     /<pitch>(\s*<step>)([A-G])(<\/step>\s*)(?:<alter>(-?\d+)<\/alter>(\s*))?(<octave>)(-?\d+)(<\/octave>)/g;
-
-function midiOf(step: string, alter: number, octave: number): number {
-    return (octave + 1) * 12 + (STEPS[step] ?? 0) + alter;
-}
 
 // Every out-of-range pitch moved into range, and how many moved.
 function repaired(xml: string): { xml: string; moved: number } {
@@ -30,7 +27,7 @@ function repaired(xml: string): { xml: string; moved: number } {
         PITCH,
         (whole, open, step, close, alterText, afterAlter, octaveOpen, octaveText, octaveClose) => {
             const alter = Number(alterText ?? 0);
-            const midi = midiOf(step, alter, Number(octaveText));
+            const midi = midiOf(step, Number(octaveText), alter);
             if (onThePiano(midi)) {
                 return whole;
             }

@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { pitchMidiOf } from "../../core/notes";
 import { fingerPositions } from "../../core/fingering";
 import type { HandSpan } from "../../core/prefs";
 import { type FingerMap, fingerKey } from "../stores/fingeringStore";
 import { scoreToBars } from "../../core/scoreToBars";
 import type { XmlCodec } from "../../core/xml";
-import { SEMITONE } from "../../core/notes";
 import { gapTracker, scoreClock, TIMED_NODES } from "../../core/scoreTiming";
 
 // Suggested fingering belongs on the staff, the way printed music carries it —
@@ -16,17 +16,7 @@ import { gapTracker, scoreClock, TIMED_NODES } from "../../core/scoreTiming";
 
 function midiOf(note: Element): number | null {
     const pitch = note.querySelector("pitch");
-    if (!pitch) {
-        return null; // a rest or unpitched note has no finger
-    }
-    const step = pitch.querySelector("step")?.textContent?.trim() ?? "";
-    const semitone = SEMITONE[step];
-    if (semitone === undefined) {
-        return null;
-    }
-    const octave = Number(pitch.querySelector("octave")?.textContent ?? "4");
-    const alter = Number(pitch.querySelector("alter")?.textContent ?? "0");
-    return (octave + 1) * 12 + semitone + alter;
+    return pitch ? pitchMidiOf(pitch) : null;
 }
 
 type Bucket = { pitches: number[][]; notes: Element[][]; gaps: number[] };

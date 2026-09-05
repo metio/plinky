@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { SEMITONE } from "./notes";
+import { pitchMidiOf } from "./notes";
 import { gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
 import type { XmlCodec } from "./xml";
 // Turns a piece's MusicXML into per-bar chord positions for one hand, so a passage
@@ -20,19 +20,7 @@ export function staffFor(hand: "left" | "right"): Staff {
 
 function midiOf(note: Element): number | null {
     const pitch = note.getElementsByTagName("pitch")[0];
-    if (!pitch) {
-        return null;
-    }
-    const step = pitch.getElementsByTagName("step")[0]?.textContent ?? "";
-    const octaveText = pitch.getElementsByTagName("octave")[0]?.textContent ?? "";
-    if (!(step in SEMITONE) || octaveText === "") {
-        return null;
-    }
-    const alter = Number(pitch.getElementsByTagName("alter")[0]?.textContent ?? "0");
-    const midi = (Number(octaveText) + 1) * 12 + SEMITONE[step]! + alter;
-    // A non-numeric <octave> or <alter> yields NaN, which would slip past the null
-    // check and place a phantom position; treat it as an unreadable note.
-    return Number.isFinite(midi) ? midi : null;
+    return pitch ? pitchMidiOf(pitch) : null;
 }
 
 // Parse the first part's measures into bars of positions for the given staff, alongside
