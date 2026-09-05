@@ -601,7 +601,7 @@ function usePlaySessionValue({
 
     const matcher = useScoreMatcher(getOsmd, {
         tempo,
-        hand,
+        hand: activeHand,
         marks,
         forgiving: aids.forgiving,
         // A loop coming round again clears what the last pass drew. Without it the second
@@ -1037,7 +1037,7 @@ function usePlaySessionValue({
         if (score.painted()) {
             score.wipePaint();
         }
-        const accompany = duet && staffCount >= 2 && hand !== "both";
+        const accompany = duet && activeHand !== "both";
         keepUp.start({ hand: activeHand, guideNotes, accompany });
     };
 

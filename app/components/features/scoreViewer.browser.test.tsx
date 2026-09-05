@@ -162,6 +162,23 @@ describe("ScoreViewer", () => {
         expect(screen.getByLabelText("C 5")).toBeTruthy();
     });
 
+    it("plays a one-staff piece with both hands whatever hand the link asked for", async () => {
+        // The practice-methods page hands out ?hands=left links, and a grade-1 tune on a
+        // single staff is a normal target for one. A single staff has no left hand to
+        // drill and no hand switch on screen to say so; the run must start on both.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase, { beatsPerBar: 4, options: { hands: "left" } });
+        const practice = await awaitReady();
+        fireEvent.click(practice);
+        await expect
+            .poll(() => screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"))
+            .toBe("true");
+    });
+
     it("frames the keyboard to the piece's own range, not a fixed two octaves", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // An all-C5 phrase: the old fixed C4–C6 keyboard always drew C4 and C6,
