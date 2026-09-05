@@ -18,11 +18,14 @@ export function DangerZone() {
     const [failed, setFailed] = useState(false);
 
     const reset = () => {
-        resetDevice(store);
         // The recordings are not in localStorage — they are a cache of their own, tens of
         // megabytes of it — so wiping the keys would leave the device holding the one
         // thing a player asking to start fresh would most notice still being there.
+        // Forgetting them also writes the "recorded piano off" preference, synchronously,
+        // before the cache deletion it awaits; it goes first so the wipe below takes that
+        // key with everything else, and the leftover check underneath stays honest.
         void samples.forget();
+        resetDevice(store);
         // A refused removal leaves Plinky keys behind. Reloading would hide that the
         // wipe never took, so report it and let the player try again instead.
         if (store.keys().some((key) => key.startsWith(PREFIX))) {
