@@ -1,9 +1,51 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useState } from "react";
 import { m } from "../../paraglide/messages.js";
 import { fieldClasses } from "../ui/classes";
 import { SwitchField } from "../ui/fields";
+
+const MIN_TEMPO = 40;
+const MAX_TEMPO = 240;
+const DEFAULT_TEMPO = 120;
+
+// The tempo field keeps what is being typed to itself until it is a tempo. A controlled
+// number input that clamps on every keystroke cannot be typed into: selecting "120" and
+// typing "9" on the way to "96" is clamped to 40 before the "6" arrives. So the text
+// lives here while the field has focus, the take's tempo moves only when the text is a
+// tempo in range, and leaving the field settles anything else to the nearest one.
+function TempoField({ tempo, onTempo }: { tempo: number; onTempo: (tempo: number) => void }) {
+    const [typed, setTyped] = useState<string | null>(null);
+    return (
+        <input
+            type="number"
+            min={MIN_TEMPO}
+            max={MAX_TEMPO}
+            value={typed ?? String(tempo)}
+            onChange={(event) => {
+                const text = event.target.value;
+                setTyped(text);
+                const value = Number(text);
+                if (text !== "" && value >= MIN_TEMPO && value <= MAX_TEMPO) {
+                    onTempo(value);
+                }
+            }}
+            onBlur={() => {
+                if (typed !== null) {
+                    const value = Number(typed);
+                    onTempo(
+                        typed === "" || !Number.isFinite(value)
+                            ? DEFAULT_TEMPO
+                            : Math.min(MAX_TEMPO, Math.max(MIN_TEMPO, value)),
+                    );
+                }
+                setTyped(null);
+            }}
+            className={`${fieldClasses} w-20`}
+        />
+    );
+}
 
 type ComposeSettingsProps = {
     title: string;
@@ -51,16 +93,7 @@ export function ComposeSettings({
             </label>
             <label className="space-y-1">
                 <span className={LABEL}>{m.compose_tempo_label()}</span>
-                <input
-                    type="number"
-                    min={40}
-                    max={240}
-                    value={tempo}
-                    onChange={(event) =>
-                        onTempo(Math.min(240, Math.max(40, Number(event.target.value) || 120)))
-                    }
-                    className={`${fieldClasses} w-20`}
-                />
+                <TempoField tempo={tempo} onTempo={onTempo} />
             </label>
             <label className="space-y-1">
                 <span className={LABEL}>{m.compose_beats_label()}</span>
