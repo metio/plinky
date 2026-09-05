@@ -35,6 +35,7 @@ import { folderFor, PIECES } from "./promo/pieces.mjs";
 import { renderStamp } from "./promo/renderStamp.mjs";
 import { startDevServer } from "./promo/devServer.mjs";
 import { collectionPieces } from "./promo/collections.mjs";
+import { readSongsSync } from "./manifest.mts";
 
 const OUT = argValue("--out") ?? "promo";
 const SECONDS = Number(argValue("--seconds") ?? 20);
@@ -220,7 +221,7 @@ function scoreUrl(id, manifest) {
     return { url: `/songs/${song.license.toLowerCase()}/${id}.mxl`, song };
 }
 
-const manifest = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
+const manifest = readSongsSync();
 mkdirSync(OUT, { recursive: true });
 
 // Every piece is looked up before anything renders, and what cannot be found is named

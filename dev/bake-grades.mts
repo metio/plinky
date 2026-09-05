@@ -29,7 +29,6 @@
 // grades that disagree with the boundaries. Run songs:bake after songs:import /
 // songs:dedup, or whenever the catalogue changes.
 
-import { readFile, writeFile } from "node:fs/promises";
 import { bakeBuiltinAssignments } from "./bake-builtin-assignments.mts";
 import { bakePeopleIndex } from "./bake-people.mts";
 import { bakeShards } from "./bake-shards.mts";
@@ -37,41 +36,17 @@ import { curate, loadCuration, unapplied } from "./curation.mts";
 import { tidied, tidyCredit, tidyTitle } from "./titles.mts";
 import { crowdedGrade, staleSong } from "./bakeChecks.mts";
 import { exerciseMeasure } from "./exerciseCosts.mts";
-import type { ExerciseConfig } from "../core/exerciseGen.ts";
 import { gradeForCost, pieceBoundaries } from "./grading.mts";
+import { readExercises, readSongs, writeExercises, writeSongs } from "./manifest.mts";
 
 const MAX_GRADE = 8;
-const SONGS = "public/songs";
-const EXERCISES = "public/exercises";
+const _SONGS = "public/songs";
+const _EXERCISES = "public/exercises";
 const check = process.argv.includes("--check");
 
-type Song = {
-    id: string;
-    cost: number;
-    grade: number;
-    license?: string;
-    title?: string;
-    composer?: string;
-    incipit?: string;
-};
-
-type Exercise = {
-    id: string;
-    cost: number;
-    grade: number;
-    kind: string;
-    title?: string;
-    composer?: string;
-    incipit?: string;
-    // A scale or arpeggio tile carries the config it is generated from, which is what
-    // lets its notation — and so everything derived from it — be reproduced without the
-    // PDMX corpus.
-    config?: ExerciseConfig;
-};
-
 async function main() {
-    const songs: Song[] = JSON.parse(await readFile(`${SONGS}/manifest.json`, "utf8"));
-    const exercises: Exercise[] = JSON.parse(await readFile(`${EXERCISES}/manifest.json`, "utf8"));
+    const songs = await readSongs();
+    const exercises = await readExercises();
 
     // The hand-made corrections, applied before anything is derived from the credits.
     // A problem here stops both modes: a curation nobody can apply is one nobody can
@@ -199,8 +174,8 @@ async function main() {
         return;
     }
 
-    await writeFile(`${SONGS}/manifest.json`, JSON.stringify(bakedSongs));
-    await writeFile(`${EXERCISES}/manifest.json`, JSON.stringify(bakedExercises));
+    await writeSongs(bakedSongs);
+    await writeExercises(bakedExercises);
     await bakePeopleIndex(false);
     // After the manifest is written, since both are read from the file on disk.
     await bakeShards(false);

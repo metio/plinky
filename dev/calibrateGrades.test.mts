@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
+import type { ScoreKind } from "../core/scoreKind.ts";
 import { type Anchor, type Row, spearman, unresolved } from "./calibrate-grades.mts";
 
 const anchor = (over: Partial<Anchor> = {}): Anchor => ({
@@ -12,7 +13,7 @@ const anchor = (over: Partial<Anchor> = {}): Anchor => ({
     least: 2,
     ...over,
 });
-const song = (title: string, composer: string, scoreKind = "solo-piano"): Row => ({
+const song = (title: string, composer: string, scoreKind: ScoreKind = "solo-piano"): Row => ({
     id: title,
     title,
     composer,

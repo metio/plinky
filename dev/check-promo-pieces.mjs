@@ -18,10 +18,8 @@
 // A whole-catalogue render said each of these once, into a log nobody reads, and carried
 // on. This turns them into a red gate. Run: `npm run promo:check`.
 
-import { readFile } from "node:fs/promises";
 import { PIECES } from "./promo/pieces.mjs";
-
-const MANIFEST = "public/songs/manifest.json";
+import { readSongsSync } from "./manifest.mts";
 
 export function promoProblems(pieces, songs) {
     const byId = new Map(songs.map((song) => [song.id, song]));
@@ -43,7 +41,7 @@ export function promoProblems(pieces, songs) {
     return problems;
 }
 
-const songs = JSON.parse(await readFile(MANIFEST, "utf8"));
+const songs = readSongsSync();
 const problems = promoProblems(PIECES, songs);
 if (problems.length > 0) {
     console.error("The promo list names pieces the catalogue cannot render:");

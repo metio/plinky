@@ -25,6 +25,7 @@
 import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import { canonicalPeople, personSlug } from "../core/person";
+import { readExercises, readSongs } from "./manifest.mts";
 
 // The formatter, over a string. `--stdin-file-path` is what tells biome which rules apply,
 // and it writes the formatted source to stdout.
@@ -35,11 +36,7 @@ function format(source: string): string {
     });
 }
 
-const SONGS = "public/songs/manifest.json";
-const EXERCISES = "public/exercises/manifest.json";
 const INDEX = "core/peopleIndex.ts";
-
-type CataloguePiece = { composer?: string };
 
 const HEADER = `// SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -70,13 +67,8 @@ export function indexedPerson(slug: string): PersonEntry | null {
 }
 `;
 
-async function readPieces(path: string): Promise<CataloguePiece[]> {
-    const parsed: unknown = JSON.parse(await readFile(path, "utf8"));
-    return Array.isArray(parsed) ? (parsed as CataloguePiece[]) : [];
-}
-
 export async function bakePeopleIndex(check: boolean): Promise<boolean> {
-    const pieces = [...(await readPieces(SONGS)), ...(await readPieces(EXERCISES))];
+    const pieces = [...(await readSongs()), ...(await readExercises())];
 
     const index = new Map<string, { name: string; pieces: number }>();
     for (const piece of pieces) {

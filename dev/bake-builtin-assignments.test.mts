@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
+import type { ScoreKind } from "../core/scoreKind.ts";
 import { resolveSets, type Definition, type Song } from "./bake-builtin-assignments.mts";
 
 const inventions: Definition = {
@@ -16,7 +17,7 @@ const song = (
     title: string,
     composer: string,
     cost: number,
-    scoreKind = "solo-piano",
+    scoreKind: ScoreKind = "solo-piano",
 ): Song => ({
     id,
     title,

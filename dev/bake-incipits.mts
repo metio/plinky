@@ -13,27 +13,15 @@
 import { encodeIncipit, readIncipit } from "../core/incipit.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { existsSync, readdirSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import type { SongMeta } from "../core/catalogMeta.ts";
+import { readSongs, SONGS_MANIFEST, writeSongs } from "./manifest.mts";
 
 const { decompressMxl } = await import("../core/musicxmlFile.ts");
 
 const DIR = "public/songs";
 
-type Entry = {
-    id: string;
-    title: string;
-    composer: string;
-    grade: number;
-    cost: number;
-    license: string;
-    source?: string;
-    tempo: number;
-    beatsPerBar: number;
-    bars: number;
-    incipit?: string;
-};
-
-const manifest: Entry[] = JSON.parse(await readFile(`${DIR}/manifest.json`, "utf8"));
+const manifest = await readSongs();
 
 // A score sits under its licence bucket — public/songs/<spdx>/<id>.mxl — so the path is
 // found, not assumed.
@@ -51,7 +39,7 @@ function scorePath(id: string): string | null {
     return null;
 }
 
-const baked: Entry[] = [];
+const baked: SongMeta[] = [];
 let drawn = 0;
 let missing = 0;
 for (const song of manifest) {
@@ -82,9 +70,9 @@ for (const song of manifest) {
 
 // The manifest ships minified: it is fetched by every browsing visitor, and this
 // file is read by machines rather than reviewed by eye.
-await writeFile(`${DIR}/manifest.json`, JSON.stringify(baked));
+await writeSongs(baked);
 
-const bytes = (await readFile(`${DIR}/manifest.json`)).byteLength;
+const bytes = (await readFile(SONGS_MANIFEST)).byteLength;
 console.log(
     `baked ${drawn} incipits (${missing} without one) — manifest now ${(bytes / 1024).toFixed(0)} KB`,
 );

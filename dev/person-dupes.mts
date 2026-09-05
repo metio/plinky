@@ -24,9 +24,8 @@
 
 import { readFile } from "node:fs/promises";
 import { candidatePairs, compare, creditedPeople, parseRulings } from "./personDupes.mts";
+import { readExercises, readSongs } from "./manifest.mts";
 
-const SONGS = "public/songs/manifest.json";
-const EXERCISES = "public/exercises/manifest.json";
 // Pairs a human has ruled on as genuinely two people. Data rather than a code list, for the
 // same reason the catalogue's other hand-kept files are: an import rewrites the manifests,
 // and a judgement made once should outlive them.
@@ -34,13 +33,10 @@ const RULINGS = "dev/catalog-people-distinct.json";
 
 const check = process.argv.includes("--check");
 
-async function credits(path: string): Promise<string[]> {
-    const parsed = JSON.parse(await readFile(path, "utf8"));
-    const items = Array.isArray(parsed) ? parsed : (parsed.items ?? []);
-    return items.map((item: { composer?: string }) => item.composer ?? "");
-}
-
-const counts = creditedPeople([...(await credits(SONGS)), ...(await credits(EXERCISES))]);
+const credited = [...(await readSongs()), ...(await readExercises())].map(
+    (item) => item.composer ?? "",
+);
+const counts = creditedPeople(credited);
 const pairs = candidatePairs([...counts.keys()]);
 
 let raw: unknown;

@@ -5,6 +5,7 @@ import { DEFAULT_SONG_SOURCE } from "../../core/attribution";
 import { type ExerciseConfig, generateExercise, parseExerciseId } from "../../core/exerciseGen";
 import type { Fetcher } from "../ports/fetcher";
 import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
+import type { ExerciseMeta } from "../../core/catalogMeta";
 
 // The finger-exercise catalogue. Generated scales/arpeggios are produced on the
 // fly from the id's config (zero storage, every form instantly available).
@@ -13,27 +14,7 @@ import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 // metadata manifest carries precomputed grades and kinds so the library can
 // filter. Built via gen-exercises.mts, over the injected network seam.
 
-export type ExerciseMeta = {
-    id: string;
-    title: string;
-    grade: number;
-    // The raw fingering-cost the grade was binned from; orders a grade's items
-    // easiest-first and feeds the skill rating uniformly across songs and exercises.
-    cost: number;
-    kind: "scale-arpeggio" | "study";
-    // A generated scale/arpeggio carries its config so it can be regenerated from the id
-    // (the id is a content fingerprint now, not a parseable "scale-c-major" slug).
-    config?: ExerciseConfig;
-    composer?: string;
-    // Curated studies are public-domain transcriptions from PDMX (CC0); generated
-    // scales/arpeggios are our own and carry no external licence.
-    license?: string;
-    // The opening bars, encoded — baked by dev/bake-exercise-incipits.mts so a shelf can
-    // draw a scale's shape without generating it.
-    incipit?: string;
-    tempo: number;
-    beatsPerBar: number;
-};
+export type { ExerciseMeta };
 
 const MANIFEST_URL = "/exercises/manifest.json";
 

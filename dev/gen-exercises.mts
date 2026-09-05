@@ -14,11 +14,12 @@
 
 import { gradeOf, rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { parse } from "csv-parse/sync";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { songId } from "../core/songId.ts";
-import type { ExerciseConfig } from "../core/exerciseGen.ts";
+import type { ExerciseMeta } from "../core/catalogMeta.ts";
+import { writeExercisesSync } from "./manifest.mts";
 
 const { EXERCISE_TILES, buildExerciseId, exerciseTitle, generateExercise } = await import(
     "../core/exerciseGen.ts"
@@ -27,16 +28,8 @@ const { EXERCISE_TILES, buildExerciseId, exerciseTitle, generateExercise } = awa
 const OUT = "public/exercises";
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
 
-type Kind = "scale-arpeggio" | "study";
-type Entry = {
-    id: string;
-    title: string;
-    grade: number;
-    cost: number;
-    kind: Kind;
-    config?: ExerciseConfig;
-    composer?: string;
-};
+// The rows before the shared meter is stamped on every one of them below.
+type Entry = Omit<ExerciseMeta, "tempo" | "beatsPerBar">;
 const entries: Entry[] = [];
 const studyFiles: { id: string; src: string }[] = [];
 
@@ -195,7 +188,7 @@ const manifest = entries.map(({ id, title, grade, cost, kind, composer, config }
 
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(`${OUT}/studies`, { recursive: true });
-writeFileSync(`${OUT}/manifest.json`, JSON.stringify(manifest));
+writeExercisesSync(manifest);
 // Studies ship as individual compressed .mxl, fetched on open like songs — named by the
 // same content-fingerprint id.
 for (const { id, src } of studyFiles) {

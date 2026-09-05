@@ -23,7 +23,7 @@ import { createReadStream, existsSync, readFileSync } from "node:fs";
 import { parse } from "csv-parse";
 import { creditAllowed } from "./publicDomain.mts";
 import { legibleTitle, usableTitle } from "./legibleTitle.mts";
-import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { gradeForCost, pieceBoundaries } from "./grading.mts";
 import {
@@ -36,6 +36,8 @@ import { encodeIncipit, readIncipit } from "../core/incipit.ts";
 import { repairMxl } from "./repairPitch.mts";
 import { songId } from "../core/songId.ts";
 import { licenseDir, licenseInfo } from "../core/attribution.ts";
+import type { SongMeta as CatalogueSong } from "../core/catalogMeta.ts";
+import { readSongs, readSongsSync, SONGS_MANIFEST, writeSongs } from "./manifest.mts";
 
 const OUT = "public/songs";
 const PDMX_ROOT = process.env.PDMX_DIR ?? "pdmx";
@@ -265,28 +267,10 @@ const CONFIGS: Record<string, SourceConfig> = {
     },
 };
 
-type SongMeta = {
-    id: string;
-    title: string;
-    composer: string;
-    grade: number;
-    cost: number;
-    license: string;
-    // What this piece IS (see ScoreKind): what lets the grade ladder ask for solo piano
-    // while the library keeps the songs and the choral reductions. Spelled out rather
-    // than plain `kind` because an exercise row's `kind` is a different question — which
-    // drill it is — and the two manifests are read through one catalogue.
+// The catalogue's row, with the two fields every import stamps made certain.
+type SongMeta = CatalogueSong & {
     scoreKind: ScoreKind;
-    // The opening bars, encoded (see core/incipit).
-    incipit?: string;
-    // Who engraved this edition, where the source names them. CC-BY and CC-BY-SA require
-    // crediting the creator, and "the CPDL editors" — the per-source constant that stood
-    // in until now — credits nobody in particular.
-    credit?: string;
     source: string;
-    tempo: number;
-    beatsPerBar: number;
-    bars: number;
 };
 
 const clean = (value: string | undefined): string => {
@@ -352,7 +336,7 @@ function barsOf(xml: string): number {
 // How many pieces the catalogue holds right now, for deciding whether a pass changed
 // anything.
 function countSongs(): number {
-    return JSON.parse(readFileSync(`${OUT}/manifest.json`, "utf8")).length;
+    return readSongsSync().length;
 }
 
 async function main() {
@@ -401,10 +385,7 @@ async function main() {
     }
     console.log(`${files.length} .mxl to consider for "${key}".`);
 
-    const manifestPath = `${OUT}/manifest.json`;
-    const existing: SongMeta[] = existsSync(manifestPath)
-        ? JSON.parse(await readFile(manifestPath, "utf8"))
-        : [];
+    const existing: CatalogueSong[] = existsSync(SONGS_MANIFEST) ? await readSongs() : [];
     // Drop this source's prior entries (and their files) so a re-run is a clean replace;
     // every other source is left standing. This is what makes the importers runnable in
     // sequence, and it is the whole reason none of them may empty the directory first.
@@ -415,7 +396,7 @@ async function main() {
     // an unstamped row is replaced only when this run produces the same piece: the id is a
     // content fingerprint, so that is the same music, and the new row carries the source
     // the old one was missing. The catalogue converges as each source is re-imported.
-    const owned = (song: SongMeta) => song.source === key;
+    const owned = (song: CatalogueSong) => song.source === key;
     const kept = existing.filter((song) => !owned(song));
     for (const song of existing.filter(owned)) {
         await rm(`${OUT}/${licenseDir(song.license)}/${song.id}.mxl`, { force: true });
@@ -592,7 +573,7 @@ async function main() {
     if (superseded.size > 0) {
         console.log(`${superseded.size} unstamped row(s) adopted by "${key}" and now attributed.`);
     }
-    const merged: SongMeta[] = [
+    const merged: CatalogueSong[] = [
         ...kept.filter((song) => !superseded.has(song.id)),
         ...added.map(({ src: _src, repaired: _repaired, ...meta }) => meta),
     ];
@@ -607,7 +588,7 @@ async function main() {
     for (const song of merged) {
         song.cost = Number(song.cost.toFixed(3));
     }
-    await writeFile(manifestPath, JSON.stringify(merged));
+    await writeSongs(merged);
 
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of merged) {

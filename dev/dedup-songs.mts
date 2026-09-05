@@ -16,10 +16,12 @@
 // locally: `npm run songs:dedup`.
 
 import { createReadStream } from "node:fs";
-import { readFile, rm, writeFile } from "node:fs/promises";
+import { rm } from "node:fs/promises";
 import { parse } from "csv-parse";
 import { licenseDir } from "../core/attribution.ts";
 import { gradeForCost, pieceBoundaries } from "./grading.mts";
+import type { SongMeta } from "../core/catalogMeta.ts";
+import { readSongs, writeSongs } from "./manifest.mts";
 
 const OUT = "public/songs";
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
@@ -28,22 +30,13 @@ const MAX_GRADE = 8;
 // The manifest fields dedup reads or re-grades. License and source are carried
 // through verbatim — the type names them so a future rewrite of the survivor set
 // can't silently drop a piece's provenance.
-type Song = {
-    id: string;
-    title: string;
-    grade: number;
-    cost: number;
-    bars: number;
-    license: string;
-    source?: string;
-};
 type Quality = { rating: number; favorites: number; views: number };
 
 const normalizeTitle = (title: string): string =>
     (title || "").toLowerCase().trim().replace(/\s+/g, " ");
 
 async function main() {
-    const manifest: Song[] = JSON.parse(await readFile(`${OUT}/manifest.json`, "utf8"));
+    const manifest = await readSongs();
     const ids = new Set(manifest.map((song) => song.id));
 
     // PDMX's crowd-quality signals for the catalogue's songs, joined by the .mxl id.
@@ -65,10 +58,10 @@ async function main() {
             .on("error", reject);
     });
 
-    const q = (song: Song): Quality =>
+    const q = (song: SongMeta): Quality =>
         quality.get(song.id) ?? { rating: 0, favorites: 0, views: 0 };
     // Positive when `a` is the better representative to keep.
-    const better = (a: Song, b: Song): number => {
+    const better = (a: SongMeta, b: SongMeta): number => {
         const qa = q(a);
         const qb = q(b);
         return (
@@ -79,7 +72,7 @@ async function main() {
         );
     };
 
-    const best = new Map<string, Song>();
+    const best = new Map<string, SongMeta>();
     for (const song of manifest) {
         const key = normalizeTitle(song.title);
         const current = best.get(key);
@@ -101,7 +94,7 @@ async function main() {
         histogram[song.grade] = (histogram[song.grade] ?? 0) + 1;
     }
 
-    await writeFile(`${OUT}/manifest.json`, JSON.stringify(deduped));
+    await writeSongs(deduped);
     let removed = 0;
     for (const song of manifest) {
         if (!keptIds.has(song.id)) {

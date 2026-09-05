@@ -13,12 +13,12 @@ import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from "no
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { copyrightReason } from "./copyrightSignals.mts";
 import { nonPianoReason } from "./scoreInstrument.mts";
+import { readSongsSync, writeSongsSync } from "./manifest.mts";
 
 const APPLY = process.argv.includes("--apply");
 
 const DIR = "public/songs";
-type Song = { id: string; title: string; composer: string; grade: number; cost: number };
-const manifest: Song[] = JSON.parse(readFileSync(`${DIR}/manifest.json`, "utf8"));
+const manifest = readSongsSync();
 
 // A score sits under its licence bucket — public/songs/<spdx>/<id>.mxl — so the path has
 // to be found rather than assumed. Reading `${DIR}/<id>.mxl` directly, as this did until
@@ -100,6 +100,6 @@ if (APPLY && flagged.length > 0) {
         // not there is a removal that did not happen.
         rmSync(scorePath(f.id));
     }
-    writeFileSync(`${DIR}/manifest.json`, JSON.stringify(kept));
+    writeSongsSync(kept);
     console.log(`APPLIED: removed ${flagged.length} scores; manifest now ${kept.length}.`);
 }
