@@ -135,11 +135,17 @@ function spell(midi: number, flats: boolean): Note {
 // The single-line note sequence (up then down) for a scale or chromatic run.
 function scaleLine(type: ExerciseType, tonic: string, fifths: number, octaves: number): Note[] {
     if (type === "chromatic-scale") {
-        const root = midiOf({ letter: tonic, octave: 4, alter: alterFor(tonic, fifths) });
+        // The tonic keeps the key's own spelling at every octave — an E-flat chromatic
+        // scale starts on E flat, not D sharp — and the notes between are spelled by the
+        // direction of travel: sharps on the way up, flats on the way down.
+        const alter = alterFor(tonic, fifths);
+        const root = midiOf({ letter: tonic, octave: 4, alter });
+        const at = (s: number, flats: boolean): Note =>
+            s % 12 === 0 ? { letter: tonic, octave: 4 + s / 12, alter } : spell(root + s, flats);
         const up: Note[] = [];
-        for (let s = 0; s <= 12 * octaves; s++) up.push(spell(root + s, false));
+        for (let s = 0; s <= 12 * octaves; s++) up.push(at(s, false));
         const down: Note[] = [];
-        for (let s = 12 * octaves - 1; s >= 0; s--) down.push(spell(root + s, true));
+        for (let s = 12 * octaves - 1; s >= 0; s--) down.push(at(s, true));
         return up.concat(down);
     }
     const base = diatonic(tonic, fifths, octaves, 1);
@@ -165,11 +171,14 @@ function scaleLine(type: ExerciseType, tonic: string, fifths: number, octaves: n
 // over to a descending line unchanged.
 function scaleLineDown(type: ExerciseType, tonic: string, fifths: number, octaves: number): Note[] {
     if (type === "chromatic-scale") {
-        const root = midiOf({ letter: tonic, octave: 4, alter: alterFor(tonic, fifths) });
+        const alter = alterFor(tonic, fifths);
+        const root = midiOf({ letter: tonic, octave: 4, alter });
+        const at = (s: number, flats: boolean): Note =>
+            s % 12 === 0 ? { letter: tonic, octave: 4 - s / 12, alter } : spell(root - s, flats);
         const down: Note[] = [];
-        for (let s = 0; s <= 12 * octaves; s++) down.push(spell(root - s, true));
+        for (let s = 0; s <= 12 * octaves; s++) down.push(at(s, true));
         const up: Note[] = [];
-        for (let s = 12 * octaves - 1; s >= 0; s--) up.push(spell(root - s, false));
+        for (let s = 12 * octaves - 1; s >= 0; s--) up.push(at(s, false));
         return down.concat(up);
     }
     const base = diatonic(tonic, fifths, octaves, -1);
@@ -345,9 +354,12 @@ function context(type: ExerciseType, key: string): { tonic: string; fifths: numb
 export function generateExercise(raw: ExerciseConfig): string {
     const config = normalizeExercise(raw);
     const { tonic, fifths } = context(config.type, config.key);
+    // A chromatic run is written with no signature — every note carries its own
+    // accidental — but it still starts on the key's tonic: an E-flat chromatic scale
+    // begins on E flat, and the signature is the one thing that is written as C.
     const fx = config.type === "chromatic-scale" ? 0 : fifths;
     const line = isScale(config.type)
-        ? scaleLine(config.type, tonic, fx, config.octaves)
+        ? scaleLine(config.type, tonic, fifths, config.octaves)
         : arpeggioLine(config.type, tonic, fx, config.octaves, config.inversion);
     // Normalisation has already cleared the interval wherever double stops do not apply.
     const main: Note[][] =
@@ -373,7 +385,7 @@ export function generateExercise(raw: ExerciseConfig): string {
     } else if (hands === "contrary") {
         // Both hands start on the tonic and mirror: right ascends, left descends. Only
         // scales reach here — effectiveHands sends an arpeggio down the "both" branch.
-        const down = scaleLineDown(config.type, tonic, fx, config.octaves);
+        const down = scaleLineDown(config.type, tonic, fifths, config.octaves);
         parts = [
             { id: "P1", clef: "G", positions: main },
             { id: "P2", clef: "F", positions: down.map((note) => [note]) },
