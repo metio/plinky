@@ -54,7 +54,40 @@ const BEAMED = `<?xml version="1.0" encoding="UTF-8"?>
   </measure></part>
 </score-partwise>`;
 
+// A note tied across the barline: the second bar opens on a continuation, which is
+// nothing to play, then a note that is.
+const TIED = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes><divisions>1</divisions><key><fifths>0</fifths></key>
+        <time><beats>2</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef></attributes>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration>
+        <tie type="start"/><type>half</type><notations><tied type="start"/></notations></note>
+    </measure>
+    <measure number="2">
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>
+        <tie type="stop"/><type>quarter</type><notations><tied type="stop"/></notations></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration>
+        <type>quarter</type></note>
+    </measure>
+  </part>
+</score-partwise>`;
+
 describe("collectNoteElements", () => {
+    it("collects no step for a tie's continuation, exactly as the matcher does", async () => {
+        // Every consumer indexes these steps by the matcher's step index; a step here
+        // that the matcher does not have puts every later reveal, ghost marker and
+        // video tint one note behind.
+        const osmd = await renderOsmd(TIED);
+        const steps = collectNoteElements(osmd, "both");
+        expect(collectSteps(osmd, "both").length).toBe(2);
+        expect(steps.length).toBe(2);
+        expect(steps.map((step) => step.measure)).toEqual([0, 1]);
+    });
+
     it("produces one step per playable position, in step with the matcher", async () => {
         const osmd = await renderOsmd(PHRASE);
         expect(collectNoteElements(osmd, "both").length).toBe(collectSteps(osmd, "both").length);
