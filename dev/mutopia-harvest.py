@@ -44,10 +44,22 @@ def license_bucket(lic):
     s = lic.lower().replace("-", " ")
     if "public domain" in s or s.strip() in ("cc0", ""):
         return ("cc0", "CC0-1.0")
+    # NonCommercial and NoDerivatives editions never enter the catalogue: a paid tier
+    # cannot ship the former and the fingering and grading we add are a derivative the
+    # latter forbids. Both strings also contain "attribution", so they must be refused
+    # before the attribution test admits them as plain CC-BY (the same order the CPDL
+    # harvester's spdx_for keeps).
+    words = s.split()
+    if "noncommercial" in s.replace(" ", "") or "nc" in words:
+        return None
+    if "noderiv" in s.replace(" ", "") or "nd" in words:
+        return None
     v = re.search(r"([234])\.\d", s)
-    ver = v.group(0) if v else "4.0"
+    if not v:
+        return None  # an unversioned licence is not one we can name, so it is not admitted
+    ver = v.group(0)
     share_alike = "sharealike" in s.replace(" ", "") or "share alike" in s or "by sa" in s
-    if "attribution" not in s and "by" not in s.split():
+    if "attribution" not in s and "by" not in words:
         return None  # not a recognised CC licence (e.g. a plate-number citation)
     tag = "bysa" if share_alike else "by"
     spdx = f"CC-BY{'-SA' if share_alike else ''}-{ver}"
