@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { isPublicDomain } from "./publicDomain.mts";
+import { creditAllowed, isPublicDomain } from "./publicDomain.mts";
 
 describe("isPublicDomain", () => {
     it("admits well-known public-domain composers", () => {
@@ -234,5 +234,14 @@ describe("a credit that names a category rather than a person", () => {
 
     it("leaves a real name that merely begins the same way alone", () => {
         expect(isPublicDomain("Mischa Levitzki (1898-1941)", "Untitled")).toBe(true);
+    });
+});
+
+describe("creditAllowed", () => {
+    it("admits a public-domain credit and refuses a copyrighted artist in the same field", () => {
+        expect(creditAllowed("Johann Sebastian Bach", "Prelude")).toBe(true);
+        expect(creditAllowed("Traditional", "Greensleeves")).toBe(true);
+        expect(creditAllowed("Ludovico Einaudi", "Nuvole Bianche")).toBe(false);
+        expect(creditAllowed("", "Untitled")).toBe(false);
     });
 });

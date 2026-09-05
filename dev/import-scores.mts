@@ -21,8 +21,7 @@ import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { execSync } from "node:child_process";
 import { createReadStream, existsSync, readFileSync } from "node:fs";
 import { parse } from "csv-parse";
-import { copyrightReason } from "./copyrightSignals.mts";
-import { isPublicDomain } from "./publicDomain.mts";
+import { creditAllowed } from "./publicDomain.mts";
 import { legibleTitle, usableTitle } from "./legibleTitle.mts";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { decompressMxl } from "../core/musicxmlFile.ts";
@@ -60,8 +59,7 @@ async function pdmxCandidates(): Promise<Candidate[]> {
                     (row.license === "publicdomain" || row.license === "cc-zero") &&
                     // PDMX's CC0 tag is unreliable — sheet music of a copyrighted song
                     // infringes the composition however the uploader tagged it.
-                    isPublicDomain(composer, title) &&
-                    !copyrightReason(composer) &&
+                    creditAllowed(composer, title) &&
                     // A piece nobody can name is a piece nobody can find.
                     legibleTitle(title) !== "" &&
                     row["subset:rated_deduplicated"] === "True" &&
@@ -463,6 +461,14 @@ async function main() {
             continue;
         }
         const composer = usableTitle(composerOf(xml, cfg.reorderComposer ?? false), hint?.composer);
+        // The file is the authority on the credit, so the file's credit is what the
+        // allowlist has to admit: an index row that said "Traditional" over a creator
+        // line naming a living composer was admitted on the row and credited from the
+        // line, and the gate never saw the name the catalogue went on to print.
+        if (!creditAllowed(composer, title)) {
+            dropped.ineligible++;
+            continue;
+        }
         // Per-piece licence when the source encodes a bucket in its filename (Mutopia,
         // CPDL); otherwise the source's single licence. Read from the SOURCE filename — the
         // catalogue id is a content fingerprint that carries no licence.
