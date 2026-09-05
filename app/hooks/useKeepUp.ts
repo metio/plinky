@@ -24,7 +24,7 @@ import {
 } from "../lib/scoreExpression";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
-import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
+import { highlightCursorNotes, litHalos } from "../lib/scoreColor";
 import { useTimerChain } from "./useTimerChain";
 import { jumpsBack } from "../../core/matcher";
 
@@ -224,9 +224,8 @@ export function useKeepUp({
             if (hit === null) {
                 return;
             }
-            for (const element of notesRef.current) {
-                litHalo(element, hit ? PLAYED_COLOR : SELECT_COLOR);
-            }
+            const color = hit ? PLAYED_COLOR : SELECT_COLOR;
+            litHalos(notesRef.current.map((element) => ({ element, color })));
             setProgress(keepUpProgress(state));
         };
 
@@ -330,9 +329,7 @@ export function useKeepUp({
         const { state, caught } = strikeKeepUp(stateRef.current, note);
         stateRef.current = state;
         if (caught) {
-            for (const element of notesRef.current) {
-                litHalo(element, PLAYED_COLOR);
-            }
+            litHalos(notesRef.current.map((element) => ({ element, color: PLAYED_COLOR })));
         }
     };
 

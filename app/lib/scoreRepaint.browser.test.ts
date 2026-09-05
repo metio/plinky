@@ -33,7 +33,7 @@ afterEach(() => {
 });
 
 // Proves the fix against a real OSMD: the walk order the snapshot relies on, the actual
-// SVG noteheads, and litHalo's real geometry — the fakes in the node suite can't.
+// SVG noteheads, and litHalos' real geometry — the fakes in the node suite can't.
 describe("note-paint snapshot across an OSMD re-render", () => {
     it("survives the render a fingering toggle forces, restoring the halo it dropped", async () => {
         host = document.createElement("div");

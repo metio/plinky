@@ -13,7 +13,7 @@ import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
 // jsdom. highlightCursorNotes returns one painted part so a step counts as painted.
 vi.mock("../lib/scoreColor", () => ({
     highlightCursorNotes: () => [{ element: {}, prior: null }],
-    litHalo: () => {},
+    litHalos: () => {},
 }));
 
 // One voice at a position: a MIDI pitch on a staff (0 = right, 1 = left) with a

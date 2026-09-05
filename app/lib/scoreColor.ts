@@ -36,8 +36,8 @@ export function hideNoteElements(steps: SVGGElement[][]): void {
 export function revealNoteElements(step: SVGGElement[], color: string): void {
     for (const element of step) {
         element.removeAttribute("visibility");
-        litHalo(element, color);
     }
+    litHalos(step.map((element) => ({ element, color })));
 }
 
 // Leaving the mode mid-run (or ending it) must never strand invisible music.
@@ -131,7 +131,7 @@ export function focusMeasures(
     color: string,
     container: HTMLElement,
 ): void {
-    let anchor: SVGGElement | null = null;
+    const marks: HaloMark[] = [];
     osmd.cursor.hide();
     osmd.cursor.reset();
     while (!osmd.cursor.iterator.EndReached) {
@@ -143,14 +143,15 @@ export function focusMeasures(
             for (const gNote of osmd.cursor.GNotesUnderCursor()) {
                 const element = svgOf(gNote);
                 if (element) {
-                    litHalo(element, color);
-                    anchor ??= element;
+                    marks.push({ element, color });
                 }
             }
         }
         osmd.cursor.next();
     }
     osmd.cursor.reset();
+    litHalos(marks);
+    const anchor = marks[0]?.element;
     if (anchor) {
         scrollToCentre(anchor, container);
     }
@@ -215,30 +216,46 @@ export function haloColor(element: SVGElement): string | null {
     return halo?.isConnected ? halo.getAttribute("fill") : null;
 }
 
-// Light a notehead by placing (or recolouring) a halo behind it. The halo sits at the
+export type HaloMark = { element: SVGElement; color: string };
+
+// Light noteheads by placing (or recolouring) a halo behind each. The halo sits at the
 // back of the SVG so the notehead, stem and beam always draw over it.
-export function litHalo(element: SVGElement, color: string): void {
-    const svg = element.ownerSVGElement;
-    if (!svg) {
-        return;
+//
+// Every read first, then every write. Inserting a halo
+// invalidates the SVG's layout, and a notehead's box read after it lays the whole
+// engraving out again — once per note of a chord, a lit bar or a restored run, on a
+// score of thousands of elements. Read together, the boxes cost one layout between them.
+export function litHalos(marks: readonly HaloMark[]): void {
+    const scales = new Map<SVGSVGElement, ReturnType<typeof svgScale>>();
+    const placed: (HaloMark & { svg: SVGSVGElement; box: DOMRect })[] = [];
+    for (const mark of marks) {
+        const svg = mark.element.ownerSVGElement;
+        if (!svg) {
+            continue;
+        }
+        if (!scales.has(svg)) {
+            scales.set(svg, svgScale(svg));
+        }
+        placed.push({ ...mark, svg, box: mark.element.getBoundingClientRect() });
     }
-    const { rect: svgRect, sx, sy } = svgScale(svg);
-    const box = element.getBoundingClientRect();
-    let halo = halos.get(element);
-    if (!halo?.isConnected) {
-        halo = document.createElementNS(SVG_NS, "rect");
-        halo.setAttribute("class", HALO_CLASS);
-        halo.setAttribute("rx", "3");
-        halo.setAttribute("pointer-events", "none");
-        halos.set(element, halo);
+    for (const { element, color, svg, box } of placed) {
+        const { rect: svgRect, sx, sy } = scales.get(svg)!;
+        let halo = halos.get(element);
+        if (!halo?.isConnected) {
+            halo = document.createElementNS(SVG_NS, "rect");
+            halo.setAttribute("class", HALO_CLASS);
+            halo.setAttribute("rx", "3");
+            halo.setAttribute("pointer-events", "none");
+            halos.set(element, halo);
+        }
+        halo.setAttribute("x", String((box.left - svgRect.left) * sx - HALO_PAD));
+        halo.setAttribute("y", String((box.top - svgRect.top) * sy - HALO_PAD));
+        halo.setAttribute("width", String(box.width * sx + HALO_PAD * 2));
+        halo.setAttribute("height", String(box.height * sy + HALO_PAD * 2));
+        halo.setAttribute("fill", color);
+        halo.setAttribute("fill-opacity", "0.4");
+        svg.insertBefore(halo, svg.firstChild);
     }
-    halo.setAttribute("x", String((box.left - svgRect.left) * sx - HALO_PAD));
-    halo.setAttribute("y", String((box.top - svgRect.top) * sy - HALO_PAD));
-    halo.setAttribute("width", String(box.width * sx + HALO_PAD * 2));
-    halo.setAttribute("height", String(box.height * sy + HALO_PAD * 2));
-    halo.setAttribute("fill", color);
-    halo.setAttribute("fill-opacity", "0.4");
-    svg.insertBefore(halo, svg.firstChild);
 }
 
 // Lift a notehead's halo, if it has one.
@@ -431,22 +448,22 @@ export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string)
         }
         painted.push({ element, prior: haloColor(element) });
     }
-    for (const { element } of painted) {
-        litHalo(element, color);
-    }
+    litHalos(painted.map(({ element }) => ({ element, color })));
     return painted;
 }
 
 // Restores notes lifted by highlightCursorNotes to the halo they wore before — its prior
 // mark, or none.
 export function restoreNotes(painted: PaintedNote[]): void {
+    const marks: HaloMark[] = [];
     for (const { element, prior } of painted) {
         if (prior === null) {
             clearHalo(element);
         } else {
-            litHalo(element, prior);
+            marks.push({ element, color: prior });
         }
     }
+    litHalos(marks);
 }
 
 // Leaves a persistent trail on notes the highlight is moving off: haloes an untouched note
@@ -454,9 +471,7 @@ export function restoreNotes(painted: PaintedNote[]): void {
 // piece was heard without erasing where it was played. Used by Listen to lay its blue trail
 // as the cursor advances.
 export function trailNotes(painted: PaintedNote[], color: string): void {
-    for (const { element, prior } of painted) {
-        litHalo(element, prior ?? color);
-    }
+    litHalos(painted.map(({ element, prior }) => ({ element, color: prior ?? color })));
 }
 
 // Each pitched note's halo colour (or null for none) in cursor-walk order — the run's
@@ -488,7 +503,7 @@ export function snapshotNotePaint(osmd: OpenSheetMusicDisplay): (string | null)[
 // Returns whether any note wore a mark, so the caller can keep the score's painted flag.
 export function restoreNotePaint(osmd: OpenSheetMusicDisplay, colors: (string | null)[]): boolean {
     let index = 0;
-    let painted = false;
+    const marks: HaloMark[] = [];
     osmd.cursor.show();
     osmd.cursor.reset();
     while (!osmd.cursor.iterator.EndReached) {
@@ -503,15 +518,15 @@ export function restoreNotePaint(osmd: OpenSheetMusicDisplay, colors: (string | 
             }
             const element = svgOf(gNote);
             if (element) {
-                litHalo(element, color);
-                painted = true;
+                marks.push({ element, color });
             }
         }
         osmd.cursor.next();
     }
     osmd.cursor.reset();
     osmd.cursor.hide();
-    return painted;
+    litHalos(marks);
+    return marks.length > 0;
 }
 
 // Haloes the noteheads at the cursor's current position whose pitch was just played,
@@ -524,13 +539,15 @@ export function paintPlayedNotes(
     pitches: number[],
     color: string = PLAYED_COLOR,
 ): void {
+    const marks: HaloMark[] = [];
     for (const gNote of osmd.cursor.GNotesUnderCursor()) {
         if (!pitches.includes(gNote.sourceNote.halfTone + 12)) {
             continue;
         }
         const element = svgOf(gNote);
         if (element) {
-            litHalo(element, color);
+            marks.push({ element, color });
         }
     }
+    litHalos(marks);
 }
