@@ -13,19 +13,15 @@ import {
     startKeepUp,
     strikeKeepUp,
 } from "../../core/keepUp";
-import { type Hand, isPracticedHand } from "../../core/matcher";
-import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
-import {
-    playOrder,
-    readParts,
-    readScoreExpression,
-    readStartTempo,
-    readTempo,
-} from "../lib/scoreExpression";
+import type { Hand } from "../../core/matcher";
+import { NOMINAL_BPM } from "../../core/elapsed";
+import { readParts, readStartTempo } from "../lib/scoreExpression";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalos } from "../lib/scoreColor";
 import { useTimerChain } from "./useTimerChain";
+import { readPosition } from "../lib/scorePosition";
+import { NO_SCORE_MARKS } from "../../core/musicxmlMarks";
 import { jumpsBack } from "../../core/matcher";
 
 // A note sink for the guide and the player's own strikes — the slice of the
@@ -44,45 +40,32 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
     cursor.reset();
     const steps: KeepUpStep[] = [];
     while (!cursor.iterator.EndReached) {
-        // A fermata holds whatever is sounding, so read it across the position rather
-        // than off any one note.
-        let fermata = false;
-        for (const note of cursor.NotesUnderCursor()) {
-            fermata ||= readScoreExpression(note).fermata;
-        }
-        // An ornament is its own beat, ahead of the note it decorates — the same split
-        // the matcher makes, through the same rule.
-        const groups = playOrder([...cursor.NotesUnderCursor()], (note) => note);
-        for (const [order, group] of groups.entries()) {
-            const whole = cursor.iterator.currentTimeStamp?.RealValue ?? 0;
+        // The ornament split, the tie, which hand a note is — the same reading the
+        // matcher and Listen make, through the same reader. No marks: keep-up keeps the
+        // engraver's tempo.
+        const position = readPosition(osmd, parts, NO_SCORE_MARKS, hand);
+        const { whole } = position;
+        for (const [order, group] of position.groups.entries()) {
             const play: KeepUpStep["play"] = [];
             const accompany: KeepUpStep["accompany"] = [];
             const lengths: number[] = [];
-            for (const note of group) {
-                const quarters = note.Length.RealValue * 4;
+            for (const entry of group) {
+                const quarters = entry.expression.notatedQuarters;
                 lengths.push(quarters);
-                if (note.isRest() || note.halfTone <= 0) {
-                    continue;
-                }
                 // A tie's later notes are the same sound continuing: the key is already
                 // down and the score asks for it to stay down. The beat still dwells its
                 // written length (the length is kept above), but there is nothing to
-                // catch there and nothing for the guide to strike again — the self-paced
-                // matcher and Listen read the tie the same way.
-                if (!readScoreExpression(note).strike) {
+                // catch there and nothing for the guide to strike again.
+                if (!entry.sounds || !entry.expression.strike) {
                     continue;
                 }
-                const entry = { pitch: note.halfTone + 12, quarters };
+                const note = { pitch: entry.pitch, quarters };
                 // The practised hand's notes are yours to catch; the other hand's are the
                 // accompaniment a duet sounds for you. A both-hands run has no other hand.
-                // The same split the self-paced matcher uses, so choosing a hand narrows
-                // the beats to catch — and the notes the guide sounds — identically in
-                // both modes.
-                const staffId = note.ParentStaff?.idInMusicSheet;
-                if (isPracticedHand(staffId, hand, parts)) {
-                    play.push(entry);
+                if (entry.practised) {
+                    play.push(note);
                 } else {
-                    accompany.push(entry);
+                    accompany.push(note);
                 }
             }
             steps.push({
@@ -90,9 +73,9 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                 play,
                 accompany,
                 lengths,
-                bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
-                stretch: fermata ? FERMATA_STRETCH : 1,
-                advancesCursor: order === groups.length - 1,
+                bpm: position.bpm,
+                stretch: position.stretch,
+                advancesCursor: order === position.groups.length - 1,
             });
         }
         cursor.next();
