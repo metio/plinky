@@ -1,6 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+// With the extension, on purpose: this module is read by plain node from the promo and
+// catalogue tooling, which resolves nothing it is not told.
+import { slugify } from "./slug.ts";
+
 // Composer identity for the person pages: the catalogue's composer strings come
 // from many corpora that spell the same person a dozen ways — "J.S. Bach",
 // "Johann Sebastian BACH", "Johann Sebastian Bach (1685 - 1750)". Canonicalizing
@@ -538,12 +542,7 @@ function slugOf(name: string): string {
     if (NOT_A_PERSON.test(name) || cannotBeAPerson(name) || A_KEY.test(name.trim())) {
         return "";
     }
-    return name
-        .normalize("NFKD")
-        .replace(/\p{M}/gu, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+    return slugify(name);
 }
 
 // The best a slug can be turned back into a name, for the composer nobody in the

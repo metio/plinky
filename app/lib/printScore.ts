@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { slugify } from "../../core/slug";
+
 // A self-contained HTML page wrapping just the rendered score's SVG, for the print
 // window. Isolating the staff from the rest of the app gives a clean printout (or
 // "Save as PDF" from the browser's print dialog) without the controls and chrome.
@@ -39,6 +41,8 @@ export function printViaIframe(html: string): void {
 }
 
 // A title reduced to a safe, lowercase file stem for a download — spaces and
-// punctuation collapse to single hyphens, so "Für Elise!" becomes "f-r-elise". The
-// same reduction a URL slug needs, so both share one implementation.
-export { slugify as fileStem } from "./slug";
+// punctuation collapse to single hyphens and accents come off their letters, so
+// "Für Elise!" becomes "fur-elise". The same cut a URL slug gets.
+export function fileStem(title: string): string {
+    return slugify(title, "score");
+}

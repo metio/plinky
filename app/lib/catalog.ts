@@ -7,7 +7,7 @@ import type { XmlCodec } from "../../core/xml";
 import { readJson, writeJson } from "../stores/jsonStore";
 import { parsePack, serializePack } from "../../core/scorePack";
 import { songId } from "../../core/songId";
-import { slugify } from "./slug";
+import { slugify } from "../../core/slug";
 
 // The one score catalogue: MusicXML pieces, rendered and practised on OSMD. The
 // bundled public-domain scores ship with the app; user-imported pieces are kept in
@@ -41,7 +41,6 @@ function bundledFiles(): Record<string, string> {
 const STORAGE_KEY = "plinky:scores";
 
 // Re-exported so importers that reach for the catalogue's slug keep working.
-export { slugify };
 
 // The demo pieces inlined into the bundle, identical for everyone. Finger exercises
 // and the song catalogue load as on-demand assets instead, keeping the JS small.
@@ -147,7 +146,7 @@ export function resolveScore(kv: KeyValueStore, id: string | undefined): Score |
 // catalogue so it neither clashes with nor silently overrides another piece.
 export function buildScore(codec: XmlCodec, xml: string, takenIds: string[]): Score {
     const meta = readScoreMeta(codec, xml);
-    const base = slugify(meta.title === "Untitled" ? "imported score" : meta.title);
+    const base = slugify(meta.title === "Untitled" ? "imported score" : meta.title, "score");
     const taken = new Set(takenIds);
     let id = base;
     for (let n = 2; taken.has(id); n++) {

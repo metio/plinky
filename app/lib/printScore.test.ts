@@ -60,8 +60,8 @@ describe("fileStem", () => {
         expect(fileStem("Twinkle Twinkle")).toBe("twinkle-twinkle");
     });
 
-    it("collapses punctuation and trims stray hyphens", () => {
-        expect(fileStem("Für Elise!")).toBe("f-r-elise");
+    it("collapses punctuation, trims stray hyphens and keeps an accented letter", () => {
+        expect(fileStem("Für Elise!")).toBe("fur-elise");
     });
 
     it("falls back to a default when nothing usable remains", () => {

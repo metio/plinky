@@ -4,7 +4,9 @@
 import { TEMPO_MAX, TEMPO_MIN } from "./playback";
 import { isDateKey } from "./dateKey";
 import { isRecord } from "./guards";
+import { jsonOf, NOT_JSON } from "./json";
 import { packToCode, unpackFromCode } from "./shareCode";
+import { slugify } from "./slug";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
 // imported scores, or finger exercises) with an optional target tempo and note per
@@ -122,13 +124,7 @@ function cleanItem(value: unknown): AssignmentItem | null {
 }
 
 export function slugifyName(name: string): string {
-    return (
-        name
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "") || "assignment"
-    );
+    return slugify(name, "assignment");
 }
 
 // A fresh id from the name, made unique against ids already taken so a new
@@ -189,10 +185,8 @@ export function serializeAssignment(assignment: Assignment): string {
 // Parse and validate an assignment file, throwing a reader-friendly message when the
 // document is not a usable assignment.
 export function parseAssignment(json: string): Assignment {
-    let data: unknown;
-    try {
-        data = JSON.parse(json);
-    } catch {
+    const data = jsonOf(json);
+    if (data === NOT_JSON) {
         throw new Error("That file is not valid JSON.");
     }
     if (!isRecord(data) || data.format !== FORMAT) {
