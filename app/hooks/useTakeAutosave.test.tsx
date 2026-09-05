@@ -84,6 +84,14 @@ describe("useTakeAutosave", () => {
         expect(calls.onSaved).toHaveBeenCalledWith(true);
     });
 
+    it("keeps the hand the run practised on the take", () => {
+        // A video of the take later tints the notes of this hand, whatever the
+        // surface is set to by then.
+        const { set, saved } = harness({ hand: "left" });
+        set({ complete: true, hand: "left" });
+        expect(saved[0]?.hand).toBe("left");
+    });
+
     it("waits for the final note's release rather than saving on the beat", () => {
         // Saving while the key is still down would record the beat the piece ended on
         // instead of how long the note was actually held.

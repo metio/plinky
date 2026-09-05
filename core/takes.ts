@@ -8,6 +8,7 @@ import {
     type RecordedNote,
 } from "./composition";
 import { type Grade, parseGrade } from "./grade";
+import type { Hand } from "./matcher";
 
 // A saved performance of a piece — your own play, kept per song so you can hear it
 // back, download it, and (the fastest one) race it as your ghost. A take IS a
@@ -26,6 +27,10 @@ export type Take = {
     // can show their metrics, not just the summary letter. Null for a take saved from a
     // run that was never graded (stopped before finishing).
     metrics: Grade | null;
+    // The hand the run practised, so a video of the take tints the notes that were
+    // played rather than whatever hand the surface is set to when it is exported.
+    // Absent on a take saved before this was recorded.
+    hand?: Hand;
     composition: Composition;
 };
 
@@ -43,8 +48,15 @@ export type StoredTake = {
     // The grade is small (a handful of numbers), so it rides along as a plain object
     // rather than through the note codec; null when the run was never graded.
     metrics: Grade | null;
+    hand?: Hand;
     code: string;
 };
+
+const HANDS: readonly Hand[] = ["both", "right", "left"];
+
+function handOf(value: unknown): Hand | undefined {
+    return HANDS.find((hand) => hand === value);
+}
 
 // One cleared step of a run: the pitches sounded together (a chord shares one
 // onset), the onset relative to the run's first note, and the velocity they were
@@ -154,6 +166,7 @@ export function takeFromStored(entry: unknown): Take | null {
         // absent or malformed grade simply reads as null rather than failing the load.
         metrics: parseGrade(value.metrics),
         composition,
+        ...(handOf(value.hand) ? { hand: handOf(value.hand) } : {}),
     };
 }
 
@@ -164,6 +177,7 @@ export function takeToStored(take: Take): StoredTake {
         letter: take.letter,
         complete: take.complete,
         metrics: take.metrics,
+        ...(take.hand ? { hand: take.hand } : {}),
         code: encodeComposition(take.composition),
     };
 }

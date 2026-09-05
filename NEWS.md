@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**A take's video shows the hand you played.** Exporting a left-hand take after
+switching the hand control to the right lit the right hand's notes in time with
+your left-hand playing. A take now remembers which hand it was, and the video
+follows that; takes saved before today still follow the control.
+
 **Practising the second time through a repeat stays on the second time.** Taking
 over from Listen partway through a repeat's second pass put the cursor back on the
 first, and from the repeat barline on it drifted away from the notes you were

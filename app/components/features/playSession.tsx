@@ -871,6 +871,7 @@ function usePlaySessionValue({
         capture: recorder.capture,
         tempo,
         beatsPerBar,
+        hand,
         finishedGrade: grading.finishedGrade,
         save: takesList.save,
         onSaved: runResult.markSaved,

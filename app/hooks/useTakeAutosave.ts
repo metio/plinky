@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import type { Grade } from "../../core/grade";
+import type { Hand } from "../../core/matcher";
 import { flushHolds, type RunCapture } from "../../core/runCapture";
 import { compositionFromRun, type RunStep, type Take } from "../../core/takes";
 
@@ -37,6 +38,8 @@ export type TakeAutosaveOptions = {
     // The run's tempo and meter, which the rebuilt composition is timed against.
     tempo: number;
     beatsPerBar?: number;
+    // The hand the run practised, kept on the take for whatever draws it later.
+    hand?: Hand;
     // The grade the run earned, read at save time rather than passed in: grading
     // records into state a render later, so the value here is the fresher one.
     finishedGrade: () => Grade | null;
@@ -89,6 +92,7 @@ export function useTakeAutosave(options: TakeAutosaveOptions): TakeAutosave {
                 letter: grade?.letter ?? "",
                 complete: o.complete,
                 metrics: grade,
+                ...(o.hand ? { hand: o.hand } : {}),
                 composition: compositionFromRun(
                     steps,
                     o.tempo,

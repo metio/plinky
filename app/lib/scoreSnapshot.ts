@@ -39,7 +39,10 @@ export async function buildScoreSnapshot(
     treadmill = false,
 ): Promise<ScoreSnapshot | null> {
     if (original) {
-        const snapshot = await snapshotFromXml(original.xml, original.hand, treadmill);
+        // The hand the take was played with, where it recorded one: the surface may
+        // have been switched to the other hand since, and its notes are not the ones
+        // the take's onsets tint.
+        const snapshot = await snapshotFromXml(original.xml, take.hand ?? original.hand, treadmill);
         const takeSteps = new Set(take.composition.notes.map((note) => note.startMs)).size;
         if (snapshot && takeSteps <= snapshot.steps.length) {
             return snapshot;
