@@ -23,6 +23,7 @@ import { Stepper } from "../ui/stepper";
 import { ReadingLevel } from "./readingLevel";
 import { usePlayPiece, usePlaySetup, usePlayRun } from "./playSession";
 import { Show } from "./conditional";
+import { TEMPO_MIN } from "../../../core/playback";
 
 const ICON = "h-5 w-5";
 
@@ -242,7 +243,7 @@ export function RunSetup() {
                                     <span>{m.tempo_trainer_target()}</span>
                                     <input
                                         type="range"
-                                        min={40}
+                                        min={TEMPO_MIN}
                                         max={180}
                                         value={trainerTarget}
                                         onChange={(event) =>
