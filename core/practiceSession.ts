@@ -163,12 +163,20 @@ export function foldSession(
         return log;
     }
 
-    const last = log.at(-1);
-    // A hand-logged sitting is a claim about time away from Plinky; a run that lands
-    // near it is separate practice and must not be absorbed into it.
+    // The most recent MEASURED session is the one a run may extend. A hand-logged sitting
+    // is a claim about time away from Plinky; a run that lands near it is separate
+    // practice and must not be absorbed into it — and it must not stand in the way
+    // either: a manual entry for today is anchored at noon, and read as "the last row"
+    // it made every earlier-in-the-day run a session of its own.
+    let lastIndex = -1;
+    for (const [index, session] of log.entries()) {
+        if (!session.manual && (lastIndex === -1 || session.end >= log[lastIndex]!.end)) {
+            lastIndex = index;
+        }
+    }
+    const last = lastIndex === -1 ? undefined : log[lastIndex];
     const extends_ =
         last !== undefined &&
-        !last.manual &&
         at >= last.end &&
         at - last.end <= gapMs &&
         at - last.start <= MAX_SPAN_MS;
@@ -200,7 +208,9 @@ export function foldSession(
         notes: last.notes + notes,
         pieces: withPiece(last.pieces, ping.pieceId),
     };
-    return [...log.slice(0, -1), merged];
+    // Replaced where it sits and re-sorted: the extended session may not be the last
+    // row when a hand-logged sitting for later in the day comes after it.
+    return sortSessions(log.map((session, index) => (index === lastIndex ? merged : session)));
 }
 
 export type ManualEntry = {
