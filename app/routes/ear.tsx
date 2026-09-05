@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useState } from "react";
 import { useSearchParams } from "react-router";
+import { useSeededState } from "../hooks/useSeededState";
 import type { EarExerciseId } from "../../core/earExercise";
 import { routeMeta, webPageData } from "../../core/site";
 import { EarSession } from "../components/features/earSession";
@@ -48,14 +48,23 @@ export default function Ear() {
     // A suggestion or a review link can open straight on a chosen drill (?exercise=&level=);
     // otherwise the page rests on the first interval level.
     const [params] = useSearchParams();
-    const param = params.get("exercise");
-    const initial: EarExerciseId = isExercise(param) ? param : "intervals";
-    const paramLevel = Number(params.get("level"));
-    const [exercise, setExercise] = useState<EarExerciseId>(initial);
-    const [level, setLevel] = useState(
-        Number.isInteger(paramLevel) && paramLevel >= 0 && paramLevel < LEVEL_LABELS[initial].length
-            ? String(paramLevel)
-            : "0",
+    const exerciseParam = params.get("exercise");
+    const [exercise, setExercise] = useSeededState<EarExerciseId>(exerciseParam, (param) =>
+        isExercise(param) ? param : "intervals",
+    );
+    // The level is seeded by both parameters: which level is in range depends on which
+    // exercise the address named.
+    const [level, setLevel] = useSeededState(
+        `${exerciseParam ?? ""}|${params.get("level") ?? ""}`,
+        () => {
+            const named: EarExerciseId = isExercise(exerciseParam) ? exerciseParam : "intervals";
+            const paramLevel = Number(params.get("level"));
+            return Number.isInteger(paramLevel) &&
+                paramLevel >= 0 &&
+                paramLevel < LEVEL_LABELS[named].length
+                ? String(paramLevel)
+                : "0";
+        },
     );
 
     const levels = LEVEL_LABELS[exercise];

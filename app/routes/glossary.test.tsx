@@ -4,7 +4,7 @@
 
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useNavigate } from "react-router";
 import { entryById, GLOSSARY, performSnippet } from "../../core/glossary";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { memoryStore } from "../adapters/memoryStore";
@@ -191,6 +191,51 @@ describe("Glossary", () => {
         expect(
             screen.getByRole("button", { name: m.glossary_hear() }).hasAttribute("disabled"),
         ).toBe(false);
+    });
+
+    it("silences the phrase still sounding when another symbol is chosen, and on leaving", async () => {
+        // The rest timer is JS and the strikes are on the audio clock: freeing the buttons
+        // without silencing the clock laid the old reading under the new one.
+        const view = mount();
+        fireEvent.click(screen.getByRole("button", { name: m.glossary_hear() }));
+        const silenced = () => view.audio.silenced;
+        const before = silenced();
+        fireEvent.click(screen.getByRole("button", { name: m.glossary_accent_name() }));
+        expect(silenced()).toBeGreaterThan(before);
+        const after = silenced();
+        view.unmount();
+        expect(silenced()).toBeGreaterThan(after);
+    });
+
+    it("follows the address through history, not only on arrival", () => {
+        // Two links into the glossary, then Back: the route stays mounted across the
+        // entries, so a selection seeded once at mount showed the wrong symbol under the
+        // right address.
+        const audio = fakeAudioEngine();
+        const scheduler = fakeScheduler();
+        function Back() {
+            const navigate = useNavigate();
+            return (
+                <button type="button" onClick={() => navigate(-1)}>
+                    back
+                </button>
+            );
+        }
+        renderWithServices(
+            <MemoryRouter
+                initialEntries={["/en/glossary/?symbol=slur", "/en/glossary/?symbol=staccato"]}
+                initialIndex={1}
+            >
+                <Back />
+                <Glossary />
+            </MemoryRouter>,
+            { store: memoryStore(), audio, scheduler },
+        );
+        expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
+            m.glossary_staccato_name(),
+        );
+        fireEvent.click(screen.getByRole("button", { name: "back" }));
+        expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(m.glossary_slur_name());
     });
 
     it("frees the buttons at once when another symbol is chosen", async () => {
