@@ -17,6 +17,8 @@
 // mangle artist names, which exact matching otherwise lets slip through. (Bare "biber"
 // is avoided: Heinrich Biber is a public-domain Baroque composer.)
 const ARTISTS = [
+    // Educational-piano composers whose names read as "classical" and are in copyright.
+    "gillock",
     "beatles",
     "lennon",
     "lenon",

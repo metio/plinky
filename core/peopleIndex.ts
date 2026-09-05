@@ -27,7 +27,6 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "alessandro-scarlatti": { name: "Alessandro Scarlatti", pieces: 1 },
     "alexander-borodin": { name: "Alexander Borodin", pieces: 1 },
     "alexander-gillet": { name: "Alexander Gillet", pieces: 8 },
-    "alexander-goedicke": { name: "Alexander Goedicke", pieces: 1 },
     "alexander-johnson": { name: "Alexander Johnson", pieces: 3 },
     "alexander-mackenzie": { name: "Alexander Mackenzie", pieces: 10 },
     "alexander-schmitt": { name: "Alexander Schmitt", pieces: 2 },

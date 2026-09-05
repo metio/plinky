@@ -24,6 +24,26 @@
       tile could say you had played nothing this week while six full bars sat right under
       it. The bars now run from Monday to today, the same days the tile counts, and the
       heading says so.
+    - |-
+      **A tempo can be typed into Compose.** The tempo field settled every keystroke on
+      the spot, so selecting 120 and typing 96 turned the 9 into 40 before the 6 arrived.
+      It now waits until what you have typed is a tempo, and tidies anything out of range
+      when you leave the field.
+    - |-
+      **Starting fresh works.** Resetting the device from Settings reported that the wipe
+      had failed every time, even though everything was gone: forgetting the recorded
+      piano wrote one preference back a moment after the wipe, and the check read that as
+      a key that would not go. The order is right now, and a clean reset says so.
+    - |-
+      **Leaving Settings no longer switches the microphone off.** If you had pressed
+      Listen there and moved on without opening the calibration, the microphone stopped
+      the moment the page closed. It stays on now; only a calibration you leave partway
+      through is stopped.
+    - |-
+      **One piece has left the catalogue.** Alexander Goedicke's *50 Simple Piano Pieces,
+      No. 46* is not yet in the public domain — he died in 1957, so his music clears the
+      seventy-year rule on 1 January 2028 — and it should not have been here. The name
+      that let it in has been taken off the list until then.
 - date: 2026-09-03
   entries:
     - |-

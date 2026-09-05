@@ -50,6 +50,14 @@ describe("isPublicDomain", () => {
         }
     });
 
+    it("refuses a familiar teaching-repertoire name whose copyright has not expired", () => {
+        // The list is read by the importer as proof of public domain, so a name that
+        // belongs on a beginner's shelf but not yet in the public domain must stay off it.
+        expect(isPublicDomain("William Gillock", "Fountain in the Rain")).toBe(false); // 1993
+        expect(isPublicDomain("A.Goedicke", "50 Simple piano Pieces, No. 46")).toBe(false); // 1957
+        expect(isPublicDomain("Alexander Gedike")).toBe(false);
+    });
+
     it("admits full-name public-domain composers whose bare surname is unsafe", () => {
         // Matched by full name so the common token never opens the door to a copyrighted
         // namesake (David Foster, b. 1949) or a too-common surname.
