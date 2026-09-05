@@ -13,7 +13,8 @@
 // this catches burial, not discoverability or per-page clutter.
 
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { assertPages, readPages } from "./pages.mjs";
 
 const APP = "app";
 
@@ -23,18 +24,10 @@ const BUDGET_FROM_HOME = 2;
 
 // --- Parse routes.ts → the page nodes (path + module file) ------------------------
 
-const routesSrc = readFileSync(join(APP, "routes.ts"), "utf8");
-// Pages live inside the `route(":locale", layout, [ … ])` block; the bare top-level
-// index is only a client redirect, so it isn't a destination.
-const localeBlock = routesSrc.match(/route\(":locale",[^[]*\[([\s\S]*?)\]\s*\)/)?.[1] ?? "";
-const pages = [];
-const homeIndex = localeBlock.match(/index\("([^"]+)"\)/);
-if (homeIndex) {
-    pages.push({ path: "/", file: homeIndex[1] });
-}
-for (const m of localeBlock.matchAll(/route\("([^"]+)",\s*"([^"]+)"/g)) {
-    pages.push({ path: `/${m[1]}`, file: m[2] });
-}
+// The route table read once, by the reader every other consumer of it shares, which
+// fails loudly when the table's shape moves rather than measuring a graph of no pages.
+assertPages();
+const pages = readPages().map((page) => ({ path: page.path, file: page.module }));
 const NODE_PATHS = pages.map((p) => p.path);
 
 // --- Crawl a file (and its local component imports) for navigation targets ---------
