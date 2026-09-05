@@ -29,13 +29,20 @@ function mount() {
         api = useSightRead(SAVED);
         return null;
     }
-    const view = render(
+    const element = (
         <ServicesProvider services={services}>
             <Probe />
-        </ServicesProvider>,
+        </ServicesProvider>
     );
-    // Non-null by the time any test reads it — the probe renders synchronously.
-    return { scheduler, view, read: () => api as SightRead };
+    const view = render(element);
+    return {
+        scheduler,
+        view,
+        // Non-null by the time any test reads it — the probe renders synchronously.
+        read: () => api as SightRead,
+        // The same tree again: a render that changes nothing.
+        rerender: () => view.rerender(element),
+    };
 }
 
 afterEach(cleanup);
@@ -166,10 +173,12 @@ describe("what a sight-read takes away", () => {
     });
 
     it("hands back the same object, and the same aids, across a render that changes nothing", () => {
-        const { read, view } = mount();
+        const { read, rerender } = mount();
         const before = read();
-        view.rerender(view.container.firstChild as never);
+        rerender();
         expect(read()).toBe(before);
         expect(read().aids).toBe(before.aids);
+        act(() => read().setVanish(false));
+        expect(read()).not.toBe(before);
     });
 });
