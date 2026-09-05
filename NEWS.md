@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**A piece opens faster on a phone.** The strip of notation above the keys used to
+engrave the whole piece a second time, beside the full score above it; on a long
+piece that was seconds of waiting before the first note could be played. It now
+draws only the bar you are in and the next, and redraws those two as you go.
+
 **The fingering strip reads the notes you are playing.** On a transposed piece it
 named the notes as written and suggested fingers for that key, while the score and
 the keys asked for the shifted ones; and on a song with a singer's line above the
