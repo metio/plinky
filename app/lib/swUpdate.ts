@@ -154,8 +154,15 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
     // A new worker taking control evicts the previous build's cache, so reload onto it
     // — whether this tab initiated the update or another tab did (applying stays false
     // here but a controller already existed). Skip only the first install's claim.
+    // Whether this page has been controlled at any point — not only at construction. A
+    // tab that did the first-ever install becomes controlled by that install's claim, and
+    // when another tab later applies an update it must reload like any other tab; judged
+    // off the moment it loaded, it would run the old HTML over an evicted cache.
+    let controlled = hadController;
     const onControllerChange = () => {
-        if (applying || hadController) {
+        const wasControlled = controlled;
+        controlled = true;
+        if (applying || wasControlled) {
             applying = false;
             requestReload();
         }
