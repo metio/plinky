@@ -12,7 +12,7 @@
 // run via `npm run ci:parity` and its own CI job.
 
 import { readFileSync } from "node:fs";
-import { gatesInWorkflow } from "./ciGates.mjs";
+import { gatesInWorkflow, HEAVY } from "./ciGates.mjs";
 
 const flake = readFileSync("flake.nix", "utf8");
 
@@ -31,6 +31,14 @@ for (const { job, command } of raw) {
     problems.push(
         `job "${job}" runs a raw command through nix: \`${command}\` — move it into a ci-* wrapper in flake.nix and call that instead`,
     );
+}
+
+for (const name of HEAVY) {
+    if (!defined.has(name)) {
+        problems.push(
+            `dev/ciGates.mjs lists \`${name}\` as heavy, but flake.nix defines no writeShellScriptBin "${name}" — the local runner would not skip the gate it is meant to`,
+        );
+    }
 }
 
 for (const name of required) {

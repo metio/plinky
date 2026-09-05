@@ -40,7 +40,11 @@ for (const [index, name] of chosen.entries()) {
         continue;
     }
     console.log(`FAILED ${seconds}s`);
-    failed.push({ name, output: `${run.stdout ?? ""}${run.stderr ?? ""}`.trimEnd() });
+    // A wrapper that could not be run at all — not on PATH, outside the devshell — has no
+    // output of its own; the spawn error is the whole story, and dropping it printed a
+    // FAILED with nothing under it.
+    const output = `${run.stdout ?? ""}${run.stderr ?? ""}`.trimEnd();
+    failed.push({ name, output: run.error ? `${output}\n${run.error.message}`.trim() : output });
 }
 
 if (skipped.length > 0) {

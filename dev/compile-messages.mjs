@@ -57,6 +57,15 @@ const urlPatterns = [
 const OUT = "./app/paraglide";
 const STAMP = `${OUT}/.stamp`;
 
+function installedCompilerVersion() {
+    try {
+        return JSON.parse(readFileSync("./node_modules/@inlang/paraglide-js/package.json", "utf8"))
+            .version;
+    } catch {
+        return "";
+    }
+}
+
 function inputKey() {
     const hash = createHash("sha256");
     hash.update(readFileSync(`${project}/settings.json`));
@@ -66,12 +75,11 @@ function inputKey() {
     }
     hash.update(staticLocale ?? "");
     hash.update(project);
-    // The compiler's own version: an upgrade changes the output from identical input.
-    hash.update(
-        JSON.parse(readFileSync("./package.json", "utf8")).devDependencies[
-            "@inlang/paraglide-js"
-        ] ?? "",
-    );
+    // The compiler's own version: an upgrade changes the output from identical input. The
+    // INSTALLED version, not the range package.json allows — a lockfile-only bump inside
+    // the range installs a new compiler under the same range, and a stamp keyed on the
+    // range would keep serving the old compiler's output.
+    hash.update(installedCompilerVersion());
     return hash.digest("hex");
 }
 
