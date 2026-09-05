@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { copyrightReason } from "./copyrightSignals.mts";
+
 // An ALLOWLIST: a song is admitted to the catalogue only when we can affirmatively
 // show its *composition* is public domain (the notes are copyrighted independently of
 // any recording — sharing sheet music of a copyrighted song still infringes). Anything
@@ -143,4 +145,12 @@ export function isPublicDomain(composer: string, title = ""): boolean {
     }
     const name = fold(composer);
     return PD_SURNAMES.test(name) || PD_FULLNAMES.test(name) || PD_STEMS.test(name);
+}
+
+// Whether a credit may enter the catalogue: a public-domain attribution with no
+// copyrighted-artist signal in it. Asked of every name that is about to be written, not
+// only of the one the source's index offered — a file's own creator line is what the
+// catalogue credits, and it need not agree with the index.
+export function creditAllowed(composer: string, title = ""): boolean {
+    return isPublicDomain(composer, title) && copyrightReason(composer) === null;
 }
