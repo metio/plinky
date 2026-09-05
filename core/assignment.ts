@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { TEMPO_MAX, TEMPO_MIN } from "./playback";
 import { isDateKey } from "./dateKey";
 import { isRecord } from "./guards";
 import { packToCode, unpackFromCode } from "./shareCode";
@@ -48,8 +49,8 @@ const FORMAT = "plinky-assignment";
 // The playable band for a target tempo. Exported so the builder's input advertises
 // the same range this rejects — a field that accepts what the save discards is a
 // field that loses the teacher's work silently.
-export const MIN_TEMPO = 20;
-export const MAX_TEMPO = 400;
+export const MIN_TEMPO = TEMPO_MIN;
+export const MAX_TEMPO = TEMPO_MAX;
 
 // A tempo feeds the 60000/tempo playback math, so only a sane positive value is
 // kept; anything else is dropped and the item simply carries no target.

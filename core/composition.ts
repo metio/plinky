@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { quartersMs } from "./elapsed";
 import { escapeXmlText } from "./xmlText";
 import { buildMidiFile, type MidiNote } from "./midiFile";
 import { spellMidi } from "./notes";
@@ -66,7 +67,7 @@ export function quantize(
     tempo: number,
     subdivisionsPerBeat: number,
 ): RecordedNote[] {
-    const beatMs = 60_000 / tempo;
+    const beatMs = quartersMs(1, tempo);
     const gridMs = beatMs / subdivisionsPerBeat;
     return notes.map((note) => ({
         ...note,
@@ -112,7 +113,7 @@ export function toReplayEvents(composition: Composition): ReplayEvent[] {
 // The note list in the quarter-note unit the MIDI writer expects, so a composition
 // exports to a Standard MIDI File that sounds like the recorded performance.
 export function toMidiNotes(composition: Composition): MidiNote[] {
-    const beatMs = 60_000 / composition.tempo;
+    const beatMs = quartersMs(1, composition.tempo);
     return composition.notes.map((note) => ({
         midi: note.pitch,
         startQuarters: note.startMs / beatMs,
@@ -433,7 +434,7 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
     const splitPoint = options.splitPoint ?? DEFAULT_SPLIT_POINT;
     const beatsPerBar = cleanBeatsPerBar(composition.beatsPerBar);
 
-    const beatMs = 60_000 / composition.tempo;
+    const beatMs = quartersMs(1, composition.tempo);
     // The render grid is always sixteenths; a coarser quantize is applied first so the
     // staff stays clean while the cell math keeps integer durations.
     const gridMs = beatMs / DIVISIONS;

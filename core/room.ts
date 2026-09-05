@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { seededRandom } from "./random";
+
 // The room the piano is standing in, as an impulse response.
 //
 // Every voice used to go straight to the limiter and out — no space around it at all. A dry
@@ -45,17 +47,6 @@ const TAIL_FROM = 0.012;
 const TAIL_BUILD = 0.03;
 
 // A seeded generator, so the room is the same one on every device and in every export.
-// mulberry32: small, fast, and good enough for noise nobody is going to analyse.
-function seeded(seed: number): () => number {
-    let state = seed >>> 0;
-    return () => {
-        state = (state + 0x6d2b79f5) >>> 0;
-        let t = state;
-        t = Math.imul(t ^ (t >>> 15), t | 1);
-        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-}
 
 // One channel of the response. The two channels are generated from different seeds and are
 // therefore uncorrelated, which is what gives the room width — the same noise in both ears
@@ -66,7 +57,7 @@ function seeded(seed: number): () => number {
 export function roomImpulse(sampleRate: number, seed: number): Float32Array<ArrayBuffer> {
     const length = Math.max(1, Math.round(sampleRate * ROOM_SECONDS));
     const out = new Float32Array(length);
-    const noise = seeded(seed);
+    const noise = seededRandom(seed);
     // exp(decay * t) reaching END_DB at the end of the tail.
     const decay = ((END_DB / 20) * Math.LN10) / ROOM_SECONDS;
     for (let index = 0; index < length; index++) {

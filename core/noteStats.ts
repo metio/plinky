@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { median } from "./stats";
+
 // Which notes you are slow to find.
 //
 // Every run already records when each note was played; nothing has ever added that
@@ -104,11 +106,7 @@ export function typicalMs(stats: NoteStats, minPlays = 3): number | null {
     }
     // A median, not a mean: one note left mid-run should not drag the baseline it is
     // being compared against.
-    const sorted = [...means].sort((a, b) => a - b);
-    const middle = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0
-        ? Math.round(((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2)
-        : (sorted[middle] ?? null);
+    return Math.round(median(means));
 }
 
 // Coerce stored (possibly corrupt or older) data into usable stats, dropping

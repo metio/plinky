@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { HIGHEST, LOWEST } from "./pianoRange";
 import { isBlackKey } from "./fingering";
 
 // Frame the practice keyboard around the notes a piece actually uses, so a
@@ -11,8 +12,8 @@ import { isBlackKey } from "./fingering";
 // a one-octave minimum so a two-note drill still gives the fingers somewhere to
 // land, and clamped to the 88-key piano.
 
-const PIANO_LOW = 21; // A0
-const PIANO_HIGH = 108; // C8
+const PIANO_LOW = LOWEST;
+const PIANO_HIGH = HIGHEST;
 // A whole tone of breathing room each side — the same padding the run-range
 // framing uses — so a stray hit on an edge note still lands on a drawn key.
 const PAD = 2;
