@@ -28,13 +28,14 @@ const UNTIL_START = 250 + PATTERN.beatsPerBar * (60_000 / BPM);
 
 function mount() {
     const scheduler = fakeScheduler();
+    const audio = fakeAudioEngine();
     const view = renderWithServices(
         <MidiProvider>
             <RhythmTrainer level={LEVEL} bpm={BPM} rng={fixed} />
         </MidiProvider>,
-        { store: memoryStore(), audio: fakeAudioEngine(), midi: fakeMidi(), scheduler },
+        { store: memoryStore(), audio, midi: fakeMidi(), scheduler },
     );
-    return { ...view, scheduler };
+    return { ...view, scheduler, audio };
 }
 
 const start = () => fireEvent.click(screen.getByRole("button", { name: m.rhythm_start() }));
@@ -104,6 +105,27 @@ describe("RhythmTrainer", () => {
         start();
         await advanceScheduler(scheduler, UNTIL_START + ONSETS.at(-1)! + 2000);
         expect(screen.getByRole("button", { name: m.rhythm_again() })).toBeTruthy();
+    });
+
+    it("takes the queued clicks off the clock when started again", async () => {
+        // The count-in and the run go onto the audio clock whole. Pressing Start again
+        // mid-run must not leave the rest of the first track ticking over the new one.
+        const { scheduler, audio } = mount();
+        start();
+        const track = audio.clicks.length;
+        expect(track).toBe(PATTERN.beatsPerBar * (PATTERN.bars + 1));
+        await advanceScheduler(scheduler, UNTIL_START + 100);
+        start();
+        expect(audio.clicks).toHaveLength(track);
+        expect(audio.clicks.every((click) => click.time > audio.now()!)).toBe(true);
+    });
+
+    it("leaves no clicks sounding after the page is left", () => {
+        const { audio, unmount } = mount();
+        start();
+        expect(audio.clicks.length).toBeGreaterThan(0);
+        unmount();
+        expect(audio.clicks).toHaveLength(0);
     });
 
     it("cannot be tapped before it has begun", () => {

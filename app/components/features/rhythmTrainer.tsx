@@ -109,7 +109,10 @@ export function RhythmTrainer({
 
         // Every click for the count-in and the run, queued once on the audio clock. The
         // pulse must not depend on a polling loop surviving a backgrounded tab: this is
-        // two bars, and queueing it whole is both simpler and steadier.
+        // two bars, and queueing it whole is both simpler and steadier. Queued whole, it
+        // has to come off whole too: a restart mid-run or leaving the page would otherwise
+        // leave the rest of the track sounding over the new count-in, or over nothing.
+        const queued: (() => void)[] = [];
         if (audioNow !== null) {
             // Queued at zero gain when muted, like the metronome's own pulse: the whole
             // count-in and run go onto the audio clock in one go, so the grid has to exist
@@ -118,10 +121,12 @@ export function RhythmTrainer({
             const beats = pattern.beatsPerBar * (pattern.bars + 1);
             const audioStart = audioNow + LEAD_MS / 1000;
             for (let beat = 0; beat < beats; beat++) {
-                audio.click(
-                    audioStart + (beat * beatMs) / 1000,
-                    beat % pattern.beatsPerBar === 0 ? "accent" : "beat",
-                    gain,
+                queued.push(
+                    audio.click(
+                        audioStart + (beat * beatMs) / 1000,
+                        beat % pattern.beatsPerBar === 0 ? "accent" : "beat",
+                        gain,
+                    ),
                 );
             }
         }
@@ -135,6 +140,9 @@ export function RhythmTrainer({
         return () => {
             scheduler.cancel(toRunning);
             scheduler.cancel(toDone);
+            for (const cancel of queued) {
+                cancel();
+            }
         };
     }, [audio, beatMs, bpm, finish, pattern, prefsStore, scheduler]);
 

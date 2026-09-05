@@ -660,7 +660,7 @@ function endVoice(ctx: AudioContext, note: number, holdScale = 1): void {
     voices.delete(note);
 }
 
-function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): void {
+function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): () => void {
     const osc = ctx.createOscillator();
     const envelope = ctx.createGain();
     osc.frequency.value = kind === "accent" ? 1600 : kind === "beat" ? 1000 : 800;
@@ -673,6 +673,14 @@ function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): 
     envelope.connect(master(ctx));
     osc.start(time);
     osc.stop(time + 0.06);
+    return () => {
+        // Stopping a source before its start time keeps it silent; one already sounding
+        // is over within the blip anyway. The envelope is shut too, so nothing rings.
+        envelope.gain.cancelScheduledValues(0);
+        envelope.gain.setValueAtTime(0, ctx.currentTime);
+        osc.stop(ctx.currentTime);
+        envelope.disconnect();
+    };
 }
 
 // When each pitch last started sounding plus how long it rings, on the wall
@@ -911,9 +919,7 @@ export const webAudioEngine: AudioEngine = {
     },
     click(time, kind, gain) {
         const ctx = context();
-        if (ctx && gain > 0) {
-            click(ctx, time, kind, gain);
-        }
+        return ctx && gain > 0 ? click(ctx, time, kind, gain) : () => {};
     },
     recentlyStruck(note, withinMs) {
         const until = struckUntil.get(note);

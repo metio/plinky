@@ -64,7 +64,7 @@ describe("the Learn page", () => {
             release: () => {},
             setPedal: () => {},
             allNotesOff: () => {},
-            click: () => {},
+            click: () => () => {},
             setRoom: () => {},
         };
         show({ audio });
