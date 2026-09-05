@@ -27,6 +27,7 @@ import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
 import { compactFieldClasses, sectionHeadingClasses } from "../ui/classes";
+import { StatTile } from "../ui/statTile";
 
 // The practice diary, rolled up. How long, on which days, and what it felt like —
 // the retrospective a player keeps for themselves and the summary a teacher asks
@@ -59,15 +60,6 @@ const HEAT_CLASS = [
     "bg-heat-strong",
     "bg-heat-deep",
 ] as const;
-
-function Stat({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="rounded-lg border border-line bg-surface p-3">
-            <div className="text-lg font-semibold text-body">{value}</div>
-            <div className="text-xs text-muted">{label}</div>
-        </div>
-    );
-}
 
 // A day per cell, weeks running left to right and weekdays top to bottom — the
 // shape every practice calendar uses, so it reads without a legend. Leading blanks
@@ -226,10 +218,10 @@ function BackLogForm({ now }: { now: Date }) {
 function Totals({ report }: { report: PracticeReportData }) {
     return (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label={m.practice_total_time()} value={duration(report.activeMs)} />
-            <Stat label={m.practice_days_practised()} value={String(report.activeDays)} />
-            <Stat label={m.practice_typical_session()} value={duration(report.averageMs)} />
-            <Stat label={m.practice_notes_played()} value={String(report.notes)} />
+            <StatTile label={m.practice_total_time()} value={duration(report.activeMs)} />
+            <StatTile label={m.practice_days_practised()} value={report.activeDays} />
+            <StatTile label={m.practice_typical_session()} value={duration(report.averageMs)} />
+            <StatTile label={m.practice_notes_played()} value={report.notes} />
         </div>
     );
 }
