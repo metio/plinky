@@ -3,10 +3,11 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, screen } from "@testing-library/react";
+import { useEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CalibrationSample } from "../../../core/micCalibration";
 import { fakePitch } from "../../adapters/fakePitch";
-import { MidiProvider } from "../../contexts/midi";
+import { MidiProvider, useMidiConnection } from "../../contexts/midi";
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { MicCalibrationWizard } from "./micCalibrationWizard";
@@ -43,6 +44,36 @@ const feed = (pitch: ReturnType<typeof fakePitch>, count: number, sample: Calibr
 };
 
 describe("MicCalibrationWizard", () => {
+    it("leaves a microphone it did not start alone when it unmounts", async () => {
+        // A player who pressed Listen on the Settings page and leaves it without ever
+        // opening the wizard is still listening; the wizard has nothing of theirs to stop.
+        const pitch = fakePitch();
+        function Listener() {
+            const { startMic } = useMidiConnection();
+            useEffect(() => {
+                startMic();
+            }, [startMic]);
+            return null;
+        }
+        const view = renderWithServices(
+            <MidiProvider>
+                <Listener />
+                <MicCalibrationWizard />
+            </MidiProvider>,
+            { pitch },
+        );
+        await flush();
+        expect(pitch.listening()).toBe(true);
+
+        view.rerender(
+            <MidiProvider>
+                <Listener />
+            </MidiProvider>,
+        );
+        await flush();
+        expect(pitch.listening()).toBe(true);
+    });
+
     it("walks the player through the steps and saves a calibration", async () => {
         const { pitch } = mount();
 

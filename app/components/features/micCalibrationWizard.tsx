@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     beginCalibration,
     type CalibrationSample,
@@ -73,8 +73,21 @@ export function MicCalibrationWizard() {
         setOpen(false);
     }, [stopMic]);
 
-    // Release the microphone if the panel unmounts mid-run (navigating away).
-    useEffect(() => () => stopMic(), [stopMic]);
+    // Release the microphone if the panel unmounts mid-run (navigating away) — and only
+    // then. The microphone is shared: a player who pressed Listen on this page and leaves
+    // it without ever opening the wizard is still listening, and the wizard has nothing
+    // of theirs to release. Read through a ref so the cleanup sees the run state at
+    // unmount rather than the one it closed over at mount.
+    const openRef = useRef(false);
+    openRef.current = open;
+    useEffect(
+        () => () => {
+            if (openRef.current) {
+                stopMic();
+            }
+        },
+        [stopMic],
+    );
 
     // Hand off to the next step once the current one has heard enough, after a
     // short dwell so the confirmation is visible.
