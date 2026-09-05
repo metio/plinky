@@ -210,6 +210,9 @@ function ChordExplorer() {
     const [root, setRoot] = useState("0");
     const [quality, setQuality] = useState<ChordQuality>("major");
     const pitches = chordPitches(ROOT + Number(root), quality);
+    // Two octaves from the root, or as far as the chord reaches: a ninth on B climbs past
+    // the top of two octaves and would lose its top note off the keyboard and the picture.
+    const top = Math.max(ROOT + 24, ...pitches);
     return (
         <Panel title={m.tools_chords_title()} hint={m.tools_chords_hint()}>
             <SegmentedControl
@@ -224,10 +227,10 @@ function ChordExplorer() {
                 onChange={setQuality}
                 options={CHORD_QUALITIES.map((id) => ({ id, label: chordName(id) }))}
             />
-            <SoundingKeyboard score={scoreOf([pitches])} label={m.tools_hear_it()} />
+            <SoundingKeyboard score={scoreOf([pitches])} label={m.tools_hear_it()} to={top} />
             <SavePictureButton
                 from={ROOT}
-                to={ROOT + 24}
+                to={top}
                 keys={pitches.map((note) => ({ note }))}
                 caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(root)))]} ${chordName(quality)}`}
                 filename="plinky-chord"
