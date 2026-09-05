@@ -24,6 +24,9 @@ type Voice =
     | number
     | {
           midi: number;
+          // An ornament's note: printed before the note it decorates, with a length the
+          // engraver reports but no time of its own.
+          grace?: boolean;
           staff?: number;
           tie?: "start" | "held";
           tieQuarters?: number;
@@ -82,6 +85,9 @@ function fakeOsmd(
                     Length: { RealValue: (marks.quarters ?? 1) / 4 },
                     ParentVoiceEntry: { Articulations: codes },
                 };
+                if (marks.grace) {
+                    note.IsGraceNote = true;
+                }
                 if (tie === "start") {
                     // The struck note of the tie: OSMD names it first in the tie, and the
                     // tie's own duration is the whole chain's.
@@ -621,5 +627,31 @@ describe("the lookahead a surface can ask for without a run", () => {
         act(() => result.current.resetPreview());
         act(() => result.current.preview(0));
         expect(result.current.upcoming[0]?.pitches).toEqual([72]);
+    });
+});
+
+describe("a position's advance", () => {
+    it("is the shortest real note, never the grace note printed before it", () => {
+        // The engraver reports a grace note with a length of its own; counted as the
+        // position's advance, the gap after every ornament read as a repeat jump and the
+        // run's clock stopped following the page there.
+        const { osmd } = fakeOsmd(
+            [
+                [{ midi: 60, quarters: 2 }],
+                [
+                    { midi: 71, grace: true, quarters: 0.5 },
+                    { midi: 62, quarters: 2 },
+                ],
+                [64],
+            ],
+            // Two half notes then a quarter: the printed onsets, in whole notes.
+            [0, 0.5, 1],
+        );
+        const steps = collectMatchSteps(osmd, "both");
+        const at = (pitch: number) =>
+            steps.find((step) => step.pitches.includes(pitch))?.elapsedMs ?? Number.NaN;
+        // At the nominal 60 bpm a quarter is a second: the note after the decorated
+        // half note lands two seconds on, not half a second — the grace note's length.
+        expect(at(64) - at(62)).toBeCloseTo(2000);
     });
 });

@@ -96,6 +96,12 @@ export type { Hand } from "../../core/matcher";
 function shortestLength(osmd: OpenSheetMusicDisplay): number {
     let shortest = Number.POSITIVE_INFINITY;
     for (const note of osmd.cursor.NotesUnderCursor()) {
+        // A grace note steals its time from its neighbour and advances nothing: the
+        // engraver reports it with a length of its own, and counting that as the
+        // position's advance made the gap after every ornament read as a repeat jump.
+        if (isGraceNote(note)) {
+            continue;
+        }
         shortest = Math.min(shortest, note.Length.RealValue * 4);
     }
     return Number.isFinite(shortest) ? shortest : 1;
