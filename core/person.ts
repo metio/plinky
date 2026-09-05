@@ -675,5 +675,8 @@ export function personFor(pieces: PersonPiece[], slug: string): Person | null {
         }
         return seen.includes(slug);
     });
-    return mine.length > 0 ? (peopleFrom(mine)[0] ?? null) : null;
+    // The person asked for, by slug: a piece two people share puts both of them in the
+    // group, with the same count when every piece of the slug's is shared, and the
+    // group's own ordering would then answer with whichever name sorts first.
+    return peopleFrom(mine).find((person) => person.slug === slug) ?? null;
 }

@@ -74,6 +74,32 @@ higher still. Each piece now opens with only what its own address asks for.
 Compose left the language prefix behind, so a reader in French landed on an
 unlocalised address and was bounced by way of a guess at their language.
 
+**Keep up honours a tie.** A note tied across the barline was asked for again on the
+far side, so holding it as written counted as a missed beat and the guide struck it
+twice. Keep up now reads the tie the way Practice and Listen do: the beat still
+dwells its length, and there is nothing to catch there.
+
+**A slur stays with the hand it is drawn over.** A phrase mark over the right hand
+was being read as joining the left hand's notes underneath it too, so a staccato
+bass under a singing tune was played smooth by Listen and expected smooth in a
+graded run. Each hand's slurs are its own now.
+
+**The recorded piano is ready for the piece as written.** Recordings were fetched
+ahead of a piece at one middling loudness, whatever the score said — so a piece
+marked soft asked for recordings that had never been fetched, and the synthesised
+voice stood in while the panel said the recordings were ready. What is fetched now
+follows the dynamics on the page.
+
+**A composer's page is their own.** When somebody's only piece was written together
+with another composer, their page showed the other person. The page now shows the
+one whose name is in the address.
+
+**Out-of-key notes in a drill are written with a natural sign.** In a sharp or flat
+key, a note the signature alters was being spelled as its neighbour with an extra
+accidental — an F natural in G major came out as E sharp, and D natural in D flat
+major as E double flat. They are written the way a reader expects now, and no drill
+shows a double accidental.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to
