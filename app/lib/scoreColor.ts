@@ -78,6 +78,13 @@ export function collectStepNotes(osmd: OpenSheetMusicDisplay, hand: Hand): StepN
                 if (!isPracticedHand(note.ParentStaff?.idInMusicSheet, hand, parts)) {
                     continue;
                 }
+                // A tie's later notes are the same sound continuing, not a note to play:
+                // the matcher collects no step for them, so neither does this walk, or
+                // every index after a tie would point one note behind — the reveal, the
+                // ghost marker and the exported video all one step late.
+                if (!readScoreExpression(note).strike) {
+                    continue;
+                }
                 // This group counts as a step the moment it holds a playable note,
                 // matching the matcher's collectSteps. The SVG group may be missing (a
                 // note OSMD didn't render a glyph for); push the step regardless so a
