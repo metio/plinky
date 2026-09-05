@@ -323,8 +323,12 @@ export function listenPerformanceOf(
     );
     const notes: RecordedNote[] = [];
     let elapsedMs = 0;
+    // Where the first note falls on the step clock. The clip window counts from the first
+    // NOTE, as the returned onsets do, not from the first step: a piece that opens with a
+    // rest would otherwise lose that rest's length off the end of the clip.
+    let firstNoteMs: number | null = null;
     for (const [index, step] of steps.entries()) {
-        if (withinMs !== undefined && elapsedMs >= withinMs) {
+        if (withinMs !== undefined && firstNoteMs !== null && elapsedMs - firstNoteMs >= withinMs) {
             break;
         }
         const tempo = effectiveTempo(dial, step.bpm, startBpm);
@@ -334,6 +338,7 @@ export function listenPerformanceOf(
             const { durationSeconds, voiced } = performListenNote(step, note, tempo);
             const finger = fingering.get(note.hand)?.[index]?.[taken[note.hand]];
             taken[note.hand] += 1;
+            firstNoteMs ??= elapsedMs;
             notes.push({
                 pitch: note.pitch,
                 startMs: elapsedMs,
