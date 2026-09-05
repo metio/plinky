@@ -86,12 +86,19 @@ export function spell(midi: number, fifths: number): BuiltPitch {
             return { step: letter, octave: octaveOf(midi, letter, alter), alter };
         }
     }
-    // Not in the key: borrow the neighbouring letter and raise or lower it.
-    const direction = fifths < 0 ? 1 : -1;
+    // Not in the key. A natural first: the letter the signature alters, written with a
+    // natural sign, is how a reader expects to see it — F natural in G major is F♮, not
+    // E♯, and D natural in D♭ major is D♮, not E𝄫.
     for (const letter of LETTERS) {
-        const base = alterFor(letter, fifths);
-        const alter = base - direction;
-        if (Math.abs(alter) <= 2 && ((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
+        if ((SEMITONE[letter] ?? 0) === pc) {
+            return { step: letter, octave: octaveOf(midi, letter, 0), alter: 0 };
+        }
+    }
+    // Otherwise borrow the neighbouring letter and lean it one step the way the key does:
+    // sharps in sharp keys, flats in flat keys. Never a double accidental.
+    const alter = fifths < 0 ? -1 : 1;
+    for (const letter of LETTERS) {
+        if (((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
             return { step: letter, octave: octaveOf(midi, letter, alter), alter };
         }
     }

@@ -41,6 +41,20 @@ describe("spell", () => {
         expect(spell(61, -2)).toEqual({ step: "D", octave: 4, alter: -1 });
     });
 
+    it("writes a note the signature alters with a natural sign, never a double accidental", () => {
+        // F natural in G major is F♮, not E♯; B natural in F major is B♮, not C♭; and in
+        // the flat-heavy keys the placement test uses, D natural is D♮, not E𝄫.
+        expect(spell(65, 1)).toEqual({ step: "F", octave: 4, alter: 0 });
+        expect(spell(71, -1)).toEqual({ step: "B", octave: 4, alter: 0 });
+        expect(spell(62, -5)).toEqual({ step: "D", octave: 4, alter: 0 });
+        expect(spell(62, 7)).toEqual({ step: "D", octave: 4, alter: 0 });
+        for (let fifths = -7; fifths <= 7; fifths++) {
+            for (let midi = 60; midi < 72; midi++) {
+                expect(Math.abs(spell(midi, fifths).alter)).toBeLessThanOrEqual(1);
+            }
+        }
+    });
+
     it("names the octave MIDI does", () => {
         expect(spell(60, 0).octave).toBe(4);
         expect(spell(72, 0).octave).toBe(5);
