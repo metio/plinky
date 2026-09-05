@@ -100,6 +100,6 @@ export const browserStore = versioned.store;
 // delete files that were never the trouble.
 export const storageHealth: StorageHealth = {
     problem: () =>
-        versioned.standing === "newer" ? "stale" : browser.health.failed() ? "refused" : null,
+        versioned.standingNow() === "newer" ? "stale" : browser.health.failed() ? "refused" : null,
     subscribe: browser.health.subscribe,
 };

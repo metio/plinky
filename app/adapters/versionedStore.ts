@@ -21,26 +21,33 @@ export const SCHEMA_KEY = "plinky:schema";
 export function versionedStore(
     inner: KeyValueStore,
     known: number = SCHEMA_VERSION,
-): { store: KeyValueStore; standing: SchemaStanding } {
-    const standing = schemaStanding(inner.get(SCHEMA_KEY), known);
+): { store: KeyValueStore; standing: SchemaStanding; standingNow: () => SchemaStanding } {
+    const standingNow = () => schemaStanding(inner.get(SCHEMA_KEY), known);
+    const standing = standingNow();
     if (standing !== "newer" && standing !== "current") {
         // Stamp on the way past. An unstamped device is this shape by definition, and an
         // older one has been brought forward by whatever migration ran — there are none
         // yet, this being the first version.
         inner.set(SCHEMA_KEY, String(known));
     }
-    if (standing !== "newer") {
-        return { store: inner, standing };
-    }
+    // Asked again at every write rather than settled at load: the tab this guard exists
+    // for is the one left open on yesterday's build beside a tab that has since loaded
+    // today's and restamped the device — and that tab decided its standing long before.
+    const outranked = () => standingNow() === "newer";
     return {
         standing,
+        standingNow,
         store: {
             get: inner.get,
             keys: inner.keys,
             // Refused rather than attempted. The write would succeed at the storage
             // layer and destroy exactly what it was meant to preserve.
-            set: () => false,
-            remove: () => {},
+            set: (key, value) => (outranked() ? false : inner.set(key, value)),
+            remove: (key) => {
+                if (!outranked()) {
+                    inner.remove(key);
+                }
+            },
         },
     };
 }
