@@ -6,14 +6,12 @@
 // screen collects the answers; these settle them, because a wrong answer here is written
 // into a library entry and read back for as long as the piece is kept.
 
+import { TEMPO_MAX, TEMPO_MIN } from "./playback";
 import { NO_TITLE } from "./scoreMeta";
 import type { XmlCodec } from "./xml";
 
-// What the tempo control offers, and so what a typed figure is allowed to be. Twenty
-// beats a minute is slower than any piece is marked; four hundred is faster than a
-// keyboard can be struck.
-export const TEMPO_MIN = 20;
-export const TEMPO_MAX = 400;
+// What the tempo control offers, and so what a typed figure is allowed to be.
+export { TEMPO_MAX, TEMPO_MIN };
 
 // Anything that parses as MusicXML and carries a pitched note is a piece. The renderer
 // draws whatever it can beyond that, so a stricter bar would reject scores that play.

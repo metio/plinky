@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { MusicItem } from "./music";
+import { hashString } from "./random";
 
 // Choosing a piece on somebody's behalf.
 //
@@ -24,17 +25,6 @@ export type PickPreferences = {
     played?: ReadonlySet<string>;
     kind?: MusicItem["kind"];
 };
-
-// A small integer hash, so the same seed and the same shelf always choose the same piece and
-// neighbouring seeds do not choose neighbouring pieces.
-function hash(seed: string): number {
-    let value = 2166136261;
-    for (let at = 0; at < seed.length; at++) {
-        value ^= seed.charCodeAt(at);
-        value = Math.imul(value, 16777619);
-    }
-    return value >>> 0;
-}
 
 // Everything at a grade that the preferences allow, in the catalogue's own order — the caller
 // may want to count them, or say how much is left to meet.
@@ -67,5 +57,5 @@ export function pickForGrade(
         ? allowed.filter((item) => !preferences.played?.has(item.id))
         : allowed;
     const pool = fresh.length > 0 ? fresh : allowed;
-    return pool[hash(seed) % pool.length];
+    return pool[hashString(seed) % pool.length];
 }

@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { quartersMs } from "./elapsed";
+
 // The self-paced duet: while you play one hand note-by-note, the app sounds the
 // other hand for you. Self-paced practice has no clock — the run advances only
 // when you play — so the sitting-out hand is scheduled a gap at a time. Each time
@@ -87,7 +89,7 @@ export function accompanimentForGap(
 ): ScheduledVoice[] {
     // A non-positive tempo would divide by zero; the caller clamps the live tempo, but
     // guard so a stray value can't schedule notes at infinity.
-    const msPerQuarter = 60000 / Math.max(bpm, 1);
+    const msPerQuarter = quartersMs(1, bpm);
     return voices.map((voice) => ({
         pitch: voice.pitch,
         delayMs: Math.max(0, voice.whole - fromWhole) * 4 * msPerQuarter,

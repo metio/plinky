@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { quartersMs } from "./elapsed";
+
 // Rhythms to read and tap, as a graded ladder.
 //
 // Rhythm is already graded everywhere else in Plinky, but only ever as a by-product of
@@ -249,7 +251,7 @@ export function cellBeats(pattern: RhythmPattern): number[] {
 // The moments a tap is expected, in milliseconds from the start of the pattern. Rests
 // ask for nothing, so they are absent — which is what makes a rest gradeable at all.
 export function expectedOnsets(pattern: RhythmPattern, bpm: number): number[] {
-    const msPerBeat = 60_000 / Math.max(1, bpm);
+    const msPerBeat = quartersMs(1, bpm);
     const starts = cellBeats(pattern);
     const onsets: number[] = [];
     pattern.cells.forEach((cell, index) => {
@@ -262,5 +264,5 @@ export function expectedOnsets(pattern: RhythmPattern, bpm: number): number[] {
 
 // How long the whole pattern lasts, so the surface knows when to stop listening.
 export function patternMs(pattern: RhythmPattern, bpm: number): number {
-    return pattern.bars * pattern.beatsPerBar * (60_000 / Math.max(1, bpm));
+    return quartersMs(pattern.bars * pattern.beatsPerBar, bpm);
 }

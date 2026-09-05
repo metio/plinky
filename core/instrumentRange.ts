@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { HIGHEST, LOWEST } from "./pianoRange";
+
 // Which keys the player's instrument actually has, and what to do about a piece that
 // reaches past them.
 //
@@ -24,13 +26,13 @@ export type InstrumentRange = { from: number; to: number };
 
 // A0 to C8 — the full piano, what the scores assume, and the assumption when nothing
 // better is known.
-export const FULL_PIANO: InstrumentRange = { from: 21, to: 108 };
+export const FULL_PIANO: InstrumentRange = { from: LOWEST, to: HIGHEST };
 
 // The sizes keyboards are actually sold in, each with the span the makers ship it as.
 // Anything else is measured rather than guessed; this list exists only to read a size off
 // a device's own name.
 export const STANDARD_SIZES: readonly { keys: number; range: InstrumentRange }[] = [
-    { keys: 88, range: { from: 21, to: 108 } }, // A0–C8
+    { keys: 88, range: FULL_PIANO }, // A0–C8
     { keys: 76, range: { from: 28, to: 103 } }, // E1–G7
     { keys: 61, range: { from: 36, to: 96 } }, // C2–C7
     { keys: 49, range: { from: 36, to: 84 } }, // C2–C6

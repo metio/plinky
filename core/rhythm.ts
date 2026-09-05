@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { median } from "./stats";
+
 // Timing windows around each note's target time, in milliseconds. A hit within
 // PERFECT_MS counts as perfect; within GOOD_MS as good; otherwise off.
 export const PERFECT_MS = 60;
@@ -62,19 +64,6 @@ export function makeHit(
 // One played note relative to the run's first note: its notated onset (the ideal)
 // and when it was actually played, both in milliseconds.
 export type Onset = { targetMs: number; playedMs: number };
-
-function median(values: number[]): number {
-    if (values.length === 0) {
-        return 0;
-    }
-    const sorted = [...values].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    const high = sorted[mid] ?? 0;
-    if (sorted.length % 2 !== 0) {
-        return high;
-    }
-    return ((sorted[mid - 1] ?? high) + high) / 2;
-}
 
 // The player's pace relative to the score: the median of each gap's played/notated
 // ratio. 1.0 means they matched the notated tempo, 2.0 that they played at half

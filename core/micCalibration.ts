@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { median as statsMedian } from "./stats";
 import type { MicCalibration } from "./pitch";
 import { SILENCE_RMS } from "./pitch";
 
@@ -175,13 +176,10 @@ function clamp(value: number, low: number, high: number): number {
     return Math.max(low, Math.min(high, value));
 }
 
+// Null for nothing heard: the shared median answers 0 for an empty list, and 0 here would
+// read as a note heard at silence.
 function median(xs: number[]): number | null {
-    if (xs.length === 0) {
-        return null;
-    }
-    const sorted = [...xs].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 1 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
+    return xs.length === 0 ? null : statsMedian(xs);
 }
 
 // The p-th value (0..1) of the sorted samples by nearest rank — a robust "peak"

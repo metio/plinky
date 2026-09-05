@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { quartersMs } from "./elapsed";
 import type { RecordedNote } from "./composition";
 
 // Writing a piece down one note at a time, instead of playing it.
@@ -42,12 +43,10 @@ const QUARTERS: Record<StepValue, number> = {
     sixteenth: 0.25,
 };
 
-// A tempo of zero or less would divide to Infinity and poison every onset after it, and
-// tempo arrives from a text field and from shared links.
-const MIN_TEMPO = 1;
-
 export function stepDurationMs(value: StepValue, tempo: number, dotted = false): number {
-    const beatMs = 60_000 / Math.max(MIN_TEMPO, tempo);
+    // quartersMs floors the tempo at one: a tempo of zero or less would divide to Infinity
+    // and poison every onset after it, and tempo arrives from a text field and from links.
+    const beatMs = quartersMs(1, tempo);
     return QUARTERS[value] * beatMs * (dotted ? 1.5 : 1);
 }
 
