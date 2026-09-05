@@ -166,6 +166,40 @@ rocked.
 switch in the moment a redraw was under way left the switch flipped over a sheet
 that never followed it.
 
+**A morning's runs make one sitting even after logging practice for later.** On
+the Stats page, a hand-logged entry for today sits at noon; logged in the morning,
+it made every run before noon a sitting of its own. The runs fold together as they
+always did, and the entry stands apart.
+
+**A glissando no longer silences the other hand.** While Listen swept a glissando,
+whatever the other hand struck at the same moment was left out. It sounds with the
+first note of the sweep now, and the sweep keeps to the beat.
+
+**The share grid names the hands correctly on a song with an accompaniment.** With
+the accompaniment shown on an art song, both rows read "Left hand" and the
+lagging-hand note vanished. Rows are named by the hand that played them.
+
+**Restart while still holding the last chord keeps the run's grade.** Pressing
+Restart or Practice before letting the final keys go saved the take without its
+grade, for good. The run is graded first now.
+
+**The tab that installed Plinky follows updates applied elsewhere.** The first tab
+ever to open Plinky on a device ignored an update another tab applied later and kept
+running the old page over a cache that update had cleared. It reloads like any other
+tab now.
+
+**Collect names catalogue pieces.** The Collect page named a piece from the
+teacher's own library only, so a piece from the catalogue showed as its code. It
+reads the catalogue too.
+
+**A ninth chord on a high root shows its top note.** In the chord explorer and the
+chord changes, a ninth built on B climbed past the two octaves drawn and lost its
+top note off the keyboard and the saved picture. The picture grows to fit.
+
+**Restoring a backup keeps to the file you chose last.** Picking a second file while
+a first, larger one was still being read could let the first one replace everything
+after all. The one you chose last is the one that counts.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to
