@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { expectedOnsets, generateRhythm } from "../../../core/rhythmPattern";
 import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
 import { fakeMidi } from "../../adapters/fakeMidi";
@@ -126,6 +126,27 @@ describe("RhythmTrainer", () => {
         expect(audio.clicks.length).toBeGreaterThan(0);
         unmount();
         expect(audio.clicks).toHaveLength(0);
+    });
+
+    it("draws one rhythm per mount, not one and then another", () => {
+        // The route remounts the trainer on a level or tempo change, so a mount effect
+        // that drew again only ever swapped the first rhythm for a second after the first
+        // paint — visible as one rhythm replaced by another as the page settled.
+        const draws = vi.fn(fixed);
+        const once = vi.fn(fixed);
+        generateRhythm(LEVEL, once);
+        renderWithServices(
+            <MidiProvider>
+                <RhythmTrainer level={LEVEL} bpm={BPM} rng={draws} />
+            </MidiProvider>,
+            {
+                store: memoryStore(),
+                audio: fakeAudioEngine(),
+                midi: fakeMidi(),
+                scheduler: fakeScheduler(),
+            },
+        );
+        expect(draws).toHaveBeenCalledTimes(once.mock.calls.length);
     });
 
     it("cannot be tapped before it has begun", () => {
