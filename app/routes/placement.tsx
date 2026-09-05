@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { generateDrill } from "../../core/drill";
 import type { Grade } from "../../core/grade";
 import {
@@ -14,15 +14,14 @@ import {
     placementRating,
     startPlacement,
 } from "../../core/placement";
-import { unaidedPrefs } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
-import { createFixedPrefsStore } from "../stores/fixedPrefsStore";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { Button } from "../components/ui/button";
-import { ServicesProvider, usePlacementStore, useServices } from "../contexts/services";
+import { ServicesProvider, usePlacementStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/placement";
 import { PageHeader } from "../components/ui/pageHeader";
+import { useUnaidedServices } from "../hooks/useUnaidedServices";
 
 export function meta(_args: Route.MetaArgs) {
     // A personal, data-driven page like the review session: it needs a title (a document
@@ -47,18 +46,11 @@ function drillFor(state: Placement): string {
 
 export default function PlacementRoute() {
     const placement = usePlacementStore();
-    const services = useServices();
     // The drill runs on its own preferences, not the player's. A test that can be taken
     // with the notes falling down a highway, the noteheads coloured and the cursor waiting
     // is not measuring reading — so the aids are fixed off for the subtree, and the set-up
     // panel is not rendered at all rather than rendered inert.
-    const assessed = useMemo(
-        () => ({
-            ...services,
-            prefs: createFixedPrefsStore(unaidedPrefs(services.prefs.load())),
-        }),
-        [services],
-    );
+    const assessed = useUnaidedServices();
     const [live, setLive] = useState<Live | null>(null);
     const saved = placement.load();
 
