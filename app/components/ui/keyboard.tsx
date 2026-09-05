@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type React from "react";
-import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
 import { spokenPitch } from "../../../core/midi";
 import { keyLabelOf } from "../../../core/notes";
 import type { NoteLabels } from "../../../core/prefs";
 import { isWhite, keybedMaxWidthPx, whiteKeys } from "../../../core/keyboardGeometry";
-import { keyState } from "../../../core/keyState";
+import { type KeyState, keyState } from "../../../core/keyState";
 import { m } from "../../paraglide/messages.js";
 import { finishFor, type KeyboardFinish } from "../../../core/keyboardFinish";
 
@@ -474,8 +474,7 @@ export function Keyboard({
     // A sounding black key IS filled, unlike an expected one: the reason an expected black
     // key is only ringed is that "press any black key" must still read as black, and
     // nothing is being asked for here.
-    const blackState = (note: number) => {
-        const state = stateOf(note);
+    const blackState = (state: KeyState) => {
         if (state === "rest") {
             return theme.black;
         }
@@ -489,25 +488,49 @@ export function Keyboard({
     //
     // The expected key keeps its black fill, so its name keeps the pale ink that reads on
     // black; only the states that flood the key with colour change it.
-    const blackLabel = (note: number) =>
-        stateOf(note) === "next" || stateOf(note) === "rest"
-            ? "text-key-black-ink"
-            : "text-key-ink";
+    const blackLabel = (state: KeyState) =>
+        state === "next" || state === "rest" ? "text-key-black-ink" : "text-key-ink";
 
     // What every key carries, whichever colour it is: its name for a screen reader, whether
     // it is sounding, its place in the roving tab order, and the four handlers. Written once
     // so a key cannot be given to the pointer and withheld from the keyboard.
+    //
+    // One handler of each kind for the whole keybed, reading the key off the element it
+    // fired on: this renders once per animation frame while a hold fill shrinks, and four
+    // fresh closures for each of eighty-eight keys a frame was most of that frame's work.
+    const noteOf = (event: { currentTarget: HTMLButtonElement }) =>
+        Number(event.currentTarget.dataset.note);
+    const onKeyClick = (event: React.MouseEvent<HTMLButtonElement>) =>
+        activate(noteOf(event))(event);
+    const onKeyKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) =>
+        keyDown(noteOf(event))(event);
+    const onKeyKeyUp = (event: React.KeyboardEvent<HTMLButtonElement>) =>
+        keyUp(noteOf(event))(event);
+    const onKeyBlur = (event: React.FocusEvent<HTMLButtonElement>) => blur(noteOf(event))();
     const keyProps = (note: number) => ({
         type: "button" as const,
         "aria-label": spokenPitch(note),
         "aria-pressed": lit.has(note),
         tabIndex: note === roved ? 0 : -1,
         "data-note": note,
-        onClick: activate(note),
-        onKeyDown: keyDown(note),
-        onKeyUp: keyUp(note),
-        onBlur: blur(note),
+        onClick: onKeyClick,
+        onKeyDown: onKeyKeyDown,
+        onKeyUp: onKeyKeyUp,
+        onBlur: onKeyBlur,
     });
+    // How many white keys sit left of each black one: one pass over both sorted lists,
+    // rather than a filter over every white key for every black one on every frame.
+    const whitesBefore = useMemo(() => {
+        const counts = new Map<number, number>();
+        let ahead = 0;
+        for (const note of blacks) {
+            while (ahead < whites.length && (whites[ahead] as number) < note) {
+                ahead += 1;
+            }
+            counts.set(note, ahead);
+        }
+        return counts;
+    }, [whites, blacks]);
 
     // What sits ON a key: the shrinking hold fill, and the key's name where names are shown.
     // The label is read ONCE — it was computed twice per key, once to decide whether to draw
@@ -562,13 +585,13 @@ export function Keyboard({
                     ))}
                 </div>
                 {blacks.map((note, index) => {
-                    const whitesBefore = whites.filter((white) => white < note).length;
+                    const state = stateOf(note);
                     // A black key sits over the gap after its white neighbour. When the
                     // range begins or ends on a black key it has no neighbour on one
                     // side, so clamp it within [0, 100%] rather than hang it off the edge.
                     const width = whiteWidth * 0.6;
                     const left = Math.min(
-                        Math.max(0, whitesBefore * whiteWidth - whiteWidth * 0.3),
+                        Math.max(0, (whitesBefore.get(note) ?? 0) * whiteWidth - whiteWidth * 0.3),
                         100 - width,
                     );
                     return (
@@ -580,11 +603,11 @@ export function Keyboard({
                                 width: `${width}%`,
                                 ...(rise ? { animationDelay: `${index * 45}ms` } : {}),
                             }}
-                            className={`${finish.blackKey} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${blackState(note)}`}
+                            className={`${finish.blackKey} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${blackState(state)}`}
                         >
                             {keyFace(
                                 note,
-                                `pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight ${blackLabel(note)}`,
+                                `pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight ${blackLabel(state)}`,
                             )}
                         </button>
                     );
