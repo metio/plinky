@@ -15,7 +15,7 @@
 // — the description says so rather than pretending otherwise.
 
 import { readFileSync } from "node:fs";
-import { slug } from "./pieces.mjs";
+import { folderFor, slug } from "./pieces.mjs";
 
 const SETS = "public/songs/builtin-assignments.json";
 const MANIFEST = "public/songs/manifest.json";
@@ -65,6 +65,28 @@ export function collectionPieces() {
             seen.add(piece.id);
             pieces.push(piece);
         }
+    }
+    // The movements of one work share a title in the manifest — six of a French Suite,
+    // five of an opus of studies — and the folder is composer and title, so they would
+    // all render to one path, each overwriting the last and the stamp beside it vouching
+    // for whichever came last. A repeated folder gets the piece's id on the end, and a
+    // path still taken after that is a list to look at, not a render to run.
+    const wanted = new Map();
+    for (const piece of pieces) {
+        const path = folderFor(piece);
+        wanted.set(path, (wanted.get(path) ?? 0) + 1);
+    }
+    const taken = new Set();
+    for (const piece of pieces) {
+        const path = folderFor(piece);
+        if ((wanted.get(path) ?? 0) > 1) {
+            piece.folder = `${path}-${piece.id.toLowerCase()}`;
+        }
+        const final = folderFor(piece);
+        if (taken.has(final)) {
+            throw new Error(`two collection pieces both want promo/${final}`);
+        }
+        taken.add(final);
     }
     return pieces;
 }
