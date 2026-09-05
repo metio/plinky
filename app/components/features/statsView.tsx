@@ -84,7 +84,6 @@ export function StatsView() {
                 <FeatureBoundary feature="GoingBlock">
                     <GoingBlock
                         history={history.load()}
-                        summary={summary}
                         pieceTitle={pieceTitle}
                         // data.now is the epoch millisecond the page's data was read at —
                         // the same instant every figure is measured against, so a window

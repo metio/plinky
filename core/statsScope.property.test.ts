@@ -5,7 +5,14 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { todayKey } from "./daily";
 import type { History } from "./history";
-import { inScope, type Scope, scopeDays, scopeStart, scopeSummary } from "./statsScope";
+import {
+    inScope,
+    type Scope,
+    scopeDays,
+    scopeStart,
+    scopeSummary,
+    weekSeries,
+} from "./statsScope";
 
 // Any day within a few years either side of the clock, so windows are sometimes empty,
 // sometimes full, and the future is well represented.
@@ -35,6 +42,27 @@ const NARROWER: [Scope, Scope][] = [
     ["month", "year"],
     ["year", "all"],
 ];
+
+describe("the week's day series", () => {
+    it("is exactly the days the week scope counts, in order, ending today", () => {
+        fc.assert(
+            fc.property(history, clock, (log, now) => {
+                const series = weekSeries(log, now);
+                expect(series.length).toBe(scopeDays("week", now));
+                expect(series.at(-1)?.date).toBe(todayKey(now));
+                for (const [at, day] of series.entries()) {
+                    expect(inScope(day.date, "week", now)).toBe(true);
+                    if (at > 0) {
+                        expect(day.date > series[at - 1].date).toBe(true);
+                    }
+                }
+                // What the bars add up to is what the tile above them reports.
+                const notes = series.reduce((sum, day) => sum + day.notes, 0);
+                expect(notes).toBe(scopeSummary(log, "week", now).totalNotes);
+            }),
+        );
+    });
+});
 
 describe("scope windows", () => {
     it("nest: anything a narrow scope counts, a wider one counts too", () => {

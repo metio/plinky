@@ -12,7 +12,7 @@ describe("WeekChart", () => {
     it("scales each day's bar against the busiest day", () => {
         const { container } = render(
             <WeekChart
-                recent={[
+                days={[
                     { date: "2026-07-10", notes: 50 },
                     { date: "2026-07-11", notes: 100 },
                 ]}
@@ -26,7 +26,7 @@ describe("WeekChart", () => {
     });
 
     it("survives an all-zero week without dividing by zero", () => {
-        const { container } = render(<WeekChart recent={[{ date: "2026-07-11", notes: 0 }]} />);
+        const { container } = render(<WeekChart days={[{ date: "2026-07-11", notes: 0 }]} />);
         expect(container.querySelector<HTMLElement>(".bg-chart-peak")?.style.height).toBe("0%");
     });
 });

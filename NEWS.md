@@ -13,7 +13,7 @@ it's ready. This is what's changed, newest first, in plain terms.
 **Your progress no longer vanishes when the catalogue fails to load once.** If the
 list of pieces could not be fetched the moment Plinky opened — a poor connection, a
 hiccup right after an update — everything you had learned read as nothing for the
-rest of the visit: the grade in the header dropped, the You page lost its level, and
+rest of the visit: the grade in the header dropped, the Stats page lost its level, and
 reviews and suggestions came up empty until you reloaded. Plinky now asks again on
 the next look, so the pieces and your progress on them are back the moment the
 connection is.
@@ -24,6 +24,12 @@ nothing at all — the app thought the same keys were already lit — and **Ligh
 off** after a channel change put the lights out on the new channel while the
 instrument kept them burning on the old one. Every light now goes out on the
 channel that lit it, and the test chord lights again on the channels you just set.
+
+**The week's bars show the week.** On the Stats page, the tile for **This week** counts
+from Monday, but the bars beneath it drew the last seven days — so on a Monday the
+tile could say you had played nothing this week while six full bars sat right under
+it. The bars now run from Monday to today, the same days the tile counts, and the
+heading says so.
 
 ## 3 September 2026
 
