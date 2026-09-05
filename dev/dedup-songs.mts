@@ -18,6 +18,7 @@
 import { createReadStream } from "node:fs";
 import { readFile, rm, writeFile } from "node:fs/promises";
 import { parse } from "csv-parse";
+import { licenseDir } from "../core/attribution.ts";
 import { gradeForCost, pieceBoundaries } from "./grading.mts";
 
 const OUT = "public/songs";
@@ -104,7 +105,9 @@ async function main() {
     let removed = 0;
     for (const song of manifest) {
         if (!keptIds.has(song.id)) {
-            await rm(`${OUT}/${song.id}.mxl`, { force: true });
+            // The score sits in its licence's directory; a path that is not there is a
+            // removal that did not happen, and says so rather than counting itself.
+            await rm(`${OUT}/${licenseDir(song.license)}/${song.id}.mxl`);
             removed++;
         }
     }

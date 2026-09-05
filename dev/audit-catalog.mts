@@ -96,7 +96,9 @@ if (APPLY && flagged.length > 0) {
     const drop = new Set(flagged.map((f) => f.id));
     const kept = manifest.filter((song) => !drop.has(song.id));
     for (const f of flagged) {
-        rmSync(`${DIR}/${f.id}.mxl`, { force: true });
+        // The score sits in its licence directory, where scorePath finds it; a path that is
+        // not there is a removal that did not happen.
+        rmSync(scorePath(f.id));
     }
     writeFileSync(`${DIR}/manifest.json`, JSON.stringify(kept));
     console.log(`APPLIED: removed ${flagged.length} scores; manifest now ${kept.length}.`);
