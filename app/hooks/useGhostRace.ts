@@ -170,17 +170,23 @@ export function useGhostRace({
     const arm = useCallback(
         ({
             partial,
+            loop = false,
             ephemeral,
             raceGhost,
             hand,
         }: {
+            // The run began partway through the piece.
             partial: boolean;
+            // The run laps a section rather than playing the piece through: a ghost that
+            // ran the whole piece from bar one would leave the bars being played, paint
+            // notes nobody played, and never reach a verdict.
+            loop?: boolean;
             ephemeral?: boolean;
             raceGhost: boolean;
             hand: Hand;
         }) => {
             const racing = ghostToRace({
-                partial,
+                partial: partial || loop,
                 ephemeral,
                 raceGhost,
                 fastestTake: () => fastestTakeOnsets(services.takes.list(id)),

@@ -199,6 +199,22 @@ describe("useGhostRace", () => {
         expect(result.current.storedGhost).toEqual([0, 700]);
         expect(result.current.sharedFromLink).toBe(false);
     });
+
+    it("does not race a ghost through a piece the run only laps a section of", () => {
+        // Looping bars 3–4 from the top: the resume point says "whole piece", the loop
+        // says otherwise, and a ghost armed for the whole piece would run off through
+        // bars nobody is playing.
+        const { result, services } = harness();
+        services.ghosts.save(SONG, [0, 1000, 2000, 3000]);
+        act(() => {
+            result.current.arm({ partial: false, loop: true, raceGhost: true, hand: "both" });
+        });
+        expect(result.current.ghost).toBeNull();
+        act(() => {
+            result.current.arm({ partial: false, raceGhost: true, hand: "both" });
+        });
+        expect(result.current.ghost).not.toBeNull();
+    });
 });
 
 // A store already holding a ghost for the score — the hook reads it on mount, so it
