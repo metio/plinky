@@ -591,8 +591,11 @@ export function useOsmdScore(
         if (!osmd || !modes || appliedColorRef.current === colorNotes) {
             return;
         }
-        appliedColorRef.current = colorNotes;
+        // Latched where the option is actually set: a toggle during an in-flight reload
+        // reaches an engine that has not loaded yet, and latching before the draw left
+        // the switch flipped over a sheet that never followed.
         redrawInPlace(() => {
+            appliedColorRef.current = colorNotes;
             osmd.setOptions(colorOptions(colorNotes, modes));
         });
     }, [colorNotes, redrawInPlace]);
