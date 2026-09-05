@@ -147,7 +147,9 @@ describe("typicalMs", () => {
 
 describe("normalizeNoteStats", () => {
     it("keeps what could have come from a run", () => {
-        expect(normalizeNoteStats({ "60": { plays: 3, wrongs: 1, totalMs: 900, timed: 3 } })).toEqual({
+        expect(
+            normalizeNoteStats({ "60": { plays: 3, wrongs: 1, totalMs: 900, timed: 3 } }),
+        ).toEqual({
             "60": { plays: 3, wrongs: 1, totalMs: 900, timed: 3 },
         });
     });
