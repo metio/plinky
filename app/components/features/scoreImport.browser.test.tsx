@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { browserStore } from "../../adapters/browserStore";
 import { DEFAULT_DRILL, generateDrill } from "../../../core/drill";
 import { loadBundledScores, loadUserScores } from "../../lib/catalog";
+import { m } from "../../paraglide/messages.js";
 import { ScoreImport } from "./scoreImport";
 
 const mount = () =>
@@ -59,6 +60,21 @@ describe("ScoreImport", () => {
         mount();
         drop(fileInput(), new File([bundled.xml], "dup.musicxml", { type: "application/xml" }));
         expect(await screen.findByText(/already in your library/)).toBeTruthy();
+    });
+
+    it("drops the duplicate warning once the import is confirmed, and again on a fresh start", async () => {
+        const bundled = loadBundledScores()[0];
+        if (!bundled) {
+            throw new Error("no bundled scores");
+        }
+        mount();
+        drop(fileInput(), new File([bundled.xml], "dup.musicxml", { type: "application/xml" }));
+        await screen.findByText(/already in your library/);
+        fireEvent.click(screen.getByRole("button", { name: m.import_confirm() }));
+        await screen.findByRole("button", { name: m.import_add_another() });
+        expect(screen.queryByText(/already in your library/)).toBeNull();
+        fireEvent.click(screen.getByRole("button", { name: m.import_add_another() }));
+        expect(screen.queryByText(/already in your library/)).toBeNull();
     });
 
     it("rejects a file with no playable notes", async () => {

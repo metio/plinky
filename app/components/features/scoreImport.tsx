@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { readScoreFile } from "../../../core/musicxmlFile";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import {
@@ -53,6 +53,9 @@ export function ScoreImport() {
     const [dragOver, setDragOver] = useState(false);
     const [savedId, setSavedId] = useState<string | null>(null);
     const [duplicate, setDuplicate] = useState(false);
+    // Which pick is current, so a slower earlier file cannot land its draft over a later
+    // one: two reads wait here, the file and the manifest, and either can lose the race.
+    const readSeq = useRef(0);
 
     const handleFile = async (file: File | undefined) => {
         setError(null);
@@ -61,7 +64,11 @@ export function ScoreImport() {
         if (!file) {
             return;
         }
+        const mine = ++readSeq.current;
         const xml = await readScoreFile(file);
+        if (mine !== readSeq.current) {
+            return;
+        }
         if (xml === null) {
             setError(m.import_read_error());
             return;
@@ -74,9 +81,12 @@ export function ScoreImport() {
         // the song catalogue, or previously imported, flag it as a duplicate.
         const id = songId(xml);
         const known = new Set(loadCatalog(store).map((entry) => entry.id));
-        setDuplicate(
-            known.has(id) || ((await songs.manifest()) ?? []).some((song) => song.id === id),
-        );
+        const inCatalogue =
+            known.has(id) || ((await songs.manifest()) ?? []).some((song) => song.id === id);
+        if (mine !== readSeq.current) {
+            return;
+        }
+        setDuplicate(inCatalogue);
         const meta = readScoreMeta(xmlCodec, xml);
         setDraft({
             xml,
@@ -121,6 +131,7 @@ export function ScoreImport() {
             return;
         }
         setDraft(null);
+        setDuplicate(false);
         setSavedId(score.id);
     };
 
@@ -128,6 +139,7 @@ export function ScoreImport() {
         setDraft(null);
         setError(null);
         setSavedId(null);
+        setDuplicate(false);
     };
 
     const set = (patch: Partial<Draft>) =>
