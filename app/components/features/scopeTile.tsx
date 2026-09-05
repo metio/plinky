@@ -6,6 +6,7 @@ import type { Scope, ScopeSummary } from "../../../core/statsScope";
 import { ShareButtons } from "./shareButtons";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
+import { StatTile } from "../ui/statTile";
 
 // What the window is called, in the reader's own language. A calendar scope has a name —
 // August 2026, 2026 — where a rolling one could only be described, which is half the reason
@@ -51,8 +52,18 @@ export function ScopeTile({
         <section className="space-y-4 rounded-xl border border-accent-line bg-gradient-to-br from-accent-surface to-ghost-surface p-5 dark:to-ghost-surface/40">
             <h3 className="font-semibold text-accent-ink text-lg">{name}</h3>
             <div className="flex gap-8">
-                <Stat value={summary.totalNotes} label={m.progress_notes_played()} />
-                <Stat value={summary.daysPracticed} label={m.progress_days_practiced()} />
+                <StatTile
+                    value={summary.totalNotes}
+                    label={m.progress_notes_played()}
+                    framed={false}
+                    tone="accent"
+                />
+                <StatTile
+                    value={summary.daysPracticed}
+                    label={m.progress_days_practiced()}
+                    framed={false}
+                    tone="accent"
+                />
             </div>
             {summary.bestDay && (
                 <p className="text-muted text-sm">
@@ -70,16 +81,5 @@ export function ScopeTile({
                 imageText={boast}
             />
         </section>
-    );
-}
-
-function Stat({ value, label }: { value: number; label: string }) {
-    return (
-        <div>
-            <div className="font-bold text-3xl text-accent-strong tabular-nums">
-                {value.toLocaleString(getLocale())}
-            </div>
-            <div className="text-muted text-xs uppercase tracking-wide">{label}</div>
-        </div>
     );
 }

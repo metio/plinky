@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**The Stats page counts in one hand.** Its figures — days practised, notes played,
+time at the keys — were drawn in three different tile styles depending on which part
+of the page held them, and only one of the three wrote a big number the way your
+language does. Every figure is the same tile now.
+
 **A piece opens faster on a phone.** The strip of notation above the keys used to
 engrave the whole piece a second time, beside the full score above it; on a long
 piece that was seconds of waiting before the first note could be played. It now

@@ -3,6 +3,7 @@
 
 import { m } from "../../paraglide/messages.js";
 import { Show } from "./conditional";
+import { StatTile } from "../ui/statTile";
 
 // The headline card: which grade you're at, the skill rating beside it, and the
 // crossed-swords badge when the opt-in competitive decay is on.
@@ -57,15 +58,6 @@ export function StandingKey() {
     );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="rounded-md border border-line p-4">
-            <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
-            <div className="font-mono text-3xl tabular-nums">{value}</div>
-        </div>
-    );
-}
-
 // The two lifetime activity tiles under the standing card.
 export function ActivityStats({
     daysPracticed,
@@ -76,8 +68,8 @@ export function ActivityStats({
 }) {
     return (
         <div className="grid grid-cols-2 gap-4">
-            <Stat label={m.progress_days_practiced()} value={String(daysPracticed)} />
-            <Stat label={m.progress_notes_played()} value={String(totalNotes)} />
+            <StatTile label={m.progress_days_practiced()} value={daysPracticed} />
+            <StatTile label={m.progress_notes_played()} value={totalNotes} />
         </div>
     );
 }

@@ -6,6 +6,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { ActivityStats, Standing } from "./standing";
 import { m } from "../../paraglide/messages.js";
+import { getLocale } from "../../paraglide/runtime.js";
 
 afterEach(cleanup);
 
@@ -29,6 +30,6 @@ describe("ActivityStats", () => {
         render(<ActivityStats daysPracticed={12} totalNotes={3456} />);
         expect(screen.getByText(m.progress_days_practiced())).toBeTruthy();
         expect(screen.getByText("12")).toBeTruthy();
-        expect(screen.getByText("3456")).toBeTruthy();
+        expect(screen.getByText((3456).toLocaleString(getLocale()))).toBeTruthy();
     });
 });
