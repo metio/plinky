@@ -29,8 +29,8 @@ export const SEMITONE: Record<string, number> = {
 
 // The order sharps and flats are added to a key signature — the circle of fifths
 // read outward from C in each direction.
-const SHARP_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
-const FLAT_ORDER = ["B", "E", "A", "D", "G", "C", "F"];
+export const SHARP_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
+export const FLAT_ORDER = ["B", "E", "A", "D", "G", "C", "F"];
 
 // The alteration a key signature applies to a letter, so notes can be spelled from
 // plain letters and the signature supplies the sharps and flats.
@@ -91,6 +91,26 @@ export function keyLabelOf(midi: number, labels: NoteLabels): KeyLabel {
 // convention MusicXML and every module here already assume.
 export function midiOf(step: string, octave: number, alter = 0): number {
     return (octave + 1) * 12 + (SEMITONE[step] ?? 0) + alter;
+}
+
+// The sounding pitch a MusicXML <pitch> element writes, as a MIDI number, or null when
+// it names no letter or an unreadable alteration or octave. An absent octave reads as 4,
+// the octave middle C sits in. The one reader every walk over the notation shares — the
+// arithmetic was written six times and had begun to disagree about an absent octave.
+export function pitchMidiOf(pitch: Element): number | null {
+    const first = (tag: string): string | null =>
+        pitch.getElementsByTagName(tag)[0]?.textContent?.trim() ?? null;
+    const step = (first("step") ?? "").toUpperCase();
+    if (SEMITONE[step] === undefined) {
+        return null;
+    }
+    const octaveText = first("octave");
+    const octave = octaveText === null || octaveText === "" ? 4 : Number(octaveText);
+    const alter = Number(first("alter") ?? "0");
+    if (!Number.isFinite(octave) || !Number.isFinite(alter)) {
+        return null;
+    }
+    return midiOf(step, octave, alter);
 }
 
 // How each of the twelve pitch classes is written, sharp-side and flat-side.

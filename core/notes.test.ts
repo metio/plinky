@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
+// @vitest-environment jsdom
 
 import { describe, expect, it } from "vitest";
-import { alterFor, keyLabelOf, LETTERS, SEMITONE, solfegeOf } from "./notes";
+import { alterFor, keyLabelOf, LETTERS, pitchMidiOf, SEMITONE, solfegeOf } from "./notes";
 
 describe("the note facts", () => {
     it("names the seven letters in scale order", () => {
@@ -104,5 +105,26 @@ describe("keyLabelOf", () => {
         // its sign would label them by the wrong pitch class.
         expect(keyLabelOf(36, "c")).toEqual({ kind: "letter", letter: "C" });
         expect(keyLabelOf(0, "all")).toEqual({ kind: "letter", letter: "C" });
+    });
+});
+
+describe("pitchMidiOf", () => {
+    const pitch = (inner: string) =>
+        new DOMParser().parseFromString(`<pitch>${inner}</pitch>`, "application/xml")
+            .documentElement;
+
+    it("reads the letter, the alteration and the octave", () => {
+        expect(pitchMidiOf(pitch("<step>C</step><octave>4</octave>"))).toBe(60);
+        expect(pitchMidiOf(pitch("<step>e</step><alter>-1</alter><octave>5</octave>"))).toBe(75);
+    });
+
+    it("reads an absent octave as the one middle C sits in", () => {
+        expect(pitchMidiOf(pitch("<step>C</step>"))).toBe(60);
+    });
+
+    it("answers null for no letter or an unreadable number", () => {
+        expect(pitchMidiOf(pitch("<octave>4</octave>"))).toBeNull();
+        expect(pitchMidiOf(pitch("<step>C</step><octave>four</octave>"))).toBeNull();
+        expect(pitchMidiOf(pitch("<step>C</step><alter>x</alter><octave>4</octave>"))).toBeNull();
     });
 });

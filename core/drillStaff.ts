@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { spellMidi } from "./notes";
 import type { Hand } from "./fingering";
 
 // Renders a fingering drill as MusicXML so it can be read on a real staff. The
@@ -10,27 +11,13 @@ import type { Hand } from "./fingering";
 
 // Pitch class → its diatonic letter and accidental. Drills are C-major (white
 // keys), but the sharp spelling keeps it correct for any incidental black key.
-const SPELL: Record<number, { step: string; alter: number }> = {
-    0: { step: "C", alter: 0 },
-    1: { step: "C", alter: 1 },
-    2: { step: "D", alter: 0 },
-    3: { step: "D", alter: 1 },
-    4: { step: "E", alter: 0 },
-    5: { step: "F", alter: 0 },
-    6: { step: "F", alter: 1 },
-    7: { step: "G", alter: 0 },
-    8: { step: "G", alter: 1 },
-    9: { step: "A", alter: 0 },
-    10: { step: "A", alter: 1 },
-    11: { step: "B", alter: 0 },
-};
-
 const QUARTER_DIVISIONS = 2;
 const BEATS_PER_BAR = 4;
 
 function noteXml(pitch: number, chord: boolean): string {
-    const spelling = SPELL[((pitch % 12) + 12) % 12]!;
-    const octave = Math.floor(pitch / 12) - 1;
+    // Sharp-side, the spelling a key of no sharps or flats asks for.
+    const spelling = spellMidi(pitch, false);
+    const octave = spelling.octave;
     const alter = spelling.alter === 0 ? "" : `<alter>${spelling.alter}</alter>`;
     const chordTag = chord ? "<chord/>" : "";
     return `<note>${chordTag}<pitch><step>${spelling.step}</step>${alter}<octave>${octave}</octave></pitch><duration>${QUARTER_DIVISIONS}</duration><type>quarter</type></note>`;
