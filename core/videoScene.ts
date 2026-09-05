@@ -307,3 +307,18 @@ export function keyboardHeightFor(asked: number, whiteWidth: number): number {
     }
     return Math.min(Math.max(asked, whiteWidth * KEY_SHORTEST), whiteWidth * KEY_LONGEST);
 }
+
+// Whether a step's box lies anywhere inside the window the painter shows of the sheet.
+// A tint for a box outside it is clipped away after the whole fill has been issued, and
+// a long take issues that fill for every played step of every frame.
+export function boxInWindow(
+    box: { x: number; y: number; width: number; height: number },
+    window: { left: number; top: number; width: number; height: number },
+): boolean {
+    return (
+        box.x + box.width >= window.left &&
+        box.x <= window.left + window.width &&
+        box.y + box.height >= window.top &&
+        box.y <= window.top + window.height
+    );
+}

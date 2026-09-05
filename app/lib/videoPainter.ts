@@ -14,10 +14,11 @@ import {
 } from "../../core/videoLook";
 import { frameAt, LEAD_IN_MS, pressGlow } from "../../core/videoFrames";
 import {
+    boxInWindow,
     highwayBlocks,
+    keyboardHeightFor,
     playedStepCount,
     type SceneKey,
-    keyboardHeightFor,
     sceneKeys,
     sceneRange,
     type ScoreBox,
@@ -543,6 +544,22 @@ export function takeScenePainter({
     const onsets = [...new Set(notes.map((note) => note.startMs))].sort((a, b) => a - b);
     const keyLayout = keyLayoutFor(width, margin, keyboardTop, keyboardHeight, keyColors, finish);
 
+    // Each step's centre along the reading axis, computed once per sheet: the sheet is
+    // fixed for the painter's life and this ran for every step on every frame.
+    const centerCache = new WeakMap<SceneScore, number[]>();
+    const centersOf = (sheet: SceneScore): number[] => {
+        const known = centerCache.get(sheet);
+        if (known) {
+            return known;
+        }
+        const centers = sheet.steps.map((group) => {
+            const box = group[0];
+            return box ? (treadmill ? box.x + box.width / 2 : box.y + box.height / 2) : 0;
+        });
+        centerCache.set(sheet, centers);
+        return centers;
+    };
+
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
         paintChrome(context, cfg);
@@ -584,10 +601,7 @@ export function takeScenePainter({
             : { y: height * 0.3, height: height * 0.32 };
         const played = playedStepCount(onsets, currentOnsetMs);
         // The window glides between step centres with the music, never jumping.
-        const centers = sheet.steps.map((group) => {
-            const box = group[0];
-            return box ? (treadmill ? box.x + box.width / 2 : box.y + box.height / 2) : 0;
-        });
+        const centers = centersOf(sheet);
         const center = stepCenterAt(onsets, centers, timeMs - LEAD_IN_MS);
 
         // The treadmill slides a horizontal window sized to show a musical
@@ -624,11 +638,17 @@ export function takeScenePainter({
         context.fill();
         context.clip();
         context.drawImage(sheet.image, left, top, windowW, windowH, panelX, panelY, panelW, panelH);
-        // Tint the played steps' noteheads; the freshest press reads strongest.
+        // Tint the played steps' noteheads; the freshest press reads strongest. Only the
+        // ones the window shows: the rest would be clipped away after the fill was issued,
+        // and a long take issues that fill for every played step of every frame.
+        const window = { left, top, width: windowW, height: windowH };
         for (let index = 0; index < played && index < sheet.steps.length; index++) {
             context.fillStyle = ACCENT;
             context.globalAlpha = index === played - 1 ? 0.5 : 0.3;
             for (const box of sheet.steps[index] ?? []) {
+                if (!boxInWindow(box, window)) {
+                    continue;
+                }
                 context.beginPath();
                 context.roundRect(
                     panelX + (box.x - left - 1) * scale,
