@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useState } from "react";
-import { Link } from "react-router";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { useMidiInput } from "../contexts/midi";
 import { PianoKeyboard } from "../components/features/pianoKeyboard";
 import { PageHeader } from "../components/ui/pageHeader";
