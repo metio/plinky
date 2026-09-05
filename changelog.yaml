@@ -136,6 +136,29 @@
     - |-
       **The keyboard's note-name button says "Do re mi" when that is what it shows.** For
       a screen reader it announced "Off" instead.
+    - |-
+      **A note that moved you on is scored as you played it.** With the forgiving setting
+      on, the note that carried you into the next position was recorded as if nobody had
+      struck it, and its loudness was marked as silence. It carries its own loudness now,
+      and a note the app credited without hearing stays out of the expression reading
+      altogether.
+    - |-
+      **A first-time bar longer than two bars plays as written.** The bars in the middle
+      of a longer first ending were played on every pass, so a three-bar ending came
+      round again the second time through. The whole bracket is skipped now.
+    - |-
+      **A chromatic scale in a flat or sharp key starts on its own tonic.** The E-flat
+      chromatic scale began on E natural and spelled its tonic as D sharp; it starts on
+      E flat, and every octave is written as E flat.
+    - |-
+      **A tremolo leaves the other hand's note alone.** A rocking tremolo in the left
+      hand also rocked whatever the right hand struck at the same moment, so a melody
+      note was repeated eight times a bar. Only the chord that carries the mark is
+      rocked.
+    - |-
+      **Colouring the notes while the sheet is redrawing takes.** Flipping the colour
+      switch in the moment a redraw was under way left the switch flipped over a sheet
+      that never followed it.
 - date: 2026-09-03
   entries:
     - |-
