@@ -19,7 +19,9 @@ vi.mock("../lib/scoreColor", () => ({
 // One voice at a position: a MIDI pitch on a staff (0 = right, 1 = left) with a
 // written length in quarter notes, or a rest carrying only a length.
 // staff omitted models a note whose engraved ParentStaff is undefined.
-type Voice = { midi: number; staff?: number; quarters?: number } | { rest: number };
+type Voice =
+    | { midi: number; staff?: number; quarters?: number; tie?: "start" | "stop" }
+    | { rest: number };
 
 // A cursor over a fixed sequence of positions, standing in for the OSMD graphic.
 // EndReached turns true once the walk steps past the last position, so the
@@ -46,6 +48,8 @@ function fakeOsmd(positions: Voice[][]) {
                     : {
                           isRest: (): boolean => false,
                           halfTone: voice.midi - 12,
+                          // A tie's later note reports a tie whose start is another note.
+                          ...(voice.tie === "stop" ? { NoteTie: { StartNote: {} } } : {}),
                           ParentStaff:
                               voice.staff === undefined
                                   ? undefined
@@ -123,6 +127,17 @@ describe("collectKeepUpSteps", () => {
             stretch: 1,
             advancesCursor: true,
         });
+    });
+
+    it("asks for no re-strike of a tie's later note, but still dwells its length", () => {
+        // The key is already down; demanding it again scores a held tie as a miss and has
+        // the guide strike it twice. The self-paced matcher and Listen read the tie so.
+        const steps = collectKeepUpSteps(
+            fakeOsmd([[{ midi: 60, tie: "start" }], [{ midi: 60, tie: "stop" }], [{ midi: 62 }]]),
+            "both",
+        );
+        expect(steps.map((step) => step.play.map((note) => note.pitch))).toEqual([[60], [], [62]]);
+        expect(steps[1]?.lengths).toEqual([1]);
     });
 
     it("leaves a note with no engraved staff out of a single hand's beats, as self-paced does", () => {
