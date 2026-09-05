@@ -79,8 +79,11 @@ export function fingerQualities(
     // Seconds before each position sounds. Judging a choice against advice given under
     // different prices would mark a player wrong for the fingering they were shown.
     gaps?: number[],
+    // The fingering to judge against, when the caller already holds it: the strip shows
+    // the optimum and re-judges on every note edited, and running the optimiser again for
+    // each edit is the same answer at the same price.
+    suggested: number[][] = fingerPositions(positions, hand, span, gaps),
 ): (FingerQuality | null)[] {
-    const suggested = fingerPositions(positions, hand, span, gaps);
     return positions.map((_, i) => {
         const here = fingers[i];
         if (!filled(here)) {
