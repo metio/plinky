@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**A piece that speeds up is graded at the speed it reaches.** The difficulty
+model read a piece's pace off its opening tempo alone, so a study that starts
+slowly and then flies was graded as slow. It now reads each note at the tempo in
+force where it is written, and a few pieces have moved a grade to match.
+
 **The Stats page counts in one hand.** Its figures — days practised, notes played,
 time at the keys — were drawn in three different tile styles depending on which part
 of the page held them, and only one of the three wrote a big number the way your
