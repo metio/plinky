@@ -12,7 +12,6 @@ import {
     removeUserScore,
     resolveScore,
     saveUserScore,
-    slugify,
 } from "./catalog";
 import { browserStore } from "../adapters/browserStore";
 import { memoryStore } from "../adapters/memoryStore";
@@ -112,13 +111,6 @@ describe("library export packs", () => {
         }
         // Each exported score is self-contained: the MusicXML rides along.
         expect(pack.scores.every((s: { xml?: string }) => typeof s.xml === "string")).toBe(true);
-    });
-});
-
-describe("slugify", () => {
-    it("makes a url-safe id, falling back to 'score'", () => {
-        expect(slugify("Für Elise!")).toBe("f-r-elise");
-        expect(slugify("   ")).toBe("score");
     });
 });
 

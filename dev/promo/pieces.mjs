@@ -19,6 +19,7 @@
 // is not the title a catalogue entry needs. Do not sync them.
 
 import { canonicalComposer, personSlug } from "../../core/person.ts";
+import { slugify } from "../../core/slug.ts";
 
 export const PIECES = [
     { id: "TOBNVaraGATl", title: "Gymnopédie No. 1", composer: "Erik Satie" },
@@ -149,10 +150,5 @@ export function folderForComposer(composer) {
 // Shared with the collections, which need folder names cut the same way — a set and a
 // piece landing on differently-shaped paths would be two answers to one question.
 export function slug(title) {
-    return title
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
+    return slugify(title);
 }
