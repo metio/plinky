@@ -25,7 +25,7 @@ import { copyrightReason } from "./copyrightSignals.mts";
 import { isPublicDomain } from "./publicDomain.mts";
 import { legibleTitle, usableTitle } from "./legibleTitle.mts";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { strFromU8, unzipSync } from "fflate";
+import { decompressMxl } from "../core/musicxmlFile.ts";
 import { gradeForCost, pieceBoundaries } from "./grading.mts";
 import {
     nonPianoVocalReason,
@@ -162,12 +162,36 @@ function cpdlCredit(file: string): string | undefined {
     return cpdlPlan.get(slug);
 }
 
-// The same slug dev/cpdl-harvest.py builds its filenames from.
-const cpdlSlug = (composer: string, title: string): string =>
+// The same slug dev/cpdl-harvest.py builds its filenames from — including its cut at
+// seventy characters, which the file name carries and the plan entry does not. A slug
+// built without the cut misses every long name, and a CC-BY edition then ships without
+// the engraver credit the licence requires.
+export const cpdlSlug = (composer: string, title: string): string =>
     `${composer}-${title}`
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 70)
+        .replace(/-+$/g, "");
+
+// The engraver credit for a file, from the source that knows it. A licence that requires
+// attribution and a source that can name the engraver must agree: a CC-BY edition without
+// its credit is a piece the catalogue may not ship, and an import that lost the join (as a
+// slug cut differently on each side once did, for every CPDL row) fails here rather than
+// shipping six hundred uncredited editions.
+function creditOf(
+    cfg: SourceConfig,
+    file: string,
+    requiresAttribution: boolean,
+): string | undefined {
+    const credit = cfg.creditFor?.(file);
+    if (cfg.creditFor && requiresAttribution && !credit) {
+        throw new Error(
+            `${file}: the licence requires attribution and the source names no engraver`,
+        );
+    }
+    return credit;
+}
 
 const CONFIGS: Record<string, SourceConfig> = {
     "openscore-lieder": {
@@ -278,15 +302,11 @@ const _norm = (value: string): string => (value || "").toLowerCase().trim().repl
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
 function readMxlFrom(bytes: Buffer): string {
-    const entries = unzipSync(new Uint8Array(bytes));
-    const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
-    const root =
-        container.match(/full-path="([^"]+)"/)?.[1] ??
-        Object.keys(entries).find((name) => name.endsWith(".xml") && !name.startsWith("META-INF"));
-    if (!root || !entries[root]) {
+    const xml = decompressMxl(new Uint8Array(bytes));
+    if (xml === null) {
         throw new Error("no rootfile");
     }
-    return strFromU8(entries[root]);
+    return xml;
 }
 
 const tagText = (xml: string, tag: string): string =>
@@ -523,7 +543,7 @@ async function main() {
             license,
             source: key,
             scoreKind: typeof cfg.kind === "function" ? cfg.kind(xml) : cfg.kind,
-            credit: cfg.creditFor?.(file),
+            credit: creditOf(cfg, file, info.requiresAttribution),
             // The opening bars, so a list can draw the mark that names a piece without
             // fetching its notation. Computed here from the score already in hand and
             // already repaired, rather than by a pass afterwards that reads every file in

@@ -10,7 +10,7 @@
 // Run under tsx: `npx tsx dev/audit-catalog.mts`
 
 import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { strFromU8, unzipSync } from "fflate";
+import { decompressMxl } from "../core/musicxmlFile.ts";
 import { copyrightReason } from "./copyrightSignals.mts";
 import { nonPianoReason } from "./scoreInstrument.mts";
 
@@ -39,20 +39,11 @@ function scorePath(id: string): string {
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
 function readMusicXml(id: string): string {
-    const entries = unzipSync(new Uint8Array(readFileSync(scorePath(id))));
-    const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
-    const root =
-        container.match(/full-path="([^"]+)"/)?.[1] ??
-        // Mutopia names its entry .musicxml, so match both rather than ".xml" alone.
-        Object.keys(entries).find(
-            (name) =>
-                (name.endsWith(".xml") || name.endsWith(".musicxml")) &&
-                !name.startsWith("META-INF"),
-        );
-    if (!root || !entries[root]) {
-        throw new Error("no rootfile");
+    const xml = decompressMxl(new Uint8Array(readFileSync(scorePath(id))));
+    if (xml === null) {
+        throw new Error(`no rootfile in ${scorePath(id)}`);
     }
-    return strFromU8(entries[root]);
+    return xml;
 }
 
 const flagged: { id: string; title: string; reason: string }[] = [];
