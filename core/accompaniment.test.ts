@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
-import { stavesPerPart, stripAccompaniment } from "./accompaniment";
+import { pianoPart, stavesPerPart, stripAccompaniment } from "./accompaniment";
 
 const part = (id: string, staves?: number) =>
     `<part id="${id}"><measure number="1"><attributes>${
@@ -80,5 +80,18 @@ describe("stripAccompaniment", () => {
         const xml = score(["V", "P"], part("V") + part("P", 2));
         const doc = domXmlCodec.parse(stripAccompaniment(domXmlCodec, xml));
         expect(doc?.querySelectorAll("note")).toHaveLength(1);
+    });
+});
+
+describe("pianoPart", () => {
+    it("names the part stripAccompaniment keeps", () => {
+        const song = score(["V", "P"], part("V") + part("P", 2));
+        expect(pianoPart(domXmlCodec.parse(song)!)?.getAttribute("id")).toBe("P");
+        const solo = domXmlCodec.parse(stripAccompaniment(domXmlCodec, song))!;
+        expect(pianoPart(solo)?.getAttribute("id")).toBe("P");
+    });
+
+    it("is null for a score with no part", () => {
+        expect(pianoPart(domXmlCodec.parse("<score-partwise/>")!)).toBeNull();
     });
 });

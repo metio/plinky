@@ -8,6 +8,7 @@ import {
     scoreToBars,
     scoreToTimedBars,
     staffFor,
+    timedBarsOf,
     windowCells,
     windowPositions,
 } from "./scoreToBars";
@@ -97,5 +98,28 @@ describe("scoreToBars", () => {
             { bar: 0, pos: 1 },
             { bar: 1, pos: 0 },
         ]);
+    });
+});
+
+describe("which part is read", () => {
+    // An art song: the singer's line on one staff, then the piano on two.
+    const SONG = `<score-partwise><part id="V">
+  <measure number="1">${note("A", 4, 1)}${note("B", 4, 1)}</measure>
+</part><part id="P">
+  <measure number="1"><attributes><staves>2</staves></attributes>${note("C", 4, 1)}${note("C", 3, 2)}</measure>
+</part></score-partwise>`;
+
+    it("reads the piano's part, not the singer's above it", () => {
+        expect(scoreToBars(domXmlCodec, SONG, 1)).toEqual([[[60]]]);
+        expect(scoreToBars(domXmlCodec, SONG, 2)).toEqual([[[48]]]);
+    });
+
+    it("hands back each position's note elements beside its pitches", () => {
+        const doc = domXmlCodec.parse(XML)!;
+        const { bars, notes } = timedBarsOf(doc, 1);
+        expect(notes.map((bar) => bar.map((position) => position.length))).toEqual(
+            bars.map((bar) => bar.map((position) => position.length)),
+        );
+        expect(notes[0]?.[0]?.[1]?.querySelector("chord")).not.toBeNull();
     });
 });

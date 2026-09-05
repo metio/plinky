@@ -26,6 +26,28 @@ export function stavesPerPart(doc: Document): number[] {
     );
 }
 
+function partElements(doc: Document): Element[] {
+    return Array.from(doc.querySelectorAll("score-partwise > part, score-timewise > part"));
+}
+
+// The played instrument's <part>: the one partsOf names the staves of, found by walking
+// the same running offsets it does. Null when the score has no part at all. Every reader
+// of the piano's notes — the fingering, the strip's bars — goes through this, so that on
+// an art song they all read the piano and none of them the singer written above it.
+export function pianoPart(doc: Document): Element | null {
+    const parts = partElements(doc);
+    const counts = stavesPerPart(doc);
+    const { right } = partsOf(counts);
+    let running = 0;
+    for (const [index, count] of counts.entries()) {
+        if (right >= running && right < running + count) {
+            return parts[index] ?? null;
+        }
+        running += count;
+    }
+    return null;
+}
+
 // Removes every part but the played instrument's, along with its entry in the part list
 // so the score's header no longer names a musician who is not there. Returns the input
 // unchanged when the score has one part, when nothing is well-formed, or when the layout
@@ -36,31 +58,17 @@ export function stripAccompaniment(codec: XmlCodec, xml: string): string {
     if (!doc) {
         return xml;
     }
-    const parts = Array.from(doc.querySelectorAll("score-partwise > part, score-timewise > part"));
+    const parts = partElements(doc);
     if (parts.length < 2) {
         return xml;
     }
-
-    const counts = stavesPerPart(doc);
-    // partsOf names staves; the part that owns the upper one is the part to keep, found by
-    // walking the same running offsets it does.
-    const { right } = partsOf(counts);
-    let running = 0;
-    let keep = -1;
-    for (const [index, count] of counts.entries()) {
-        if (right >= running && right < running + count) {
-            keep = index;
-        }
-        running += count;
-    }
-    if (keep < 0) {
+    const kept = pianoPart(doc);
+    if (!kept) {
         return xml;
     }
-
-    const kept = parts[keep] as Element;
     const keptId = kept.getAttribute("id");
-    for (const [index, part] of parts.entries()) {
-        if (index !== keep) {
+    for (const part of parts) {
+        if (part !== kept) {
             part.remove();
         }
     }
