@@ -37,7 +37,7 @@
 // Removing songs shifts the grade boundaries, so run `npm run songs:bake` afterwards.
 
 import { midiOf } from "../core/notes.ts";
-import { readdir, readFile, rm } from "node:fs/promises";
+import { readFile, rm } from "node:fs/promises";
 import { sameOpening } from "../core/incipit.ts";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { canonicalComposer } from "../core/person.ts";
@@ -45,9 +45,9 @@ import { BEYOND_REPAIR, beyondThePiano } from "../core/pianoRange.ts";
 import { quantiserMarks } from "../core/transcriptionQuality.ts";
 import { sameWork, workTitle } from "../core/workTitle.ts";
 import type { SongMeta } from "../core/catalogMeta.ts";
-import { readSongs, writeSongs } from "./manifest.mts";
+import { readSongs, scoreFiles, writeSongs } from "./manifest.mts";
 
-const OUT = "public/songs";
+const _OUT = "public/songs";
 // Duplicates a person found that the automatic test cannot: two copies of one work whose
 // TITLES name different things — a movement against the suite it belongs to, say — which
 // `sameWork` holds apart on purpose, because that is also what keeps Bach's two Menuets and
@@ -64,21 +64,6 @@ const EXCLUDED = "dev/catalog-excluded.json";
 // Where each .mxl actually lives. The manifest names a licence and the files sit in a
 // directory per licence — an earlier version of this deleted `public/songs/<id>.mxl`, which
 // is nowhere, so every removal it made left its file orphaned on disk.
-async function locate(): Promise<Map<string, string>> {
-    const at = new Map<string, string>();
-    for (const entry of await readdir(OUT, { withFileTypes: true })) {
-        if (!entry.isDirectory() || entry.name === "index") {
-            continue;
-        }
-        for (const file of await readdir(`${OUT}/${entry.name}`)) {
-            if (file.endsWith(".mxl")) {
-                at.set(file.replace(/\.mxl$/, ""), `${OUT}/${entry.name}/${file}`);
-            }
-        }
-    }
-    return at;
-}
-
 // Whether the score carries notes so far outside the keyboard that they are not a
 // part of the music written in the wrong octave but something stapled onto it.
 //
@@ -100,7 +85,7 @@ function phantomVoice(xml: string): boolean {
 async function main() {
     const check = process.argv.includes("--check");
     const manifest = await readSongs();
-    const at = await locate();
+    const at = scoreFiles();
 
     const machine: SongMeta[] = [];
     for (const song of manifest) {

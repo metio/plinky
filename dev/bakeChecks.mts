@@ -10,12 +10,13 @@
 // follow either. Every one of them is a number somebody could change without touching the
 // catalogue, and grades derived from stale ones are wrong in a way nothing downstream sees.
 
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { encodeIncipit, readIncipit } from "../core/incipit.ts";
 import { rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
+import { scorePath } from "./manifest.mts";
 
-const SONGS = "public/songs";
+const _SONGS = "public/songs";
 
 export type ProbeSong = {
     id: string;
@@ -65,21 +66,11 @@ export async function staleSong(songs: ProbeSong[]): Promise<string | null> {
         return null;
     }
     const { decompressMxl } = await import("../core/musicxmlFile.ts");
-    const buckets = (await readdir(SONGS, { withFileTypes: true }))
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => entry.name);
     const step = Math.max(1, Math.floor(songs.length / SONG_PROBES));
     for (let i = 0; i < songs.length; i += step) {
         const song = songs[i]!;
-        const bucket = song.license?.toLowerCase();
-        const paths = bucket ? [bucket, ...buckets] : buckets;
-        let bytes: Buffer | null = null;
-        for (const path of paths) {
-            bytes = await readFile(`${SONGS}/${path}/${song.id}.mxl`).catch(() => null);
-            if (bytes) {
-                break;
-            }
-        }
+        const path = scorePath(song.id, song.license);
+        const bytes = path === null ? null : await readFile(path).catch(() => null);
         const named = song.title ?? song.id;
         // A row whose score cannot be read is a row the app cannot open: a problem to
         // name, not a probe to skip.

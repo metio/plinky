@@ -29,7 +29,8 @@ import {
 } from "../core/scoreDifficulty.ts";
 import { buildExerciseId, type ExerciseConfig } from "../core/exerciseGen.ts";
 import type { SongMeta } from "../core/catalogMeta.ts";
-import { readExercises, readSongs } from "./manifest.mts";
+import { readExercises, readSongs, scorePath } from "./manifest.mts";
+import { matchWork } from "./works.mts";
 
 export type Anchor = {
     grade: number;
@@ -90,14 +91,9 @@ function scoreXml(buffer: Buffer): string {
 // nineteen collections while calibrating against eighteen. That is the same shape as an
 // accessibility sweep passing over pages that were never built.
 export function unresolved(anchors: Anchor[], songs: Row[]): string[] {
-    const piano = songs.filter((song) => song.scoreKind === "solo-piano");
     const problems: string[] = [];
     for (const anchor of anchors) {
-        const composer = new RegExp(anchor.composer, "i");
-        const title = new RegExp(anchor.title, "i");
-        const found = piano.filter(
-            (song) => composer.test(song.composer) && title.test(song.title),
-        ).length;
+        const found = matchWork(songs, anchor).length;
         if (found < anchor.least) {
             problems.push(
                 `${anchor.label} resolves to ${found} piece(s), fewer than the ${anchor.least} it needs`,
@@ -137,7 +133,6 @@ async function main() {
         await check();
     }
     const rows: Row[] = await readSongs();
-    const piano = rows.filter((row) => row.scoreKind === "solo-piano");
     const { anchors }: { anchors: Anchor[] } = JSON.parse(
         await readFile("dev/grade-anchors.json", "utf8"),
     );
@@ -152,14 +147,11 @@ async function main() {
         key: number;
     }[] = [];
     for (const anchor of anchors) {
-        const composer = new RegExp(anchor.composer, "i");
-        const title = new RegExp(anchor.title, "i");
-        const hits = piano.filter((row) => composer.test(row.composer) && title.test(row.title));
+        const hits = matchWork(rows, anchor);
         const costs: number[] = [];
         for (const hit of hits) {
-            const buffer = await readFile(
-                `public/songs/${hit.license.toLowerCase()}/${hit.id}.mxl`,
-            ).catch(() => null);
+            const path = scorePath(hit.id, hit.license);
+            const buffer = path === null ? null : await readFile(path).catch(() => null);
             if (!buffer) {
                 continue;
             }
