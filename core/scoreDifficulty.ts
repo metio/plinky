@@ -196,24 +196,13 @@ export const SPEED_WEIGHT = 0.4;
 // one hand is a real step up in coordination; three is another.
 export const TEXTURE_WEIGHT = 0.6;
 
-function beatsPerNote(note: Element, divisions: number): number | null {
-    // A chord member sounds with the note before it and takes no time of its own; a grace
-    // note carries no duration at all.
-    if (note.querySelector("chord") || note.querySelector("grace")) {
-        return null;
-    }
-    const raw = Number(note.querySelector("duration")?.textContent ?? "");
-    if (!Number.isFinite(raw) || raw <= 0 || divisions <= 0) {
-        return null;
-    }
-    return raw / divisions;
-}
-
 // The speed and texture of an already-parsed document, in one walk.
 export function readPace(doc: Document): { notesPerSecond: number; voices: number } {
-    let divisions = 1;
-    let tempo = 0;
-    const beats: number[] = [];
+    // How long each of the player's notes takes, in seconds at the tempo in force where
+    // it is written — the same clock the gaps between positions are measured by, so the
+    // pace term and the gap term cannot disagree about one score. A mark that speeds a
+    // piece up partway through is heard here; the first tempo alone was not the piece.
+    const seconds: number[] = [];
     // Distinct voice numbers seen per staff — two lines in one hand, not two hands.
     const voicesByStaff = new Map<number, Set<string>>();
     // The player's staves, as parsePositions names them: on an art song the singer's
@@ -227,28 +216,18 @@ export function readPace(doc: Document): { notesPerSecond: number; voices: numbe
     const scanned: { nodes: Iterable<Element>; staves: number }[] =
         written.length > 0
             ? written.map((part, index) => ({
-                  nodes: part.querySelectorAll("divisions, sound, note"),
+                  nodes: part.querySelectorAll(TIMED_NODES),
                   staves: counts[index] ?? 1,
               }))
-            : [{ nodes: doc.querySelectorAll("divisions, sound, note"), staves: 2 }];
+            : [{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 2 }];
     let offset = 0;
+    // One clock for the whole score: a tempo is written once, in whichever part comes
+    // first, and holds for every part below it.
+    const clock = scoreClock();
     for (const part of scanned) {
         for (const node of part.nodes) {
-            if (node.tagName === "divisions") {
-                const value = Number(node.textContent ?? "");
-                if (Number.isFinite(value) && value > 0) {
-                    divisions = value;
-                }
-                continue;
-            }
-            if (node.tagName === "sound") {
-                const value = Number(node.getAttribute("tempo") ?? "");
-                if (Number.isFinite(value) && value > 0 && tempo === 0) {
-                    tempo = value;
-                }
-                continue;
-            }
-            if (node.querySelector("rest")) {
+            const length = clock.read(node);
+            if (node.tagName !== "note" || node.querySelector("rest")) {
                 continue;
             }
             const within = Number.parseInt(
@@ -266,21 +245,21 @@ export function readPace(doc: Document): { notesPerSecond: number; voices: numbe
                 voicesByStaff.set(staff, seen);
             }
             seen.add(voice);
-            const beat = beatsPerNote(node, divisions);
-            if (beat !== null) {
-                beats.push(beat);
+            // A chord member and a grace note take no time of their own; the clock
+            // reads them as none. A score that states no tempo is read at the clock's
+            // moderate default rather than assumed still.
+            if (length > 0) {
+                seconds.push(length);
             }
         }
         offset += part.staves;
     }
-    // A score that states no tempo is read at a moderate one rather than assumed still.
-    const played = tempo > 0 ? tempo : 100;
     let notesPerSecond = 0;
-    if (beats.length > 0) {
-        const sorted = [...beats].sort((a, b) => a - b);
+    if (seconds.length > 0) {
+        const sorted = [...seconds].sort((a, b) => a - b);
         const quick =
             sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * SPEED_PERCENTILE))]!;
-        notesPerSecond = quick > 0 ? played / 60 / quick : 0;
+        notesPerSecond = quick > 0 ? 1 / quick : 0;
     }
     const voices = Math.max(1, ...[...voicesByStaff.values()].map((set) => set.size));
     return { notesPerSecond, voices };

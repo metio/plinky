@@ -421,6 +421,16 @@ describe("parsePositions reads which staves are the player's", () => {
     });
 });
 
+describe("readPace hears a tempo mark partway through", () => {
+    it("reads the quickest notes at the tempo in force where they are written", () => {
+        // Eight quarters at 60, then eight at 120: the quick tenth of the notes is the
+        // second half's, at two a second — a reading off the opening tempo alone said one.
+        const note = `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><staff>1</staff></note>`;
+        const xml = `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes><sound tempo="60"/>${note.repeat(8)}</measure><measure number="2"><sound tempo="120"/>${note.repeat(8)}</measure></part></score-partwise>`;
+        expect(readPace(domXmlCodec.parse(xml)!).notesPerSecond).toBeCloseTo(2);
+    });
+});
+
 describe("readPace reads the player's staves only", () => {
     it("measures the pianist's speed and texture, not the singer's", () => {
         // A song whose singer runs in semiquavers over a piano part in crotchets: the
