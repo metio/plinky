@@ -126,7 +126,13 @@ export function paintMeasureRange(
     osmd.cursor.reset();
     while (!osmd.cursor.iterator.EndReached) {
         const measure = osmd.cursor.iterator.CurrentMeasureIndex;
-        if (measure >= from && measure < to) {
+        // The walk stops at the window's end: on a phone this runs on every bar the
+        // player clears, and walking on to the end of a long piece to halo nothing is
+        // most of the cost.
+        if (measure >= to) {
+            break;
+        }
+        if (measure >= from) {
             for (const gNote of osmd.cursor.GNotesUnderCursor()) {
                 const element = svgOf(gNote);
                 if (element) {
