@@ -19,6 +19,11 @@ import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 
 const [file, out, at] = process.argv.slice(2);
+// The frame's time, in seconds; the first frame when none is given.
+const seconds = at === undefined ? 0 : Number(at);
+if (!Number.isFinite(seconds) || seconds < 0) {
+    throw new Error(`seconds must be a non-negative number, got ${at}`);
+}
 const b64 = readFileSync(file).toString("base64");
 const browser = await chromium.launch();
 // A generous viewport; the video element is then sized to the clip's own dimensions below.
@@ -42,7 +47,7 @@ await page.evaluate((t) => {
         v.onseeked = resolve;
         v.currentTime = t;
     });
-}, Number(at));
+}, seconds);
 // Native size, so a pixel in the file is a pixel in the picture.
 await page.evaluate(() => {
     const v = document.querySelector("video");
