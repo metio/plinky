@@ -15,6 +15,7 @@
 
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
+import { tokenValue } from "./brandTokens.mjs";
 
 // Two forms of one mark, each used where it can be read. The lockup carries the name and
 // goes on the banner and the social card, which have room for it. The icon is the same
@@ -25,9 +26,12 @@ const MARK = "brand/plinky-mark.png";
 const ICON = "brand/plinky-icon.png";
 // The keys with no tile under them, for setting on something already violet.
 const KEYS = "brand/plinky-keys.png";
-const PAPER = "#f9f8fc";
-const INK = "#191545";
-const ACCENT = "#4915d2";
+// The palette is the app's, read off its tokens: the banner and the social card paint
+// on the same paper, in the same ink, as the brand kit and the pages themselves.
+const css = await readFile("app/app.css", "utf8");
+const PAPER = tokenValue(css, "", "--color-surface");
+const INK = tokenValue(css, "", "--color-ink");
+const ACCENT = tokenValue(css, "", "--color-accent-solid");
 
 // Carried into the page as a data URI rather than a file:// URL, so the render does not
 // depend on where the browser thinks its document lives.

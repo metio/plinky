@@ -24,6 +24,7 @@ import { FOLLOW_US } from "../../core/social.ts";
 import { indexedPerson } from "../../core/peopleIndex.ts";
 import { canonicalPeople, personSlug } from "../../core/person.ts";
 import { folderForComposer, PIECES } from "./pieces.mjs";
+import { uploadText } from "./uploadText.mjs";
 
 const outAt = process.argv.indexOf("--out");
 const OUT = (outAt >= 0 ? process.argv[outAt + 1] : undefined) ?? "promo";
@@ -105,7 +106,7 @@ for (const composer of byComposer.keys()) {
     const title = TRADITIONAL.test(composer.trim())
         ? "Traditional tunes on piano | Plinky"
         : `${composer} — piano | Plinky`;
-    await writeFile(`${dir}/playlist.txt`, `${title}\n\n${describe(composer)}\n`);
+    await writeFile(`${dir}/playlist.txt`, uploadText(title, describe(composer)));
     written += 1;
     if (pagesFor(composer).length === 0 && !TRADITIONAL.test(composer.trim())) {
         unlinked += 1;
