@@ -87,3 +87,21 @@ export function withNotes(notes: readonly RecordedNote[]): RecordingState {
 export function anchoredAt(state: RecordingState, nowMs: number): RecordingState {
     return { ...state, originMs: nowMs - tailMs(state.notes), open: new Map() };
 }
+
+// Writes every key still held as a note of `durationMs`, as when the way of writing
+// changes under it: a key held across the switch into step entry has been played and
+// heard, and the step side has no hold to close, so it is given one step's length rather
+// than lost.
+export function closedOpen(state: RecordingState, durationMs: number): RecordingState {
+    if (state.open.size === 0) {
+        return state;
+    }
+    const closed: RecordedNote[] = [...state.open].map(([pitch, held]) => ({
+        pitch,
+        startMs: held.startMs,
+        durationMs: Math.max(1, durationMs),
+        velocity: held.velocity,
+    }));
+    const notes = [...state.notes, ...closed].sort((a, b) => a.startMs - b.startMs);
+    return { ...state, open: new Map(), notes };
+}

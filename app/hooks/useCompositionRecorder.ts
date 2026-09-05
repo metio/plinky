@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RecordedNote } from "../../core/composition";
 import {
     anchoredAt,
+    closedOpen,
     EMPTY_RECORDING,
     noteOff,
     noteOn,
@@ -82,7 +83,12 @@ export function useCompositionRecorder({
         }
         steppingRef.current = stepping;
         if (stepping) {
-            stepRef.current = stepFrom(stateRef.current.notes);
+            // A key held across the switch is written as one step rather than lost: the
+            // press is only in the live state's open map, which the step side cannot see.
+            const closed = closedOpen(stateRef.current, stepMs);
+            stateRef.current = closed;
+            stepRef.current = stepFrom(closed.notes);
+            setNotes(closed.notes);
         } else {
             stateRef.current = withNotes(stepRef.current.notes);
         }

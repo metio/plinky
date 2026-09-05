@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
     anchoredAt,
+    closedOpen,
     EMPTY_RECORDING,
     noteOff,
     noteOn,
@@ -110,5 +111,24 @@ describe("anchoredAt", () => {
         const holding = noteOn(EMPTY_RECORDING, { note: 60, velocity: 90, timestamp: 0 });
         const armed = anchoredAt(holding, 1_000);
         expect(armed.open.size).toBe(0);
+    });
+});
+
+describe("closedOpen", () => {
+    it("writes every held key as a note of the length given, in onset order", () => {
+        let state = noteOn(EMPTY_RECORDING, { note: 64, velocity: 80, timestamp: 1_500 });
+        state = noteOn(state, { note: 60, velocity: 90, timestamp: 1_000 });
+        const closed = closedOpen(state, 500);
+        expect(closed.open.size).toBe(0);
+        // The second press was stamped earlier than the first on the clock, so it
+        // sorts first — the recording keeps onset order whatever order keys go down.
+        expect(closed.notes.map((note) => [note.pitch, note.durationMs])).toEqual([
+            [60, 500],
+            [64, 500],
+        ]);
+    });
+
+    it("leaves a state with nothing held alone", () => {
+        expect(closedOpen(EMPTY_RECORDING, 500)).toBe(EMPTY_RECORDING);
     });
 });
