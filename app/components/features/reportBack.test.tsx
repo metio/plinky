@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { makeAssignment } from "../../../core/assignment";
 import { decodeReport, NOT_PLAYED } from "../../../core/assignmentReport";
 import { memoryStore } from "../../adapters/memoryStore";
@@ -69,5 +69,20 @@ describe("ReportBack", () => {
         fireEvent.click(screen.getByRole("button", { name: m.report_make() }));
 
         expect(screen.getByText(m.report_not_proof())).toBeTruthy();
+    });
+
+    it("does not say the code was copied where there is no clipboard to copy to", async () => {
+        vi.stubGlobal("navigator", {});
+        try {
+            mount({ "plinky:mastery:twinkle": JSON.stringify({ bestScore: 88, learned: true }) });
+            fireEvent.change(screen.getByLabelText(m.report_who()), { target: { value: "Ada" } });
+            fireEvent.click(screen.getByRole("button", { name: m.report_make() }));
+            fireEvent.click(screen.getByRole("button", { name: m.report_copy() }));
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            expect(screen.queryByText(m.share_copied())).toBeNull();
+            expect(screen.getByRole("button", { name: m.report_copy() })).toBeTruthy();
+        } finally {
+            vi.unstubAllGlobals();
+        }
     });
 });

@@ -10,6 +10,7 @@ import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { fieldClasses } from "../ui/classes";
+import { copyText } from "../../lib/clipboard";
 
 // Handing an assignment back to whoever set it. The student types a name, and the
 // device turns what it knows about the list into one code to paste into a message.
@@ -38,11 +39,10 @@ export function ReportBack({ assignment }: { assignment: Assignment }) {
         if (!code) {
             return;
         }
-        try {
-            await navigator.clipboard?.writeText(code);
+        // A blocked or absent clipboard leaves the code on screen to select by hand, and
+        // says nothing about having copied it.
+        if (await copyText(code)) {
             flashCopied("report");
-        } catch {
-            // A blocked clipboard leaves the code on screen to select by hand.
         }
     };
 

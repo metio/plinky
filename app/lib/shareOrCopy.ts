@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { copyText } from "./clipboard";
+
 // Handing something to somebody else: the native share sheet where the browser has one,
 // the clipboard where it does not.
 //
@@ -35,8 +37,9 @@ export async function shareOrCopy({
             await navigator.share(share);
             return;
         }
-        await navigator.clipboard?.writeText(copy);
-        onCopied();
+        if (await copyText(copy)) {
+            onCopied();
+        }
     } catch {
         // A cancelled share or a blocked clipboard needs no message.
     }

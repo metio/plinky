@@ -58,11 +58,12 @@ describe("shareOrCopy", () => {
         expect(onCopied).not.toHaveBeenCalled();
     });
 
-    it("survives a browser with no clipboard at all", async () => {
+    it("survives a browser with no clipboard at all, and does not claim to have copied", async () => {
         const onCopied = vi.fn();
         withNavigator({});
         await expect(
             shareOrCopy({ share: { url: "u" }, copy: "c", onCopied }),
         ).resolves.toBeUndefined();
+        expect(onCopied).not.toHaveBeenCalled();
     });
 });
