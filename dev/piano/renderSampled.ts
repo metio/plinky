@@ -6,20 +6,15 @@
 // before anything is built: how much better does a real sampled piano sound here, and what
 // does it cost to fetch.
 //
-// It runs in a browser because that is where an OfflineAudioContext is, and it reads the
-// piece exactly the way the promo renderer does — engraved by the same engine, performed
-// by the same reading of the page — so the two recordings differ in nothing but the voice.
+// It runs in a browser because that is where an OfflineAudioContext is, and it takes the
+// piece from the promo renderer's own reading and cut — engraved by the same engine,
+// performed by the same reading of the page, ended at the same pause — so the recording
+// and the video differ in nothing but the voice.
 //
 // Nothing here is shipped. It is dev tooling that happens to run in a browser.
 
-import { decompressMxl } from "../../core/musicxmlFile";
-import { performanceLengthMs } from "../../core/scorePerformance";
-import { listenPerformanceOf } from "../../core/listenPerformance";
-import { readScoreMarks, tempoAt } from "../../core/musicxmlMarks";
-import { NOMINAL_BPM } from "../../core/elapsed";
-import { collectListenSteps } from "../../app/lib/listenSteps";
-import { readStartTempo } from "../../app/lib/scoreExpression";
 import { renderTakeAudio } from "../../app/adapters/offlineAudio";
+import { performanceCut, readPerformance } from "../promo/renderPromo";
 import { LEAD_IN_MS } from "../../core/videoFrames";
 // @ts-expect-error — dev tooling, shared with the Node side as plain JavaScript.
 import { regionFor } from "./voicing.mjs";
@@ -65,55 +60,21 @@ export type SampledResult = {
     durationMs: number;
 };
 
-async function notesOf(request: SampledRequest) {
-    const response = await fetch(request.scoreUrl);
-    if (!response.ok) {
-        throw new Error(`${request.scoreUrl}: ${response.status}`);
-    }
-    const xml = decompressMxl(new Uint8Array(await response.arrayBuffer()));
-    if (!xml) {
-        throw new Error(`${request.scoreUrl}: not a readable .mxl`);
-    }
-    const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
-    const host = document.createElement("div");
-    host.style.width = "1200px";
-    document.body.appendChild(host);
-    const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
-    await osmd.load(xml);
-    osmd.render();
-    // The marks come from the file, not the engraving: without them every note is struck
-    // at the same even touch, which is the one thing that makes a rendered piece sound
-    // like a machine playing it.
-    const marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
-    // The listening reading, the same one the promo renderer uses: the question here is how
-    // the app sounds through a real piano, and the app plays the figures an ornament and a
-    // tremolo stand for. Those figures reach pitches the written note never does, so the
-    // graded reading would also under-count the recordings a session has to fetch.
-    const steps = collectListenSteps(osmd, marks);
-    const startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
-    host.remove();
-    return listenPerformanceOf(steps, {
-        startBpm,
-        speed: request.speed,
-        // No window means the whole piece, which is what a session plays.
-        ...(request.clipMs > 0 ? { withinMs: request.clipMs } : {}),
-    });
-}
-
 // The (pitch, velocity) pairs a whole piece plays, for measuring what a session would have
 // to fetch. Exported from here because a bare module specifier only resolves inside a
 // module the dev server served — an inline evaluate cannot import the engraver.
 export async function playedPairs(scoreUrl: string): Promise<[number, number][]> {
-    const notes = await notesOf({ scoreUrl, samplesBase: "", clipMs: 0, regions: [] });
+    const notes = await readPerformance({ scoreUrl, clipMs: 0 });
     return notes.map((note) => [note.pitch, note.velocity]);
 }
 
 export async function renderSampled(request: SampledRequest): Promise<SampledResult> {
-    const notes = await notesOf(request);
-    if (notes.length === 0) {
-        throw new Error(`${request.scoreUrl}: nothing to play`);
-    }
-    const durationMs = Math.round(performanceLengthMs(notes) + 700 + RELEASE_S * 1000);
+    // The same notes the video holds, cut at the same silence: a recording that stopped
+    // hard at the asked-for length beside a picture that ran on to the next pause was two
+    // performances of one piece.
+    const cut = await performanceCut(request);
+    const notes = cut.notes;
+    const durationMs = Math.round(LEAD_IN_MS + cut.durationMs + RELEASE_S * 1000);
 
     // Only what this piece asks for. The app knows its notes before it plays them — a
     // score is the whole list — so a sampled instrument never has to hold the keyboard it

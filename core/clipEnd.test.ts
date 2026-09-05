@@ -3,15 +3,16 @@
 
 import { describe, expect, it } from "vitest";
 import {
-    type ClipNote,
-    type ClipWindow,
     clipCut,
     clipEnd,
     ENDING_MS,
     LOOKAHEAD_MS,
     PAUSE_MS,
     PROMO_WINDOW,
+    promoWindow,
     RING_MS,
+    type ClipNote,
+    type ClipWindow,
 } from "./clipEnd";
 
 const note = (startMs: number, durationMs: number): ClipNote => ({ startMs, durationMs });
@@ -172,6 +173,13 @@ describe("clipCut", () => {
 describe("the promo window", () => {
     it("aims at twenty-five seconds, between twenty and thirty", () => {
         expect(PROMO_WINDOW).toEqual({ earliestMs: 20_000, latestMs: 30_000, targetMs: 25_000 });
+        // The same shape at any length: a twelve-second ask is cut between twelve and
+        // eighteen, aiming at fifteen, rather than at the default's twenty to thirty.
+        expect(promoWindow(12_000)).toEqual({
+            earliestMs: 12_000,
+            latestMs: 18_000,
+            targetMs: 15_000,
+        });
     });
 
     it("sits the pause threshold above articulation and below a breath", () => {
