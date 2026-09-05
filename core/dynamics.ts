@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { rampAt } from "./ramp";
+
 export type DynamicsSummary = {
     mean: number; // average velocity, 0..127
     evenness: number; // 0..100, higher is steadier
@@ -49,28 +51,5 @@ export type DynamicPoint = {
 // that writes no dynamics asks for nothing in particular, which is a different statement
 // from asking for silence.
 export function volumeAt(points: readonly DynamicPoint[], whole: number): number | null {
-    let index = -1;
-    for (const [at, point] of points.entries()) {
-        if (point.whole <= whole + EPSILON) {
-            index = at;
-        }
-    }
-    const current = points[index];
-    if (!current) {
-        return null;
-    }
-    const next = points[index + 1];
-    if (!current.ramp || !next) {
-        return current.volume;
-    }
-    const span = next.whole - current.whole;
-    if (span <= 0) {
-        return current.volume;
-    }
-    const travelled = Math.min(1, Math.max(0, (whole - current.whole) / span));
-    return current.volume + (next.volume - current.volume) * travelled;
+    return rampAt(points, whole, (point) => point.volume);
 }
-
-// Printed onsets are exact binary fractions in every ordinary metre, but a triplet is a
-// third, so a mark written at one needs room for a rounded value.
-const EPSILON = 1e-9;
