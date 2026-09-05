@@ -9,6 +9,7 @@ import {
     haloColor,
     highlightCursorNotes,
     paintBarSelection,
+    paintMeasureRange,
     paintPlayedNotes,
     restoreNotePaint,
     restoreNotes,
@@ -140,6 +141,36 @@ function mount(notes: ReturnType<typeof gNote>[]): void {
         }
     }
 }
+
+describe("paintMeasureRange", () => {
+    it("stops walking at the end of the window rather than the end of the piece", () => {
+        // On a phone this runs on every bar the player clears; walking the rest of a long
+        // piece to halo nothing was most of its cost.
+        let at = 0;
+        let steps = 0;
+        const positions = 40; // ten bars of four positions
+        const osmd = {
+            cursor: {
+                show: () => {},
+                hide: () => {},
+                reset: () => {
+                    at = 0;
+                },
+                next: () => {
+                    at += 1;
+                    steps += 1;
+                },
+                GNotesUnderCursor: () => [],
+                get iterator() {
+                    return { EndReached: at >= positions, CurrentMeasureIndex: Math.floor(at / 4) };
+                },
+            },
+        } as unknown as OpenSheetMusicDisplay;
+        paintMeasureRange(osmd, 2, 4, WINDOW_COLOR);
+        // Positions 0..15 are walked (bars 0-3); bar 4's first position ends the walk.
+        expect(steps).toBeLessThanOrEqual(17);
+    });
+});
 
 describe("paintPlayedNotes", () => {
     it("lights the played note with a halo, leaving others unlit and the note itself alone", () => {
