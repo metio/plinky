@@ -80,14 +80,16 @@ export async function staleSong(songs: ProbeSong[]): Promise<string | null> {
                 break;
             }
         }
+        const named = song.title ?? song.id;
+        // A row whose score cannot be read is a row the app cannot open: a problem to
+        // name, not a probe to skip.
         if (!bytes) {
-            continue;
+            return `${named} (${song.id}) has no .mxl under public/songs — the manifest names a score that is not shipped`;
         }
         const xml = decompressMxl(new Uint8Array(bytes));
         if (!xml) {
-            continue;
+            return `${named} (${song.id}) has an .mxl that cannot be read`;
         }
-        const named = song.title ?? song.id;
         const fresh = Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3));
         if (fresh !== song.cost) {
             return `${named} is stored at cost ${song.cost} but measures ${fresh} — run \`npm run songs:cost\``;
