@@ -37,8 +37,13 @@ const VENDOR = /opensheetmusicdisplay/;
 // machinery moved into a shared chunk called after the render they share, and a pattern
 // naming only the video adapter stopped matching it. Nothing broke loudly — the ten
 // kilobytes simply reappeared inside the app figure and read as a regression in whatever
-// change happened to be in flight. Hence the assertion below.
-const ON_DEMAND = /webCodecsVideo|webAudioFile|offlineAudio/;
+// change happened to be in flight. Hence the assertions below.
+const ON_DEMAND = /webCodecsVideo|webAudioFile|webCodecsAudio|offlineAudio/;
+// The least the encoders can weigh: the muxer alone is nine kilobytes gzipped. A match
+// below this is a thin adapter chunk still answering to the pattern while the machinery
+// under it has moved to a chunk with a new name — which is how the shared encoder chunk
+// came to be counted as app weight a second time, with the "no match" check silent.
+const ON_DEMAND_LEAST_KB = 8;
 
 // What a single visitor downloads, in two independent measurements. CI builds one
 // locale (`PLINKY_LOCALE=en npm run build`), because the deploy ships a tree-shaken
@@ -500,7 +505,12 @@ const BUDGET_VENDOR_KB = 324;
 // that ship in whichever language the visitor gets. Weighed against what it buys: the app
 // had no surface where somebody could simply press a key, and every other page asks for a
 // piece, a run or an answer first. 1.6 KB, measured at 416.5.
-const BUDGET_APP_KB = 417;
+//
+// 422. The audit branch: a hundred and thirty commits of fixes across every layer, and
+// with them Listen's human touch, the settings index, and Keep up's beat windows. Two
+// kilobytes in the score viewer, three in the incipit chunk (two chunks folded into one),
+// under one each in settings and the services. Measured at 421.0.
+const BUDGET_APP_KB = 422;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
@@ -547,6 +557,14 @@ if (onDemandChunks.length === 0) {
     process.exit(1);
 }
 const onDemand = onDemandChunks.reduce((sum, chunk) => sum + chunk.gz, 0);
+if (onDemand / 1024 < ON_DEMAND_LEAST_KB) {
+    console.error(
+        `Only ${(onDemand / 1024).toFixed(1)} KB matched the on-demand pattern, less than the encoders ` +
+            "weigh. Their shared chunk has been renamed and is being counted as " +
+            "per-visitor weight. Update ON_DEMAND in dev/check-bundle-size.mjs.",
+    );
+    process.exit(1);
+}
 const app = total - vendor - onDemand;
 const kb = (bytes) => (bytes / 1024).toFixed(1);
 
