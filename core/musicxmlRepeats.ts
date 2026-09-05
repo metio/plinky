@@ -32,10 +32,15 @@ export function readMeasureRepeats(doc: Document): MeasureRepeats[] {
     if (!part) {
         return [];
     }
+    // The bracket currently open, by the pass numbers it names. The file writes an ending
+    // on the barline that opens the bracket and on the one that closes it; the bars in
+    // between carry nothing, and read on their own they would play on every pass.
+    let open: number[] | null = null;
     return Array.from(part.getElementsByTagName("measure")).map((measure) => {
         let forward = false;
         let backwardTimes: number | null = null;
-        const endings: number[] = [];
+        const endings: number[] = open ? [...open] : [];
+        let closes = false;
         for (const barline of Array.from(measure.getElementsByTagName("barline"))) {
             for (const repeat of Array.from(barline.getElementsByTagName("repeat"))) {
                 if (repeat.getAttribute("direction") === "forward") {
@@ -54,7 +59,16 @@ export function readMeasureRepeats(doc: Document): MeasureRepeats[] {
                         endings.push(value);
                     }
                 }
+                const type = ending.getAttribute("type");
+                if (type === "start") {
+                    open = [...endings];
+                } else if (type === "stop" || type === "discontinue") {
+                    closes = true;
+                }
             }
+        }
+        if (closes) {
+            open = null;
         }
         return { forward, backwardTimes, endings };
     });
