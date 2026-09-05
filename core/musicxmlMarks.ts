@@ -9,6 +9,7 @@
 // single letters. Here they come off the document, where they are four instances of one
 // idea: something written at a position, standing until something else ends it.
 
+import { rampAt } from "./ramp";
 import { child, text } from "./musicxmlDom";
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
@@ -345,34 +346,11 @@ function wordsOf(element: Element): string | null {
 
 // The tempo in force at a printed position, or null where the piece has stated none yet.
 export function tempoAt(points: readonly TempoPoint[], whole: number): number | null {
-    let index = -1;
-    for (const [at, point] of points.entries()) {
-        if (point.whole <= whole + TEMPO_EPSILON) {
-            index = at;
-        }
-    }
-    const current = points[index];
-    if (!current) {
-        return null;
-    }
-    const next = points[index + 1];
     // A stated tempo holds until the next one. A ramp — a rit. or an accel. — slides toward
     // whatever is stated next, so the pulse actually gives rather than stepping down at the
     // barline after the word.
-    if (!current.ramp || !next) {
-        return current.bpm;
-    }
-    const span = next.whole - current.whole;
-    if (span <= 0) {
-        return current.bpm;
-    }
-    const travelled = Math.min(1, Math.max(0, (whole - current.whole) / span));
-    return current.bpm + (next.bpm - current.bpm) * travelled;
+    return rampAt(points, whole, (point) => point.bpm);
 }
-
-// Printed onsets are exact binary fractions in every ordinary metre, but a triplet is a
-// third, so a mark written at one needs room for a rounded value.
-const TEMPO_EPSILON = 1e-9;
 
 // The key in force at a point in the piece.
 //
@@ -383,6 +361,10 @@ const TEMPO_EPSILON = 1e-9;
 //
 // Zero for a piece with no signature at all, and for anything before the first one, which is
 // C major either way.
+// Printed onsets are exact binary fractions in every ordinary metre, but a triplet is a
+// third, so a mark written at one needs room for a rounded value.
+const TEMPO_EPSILON = 1e-9;
+
 export function fifthsAt(keys: readonly XmlKeyPoint[], whole: number): number {
     let current = 0;
     for (const point of keys) {
