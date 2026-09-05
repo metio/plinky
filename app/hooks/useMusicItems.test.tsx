@@ -6,6 +6,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { makeAssignment } from "../../core/assignment";
+import type { XmlCodec } from "../../core/xml";
 import { memoryStore } from "../adapters/memoryStore";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import { ServicesProvider } from "../contexts/services";
@@ -47,6 +48,33 @@ describe("useMusicItems", () => {
         for (const item of result.current.items) {
             expect(item.incipit, item.title).toBeTruthy();
         }
+    });
+
+    it("opens each score held on the device once per load", async () => {
+        // Grade, cost and opening bars come off one read of the score; a library of
+        // imports used to be parsed six times over and fingered twice on every visit.
+        const store = memoryStore();
+        saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
+        let parses = 0;
+        const xml: XmlCodec = {
+            parse: (text) => {
+                parses += 1;
+                return domXmlCodec.parse(text);
+            },
+            serialize: domXmlCodec.serialize,
+        };
+        const { exercises, songs } = emptySources();
+        const { result } = renderHook(() => useMusicItems(), {
+            wrapper: ({ children }) => (
+                <ServicesProvider services={{ store, exercises, songs, xml }}>
+                    {children}
+                </ServicesProvider>
+            ),
+        });
+        await waitFor(() => expect(result.current.loaded).toBe(true));
+        // Every id here is new to the measure cache, so each score is opened exactly
+        // once — no more than the number of scores on the device.
+        expect(parses).toBeLessThanOrEqual(loadBundledScores().length + 1);
     });
 
     it("combines local scores with both manifests, gentlest first, and flags loaded", async () => {
