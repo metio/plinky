@@ -221,16 +221,20 @@ export type CatalogSources = {
 // sources it was built from and against the raw imported-scores string, so importing or
 // removing a score rebuilds it rather than serving a catalogue that has quietly lost a
 // piece. A WeakMap because a store that goes away should take its catalogue with it.
+//
+// What is held is the build in flight, not its result: the header badge and the Home
+// panel's two loaders all ask within one tick of a cold load, before any of them could
+// have finished, and each would otherwise assemble the whole catalogue for itself.
 type BuiltCatalogue = {
     songs: CatalogSources["songs"];
     exercises: CatalogSources["exercises"];
     xml: XmlCodec;
     scores: string | null;
-    index: Map<string, GradeCatalogItem>;
+    index: Promise<Map<string, GradeCatalogItem>>;
 };
 const BUILT = new WeakMap<KeyValueStore, BuiltCatalogue>();
 
-async function buildCatalogue(sources: CatalogSources): Promise<Map<string, GradeCatalogItem>> {
+function buildCatalogue(sources: CatalogSources): Promise<Map<string, GradeCatalogItem>> {
     const scores = userScoresRaw(sources.store);
     const cached = BUILT.get(sources.store);
     if (
@@ -242,13 +246,34 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
     ) {
         return cached.index;
     }
+    // A failed manifest (null) contributes nothing this pass, and the pass is served but
+    // not remembered: the manifest layer keeps a failure out of its own cache so the next
+    // call asks the network again, and remembering the gap here would stop that call
+    // from ever being made — every song mastery would then read as "no catalogue match"
+    // until a reload.
+    let entry: BuiltCatalogue;
+    const index = assembleCatalogue(sources).then(({ index, complete }) => {
+        if (!complete && BUILT.get(sources.store) === entry) {
+            BUILT.delete(sources.store);
+        }
+        return index;
+    });
+    entry = { songs: sources.songs, exercises: sources.exercises, xml: sources.xml, scores, index };
+    BUILT.set(sources.store, entry);
+    return index;
+}
+
+async function assembleCatalogue(
+    sources: CatalogSources,
+): Promise<{ index: Map<string, GradeCatalogItem>; complete: boolean }> {
     const index = new Map<string, GradeCatalogItem>();
-    // A failed manifest (null) contributes nothing this pass; the catalogue is
-    // rebuilt on the next load, so the gap heals once the network is back.
-    const [songs, exercises] = await Promise.all([
-        sources.songs.manifest().then((list) => list ?? []),
-        sources.exercises.manifest().then((list) => list ?? []),
+    const [songList, exerciseList] = await Promise.all([
+        sources.songs.manifest(),
+        sources.exercises.manifest(),
     ]);
+    const complete = songList !== null && exerciseList !== null;
+    const songs = songList ?? [];
+    const exercises = exerciseList ?? [];
     for (const song of songs) {
         index.set(song.id, { ...song, kind: "piece" });
     }
@@ -286,14 +311,7 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
             ...(opening ? { incipit: encodeIncipit(opening) } : {}),
         });
     }
-    BUILT.set(sources.store, {
-        songs: sources.songs,
-        exercises: sources.exercises,
-        xml: sources.xml,
-        scores,
-        index,
-    });
-    return index;
+    return { index, complete };
 }
 
 export async function loadGradeCatalogue(sources: CatalogSources): Promise<GradeCatalogItem[]> {
