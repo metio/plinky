@@ -10,34 +10,6 @@ import { NotesIcon } from "../ui/icons";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { usePlayPiece } from "./playSession";
 
-// The scale this piece is built from, offered under the score before you play it.
-//
-// The oldest piece of piano teaching there is — the skill alone, then the same skill in
-// real music, minutes apart — and the thing the course apps use to make their lessons
-// stick. What lets Plinky do it honestly is that the key is READ rather than guessed: the
-// score is parsed on the way in, so the offer knows which black keys this piece will ask
-// for instead of inferring them from an eight-note opening.
-//
-// It says which notes rather than which key. A signature's major scale and its relative
-// minor hold exactly the same seven notes, so the same scale prepares a piece in either —
-// and barely one score in twenty says which mode it is in, so claiming the key would be a
-// guess where naming the accidentals is a fact.
-//
-// An offer, never a requirement: nothing is gated behind it and skipping it costs nothing.
-// The exercise the offer points at: a one-octave major scale in the key it names. Built
-// here so the card can hand it to the localised namer, which knows both the language and
-// the note system the reader uses.
-function warmUpExercise(key: string) {
-    return {
-        type: "major-scale",
-        key,
-        octaves: 1,
-        hands: "both",
-        inversion: 0,
-        interval: "single",
-    } as const;
-}
-
 export function WarmUpCard() {
     const { fifths, id, title } = usePlayPiece();
     const warmUp = warmUpFor({
@@ -69,7 +41,7 @@ export function WarmUpCard() {
                     to={to}
                     className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-accent-strong hover:underline"
                 >
-                    {exerciseName(warmUpExercise(warmUp.key))} →
+                    {exerciseName(warmUp.exercise)} →
                 </Link>
             </div>
         </SettingsSection>
