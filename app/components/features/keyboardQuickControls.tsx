@@ -80,7 +80,9 @@ export function KeyboardQuickControls({
                                 ? m.note_labels_all()
                                 : noteLabels === "c"
                                   ? m.note_labels_c()
-                                  : m.note_labels_off()
+                                  : noteLabels === "solfege"
+                                    ? m.note_labels_solfege()
+                                    : m.note_labels_off()
                         }`}
                         className={CYCLE_BUTTON}
                     >

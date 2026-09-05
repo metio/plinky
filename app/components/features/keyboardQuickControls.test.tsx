@@ -34,6 +34,15 @@ describe("KeyboardQuickControls", () => {
         expect(onNoteLabels).toHaveBeenCalledWith("c");
     });
 
+    it("names the solfège labels for what they are, not as off", () => {
+        renderControls({ noteLabels: "solfege" });
+        expect(
+            screen.getByRole("button", {
+                name: `${m.settings_note_labels()}: ${m.note_labels_solfege()}`,
+            }),
+        ).toBeTruthy();
+    });
+
     it("cycles the next-note hint and wraps never back to always", () => {
         const onNoteHints = vi.fn();
         const { rerender } = renderControls({ noteHints: "miss", onNoteHints });
