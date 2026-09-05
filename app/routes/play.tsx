@@ -77,12 +77,21 @@ export function meta({ params }: Route.MetaArgs) {
     ];
 }
 
+// One route serves every piece, and moving from one piece to the next — the warm-up
+// scale a piece offers, the way back from it — re-renders the route rather than
+// remounting it. The page is keyed on the piece so that everything read once from the
+// address below starts over for the new one: a transposition, a hand, a loop or a slower
+// tempo asked for on one piece must not carry into the next.
 export default function PlayRoute({ params }: Route.ComponentProps) {
+    return <PlayPage key={params.scoreId} scoreId={params.scoreId} />;
+}
+
+function PlayPage({ scoreId }: { scoreId: string }) {
     // Resolves a tick after paint: undefined while loading, null when there is no
     // such score, "unavailable" when a fetch failed — a retry bumps `attempt`
     // to ask again (a failed fetch is never cached).
     const [attempt, setAttempt] = useState(0);
-    const resolved = useScore(params.scoreId, attempt);
+    const resolved = useScore(scoreId, attempt);
     const score = resolved === "unavailable" ? undefined : resolved;
     // ?tab=runs opens straight onto your saved runs, so a recording can be linked to —
     // the shelf's list of takes points here.

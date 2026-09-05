@@ -42,6 +42,31 @@ function renderPlay(scoreId: string) {
 }
 
 describe("Play", () => {
+    it("opens the next piece clean of what the address asked for the last one", async () => {
+        // One route serves every piece and moving between them re-renders it rather than
+        // remounting: a transposition asked for on one piece must not carry to the next.
+        const first = { params: { scoreId: bundledId("ode to joy") } } as unknown as Route.ComponentProps;
+        const second = { params: { scoreId: bundledId("twinkle") } } as unknown as Route.ComponentProps;
+        const page = (props: Route.ComponentProps) => (
+            <MemoryRouter initialEntries={["/en/play/x/?transpose=2"]}>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Play {...props} />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>
+        );
+        const view = render(page(first));
+        expect(await screen.findByText("Ode to Joy")).toBeTruthy();
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
+        expect(screen.getByText("+2 st")).toBeTruthy();
+
+        view.rerender(page(second));
+        expect(await screen.findByText(/twinkle/i)).toBeTruthy();
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
+        expect(screen.getByText("0 st")).toBeTruthy();
+    });
+
     it("renders the requested bundled piece", async () => {
         renderPlay(bundledId("ode to joy"));
         expect(await screen.findByText("Ode to Joy")).toBeTruthy();
