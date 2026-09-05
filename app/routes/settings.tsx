@@ -48,10 +48,10 @@ import { type Groove, GROOVES } from "../../core/groove";
 import { BARS_PER_ROW, METRONOME_SUBDIVISIONS, NOTE_SCALES, REVEAL_TRIES } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, type Prefs, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
-import { useEffect } from "react";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
 import { PageHeader } from "../components/ui/pageHeader";
+import { useScrollToHash } from "../hooks/useScrollToHash";
 
 export function meta(_args: Route.MetaArgs) {
     // A utility page for the visitor's own device — no place in the index, so
@@ -77,12 +77,7 @@ export default function Settings() {
     // people actually get stuck on — a piano to connect, the computer keys, the hand a
     // fingering has to fit — and a client-router navigation does not act on the hash by
     // itself, so a link to one of them otherwise arrived at the top of a long page.
-    useEffect(() => {
-        const anchor = window.location.hash.slice(1);
-        if (anchor) {
-            document.getElementById(anchor)?.scrollIntoView();
-        }
-    }, []);
+    useScrollToHash();
 
     const { prefs, update } = usePrefs();
     const synth = useSynth();

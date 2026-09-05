@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect } from "react";
 import { paragraphs } from "../../core/help";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -9,6 +8,7 @@ import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/help";
 import { PageHeader } from "../components/ui/pageHeader";
 import { sectionHeadingClasses } from "../components/ui/classes";
+import { useScrollToHash } from "../hooks/useScrollToHash";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -182,12 +182,7 @@ export default function Help() {
     // Land on the section for the page the reader came from: the header ? links to
     // /help#<pageKey>, but a client-router navigation doesn't scroll to the hash on
     // its own.
-    useEffect(() => {
-        const anchor = window.location.hash.slice(1);
-        if (anchor) {
-            document.getElementById(anchor)?.scrollIntoView();
-        }
-    }, []);
+    useScrollToHash();
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">

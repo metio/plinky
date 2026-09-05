@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { TheoryIndex } from "../components/features/theoryIndex";
-import { useEffect } from "react";
 
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
@@ -29,6 +28,7 @@ import { LinkedText, slot } from "../components/ui/linkedText";
 import { LocalizedLink } from "../components/ui/localizedLink";
 import { PageHeader } from "../components/ui/pageHeader";
 import { Card } from "../components/ui/card";
+import { useScrollToHash } from "../hooks/useScrollToHash";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -158,12 +158,7 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
 export default function TheoryRoute() {
     // The day's practice links to a single lesson; a client-router navigation does not
     // scroll to a hash on its own.
-    useEffect(() => {
-        const anchor = window.location.hash.slice(1);
-        if (anchor) {
-            document.getElementById(anchor)?.scrollIntoView();
-        }
-    }, []);
+    useScrollToHash();
     let counter = 0;
     return (
         // Wider than the rest of the app, and two columns, for the same reason the
