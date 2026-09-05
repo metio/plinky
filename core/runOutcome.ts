@@ -50,7 +50,7 @@ export type OutcomeNote = RunNote & {
 // is missing — a run with no engraved score behind it, or a take recorded before there
 // was one — contributes its position-level figures once, which is what there is to say
 // about it.
-function expressionNotes(notes: OutcomeNote[]): ExpressionNote[] {
+export function expressionNotes(notes: OutcomeNote[]): ExpressionNote[] {
     const out: ExpressionNote[] = [];
     for (const note of notes) {
         const expected = note.expectedVelocities;
@@ -64,12 +64,19 @@ function expressionNotes(notes: OutcomeNote[]): ExpressionNote[] {
             continue;
         }
         for (const [index] of expected.entries()) {
+            const velocity = note.velocities?.[index] ?? note.velocity;
+            // A pitch the forgiving advance credited without it ever being played arrives
+            // at velocity 0, the value reserved for no strike at all: there is nothing
+            // expressive to read off it, so it is left out rather than scored as silent.
+            if (velocity === 0) {
+                continue;
+            }
             out.push({
-                velocity: note.velocities?.[index] ?? note.velocity,
+                velocity,
                 // Under the pedal the fingers are not what holds the note, so there is no
                 // articulation here to be right or wrong about — reporting no hold leaves
                 // it out of that half of the reading, which still measures the dynamics.
-                keyHeldMs: note.pedalled ? undefined : note.keyHoldsMs?.[index] || note.keyHeldMs,
+                keyHeldMs: note.pedalled ? undefined : (note.keyHoldsMs?.[index] ?? note.keyHeldMs),
                 expectedVelocity: expected[index] ?? null,
                 expectedHoldMs: note.expectedHoldsMs?.[index] ?? 0,
             });

@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { LENIENT_TOLERANCE, PRECISE_TOLERANCE } from "./rhythm";
 import { parseGrade } from "./grade";
 import { captureCleared, captureRelease, startCapture } from "./runCapture";
-import { type OutcomeNote, deriveRunOutcome, tempoScale } from "./runOutcome";
+import { type OutcomeNote, deriveRunOutcome, expressionNotes, tempoScale } from "./runOutcome";
 
 // A run note played exactly on its notated onset (perfect timing), on the treble staff,
 // with a mid-range velocity — the building block a test tweaks one field of.
@@ -213,6 +213,26 @@ describe("tempoScale", () => {
         expect(tempoScale(50, 100)).toBe(0.5);
         // The slower run's grid is scored on the lower scale, so it cannot match.
         expect(JSON.stringify(outcome.grid)).not.toBe(JSON.stringify(halfSpeed.grid));
+    });
+});
+
+describe("expressionNotes", () => {
+    it("leaves out a pitch the forgiving advance credited without a strike", () => {
+        // Such a pitch arrives at velocity 0, the value reserved for no strike at all: it
+        // is not a soft note to be marked down, and its hold is not borrowed from the
+        // position either.
+        const notes = expressionNotes([
+            {
+                ...onNote(0, 60),
+                velocities: [0, 90],
+                keyHoldsMs: [0, 400],
+                expectedVelocities: [40, 90],
+                expectedHoldsMs: [1000, 250],
+            },
+        ]);
+        expect(notes).toHaveLength(1);
+        expect(notes[0]?.velocity).toBe(90);
+        expect(notes[0]?.expectedVelocity).toBe(90);
     });
 });
 
