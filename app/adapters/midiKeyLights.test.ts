@@ -97,10 +97,40 @@ describe("createMidiKeyLights", () => {
         channels = { left: 15, right: 16 };
         sent.length = 0;
         lights.show({ left: [], right: [64] });
+        // The key lit on channel 4 goes out on channel 4; the new one lights on 16.
         expect(sent).toEqual([
-            [0x8f, 60, 0],
+            [0x83, 60, 0],
             [0x9f, 64, 127],
         ]);
+    });
+
+    it("lights the same picture again on the new channels after a channel change", () => {
+        // The Settings flow: Test, correct a channel, Test again. The second Test must
+        // reach the instrument on the corrected channels, not diff away to nothing.
+        const { sent, send } = recorder();
+        let channels = { left: 3, right: 4 };
+        const lights = createMidiKeyLights(send, () => channels);
+        lights.show({ left: [48], right: [60] });
+        channels = { left: 2, right: 1 };
+        sent.length = 0;
+        lights.show({ left: [48], right: [60] });
+        expect(sent).toEqual([
+            [0x82, 48, 0],
+            [0x83, 60, 0],
+            [0x91, 48, 127],
+            [0x90, 60, 127],
+        ]);
+    });
+
+    it("puts a key out on the channel it was lit on", () => {
+        const { sent, send } = recorder();
+        let channels = { left: 3, right: 4 };
+        const lights = createMidiKeyLights(send, () => channels);
+        lights.show({ left: [], right: [60] });
+        channels = { left: 15, right: 16 };
+        sent.length = 0;
+        lights.clear();
+        expect(sent).toEqual([[0x83, 60, 0]]);
     });
 
     it("says nothing when there is nothing to show", () => {

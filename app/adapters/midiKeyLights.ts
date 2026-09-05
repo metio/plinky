@@ -37,30 +37,47 @@ export function createMidiKeyLights(
     channels: () => LightChannels,
 ): KeyLightsPort {
     let shown: LitKeys = NOTHING_LIT;
+    // The channels the picture was lit on, or null while nothing is lit. A note-off only
+    // reaches the light it is meant for on the channel that lit it, so the picture is
+    // remembered together with its channels rather than against whatever Settings says
+    // at the moment of the off.
+    let shownOn: LightChannels | null = null;
 
-    const emit = (keys: LitKeys, status: number, velocity: number) => {
-        const { left, right } = channels();
+    const emit = (keys: LitKeys, status: number, velocity: number, on: LightChannels) => {
         for (const note of keys.left) {
-            send(message(status, left, note, velocity));
+            send(message(status, on.left, note, velocity));
         }
         for (const note of keys.right) {
-            send(message(status, right, note, velocity));
+            send(message(status, on.right, note, velocity));
         }
     };
 
     return {
         show(keys) {
+            const current = channels();
+            // A channel changed under a lit picture: put the whole picture out on the
+            // channels it was lit on, and start over on the new ones. Diffing across the
+            // change would leave the old lights burning and, for an unchanged picture,
+            // send nothing at all on the channels the player just corrected.
+            if (shownOn !== null && (shownOn.left !== current.left || shownOn.right !== current.right)) {
+                emit(shown, NOTE_OFF, 0, shownOn);
+                shown = NOTHING_LIT;
+            }
             const change = diffLights(shown, keys);
             // Off before on: a key moving from one hand's channel to the other must be
             // extinguished on the old channel first, or the instrument is left holding
             // a light nothing will ever take back.
-            emit(change.off, NOTE_OFF, 0);
-            emit(change.on, NOTE_ON, LIT_VELOCITY);
+            emit(change.off, NOTE_OFF, 0, current);
+            emit(change.on, NOTE_ON, LIT_VELOCITY, current);
             shown = keys;
+            shownOn = keys.left.length + keys.right.length > 0 ? current : null;
         },
         clear() {
-            emit(shown, NOTE_OFF, 0);
+            if (shownOn !== null) {
+                emit(shown, NOTE_OFF, 0, shownOn);
+            }
             shown = NOTHING_LIT;
+            shownOn = null;
         },
     };
 }
