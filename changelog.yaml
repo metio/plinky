@@ -1,6 +1,16 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-09-05
+  entries:
+    - |-
+      **Your progress no longer vanishes when the catalogue fails to load once.** If the
+      list of pieces could not be fetched the moment Plinky opened — a poor connection, a
+      hiccup right after an update — everything you had learned read as nothing for the
+      rest of the visit: the grade in the header dropped, the You page lost its level, and
+      reviews and suggestions came up empty until you reloaded. Plinky now asks again on
+      the next look, so the pieces and your progress on them are back the moment the
+      connection is.
 - date: 2026-09-03
   entries:
     - |-

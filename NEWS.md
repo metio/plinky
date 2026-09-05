@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 5 September 2026
+
+**Your progress no longer vanishes when the catalogue fails to load once.** If the
+list of pieces could not be fetched the moment Plinky opened — a poor connection, a
+hiccup right after an update — everything you had learned read as nothing for the
+rest of the visit: the grade in the header dropped, the You page lost its level, and
+reviews and suggestions came up empty until you reloaded. Plinky now asks again on
+the next look, so the pieces and your progress on them are back the moment the
+connection is.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to
