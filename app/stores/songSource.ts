@@ -101,11 +101,21 @@ export function createSongSource(fetchUrl: Fetcher): SongSource {
     // leaves the question genuinely unanswered, and a deploy mid-session can leave a cached
     // page asking for a slice that has moved. Falling back keeps a real piece from ever
     // reading as nonexistent — the distinction ResolvedScore exists to make.
+    //
+    // One memoised getter per slice, kept for the session like the manifest's own: a
+    // getter made per call would forget its slice as soon as it answered, and a piece
+    // opened twice would fetch its slice twice. At most one entry per shard.
+    const slices = new Map<string, () => Promise<SongMeta[] | null>>();
+    const sliceFor = (name: string) => {
+        let get = slices.get(name);
+        if (!get) {
+            get = cachedManifest<SongMeta>(fetchUrl, `${SLICE_DIR}/${name}.json`);
+            slices.set(name, get);
+        }
+        return get;
+    };
     const metaFor = async (id: string): Promise<SongMeta | null | "unavailable"> => {
-        const slice = await cachedManifest<SongMeta>(
-            fetchUrl,
-            `${SLICE_DIR}/${shardName(id)}.json`,
-        )();
+        const slice = await sliceFor(shardName(id))();
         if (slice !== null) {
             return slice.find((song) => song.id === id) ?? null;
         }
