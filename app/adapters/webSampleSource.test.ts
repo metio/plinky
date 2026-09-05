@@ -210,6 +210,20 @@ describe("webSampleSource", () => {
         expect(second.source.bufferFor(REGION)).not.toBeNull();
     });
 
+    it("plays a recording the cache refused to keep", async () => {
+        // Keeping a copy is a convenience: storage that is full or private must not cost
+        // the recording the network has just delivered, or the real piano never sounds.
+        const refusing = {
+            ...fakeCache().cache,
+            put: async () => {
+                throw new Error("quota exceeded");
+            },
+        } as unknown as Cache;
+        const { source, decodeAudioData } = world({ cache: refusing });
+        await source.prepare([NOTE]);
+        expect(decodeAudioData).toHaveBeenCalledTimes(1);
+    });
+
     it("stays quiet rather than failing when the recordings cannot be reached", async () => {
         const { source } = world({ failManifest: true });
         await source.prepare([NOTE]);

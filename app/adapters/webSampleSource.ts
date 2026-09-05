@@ -90,8 +90,16 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             if (!response.ok) {
                 return null;
             }
-            await store?.put(url, response.clone());
-            return await response.arrayBuffer();
+            const bytes = await response.clone().arrayBuffer();
+            // Keeping a copy is a convenience, not a condition: a cache that refuses the
+            // write — storage full, a private window — must not cost the recording the
+            // network has just delivered, or the real piano never sounds on that device.
+            try {
+                await store?.put(url, response);
+            } catch {
+                // Fetched again next time; played now.
+            }
+            return bytes;
         } catch {
             return null;
         }
