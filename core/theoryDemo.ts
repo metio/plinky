@@ -17,6 +17,7 @@
 // One timeline fixes all of it by construction: a step is a moment, and the three views
 // are three readings of the same moments rather than three guesses at them.
 
+import { spellMidi } from "./notes";
 import {
     type NoteValue,
     type Snippet,
@@ -24,7 +25,6 @@ import {
     noteQuarters,
     snippetMidi,
 } from "./glossaryScore";
-import { NATURAL_OF } from "./glossaryScore";
 
 // One moment of a demonstration: what sounds, and for how long. No notes is a silence —
 // a rest is a fact about the page and about the ear alike, and the only way to teach one
@@ -50,17 +50,9 @@ export type DemoScore = {
 // for a black key the letter depends on the key you are in — so the sharp side is written
 // as the natural below it plus an accidental, which is what a key of no sharps or flats
 // asks for. The lessons here live in C, where that is always right.
-function spell(pitch: number): { step: string; octave: number; alter?: number } | null {
-    const withinOctave = ((pitch % 12) + 12) % 12;
-    const octave = Math.floor(pitch / 12) - 1;
-    const natural = NATURAL_OF[withinOctave];
-    if (natural) {
-        return { step: natural, octave };
-    }
-    // A black key: the white key below it, sharpened. Never the octave below — B♯ would be
-    // the wrong letter and the wrong line.
-    const below = NATURAL_OF[withinOctave - 1];
-    return below ? { step: below, octave, alter: 1 } : null;
+function spell(pitch: number): { step: string; octave: number; alter?: number } {
+    const { step, octave, alter } = spellMidi(pitch, false);
+    return alter === 0 ? { step, octave } : { step, octave, alter };
 }
 
 // The steps as something the engraver can draw. A step with several notes becomes a

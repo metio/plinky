@@ -15,14 +15,15 @@
 //
 // Pure: a key signature in, an exercise out. No catalogue, no store, no clock.
 
+import { FLAT_ORDER as FLATS, SHARP_ORDER as SHARPS } from "./notes";
 import type { ExerciseConfig } from "./exerciseGen";
 import { keySlugFor } from "./exerciseGen";
 
 // The order sharps and flats appear in a key signature, which never varies: F C G D A E B
 // for sharps and its reverse for flats. Two flats is always B♭ and E♭, never any other
 // pair — which is what lets the offer name the actual notes rather than only counting them.
-const SHARP_ORDER = ["F♯", "C♯", "G♯", "D♯", "A♯", "E♯", "B♯"];
-const FLAT_ORDER = ["B♭", "E♭", "A♭", "D♭", "G♭", "C♭", "F♭"];
+const SHARP_ORDER = SHARPS.map((letter) => `${letter}♯`);
+const FLAT_ORDER = FLATS.map((letter) => `${letter}♭`);
 
 // The black keys this signature asks for, in the order the signature writes them.
 export function accidentalsOf(fifths: number): string[] {

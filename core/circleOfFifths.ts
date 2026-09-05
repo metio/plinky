@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { FLAT_ORDER as FLATS, SHARP_ORDER as SHARPS } from "./notes";
 import { type NoteNameId, type PitchClass, pitchClassOf, type Spelling } from "./theory";
 
 // The circle of fifths: the twelve major keys in the order a fifth takes you through
@@ -78,24 +79,12 @@ export function neighbours(key: CircleKey): { up: CircleKey; down: CircleKey } {
 // though it sounds B. Spelling these from a pitch class asks the wrong question and
 // gets the wrong letter — F sharp major would print "F" for its sixth sharp, naming
 // five letters for six accidentals and appearing to sharpen a note the key holds.
-const SHARP_ORDER: NoteNameId[] = [
-    "f-sharp",
-    "c-sharp",
-    "g-sharp",
-    "d-sharp",
-    "a-sharp",
-    "e-sharp",
-    "b-sharp",
-];
-const FLAT_ORDER: NoteNameId[] = [
-    "b-flat",
-    "e-flat",
-    "a-flat",
-    "d-flat",
-    "g-flat",
-    "c-flat",
-    "f-flat",
-];
+const SHARP_ORDER: NoteNameId[] = SHARPS.map(
+    (letter) => `${letter.toLowerCase()}-sharp` as NoteNameId,
+);
+const FLAT_ORDER: NoteNameId[] = FLATS.map(
+    (letter) => `${letter.toLowerCase()}-flat` as NoteNameId,
+);
 
 export function signatureNotes(key: CircleKey): NoteNameId[] {
     const order = key.accidentals < 0 ? FLAT_ORDER : SHARP_ORDER;
