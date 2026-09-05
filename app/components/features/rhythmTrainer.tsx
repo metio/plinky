@@ -59,7 +59,7 @@ export function RhythmTrainer({
     const audio = useAudioEngine();
     const prefsStore = usePrefsStore();
 
-    const [pattern, setPattern] = useState<RhythmPattern>(() => generateRhythm(level, rng));
+    const [pattern, _setPattern] = useState<RhythmPattern>(() => generateRhythm(level, rng));
     const [phase, setPhase] = useState<Phase>("idle");
     const [active, setActive] = useState<number | null>(null);
     const [verdict, setVerdict] = useState<RhythmVerdict | null>(null);
@@ -73,14 +73,6 @@ export function RhythmTrainer({
 
     // A fresh rhythm whenever the level or the tempo the reader is working at changes,
     // rather than leaving the last level's pattern on screen under the new heading.
-    useEffect(() => {
-        setPattern(generateRhythm(level, rng));
-        setPhase("idle");
-        setActive(null);
-        setVerdict(null);
-        run.current = null;
-    }, [level, rng]);
-
     const finish = useCallback(() => {
         const current = run.current;
         run.current = null;
