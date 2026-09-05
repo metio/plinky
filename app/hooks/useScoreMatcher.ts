@@ -45,6 +45,7 @@ import {
     readStartTempo,
     readTempo,
 } from "../lib/scoreExpression";
+import { seekToOrdinal } from "../lib/scoreCursor";
 import {
     currentBar,
     expectedPitches,
@@ -112,7 +113,14 @@ function shortestLength(osmd: OpenSheetMusicDisplay): number {
 // notes that fall on the beat.
 type StepGroup = Omit<
     MatchStep,
-    "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor" | "slackMs" | "pedalled"
+    | "bar"
+    | "position"
+    | "elapsedMs"
+    | "holdMs"
+    | "expected"
+    | "advancesCursor"
+    | "slackMs"
+    | "pedalled"
 > & {
     expected: { velocity: number | null; soundQuarters: number; writtenQuarters: number }[];
     // The ornament's own written length, for placing it before the beat. Zero on the
@@ -306,6 +314,7 @@ export function collectMatchSteps(
             atPosition.push({
                 ...rest,
                 bar,
+                position: index,
                 elapsedMs: onset,
                 holdMs: quartersMs(group.holdQuarters * stretch, bpm),
                 // An ornament may be crushed in before the beat or leaned on, taking half
@@ -351,21 +360,6 @@ export function collectMatchSteps(
 // lines up with the run's progress. Leaves the cursor reset for the caller.
 export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): number[][] {
     return collectMatchSteps(osmd, hand).map((step) => step.pitches);
-}
-
-// Walk the reset cursor forward to the first playable position at or after `from`,
-// so the visual cursor and the reducer agree from note one.
-function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): void {
-    const parts = readParts(osmd);
-    while (
-        !osmd.cursor.iterator.EndReached &&
-        ((osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) < from ||
-            // Only whether the position is playable is asked here, so it needs no
-            // dynamics: seeking is about finding a note, not about how it sounds.
-            playableAtCursor(osmd, hand, parts) === 0)
-    ) {
-        osmd.cursor.next();
-    }
 }
 
 // Step the visual cursor to the next playable position for the hand — rests, and
@@ -515,7 +509,8 @@ export function useScoreMatcher(
     const runStepsRef = useRef<MatchStep[]>([]);
     // Where the run's first step sits among the whole piece's steps, so relative
     // reducer indices translate to the engraved note they belong to.
-    const runStartIndexRef = useRef(0);
+    // Each run step's index among the whole piece's steps, by ordinal in the run.
+    const runIndicesRef = useRef<number[]>([]);
 
     const stop = useCallback(() => {
         practicingRef.current = false;
@@ -651,11 +646,17 @@ export function useScoreMatcher(
                           anchor?.whole ?? Number.NEGATIVE_INFINITY,
                       )
                     : 0;
-            const steps = loop
-                ? all.filter((step) => step.bar >= loop.from - 1 && step.bar <= loop.to - 1)
+            // Which of the whole piece's steps the run is over, by index into `all`: a
+            // section loop over repeated bars keeps both passes, which is not one
+            // contiguous slice, so each step's place in the piece is kept beside it.
+            const indices = loop
+                ? all.flatMap((step, index) =>
+                      step.bar >= loop.from - 1 && step.bar <= loop.to - 1 ? [index] : [],
+                  )
                 : startIndex < 0
                   ? []
-                  : all.slice(startIndex);
+                  : all.slice(startIndex).map((_, offset) => startIndex + offset);
+            const steps = indices.map((index) => all[index]!);
             // A score with no playable positions (all rests, empty, or resumed past the
             // end) has nothing to match: entering the practicing state would strand the
             // UI at 0/0 forever, since completion is only reached by clearing a position.
@@ -665,14 +666,14 @@ export function useScoreMatcher(
             }
             const state = startMatch(steps);
             stateRef.current = state;
-            // The collector leaves the cursor reset; walk it to the run's first position.
-            seekCursorTo(osmd, hand, steps[0]!.whole);
+            // The collector leaves the cursor reset; walk it to the run's first position —
+            // by cursor position, so a resume on the second pass of a repeat lands there
+            // rather than on the same bar of the first.
+            seekToOrdinal(osmd.cursor, steps[0]!.position);
             osmd.cursor.show();
             runLoopRef.current = loop !== null;
             runStepsRef.current = steps;
-            // Both slicing and the loop's bar filter keep contiguous runs of `all`,
-            // so the first step's position anchors every later relative index.
-            runStartIndexRef.current = steps[0] ? all.indexOf(steps[0]) : 0;
+            runIndicesRef.current = indices;
             runTempoRef.current = optionsRef.current.tempo ?? 100;
             runStartBpmRef.current =
                 tempoAt(optionsRef.current.marks?.tempi ?? [], 0) ??
@@ -716,7 +717,7 @@ export function useScoreMatcher(
                     wrongSeq.current += 1;
                     setLastWrong({ note: event.note, seq: wrongSeq.current });
                     optionsRef.current.onWrong?.({
-                        index: runStartIndexRef.current + next.index,
+                        index: runIndicesRef.current[next.index] ?? 0,
                         misses: next.sinceWrong,
                     });
                     continue;
@@ -727,7 +728,7 @@ export function useScoreMatcher(
                 optionsRef.current.onCorrect?.({
                     pitches: event.playedPitches,
                     ordinal: event.ordinal,
-                    index: runStartIndexRef.current + event.ordinal,
+                    index: runIndicesRef.current[event.ordinal] ?? 0,
                     timestamp,
                     timeMs: event.step.elapsedMs / dialRatio(),
                     // The written length to hold, taken from the cleared step itself,
@@ -766,8 +767,7 @@ export function useScoreMatcher(
                 // completion to grade — and the per-lap progress count starts over.
                 const fresh = startMatch(runStepsRef.current);
                 stateRef.current = fresh;
-                osmd.cursor.reset();
-                seekCursorTo(osmd, runHandRef.current, runStepsRef.current[0]!.whole);
+                seekToOrdinal(osmd.cursor, runStepsRef.current[0]!.position);
                 setDone(0);
                 setMissedHere(false);
                 // Wipe the lap that has just ended, so the bars ahead read as unplayed

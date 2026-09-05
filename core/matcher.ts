@@ -102,6 +102,12 @@ export type MatchStep = {
     elapsedMs: number;
     // The 0-based bar the position sits in, for a focus view.
     bar: number;
+    // Which cursor position the step was read from: how many steps the visual cursor
+    // takes from the top of the piece to stand on it. A printed onset names two places
+    // on a repeated piece and a bar filter over one keeps both passes, so this — not the
+    // onset, not an offset from the run's first step — is what puts the cursor back on
+    // the step and names it among the whole piece's steps.
+    position: number;
     // Whether clearing this step moves the visual cursor on. False for an ornament: a
     // grace note and the note it decorates are printed in one place, so the cursor stays
     // there while the player works through them, and only the last step at a position

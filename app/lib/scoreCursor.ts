@@ -48,6 +48,36 @@ export function seekToWhole(cursor: CursorLike, whole: number): void {
     }
 }
 
+// Walks the cursor to its `ordinal`-th position from the top. The one seek that lands
+// on the right pass of a repeat: a printed onset names two places there, and a step
+// records which cursor position it was read from.
+export function seekToOrdinal(cursor: CursorLike, ordinal: number): void {
+    cursor.reset();
+    for (let taken = 0; taken < ordinal && !cursor.iterator.EndReached; taken++) {
+        cursor.next();
+    }
+}
+
+// Which position the cursor stands on, counted from the top — what seekToOrdinal puts
+// back. OSMD's iterator counts nothing, so it is measured by walking to the end from
+// here and again from the top; the cursor is left reset, and a caller that wants it
+// where it was seeks it back.
+export function cursorOrdinal(cursor: CursorLike): number {
+    let ahead = 0;
+    while (!cursor.iterator.EndReached) {
+        cursor.next();
+        ahead += 1;
+    }
+    cursor.reset();
+    let total = 0;
+    while (!cursor.iterator.EndReached) {
+        cursor.next();
+        total += 1;
+    }
+    cursor.reset();
+    return total - ahead;
+}
+
 // The notated lengths under the cursor as quarter-note counts — what a playback
 // step dwells on. Rests count too, so a written gap keeps its own length.
 export function stepLengths(notes: Iterable<{ Length: { RealValue: number } }>): number[] {

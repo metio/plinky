@@ -2,7 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { type CursorLike, cursorWhole, seekToBar, seekToWhole, stepLengths } from "./scoreCursor";
+import {
+    type CursorLike,
+    cursorOrdinal,
+    cursorWhole,
+    seekToBar,
+    seekToOrdinal,
+    seekToWhole,
+    stepLengths,
+} from "./scoreCursor";
 
 // A stub cursor over a fixed list of positions, each a (bar, whole-note onset)
 // pair — the slice of OSMD's cursor the helpers read.
@@ -70,5 +78,37 @@ describe("scoreCursor", () => {
             stepLengths([{ Length: { RealValue: 0.25 } }, { Length: { RealValue: 0.5 } }]),
         ).toEqual([1, 2]);
         expect(stepLengths([])).toEqual([]);
+    });
+});
+
+describe("seeking by cursor position", () => {
+    // A repeat: the printed onsets rewind, so an onset names two places and only the
+    // position count tells them apart.
+    const repeated = [
+        { bar: 0, whole: 0 },
+        { bar: 0, whole: 0.25 },
+        { bar: 0, whole: 0 },
+        { bar: 0, whole: 0.25 },
+        { bar: 1, whole: 0.5 },
+    ];
+
+    it("lands on the second pass of a repeat where an onset could not", () => {
+        const cursor = stubCursor(repeated);
+        seekToOrdinal(cursor, 3);
+        expect(cursor.iterator.currentTimeStamp?.RealValue).toBe(0.25);
+        expect(cursorOrdinal(cursor)).toBe(3);
+        seekToWhole(cursor, 0.25);
+        expect(cursorOrdinal(cursor)).toBe(1);
+    });
+
+    it("stops at the end when asked for a position past it", () => {
+        const cursor = stubCursor(repeated);
+        seekToOrdinal(cursor, 99);
+        expect(cursor.iterator.EndReached).toBe(true);
+    });
+
+    it("reads a reset cursor as position 0 and a run-off cursor as the count", () => {
+        expect(cursorOrdinal(stubCursor(repeated))).toBe(0);
+        expect(cursorOrdinal(stubCursor(repeated, 5))).toBe(5);
     });
 });

@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**Practising the second time through a repeat stays on the second time.** Taking
+over from Listen partway through a repeat's second pass put the cursor back on the
+first, and from the repeat barline on it drifted away from the notes you were
+being asked for. Looping a section inside a repeat also marked the wrong notes on
+its second pass — bars outside the loop lit up green and red while the loop's own
+stayed blank. Both follow the pass you are on now.
+
 **The rhythm trainer's clicks stop when you do.** Pressing **Start** again partway
 through a run laid a fresh count-in over the rest of the old one, two pulses out of
 step, and leaving the page mid-run left the clicks ticking on for the rest of the
