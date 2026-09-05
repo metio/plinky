@@ -26,7 +26,10 @@ export function SettingsIndex({
     current: string;
 }) {
     return (
-        <nav aria-label={m.settings_index_label()} className="space-y-5 md:sticky md:top-24 md:self-start">
+        <nav
+            aria-label={m.settings_index_label()}
+            className="space-y-5 md:sticky md:top-24 md:self-start"
+        >
             {groups.map((group) => (
                 <div key={group.label} className="space-y-1">
                     <p className={sectionLabelClasses}>{group.label}</p>
