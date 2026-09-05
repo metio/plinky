@@ -165,10 +165,13 @@ export function clipCut<T extends ClipNote>(
     return { ...end, notes: kept, durationMs: Math.round(stops + tail) };
 }
 
-// The window the promo clips use: somewhere between twenty and thirty seconds, aiming at
-// twenty-five, so a feed of them averages where it was asked to.
-export const PROMO_WINDOW: ClipWindow = {
-    earliestMs: 20_000,
-    latestMs: 30_000,
-    targetMs: 25_000,
-};
+// The window a clip of the asked-for length is cut in: no shorter than asked, up to half
+// as long again, aiming a quarter over — so a feed of them averages a little past what was
+// asked, at the pauses the music makes rather than on a stopwatch.
+export function promoWindow(clipMs: number): ClipWindow {
+    return { earliestMs: clipMs, latestMs: clipMs * 1.5, targetMs: clipMs * 1.25 };
+}
+
+// The window the promo clips use by default: somewhere between twenty and thirty
+// seconds, aiming at twenty-five.
+export const PROMO_WINDOW: ClipWindow = promoWindow(20_000);

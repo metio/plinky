@@ -10,7 +10,7 @@
 // Nothing here is shipped. It is dev tooling that happens to run in a browser.
 
 import { decompressMxl } from "../../core/musicxmlFile";
-import { clipCut, gapsIn, LOOKAHEAD_MS, PROMO_WINDOW } from "../../core/clipEnd";
+import { type ClipWindow, clipCut, gapsIn, LOOKAHEAD_MS, promoWindow } from "../../core/clipEnd";
 import type { RecordedNote } from "../../core/composition";
 import { listenPerformanceOf } from "../../core/listenPerformance";
 import {
@@ -106,7 +106,16 @@ async function loadSamples(base: string, notes: { pitch: number; velocity: numbe
 // hour of video is a poor way to find out where the clips end, and a report that
 // re-implemented the reading would answer for a different performance than the one that
 // ships.
-export async function readPerformance(request: PromoRequest): Promise<RecordedNote[]> {
+// What decides the performance a clip is cut from — the piece, the speed, and how much of
+// it was asked for. The rest of a request is the picture's business.
+export type PerformanceRequest = Pick<PromoRequest, "scoreUrl" | "speed" | "clipMs">;
+
+// The window a request's clip is cut in, or none for a full-length upload.
+export function windowOf(request: PerformanceRequest): ClipWindow | null {
+    return request.clipMs > 0 ? promoWindow(request.clipMs) : null;
+}
+
+export async function readPerformance(request: PerformanceRequest): Promise<RecordedNote[]> {
     const response = await fetch(request.scoreUrl);
     if (!response.ok) {
         throw new Error(`${request.scoreUrl}: ${response.status}`);
@@ -146,11 +155,12 @@ export async function readPerformance(request: PromoRequest): Promise<RecordedNo
     // that stops at thirty seconds ends at thirty seconds, and a cut that cannot tell that
     // from a piece which genuinely ends there awards it a perfect ending and lands every
     // continuous piece on the same bound.
+    const window = windowOf(request);
     const played = listenPerformanceOf(steps, {
         startBpm,
         speed: request.speed,
         // No window means the whole piece, which is what a full-length upload is.
-        ...(request.clipMs > 0 ? { withinMs: PROMO_WINDOW.latestMs + LOOKAHEAD_MS } : {}),
+        ...(window ? { withinMs: window.latestMs + LOOKAHEAD_MS } : {}),
     });
     if (played.length === 0) {
         throw new Error(`${request.scoreUrl}: nothing to play`);
@@ -158,15 +168,20 @@ export async function readPerformance(request: PromoRequest): Promise<RecordedNo
     return played;
 }
 
+// The performance a clip actually holds: read, then cut at a silence inside the window.
+// Which notes to keep and how long to run is the cut, and the cut is pure — it lives in
+// core so it can be reasoned about and tested away from a browser. Every rendering of a
+// piece — the video, the sampled recording beside it — takes its notes from here, so no
+// two of them can answer for different performances.
+export async function performanceCut(request: PerformanceRequest) {
+    return clipCut(await readPerformance(request), windowOf(request));
+}
+
 export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
     if (!(await webCodecsVideoExporter.supported())) {
         throw new Error("this browser cannot encode; nothing to render");
     }
-    const played = await readPerformance(request);
-    // Which notes to keep and how long to run is the cut, and the cut is pure — it lives in
-    // core so it can be reasoned about and tested away from a browser. A full-length upload
-    // asks for no window and gets the whole piece.
-    const { notes, durationMs } = clipCut(played, request.clipMs > 0 ? PROMO_WINDOW : null);
+    const { notes, durationMs } = await performanceCut(request);
 
     // The notes waterfall: takeHighwayPainter is the falling-blocks scene. The other
     // exported painter, takeScenePainter, draws the lit keyboard with an optional notation
@@ -225,14 +240,15 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
 // Where a clip of this piece would end, and what the window had to choose among. The
 // report behind `npm run promo:cuts`, which is how a batch's lengths are checked without
 // rendering one.
-export async function reportCut(request: PromoRequest) {
+export async function reportCut(request: PerformanceRequest) {
     const played = await readPerformance(request);
-    const cut = clipCut(played, PROMO_WINDOW);
+    const window = windowOf(request) ?? promoWindow(20_000);
+    const cut = clipCut(played, window);
     return {
         endMs: cut.endMs,
         pauseMs: cut.pauseMs,
         durationMs: cut.durationMs,
-        gaps: gapsIn(played, PROMO_WINDOW),
+        gaps: gapsIn(played, window),
         performanceMs: played.reduce((end, n) => Math.max(end, n.startMs + n.durationMs), 0),
         noteCount: played.length,
     };
