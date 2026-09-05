@@ -73,7 +73,7 @@ describe("MicConnect", () => {
             release: () => {},
             setPedal: () => {},
             allNotesOff: () => {},
-            click: () => {},
+            click: () => () => {},
             setRoom: () => {},
             recentlyStruck: (note: number) => note === 60,
         };

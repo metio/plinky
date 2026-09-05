@@ -224,3 +224,25 @@ describe("everything a rendered piece asks the instrument for", () => {
         expect(tally).toEqual({ note: 6, resonance: 1 });
     });
 });
+
+describe("a click", () => {
+    it("can be taken back off the clock before it sounds", async () => {
+        // A count-in queued whole on the audio clock has to come off whole when the
+        // player restarts or leaves: allNotesOff reaches the voices, and a click is a
+        // fire-and-forget oscillator it never sees.
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake, silentPack);
+        const cancel = engine.click(5, "beat", 0.2);
+        // Queued for five seconds out, so it is still ringing at four.
+        expect(fake.ringingAt(4)).toBe(1);
+        cancel();
+        expect(fake.ringingAt(4)).toBe(0);
+    });
+
+    it("hands back a cancel that does nothing for a click never queued", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake, silentPack);
+        expect(() => engine.click(1, "beat", 0)()).not.toThrow();
+        expect(fake.started()).toBe(0);
+    });
+});

@@ -74,7 +74,16 @@ export function fakeAudioEngine(): FakeAudioEngine {
             engine.silenced += 1;
         },
         click(time, kind, gain) {
-            engine.clicks.push({ time, kind, gain });
+            const queued = { time, kind, gain };
+            engine.clicks.push(queued);
+            // Cancelling takes the click back off the record, so a test reads what
+            // would actually sound.
+            return () => {
+                const at = engine.clicks.indexOf(queued);
+                if (at >= 0) {
+                    engine.clicks.splice(at, 1);
+                }
+            };
         },
         setRoom(wet) {
             engine.room = wet;

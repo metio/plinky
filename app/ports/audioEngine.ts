@@ -83,8 +83,11 @@ export interface AudioEngine {
     // where the volume preference is folded into each strike's `gain` instead: there is one
     // room, and every voice already in it is in the same one.
     setRoom(wet: number): void;
-    // A click at an absolute audio-clock time, `gain` already volume-adjusted.
-    click(time: number, kind: ClickKind, gain: number): void;
+    // A click at an absolute audio-clock time, `gain` already volume-adjusted. Returns
+    // a cancel that silences the click if it has not sounded yet: a track queued whole on
+    // the audio clock — a count-in and a run — can then be taken off it again when the
+    // player restarts or leaves, where allNotesOff reaches only the voices.
+    click(time: number, kind: ClickKind, gain: number): () => void;
     // Whether the engine synthesized this pitch recently enough that a
     // microphone could still be hearing it ring — the echo probe the mic input
     // uses to ignore the app's own speaker. Optional: fakes and offline
