@@ -33,6 +33,19 @@ describe("symbolsInScore", () => {
         }
     });
 
+    it("judges each staff of a grand staff against its own clef", () => {
+        // E4 sits on the bottom line of the treble and G2 on the bottom line of the bass:
+        // no ledger line anywhere. Read every note against the bass stave because the
+        // score has an F clef somewhere, and every treble note is a ledger line.
+        const grand = (treble: string, bass: string) =>
+            `<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>${treble}<backup><duration>4</duration></backup>${bass}</measure></part></score-partwise>`;
+        const note = (step: string, octave: number, staff: number) =>
+            `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>4</duration><type>whole</type><staff>${staff}</staff></note>`;
+        expect(ids(grand(note("E", 4, 1), note("G", 2, 2)))).not.toContain("ledger");
+        // Middle C on the bass staff hangs a line above it.
+        expect(ids(grand(note("E", 4, 1), note("C", 4, 2)))).toContain("ledger");
+    });
+
     it("finds ledger lines from the pitch and the clef, since nothing marks them", () => {
         const treble = (step: string, octave: number) =>
             ids(
