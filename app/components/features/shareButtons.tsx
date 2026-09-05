@@ -3,6 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { useCopied } from "../../hooks/useCopied";
+import { downloadBlob } from "../../lib/download";
+import { svgToPng } from "../../lib/rasterize";
 import { m } from "../../paraglide/messages.js";
 import { SITE_URL } from "../../../core/site";
 import { type Brand, BrandIcon } from "../ui/brandIcons";
@@ -39,35 +41,18 @@ const LINK = "rounded-md border border-line-strong px-3 py-1.5 text-sm font-medi
 // (mobile) or downloads it. The card is self-contained, so the canvas stays untainted
 // and can be exported.
 async function saveImage(svg: string, boast: string): Promise<void> {
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
-    try {
-        const image = new Image();
-        image.src = url;
-        await image.decode();
-        const canvas = document.createElement("canvas");
-        canvas.width = 1080;
-        canvas.height = 1350;
-        canvas.getContext("2d")?.drawImage(image, 0, 0);
-        const png = await new Promise<Blob | null>((resolve) =>
-            canvas.toBlob(resolve, "image/png"),
-        );
-        if (!png) {
-            return;
-        }
-        const file = new File([png], "plinky.png", { type: "image/png" });
-        if (navigator.canShare?.({ files: [file] })) {
-            await navigator.share({ files: [file], text: boast });
-            return;
-        }
-        const link = URL.createObjectURL(png);
-        const anchor = document.createElement("a");
-        anchor.href = link;
-        anchor.download = "plinky.png";
-        anchor.click();
-        URL.revokeObjectURL(link);
-    } finally {
-        URL.revokeObjectURL(url);
+    const png = await svgToPng(svg, 1080, 1350);
+    if (!png) {
+        return;
     }
+    const file = new File([png], "plinky.png", { type: "image/png" });
+    if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], text: boast });
+        return;
+    }
+    // The shared download defers revoking its object URL: revoked on the same tick, the
+    // browser's fetch of it can lose the race and Firefox drops the file outright.
+    downloadBlob(png, "image/png", "plinky.png");
 }
 
 // Copy / save-image / per-platform buttons shared by every card. `text` is the

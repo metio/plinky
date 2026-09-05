@@ -7,6 +7,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { m } from "../../paraglide/messages.js";
 import { ShareButtons } from "./shareButtons";
 
+// The raster and the download are the shared helpers' business; here they are stubbed so
+// the card's own choice — share the file, or download it — is what is observed.
+vi.mock("../../lib/rasterize", () => ({
+    svgToPng: vi.fn(() => Promise.resolve(new Blob(["png"], { type: "image/png" }))),
+}));
+vi.mock("../../lib/download", () => ({ downloadBlob: vi.fn() }));
+import { downloadBlob } from "../../lib/download";
+
 // A minimal valid SVG so the rasterise path has something to decode.
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>';
 
@@ -79,6 +87,18 @@ describe("ShareButtons", () => {
         });
         mount();
         expect(await screen.findByRole("button", { name: m.share_share() })).toBeTruthy();
+    });
+
+    it("downloads the image through the shared helper when files can't be shared", async () => {
+        // The shared download revokes its object URL a tick later; a hand-rolled copy
+        // that revoked at once lost the file on Firefox.
+        mount();
+        fireEvent.click(screen.getByRole("button", { name: m.share_image() }));
+        await waitFor(() => expect(downloadBlob).toHaveBeenCalled());
+        const [blob, type, name] = vi.mocked(downloadBlob).mock.calls[0] ?? [];
+        expect(blob).toBeInstanceOf(Blob);
+        expect(type).toBe("image/png");
+        expect(name).toBe("plinky.png");
     });
 
     it("opens Instagram alongside the image save when files can't be shared", () => {
