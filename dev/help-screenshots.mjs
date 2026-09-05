@@ -24,11 +24,11 @@
 // this needs no image library and no host binary: anywhere Playwright runs, this runs.
 
 import { createHash } from "node:crypto";
-import { createReadStream, existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { createServer } from "node:http";
-import { basename, extname, join, normalize } from "node:path";
+import { basename, join } from "node:path";
 import { chromium } from "playwright";
+import { serveStatic } from "./staticServer.mjs";
 
 const CLIENT = "build/client";
 const OUT = "public/help";
@@ -88,34 +88,10 @@ async function localeFingerprint(locale) {
     return createHash("sha256").update(`${appFingerprint}\n${words}`).digest("hex").slice(0, 16);
 }
 
-const TYPES = {
-    ".html": "text/html; charset=utf-8",
-    ".js": "text/javascript",
-    ".css": "text/css",
-    ".json": "application/json",
-    ".png": "image/png",
-    ".webp": "image/webp",
-    ".svg": "image/svg+xml",
-    ".woff2": "font/woff2",
-    ".mxl": "application/octet-stream",
-    ".musicxml": "application/xml",
-    ".webmanifest": "application/manifest+json",
-};
-
 // The built site as it is served: a prerendered document per path, everything else a
 // file, and the SPA shell for anything that has neither.
 function serve() {
-    const server = createServer((request, response) => {
-        const path = normalize(decodeURIComponent(new URL(request.url, "http://x").pathname));
-        const candidates = [join(CLIENT, path), join(CLIENT, path, "index.html")];
-        const file = candidates.find((one) => existsSync(one) && statSync(one).isFile());
-        const served = file ?? join(CLIENT, "index.html");
-        response.writeHead(200, { "content-type": TYPES[extname(served)] ?? "text/plain" });
-        createReadStream(served).pipe(response);
-    });
-    return new Promise((resolve) => {
-        server.listen(0, "127.0.0.1", () => resolve({ server, port: server.address().port }));
-    });
+    return serveStatic(CLIENT, { fallback: "spa", host: "127.0.0.1" });
 }
 
 if (!existsSync(join(CLIENT, "index.html"))) {

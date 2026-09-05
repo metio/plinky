@@ -29,6 +29,7 @@
 import { assertPages, noindexPaths, staticPaths } from "./dev/pages.mjs";
 import { heaviestLocale } from "./dev/locale-stress.mjs";
 import { builtLocales } from "./dev/single-locale-build.mjs";
+import { pageUrl } from "./dev/sitemap.mjs";
 
 // Fails loudly if the route-table reading has gone stale, before any of it is trusted.
 assertPages();
@@ -39,7 +40,7 @@ assertPages();
 // one language none of these gates needed to check, since every string was written to fit
 // it. Falling back to that same choice keeps this config readable before a build exists.
 const LOCALE = builtLocales()[0] ?? heaviestLocale().locale;
-const url = (path) => `http://localhost/${LOCALE}${path === "/" ? "/" : `${path}/`}`;
+const url = (path) => pageUrl("http://localhost", LOCALE, path);
 
 // One concrete score page. Any bundled score would do; this one is prerendered.
 const PLAY_SAMPLE = "/play/47xd2XDpYFCy";

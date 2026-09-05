@@ -10,6 +10,8 @@
 // tripwire for a catalogue that has outgrown the layout rather than a live constraint —
 // and a build that fails is better than a sitemap that is silently ignored.
 const MAX_URLS_PER_SITEMAP = 50_000;
+// The other cap the protocol sets: a sitemap file may not exceed 50 MB uncompressed.
+const MAX_BYTES_PER_SITEMAP = 50 * 1024 * 1024;
 
 const escapeXml = (value) =>
     value
@@ -41,7 +43,14 @@ const alternate = (hreflang, href) =>
 // Every URL carries the whole cluster's hreflang alternates — each locale that has the
 // page, itself included, plus x-default — which is what ties the language versions of a
 // page together instead of leaving them competing as duplicates.
-export function buildSitemaps({ entries, siteUrl, baseLocale, lastmod, noindex = [] }) {
+export function buildSitemaps({
+    entries,
+    siteUrl,
+    baseLocale,
+    lastmod,
+    noindex = [],
+    maxBytes = MAX_BYTES_PER_SITEMAP,
+}) {
     const skip = new Set(noindex);
 
     // Group by canonical path first: the alternates a URL needs are a property of the page
@@ -90,10 +99,15 @@ export function buildSitemaps({ entries, siteUrl, baseLocale, lastmod, noindex =
                     "split the locale's pages across numbered children before this ships",
             );
         }
-        children.set(
-            locale,
-            `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join("")}</urlset>\n`,
-        );
+        const child = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join("")}</urlset>\n`;
+        const bytes = Buffer.byteLength(child, "utf8");
+        if (bytes > maxBytes) {
+            throw new Error(
+                `sitemap-${locale}.xml would be ${bytes} bytes, over the ${maxBytes} a sitemap may weigh — ` +
+                    "every URL carries the whole hreflang cluster, so split the locale's pages across numbered children before this ships",
+            );
+        }
+        children.set(locale, child);
     }
 
     // The index carries each child's <lastmod> as well, so a crawler can tell which

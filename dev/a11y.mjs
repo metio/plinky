@@ -6,12 +6,11 @@
 // each prerendered page. Lighthouse only audits light mode, so running both modes
 // here is the only way dark-mode issues (contrast especially) get caught. Exits
 // non-zero on any violation.
-import { existsSync, readFileSync, statSync } from "node:fs";
-import { createServer } from "node:http";
-import { extname, join } from "node:path";
+import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import lighthouserc from "../lighthouserc.js";
 import { requireSingleLocaleBuild } from "./single-locale-build.mjs";
+import { serveStatic } from "./staticServer.mjs";
 
 // The npm script builds the single locale first, so this only fires when the script is
 // run by hand over a tree something else left behind — an all-locales build serves each
@@ -28,17 +27,6 @@ const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
 // place and both pick it up. Strip the host to get each prerendered path; the URLs are
 // already locale-prefixed (the bare "/" is only a client redirect, so it isn't listed).
 const PAGES = lighthouserc.ci.collect.url.map((url) => new URL(url).pathname);
-const MIME = {
-    ".html": "text/html",
-    ".js": "text/javascript",
-    ".css": "text/css",
-    ".json": "application/json",
-    ".svg": "image/svg+xml",
-    ".png": "image/png",
-    ".ico": "image/x-icon",
-    ".webmanifest": "application/manifest+json",
-};
-
 const axeSrc = readFileSync("node_modules/axe-core/axe.min.js", "utf8");
 
 // Which document each request actually got, so a page that fell through to the SPA shell
@@ -47,31 +35,11 @@ const served = new Map();
 
 // A static server matching how Cloudflare Pages serves the build: directory URLs map
 // to their index.html, and unknown paths fall back to the SPA shell.
-const server = createServer((req, res) => {
-    let path = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
-    if (path.endsWith("/")) {
-        path += "index.html";
-    }
-    let file = join(ROOT, path);
-    // A directory path without a trailing slash (e.g. /en/scores) would otherwise
-    // readFileSync a directory and throw EISDIR; serve its index.html instead.
-    if (existsSync(file) && statSync(file).isDirectory()) {
-        file = join(file, "index.html");
-    }
-    if (!existsSync(file)) {
-        // The SPA shell, the way Cloudflare Pages serves an unknown path. Recorded,
-        // because every page in the audited set is prerendered: reaching the shell means
-        // the page was not built, and axe would find nothing wrong with an empty document
-        // and report it as a clean pass. That is exactly what happened when the build
-        // moved to another language while the audited URLs stayed on /en/ — twenty-two
-        // pages, zero violations, none of them real.
-        served.set(path, "fallback");
-        file = join(ROOT, "index.html");
-    }
-    res.writeHead(200, { "content-type": MIME[extname(file)] ?? "application/octet-stream" });
-    res.end(readFileSync(file));
+const { server } = await serveStatic(ROOT, {
+    fallback: "spa",
+    onFallback: (path) => served.set(path, "fallback"),
+    port: PORT,
 });
-await new Promise((resolve) => server.listen(PORT, resolve));
 
 const browser = await chromium.launch({
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
