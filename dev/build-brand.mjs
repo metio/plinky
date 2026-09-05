@@ -16,6 +16,7 @@
 
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
+import { tokenValue } from "./brandTokens.mjs";
 
 const OUT = "brand";
 const CSS = "app/app.css";
@@ -48,16 +49,6 @@ const SPOKEN_FOR = [
 // A token's light-theme value. app.css is the source; the three meaning-carrying colours
 // resolve to Tailwind's own palette, which only exists once the stylesheet is built — so
 // those are read out of the build, where they are already resolved.
-function tokenValue(css, built, name) {
-    const from = (text) => text.match(new RegExp(`${name}:\\s*([^;]+)`));
-    const match = from(css) ?? from(built);
-    if (!match) {
-        throw new Error(`${name} is defined in neither ${CSS} nor the build`);
-    }
-    const raw = match[1].trim();
-    return raw.startsWith("var(") ? tokenValue(css, built, raw.slice(4, -1).trim()) : raw;
-}
-
 const css = await readFile(CSS, "utf8");
 // Carried into the page as a data URI rather than a file:// URL, so the render does not
 // depend on where the browser thinks its document lives.

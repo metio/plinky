@@ -14,8 +14,9 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
-import { spawn } from "node:child_process";
 import { regionFor } from "./voicing.mjs";
+import { startDevServer } from "../promo/devServer.mjs";
+import { readSongsSync } from "../manifest.mts";
 
 const PACK = argValue("--pack");
 const COUNT = Number(argValue("--pieces") ?? 12);
@@ -24,20 +25,6 @@ const PORT = 5203;
 function argValue(flag) {
     const index = process.argv.indexOf(flag);
     return index > 0 ? process.argv[index + 1] : undefined;
-}
-
-async function waitForServer(url, attempts = 120) {
-    for (let index = 0; index < attempts; index++) {
-        try {
-            if ((await fetch(url)).ok) {
-                return;
-            }
-        } catch {
-            // not up yet
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    throw new Error(`dev server never came up at ${url}`);
 }
 
 if (!PACK || !existsSync(join(PACK, "manifest.json"))) {
@@ -52,7 +39,7 @@ const sizeOf = new Map(
 // The manifest carries what the SFZ said; the lookup is the one both sides share.
 const regions = manifest.notes;
 
-const songs = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
+const songs = readSongsSync();
 // A spread of the catalogue rather than the pieces the demo already used: grades 1 to 8,
 // so the answer covers a beginner's first study and a Chopin nocturne alike.
 const pieces = [];
@@ -64,14 +51,10 @@ for (let grade = 1; grade <= 8; grade++) {
     }
 }
 
-const server = spawn("npx", ["react-router", "dev", "--port", String(PORT)], {
-    stdio: "ignore",
-    env: process.env,
-});
+const server = await startDevServer(PORT);
 const base = `http://localhost:${PORT}`;
 
 try {
-    await waitForServer(`${base}/en/`);
     const browser = await chromium.launch();
     const page = await browser.newPage();
     await page.goto(`${base}/en/`, { waitUntil: "domcontentloaded" });

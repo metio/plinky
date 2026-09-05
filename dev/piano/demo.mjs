@@ -13,19 +13,15 @@
 // by Alexander Holm, CC-BY-3.0). It is served to the browser from its own little origin,
 // because the dev server serves the repository and this is not part of it.
 
-import { spawn, spawnSync } from "node:child_process";
-import {
-    createReadStream,
-    existsSync,
-    mkdirSync,
-    readFileSync,
-    statSync,
-    writeFileSync,
-} from "node:fs";
+import { spawnSync } from "node:child_process";
+import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
-import { join, normalize } from "node:path";
+import { join, normalize, relative } from "node:path";
 import { chromium } from "playwright";
 import { readSfz } from "./salamander.mjs";
+import { slug } from "../promo/pieces.mjs";
+import { startDevServer } from "../promo/devServer.mjs";
+import { readSongsSync } from "../manifest.mts";
 
 const OUT = argValue("--out") ?? "piano-demo";
 const SECONDS = Number(argValue("--seconds") ?? 25);
@@ -51,29 +47,6 @@ const PIECES = [
 function argValue(flag) {
     const index = process.argv.indexOf(flag);
     return index > 0 ? process.argv[index + 1] : undefined;
-}
-
-function slug(title) {
-    return title
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
-}
-
-async function waitForServer(url, attempts = 120) {
-    for (let index = 0; index < attempts; index++) {
-        try {
-            if ((await fetch(url)).ok) {
-                return;
-            }
-        } catch {
-            // not up yet
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    throw new Error(`dev server never came up at ${url}`);
 }
 
 // Serves the unpacked library with CORS open, so the page can fetch a recording by the
@@ -184,18 +157,17 @@ const sfz = join(LIBRARY, "SalamanderGrandPianoV3.sfz");
 const regions = readSfz(sfz).map((region) => ({
     ...region,
     // Relative to the library root, which is what the sample server serves from.
-    file: region.file.slice(LIBRARY.length).replace(/^\//, ""),
+    file: relative(LIBRARY, region.file),
 }));
 console.log(`${regions.length} sampled regions from ${sfz.split("/").pop()}`);
 
-const manifest = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
+const manifest = readSongsSync();
 mkdirSync(OUT, { recursive: true });
 
 const samples = serveSamples(LIBRARY);
-const server = spawn("npx", ["react-router", "dev", "--port", String(PORT)], {
-    stdio: "inherit",
-    env: process.env,
-});
+// Our own server on our own port, or nothing: a driver that finds someone else's server
+// renders someone else's code, and the refusal lives in one place.
+const server = await startDevServer(PORT);
 const base = `http://localhost:${PORT}`;
 
 try {

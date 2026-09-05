@@ -131,23 +131,30 @@ export async function readPerformance(request: PerformanceRequest): Promise<Reco
     const host = document.createElement("div");
     host.style.width = "1200px";
     document.body.appendChild(host);
-    const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
-    await osmd.load(xml);
-    osmd.render();
-    // The marks come from the file, not the engraving: without them every note is struck
-    // at the same even touch, which is the one thing that makes a rendered piece sound
-    // like a machine playing it.
-    const marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
-    // Read the way LISTEN reads, not the way a run is graded. The graded reading asks for
-    // the written note where the page prints an ornament, a tremolo or a glissando —
-    // deliberately, because nobody can be graded on a trill note by note — and plays every
-    // rolled chord as a block. A clip is the shop window: it should sound like the app
-    // sounds, so it comes off the same model Listen sounds.
-    const steps = collectListenSteps(osmd, marks);
-    // Every position is counted in the same proportion to the opening tempo that its own
-    // mark stands in, which is what the transport does with the dial at the written tempo.
-    const startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
-    host.remove();
+    // The host comes off the page however the engraving ends: a load the engraver
+    // refuses must not leave one host per attempt behind for the rest of the batch.
+    let steps: ReturnType<typeof collectListenSteps>;
+    let startBpm: number;
+    try {
+        const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
+        await osmd.load(xml);
+        osmd.render();
+        // The marks come from the file, not the engraving: without them every note is struck
+        // at the same even touch, which is the one thing that makes a rendered piece sound
+        // like a machine playing it.
+        const marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
+        // Read the way LISTEN reads, not the way a run is graded. The graded reading asks for
+        // the written note where the page prints an ornament, a tremolo or a glissando —
+        // deliberately, because nobody can be graded on a trill note by note — and plays every
+        // rolled chord as a block. A clip is the shop window: it should sound like the app
+        // sounds, so it comes off the same model Listen sounds.
+        steps = collectListenSteps(osmd, marks);
+        // Every position is counted in the same proportion to the opening tempo that its own
+        // mark stands in, which is what the transport does with the dial at the written tempo.
+        startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
+    } finally {
+        host.remove();
+    }
 
     // Read long enough to choose where to stop, then cut at a silence. A short clip asked
     // for a flat twenty seconds and got whatever fell there — mid-phrase, mid-chord, on a
