@@ -5,6 +5,7 @@ import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { noteName } from "../../../core/midi";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { usePrefs } from "../../hooks/usePrefs";
 import { KeyboardHint } from "../ui/keyboardHint";
 import { sectionLabelClasses } from "../ui/classes";
 
@@ -13,6 +14,7 @@ import { sectionLabelClasses } from "../ui/classes";
 // block where Web MIDI is unsupported, so there's no unsupported state here.
 export function MidiConnect() {
     const heldNotes = useHeldNotes();
+    const { prefs } = usePrefs();
     const { support, status, error, devices, octaveOffset, requestAccess } = useMidiConnection();
 
     return (
@@ -39,7 +41,7 @@ export function MidiConnect() {
 
             {error && status !== "error" && <p className="text-sm text-danger">{error}</p>}
 
-            <KeyboardHint octaveOffset={octaveOffset} />
+            <KeyboardHint octaveOffset={octaveOffset} keyMap={prefs.keyMap} />
 
             <div>
                 <h3 className={`mb-2 ${sectionLabelClasses}`}>{m.midi_debug_inputs()}</h3>
