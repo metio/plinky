@@ -85,7 +85,14 @@ function thin(notes: readonly number[], count: number): number[] {
 // starts on to the note it arrives at, and the time the pair occupies.
 // The sweep, and the note it arrives on. The arrival pitch is carried because it is written
 // at a LATER position than the one that spells the figure out.
-export type GlissandoSpan = { from: number; to: number; arrivesAt: number };
+export type GlissandoSpan = {
+    from: number;
+    to: number;
+    arrivesAt: number;
+    // The MIDI pitch the slide starts from — the note carrying the mark, so a position
+    // that also strikes the other hand's note knows which one glides.
+    pitch?: number;
+};
 
 export function readGlissandos(
     notes: readonly {
@@ -96,18 +103,19 @@ export function readGlissandos(
     }[],
 ): GlissandoSpan[] {
     const spans: GlissandoSpan[] = [];
-    let open: number | null = null;
+    let open: { whole: number; pitch: number } | null = null;
     for (const note of notes) {
         if (note.marks.glissando === null || note.midi === null) {
             continue;
         }
         if (note.marks.glissando === "start") {
-            open ??= note.whole;
-        } else if (open !== null && note.whole > open) {
+            open ??= { whole: note.whole, pitch: note.midi };
+        } else if (open !== null && note.whole > open.whole) {
             spans.push({
-                from: open,
+                from: open.whole,
                 to: note.whole + note.wholes,
                 arrivesAt: note.midi,
+                pitch: open.pitch,
             });
             open = null;
         }

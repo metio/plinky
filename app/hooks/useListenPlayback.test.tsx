@@ -283,6 +283,66 @@ describe("collectListenSteps", () => {
         ).toBe(true);
     });
 
+    it("fits a grace note into the beat it decorates, so the bar keeps its length", () => {
+        // A written-eighth grace before a quarter: the position still advances one quarter
+        // in all. Dwelling the grace for its written length and then the beat for its own
+        // put every later beat late and Listen drifted from the graded run's clock.
+        let position = 0;
+        const grace = {
+            Length: { RealValue: 0.125 },
+            isRest: () => false,
+            halfTone: 50,
+            IsGraceNote: true,
+            ParentVoiceEntry: { Articulations: [] },
+        };
+        const beat = { Length: { RealValue: 0.25 }, isRest: () => false, halfTone: 48 };
+        const cursor = {
+            reset: vi.fn(() => {
+                position = 0;
+            }),
+            show: vi.fn(),
+            hide: vi.fn(),
+            next: vi.fn(() => {
+                position++;
+            }),
+            iterator: {
+                get EndReached() {
+                    return position >= 2;
+                },
+                get CurrentMeasureIndex() {
+                    return 0;
+                },
+                get currentTimeStamp() {
+                    return { RealValue: position * 0.25 };
+                },
+            },
+            NotesUnderCursor: () => (position === 0 ? [grace, beat] : [beat]),
+        };
+        const osmd = { cursor, Sheet: { SourceMeasures: [] } } as unknown as OpenSheetMusicDisplay;
+        const steps = collectListenSteps(osmd);
+        const advance = (step: (typeof steps)[number]) => Math.min(...step.lengths);
+        expect(steps.map((step) => step.notes[0]?.pitch)).toEqual([62, 60, 60]);
+        expect(advance(steps[0]!) + advance(steps[1]!)).toBeCloseTo(1);
+        expect(advance(steps[2]!)).toBeCloseTo(1);
+    });
+
+    it("spells a trill out over the other hand's note, which sounds once", () => {
+        const osmd = lineOsmd([[48, 72]], {});
+        const trilled = { ParentVoiceEntry: { OrnamentContainer: { ornament: 0 } } };
+        const raw = osmd.cursor.NotesUnderCursor;
+        (osmd.cursor as unknown as { NotesUnderCursor: () => unknown[] }).NotesUnderCursor = () =>
+            raw().map((note: { halfTone: number }) =>
+                note.halfTone === 72
+                    ? { ...note, ...trilled, ParentStaff: { idInMusicSheet: 0 } }
+                    : { ...note, ParentStaff: { idInMusicSheet: 1 } },
+            );
+        const steps = collectListenSteps(osmd);
+        expect(steps.length).toBeGreaterThan(2);
+        expect(
+            steps.flatMap((step) => step.notes.filter((note) => note.pitch === 60)),
+        ).toHaveLength(1);
+    });
+
     it("rocks an alternating tremolo between the two written chords", () => {
         const steps = collectListenSteps(fakeOsmd(2), {
             ...NO_SCORE_MARKS,
