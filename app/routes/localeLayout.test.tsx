@@ -13,8 +13,8 @@ afterEach(cleanup);
 
 // Shows where the router settled, so a redirect's destination is observable.
 function Destination() {
-    const { pathname } = useLocation();
-    return <div data-testid="dest">{pathname}</div>;
+    const { pathname, search, hash } = useLocation();
+    return <div data-testid="dest">{`${pathname}${search}${hash}`}</div>;
 }
 
 function routerAt(initial: string) {
@@ -39,6 +39,14 @@ describe("LocaleLayout", () => {
         expect(dest).toMatch(/\/play\/abc\/$/);
         expect(dest.startsWith("/zz/")).toBe(false);
         expect(isLocale(dest.split("/")[1])).toBe(true);
+    });
+
+    it("carries the query and the fragment through the redirect", async () => {
+        // A piece opened by a link that asks for one hand keeps the ask; a page opened at
+        // a heading opens at the heading.
+        renderWithServices(routerAt("/zz/play/abc?hands=left#bar-3"));
+        const dest = (await screen.findByTestId("dest")).textContent ?? "";
+        expect(dest).toMatch(/\/play\/abc\/\?hands=left#bar-3$/);
     });
 
     it("reads a lone segment as a page name, not as a mistyped locale", async () => {

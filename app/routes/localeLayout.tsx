@@ -13,7 +13,7 @@ import { localizedHref } from "../components/ui/href";
 // and keeps <html lang> in sync on the client.
 export default function LocaleLayout() {
     const { locale } = useParams();
-    const { pathname } = useLocation();
+    const { pathname, search, hash } = useLocation();
     const valid = isLocale(locale);
 
     useEffect(() => {
@@ -46,7 +46,14 @@ export default function LocaleLayout() {
             return null;
         }
         const rest = pathname.replace(/^\/[^/]+/, "");
-        return <Navigate to={localizedHref(rest === "" ? pathname : rest)} replace />;
+        // The query and the fragment travel with the page: a piece opened by a link that
+        // asks for one hand, or a help page opened at a heading, keeps the ask.
+        return (
+            <Navigate
+                to={localizedHref(`${rest === "" ? pathname : rest}${search}${hash}`)}
+                replace
+            />
+        );
     }
 
     return (
