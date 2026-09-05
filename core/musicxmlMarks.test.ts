@@ -42,7 +42,7 @@ describe("the marks that cover a stretch of music", () => {
             `<measure number="1">${ATTR}${note("C", 4, '<notations><slur number="1" type="start"/></notations>')}${note("D", 4)}${note("E", 4, '<notations><slur number="1" type="stop"/></notations>')}${note("F", 4)}</measure>`,
         );
         const spans = slurSpans(timeline.notes);
-        expect(spans).toEqual([{ from: 0, to: 0.5 }]);
+        expect(spans).toEqual([{ from: 0, to: 0.5, staff: 0 }]);
         // Every note under the arch is joined onward except its last.
         expect([0, 0.25, 0.5, 0.75].map((at) => slurredOnwardAt(spans, at))).toEqual([
             true,
@@ -59,8 +59,8 @@ describe("the marks that cover a stretch of music", () => {
             `<measure number="1">${ATTR}${note("C", 4, '<notations><slur number="1" type="start"/></notations>')}${note("D", 4, '<notations><slur number="2" type="start"/></notations>')}${note("E", 4, '<notations><slur number="1" type="stop"/></notations>')}${note("F", 4, '<notations><slur number="2" type="stop"/></notations>')}</measure>`,
         );
         expect(slurSpans(timeline.notes)).toEqual([
-            { from: 0, to: 0.5 },
-            { from: 0.25, to: 0.75 },
+            { from: 0, to: 0.5, staff: 0 },
+            { from: 0.25, to: 0.75, staff: 0 },
         ]);
     });
 
@@ -68,7 +68,7 @@ describe("the marks that cover a stretch of music", () => {
         const { timeline } = read(
             `<measure number="1">${ATTR}${note("C", 4, '<notations><slur number="1" type="start"/></notations>')}${note("D", 4)}</measure>`,
         );
-        expect(slurSpans(timeline.notes)).toEqual([{ from: 0, to: 0.25 }]);
+        expect(slurSpans(timeline.notes)).toEqual([{ from: 0, to: 0.25, staff: 0 }]);
     });
 
     it("reads each written dynamic as a loudness at the place it is written", () => {
@@ -134,6 +134,24 @@ describe("the marks that cover a stretch of music", () => {
         );
         expect(pedals).toHaveLength(1);
         expect(pedals[0]?.to).toBeGreaterThanOrEqual(pedals[0]?.from ?? 0);
+    });
+
+    it("keeps a slur to the staff it is drawn on, numbered as the engraver numbers staves", () => {
+        // A right-hand arch over a left hand of staccato quarters: the bass is not slurred.
+        // Staves are 1 and 2 in the file and 0 and 1 to the engraver.
+        const right = (step: string, extra = "") =>
+            `<note><pitch><step>${step}</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff>${extra}</note>`;
+        const left = (step: string) =>
+            `<note><pitch><step>${step}</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><articulations><staccato/></articulations></notations></note>`;
+        const timeline = readTimeline(
+            score(
+                `<measure number="1"><attributes><divisions>4</divisions><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>${right("C", '<notations><slur number="1" type="start"/></notations>')}${right("D")}${right("E", '<notations><slur number="1" type="stop"/></notations>')}${right("F")}<backup><duration>16</duration></backup>${left("C")}${left("G")}${left("G")}${left("C")}</measure>`,
+            ),
+        );
+        const spans = slurSpans(timeline.notes);
+        expect(spans).toEqual([{ from: 0, to: 0.5, staff: 0 }]);
+        expect(slurredOnwardAt(spans, 0.25, 0)).toBe(true);
+        expect(slurredOnwardAt(spans, 0.25, 1)).toBe(false);
     });
 
     it("reads the key signature, and calls a score without one C major", () => {

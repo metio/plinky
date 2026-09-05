@@ -55,26 +55,30 @@ const DYNAMIC_VELOCITY: Record<string, number> = {
 // "1" for everything, which is the single-arch case and pairs correctly.
 export function slurSpans(notes: readonly XmlNote[]): SlurSpan[] {
     const spans: SlurSpan[] = [];
-    const open = new Map<string, number>();
+    // Open arches, keyed by number AND staff: the file numbers slurs per part, so a
+    // right-hand slur 1 and a left-hand slur 1 can be open at once, and each closes on
+    // its own staff.
+    const open = new Map<string, { from: number; staff: number }>();
+    const key = (number: string, staff: number) => `${staff}:${number}`;
     for (const note of notes) {
         for (const number of note.marks.slurStarts) {
-            if (!open.has(number)) {
-                open.set(number, note.whole);
+            if (!open.has(key(number, note.staffId))) {
+                open.set(key(number, note.staffId), { from: note.whole, staff: note.staffId });
             }
         }
         for (const number of note.marks.slurStops) {
-            const from = open.get(number);
-            if (from !== undefined) {
-                spans.push({ from, to: note.whole });
-                open.delete(number);
+            const opened = open.get(key(number, note.staffId));
+            if (opened !== undefined) {
+                spans.push({ from: opened.from, to: note.whole, staff: opened.staff });
+                open.delete(key(number, note.staffId));
             }
         }
     }
     // An arch the engraving opens and never closes joins to the last note it opened over.
     // Dropping it would play the phrase detached, which is silent as failures go.
     const last = notes.at(-1)?.whole ?? 0;
-    for (const from of open.values()) {
-        spans.push({ from, to: Math.max(from, last) });
+    for (const { from, staff } of open.values()) {
+        spans.push({ from, to: Math.max(from, last), staff });
     }
     return spans;
 }
