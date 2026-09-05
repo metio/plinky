@@ -219,6 +219,20 @@ export function decodeComposition(code: string): Composition | null {
         if (Math.abs(running) > MAX_SHARED_MS || duration < 0 || duration > MAX_SHARED_MS) {
             return null;
         }
+        // A pitch is a key and a velocity a MIDI level: finite is not enough, since every
+        // voice that plays a note indexes by the pitch, and a crafted link with a pitch of
+        // a thousand would throw its way through each of them.
+        const pitch = pitches[i]!;
+        const velocity = velocities[i]!;
+        if (
+            !Number.isInteger(pitch) ||
+            pitch < 0 ||
+            pitch > 127 ||
+            velocity < 0 ||
+            velocity > 127
+        ) {
+            return null;
+        }
         notes.push({
             startMs: running,
             durationMs: duration,
