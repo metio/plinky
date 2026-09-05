@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { todayKey } from "../../../core/daily";
-import { shiftDay } from "../../../core/dateKey";
+import { shiftDay, weekdayIndex } from "../../../core/dateKey";
 import {
     heatLevel,
     MAX_LABEL_LENGTH,
@@ -76,7 +76,8 @@ function Stat({ label, value }: { label: string; value: string }) {
 function ConsistencyGrid({ days }: { days: PracticeDay[] }) {
     const busiest = Math.max(0, ...days.map((day) => day.activeMs));
     const first = days.at(0);
-    const leading = first ? new Date(`${first.date}T00:00:00`).getDay() : 0;
+    // Monday first, as the week scope counts it: one reading of where a week starts.
+    const leading = first ? weekdayIndex(first.date) : 0;
     // The days before the range began, only ever drawn as blanks. Keyed by the date
     // they stand for rather than by position, so a range change re-keys them instead
     // of reusing a cell that now means a different day.

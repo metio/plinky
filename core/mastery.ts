@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { DAY_MS } from "./dateKey";
 import type { Letter } from "./grade";
 
 // Spaced-repetition state for one score: the best score so far, whether it is
@@ -20,7 +21,6 @@ export type Mastery = {
     deadline: string;
 };
 
-const DAY_MS = 86_400_000;
 const FIRST_INTERVAL_DAYS = 1;
 const GROWTH = 2.3;
 const MAX_INTERVAL_DAYS = 180;

@@ -8,7 +8,8 @@
 // midnight fall on the other side of the boundary, and adding 24 hours across a
 // daylight-saving change would skip or repeat a day.
 
-const DAY_MS = 86_400_000;
+// One day in milliseconds — the unit every day count in core is built on.
+export const DAY_MS = 86_400_000;
 
 function atUtcMidnight(dateKey: string): number {
     return Date.parse(`${dateKey}T00:00:00Z`);
@@ -27,6 +28,16 @@ export function shiftDay(dateKey: string, delta: number): string {
 
 // Whole days from `from` to `to`, negative when `to` is earlier. Both ends sit at
 // UTC midnight, so this is exact rather than a rounded division.
+// Which day of the week a date key falls on, Monday first: 0 for Monday through 6 for
+// Sunday. The one reading of "where does the week start" every grid and window shares.
+export function weekdayIndex(dateKey: string): number {
+    const at = atUtcMidnight(dateKey);
+    if (!Number.isFinite(at)) {
+        return 0;
+    }
+    return (new Date(at).getUTCDay() + 6) % 7;
+}
+
 export function daysBetween(from: string, to: string): number {
     const start = atUtcMidnight(from);
     const end = atUtcMidnight(to);
