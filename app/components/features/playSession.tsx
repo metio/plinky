@@ -1118,7 +1118,7 @@ function usePlaySessionValue({
         // Same for the read-ahead drill, which walks the cursor the same way.
         vanishing.arm();
         // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
-        ghostRace.arm({ partial, ephemeral, raceGhost, hand: activeHand });
+        ghostRace.arm({ partial, loop: loop.on, ephemeral, raceGhost, hand: activeHand });
         // Read both hands off the freshly drawn score so the duet can sound the one
         // you're not practising (inert unless the duet is on).
         accompaniment.prime();
