@@ -83,7 +83,9 @@ const note = (
     midi: number | null,
     tremolo: { beams: number; part: "single" | "start" | "stop" } | null,
     wholes = 0.5,
-) => ({ whole, wholes, midi, marks: { tremolo } });
+    staff = 1,
+    voice = "1",
+) => ({ whole, wholes, midi, staff, voice, marks: { tremolo } });
 
 describe("readTremolos", () => {
     it("reads a single-note tremolo over its own note", () => {
@@ -117,6 +119,17 @@ describe("readTremolos", () => {
             [48, 60],
             [55, 67],
         ]);
+    });
+
+    it("rocks only the chord that carries the mark, not the other hand's note at the onset", () => {
+        // A left-hand alternating tremolo under a right-hand melody note struck at the same
+        // moment: the melody sounds once, and is not rocked eight times a bar.
+        const spans = readTremolos([
+            note(0, 36, { beams: 2, part: "start" }, 0.5, 2, "5"),
+            note(0, 76, null, 0.25, 1, "1"),
+            note(0.5, 43, { beams: 2, part: "stop" }, 0.5, 2, "5"),
+        ]);
+        expect(spans[0]?.pair?.map((chord) => chord.pitches)).toEqual([[36], [43]]);
     });
 
     it("opens one figure per position however many notes carry the mark", () => {
