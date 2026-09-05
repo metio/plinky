@@ -224,6 +224,17 @@ describe("listenPerformanceOf", () => {
             step([60 + index], { whole: index * 0.25, measureIndex: index }),
         );
 
+    it("counts a clip's window from the first note, not from an opening rest", () => {
+        // A two-beat rest, then three notes a beat apart at 120: a one-second window holds
+        // the first two notes. Counted from the first step, the rest alone used it up.
+        const steps = [
+            step([], { lengths: [2], whole: 0, measureIndex: 0 }),
+            ...line(3).map((one) => ({ ...one, whole: 0.5 + one.whole, measureIndex: 1 })),
+        ];
+        const played = listenPerformanceOf(steps, { startBpm: 120, withinMs: 1000 });
+        expect(played.map((one) => one.startMs)).toEqual([0, 500]);
+    });
+
     it("lays the positions out on one clock at the score's own tempo", () => {
         const played = listenPerformanceOf(line(3), { startBpm: 120 });
         expect(played.map((one) => one.startMs)).toEqual([0, 500, 1000]);
