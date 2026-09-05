@@ -49,6 +49,37 @@ describe("useComposeFile", () => {
         expect(result.current.pendingReplace).toBe(false);
     });
 
+    it("lets the latest pick win when an earlier one is still being read", async () => {
+        // The earlier file's bytes arrive only after the later one has been loaded: it
+        // must not come back to park itself over the later pick.
+        const onLoad = vi.fn();
+        const { result } = renderHook(() => useComposeFile({ hasWork: () => false, onLoad }), {
+            wrapper,
+        });
+        const slow = midiFile();
+        let release: () => void = () => {};
+        const bytes = slow.arrayBuffer.bind(slow);
+        Object.defineProperty(slow, "arrayBuffer", {
+            value: () =>
+                new Promise<ArrayBuffer>((resolve) => {
+                    release = () => void bytes().then(resolve);
+                }),
+        });
+        let first: Promise<void> = Promise.resolve();
+        act(() => {
+            first = result.current.openFile(slow);
+        });
+        await act(() => result.current.openFile(midiFile()));
+        expect(onLoad).toHaveBeenCalledTimes(1);
+        await act(async () => {
+            release();
+            await first;
+        });
+        expect(onLoad).toHaveBeenCalledTimes(1);
+        expect(result.current.pendingReplace).toBe(false);
+        expect(result.current.error).toBeNull();
+    });
+
     it("holds the parsed file for confirmation when work is in progress", async () => {
         const onLoad = vi.fn();
         const { result } = renderHook(() => useComposeFile({ hasWork: () => true, onLoad }), {
