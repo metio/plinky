@@ -318,8 +318,10 @@ function usePlaySessionValue({
         () => hints.seen(ROTATE_HINT_ID),
         () => true,
     );
-    // The notation the mobile focus strip shows — transposed to match what's played,
-    // but un-annotated (it's for reading the bar, not the printed fingering).
+    // The notation the mobile focus strip and the fingering strip read — transposed to
+    // match what's played, so the strip names the notes the keys ask for and suggests
+    // fingers for that key's black-and-white pattern, but un-annotated (the printed
+    // fingering is the score's business).
     const focusXml = useMemo(
         () => (transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose)),
         [xml, transpose, xmlCodec],

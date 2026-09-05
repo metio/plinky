@@ -17,7 +17,7 @@ import { usePlayPiece, usePlayShell, usePlaySetup, usePlayRun } from "./playSess
 // through all of full screen (unless folded away from the score corner's quick
 // controls), so the keys are there to noodle on before a run starts.
 export function PlayStage() {
-    const { focusXml, id, keyRange, score, staffCount, xml } = usePlayPiece();
+    const { focusXml, id, keyRange, score, staffCount } = usePlayPiece();
     const {
         coarsePointer,
         compact,
@@ -99,7 +99,7 @@ export function PlayStage() {
                 {fullscreen && fingerStrip ? (
                     <FingeringStrip
                         id={id}
-                        xml={xml}
+                        xml={focusXml}
                         staffCount={staffCount}
                         svg={getSvg}
                         measureBoxes={score.measureBoxes}

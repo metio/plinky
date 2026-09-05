@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**The fingering strip reads the notes you are playing.** On a transposed piece it
+named the notes as written and suggested fingers for that key, while the score and
+the keys asked for the shifted ones; and on a song with a singer's line above the
+piano, both the strip and the printed fingering worked on the vocal line. Both now
+read the piano, in the key being played.
+
 **A take's video shows the hand you played.** Exporting a left-hand take after
 switching the hand control to the right lit the right hand's notes in time with
 your left-hand playing. A take now remembers which hand it was, and the video

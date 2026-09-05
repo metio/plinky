@@ -44,6 +44,25 @@ describe("annotateFingerings", () => {
         expect(fingerings(annotated)).toHaveLength(2);
     });
 
+    it("fingers the piano and leaves the singer's line alone", () => {
+        // An art song: the sung line carries no piano fingering, and the piano's right
+        // hand is fingered on its own, not as a continuation of the last sung note.
+        const song = `<?xml version="1.0"?><score-partwise><part id="V"><measure number="1">${note(
+            "A",
+            5,
+        )}</measure></part><part id="P"><measure number="1"><attributes><staves>2</staves></attributes>${note(
+            "C",
+            4,
+            1,
+        )}${note("C", 2, 2)}</measure></part></score-partwise>`;
+        const doc = new DOMParser().parseFromString(
+            annotateFingerings(domXmlCodec, song, noSpan),
+            "application/xml",
+        );
+        expect(doc.querySelectorAll("part#V fingering")).toHaveLength(0);
+        expect(doc.querySelectorAll("part#P fingering")).toHaveLength(2);
+    });
+
     it("skips rests and leaves malformed XML untouched", () => {
         const withRest = score(`${note("C", 4)}<note><rest/><duration>2</duration></note>`);
         expect(fingerings(annotateFingerings(domXmlCodec, withRest, noSpan))).toHaveLength(1);

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { pianoPart } from "./accompaniment";
 import { pitchMidiOf } from "./notes";
 import { gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
 import type { XmlCodec } from "./xml";
@@ -23,7 +24,7 @@ function midiOf(note: Element): number | null {
     return pitch ? pitchMidiOf(pitch) : null;
 }
 
-// Parse the first part's measures into bars of positions for the given staff, alongside
+// Parse the piano part's measures into bars of positions for the given staff, alongside
 // how long the hand has before each position sounds. A note marked <chord/> joins the
 // position before it; rests and the other staff are skipped as positions but still pass
 // time, because a rest is time the hand can move in. Returns empty for unreadable XML, so
@@ -34,12 +35,28 @@ export function scoreToTimedBars(
     staff: Staff,
 ): { bars: Bar[]; gaps: number[][] } {
     const doc = codec.parse(xml);
-    const part = doc?.getElementsByTagName("part")[0];
-    if (!doc || !part) {
+    if (!doc) {
         return { bars: [], gaps: [] };
+    }
+    const { bars, gaps } = timedBarsOf(doc, staff);
+    return { bars, gaps };
+}
+
+// The same walk off a document already open, keeping a handle on each note's element
+// beside its pitch — for whatever writes back onto the score, such as the printed
+// fingering. One walk, so what is printed on a note and what the strip shows for it
+// can never disagree about which position it is.
+export function timedBarsOf(
+    doc: Document,
+    staff: Staff,
+): { bars: Bar[]; gaps: number[][]; notes: Element[][][] } {
+    const part = pianoPart(doc);
+    if (!part) {
+        return { bars: [], gaps: [], notes: [] };
     }
     const bars: Bar[] = [];
     const gaps: number[][] = [];
+    const notes: Element[][][] = [];
     // One clock for the whole part — divisions and tempo run across bar lines — and one
     // tracker for this staff alone: the hand's waiting is measured off its own notes and
     // rests, and the other staff's notes, written after a <backup> over the same time,
@@ -49,6 +66,7 @@ export function scoreToTimedBars(
     const timing = gapTracker();
     for (const measure of Array.from(part.getElementsByTagName("measure"))) {
         const positions: number[][] = [];
+        const elements: Element[][] = [];
         const barGaps: number[] = [];
         for (const node of Array.from(measure.querySelectorAll(TIMED_NODES))) {
             const seconds = clock.read(node);
@@ -66,15 +84,18 @@ export function scoreToTimedBars(
             }
             if (node.getElementsByTagName("chord").length > 0 && positions.length > 0) {
                 positions[positions.length - 1]!.push(midi);
+                elements[elements.length - 1]!.push(node);
                 continue;
             }
             barGaps.push(timing.start(seconds));
             positions.push([midi]);
+            elements.push([node]);
         }
         bars.push(positions);
         gaps.push(barGaps);
+        notes.push(elements);
     }
-    return { bars, gaps };
+    return { bars, gaps, notes };
 }
 
 export function scoreToBars(codec: XmlCodec, xml: string, staff: Staff): Bar[] {
