@@ -200,6 +200,10 @@ top note off the keyboard and the saved picture. The picture grows to fit.
 a first, larger one was still being read could let the first one replace everything
 after all. The one you chose last is the one that counts.
 
+**The practice grid starts its weeks on Monday.** The Stats page counts a week from
+Monday everywhere else, but the grid of practised days started its rows on Sunday,
+so a weekday pattern read one column off. One reading of the week now.
+
 ## 3 September 2026
 
 **A piano to just play.** Every other page here wants something of you — a piece to

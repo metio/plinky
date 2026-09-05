@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { daysBetween } from "./dateKey";
 import { DEFAULT_DRILL, generateDrill } from "./drill";
 import type { Grade } from "./grade";
 import { hashString, seededRandom } from "./random";
@@ -17,16 +18,12 @@ export function todayKey(now: Date): string {
     return `${year}-${month}-${day}`;
 }
 
-const DAY_MS = 86_400_000;
 // Day one of the daily challenge; the running number counts up from here so every
 // player refers to the same "Plinky #N" on a given date.
 export const DAILY_EPOCH = "2026-06-25";
 
 export function dailyNumber(dateKey: string, epoch: string = DAILY_EPOCH): number {
-    const days = Math.floor(
-        (Date.parse(`${dateKey}T00:00:00Z`) - Date.parse(`${epoch}T00:00:00Z`)) / DAY_MS,
-    );
-    return days + 1;
+    return daysBetween(epoch, dateKey) + 1;
 }
 
 // About how long the day's phrase should take to play. Long enough that accuracy,

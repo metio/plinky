@@ -193,6 +193,10 @@
       **Restoring a backup keeps to the file you chose last.** Picking a second file while
       a first, larger one was still being read could let the first one replace everything
       after all. The one you chose last is the one that counts.
+    - |-
+      **The practice grid starts its weeks on Monday.** The Stats page counts a week from
+      Monday everywhere else, but the grid of practised days started its rows on Sunday,
+      so a weekday pattern read one column off. One reading of the week now.
 - date: 2026-09-03
   entries:
     - |-

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { daysBetween, daysInRange, isDateKey, shiftDay } from "./dateKey";
+import { daysBetween, daysInRange, isDateKey, shiftDay, weekdayIndex } from "./dateKey";
 
 describe("shiftDay", () => {
     it("moves forward and back", () => {
@@ -71,5 +71,15 @@ describe("isDateKey", () => {
         expect(isDateKey("2026-6-23")).toBe(false);
         expect(isDateKey("23/06/2026")).toBe(false);
         expect(isDateKey("")).toBe(false);
+    });
+});
+
+describe("weekdayIndex", () => {
+    it("counts the week from Monday, whatever zone the runner is in", () => {
+        // 2026-08-24 is a Monday, 2026-08-30 the Sunday that ends its week.
+        expect(weekdayIndex("2026-08-24")).toBe(0);
+        expect(weekdayIndex("2026-08-26")).toBe(2);
+        expect(weekdayIndex("2026-08-30")).toBe(6);
+        expect(weekdayIndex("not a date")).toBe(0);
     });
 });

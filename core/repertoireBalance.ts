@@ -14,6 +14,7 @@
 // as a piece nobody has played for a month, which is a fact a player can do as they like
 // with — put it back in the rotation, or let it go.
 
+import { DAY_MS } from "./dateKey";
 import type { PracticeLog } from "./practiceSession";
 
 export type RepertoireEntry = {
@@ -64,5 +65,5 @@ export function repertoireBalance(log: PracticeLog): RepertoireEntry[] {
 // Whole days since a piece was last touched, from a reference instant the caller owns —
 // core reads no clock.
 export function daysSince(entry: RepertoireEntry, now: number): number {
-    return Math.max(0, Math.floor((now - entry.lastAt) / 86_400_000));
+    return Math.max(0, Math.floor((now - entry.lastAt) / DAY_MS));
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { todayKey } from "./daily";
-import { daysInRange } from "./dateKey";
+import { daysBetween, daysInRange, shiftDay, weekdayIndex } from "./dateKey";
 import type { History } from "./history";
 
 // Which window of time the You page's figures are about.
@@ -43,19 +43,14 @@ export function scopeStart(scope: Scope, now: Date): string | null {
             // The week starts on Monday, which is what a calendar in most of the world
             // shows and what "this week" means to somebody looking at one. Sunday reads as
             // the end of a week here, not the start of the next.
-            return weekStart(today, now);
+            return weekStart(today);
     }
 }
 
-function weekStart(today: string, now: Date): string {
-    // getDay is 0 for Sunday, so Monday-first is (day + 6) % 7 days back.
-    const back = (now.getDay() + 6) % 7;
-    const start = new Date(now);
-    start.setDate(start.getDate() - back);
-    const iso = todayKey(start);
-    // A clock change inside the week can make the shift land a day out; the start can
-    // never be after today, so clamp rather than trust the arithmetic.
-    return iso > today ? today : iso;
+function weekStart(today: string): string {
+    // Counted on the date key itself, so a clock change inside the week cannot land the
+    // shift a day out: the week starts weekdayIndex days before today, Monday first.
+    return shiftDay(today, -weekdayIndex(today));
 }
 
 // Whether a date key falls inside the scope. Keys are YYYY-MM-DD, so they compare as
@@ -75,9 +70,7 @@ export function scopeDays(scope: Scope, now: Date): number | null {
     if (start === null) {
         return null;
     }
-    const from = new Date(`${start}T00:00:00`);
-    const to = new Date(`${todayKey(now)}T00:00:00`);
-    return Math.round((to.getTime() - from.getTime()) / 86_400_000) + 1;
+    return daysBetween(start, todayKey(now)) + 1;
 }
 
 export type DaySeries = { date: string; notes: number }[];
