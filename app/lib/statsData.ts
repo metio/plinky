@@ -10,7 +10,7 @@ import type { DecayMode } from "../../core/review";
 import { MAX_GRADE } from "../../core/scoreDifficulty";
 import type { Grid } from "../../core/shareCard";
 import {
-    currentGrade,
+    ladderStanding,
     dueItems,
     type GradeCatalogItem,
     type GradedMastery,
@@ -65,11 +65,7 @@ export type YouInput = {
 // derivation is exercised as a table without mounting React or loading a store.
 export function buildStatsData(input: YouInput): StatsData {
     const { items, catalogue, mode, now } = input;
-    const level = currentGrade(items);
-    const masteredIds = new Set(
-        items.filter((item) => item.mastery.learned && !item.mastery.backlog).map((i) => i.id),
-    );
-    const workingGrade = Math.min(level + 1, MAX_GRADE);
+    const { level, workingGrade, mastered } = ladderStanding(items);
 
     return {
         items,
@@ -78,7 +74,7 @@ export function buildStatsData(input: YouInput): StatsData {
         level,
         skill: skillRating(items, mode, now),
         workingGrade,
-        upNext: gradeSuggestions(catalogue, workingGrade, masteredIds, SUGGESTION_COUNT),
+        upNext: gradeSuggestions(catalogue, workingGrade, mastered, SUGGESTION_COUNT),
         reviews: dueItems(items, now, input.reviewCap).map((item) => ({
             id: item.id,
             title: item.title,

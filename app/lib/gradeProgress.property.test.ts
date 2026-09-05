@@ -9,6 +9,7 @@ import { REVIEW_CAP } from "../../core/review";
 import {
     currentGrade,
     dueItems,
+    ladderStanding,
     masteredInGrade,
     skillRating,
     STAR_THRESHOLDS,
@@ -95,6 +96,28 @@ describe("gradeProgress invariants", () => {
                 const rating = skillRating(items, mode, now);
                 expect(Number.isFinite(rating)).toBe(true);
                 expect(rating).toBeGreaterThanOrEqual(0);
+            }),
+        );
+    });
+
+    it("stands one grade above the one held, and treats every learned piece as mastered", () => {
+        // The Home suggestion and the Stats page's up-next list both read this; a piece
+        // that has lapsed is still learned, so it is never offered as something new.
+        fc.assert(
+            fc.property(arbItems, (items) => {
+                const standing = ladderStanding(items);
+                expect(standing.level).toBe(currentGrade(items));
+                expect(standing.workingGrade).toBe(Math.min(currentGrade(items) + 1, MAX_GRADE));
+                for (const item of items) {
+                    expect(standing.mastered.has(item.id)).toBe(
+                        items.some(
+                            (other) =>
+                                other.id === item.id &&
+                                other.mastery.learned &&
+                                !other.mastery.backlog,
+                        ),
+                    );
+                }
             }),
         );
     });

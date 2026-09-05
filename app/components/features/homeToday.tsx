@@ -15,10 +15,10 @@ import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/lear
 import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
 import {
-    currentGrade,
     dueItems,
     type GradeCatalogItem,
     gradeSuggestions,
+    ladderStanding,
     loadGradeCatalogue,
     loadGradedMastery,
     skillRating,
@@ -42,7 +42,6 @@ import {
 import { nextAssignmentStep } from "../../../core/assignment";
 import { useKnownPieces } from "../../hooks/useKnownPieces";
 import { starterAssignment } from "../../../core/starterAssignments";
-import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import { type Task, todayTasks } from "../../../core/today";
 import { loadBundledScores } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
@@ -372,11 +371,7 @@ export function HomeToday() {
             }
             const now = Date.now();
             const prefs = prefsStore.load();
-            const level = currentGrade(items);
-            const workingGrade = Math.min(level + 1, MAX_GRADE);
-            const mastered = new Set(
-                items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
-            );
+            const { level, workingGrade, mastered } = ladderStanding(items);
             const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
             const day = dailyNumber(todayKey(new Date(now)));
             const dailyDoneToday = services.daily.lastDone() === day;
