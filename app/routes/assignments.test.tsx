@@ -163,6 +163,16 @@ describe("AssignmentsRoute missing pieces", () => {
         );
     });
 
+    it("offers a linked assignment once, and not again after it was imported", async () => {
+        const code = encodeAssignmentLink(
+            makeAssignment({ name: "Shared set", items: [{ id: bundled.id }] }),
+        );
+        mount({ store: memoryStore(), ...emptySources() }, `/assignments?assignment=${code}`);
+        fireEvent.click(await screen.findByText("Import this assignment"));
+        await screen.findByRole("status");
+        expect(screen.queryByText("Import this assignment")).toBeNull();
+    });
+
     it("shows no availability line before the sources have loaded", async () => {
         const code = encodeAssignmentLink(
             makeAssignment({ name: "Shared set", items: [{ id: "gone-id" }] }),
