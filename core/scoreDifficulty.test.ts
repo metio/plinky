@@ -5,6 +5,7 @@
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
 import {
+    readPace,
     categoryOf,
     gradeOf,
     MAX_GRADE,
@@ -366,6 +367,27 @@ describe("parsePositions reads which staves are the player's", () => {
         const { right, left } = parsePositions(domXmlCodec, reduction);
 
         expect(right.concat(left)).not.toEqual([]);
+    });
+});
+
+describe("readPace reads the player's staves only", () => {
+    it("measures the pianist's speed and texture, not the singer's", () => {
+        // A song whose singer runs in semiquavers over a piano part in crotchets: the
+        // pace is the pianist's, one note a second at 60 to the crotchet, and the singer's
+        // voice does not count as a third hand.
+        const timed = (step: string, staff: number, ticks: number) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>${ticks}</duration><voice>1</voice><staff>${staff}</staff></note>`;
+        const xml =
+            `<?xml version="1.0"?><score-partwise>` +
+            `<part id="P1"><measure number="1"><attributes><divisions>4</divisions><staves>1</staves></attributes><sound tempo="60"/>` +
+            `${timed("A", 1, 1)}${timed("B", 1, 1)}${timed("A", 1, 1)}${timed("B", 1, 1)}</measure></part>` +
+            `<part id="P2"><measure number="1"><attributes><divisions>4</divisions><staves>2</staves></attributes>` +
+            `${timed("C", 1, 4)}<backup><duration>4</duration></backup>${timed("C", 2, 4)}</measure></part>` +
+            `</score-partwise>`;
+        const doc = domXmlCodec.parse(xml)!;
+        const pace = readPace(doc);
+        expect(pace.notesPerSecond).toBeCloseTo(1);
+        expect(pace.voices).toBe(1);
     });
 });
 
