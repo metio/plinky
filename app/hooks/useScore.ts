@@ -17,6 +17,13 @@ export function useScore(scoreId: string, attempt = 0): Score | null | undefined
     const [score, setScore] = useState<Score | null | undefined | "unavailable">(undefined);
     // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` is a hook argument; a bump must re-run the resolution
     useEffect(() => {
+        // Nothing to resolve is answered here, before any source is asked: a caller with
+        // no piece on hand (a review queue still loading, an ear item) would otherwise
+        // send the empty id through the manifest and a catalogue slice to find nothing.
+        if (!scoreId) {
+            setScore(null);
+            return;
+        }
         const local = resolveScore(store, scoreId);
         if (local) {
             setScore(local);

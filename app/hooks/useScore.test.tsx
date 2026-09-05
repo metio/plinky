@@ -36,6 +36,23 @@ const wrap =
     );
 
 describe("useScore", () => {
+    it("answers null for an empty id without asking any source", async () => {
+        // A review queue still loading, or an ear item, has no piece to resolve; sending
+        // the empty id through the sources fetched a catalogue slice to find nothing.
+        const asked: string[] = [];
+        const exercises = source<ExerciseSource>((id) => {
+            asked.push(id);
+            return Promise.resolve(null);
+        });
+        const songs = source<SongSource>((id) => {
+            asked.push(id);
+            return Promise.resolve(null);
+        });
+        const { result } = renderHook(() => useScore(""), { wrapper: wrap(exercises, songs) });
+        await waitFor(() => expect(result.current).toBeNull());
+        expect(asked).toEqual([]);
+    });
+
     it("resolves a fetched score, having reported undefined while loading", async () => {
         const exercises = source<ExerciseSource>((id) => Promise.resolve(scoreFor(id)));
         const songs = source<SongSource>(() => Promise.resolve(null));
