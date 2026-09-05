@@ -3,14 +3,10 @@
 
 import { ArrayBufferTarget, Muxer } from "mp4-muxer";
 import type { AudioExport, AudioExporter } from "../ports/audioExporter";
-import {
-    type AudioCodecChoice,
-    audioConfig,
-    pickAudioCodec,
-    planarSlice,
-} from "../../core/videoEncoding";
+import { type AudioCodecChoice, audioConfig, pickAudioCodec } from "../../core/videoEncoding";
 import { wavBytes } from "../../core/wavFile";
-import { EXPORT_SAMPLE_RATE, renderTakeAudio } from "./offlineAudio";
+import { renderTakeAudio } from "./offlineAudio";
+import { feedAudio, probeAudioCodec, withEncoders } from "./webCodecsAudio";
 
 // The platform half of the audio-file seam: the same offline render the video export
 // sounds, encoded on its own.
@@ -26,18 +22,6 @@ import { EXPORT_SAMPLE_RATE, renderTakeAudio } from "./offlineAudio";
 // same quality and no more playable.
 
 // Feed the encoder in ~85ms slabs, as the video export does.
-const AUDIO_CHUNK_FRAMES = 4_096;
-
-const probeAudioCodec = async (choice: AudioCodecChoice): Promise<boolean> => {
-    if (typeof AudioEncoder === "undefined") {
-        return false;
-    }
-    const check = await AudioEncoder.isConfigSupported(
-        audioConfig(choice.codec, { sampleRate: EXPORT_SAMPLE_RATE, numberOfChannels: 2 }),
-    );
-    return check.supported === true;
-};
-
 // The take as an MP4 holding nothing but sound — an .m4a, which is what that is called.
 async function encoded(audio: AudioBuffer, codec: AudioCodecChoice): Promise<Blob> {
     const muxer = new Muxer({
@@ -61,22 +45,14 @@ async function encoded(audio: AudioBuffer, codec: AudioCodecChoice): Promise<Blo
             failure = failure ?? error;
         },
     });
-    encoder.configure(audioConfig(codec.codec, audio));
-    for (let from = 0; from < audio.length; from += AUDIO_CHUNK_FRAMES) {
-        const count = Math.min(AUDIO_CHUNK_FRAMES, audio.length - from);
-        const data = new AudioData({
-            format: "f32-planar",
-            sampleRate: audio.sampleRate,
-            numberOfFrames: count,
-            numberOfChannels: audio.numberOfChannels,
-            timestamp: Math.round((from / audio.sampleRate) * 1_000_000),
-            data: planarSlice(audio, from, count),
-        });
-        encoder.encode(data);
-        data.close();
-    }
-    await encoder.flush();
-    encoder.close();
+    await withEncoders([encoder], async () => {
+        encoder.configure(audioConfig(codec.codec, audio));
+        feedAudio(encoder, audio);
+        if (failure) {
+            throw failure;
+        }
+        await encoder.flush();
+    });
     if (failure) {
         throw failure;
     }
