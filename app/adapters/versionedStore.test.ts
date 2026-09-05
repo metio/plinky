@@ -81,4 +81,21 @@ describe("versionedStore", () => {
             expect(store.keys()).toContain("plinky:mastery:a");
         });
     });
+
+    describe("a tab left open while a newer build restamps the device", () => {
+        it("refuses its writes from the moment the stamp moves, not from its own load", () => {
+            const inner = memoryStore({ [SCHEMA_KEY]: "3" });
+            const { store, standing, standingNow } = versionedStore(inner, 3);
+            expect(standing).toBe("current");
+            expect(store.set("plinky:mastery:a", "{}")).toBe(true);
+
+            // The other tab loads tomorrow's build and stamps the device.
+            inner.set(SCHEMA_KEY, "4");
+
+            expect(standingNow()).toBe("newer");
+            expect(store.set("plinky:mastery:a", '{"stale":true}')).toBe(false);
+            store.remove("plinky:mastery:a");
+            expect(inner.get("plinky:mastery:a")).toBe("{}");
+        });
+    });
 });
