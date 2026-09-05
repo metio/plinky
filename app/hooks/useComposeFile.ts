@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useLatest } from "./useLatest";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { Composition } from "../../core/composition";
 import { readScoreFile } from "../../core/musicxmlFile";
 import { parseMusicXml } from "../../core/musicxmlParse";
@@ -26,6 +26,10 @@ export function useComposeFile({ hasWork, onLoad }: ComposeFileOptions) {
     const [pendingReplace, setPendingReplace] = useState<Composition | null>(null);
 
     const optionsRef = useLatest({ hasWork, onLoad });
+    // Which pick is current: a file still being read or parsed when a later one lands
+    // must not come back to park itself over it, or to report an error the later pick
+    // has since made moot.
+    const openSeq = useRef(0);
 
     const openFile = useCallback(
         async (file: File | undefined) => {
@@ -33,6 +37,7 @@ export function useComposeFile({ hasWork, onLoad }: ComposeFileOptions) {
             if (!file) {
                 return;
             }
+            const mine = ++openSeq.current;
             let loaded: Composition | null = null;
             try {
                 const bytes = new Uint8Array(await file.arrayBuffer());
@@ -57,6 +62,9 @@ export function useComposeFile({ hasWork, onLoad }: ComposeFileOptions) {
                 // Reading the bytes or the on-demand MIDI parser throwing must surface the
                 // same error as an unreadable file, not reject unhandled through `void`.
                 loaded = null;
+            }
+            if (mine !== openSeq.current) {
+                return;
             }
             if (!loaded) {
                 setError(m.compose_open_error());
