@@ -39,6 +39,24 @@ describe("reading the repeat barlines", () => {
         expect(read[0]?.backwardTimes).toBe(4);
     });
 
+    it("carries a bracket over the bars between its start and its stop", () => {
+        // The file marks the bracket's first and last bars only; the bars between are
+        // under it just the same, and read on their own they would play on every pass.
+        const read = readMeasureRepeats(
+            score(
+                `<measure number="1"/>` +
+                    `<measure number="2"><barline location="left"><ending number="1" type="start"/></barline></measure>` +
+                    `<measure number="3"/>` +
+                    `<measure number="4"><barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline></measure>` +
+                    `<measure number="5"><barline location="left"><ending number="2" type="start"/></barline><barline location="right"><ending number="2" type="discontinue"/></barline></measure>` +
+                    `<measure number="6"/>`,
+            ),
+        );
+        expect(read.map((measure) => measure.endings)).toEqual([[], [1], [1], [1], [2], []]);
+        // Second time through, the whole first-time bracket is skipped.
+        expect(performanceOrder(read)).toEqual([0, 1, 2, 3, 0, 4, 5]);
+    });
+
     it("reads an ending bracket, including one covering two passes", () => {
         const read = readMeasureRepeats(
             score(
