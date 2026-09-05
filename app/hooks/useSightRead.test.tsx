@@ -29,19 +29,21 @@ function mount() {
         api = useSightRead(SAVED);
         return null;
     }
-    const element = (
+    // Built afresh per render: React skips a subtree handed the very same element again,
+    // so an identity check has to render new elements that change nothing.
+    const tree = () => (
         <ServicesProvider services={services}>
             <Probe />
         </ServicesProvider>
     );
-    const view = render(element);
+    const view = render(tree());
     return {
         scheduler,
         view,
         // Non-null by the time any test reads it — the probe renders synchronously.
         read: () => api as SightRead,
         // The same tree again: a render that changes nothing.
-        rerender: () => view.rerender(element),
+        rerender: () => view.rerender(tree()),
     };
 }
 
