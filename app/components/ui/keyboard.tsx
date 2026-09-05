@@ -203,11 +203,10 @@ export function Keyboard({
     const keysRef = useRef<HTMLDivElement>(null);
     // The one key in the tab order (roving tabindex): Tab reaches the keybed once, then
     // arrow keys walk the notes, instead of every key being its own tab stop.
-    const [roved, setRoved] = useState(from);
-    useEffect(() => {
-        // Keep the rovable key inside the current range as pieces change.
-        setRoved((current) => Math.min(Math.max(current, from), to));
-    }, [from, to]);
+    const [rovedNote, setRoved] = useState(from);
+    // Kept inside the current range as pieces change — clamped on the way out rather
+    // than corrected a render late.
+    const roved = Math.min(Math.max(rovedNote, from), to);
 
     // A note sounds while at least one source holds it; the source is a pointerId, an
     // Enter/Space key, or a screen-reader click. Reference-counting per note is what lets

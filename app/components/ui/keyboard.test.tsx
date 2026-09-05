@@ -240,6 +240,18 @@ describe("Keyboard", () => {
         expect(cs).toBe(document.activeElement);
     });
 
+    it("keeps the roving key inside the range the moment the range changes", () => {
+        // A piece change narrows the keybed; the one tab stop must land on a key that is
+        // still there, on that very render rather than one later.
+        const view = render(<Keyboard from={60} to={72} />);
+        fireEvent.keyDown(screen.getByLabelText("C 4"), { key: "End" });
+        view.rerender(<Keyboard from={60} to={64} />);
+        const stops = [...document.querySelectorAll("[data-note]")].filter(
+            (key) => (key as HTMLElement).tabIndex === 0,
+        );
+        expect(stops.map((key) => key.getAttribute("data-note"))).toEqual(["64"]);
+    });
+
     it("does not sound a key when a pointer moves over it with none held down", () => {
         const onPress = vi.fn();
         render(<Keyboard from={60} to={62} onPress={onPress} />);

@@ -48,6 +48,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/assignments";
 import { localizedHref } from "../components/ui/href";
 import { PageHeader } from "../components/ui/pageHeader";
+import { useSeededState } from "../hooks/useSeededState";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.assignments_heading(), m.meta_assignments_description());
@@ -71,7 +72,6 @@ export default function AssignmentsRoute() {
     // fetches. Held in one array, whichever resolved second replaced the other.
     const [starter, setStarter] = useState<Assignment | null>(null);
     const [namedWorks, setNamedWorks] = useState<Assignment[]>([]);
-    const [incoming, setIncoming] = useState<Assignment | null>(null);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
     // Which Share button just copied its link — "draft" or a saved assignment's id —
@@ -136,10 +136,12 @@ export default function AssignmentsRoute() {
     }, [exercises.manifest, songs.builtins, store, assignmentsStore.list]);
 
     // A shared assignment arriving by link is offered for import rather than saved
-    // silently, so the player chooses to add a stranger's list to their own.
-    useEffect(() => {
-        setIncoming(decodeAssignmentLink(searchParams.get("assignment") ?? ""));
-    }, [searchParams]);
+    // silently, so the player chooses to add a stranger's list to their own. Read off
+    // the address, and dismissed under it: a state set from the address by effect was
+    // one render behind it.
+    const [incoming, setIncoming] = useSeededState(searchParams.get("assignment"), (code) =>
+        decodeAssignmentLink(code ?? ""),
+    );
 
     // The picker pool covers the catalogue and exercises; songs are labelled from
     // the wider known-pieces set, and an unresolved id falls back to itself.

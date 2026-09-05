@@ -70,6 +70,7 @@ import { paintPlayedNotes } from "../../lib/scoreColor";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
 import { TEMPO_MIN } from "../../../core/playback";
+import { useSeededState } from "../../hooks/useSeededState";
 
 // The one-time hint nudging a touch phone sideways for a wider keyboard.
 const ROTATE_HINT_ID = "rotate";
@@ -249,14 +250,9 @@ function usePlaySessionValue({
         [id, services.fingering, fingeringTick],
     );
     const hasSaved = Object.keys(saved).length > 0;
-    const [showMine, setShowMine] = useState(hasSaved);
     // Once a fingering exists, default to showing theirs — the moment it's first worked
-    // out this session, not only on a fresh mount.
-    useEffect(() => {
-        if (hasSaved) {
-            setShowMine(true);
-        }
-    }, [hasSaved]);
+    // out this session, not only on a fresh mount — while a choice made since holds.
+    const [showMine, setShowMine] = useSeededState(hasSaved ? "saved" : "none", () => hasSaved);
     const xmlCodec = useXmlCodec();
     // How the score is laid out and read — bars per row, bar numbers, treadmill, on-staff
     // fingering and follow-the-note scrolling — the toggles that feed the OSMD render.
@@ -1376,6 +1372,7 @@ function usePlaySessionValue({
             showMine,
             hasSaved,
             hand,
+            setShowMine,
         ],
     );
 
