@@ -18,6 +18,10 @@ export type NoteStat = {
     wrongs: number;
     // Total reading time across those plays, for the mean.
     totalMs: number;
+    // How many of the plays carried a measurable gap — the mean is over these alone. A
+    // run's first note has no gap before it, and averaging its nothing in with the rest
+    // read every piece-opening note as quick to find.
+    timed: number;
 };
 
 // Keyed by MIDI note. Kept per note rather than per pitch class on purpose: reading
@@ -39,7 +43,7 @@ export type StatNote = {
 // for good, and the number is meant to be something a player can act on.
 export const MAX_READ_MS = 10_000;
 
-const EMPTY: NoteStat = { plays: 0, wrongs: 0, totalMs: 0 };
+const EMPTY: NoteStat = { plays: 0, wrongs: 0, totalMs: 0, timed: 0 };
 
 // Fold a run's notes into the running totals. The first note of a run has no gap
 // before it — nothing says when the player started reading — so it contributes its
@@ -57,6 +61,7 @@ export function foldRun(stats: NoteStats, notes: StatNote[]): NoteStats {
                 plays: current.plays + 1,
                 wrongs: current.wrongs + Math.max(0, note.wrongBefore),
                 totalMs: current.totalMs + (countable ? gap : 0),
+                timed: current.timed + (countable ? 1 : 0),
             };
         }
     });
@@ -66,7 +71,7 @@ export function foldRun(stats: NoteStats, notes: StatNote[]): NoteStats {
 // How long this note takes to find, or null when it has never been read with a
 // measurable gap — an average over nothing is a number that lies.
 export function meanMs(stat: NoteStat): number | null {
-    return stat.plays > 0 && stat.totalMs > 0 ? Math.round(stat.totalMs / stat.plays) : null;
+    return stat.timed > 0 && stat.totalMs > 0 ? Math.round(stat.totalMs / stat.timed) : null;
 }
 
 export type SlowNote = { note: number; meanMs: number; plays: number; wrongs: number };
@@ -131,7 +136,10 @@ export function normalizeNoteStats(raw: unknown): NoteStats {
         if (plays === 0) {
             continue;
         }
-        out[key] = { plays, wrongs: num(stat.wrongs), totalMs: num(stat.totalMs) };
+        // Stats written before the timed count existed carry none: every play is taken as
+        // timed, which is what the mean used to assume.
+        const timed = stat.timed === undefined ? plays : Math.min(plays, num(stat.timed));
+        out[key] = { plays, wrongs: num(stat.wrongs), totalMs: num(stat.totalMs), timed };
     }
     return out;
 }

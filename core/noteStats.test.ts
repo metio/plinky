@@ -19,11 +19,20 @@ const note = (pitches: number[], playedMs: number, wrongBefore = 0) => ({
 });
 
 describe("foldRun", () => {
+    it("averages the reading time over the plays that carried a gap", () => {
+        // A run's first note has no gap before it; counting that play in the mean read
+        // every piece-opening note as quick to find.
+        const stats = foldRun({}, [note([60], 0), note([62], 1000), note([60], 3000)]);
+        expect(stats[60]?.plays).toBe(2);
+        expect(stats[60]?.timed).toBe(1);
+        expect(meanMs(stats[60]!)).toBe(2000);
+    });
+
     it("credits each note the gap since the one before it", () => {
         const stats = foldRun({}, [note([60], 0), note([62], 500), note([64], 1500)]);
 
         // The first note has no gap to measure; the others take 500ms and 1000ms.
-        expect(stats["60"]).toEqual({ plays: 1, wrongs: 0, totalMs: 0 });
+        expect(stats["60"]).toEqual({ plays: 1, wrongs: 0, totalMs: 0, timed: 0 });
         expect(meanMs(stats["62"]!)).toBe(500);
         expect(meanMs(stats["64"]!)).toBe(1000);
     });
@@ -48,7 +57,7 @@ describe("foldRun", () => {
         // for good.
         const stats = foldRun({}, [note([60], 0), note([62], MAX_READ_MS + 1)]);
 
-        expect(stats["62"]).toEqual({ plays: 1, wrongs: 0, totalMs: 0 });
+        expect(stats["62"]).toEqual({ plays: 1, wrongs: 0, totalMs: 0, timed: 0 });
         expect(meanMs(stats["62"]!)).toBeNull();
     });
 
@@ -62,23 +71,23 @@ describe("foldRun", () => {
         // The very first note of a run still tells us it was fumbled.
         const stats = foldRun({}, [note([60], 0, 2)]);
 
-        expect(stats["60"]).toEqual({ plays: 1, wrongs: 2, totalMs: 0 });
+        expect(stats["60"]).toEqual({ plays: 1, wrongs: 2, totalMs: 0, timed: 0 });
     });
 });
 
 describe("meanMs", () => {
     it("says nothing rather than averaging over nothing", () => {
-        expect(meanMs({ plays: 0, wrongs: 0, totalMs: 0 })).toBeNull();
-        expect(meanMs({ plays: 4, wrongs: 0, totalMs: 0 })).toBeNull();
-        expect(meanMs({ plays: 2, wrongs: 0, totalMs: 900 })).toBe(450);
+        expect(meanMs({ plays: 0, wrongs: 0, totalMs: 0, timed: 0 })).toBeNull();
+        expect(meanMs({ plays: 4, wrongs: 0, totalMs: 0, timed: 0 })).toBeNull();
+        expect(meanMs({ plays: 2, wrongs: 0, totalMs: 900, timed: 2 })).toBe(450);
     });
 });
 
 describe("slowestNotes", () => {
     const stats: NoteStats = {
-        "60": { plays: 10, wrongs: 0, totalMs: 3000 },
-        "62": { plays: 10, wrongs: 4, totalMs: 12000 },
-        "64": { plays: 2, wrongs: 0, totalMs: 20000 },
+        "60": { plays: 10, wrongs: 0, totalMs: 3000, timed: 10 },
+        "62": { plays: 10, wrongs: 4, totalMs: 12000, timed: 10 },
+        "64": { plays: 2, wrongs: 0, totalMs: 20000, timed: 2 },
     };
 
     it("puts the slowest first", () => {
@@ -109,7 +118,7 @@ describe("slowestNotes", () => {
         const many: NoteStats = Object.fromEntries(
             Array.from({ length: 20 }, (_, i) => [
                 String(60 + i),
-                { plays: 5, wrongs: 0, totalMs: 1000 * (i + 1) },
+                { plays: 5, wrongs: 0, totalMs: 1000 * (i + 1), timed: 5 },
             ]),
         );
 
@@ -122,9 +131,9 @@ describe("typicalMs", () => {
         // One note abandoned mid-run must not drag the line everything else is
         // measured against.
         const stats: NoteStats = {
-            "60": { plays: 5, wrongs: 0, totalMs: 2500 },
-            "62": { plays: 5, wrongs: 0, totalMs: 3000 },
-            "64": { plays: 5, wrongs: 0, totalMs: 45000 },
+            "60": { plays: 5, wrongs: 0, totalMs: 2500, timed: 5 },
+            "62": { plays: 5, wrongs: 0, totalMs: 3000, timed: 5 },
+            "64": { plays: 5, wrongs: 0, totalMs: 45000, timed: 5 },
         };
 
         expect(typicalMs(stats)).toBe(600);
@@ -132,23 +141,23 @@ describe("typicalMs", () => {
 
     it("says nothing until something qualifies", () => {
         expect(typicalMs({})).toBeNull();
-        expect(typicalMs({ "60": { plays: 1, wrongs: 0, totalMs: 500 } })).toBeNull();
+        expect(typicalMs({ "60": { plays: 1, wrongs: 0, totalMs: 500, timed: 1 } })).toBeNull();
     });
 });
 
 describe("normalizeNoteStats", () => {
     it("keeps what could have come from a run", () => {
-        expect(normalizeNoteStats({ "60": { plays: 3, wrongs: 1, totalMs: 900 } })).toEqual({
-            "60": { plays: 3, wrongs: 1, totalMs: 900 },
+        expect(normalizeNoteStats({ "60": { plays: 3, wrongs: 1, totalMs: 900, timed: 3 } })).toEqual({
+            "60": { plays: 3, wrongs: 1, totalMs: 900, timed: 3 },
         });
     });
 
     it("drops entries that could not", () => {
         const cleaned = normalizeNoteStats({
-            "60": { plays: 3, wrongs: 1, totalMs: 900 },
-            "999": { plays: 3, wrongs: 0, totalMs: 100 },
-            nonsense: { plays: 3, wrongs: 0, totalMs: 100 },
-            "62": { plays: 0, wrongs: 0, totalMs: 0 },
+            "60": { plays: 3, wrongs: 1, totalMs: 900, timed: 3 },
+            "999": { plays: 3, wrongs: 0, totalMs: 100, timed: 3 },
+            nonsense: { plays: 3, wrongs: 0, totalMs: 100, timed: 3 },
+            "62": { plays: 0, wrongs: 0, totalMs: 0, timed: 0 },
             "64": "not a stat",
             "65": { plays: -5, wrongs: 0, totalMs: 100 },
         });

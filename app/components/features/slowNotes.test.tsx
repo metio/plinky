@@ -26,16 +26,16 @@ describe("SlowNotes", () => {
     });
 
     it("stays quiet when every note is still short of the threshold", () => {
-        const { container } = mount({ "60": { plays: 2, wrongs: 0, totalMs: 4000 } });
+        const { container } = mount({ "60": { plays: 2, wrongs: 0, totalMs: 4000, timed: 2 } });
 
         expect(container.firstChild).toBeNull();
     });
 
     it("lists the slowest notes by name, longest first", () => {
         mount({
-            "60": { plays: 10, wrongs: 0, totalMs: 3000 },
-            "62": { plays: 10, wrongs: 0, totalMs: 12000 },
-            "64": { plays: 10, wrongs: 0, totalMs: 8000 },
+            "60": { plays: 10, wrongs: 0, totalMs: 3000, timed: 10 },
+            "62": { plays: 10, wrongs: 0, totalMs: 12000, timed: 10 },
+            "64": { plays: 10, wrongs: 0, totalMs: 8000, timed: 10 },
         });
 
         const rows = screen.getAllByRole("listitem").map((li) => li.textContent);
@@ -47,9 +47,9 @@ describe("SlowNotes", () => {
 
     it("shows each note's reading time in seconds", () => {
         mount({
-            "60": { plays: 10, wrongs: 0, totalMs: 3000 },
-            "62": { plays: 10, wrongs: 0, totalMs: 12000 },
-            "64": { plays: 10, wrongs: 0, totalMs: 8000 },
+            "60": { plays: 10, wrongs: 0, totalMs: 3000, timed: 10 },
+            "62": { plays: 10, wrongs: 0, totalMs: 12000, timed: 10 },
+            "64": { plays: 10, wrongs: 0, totalMs: 8000, timed: 10 },
         });
 
         expect(screen.getByText(m.slow_notes_seconds({ seconds: "1.2" }))).toBeTruthy();
@@ -58,9 +58,9 @@ describe("SlowNotes", () => {
 
     it("gives the typical time these are slow against", () => {
         mount({
-            "60": { plays: 10, wrongs: 0, totalMs: 3000 },
-            "62": { plays: 10, wrongs: 0, totalMs: 12000 },
-            "64": { plays: 10, wrongs: 0, totalMs: 8000 },
+            "60": { plays: 10, wrongs: 0, totalMs: 3000, timed: 10 },
+            "62": { plays: 10, wrongs: 0, totalMs: 12000, timed: 10 },
+            "64": { plays: 10, wrongs: 0, totalMs: 8000, timed: 10 },
         });
 
         // The median of 0.3, 0.8 and 1.2 is 0.8.
