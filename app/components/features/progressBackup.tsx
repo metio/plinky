@@ -74,6 +74,7 @@ export function ProgressBackup() {
 
     return (
         <SettingsSection
+            anchor="backup"
             title={m.progress_backup_heading()}
             hint={m.progress_backup_hint()}
             icon={<ArchiveIcon className="h-5 w-5" />}

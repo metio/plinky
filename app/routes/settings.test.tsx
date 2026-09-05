@@ -59,6 +59,27 @@ describe("Settings, when one control breaks", () => {
     });
 });
 
+describe("Settings index", () => {
+    it("offers every section on the page, grouped, and none the page hides", () => {
+        mount();
+        const nav = screen.getByRole("navigation", { name: m.settings_index_label() });
+        expect(nav).toBeTruthy();
+        expect(screen.getByRole("list", { name: m.settings_group_playing() })).toBeTruthy();
+        for (const title of [
+            m.settings_sound(),
+            m.settings_grades(),
+            m.settings_danger_heading(),
+        ]) {
+            const link = screen.getByRole("link", { name: title });
+            const anchor = link.getAttribute("href")?.slice(1) ?? "";
+            expect(document.getElementById(anchor)).toBeTruthy();
+        }
+        // jsdom has no Web MIDI, so the page hides that panel and the index does not
+        // offer a way to a section that is not there.
+        expect(screen.queryByRole("link", { name: m.settings_connect_midi() })).toBeNull();
+    });
+});
+
 describe("Settings", () => {
     it("persists a flipped switch through the prefs store", () => {
         const { services } = mount();

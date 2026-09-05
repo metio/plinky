@@ -37,6 +37,7 @@ export function DangerZone() {
 
     return (
         <SettingsSection
+            anchor="danger"
             title={m.settings_danger_heading()}
             hint={m.settings_reset_help()}
             icon={<TrashIcon className="h-5 w-5" />}

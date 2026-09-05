@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 5 September 2026
 
+**Settings has an index down the side.** The page had grown to a dozen sections and
+a long scroll to find one; the list beside it now names every section under four
+headings — your instrument, while you play, learning, this device — and jumps
+straight there, the way the theory course and the glossary already do.
+
 **Listen plays with a human touch.** Every note used to land exactly on the beat at
 exactly its weight, which is how a machine plays and not how a pianist does. Now a
 phrase eases into its ending, the last bar of the piece broadens, the tune is struck
