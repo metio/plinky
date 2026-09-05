@@ -34,4 +34,20 @@ describe("FocusStrip", () => {
             { timeout: 30000 },
         );
     });
+
+    it("engraves only the bar being played and its neighbour, and follows the cursor", async () => {
+        // Sixteen whole-note bars in the piece; two notes on the strip, whichever bar the
+        // run is in. The rest of the piece is parsed and never drawn.
+        const view = render(<FocusStrip xml={PIECE} bar={4} label="now" />);
+        const box = view.container.firstElementChild as HTMLElement;
+        const drawn = () => box.querySelectorAll("g.vf-stavenote").length;
+        await waitFor(() => expect(drawn()).toBe(2), { timeout: 30000 });
+        view.rerender(<FocusStrip xml={PIECE} bar={9} label="now" />);
+        await waitFor(
+            () =>
+                expect(box.querySelectorAll(`[fill="${WINDOW_COLOR}"]`).length).toBeGreaterThan(0),
+            { timeout: 30000 },
+        );
+        expect(drawn()).toBe(2);
+    });
 });
