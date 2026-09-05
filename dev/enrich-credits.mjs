@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { CREDIT_OVERRIDES } from "./creditOverrides.mjs";
-import { readSongsSync, writeSongsSync } from "./manifest.mts";
+import { readSongsSync, scorePath, writeSongsSync } from "./manifest.mts";
 
 const manifest = readSongsSync();
 
@@ -49,7 +49,11 @@ for (const song of manifest) {
         song.composer = composer;
         patchedManifest++;
     }
-    const mxlPath = `public/songs/${song.license.toLowerCase()}/${song.id}.mxl`;
+    const mxlPath = scorePath(song.id, song.license);
+    if (mxlPath === null) {
+        console.warn(`  ${song.id}: no .mxl shipped, credit left as it is in the file`);
+        continue;
+    }
     const entries = unzipSync(new Uint8Array(readFileSync(mxlPath)));
     let changed = false;
     for (const [name, bytes] of Object.entries(entries)) {

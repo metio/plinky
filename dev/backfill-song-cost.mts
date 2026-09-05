@@ -18,14 +18,13 @@
 import { rawDifficulty } from "../core/scoreDifficulty.ts";
 import { reachableGrades, reachOf } from "./measureReach.mts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
-import { existsSync, readdirSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import type { SongMeta } from "../core/catalogMeta.ts";
-import { readSongs, writeSongs } from "./manifest.mts";
+import { readSongs, scorePath as shippedScorePath, writeSongs } from "./manifest.mts";
 
 const { decompressMxl } = await import("../core/musicxmlFile.ts");
 
-const DIR = "public/songs";
+const _DIR = "public/songs";
 
 const manifest = await readSongs();
 
@@ -38,15 +37,11 @@ const sample = sampleAt > 0 ? Number(process.argv[sampleAt + 1] ?? 10) : 0;
 // A score sits under its licence bucket — public/songs/<spdx>/<id>.mxl — so the path is
 // found, not assumed. Reading `${DIR}/<id>.mxl` throws for every score in the catalogue.
 function scorePath(id: string): string {
-    for (const bucket of readdirSync(DIR, { withFileTypes: true })) {
-        if (bucket.isDirectory()) {
-            const path = `${DIR}/${bucket.name}/${id}.mxl`;
-            if (existsSync(path)) {
-                return path;
-            }
-        }
+    const path = shippedScorePath(id);
+    if (path === null) {
+        throw new Error(`no .mxl for ${id}`);
     }
-    throw new Error(`no .mxl for ${id}`);
+    return path;
 }
 
 if (sample > 0) {

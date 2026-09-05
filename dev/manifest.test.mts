@@ -1,12 +1,19 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { SongMeta } from "../core/catalogMeta.ts";
-import { readSongs, readSongsSync, writeSongs, writeSongsSync } from "./manifest.mts";
+import {
+    readSongs,
+    readSongsSync,
+    scoreFiles,
+    scorePath,
+    writeSongs,
+    writeSongsSync,
+} from "./manifest.mts";
 
 const ROW: SongMeta = {
     id: "abc123",
@@ -46,5 +53,22 @@ describe("the song manifest", () => {
         const path = join(dir, "manifest.json");
         writeFileSync(path, "{}");
         expect(() => readSongsSync(path)).toThrow(/not a list/);
+    });
+});
+
+describe("where a shipped score is", () => {
+    it("looks under the licence bucket first, then under every other", () => {
+        dir = mkdtempSync(join(tmpdir(), "plinky-songs-"));
+        mkdirSync(join(dir, "cc0-1.0"));
+        mkdirSync(join(dir, "cc-by-4.0"));
+        mkdirSync(join(dir, "index"));
+        writeFileSync(join(dir, "cc0-1.0", "abc.mxl"), "");
+        writeFileSync(join(dir, "cc-by-4.0", "def.mxl"), "");
+        expect(scorePath("abc", "CC0-1.0", dir)).toBe(`${dir}/cc0-1.0/abc.mxl`);
+        // A row whose licence names the wrong bucket still finds its file.
+        expect(scorePath("def", "CC0-1.0", dir)).toBe(`${dir}/cc-by-4.0/def.mxl`);
+        expect(scorePath("def", undefined, dir)).toBe(`${dir}/cc-by-4.0/def.mxl`);
+        expect(scorePath("ghi", "CC0-1.0", dir)).toBeNull();
+        expect([...scoreFiles(dir).keys()].sort()).toEqual(["abc", "def"]);
     });
 });

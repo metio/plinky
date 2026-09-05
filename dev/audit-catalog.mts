@@ -9,15 +9,15 @@
 //
 // Run under tsx: `npx tsx dev/audit-catalog.mts`
 
-import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { copyrightReason } from "./copyrightSignals.mts";
 import { nonPianoReason } from "./scoreInstrument.mts";
-import { readSongsSync, writeSongsSync } from "./manifest.mts";
+import { readSongsSync, scorePath as shippedScorePath, writeSongsSync } from "./manifest.mts";
 
 const APPLY = process.argv.includes("--apply");
 
-const DIR = "public/songs";
+const _DIR = "public/songs";
 const manifest = readSongsSync();
 
 // A score sits under its licence bucket — public/songs/<spdx>/<id>.mxl — so the path has
@@ -26,15 +26,11 @@ const manifest = readSongsSync();
 // unreadable; an audit that flags everything is one nobody reads, which is how seven
 // tablature scores sat here unnoticed.
 function scorePath(id: string): string {
-    for (const bucket of readdirSync(DIR, { withFileTypes: true })) {
-        if (bucket.isDirectory()) {
-            const path = `${DIR}/${bucket.name}/${id}.mxl`;
-            if (existsSync(path)) {
-                return path;
-            }
-        }
+    const path = shippedScorePath(id);
+    if (path === null) {
+        throw new Error(`no .mxl for ${id}`);
     }
-    throw new Error(`no .mxl for ${id}`);
+    return path;
 }
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.

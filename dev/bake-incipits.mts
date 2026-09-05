@@ -12,38 +12,21 @@
 
 import { encodeIncipit, readIncipit } from "../core/incipit.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
-import { existsSync, readdirSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import type { SongMeta } from "../core/catalogMeta.ts";
-import { readSongs, SONGS_MANIFEST, writeSongs } from "./manifest.mts";
+import { readSongs, scorePath, SONGS_MANIFEST, writeSongs } from "./manifest.mts";
 
 const { decompressMxl } = await import("../core/musicxmlFile.ts");
 
-const DIR = "public/songs";
+const _DIR = "public/songs";
 
 const manifest = await readSongs();
-
-// A score sits under its licence bucket — public/songs/<spdx>/<id>.mxl — so the path is
-// found, not assumed.
-const buckets = readdirSync(DIR, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => `${DIR}/${entry.name}`);
-
-function scorePath(id: string): string | null {
-    for (const bucket of buckets) {
-        const path = `${bucket}/${id}.mxl`;
-        if (existsSync(path)) {
-            return path;
-        }
-    }
-    return null;
-}
 
 const baked: SongMeta[] = [];
 let drawn = 0;
 let missing = 0;
 for (const song of manifest) {
-    const path = scorePath(song.id);
+    const path = scorePath(song.id, song.license);
     let incipit: string | undefined;
     if (path) {
         const xml = decompressMxl(new Uint8Array(await readFile(path)));

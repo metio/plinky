@@ -6,8 +6,9 @@
 // field the manifest gained was typed as absent in the scripts written before it, and each
 // silently dropped or ignored what its own type said was not there.
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
+import { licenseDir } from "../core/attribution.ts";
 import type { ExerciseMeta, SongMeta } from "../core/catalogMeta.ts";
 
 export const SONGS_DIR = "public/songs";
@@ -56,4 +57,40 @@ export async function writeExercises(
 
 export function writeExercisesSync(rows: readonly ExerciseMeta[], path = EXERCISES_MANIFEST): void {
     writeFileSync(path, serialize(rows));
+}
+
+// The licence buckets a score can sit under: public/songs/<spdx>/.
+function buckets(dir: string): string[] {
+    return readdirSync(dir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory() && entry.name !== "index")
+        .map((entry) => entry.name);
+}
+
+// Where a shipped score's .mxl is, or null when it is not shipped. Its licence names the
+// bucket it should be under, and is tried first; the rest are searched after, because a
+// row's licence and the bucket a file was written to have disagreed before, and a script
+// that assumed the bucket read nothing and said so quietly.
+export function scorePath(id: string, license?: string, dir = SONGS_DIR): string | null {
+    const named = license ? [licenseDir(license)] : [];
+    for (const bucket of [...named, ...buckets(dir).filter((b) => !named.includes(b))]) {
+        const path = `${dir}/${bucket}/${id}.mxl`;
+        if (existsSync(path)) {
+            return path;
+        }
+    }
+    return null;
+}
+
+// Every shipped score's path by id — for a pass over the whole catalogue, where asking
+// per score would read the directories once per row.
+export function scoreFiles(dir = SONGS_DIR): Map<string, string> {
+    const at = new Map<string, string>();
+    for (const bucket of buckets(dir)) {
+        for (const file of readdirSync(`${dir}/${bucket}`)) {
+            if (file.endsWith(".mxl")) {
+                at.set(file.slice(0, -".mxl".length), `${dir}/${bucket}/${file}`);
+            }
+        }
+    }
+    return at;
 }
