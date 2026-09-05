@@ -72,6 +72,18 @@ describe("exercise ids", () => {
         }
     });
 
+    it("starts a chromatic run in a flat key on that key's tonic", () => {
+        // The run is written without a signature, every note carrying its own accidental,
+        // but it is still the E-flat chromatic scale and begins on E flat.
+        const xml = generateExercise(parseExerciseId("scale-eflat-chromatic")!);
+        const first =
+            /<pitch><step>([A-G])<\/step>(?:<alter>(-?\d)<\/alter>)?<octave>(\d)<\/octave>/.exec(
+                xml,
+            );
+        expect(first?.[1]).toBe("E");
+        expect(first?.[2]).toBe("-1");
+    });
+
     it("offers exactly one chromatic-scale tile (the canonical C-rooted run)", () => {
         const chromatic = EXERCISE_TILES.filter((tile) => tile.type === "chromatic-scale");
         expect(chromatic).toHaveLength(1);
