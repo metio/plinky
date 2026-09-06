@@ -10,6 +10,10 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 6 September 2026
 
+**The pace you practise at stays chosen.** Keep up, the guide notes under it and the
+duet used to reset at every piece; somebody who always practises on the clock had
+to say so each time. They are remembered now, like the hand and the reading aids.
+
 **A held note no longer stretches the bar under it.** Where one hand moves on
 inside the other's note — triplets against quavers, a syncopation, a semiquaver
 under a dotted semiquaver — Listen and Keep up waited for the longer note to end

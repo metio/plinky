@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { reveal } from "../testing/controls";
+import { choose, chosen, reveal } from "../testing/controls";
 import { Link, MemoryRouter, Route as RouterRoute, Routes, useParams } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -140,6 +140,22 @@ describe("Play", () => {
         expect(screen.getByRole("tablist", { name: m.run_pace_label() })).toBeTruthy();
         expect(screen.getByRole("switch", { name: m.sight_read() })).toBeTruthy();
         expect(screen.getByRole("switch", { name: m.race_ghost_toggle() })).toBeTruthy();
+    });
+
+    it("keeps the pace you chose for the next piece you open", async () => {
+        // Keep up, its guide and the duet used to reset at every piece, so somebody who
+        // always practises on the clock had to say so each time.
+        renderPlay(bundledId("ode to joy"));
+        await screen.findByRole("button", { name: m.run_group_practice_title() });
+        reveal(m.run_group_practice_title);
+        expect(chosen(m.run_pace_label)).toBe(m.sight_read_tempo_own());
+        choose(m.run_pace_label, m.keep_up_toggle);
+        cleanup();
+
+        renderPlay(bundledId("ode to joy"));
+        await screen.findByRole("button", { name: m.run_group_practice_title() });
+        reveal(m.run_group_practice_title);
+        expect(chosen(m.run_pace_label)).toBe(m.keep_up_toggle());
     });
 
     it("flips the fingering switch at once and says the sheet is catching up", async () => {

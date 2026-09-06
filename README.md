@@ -145,7 +145,9 @@ Practice is self-paced by default, but flip on **Keep up** and it becomes tempo-
 after a one-bar count-in, the cursor advances on the beat whether or not you're ready, and
 any note you don't catch before it passes is a miss (Synthesia / Guitar-Hero style). The
 notes sound as a guide so you can follow along by ear — or turn that off to read them at
-tempo yourself. At the end it tells you how many you kept up with.
+tempo yourself. At the end it tells you how many you kept up with. Whichever pace you
+choose stays chosen, along with the guide and the duet, so somebody who always practises
+one way says so once rather than at every piece.
 
 Practice is about repetition; **sight-reading** is the opposite discipline, so it has a
 mode of its own under *Extra challenge*. Turn on **Sight-read this piece** and every

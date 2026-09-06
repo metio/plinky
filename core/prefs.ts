@@ -107,6 +107,16 @@ export type Prefs = {
     // note (often the wrong hand on a two-hand piece) was missed, so a mistake never
     // freezes you mid-piece. Off waits for every note, which builds accuracy.
     forgiving: boolean;
+    // How a run is paced: on the clock (Keep up) or at the player's own pace. Somebody who
+    // always practises one way should not have to say so at every piece, so the last
+    // choice is kept — like the hand and the reading aids, and unlike the loop or the
+    // transposition, which belong to one piece.
+    keepUp: boolean;
+    // Under Keep up, whether the notes sound as they pass — a follow-along — or the run is
+    // a read-at-tempo test.
+    guideNotes: boolean;
+    // Sound the other hand while one is practised alone.
+    duet: boolean;
     // How a grade decays when its pieces go unreviewed: gentle keeps the grade and
     // only dulls its shine, competitive lets it actually slip — the opt-in challenge.
     decayMode: DecayMode;
@@ -270,6 +280,9 @@ function defaults(): Prefs {
         lightLeftChannel: defaultChannels("casio").left,
         lightRightChannel: defaultChannels("casio").right,
         forgiving: true,
+        keepUp: false,
+        guideNotes: true,
+        duet: false,
         decayMode: "gentle",
         reviewCap: REVIEW_CAP,
         barsPerRow: 0,
@@ -380,6 +393,9 @@ export function parsePrefs(raw: string | null): Prefs {
             noteHints: oneOf(parsed.noteHints, NOTE_HINT_CYCLE, base.noteHints),
             noteLabels: oneOf(parsed.noteLabels, NOTE_LABEL_CYCLE, base.noteLabels),
             forgiving: bool(parsed.forgiving, base.forgiving),
+            keepUp: bool(parsed.keepUp, base.keepUp),
+            guideNotes: bool(parsed.guideNotes, base.guideNotes),
+            duet: bool(parsed.duet, base.duet),
             decayMode: oneOf(parsed.decayMode, DECAY_MODES, base.decayMode),
             reviewCap: oneOf(parsed.reviewCap, REVIEW_CAPS, base.reviewCap),
             barsPerRow: oneOf(parsed.barsPerRow, BARS_PER_ROW, base.barsPerRow),
