@@ -8,7 +8,8 @@ import { domXmlCodec } from "../adapters/domXmlCodec";
 import { collectMatchSteps } from "./useScoreMatcher";
 
 // The block-chord reading through the real engraver: what the run asks for is the tune
-// as written in the right hand and one block per chord in the left.
+// as written in the right hand and one block per chord in the left — the C triad where
+// the left hand had it, and the G7 as a root-third-seventh shell from the G2 it played.
 const note = (step: string, octave: number, duration: number, staff: 1 | 2) =>
     `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>${duration}</duration><voice>${staff}</voice><type>${duration === 8 ? "half" : "quarter"}</type><staff>${staff}</staff></note>`;
 const ATTR = `<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>`;
@@ -32,6 +33,6 @@ describe("the block-chord reading on the play page", () => {
         const steps = collectMatchSteps(osmd, "both").map((step) =>
             [...step.pitches].sort((a, b) => a - b),
         );
-        expect(steps).toEqual([[48, 52, 55, 76], [79], [55, 59, 62, 77], [74]]);
+        expect(steps).toEqual([[48, 52, 55, 76], [79], [43, 47, 53, 77], [74]]);
     });
 });
