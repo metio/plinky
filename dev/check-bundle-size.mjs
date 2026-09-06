@@ -516,7 +516,11 @@ const BUDGET_VENDOR_KB = 324;
 // "Name the chords" switch sits in Settings and in run set-up with twenty-six locales of
 // copy behind it. Two kilobytes in the score viewer, one across settings and the services.
 // Measured at 424.1.
-const BUDGET_APP_KB = 426;
+//
+// 428. Left hand as chords: the block-chord rewrite is one more reduction the score viewer
+// applies before engraving, and the piece's chord panel in run set-up carries its own copy
+// across every locale. Two kilobytes in the score viewer. Measured at 426.7.
+const BUDGET_APP_KB = 428;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
