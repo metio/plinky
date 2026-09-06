@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
     canonicalComposer,
+    canonicalPeople,
     composerCounts,
     nameFromSlug,
     peopleFrom,
@@ -387,6 +388,14 @@ describe("a credit that names more than one person", () => {
             "scott-joplin",
             "scott-hayden",
         ]);
+        // The conjunction in the credit's own language. "Lemoine y Carulli" made one
+        // Spanish-sounding composer nobody has heard of, out of two Frenchmen.
+        expect(personSlugs("Lemoine y Carulli")).toEqual(["henri-lemoine", "gustave-carulli"]);
+        expect(personSlugs("Bartholomäus Gesius und Georg Philipp Telemann")).toEqual([
+            "bartholomaus-gesius",
+            "georg-philipp-telemann",
+        ]);
+        expect(canonicalPeople("Henry Lemoine")).toEqual(["Henri Lemoine"]);
     });
 
     it("canonicalises each name in its own right", () => {

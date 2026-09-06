@@ -75,7 +75,7 @@ export function useListenPlayback({
     // from onLap because a lap is the player drilling a range and a repeat is the page
     // telling the reader to go round — and the lap also ramps the tempo, which a repeat
     // must not. Announced rather than acted on here: the trail belongs to the surface.
-    onRewind?: () => void;
+    onRewind?: (span: { from: number; to: number }) => void;
     // Re-centre the treadmill after each cursor step; a no-op elsewhere.
     centerCursor: () => void;
     // Where the music has reached, as a notated onset in whole notes, before the position
@@ -224,7 +224,7 @@ export function useListenPlayback({
             // asks for the same bars again.
             const previous = steps[step - 1];
             if (previous !== undefined && jumpsBack(previous, current)) {
-                onRewind?.();
+                onRewind?.({ from: current.whole, to: previous.whole });
             }
             onPosition?.(current.whole);
             setSounding(

@@ -10,6 +10,16 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 6 September 2026
 
+**A repeat only uncolours the bars it repeats.** When the score sent the run back
+over a repeated section, every coloured note on the page lost its colour — including
+the sections before it that were played and passed. Now only the bars being played
+again are cleared, in Practice, Keep up and Listen alike.
+
+**Two composers are two composers, in any language.** A credit joining two people
+with the Spanish *y* — "Lemoine y Carulli" — was read as one composer with an odd
+name. The catalogue now reads *y*, *e*, *et*, *und* and *och* the way it already read
+*and*, so each person gets their own page and the piece appears on both.
+
 **A held note no longer stretches the bar under it.** Where one hand moves on
 inside the other's note — triplets against quavers, a syncopation, a semiquaver
 under a dotted semiquaver — Listen and Keep up waited for the longer note to end

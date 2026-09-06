@@ -273,6 +273,40 @@ export function clearAllHalos(svg: SVGSVGElement): void {
     removeByClass(svg, HALO_CLASS);
 }
 
+// Where a repeat sends the music back over: the printed onset it returns to and the one
+// it leaves, in whole notes, both inclusive.
+export type RepeatSpan = { from: number; to: number };
+
+// Lift the halos on the notes printed inside a span and leave every other halo alone.
+//
+// A written repeat sends the run back over bars it has already coloured, and those bars
+// must be uncoloured for the second pass to show where it has got to. Only those bars: a
+// piece with two repeated sections used to lose the first section's whole trail the
+// moment the second section repeated, though that music had been played and passed.
+// Walks the cursor (leaving it reset), since the printed onset of a note is only known
+// at the position the engraver puts it.
+export function clearHalosWithin(osmd: OpenSheetMusicDisplay, span: RepeatSpan): void {
+    const cursor = osmd.cursor;
+    cursor.reset();
+    while (!cursor.iterator.EndReached) {
+        const whole = cursor.iterator.currentTimeStamp?.RealValue ?? 0;
+        if (whole >= span.from - SPAN_EPSILON && whole <= span.to + SPAN_EPSILON) {
+            for (const gNote of cursor.GNotesUnderCursor()) {
+                const element = svgOf(gNote);
+                if (element) {
+                    clearHalo(element);
+                }
+            }
+        }
+        cursor.next();
+    }
+    cursor.reset();
+}
+
+// Onsets are fractions of a whole note accumulated in floating point; a position on the
+// span's edge must not fall off it by rounding.
+const SPAN_EPSILON = 1e-6;
+
 // The rendered box of each measure, in the SVG's coordinate space, unioned over its notes
 // and rests. Walks the cursor (leaving it reset+hidden), reading each glyph group's client
 // rect and folding it into that measure's bounds — measured once per render and reused for

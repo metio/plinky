@@ -390,7 +390,9 @@ export function useScoreMatcher(
         // event, because a lap is the player choosing to drill a range and a repeat is the
         // score asking. Kept apart so a consumer can answer one without answering both:
         // the lap also bumps the practice tempo, which a repeat must not.
-        onRewind?: () => void;
+        // A written repeat sent the run back: from the onset it returns to, over the
+        // one it leaves, in whole notes.
+        onRewind?: (span: { from: number; to: number }) => void;
         // A wrong note at a position: its whole-piece step index and how many wrong
         // attempts that position has absorbed so far (1 on the first slip) — what a
         // tries budget compares against.
@@ -707,7 +709,7 @@ export function useScoreMatcher(
                 // the same reason the lap is: the halos belong to the surface.
                 const following = runStepsRef.current[event.ordinal + 1];
                 if (following !== undefined && jumpsBack(event.step, following)) {
-                    optionsRef.current.onRewind?.();
+                    optionsRef.current.onRewind?.({ from: following.whole, to: event.step.whole });
                 }
             }
             if (next.complete && runLoopRef.current) {

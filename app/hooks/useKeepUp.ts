@@ -137,7 +137,7 @@ export function useKeepUp({
     // A written repeat has sent the run back over bars it has already painted. Announced
     // rather than acted on here: the trail belongs to the surface, the same way Listen's
     // does. Separate from finishing, which a repeat is not.
-    onRewind?: () => void;
+    onRewind?: (span: { from: number; to: number }) => void;
     // A run paints the score — the "play now" window, then a green/red hit/miss
     // trail it leaves in place. The surface tracks that something is painted so the
     // next run re-renders to wipe it; without this signal last run's marks persist.
@@ -321,7 +321,7 @@ export function useKeepUp({
                 // trail stops saying how far this pass has got.
                 const previous = steps[step - 1];
                 if (previous !== undefined && jumpsBack(previous, current)) {
-                    onRewind?.();
+                    onRewind?.({ from: current.whole, to: previous.whole });
                 }
                 onPosition?.(current.whole);
             }

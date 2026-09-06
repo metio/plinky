@@ -275,6 +275,12 @@ const ALIASES: Record<string, string> = {
     "c.p.e. bach": "Carl Philipp Emanuel Bach",
     "cpe bach": "Carl Philipp Emanuel Bach",
     gounod: "Charles Gounod",
+    // The publisher-composer behind the Solfège des Solfèges, whose two spellings the
+    // table already merges above; a bare surname is him too. His co-author on it is
+    // Gustave Carulli, not the guitarist Ferdinando, and the catalogue carries no other
+    // Carulli.
+    lemoine: "Henri Lemoine",
+    carulli: "Gustave Carulli",
     "pyotr tchaikovsky": "Pyotr Ilyich Tchaikovsky",
     delibes: "Léo Delibes",
     "h. bertini": "Henri Bertini",
@@ -531,7 +537,11 @@ export function canonicalPeople(raw: string): string[] {
     if (joint) {
         return joint;
     }
-    const parts = cleaned.split(/\s+\/\s+|\s+&\s+|\s+\band\b\s+/i);
+    // The conjunction in each language a credit arrives in: "Lemoine y Carulli" names two
+    // people as surely as "Joplin and Hayden" does. Matched as a whole word between
+    // spaces, so "Ortega y Gasset" — one person, Spanish compound surname — would split
+    // wrongly too; a credit like that belongs in JOINT_CREDITS, as the hyphenated pairs do.
+    const parts = cleaned.split(/\s+\/\s+|\s+&\s+|\s+\b(?:and|y|e|et|und|och)\b\s+/i);
     return parts.length === 1
         ? [cleaned]
         : parts.map((part) => canonicalComposer(part.trim())).filter((part) => part !== "");

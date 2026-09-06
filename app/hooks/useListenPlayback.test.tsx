@@ -850,6 +850,9 @@ describe("Listen over a written repeat", () => {
         // Exactly once — at the third step, the only place an onset is earlier than the
         // one before it. The last two steps move forward again and must not re-fire.
         expect(onRewind).toHaveBeenCalledTimes(1);
+        // Named by the span it sends the music back over, so only those bars are wiped.
+        const [span] = onRewind.mock.calls[0] as [{ from: number; to: number }];
+        expect(span.from).toBeLessThan(span.to);
     });
 
     it("stays quiet on a score that never repeats", () => {

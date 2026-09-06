@@ -10,9 +10,11 @@ import { type MeasureBox, SCORE_PAGE_MARGIN } from "../../core/scoreCanvas";
 import { useScheduler, useXmlCodec } from "../contexts/services";
 import { prepareScoreSource } from "../lib/scoreSource";
 import {
-    collectMeasureBoxes,
-    restoreNotePaint,
     clearAllHalos,
+    clearHalosWithin,
+    collectMeasureBoxes,
+    type RepeatSpan,
+    restoreNotePaint,
     scoreSvg,
     snapshotNotePaint,
 } from "../lib/scoreColor";
@@ -52,7 +54,8 @@ export type OsmdScore = {
     painted: () => boolean;
     // Take the feedback halos off without re-rendering — what a section loop wants when it
     // comes round, where a re-render would pull the score out from under the run.
-    clearPaint: () => void;
+    // Lift the feedback halos: all of them, or only those inside a repeated span.
+    clearPaint: (span?: RepeatSpan) => void;
     resetPaint: () => void;
     // Re-render to wipe the injected feedback halos, repainting the loop overlay too.
     wipePaint: () => void;
@@ -220,13 +223,23 @@ export function useOsmdScore(
     // render replaces the very note elements a running match is holding on to. A halo is a
     // separate injected element, so taking it away leaves both the engraving and the run
     // untouched, which is what lets a section loop start each pass on a clean score.
-    const clearPaint = useCallback(() => {
-        const svg = scoreSvg(containerRef.current);
-        if (svg) {
+    const clearPaint = useCallback(
+        (span?: RepeatSpan) => {
+            const svg = scoreSvg(containerRef.current);
+            if (!svg) {
+                return;
+            }
+            if (span !== undefined && osmdRef.current) {
+                // A repeat: only the bars being played again lose their colour, and the
+                // score stays painted, since everything before them keeps its trail.
+                clearHalosWithin(osmdRef.current, span);
+                return;
+            }
             clearAllHalos(svg);
             paintedRef.current = false;
-        }
-    }, [containerRef]);
+        },
+        [containerRef],
+    );
 
     // Wipe the injected paint (feedback halos) by re-rendering the score's SVG, then bump
     // the render version. A bare render() rebuilds the SVG and so also drops any other
