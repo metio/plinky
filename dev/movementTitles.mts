@@ -24,7 +24,8 @@ import { canonicalComposer } from "../core/person.ts";
 const NOISE = /^[-–—_.\s]*$/;
 // Arrangement and edition notes. They sit in the same credit block and name the wrong
 // person: "Arr. for piano 4 hands by | Theodor Kirchner" is two lines about an arranger.
-const APPARATUS = /\b(arr\.|arrange|transcription|transcribed|edit(ed|ion)?|ed\.|rev\.|urtext|copyright|©)/i;
+const APPARATUS =
+    /\b(arr\.|arrange|transcription|transcribed|edit(ed|ion)?|ed\.|rev\.|urtext|copyright|©)/i;
 // A life span standing on its own — "c. 1802 – c. 1880" — printed under a composer's name.
 const DATES = /^\(?\s*(c\.?\s*)?\d{3,4}\s*[-–—~]\s*(c\.?\s*)?\d{3,4}\s*\)?$/;
 
