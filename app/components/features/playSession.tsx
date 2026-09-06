@@ -176,12 +176,12 @@ function usePlaySessionValue({
     // Tempo-enforced "keep up" mode: Practice runs at a fixed tempo, the cursor advancing
     // on the clock rather than waiting for you, so a note not cleared before it passes is a
     // miss. `guideNotes` sounds the notes as they pass for a follow-along; off, it's a
-    // read-at-tempo test. Session toggles (not persisted), off by default.
-    const [enforceTempo, setEnforceTempo] = useState(false);
-    const [guideNotes, setGuideNotes] = useState(true);
-    // Duet: sound the other hand while you play yours during a hands-separate keep-up run.
-    // Off by default and, like the others, a session toggle rather than a saved pref.
-    const [duet, setDuet] = useState(false);
+    // read-at-tempo test. Kept across visits, like the hand and the reading aids: a player
+    // who always practises one way should not have to say so at every piece.
+    const [enforceTempo, setEnforceTempo] = usePref("keepUp");
+    const [guideNotes, setGuideNotes] = usePref("guideNotes");
+    // Duet: sound the other hand while you play yours in a hands-separate run.
+    const [duet, setDuet] = usePref("duet");
     // Focus mode: draw only the looped bars, re-engraved on their own. A session
     // toggle, and only ever meaningful with a loop set — there is no "just these
     // bars" without bars to mean.
@@ -1381,6 +1381,9 @@ function usePlaySessionValue({
             hasSaved,
             hand,
             setShowMine,
+            setGuideNotes,
+            setEnforceTempo,
+            setDuet,
         ],
     );
 
