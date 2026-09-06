@@ -7,6 +7,7 @@ import {
     type EarExerciseId,
     type EarQuestion,
     type EarRound,
+    type EarFocus,
     generateQuestion,
     isCorrect,
     scoreRounds,
@@ -60,6 +61,7 @@ export function EarSession({
     level,
     autoStart = false,
     onComplete,
+    focus,
 }: {
     exercise: EarExerciseId;
     level: number;
@@ -71,6 +73,9 @@ export function EarSession({
     // finished-state control from "practise again" to nothing, so the caller drives what
     // comes next.
     onComplete?: (itemId: string) => void;
+    // A piece's own progression and key, brought here to be heard: the first question
+    // plays that progression, and every question stays in that key.
+    focus?: EarFocus;
 }) {
     const finish = useKeyboardFinish();
     const mastery = useMasteryStore();
@@ -90,10 +95,26 @@ export function EarSession({
     const score = useMemo(() => scoreRounds(rounds), [rounds]);
     const done = rounds.length >= EAR_SESSION_ROUNDS;
 
+    // Read through refs so `next` stays fixed by the keyed (exercise, level): the
+    // auto-start effect below depends on it, and a `next` that changed with every answered
+    // round would fire that effect again and skip ahead a question.
+    const focusRef = useRef(focus);
+    focusRef.current = focus;
+    const roundsRef = useRef(0);
+    roundsRef.current = rounds.length;
     const next = useCallback(() => {
         setGiven(null);
         setQuestionSeq((seq) => seq + 1);
-        setQuestion(generateQuestion(exercise, level, Math.random));
+        // The piece's progression is the opening question; the rest are the level's own,
+        // in the piece's key.
+        const focused = focusRef.current;
+        const opening = roundsRef.current === 0 && focused?.progression !== undefined;
+        setQuestion(
+            generateQuestion(exercise, level, Math.random, {
+                ...(opening ? { progression: focused?.progression } : {}),
+                ...(focused?.tonicClass === undefined ? {} : { tonicClass: focused.tonicClass }),
+            }),
+        );
     }, [exercise, level]);
 
     // A review drill has already been chosen, so it opens straight on its first question.

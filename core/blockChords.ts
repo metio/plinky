@@ -26,7 +26,8 @@ import type { XmlCodec } from "./xml";
 // something to play — and a beat where nothing sounds gets a rest.
 
 const LEFT_VOICE = "5";
-// Where the left hand's chords sit: C3 up to B3, a comfortable octave for a triad.
+// Where the left hand's chords sit when the hand has no notes to say: C3 up to B3, a
+// comfortable octave for a triad.
 const LEFT_OCTAVE_BOTTOM = 48;
 
 type Segment = { ticks: number; span: ChordSpan | null };
@@ -55,11 +56,16 @@ export function blockChords(codec: XmlCodec, xml: string): string {
     // Where the composer's left hand actually sounds. The chords go there and nowhere
     // else: a pickup the right hand plays alone, or a bar the left hand rests through,
     // stays silent rather than gaining a chord read off the tune.
-    const sounding = merged(
-        timeline.notes
-            .filter((note) => note.staffId === left && note.midi !== null && note.wholes > 0)
-            .map((note) => ({ from: note.whole, to: note.whole + note.wholes })),
+    const leftNotes = timeline.notes.filter(
+        (note) => note.staffId === left && note.midi !== null && note.wholes > 0,
     );
+    const sounding = merged(
+        leftNotes.map((note) => ({ from: note.whole, to: note.whole + note.wholes })),
+    );
+    // The chords sit where the composer's hand sat: the octave whose bottom is just under
+    // the middle of what the left hand plays, so a low bass line stays low and a high
+    // accompaniment stays high.
+    const bottom = registerOf(leftNotes.map((note) => note.midi as number));
     const measures = Array.from(leftPart.children).filter((child) => child.tagName === "measure");
     let divisions = 1;
     for (const [index, measure] of measures.entries()) {
@@ -83,7 +89,7 @@ export function blockChords(codec: XmlCodec, xml: string): string {
         }
         for (const segment of segmentsOf(spans, sounding, from, to, ticksPerWhole)) {
             for (const piece of splitTicks(segment.ticks, divisions)) {
-                appendChord(doc, measure, segment.span, piece, divisions, staffNumber);
+                appendChord(doc, measure, segment.span, piece, divisions, staffNumber, bottom);
             }
         }
     }
@@ -268,11 +274,34 @@ function typeOf(ticks: number, divisions: number): { type: string; dot: boolean 
     return { type: "quarter", dot: false };
 }
 
-// The chord's three tones in the left hand's octave, the bass note lowest.
-function voicing(span: ChordSpan): number[] {
-    const tones = chordPitches(span.root, span.quality).slice(0, 3).map(pitchClassOf);
+// Where the chords' bass notes go: a little under the middle of what the hand plays, so
+// the block, which reaches up from its bass, sits where the pattern it replaces sat.
+function registerOf(midis: readonly number[]): number {
+    if (midis.length === 0) {
+        return LEFT_OCTAVE_BOTTOM + 4;
+    }
+    const sorted = [...midis].sort((a, b) => a - b);
+    const middle = sorted[Math.floor(sorted.length / 2)] as number;
+    return Math.max(28, middle - 4);
+}
+
+// The placement of a pitch class nearest a target note, the lower on a tie.
+function nearest(pitchClass: number, target: number): number {
+    const below = target - ((((target - pitchClass) % 12) + 12) % 12);
+    const above = below + 12;
+    return above - target < target - below ? above : below;
+}
+
+// The chord's tones in the hand's octave, the bass note lowest: a triad as it is, and a
+// seventh chord as its shell — root, third and seventh — since the seventh is the note
+// the symbol names and the fifth is the one a hand can spare.
+function voicing(span: ChordSpan, target: number): number[] {
+    const stack = chordPitches(span.root, span.quality).map(pitchClassOf);
+    const tones = (stack.length >= 4 ? [stack[0], stack[1], stack[3]] : stack.slice(0, 3)).filter(
+        (tone): tone is number => tone !== undefined,
+    );
     const bass = tones.includes(span.bass) ? span.bass : span.root;
-    const bottom = LEFT_OCTAVE_BOTTOM + pitchClassOf(bass);
+    const bottom = nearest(bass, target);
     const above = tones
         .filter((tone) => tone !== bass)
         .map((tone) => bottom + ((tone - bass + 12) % 12))
@@ -287,9 +316,10 @@ function appendChord(
     ticks: number,
     divisions: number,
     staffNumber: number | null,
+    bottomOfOctave: number,
 ): void {
     const { type, dot } = typeOf(ticks, divisions);
-    const pitches = span === null ? [] : voicing(span);
+    const pitches = span === null ? [] : voicing(span, bottomOfOctave);
     const flats = span === null ? false : spellsFlat(span);
     const notes = pitches.length === 0 ? [null] : pitches;
     for (const [index, midi] of notes.entries()) {

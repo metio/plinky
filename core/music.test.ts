@@ -135,6 +135,20 @@ describe("filterMusic", () => {
         expect(result.map((entry) => entry.id)).toEqual(["due"]);
     });
 
+    it("narrows to the pieces built on one loop when asked", () => {
+        const items = [
+            item({ id: "same", progression: "I V vi IV" }),
+            item({ id: "other", progression: "I IV V I" }),
+            item({ id: "none" }),
+        ];
+        const result = filterMusic(
+            items,
+            { ...EMPTY_MUSIC_FILTER, progression: "I V vi IV" },
+            emptyContext,
+        );
+        expect(result.map((entry) => entry.id)).toEqual(["same"]);
+    });
+
     it("intersects every active axis", () => {
         const items = [
             item({ id: "hit", title: "Sonatina", grade: 2, kind: "song" }),
@@ -151,6 +165,7 @@ describe("filterMusic", () => {
                 favoritesOnly: true,
                 dueOnly: false,
                 freshOnly: false,
+                progression: "",
             },
             { ...emptyContext, favorites: new Set(["hit", "wrong-grade", "wrong-kind"]) },
         );

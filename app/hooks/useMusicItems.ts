@@ -78,6 +78,7 @@ export function useMusicItems() {
                         // somewhere easier — so a row either has a way in to offer or says
                         // nothing about one.
                         ...(song.reach ? { reach: song.reach } : {}),
+                        ...(song.progression ? { progression: song.progression } : {}),
                         removable: false,
                         kind: "song" as const,
                     })),

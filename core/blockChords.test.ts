@@ -59,7 +59,9 @@ function leftHand(xml: string): number[][][] {
 describe("blockChords", () => {
     it("holds each bar's chord as one block in the left hand, the tune untouched", () => {
         const blocked = blockChords(domXmlCodec, ALBERTI);
-        expect(leftHand(blocked)).toEqual([[[48, 52, 55]], [[55, 59, 62]]]);
+        // The G7 is voiced as its shell, root, third and seventh, in the hand's own
+        // register: the Alberti bass sits around G2 to G3, so the chords do too.
+        expect(leftHand(blocked)).toEqual([[[48, 52, 55]], [[43, 47, 53]]]);
         // The right hand is the composer's.
         const doc = domXmlCodec.parse(blocked);
         const right = Array.from(doc?.querySelectorAll("note") ?? []).filter(
@@ -90,7 +92,7 @@ describe("blockChords", () => {
         const [measure] = leftHand(blockChords(domXmlCodec, twoChords));
         expect(measure).toEqual([
             [48, 52, 55],
-            [55, 59, 62],
+            [43, 47, 50],
         ]);
     });
 

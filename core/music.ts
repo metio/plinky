@@ -25,6 +25,8 @@ export type MusicItem = {
     // measured it (core/simplify). A hard piece whose tune is easy can say so in the list
     // rather than only reading as out of reach.
     reach?: Reach;
+    // The loop the piece is built on, where the catalogue read one — see SongMeta.
+    progression?: string;
     removable: boolean;
     kind: MusicKind;
 };
@@ -42,6 +44,10 @@ export type MusicFilter = {
     // played through for a while. "Something I have not tried" is a real way to browse
     // three thousand pieces, and the mastery record already knows the answer.
     freshOnly: boolean;
+    // Only pieces built on this loop of numerals, as the catalogue writes it ("I V vi IV").
+    // Empty means any. A piece's own panel sends a reader here, so a shape learned in one
+    // piece leads to the next piece it is the shape of.
+    progression: string;
 };
 
 export const EMPTY_MUSIC_FILTER: MusicFilter = {
@@ -51,6 +57,7 @@ export const EMPTY_MUSIC_FILTER: MusicFilter = {
     favoritesOnly: false,
     dueOnly: false,
     freshOnly: false,
+    progression: "",
 };
 
 // The per-player state the filters consult: the starred set, the mastery
@@ -120,6 +127,9 @@ export function filterMusic(
             return false;
         }
         if (filter.freshOnly && context.mastery[item.id] !== undefined) {
+            return false;
+        }
+        if (filter.progression !== "" && item.progression !== filter.progression) {
             return false;
         }
         if (filter.dueOnly) {

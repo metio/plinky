@@ -32,6 +32,13 @@ describe("readMusicFilter", () => {
 });
 
 describe("musicFilterParams", () => {
+    it("carries a progression with hyphens and stores it with spaces", () => {
+        expect(readMusicFilter({ progression: "I-V-vi-IV" }).progression).toBe("I V vi IV");
+        expect(musicFilterParams({ ...EMPTY_MUSIC_FILTER, progression: "I V vi IV" })).toEqual({
+            progression: "I-V-vi-IV",
+        });
+    });
+
     it("writes nothing for the plain shelf", () => {
         expect(musicFilterParams(EMPTY_MUSIC_FILTER)).toEqual({});
     });
@@ -50,6 +57,7 @@ describe("musicFilterParams", () => {
             favoritesOnly: true,
             dueOnly: false,
             freshOnly: true,
+            progression: "I V vi IV",
         };
         expect(readMusicFilter(musicFilterParams(filter))).toEqual(filter);
     });

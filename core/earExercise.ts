@@ -202,6 +202,12 @@ export type ProgressionConfig = {
     // The tonic register the progression is voiced around.
     lowest: number;
     highest: number;
+    // A progression to play as it stands rather than one drawn from the level — a piece's
+    // own loop, brought here to be heard. Its chords join the choices.
+    fixed?: ChordDegree[];
+    // The key to voice in, as a pitch class: a piece's progression is heard in the piece's
+    // key, and the level's own questions stay in it too.
+    tonicClass?: number;
 };
 
 // Scale degrees climb from the tonic triad a beginner tells apart, through the whole major
@@ -469,21 +475,29 @@ export function generateProgression(
     // The tonic sits where every degree's triad fits the range: I's root is the lowest
     // note, and vii°'s stack the highest, seventeen semitones above the tonic.
     const high = config.highest - 17;
-    const tonic = pickBetween(config.lowest, high, rng);
+    const tonic =
+        config.tonicClass === undefined
+            ? pickBetween(config.lowest, high, rng)
+            : tonicInRange(config.tonicClass, config.lowest, high);
 
     // Always I to I, so the key is heard at the start and resolved at the end; the middle
     // chords are drawn from the level's vocabulary, never repeating one twice in a row —
-    // and the chord before the closing I is never itself I, so the resolution lands.
-    const sequence: ChordDegree[] = ["I"];
-    for (let position = 1; position < config.length - 1; position++) {
-        const previous = sequence[position - 1];
-        const beforeClose = position === config.length - 2;
-        const candidates = degrees.filter(
-            (degree) => degree !== previous && !(beforeClose && degree === "I"),
-        );
-        sequence.push(candidates.length > 0 ? pick(candidates, rng) : previous!);
+    // and the chord before the closing I is never itself I, so the resolution lands. A
+    // fixed progression is played exactly as given: it is a piece's loop, not a question
+    // the drill made up, and it need not start or end on I.
+    const fixed = config.fixed ?? [];
+    const sequence: ChordDegree[] = fixed.length > 0 ? [...fixed] : ["I"];
+    if (fixed.length === 0) {
+        for (let position = 1; position < config.length - 1; position++) {
+            const previous = sequence[position - 1];
+            const beforeClose = position === config.length - 2;
+            const candidates = degrees.filter(
+                (degree) => degree !== previous && !(beforeClose && degree === "I"),
+            );
+            sequence.push(candidates.length > 0 ? pick(candidates, rng) : previous!);
+        }
+        sequence.push("I");
     }
-    sequence.push("I");
 
     // Each chord is a block, one after the next a beat apart.
     const notes: EarNote[] = sequence.flatMap((degree, index) =>
@@ -500,8 +514,39 @@ export function generateProgression(
         notes,
         answer: sequence.join("-"),
         sequence,
-        choices: [...degrees],
+        // The level's vocabulary, plus whatever a fixed progression brought with it.
+        choices: [...new Set([...degrees, ...sequence])],
     };
+}
+
+// The tonic of a pitch class whose chords all fit under the top of the range. The bottom
+// is where the drill prefers to start, not a wall: a key that will not fit above it sits
+// an octave lower rather than turning into a different key.
+function tonicInRange(pitchClass: number, lowest: number, high: number): number {
+    let tonic = lowest + ((((pitchClass - lowest) % 12) + 12) % 12);
+    if (tonic > high) {
+        tonic -= 12;
+    }
+    return tonic;
+}
+
+// A progression written the way a link carries it — "I-V-vi-IV" — read back as degrees,
+// or null where any part is not a chord the drill knows. A seventh is its triad's chord:
+// V7 is V, ii7 is ii, since the drill voices triads.
+export function parseProgression(text: string | null | undefined): ChordDegree[] | null {
+    if (!text) {
+        return null;
+    }
+    const all = PROGRESSION_LEVELS[PROGRESSION_LEVELS.length - 1] as readonly ChordDegree[];
+    const degrees: ChordDegree[] = [];
+    for (const part of text.split(/[-\s]+/u).filter((one) => one !== "")) {
+        const triad = part.replace(/(Δ7|ø7|°7|7)$/u, "").replace(/ø$/u, "°");
+        if (!(all as readonly string[]).includes(triad)) {
+            return null;
+        }
+        degrees.push(triad as ChordDegree);
+    }
+    return degrees.length >= 2 ? degrees : null;
 }
 
 export function generateScaleDegree(
@@ -587,10 +632,15 @@ export function generateMelodic(config: MelodicConfig, rng: () => number): Melod
 // The question for an exercise at a level, over the default register. The one place the
 // exercise id maps to its generator and its level-set, so a caller names an exercise and
 // a level and gets a playable question — the surface it drives falls out of the kind.
+// What a piece brought to the drill: its own progression, to be heard first, and its key,
+// which every question of the session is then voiced in.
+export type EarFocus = { progression?: ChordDegree[]; tonicClass?: number };
+
 export function generateQuestion(
     exercise: EarExerciseId,
     level: number,
     rng: () => number,
+    focus: EarFocus = {},
 ): EarQuestion {
     const range = { lowest: DEFAULT_LOWEST, highest: DEFAULT_HIGHEST };
     switch (exercise) {
@@ -606,6 +656,8 @@ export function generateQuestion(
                     degrees: atLevel(PROGRESSION_LEVELS, level),
                     length: PROGRESSION_LENGTH,
                     ...range,
+                    ...(focus.progression ? { fixed: focus.progression } : {}),
+                    ...(focus.tonicClass === undefined ? {} : { tonicClass: focus.tonicClass }),
                 },
                 rng,
             );

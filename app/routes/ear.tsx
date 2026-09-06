@@ -3,7 +3,7 @@
 
 import { useSearchParams } from "react-router";
 import { useSeededState } from "../hooks/useSeededState";
-import type { EarExerciseId } from "../../core/earExercise";
+import { type EarExerciseId, parseProgression } from "../../core/earExercise";
 import { routeMeta, webPageData } from "../../core/site";
 import { EarSession } from "../components/features/earSession";
 import { EXERCISE_LABELS, LEVEL_LABELS } from "../lib/earLabels";
@@ -67,6 +67,19 @@ export default function Ear() {
         },
     );
 
+    // A piece's own progression and key, when a piece sent the reader here.
+    const progression = parseProgression(params.get("progression"));
+    const tonicParam = Number(params.get("tonic"));
+    const tonicClass =
+        Number.isInteger(tonicParam) && tonicParam >= 0 && tonicParam < 12 ? tonicParam : undefined;
+    const focus =
+        exercise === "progressions" && (progression !== null || tonicClass !== undefined)
+            ? {
+                  ...(progression ? { progression } : {}),
+                  ...(tonicClass === undefined ? {} : { tonicClass }),
+              }
+            : undefined;
+
     const levels = LEVEL_LABELS[exercise];
 
     return (
@@ -101,7 +114,12 @@ export default function Ear() {
 
             {/* Keyed on the pair, so choosing a different exercise or level starts a fresh
                 session — the reset falls out of the remount rather than a handler. */}
-            <EarSession key={`${exercise}-${level}`} exercise={exercise} level={Number(level)} />
+            <EarSession
+                key={`${exercise}-${level}-${params.get("progression") ?? ""}-${params.get("tonic") ?? ""}`}
+                exercise={exercise}
+                level={Number(level)}
+                focus={focus}
+            />
         </main>
     );
 }

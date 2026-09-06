@@ -512,8 +512,9 @@ plays a note louder than the page asks — what is printed is a ceiling, and int
 lives underneath it.
 
 The same reading gives a piece a chord panel before a run — the chords it is built on,
-commonest first, the loop it keeps returning to, and links to practise the key's chord set
-and to hear the progression in the ear drill — and a fourth way of thinning a piece:
+commonest first, the loop it keeps returning to, and links to practise the key's chord set,
+to hear that very loop in the ear drill in the piece's own key, and to the other pieces on
+the shelf built on the same loop — and a fourth way of thinning a piece:
 **Left hand as chords** keeps the tune as written and plays the harmony under it as plain
 block chords, one per change, so the shape of a piece is learned before the pattern that
 decorates it. Like the other thinnings it counts as practice, never as the piece.

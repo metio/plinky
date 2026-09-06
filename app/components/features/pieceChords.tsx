@@ -65,10 +65,26 @@ export function PieceChords({ xml }: { xml: string }) {
                 {summary.earLevel !== null && (
                     <li>
                         <Link
-                            to={`/ear?exercise=progressions&level=${summary.earLevel}`}
+                            // The drill opens on this piece's own loop, in this piece's
+                            // key, before its own questions.
+                            to={`/ear?exercise=progressions&level=${summary.earLevel}${
+                                summary.progression === null
+                                    ? ""
+                                    : `&progression=${summary.progression.join("-")}`
+                            }&tonic=${summary.key.tonic}`}
                             className={linkClasses}
                         >
                             {m.piece_chords_ear()}
+                        </Link>
+                    </li>
+                )}
+                {summary.progression !== null && (
+                    <li>
+                        <Link
+                            to={`/music?progression=${summary.progression.join("-")}`}
+                            className={linkClasses}
+                        >
+                            {m.piece_chords_others()}
                         </Link>
                     </li>
                 )}

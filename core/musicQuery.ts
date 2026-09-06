@@ -34,6 +34,11 @@ export function readMusicFilter(params: Readonly<Record<string, string>>): Music
         favoritesOnly: params.starred === "1",
         dueOnly: params.due === "1",
         freshOnly: params.fresh === "1",
+        // Carried with hyphens in the address ("I-V-vi-IV"), stored with spaces.
+        progression: (params.progression ?? "")
+            .split("-")
+            .filter((one) => one !== "")
+            .join(" "),
     };
 }
 
@@ -58,6 +63,9 @@ export function musicFilterParams(filter: MusicFilter): Record<string, string> {
     }
     if (filter.freshOnly) {
         params.fresh = "1";
+    }
+    if (filter.progression !== "") {
+        params.progression = filter.progression.split(" ").join("-");
     }
     return params;
 }

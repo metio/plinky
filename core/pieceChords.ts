@@ -19,8 +19,10 @@ export type PieceChords = {
     key: { tonic: PitchClass; mode: Mode };
     // The chords the piece uses, commonest first, with how many changes land on each.
     vocabulary: { numeral: string; count: number }[];
-    // The four-chord loop the piece returns to most, as numerals — or null when the piece
-    // never settles into one.
+    // The four-chord loop the piece returns to most, as the triads under its numerals and
+    // turned to start on I where I is in it — or null when the piece never settles into
+    // one. Triads, because a loop is the same loop whether its V carries a seventh this
+    // time round; and one rotation, because a loop has no first chord.
     progression: string[] | null;
     // The chord set on the shelf that drills this key's seven chords.
     chordSet: string | null;
@@ -54,10 +56,18 @@ export function summarizeChords(spans: readonly ChordSpan[]): PieceChords | null
     const vocabulary = [...counts.entries()]
         .map(([numeral, count]) => ({ numeral, count }))
         .sort((a, b) => b.count - a.count || a.numeral.localeCompare(b.numeral));
+    // The loop is read over the triads, with the duplicates that collapsing sevenths
+    // creates folded again — I V7 V I is I V I.
+    const triads: string[] = [];
+    for (const numeral of changes.map(triadOf)) {
+        if (triads[triads.length - 1] !== numeral) {
+            triads.push(numeral);
+        }
+    }
     return {
         key,
         vocabulary,
-        progression: commonLoop(changes),
+        progression: commonLoop(triads),
         chordSet: chordSetFor(key),
         earLevel: key.mode === "major" ? earLevelFor(vocabulary.map((one) => one.numeral)) : null,
     };
@@ -82,7 +92,18 @@ function commonLoop(changes: readonly string[]): string[] | null {
             best = entry;
         }
     }
-    return best !== null && best[1] >= 2 ? best[0].split(" ") : null;
+    return best !== null && best[1] >= 2 ? canonical(best[0].split(" ")) : null;
+}
+
+// One rotation for one loop: starting on I where the loop has one, else on whichever
+// rotation reads first — so I V vi IV and V vi IV I are the same progression on the shelf.
+function canonical(loop: string[]): string[] {
+    const rotations = loop.map((_, at) => [...loop.slice(at), ...loop.slice(0, at)]);
+    const onTonic = rotations.find((one) => one[0] === "I" || one[0] === "i");
+    if (onTonic) {
+        return onTonic;
+    }
+    return rotations.sort((a, b) => a.join(" ").localeCompare(b.join(" ")))[0] ?? loop;
 }
 
 // The chord-set exercise for the key: "chords-c-major", "chords-a-minor". Null outside
@@ -118,5 +139,6 @@ function earLevelFor(numerals: readonly string[]): number | null {
 }
 
 function triadOf(numeral: string): ChordDegree | string {
-    return numeral.replace(/(Δ7|ø7|°7|7)$/u, "").replace(/ø$/u, "°");
+    // A half-diminished or diminished seventh is a diminished triad with a seventh on it.
+    return numeral.replace(/(ø7|°7)$/u, "°").replace(/(Δ7|7)$/u, "");
 }
