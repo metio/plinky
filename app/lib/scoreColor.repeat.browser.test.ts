@@ -4,7 +4,14 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { PLAYED_COLOR } from "../../core/scoreCanvas";
-import { clearHalosWithin, collectNoteElements, haloColor, litHalos } from "./scoreColor";
+import { cursorOrdinal, seekToOrdinal } from "./scoreCursor";
+import {
+    clearHalosWithin,
+    collectNoteElements,
+    haloColor,
+    litHalos,
+    paintPlayedNotes,
+} from "./scoreColor";
 
 // A bar before a repeated pair, the pair, and a bar after. Whole notes in four-four, so
 // each bar is one whole note and the printed onsets are 0, 1, 2 and 3.
@@ -51,6 +58,45 @@ describe("uncolouring the bars a repeat plays again", () => {
             PLAYED_COLOR,
             null,
             null,
+            PLAYED_COLOR,
+        ]);
+    });
+
+    it("leaves the cursor where the run had stepped it, so the second pass paints on", async () => {
+        host = document.createElement("div");
+        host.style.width = "800px";
+        document.body.appendChild(host);
+        const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
+        await osmd.load(XML);
+        osmd.render();
+        osmd.cursor.show();
+        const elements = [...new Set(collectNoteElements(osmd, "both").flat())];
+        const C4 = 60;
+
+        // The first pass: C, D, E each painted under the cursor, then the step past E
+        // lands on the repeat's second pass of bar 2 — the fourth position from the top.
+        osmd.cursor.reset();
+        for (let i = 0; i < 3; i++) {
+            paintPlayedNotes(osmd, [C4 + [0, 2, 4][i]!]);
+            osmd.cursor.next();
+        }
+        expect(cursorOrdinal(osmd.cursor)).toBe(3);
+        seekToOrdinal(osmd.cursor, 3);
+
+        clearHalosWithin(osmd, { from: 1, to: 2 });
+        expect(cursorOrdinal(osmd.cursor)).toBe(3);
+        seekToOrdinal(osmd.cursor, 3);
+
+        // The second pass and the bar after it: D and E again, then F. Every one of
+        // them lands where the run is, so the score ends fully coloured.
+        for (const pitch of [C4 + 2, C4 + 4, C4 + 5]) {
+            paintPlayedNotes(osmd, [pitch]);
+            osmd.cursor.next();
+        }
+        expect(elements.map((element) => haloColor(element))).toEqual([
+            PLAYED_COLOR,
+            PLAYED_COLOR,
+            PLAYED_COLOR,
             PLAYED_COLOR,
         ]);
     });

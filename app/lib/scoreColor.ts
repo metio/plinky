@@ -3,6 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type Hand, isPracticedHand } from "../../core/matcher";
+import { cursorOrdinal, seekToOrdinal } from "./scoreCursor";
 import { playOrder, readParts, readScoreExpression } from "./scoreExpression";
 import { type MeasureBox, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
 
@@ -283,11 +284,14 @@ export type RepeatSpan = { from: number; to: number };
 // must be uncoloured for the second pass to show where it has got to. Only those bars: a
 // piece with two repeated sections used to lose the first section's whole trail the
 // moment the second section repeated, though that music had been played and passed.
-// Walks the cursor (leaving it reset), since the printed onset of a note is only known
-// at the position the engraver puts it.
+// Walks the cursor, since the printed onset of a note is only known at the position the
+// engraver puts it, and puts it back where it stood. The rewind fires after the run has
+// stepped the cursor onto the repeat's second pass, and every halo from here on is painted
+// under the cursor: left reset, the cursor would sit three positions behind the run for
+// the rest of the piece, and the colour would land on the wrong notes or on none.
 export function clearHalosWithin(osmd: OpenSheetMusicDisplay, span: RepeatSpan): void {
     const cursor = osmd.cursor;
-    cursor.reset();
+    const standing = cursorOrdinal(cursor);
     while (!cursor.iterator.EndReached) {
         const whole = cursor.iterator.currentTimeStamp?.RealValue ?? 0;
         if (whole >= span.from - SPAN_EPSILON && whole <= span.to + SPAN_EPSILON) {
@@ -300,7 +304,7 @@ export function clearHalosWithin(osmd: OpenSheetMusicDisplay, span: RepeatSpan):
         }
         cursor.next();
     }
-    cursor.reset();
+    seekToOrdinal(cursor, standing);
 }
 
 // Onsets are fractions of a whole note accumulated in floating point; a position on the
