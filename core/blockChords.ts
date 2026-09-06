@@ -52,6 +52,14 @@ export function blockChords(codec: XmlCodec, xml: string): string {
     const staffNumber = ownPart ? null : 2;
     const timeline = readTimeline(doc);
     const spans = readHarmony(timeline);
+    // Where the composer's left hand actually sounds. The chords go there and nowhere
+    // else: a pickup the right hand plays alone, or a bar the left hand rests through,
+    // stays silent rather than gaining a chord read off the tune.
+    const sounding = merged(
+        timeline.notes
+            .filter((note) => note.staffId === left && note.midi !== null && note.wholes > 0)
+            .map((note) => ({ from: note.whole, to: note.whole + note.wholes })),
+    );
     const measures = Array.from(leftPart.children).filter((child) => child.tagName === "measure");
     let divisions = 1;
     for (const [index, measure] of measures.entries()) {
@@ -73,13 +81,29 @@ export function blockChords(codec: XmlCodec, xml: string): string {
         if (back > 0) {
             measure.appendChild(backup(doc, back));
         }
-        for (const segment of segmentsOf(spans, from, to, ticksPerWhole)) {
+        for (const segment of segmentsOf(spans, sounding, from, to, ticksPerWhole)) {
             for (const piece of splitTicks(segment.ticks, divisions)) {
                 appendChord(doc, measure, segment.span, piece, divisions, staffNumber);
             }
         }
     }
     return codec.serialize(doc);
+}
+
+// The stretches the hand is sounding at all, note lengths joined: what matters is where it
+// falls silent and comes back, not where one note hands over to the next.
+function merged(played: readonly { from: number; to: number }[]): { from: number; to: number }[] {
+    const sorted = [...played].sort((a, b) => a.from - b.from);
+    const out: { from: number; to: number }[] = [];
+    for (const one of sorted) {
+        const last = out[out.length - 1];
+        if (last && one.from <= last.to + EPSILON) {
+            last.to = Math.max(last.to, one.to);
+        } else {
+            out.push({ ...one });
+        }
+    }
+    return out;
 }
 
 // Take the left hand's notes out of the measure, and every backup or forward that was
@@ -147,6 +171,7 @@ function backup(doc: Document, ticks: number): Element {
 // The measure cut at every chord change inside it, each piece with the chord in force.
 function segmentsOf(
     spans: readonly ChordSpan[],
+    sounding: readonly { from: number; to: number }[],
     from: number,
     to: number,
     ticksPerWhole: number,
@@ -154,6 +179,15 @@ function segmentsOf(
     const edges = new Set<number>([from, to]);
     for (const span of spans) {
         for (const edge of [span.from, span.to]) {
+            if (edge > from + EPSILON && edge < to - EPSILON) {
+                edges.add(edge);
+            }
+        }
+    }
+    // A chord is cut where the left hand falls silent or comes back in, too, so the
+    // silence is exactly the composer's.
+    for (const played of sounding) {
+        for (const edge of [played.from, played.to]) {
             if (edge > from + EPSILON && edge < to - EPSILON) {
                 edges.add(edge);
             }
@@ -172,12 +206,25 @@ function segmentsOf(
         if (ticks <= 0) {
             continue;
         }
-        const span =
-            spans.find((one) => one.from <= start + EPSILON && one.to > start + EPSILON) ?? null;
-        segments.push({ ticks, span });
+        const played = sounding.some((one) => one.from < end - EPSILON && one.to > start + EPSILON);
+        const span = played
+            ? (spans.find((one) => one.from <= start + EPSILON && one.to > start + EPSILON) ?? null)
+            : null;
+        const last = segments[segments.length - 1];
+        // Silence is silence: two chord changes over a resting hand are one rest.
+        if (span === null && last !== undefined && last.span === null) {
+            last.ticks += ticks;
+        } else {
+            segments.push({ ticks, span });
+        }
     }
     if (used < total) {
-        segments.push({ ticks: total - used, span: null });
+        const last = segments[segments.length - 1];
+        if (last !== undefined && last.span === null) {
+            last.ticks += total - used;
+        } else {
+            segments.push({ ticks: total - used, span: null });
+        }
     }
     return segments;
 }

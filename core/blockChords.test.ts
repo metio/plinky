@@ -106,6 +106,22 @@ describe("blockChords", () => {
         expect(leftHand(blockChords(domXmlCodec, silentBar))[1]).toEqual([[]]);
     });
 
+    it("plays only where the composer's left hand played", () => {
+        // A pickup the right hand plays alone: no chord is read off the tune for it.
+        const pickup = score(
+            `<measure number="1">${ATTR}${note("E", 5, 8, 1)}${note("D", 5, 8, 1)}<backup><duration>16</duration></backup><note><rest/><duration>16</duration><voice>2</voice><type>whole</type><staff>2</staff></note></measure>` +
+                bar(
+                    2,
+                    note("E", 5, 8, 1) + note("G", 5, 8, 1),
+                    note("C", 3, 4, 2) +
+                        note("G", 3, 4, 2) +
+                        note("E", 3, 4, 2) +
+                        note("G", 3, 4, 2),
+                ),
+        );
+        expect(leftHand(blockChords(domXmlCodec, pickup))).toEqual([[[]], [[48, 52, 55]]]);
+    });
+
     it("leaves a single-staff score alone", () => {
         const melody = `<?xml version="1.0"?><score-partwise><part-list><score-part id="P1"/></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>${note("C", 4, 1, 1)}</measure></part></score-partwise>`;
         expect(blockChords(domXmlCodec, melody)).toBe(melody);
