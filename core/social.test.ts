@@ -3,7 +3,7 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { CHANNELS, FOLLOW_US } from "./social";
+import { CHANNELS } from "./social";
 
 describe("the channels Plinky is followed on", () => {
     it("is named once and read everywhere", () => {
@@ -24,14 +24,6 @@ describe("the channels Plinky is followed on", () => {
             expect(channel.href, `${channel.label} should have no query string`).not.toContain("?");
             expect(channel.href).toMatch(/^https:\/\//);
         }
-    });
-
-    it("offers a post the three places to follow, and not the two it is already on", () => {
-        expect(FOLLOW_US.map((channel) => channel.label)).toEqual([
-            "Instagram",
-            "Facebook",
-            "Reddit",
-        ]);
     });
 
     it("is the same set the README tells a reader", () => {

@@ -17,7 +17,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { folderFor, PIECES } from "./pieces.mjs";
 import { collectionPieces } from "./collections.mjs";
-import { CHANNELS, FOLLOW_US } from "../../core/social.ts";
+import { CHANNELS } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
 import { uploadText } from "./uploadText.mjs";
 import { readSongsSync } from "../manifest.mts";
@@ -27,9 +27,6 @@ import { readSongsSync } from "../manifest.mts";
 // directory node happens to live in.
 const outAt = process.argv.indexOf("--out");
 const OUT = (outAt >= 0 ? process.argv[outAt + 1] : undefined) ?? "promo";
-// One line per channel, from the single list in core/social.
-const FOLLOW_LINES = FOLLOW_US.map((c) => `${c.label}: ${c.href}`);
-
 const SITE = "https://plinky.fun";
 
 const byId = new Map(readSongsSync().map((item) => [item.id, item]));
@@ -86,12 +83,9 @@ function describe(piece, entry) {
         "",
         SITE,
         "",
-        // Where somebody who liked the clip goes next. A viewer who watched to the end is
-        // the one person most likely to follow, and YouTube gives them nowhere to do it —
-        // the description is the only place these can be said.
-        "More Plinky:",
-        ...FOLLOW_LINES,
-        "",
+        // No list of the other channels: the YouTube profile carries them itself, shown
+        // under every video, and kept in one place — a link that changes is changed once
+        // there rather than in sixty-four descriptions.
         // No entry means no licence, and a licence is a legal fact about a particular
         // score rather than a default. Guessing CC0 would tell a viewer they may reuse an
         // edition nothing here has checked — and it contradicted the warning printed

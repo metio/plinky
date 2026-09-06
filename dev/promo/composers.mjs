@@ -20,7 +20,6 @@
 // Usage: npm run promo:composers [-- --out promo]
 
 import { mkdir, writeFile } from "node:fs/promises";
-import { FOLLOW_US } from "../../core/social.ts";
 import { indexedPerson } from "../../core/peopleIndex.ts";
 import { canonicalPeople, personSlug } from "../../core/person.ts";
 import { folderForComposer, PIECES } from "./pieces.mjs";
@@ -29,7 +28,6 @@ import { uploadText } from "./uploadText.mjs";
 const outAt = process.argv.indexOf("--out");
 const OUT = (outAt >= 0 ? process.argv[outAt + 1] : undefined) ?? "promo";
 // One line per channel, from the single list in core/social.
-const FOLLOW_LINES = FOLLOW_US.map((c) => `${c.label}: ${c.href}`);
 
 const SITE = "https://plinky.fun";
 
@@ -79,10 +77,6 @@ function describe(composer) {
             : "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
         "",
         SITE,
-        "",
-        // Where somebody who liked the playlist goes next, the same three the clips carry.
-        "More Plinky:",
-        ...FOLLOW_LINES,
         "",
         "Every score is Creative Commons, so each piece here is one you are free to play, share and record.",
     ].join("\n");

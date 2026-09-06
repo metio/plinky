@@ -16,7 +16,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { collections, folderForCollection } from "./collections.mjs";
 import { folderFor } from "./pieces.mjs";
-import { FOLLOW_US } from "../../core/social.ts";
 import { FINGER_LEGEND } from "./fingerLegend.mjs";
 import { uploadText } from "./uploadText.mjs";
 
@@ -46,9 +45,6 @@ function describe(set) {
         "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
         "",
         SITE,
-        "",
-        "More Plinky:",
-        ...FOLLOW_US.map((channel) => `${channel.label}: ${channel.href}`),
         "",
         "Every score is Creative Commons, so each piece here is one you are free to play, share and record.",
     ]

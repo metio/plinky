@@ -32,9 +32,3 @@ export const CHANNELS: readonly Channel[] = [
     { brand: "reddit", label: "Reddit", href: "https://www.reddit.com/r/plinky_piano/" },
     { brand: "github", label: "GitHub", href: "https://github.com/metio/plinky" },
 ];
-
-// The three a post points somebody at. GitHub is where the code is and YouTube is where
-// the clip already is, so neither belongs in a video's own description.
-export const FOLLOW_US: readonly Channel[] = CHANNELS.filter((channel) =>
-    ["instagram", "facebook", "reddit"].includes(channel.brand),
-);
