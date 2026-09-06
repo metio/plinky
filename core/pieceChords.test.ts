@@ -43,6 +43,38 @@ describe("summarizeChords", () => {
         expect(summary?.progression).toBeNull();
     });
 
+    it("reads the loop over triads and turns it to start on the tonic", () => {
+        // V7 in one round and V in the next are the same loop, wherever the walk began.
+        const spans = [
+            ...loop(["V7", "vi", "IV", "I"], 1),
+            ...loop(["V", "vi", "IV", "I"], 1).map((one) => ({
+                ...one,
+                from: one.from + 4,
+                to: one.to + 4,
+            })),
+            ...loop(["V7", "vi", "IV", "I"], 1).map((one) => ({
+                ...one,
+                from: one.from + 8,
+                to: one.to + 8,
+            })),
+        ];
+        expect(summarizeChords(spans)?.progression).toEqual(["I", "V", "vi", "IV"]);
+    });
+
+    it("keeps a diminished seventh chord's triad diminished", () => {
+        const spans = loop(["i", "iiø7", "V7", "VI"], 1).map((one, at) => ({
+            ...one,
+            key: { tonic: 9, mode: "minor" as const },
+            from: at,
+            to: at + 1,
+        }));
+        const more = [
+            ...spans,
+            ...spans.map((one) => ({ ...one, from: one.from + 4, to: one.to + 4 })),
+        ];
+        expect(summarizeChords(more)?.progression).toEqual(["i", "ii°", "V", "VI"]);
+    });
+
     it("points at the key's chord set and the ear level that covers the piece", () => {
         const summary = summarizeChords(loop(["I", "V7", "vi", "IV"], 2));
         expect(summary?.chordSet).toBe("chords-c-major");

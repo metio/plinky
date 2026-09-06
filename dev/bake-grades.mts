@@ -36,6 +36,7 @@ import { curate, loadCuration, unapplied } from "./curation.mts";
 import { tidied, tidyCredit, tidyTitle } from "./titles.mts";
 import { crowdedGrade, staleSong } from "./bakeChecks.mts";
 import { exerciseMeasure } from "./exerciseCosts.mts";
+import { progressionOf } from "./progressionOf.mts";
 import { gradeForCost, pieceBoundaries } from "./grading.mts";
 import { readExercises, readSongs, writeExercises, writeSongs } from "./manifest.mts";
 
@@ -84,9 +85,22 @@ async function main() {
     // The freshly-graded catalogue these boundaries imply. Re-grading can move a piece
     // across a grade boundary, so re-establish the shipped order both manifests are
     // pinned to: songs easiest-first (grade follows cost), exercises by grade then cost.
-    const bakedSongs = correctedSongs.pieces
-        .map((song) => ({ ...song, grade: gradeForCost(song.cost, boundaries) }))
-        .sort((a, b) => a.cost - b.cost);
+    // The progression is read off each score here, so the shelf can answer "other pieces
+    // built on this" from the manifest alone; a stale one is dropped before the fresh
+    // reading is added, like the grade.
+    const bakedSongs = (
+        await Promise.all(
+            correctedSongs.pieces.map(async (song) => {
+                const { progression: _stale, ...rest } = song;
+                const progression = await progressionOf(song);
+                return {
+                    ...rest,
+                    grade: gradeForCost(song.cost, boundaries),
+                    ...(progression === null ? {} : { progression }),
+                };
+            }),
+        )
+    ).sort((a, b) => a.cost - b.cost);
     // Exercise cost is remeasured here rather than carried over. Every change to the
     // difficulty model invalidates every stored cost, and `npm run exercises` — the only
     // thing that used to refresh these — needs the PDMX corpus and has no reason to be run

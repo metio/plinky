@@ -13,6 +13,7 @@ import { createAssignmentsStore } from "../stores/assignmentsStore";
 import type { ExerciseSource } from "../stores/exerciseSource";
 import type { SongSource } from "../stores/songSource";
 import { renderWithServices } from "../testing/renderWithServices";
+import { m } from "../paraglide/messages.js";
 import Music from "./music";
 
 const source = <T,>(): T => ({ manifest: () => Promise.resolve([]) }) as unknown as T;
@@ -58,6 +59,30 @@ describe("Music tabs", () => {
             },
         );
         expect(await screen.findByText("Scores & backup")).toBeTruthy();
+    });
+});
+
+describe("Music narrowed to a progression", () => {
+    it("says which loop the shelf is narrowed to, and offers the whole shelf back", async () => {
+        renderWithServices(
+            <MemoryRouter initialEntries={["/music?progression=I-V-vi-IV"]}>
+                <Music />
+            </MemoryRouter>,
+            {
+                store: memoryStore(),
+                exercises: source<ExerciseSource>(),
+                songs: source<SongSource>(),
+            },
+        );
+        expect(
+            await screen.findByText(m.music_built_on({ progression: "I – V – vi – IV" })),
+        ).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: m.music_show_everything() }));
+        await waitFor(() => {
+            expect(
+                screen.queryByText(m.music_built_on({ progression: "I – V – vi – IV" })),
+            ).toBeNull();
+        });
     });
 });
 

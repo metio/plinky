@@ -45,6 +45,10 @@ export type SongMeta = {
     // somebody reads as "not yet" and nothing more, when the truth is usually that the tune
     // is within reach and the filling is not; this is what lets a list say so.
     reach?: Reach;
+    // The four-chord loop the piece keeps coming back to, as numerals joined by spaces
+    // ("I V vi IV"), read off the notes at bake time by core/harmony. Absent where the
+    // piece never settles into one. What lets a shelf answer "other pieces built on this".
+    progression?: string;
 };
 
 // A named work the catalogue holds enough of to work through as one thing — an opus, a

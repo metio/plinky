@@ -57,7 +57,15 @@ export function useMusicFilters(items: readonly MusicItem[], mastery: Record<str
                 (prev) => {
                     // Everything the shelf does not own — the tab, above all — stays put.
                     const kept = Object.fromEntries(prev);
-                    for (const key of ["q", "kind", "grade", "starred", "due", "fresh"]) {
+                    for (const key of [
+                        "q",
+                        "kind",
+                        "grade",
+                        "starred",
+                        "due",
+                        "fresh",
+                        "progression",
+                    ]) {
                         delete kept[key];
                     }
                     return { ...kept, ...musicFilterParams(next) };
@@ -149,6 +157,9 @@ export function useMusicFilters(items: readonly MusicItem[], mastery: Record<str
         toggleFavoritesOnly: () => update({ ...filter, favoritesOnly: !favoritesOnly }),
         dueOnly,
         toggleDueOnly: () => update({ ...filter, dueOnly: !dueOnly }),
+        // The loop the shelf is narrowed to, and the way back to the whole shelf.
+        progression: filter.progression,
+        clearProgression: () => update({ ...filter, progression: "" }),
         favorites,
         matches,
         visible,

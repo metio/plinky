@@ -9,6 +9,7 @@ import { MusicRow } from "../components/features/musicRow";
 import { ScoreBackup } from "../components/features/scoreBackup";
 import { ScoreImport } from "../components/features/scoreImport";
 import { Button } from "../components/ui/button";
+import { linkClasses } from "../components/ui/classes";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dueCount } from "../../core/music";
 import { isDue } from "../../core/mastery";
@@ -138,6 +139,24 @@ export default function MusicRoute() {
                 </>
             ) : tab === "people" ? null : (
                 <>
+                    {/* A piece's chord panel narrows the shelf to what shares its loop;
+                        the line says so, and is the way back to everything. */}
+                    <Show when={filters.progression !== ""}>
+                        <p className="flex flex-wrap items-baseline gap-x-3 text-sm text-body">
+                            <span>
+                                {m.music_built_on({
+                                    progression: filters.progression.split(" ").join(" – "),
+                                })}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={filters.clearProgression}
+                                className={linkClasses}
+                            >
+                                {m.music_show_everything()}
+                            </button>
+                        </p>
+                    </Show>
                     <MusicFilters
                         kind={filters.kind}
                         onKind={filters.setKind}
