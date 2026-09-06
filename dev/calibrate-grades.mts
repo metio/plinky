@@ -237,7 +237,7 @@ async function main() {
     // a statement about that curriculum and stays put unless the curriculum itself moves.
     // Pieces are the opposite case, which is why they are anchored instead.
     const tiles = await readExercises();
-    for (const kind of ["scale", "arpeggio"] as const) {
+    for (const kind of ["scale", "arpeggio", "chords"] as const) {
         const costs = tiles
             .filter((tile) => tile.kind === "scale-arpeggio" && kindOf(tile) === kind)
             .map((tile) => tile.cost);

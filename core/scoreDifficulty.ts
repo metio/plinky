@@ -365,16 +365,19 @@ export function difficultyOf(doc: Document, hands: Hands): number {
     );
 }
 
-export type Category = "scale" | "arpeggio" | "piece";
+export type Category = "scale" | "arpeggio" | "chords" | "piece";
 
-// Scales and arpeggios are recognised by their catalogue id prefix; everything
-// else is a piece.
+// Scales, arpeggios and chord sets are recognised by their catalogue id prefix;
+// everything else is a piece.
 export function categoryOf(id: string): Category {
     if (id.startsWith("scale-")) {
         return "scale";
     }
     if (id.startsWith("arpeggio-")) {
         return "arpeggio";
+    }
+    if (id.startsWith("chords-")) {
+        return "chords";
     }
     return "piece";
 }
@@ -409,6 +412,9 @@ const GRADE_THRESHOLDS: Record<Category, number[]> = {
     piece: [5.498, 7.785, 10.513, 13.079, 15.349, 18.984, 22.041],
     scale: [0.95, 1.05, 1.75, 2.45, 3.1, 3.25, 3.9],
     arpeggio: [1.117, 1.817, 1.983, 2.683, 3.336, 3.917, 4.25],
+    // Block chords cost more to finger than either: three keys under one hand at every
+    // position. The octiles of the twenty-four chord tiles, like the two rows above.
+    chords: [3.483, 4.117, 4.583, 5.5, 6.083, 6.95, 7.317],
 };
 
 // What the import and bake tooling grades a piece against, so the manifest and the grade

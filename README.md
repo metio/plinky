@@ -199,8 +199,9 @@ one-tap **review session** walks you through everything that's fading, and you c
 
 ## Features, one by one
 
-- **Music** — the catalogue: bundled scales, arpeggios, and familiar tunes like
-  *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import, in two tabs.
+- **Music** — the catalogue: bundled scales, arpeggios, the seven chords of every key
+  as block-chord sets, and familiar tunes like *Twinkle, Twinkle* and *Ode to Joy*, plus
+  anything you import, in two tabs.
   **Search** finds something to play: search, star, filter by kind, grade, or what's
   **due now**, and open one to practise. **Manage** grows and safeguards the library:
   add your own MusicXML score (drag-and-drop, with a staff preview and editable

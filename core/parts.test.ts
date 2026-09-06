@@ -27,8 +27,15 @@ describe("partsOf", () => {
         expect(partsOf([2, 2])).toEqual({ right: 2, left: 3, other: [0, 1] });
     });
 
+    it("reads two single-staff parts, and nothing else, as the two hands", () => {
+        // How every generated both-hands exercise is written, and how some editors
+        // export a piano piece. Read as "the last part is the piano", the treble was the
+        // other instrument and the bass the right hand.
+        expect(partsOf([1, 1])).toEqual({ right: 0, left: 1, other: [] });
+    });
+
     it("falls back to the last part when nothing has two staves", () => {
-        expect(partsOf([1, 1])).toEqual({ right: 1, left: 2, other: [0] });
+        expect(partsOf([1, 1, 1])).toEqual({ right: 2, left: 3, other: [0, 1] });
     });
 
     it("reads a single-staff score the way it always did", () => {

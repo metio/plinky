@@ -19,7 +19,12 @@ export type ExerciseType =
     | "major-arpeggio"
     | "minor-arpeggio"
     | "dom7-arpeggio"
-    | "dim7-arpeggio";
+    | "dim7-arpeggio"
+    // The seven chords of a key as blocks, up the scale and back: the hand shape a
+    // player meets in every piece in that key, learned once here rather than note by
+    // note in each of them.
+    | "major-chords"
+    | "minor-chords";
 
 export type Hands = "right" | "left" | "both" | "contrary";
 
@@ -235,6 +240,31 @@ function arpeggioLine(
     return turn(ascending, ascending);
 }
 
+// The seven diatonic triads of the key as blocks, one on each degree up the scale and
+// back down, in the inversion asked for. A minor key's chords are the natural minor's —
+// the seven a chart of that key prints — so the dominant is minor here, as it is in the
+// natural minor scale beside it; the raised leading note is the harmonic scale's lesson.
+//
+// An inversion rotates every chord the same way: first inversion puts the third at the
+// bottom, second the fifth, with the lower tones carried an octave up. The line then
+// starts higher and the shape is the one a hand keeps while the bass moves — what a player
+// who has the root positions needs next.
+function chordLine(tonic: string, fifths: number, octaves: number, inversion: number): Note[][] {
+    // Two octaves past the run, so the top chord's upper tones and any inversion's
+    // carried tones are still on the line.
+    const scale = diatonic(tonic, fifths, octaves + 2, 1);
+    const up: Note[][] = [];
+    for (let degree = 0; degree <= octaves * 7; degree++) {
+        const tones = [scale[degree]!, scale[degree + 2]!, scale[degree + 4]!];
+        // Rotating carries the tones taken off the bottom up an octave: seven degrees on.
+        const rotated = [
+            ...tones.slice(inversion),
+            ...tones.slice(0, inversion).map((_, at) => scale[degree + at * 2 + 7]!),
+        ];
+        up.push(rotated);
+    }
+    return up.concat([...up].reverse().slice(1));
+}
 const shiftOctave = (notes: Note[], by: number): Note[] =>
     notes.map((n) => ({ ...n, octave: n.octave + by }));
 const shiftPositions = (positions: Note[][], by: number): Note[][] =>
@@ -311,6 +341,10 @@ ${bodies}
 }
 
 const isScale = (type: ExerciseType): boolean => type.endsWith("-scale");
+const isChords = (type: ExerciseType): boolean => type.endsWith("-chords");
+// Whether the form has inversions to choose between: a chord shape does, and so does an
+// arpeggio, which is a chord shape spread out; a scale has no bottom note to rotate.
+export const hasInversions = (type: ExerciseType): boolean => isArpeggio(type) || isChords(type);
 
 // The config with every dial that does not apply to this exercise returned to its
 // default, so the id, the title and the notes always describe the same thing.
@@ -329,7 +363,7 @@ function normalizeExercise(config: ExerciseConfig): ExerciseConfig {
     return {
         ...config,
         hands,
-        inversion: isArpeggio(config.type) ? config.inversion : 0,
+        inversion: hasInversions(config.type) ? config.inversion : 0,
         interval:
             supportsIntervals(config.type) && hands !== "contrary" ? config.interval : "single",
     };
@@ -342,7 +376,8 @@ function isMinorType(type: ExerciseType): boolean {
         type === "natural-minor-scale" ||
         type === "harmonic-minor-scale" ||
         type === "melodic-minor-scale" ||
-        type === "minor-arpeggio"
+        type === "minor-arpeggio" ||
+        type === "minor-chords"
     );
 }
 
@@ -360,27 +395,33 @@ export function generateExercise(raw: ExerciseConfig): string {
     const fx = config.type === "chromatic-scale" ? 0 : fifths;
     const line = isScale(config.type)
         ? scaleLine(config.type, tonic, fifths, config.octaves)
-        : arpeggioLine(config.type, tonic, fx, config.octaves, config.inversion);
+        : isChords(config.type)
+          ? []
+          : arpeggioLine(config.type, tonic, fx, config.octaves, config.inversion);
     // Normalisation has already cleared the interval wherever double stops do not apply.
-    const main: Note[][] =
-        config.interval !== "single"
-            ? doubleStops(
-                  config.type,
-                  tonic,
-                  fx,
-                  config.octaves,
-                  config.interval === "thirds" ? 2 : 5,
-              )
-            : line.map((note) => [note]);
+    const main: Note[][] = isChords(config.type)
+        ? chordLine(tonic, fifths, config.octaves, config.inversion)
+        : config.interval !== "single"
+          ? doubleStops(
+                config.type,
+                tonic,
+                fx,
+                config.octaves,
+                config.interval === "thirds" ? 2 : 5,
+            )
+          : line.map((note) => [note]);
     const title = exerciseTitle(config);
     const hands = config.hands;
+    // The left hand plays a line two octaves down, where a scale sits; a block chord two
+    // octaves down is mud, so chords go one octave down, around the C below middle C.
+    const leftShift = isChords(config.type) ? -1 : -2;
     let parts: Part[];
     if (hands === "left") {
-        parts = [{ id: "P1", clef: "F", positions: shiftPositions(main, -2) }];
+        parts = [{ id: "P1", clef: "F", positions: shiftPositions(main, leftShift) }];
     } else if (hands === "both") {
         parts = [
             { id: "P1", clef: "G", positions: main },
-            { id: "P2", clef: "F", positions: shiftPositions(main, -2) },
+            { id: "P2", clef: "F", positions: shiftPositions(main, leftShift) },
         ];
     } else if (hands === "contrary") {
         // Both hands start on the tonic and mirror: right ascends, left descends. Only
@@ -406,6 +447,8 @@ const SCALE_LABEL: Record<string, string> = {
     "minor-arpeggio": "minor arpeggio",
     "dom7-arpeggio": "dominant 7th arpeggio",
     "dim7-arpeggio": "diminished 7th arpeggio",
+    "major-chords": "major chords",
+    "minor-chords": "minor chords",
 };
 
 // What an exercise is called, before anything says it: the key it is in, what it is, and
@@ -472,6 +515,8 @@ const TYPE_TO_PARTS: Record<ExerciseType, [string, string]> = {
     "minor-arpeggio": ["arpeggio", "minor"],
     "dom7-arpeggio": ["arpeggio", "dom7"],
     "dim7-arpeggio": ["arpeggio", "dim7"],
+    "major-chords": ["chords", "major"],
+    "minor-chords": ["chords", "minor"],
 };
 const HAND_CODE: Record<Hands, string> = { right: "r", left: "l", both: "b", contrary: "c" };
 const CODE_HAND: Record<string, Hands> = { r: "right", l: "left", b: "both", c: "contrary" };
@@ -501,7 +546,7 @@ export function buildExerciseId(raw: ExerciseConfig): string {
 export function parseExerciseId(id: string): ExerciseConfig | null {
     const [basePart, formPart] = id.split(".");
     if (!basePart) return null;
-    let kind: "scale" | "arpeggio";
+    let kind: "scale" | "arpeggio" | "chords";
     let rest: string;
     if (basePart.startsWith("scale-")) {
         kind = "scale";
@@ -509,13 +554,18 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
     } else if (basePart.startsWith("arpeggio-")) {
         kind = "arpeggio";
         rest = basePart.slice(9);
+    } else if (basePart.startsWith("chords-")) {
+        kind = "chords";
+        rest = basePart.slice(7);
     } else {
         return null;
     }
     const modes =
         kind === "scale"
             ? ["harmonic-minor", "melodic-minor", "chromatic", "major", "minor"]
-            : ["dom7", "dim7", "major", "minor"];
+            : kind === "arpeggio"
+              ? ["dom7", "dim7", "major", "minor"]
+              : ["major", "minor"];
     const mode = modes.find((m) => rest.endsWith(`-${m}`));
     if (!mode) return null;
     const key = rest.slice(0, -(mode.length + 1));
@@ -564,12 +614,14 @@ const MAJOR_FORMS: ExerciseType[] = [
     "major-arpeggio",
     "dom7-arpeggio",
     "dim7-arpeggio",
+    "major-chords",
 ];
 const MINOR_FORMS: ExerciseType[] = [
     "natural-minor-scale",
     "harmonic-minor-scale",
     "melodic-minor-scale",
     "minor-arpeggio",
+    "minor-chords",
 ];
 
 // The keys come from the tables themselves rather than a list beside them: a second list

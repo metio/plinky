@@ -44,7 +44,7 @@ export function crowdedGrade(exercises: { kind: string; grade: number }[]): stri
     }
     for (const [grade, count] of perGrade) {
         if (count > tiles.length * CROWDED_SHARE) {
-            return `${count} of ${tiles.length} scale and arpeggio tiles are grade ${grade}`;
+            return `${count} of ${tiles.length} scale, arpeggio and chord tiles are grade ${grade}`;
         }
     }
     return null;

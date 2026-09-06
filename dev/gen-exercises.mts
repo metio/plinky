@@ -14,12 +14,12 @@
 
 import { gradeOf, rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { parse } from "csv-parse/sync";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { songId } from "../core/songId.ts";
 import type { ExerciseMeta } from "../core/catalogMeta.ts";
-import { writeExercisesSync } from "./manifest.mts";
+import { readExercisesSync, writeExercisesSync } from "./manifest.mts";
 
 const { EXERCISE_TILES, buildExerciseId, exerciseTitle, generateExercise } = await import(
     "../core/exerciseGen.ts"
@@ -75,7 +75,16 @@ const normalizeTitle = (title: string): string =>
 
 function sourceStudies(): void {
     if (!existsSync(`${ROOT}/PDMX.csv`)) {
-        console.log("No PDMX corpus found — skipping studies.");
+        // Without the corpus the studies cannot be sourced afresh, so the ones already
+        // shipped are carried over as they are: a tile added to the curriculum must not
+        // cost the catalogue its forty studies.
+        const kept = readExercisesSync().filter((row) => row.kind === "study");
+        for (const row of kept) {
+            const { tempo: _tempo, beatsPerBar: _beats, ...entry } = row;
+            entries.push(entry);
+            studyFiles.push({ id: row.id, src: `${OUT}/studies/${row.id}.mxl` });
+        }
+        console.log(`No PDMX corpus found — keeping the ${kept.length} studies already shipped.`);
         return;
     }
     const lines = readFileSync(`${ROOT}/PDMX.csv`, "utf8").split("\n");
@@ -186,13 +195,15 @@ const manifest = entries.map(({ id, title, grade, cost, kind, composer, config }
     beatsPerBar: 4,
 }));
 
+// A kept study's file lives under OUT, so every file is read before OUT is cleared.
+const studyBytes = studyFiles.map(({ id, src }) => ({ id, bytes: readFileSync(src) }));
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(`${OUT}/studies`, { recursive: true });
 writeExercisesSync(manifest);
 // Studies ship as individual compressed .mxl, fetched on open like songs — named by the
 // same content-fingerprint id.
-for (const { id, src } of studyFiles) {
-    copyFileSync(src, `${OUT}/studies/${id}.mxl`);
+for (const { id, bytes } of studyBytes) {
+    writeFileSync(`${OUT}/studies/${id}.mxl`, bytes);
 }
 
 const histogram = Array.from({ length: 9 }, () => 0);

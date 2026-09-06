@@ -21,7 +21,8 @@ export type MethodId =
     | "handsApart"
     | "hearingFirst"
     | "interleaving"
-    | "spacing";
+    | "spacing"
+    | "chords";
 
 export type PracticeMethod = {
     id: MethodId;
@@ -40,6 +41,8 @@ export type PracticeMethod = {
     opens?: PlayOptions;
     // Where the button goes when the method is not a piece to open.
     route?: string;
+    // A generated exercise to open instead of a piece: the method IS the exercise.
+    tile?: string;
 };
 
 export const METHODS: PracticeMethod[] = [
@@ -60,4 +63,8 @@ export const METHODS: PracticeMethod[] = [
     // rather than at a piece chosen at random, which would be the opposite of the method.
     { id: "interleaving", note: 67, minutes: 15, route: "/review" },
     { id: "spacing", note: 69, minutes: 10, route: "/review" },
+    // The chords of a key as blocks, learned once rather than note by note in every piece
+    // in that key. C major first: the shape is the lesson, and the key dial on the
+    // exercise's own page reaches the other twenty-three.
+    { id: "chords", note: 71, minutes: 5, tile: "chords-c-major" },
 ];

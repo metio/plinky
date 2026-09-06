@@ -65,8 +65,8 @@ describe("exercise ids", () => {
         expect(parseExerciseId("QmAbc123")).toBeNull();
     });
 
-    it("has 97 tiles that all round-trip", () => {
-        expect(EXERCISE_TILES).toHaveLength(97);
+    it("has 121 tiles that all round-trip", () => {
+        expect(EXERCISE_TILES).toHaveLength(121);
         for (const tile of EXERCISE_TILES) {
             expect(parseExerciseId(buildExerciseId(tile))).toEqual(tile);
         }
@@ -103,6 +103,21 @@ describe("exercise ids", () => {
     });
 });
 
+// The positions of a generated exercise in document order, each the MIDI numbers sounded
+// together — a block chord is one position of three.
+function positionSequence(xml: string): number[][] {
+    const positions: number[][] = [];
+    for (const match of xml.matchAll(/<note>(<chord\/>)?<pitch>(.*?)<\/pitch>/gs)) {
+        const pitch = pitchSequence(`<pitch>${match[2]}</pitch>`)[0] as number;
+        if (match[1] && positions.length > 0) {
+            positions[positions.length - 1]?.push(pitch);
+        } else {
+            positions.push([pitch]);
+        }
+    }
+    return positions;
+}
+
 // Pitches in document order from a generated single-hand exercise, as MIDI-ish
 // numbers, read straight from the MusicXML so no DOM is needed.
 function pitchSequence(xml: string): number[] {
@@ -117,6 +132,63 @@ function pitchSequence(xml: string): number[] {
     }
     return out;
 }
+
+describe("chord sets", () => {
+    const config = (over: Partial<ExerciseConfig> = {}): ExerciseConfig => ({
+        type: "major-chords",
+        key: "c",
+        octaves: 1,
+        hands: "right",
+        inversion: 0,
+        interval: "single",
+        ...over,
+    });
+
+    it("plays the seven triads of the key up the scale and back, as blocks", () => {
+        const positions = positionSequence(generateExercise(config()));
+        // Eight chords up (the tonic twice, an octave apart) and seven back down.
+        expect(positions).toHaveLength(15);
+        expect(positions[0]).toEqual([60, 64, 67]);
+        expect(positions[1]).toEqual([62, 65, 69]);
+        expect(positions[6]).toEqual([71, 74, 77]);
+        expect(positions[7]).toEqual([72, 76, 79]);
+        expect(positions[14]).toEqual([60, 64, 67]);
+    });
+
+    it("rotates every chord for an inversion, carrying the lower tones up", () => {
+        expect(positionSequence(generateExercise(config({ inversion: 1 })))[0]).toEqual([
+            64, 67, 72,
+        ]);
+        expect(positionSequence(generateExercise(config({ inversion: 2 })))[0]).toEqual([
+            67, 72, 76,
+        ]);
+    });
+
+    it("builds a minor key's chords on the natural minor", () => {
+        const positions = positionSequence(
+            generateExercise(config({ type: "minor-chords", key: "a" })),
+        );
+        // Every line starts in the fourth octave, as the scales do, so A minor opens on A4.
+        expect(positions[0]).toEqual([69, 72, 76]);
+        // The dominant is E minor here: the raised leading note is the harmonic scale's.
+        expect(positions[4]).toEqual([76, 79, 83]);
+    });
+
+    it("puts the left hand one octave down, not two", () => {
+        expect(positionSequence(generateExercise(config({ hands: "left" })))[0]).toEqual([
+            48, 52, 55,
+        ]);
+    });
+
+    it("names its id by the chords prefix and round-trips every dial", () => {
+        const id = buildExerciseId(config({ inversion: 2, hands: "both" }));
+        expect(id).toBe("chords-c-major.1bi2");
+        expect(parseExerciseId(id)).toEqual(config({ inversion: 2, hands: "both" }));
+        expect(parseExerciseId("chords-a-minor")).toEqual(
+            config({ type: "minor-chords", key: "a" }),
+        );
+    });
+});
 
 describe("arpeggio inversions", () => {
     for (const octaves of [1, 2] as const) {

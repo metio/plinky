@@ -21,9 +21,9 @@ const mount = () =>
 afterEach(cleanup);
 
 describe("PracticeMethods", () => {
-    it("assembles the catalogue once for all six buttons", async () => {
+    it("assembles the catalogue once for every button that opens a piece", async () => {
         // Each button picks from the same catalogue; a hook per button would parse every
-        // held score and map three thousand rows six times over on every home visit.
+        // held score and map three thousand rows once per method on every home visit.
         const songs = { manifest: vi.fn(() => Promise.resolve([])) };
         const exercises = { manifest: vi.fn(() => Promise.resolve([])) };
         renderWithServices(
@@ -74,6 +74,16 @@ describe("PracticeMethods", () => {
         });
     });
 
+    it("opens the chord set straight away, needing no grade and no catalogue", async () => {
+        renderWithServices(
+            <MemoryRouter>
+                <PracticeMethods />
+            </MemoryRouter>,
+        );
+        const link = await screen.findByRole("link", { name: m.methods_chords_open() });
+        expect(link.getAttribute("href")).toContain("/play/chords-c-major");
+    });
+
     it("sends the two methods that are not about one piece to the review queue", async () => {
         mount();
         await waitFor(() => {
@@ -93,7 +103,7 @@ describe("PracticeMethods", () => {
             const hrefs = screen
                 .getAllByRole("link")
                 .map((link) => link.getAttribute("href") ?? "")
-                .filter((href) => href.includes("/play/"));
+                .filter((href) => href.includes("/play/") && !href.includes("/play/chords-"));
             expect(hrefs).toHaveLength(4);
             expect(hrefs.some((href) => href.includes("speed=0.6"))).toBe(true);
             expect(hrefs.some((href) => href.includes("hands=left"))).toBe(true);
@@ -104,13 +114,13 @@ describe("PracticeMethods", () => {
         });
     });
 
-    it("offers each method its own piece rather than the same one six times", async () => {
+    it("offers each piece-opening method its own piece rather than the same one every time", async () => {
         mount();
         await waitFor(() => {
             const pieces = screen
                 .getAllByRole("link")
                 .map((link) => link.getAttribute("href") ?? "")
-                .filter((href) => href.includes("/play/"))
+                .filter((href) => href.includes("/play/") && !href.includes("/play/chords-"))
                 .map((href) => href.split("?")[0]);
             expect(pieces).toHaveLength(4);
             // Seeded by method id, so which piece each one offers is stable but they are

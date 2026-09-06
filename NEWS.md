@@ -10,6 +10,19 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 6 September 2026
 
+**Chords to practise, in every key.** The Music page has always had scales and
+arpeggios to work through; now it has the seven chords of each of the twenty-four
+keys as well, played as blocks up the scale and back — root position or an
+inversion, one hand or both — graded and remembered like any piece. Most pieces in
+a key are built from those seven, so learning the shapes once carries to all of
+them. The front page's ways to practise gained a seventh: learn the chords, not the
+notes.
+
+**Both-hands scales and arpeggios ask for both hands.** A generated exercise with
+both hands on was read as a piano under another instrument: the run asked for the
+left hand's notes alone and played the right hand for you. Both hands are the
+player's now, in every scale, arpeggio and chord set.
+
 **A repeat only uncolours the bars it repeats.** When the score sent the run back
 over a repeated section, every coloured note on the page lost its colour — including
 the sections before it that were played and passed. Now only the bars being played

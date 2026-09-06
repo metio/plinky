@@ -9,7 +9,15 @@ import { type MethodId, METHODS, type PracticeMethod } from "../../../core/pract
 import { useMusicItems } from "../../hooks/useMusicItems";
 import { useServices } from "../../contexts/services";
 import { HubCard } from "../ui/hubCard";
-import { CalendarIcon, EarIcon, HandIcon, ListIcon, MetronomeIcon, RotateIcon } from "../ui/icons";
+import {
+    CalendarIcon,
+    EarIcon,
+    HandIcon,
+    KeysIcon,
+    ListIcon,
+    MetronomeIcon,
+    RotateIcon,
+} from "../ui/icons";
 import { useSynth } from "../../hooks/useSynth";
 import { localizedHref } from "../ui/href";
 import { sectionHeadingClasses } from "../ui/classes";
@@ -22,6 +30,7 @@ const NAME: Record<MethodId, () => string> = {
     hearingFirst: () => m.method_hearing_first_name(),
     interleaving: () => m.method_interleaving_name(),
     spacing: () => m.method_spacing_name(),
+    chords: () => m.method_chords_name(),
 };
 
 const HOW: Record<MethodId, () => string> = {
@@ -31,6 +40,7 @@ const HOW: Record<MethodId, () => string> = {
     hearingFirst: () => m.method_hearing_first_how(),
     interleaving: () => m.method_interleaving_how(),
     spacing: () => m.method_spacing_how(),
+    chords: () => m.method_chords_how(),
 };
 
 const WHY: Record<MethodId, () => string> = {
@@ -40,6 +50,7 @@ const WHY: Record<MethodId, () => string> = {
     hearingFirst: () => m.method_hearing_first_why(),
     interleaving: () => m.method_interleaving_why(),
     spacing: () => m.method_spacing_why(),
+    chords: () => m.method_chords_why(),
 };
 
 // One icon per method, so six of these in a column read as six things at a glance rather
@@ -52,6 +63,7 @@ const ICONS: Record<MethodId, (props: { className?: string }) => React.JSX.Eleme
     hearingFirst: EarIcon,
     interleaving: ListIcon,
     spacing: CalendarIcon,
+    chords: KeysIcon,
 };
 
 // One method's own button. It opens a piece at the player's grade with the method already
@@ -84,6 +96,17 @@ function MethodAction({
             </Link>
         );
     }
+    // A generated exercise needs no grade and no catalogue: it is always there to open.
+    if (method.tile) {
+        return (
+            <Link
+                to={localizedHref(`/play/${method.tile}`)}
+                className="inline-block text-sm font-semibold text-accent-strong hover:underline"
+            >
+                {m.methods_chords_open()}
+            </Link>
+        );
+    }
     // Seeded by the method, so each suggestion offers its own piece and none of them
     // changes under the reader on a re-render.
     const piece = pickForGrade(items, grade, method.id);
@@ -98,7 +121,7 @@ function MethodAction({
     );
 }
 
-// Six ways to practise: why each one works, what Plinky gives you to do it with, and a
+// Seven ways to practise: why each one works, what Plinky gives you to do it with, and a
 // button that opens a piece with it already set up.
 //
 // The reason leads and the instruction follows, because somebody who does not yet know why
@@ -109,7 +132,7 @@ export function PracticeMethods() {
     // Read every render rather than memoised — a grade reached while the page is open
     // should change what the buttons offer.
     const grade = Math.max(1, services.milestones.reachedGrade());
-    // One catalogue for the six buttons. Assembling it parses every score held on the
+    // One catalogue for the buttons that open a piece. Assembling it parses every score held on the
     // device and maps three thousand manifest rows, so it is read here once and handed
     // down rather than rebuilt by each method for itself.
     const { items } = useMusicItems();
