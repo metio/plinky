@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 6 September 2026
 
+**A chord set no longer offers contrary motion.** On a chord set the *Contrary*
+button switched the hands to *Both* and changed nothing else, because a block chord
+has no mirror form to play. The choice is only offered on the scales, where it
+means something.
+
 **Thirty-six pieces now say which one they are.** A library that publishes a suite
 as one file per movement often gives every file the name of the whole suite, and the
 catalogue had taken those names at their word: seven Chopin preludes all called

@@ -7,7 +7,7 @@ import {
     type Hands,
     type Interval,
     hasInversions,
-    isArpeggio,
+    supportsContrary,
     supportsIntervals,
 } from "../../../core/exerciseGen";
 import { m } from "../../paraglide/messages.js";
@@ -40,9 +40,9 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
         ["right", m.exercise_hand_right()],
         ["left", m.exercise_hand_left()],
         ["both", m.exercise_hand_both()],
-        ...(isArpeggio(config.type)
-            ? []
-            : ([["contrary", m.exercise_hand_contrary()]] as [Hands, string][])),
+        ...(supportsContrary(config.type)
+            ? ([["contrary", m.exercise_hand_contrary()]] as [Hands, string][])
+            : []),
     ];
     const inversions: [0 | 1 | 2, string][] = [
         [0, m.exercise_inv_root()],

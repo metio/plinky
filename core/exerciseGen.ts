@@ -341,6 +341,12 @@ ${bodies}
 }
 
 const isScale = (type: ExerciseType): boolean => type.endsWith("-scale");
+
+// Which exercises can be played in contrary motion: the scales, whose mirror form is the
+// same line the other way. An arpeggio and a chord set have no mirror — both hands play
+// them in parallel — so a form offering the choice there would offer a button that
+// changes nothing but the id it lands on.
+export const supportsContrary = (type: ExerciseType): boolean => isScale(type);
 const isChords = (type: ExerciseType): boolean => type.endsWith("-chords");
 // Whether the form has inversions to choose between: a chord shape does, and so does an
 // arpeggio, which is a chord shape spread out; a scale has no bottom note to rotate.
@@ -359,7 +365,7 @@ export const hasInversions = (type: ExerciseType): boolean => isArpeggio(type) |
 // a name for the exercise rather than for the route taken to it.
 function normalizeExercise(config: ExerciseConfig): ExerciseConfig {
     const hands: Hands =
-        config.hands === "contrary" && !isScale(config.type) ? "both" : config.hands;
+        config.hands === "contrary" && !supportsContrary(config.type) ? "both" : config.hands;
     return {
         ...config,
         hands,
@@ -635,4 +641,4 @@ export const EXERCISE_TILES: ExerciseConfig[] = [
     ...Object.keys(MINOR_KEYS).flatMap((key) => MINOR_FORMS.map((type) => browsable(type, key))),
 ];
 
-export const isArpeggio = (type: ExerciseType): boolean => type.endsWith("-arpeggio");
+const isArpeggio = (type: ExerciseType): boolean => type.endsWith("-arpeggio");
