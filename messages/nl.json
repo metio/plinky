@@ -211,6 +211,8 @@
     "note_size_caption": "Het hele stuk wordt vergroot voor grotere, beter leesbare noten — handig op een klein scherm, of als je net begint.",
     "color_notes_toggle": "Kleur de noten",
     "color_notes_hint": "Elke nootkop krijgt een kleur op basis van zijn naam — elke C rood, elke D oranje, enzovoort — zodat je op kleur kunt lezen terwijl de namen inslijten.",
+    "chord_symbols_toggle": "Akkoorden benoemen",
+    "chord_symbols_hint": "Schrijft C, Am, G7 boven de notenbalk waar de noten duidelijk een akkoord vormen, zodat een maat leest als de vorm waaruit hij is gebouwd — en een vorm die je uit één stuk kent, is in het volgende dezelfde.",
     "reading_level_label": "Niveau",
     "reading_level_help": "Stelt de leeshulp samen in — kies waar je staat en verfijn ze hieronder.",
     "reading_level_custom_help": "Je eigen mix van hulpmiddelen. Kies een niveau om ze te herstellen.",

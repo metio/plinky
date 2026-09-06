@@ -211,6 +211,8 @@
     "note_size_caption": "Agrandit toute la partition pour des notes plus grandes et plus faciles à lire — pratique sur un petit écran, ou quand vous débutez.",
     "color_notes_toggle": "Colorer les notes",
     "color_notes_hint": "Chaque tête de note prend la couleur de son nom — chaque do en rouge, chaque ré en orange, et ainsi de suite — pour lire par la couleur pendant que les noms s'installent.",
+    "chord_symbols_toggle": "Nommer les accords",
+    "chord_symbols_hint": "Écrit C, Am, G7 au-dessus de la portée partout où les notes forment clairement un accord, pour qu'une mesure se lise comme la forme qui la construit — et une forme connue dans un morceau est la même dans le suivant.",
     "reading_level_label": "Niveau",
     "reading_level_help": "Règle les aides de lecture d'un coup — choisis où tu en es, puis ajuste-les ci-dessous.",
     "reading_level_custom_help": "Ton propre mélange d'aides. Choisis un niveau pour les réinitialiser.",

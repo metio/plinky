@@ -94,6 +94,9 @@ const MINOR: Candidate[] = [
 // is the one a listener hears the chord by; and the chord already in force keeps a
 // small edge, so one passing beat does not flip the label back and forth.
 const BASS_SHARE = 0.25;
+// …and a bass that is the ROOT a little more still: two notes fit two chords, and B over
+// D is B minor to a musician, not G major with its root missing.
+const ROOT_SHARE = 0.1;
 const STAY_SHARE = 0.15;
 const RELATIVE_MINOR = 9;
 const FIFTH = 7;
@@ -193,6 +196,9 @@ function fitOf(beat: Beat, tonic: PitchClass, candidate: Candidate, previous: Fi
     let score = inside;
     if (beat.bass !== null && tones.has(beat.bass)) {
         score += BASS_SHARE * beat.total;
+        if (beat.bass === root) {
+            score += ROOT_SHARE * beat.total;
+        }
     }
     if (
         previous !== null &&

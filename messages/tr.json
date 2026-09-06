@@ -211,6 +211,8 @@
     "note_size_caption": "Daha büyük ve okunması kolay notalar için tüm notayı büyütür — küçük bir ekranda ya da yeni başlarken kullanışlı.",
     "color_notes_toggle": "Notaları renklendir",
     "color_notes_hint": "Her nota başını adına göre renklendirir — her C kırmızı, her D turuncu, ve böyle sürer — böylece isimler yerleşirken renklere bakarak da okuyabilirsin.",
+    "chord_symbols_toggle": "Akorları adlandır",
+    "chord_symbols_hint": "Notaların açıkça bir akor oluşturduğu her yerde dizeğin üstüne C, Am, G7 yazar; böylece bir ölçü, üzerine kurulduğu şekil olarak okunur — ve bir parçadan bildiğin şekil bir sonrakinde de aynıdır.",
     "reading_level_label": "Seviye",
     "reading_level_help": "Okuma yardımlarını birlikte ayarlar — nerede olduğunu seç, sonra aşağıdan ince ayar yap.",
     "reading_level_custom_help": "Kendi yardım karışımın. Sıfırlamak için bir seviye seç.",

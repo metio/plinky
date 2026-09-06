@@ -269,6 +269,12 @@ export default function Settings() {
                             help={m.color_notes_hint()}
                         />
                         <SwitchField
+                            label={m.chord_symbols_toggle()}
+                            checked={prefs.chordSymbols}
+                            onChange={(chordSymbols) => update({ chordSymbols })}
+                            help={m.chord_symbols_hint()}
+                        />
+                        <SwitchField
                             label={m.accompaniment_toggle()}
                             checked={prefs.showAccompaniment}
                             onChange={(showAccompaniment) => update({ showAccompaniment })}

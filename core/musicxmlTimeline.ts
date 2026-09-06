@@ -43,6 +43,8 @@ export type XmlNote = {
     tie: "start" | "stop" | "both" | null;
     // 0-based index into the measures as printed.
     measure: number;
+    // The `<note>` itself, for a writer that puts something beside it.
+    element: Element;
     // What the file writes over this note. All of it optional in the format and most of it
     // absent in most scores, so every field has a quiet default rather than a null to
     // branch on at each use.
@@ -357,6 +359,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     grace,
                     tie: tieOf(element),
                     measure: index,
+                    element,
                     marks: marksOf(element),
                 });
 

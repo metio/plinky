@@ -211,6 +211,8 @@
     "note_size_caption": "Zmadhon tërë partiturën për nota më të mëdha e më të lehta për t'u lexuar — e dobishme në një ekran të vogël, ose kur sapo po fillon.",
     "color_notes_toggle": "Ngjyros notat",
     "color_notes_hint": "Çdo kokë note merr ngjyrën nga emri i saj — çdo C e kuqe, çdo D portokalli, e kështu me radhë — që t'i lexosh sipas ngjyrës ndërsa emrat po ngulitën.",
+    "chord_symbols_toggle": "Emërto akordet",
+    "chord_symbols_hint": "Shkruan C, Am, G7 mbi pentagram kudo që notat bëjnë qartë një akord, që një masë të lexohet si forma nga e cila është ndërtuar — dhe një formë që e njeh nga një pjesë është e njëjta në tjetrën.",
     "reading_level_label": "Niveli",
     "reading_level_help": "I vendos ndihmat e leximit bashkë — zgjidh ku je dhe rregulloji më poshtë.",
     "reading_level_custom_help": "Përzierja jote e ndihmave. Zgjidh një nivel për t'i rivendosur.",

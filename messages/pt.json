@@ -211,6 +211,8 @@
     "note_size_caption": "Amplia toda a partitura para notas maiores e mais fáceis de ler — prático num ecrã pequeno, ou quando estás a começar.",
     "color_notes_toggle": "Colorir as notas",
     "color_notes_hint": "Cada cabeça de nota ganha a cor do seu nome — cada dó vermelho, cada ré laranja, e assim por diante — para ler pela cor enquanto os nomes se fixam.",
+    "chord_symbols_toggle": "Nomear os acordes",
+    "chord_symbols_hint": "Escreve C, Am, G7 por cima da pauta onde as notas formam claramente um acorde, para que um compasso se leia como a forma de que é feito — e uma forma que conheces de uma peça é a mesma na seguinte.",
     "reading_level_label": "Nível",
     "reading_level_help": "Define as ajudas de leitura em conjunto — escolhe onde estás e afina-as em baixo.",
     "reading_level_custom_help": "A tua própria combinação de ajudas. Escolhe um nível para as repor.",

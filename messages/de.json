@@ -211,6 +211,8 @@
     "note_size_caption": "Vergrößert die gesamte Notendarstellung für größere, leichter lesbare Noten – praktisch auf einem kleinen Bildschirm, oder wenn du gerade erst anfängst.",
     "color_notes_toggle": "Noten einfärben",
     "color_notes_hint": "Jeder Notenkopf trägt die Farbe seines Namens — jedes C rot, jedes D orange und so weiter — damit du nach Farbe lesen kannst, während sich die Namen einprägen.",
+    "chord_symbols_toggle": "Akkorde benennen",
+    "chord_symbols_hint": "Schreibt C, Am, G7 über die Notenzeile, wo die Noten einen Akkord klar erkennen lassen — so liest sich ein Takt als die Form, aus der er gebaut ist, und eine Form aus einem Stück ist im nächsten dieselbe.",
     "reading_level_label": "Niveau",
     "reading_level_help": "Stellt die Lesehilfen gemeinsam ein — wähle, wo du stehst, und passe sie unten einzeln an.",
     "reading_level_custom_help": "Deine eigene Mischung an Hilfen. Wähle eine Stufe, um sie zurückzusetzen.",

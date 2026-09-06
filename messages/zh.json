@@ -211,6 +211,8 @@
     "note_size_caption": "放大整个乐谱，让音符更大、更易读——在小屏幕上或刚入门时很实用。",
     "color_notes_toggle": "为音符着色",
     "color_notes_hint": "每个符头都按音名着色——每个 C 都是红色，每个 D 都是橙色，以此类推——让你在记住音名的过程中，先凭颜色读谱。",
+    "chord_symbols_toggle": "标出和弦",
+    "chord_symbols_hint": "在音符明显构成和弦的地方，于五线谱上方写出 C、Am、G7，让一小节读起来就是它所依托的形状——在一首曲子里熟悉的形状，到下一首也是一样的。",
     "reading_level_label": "水平",
     "reading_level_help": "一次设置所有阅读辅助——选择你的水平，再在下面逐项微调。",
     "reading_level_custom_help": "你自己的辅助组合。选择一个水平即可重置。",

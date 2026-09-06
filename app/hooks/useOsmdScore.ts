@@ -95,6 +95,7 @@ export function useOsmdScore(
         barNumbers,
         treadmill,
         showBeams,
+        chordSymbols,
         showAccompaniment,
         reduction,
         colorNotes,
@@ -132,6 +133,8 @@ export function useOsmdScore(
         // elements are stripped before OSMD loads it, so short notes render with flags.
         // The effective value is decided per piece by beamsVisible before it reaches here.
         showBeams: boolean;
+        // Chord symbols above the staff, read off the notes where the score writes none.
+        chordSymbols: boolean;
         // Whether a multi-part score keeps its other parts. When false they are removed
         // before OSMD loads the sheet, so the cursor, the matcher and every staff index
         // downstream see the piano's grand staff exactly as a solo piece gives them.
@@ -305,6 +308,7 @@ export function useOsmdScore(
                 showAccompaniment,
                 reduction,
                 showBeams,
+                chordSymbols,
             }),
         [
             xmlCodec,
@@ -316,6 +320,7 @@ export function useOsmdScore(
             showAccompaniment,
             reduction,
             showBeams,
+            chordSymbols,
         ],
     );
 

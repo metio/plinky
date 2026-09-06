@@ -87,6 +87,14 @@ describe("readHarmony", () => {
         expect(read(notes).map(summary)).toEqual(["I@0-0.5", "V@0.5-1"]);
     });
 
+    it("reads two notes as the chord whose root is underneath", () => {
+        // In D major, B under D fits B minor and G major alike; the bass decides, as a
+        // musician does — B minor, not G with its root missing.
+        // A bar of D first, so the mode reads as major rather than as B minor's own.
+        const [, span] = read([...block([50, 54, 57], 0), ...block([47, 62], 4)], 2, 2);
+        expect(span).toMatchObject({ root: 11, quality: "minor", numeral: "vi" });
+    });
+
     it("names the seventh and the inversion from the bass", () => {
         const [span] = read(block([47, 50, 53, 55], 0));
         expect(span).toMatchObject({

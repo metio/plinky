@@ -16,6 +16,7 @@ const note = (step: string, octave: number, beam = "") =>
 const PIECE = `<?xml version="1.0"?><score-partwise><part-list><score-part id="P1"><part-name>Voice</part-name></score-part><score-part id="P2"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>2</divisions></attributes>${note("G", 4)}${note("A", 4)}</measure></part><part id="P2"><measure number="1"><attributes><divisions>2</divisions><staves>2</staves></attributes>${note("C", 4, '<beam number="1">begin</beam>')}${note("D", 4, '<beam number="1">end</beam>')}</measure></part></score-partwise>`;
 
 const asWritten: ScoreSourceInputs = {
+    chordSymbols: false,
     xml: PIECE,
     transpose: 0,
     handSpan: { left: null, right: null },

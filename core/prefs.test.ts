@@ -16,6 +16,7 @@ const BASE: Prefs = {
     showAccompaniment: false,
     reduction: "" as const,
     colorNotes: true,
+    chordSymbols: false,
     noteHints: "always",
     noteLabels: "all",
     instrumentSounds: false,

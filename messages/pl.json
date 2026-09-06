@@ -211,6 +211,8 @@
     "note_size_caption": "Powiększa całą partyturę, dzięki czemu nuty są większe i łatwiejsze do odczytania — przydatne na małym ekranie albo na początku nauki.",
     "color_notes_toggle": "Koloruj nuty",
     "color_notes_hint": "Każda główka nuty przyjmuje kolor swojej nazwy — każde C na czerwono, każde D na pomarańczowo i tak dalej — żebyś mógł czytać po kolorze, aż nazwy same wejdą ci w pamięć.",
+    "chord_symbols_toggle": "Nazywaj akordy",
+    "chord_symbols_hint": "Wpisuje C, Am, G7 nad pięciolinią tam, gdzie nuty wyraźnie tworzą akord, aby takt czytało się jako kształt, z którego jest zbudowany — a kształt znany z jednego utworu jest ten sam w następnym.",
     "reading_level_label": "Poziom",
     "reading_level_help": "Ustawia pomoce w czytaniu razem — wybierz, gdzie jesteś, i dostrój je poniżej.",
     "reading_level_custom_help": "Twój własny zestaw pomocy. Wybierz poziom, aby je zresetować.",

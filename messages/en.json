@@ -336,6 +336,8 @@
     "note_size_caption": "Magnifies the whole score for bigger, easier-to-read notes — handy on a small screen, or when you're starting out.",
     "color_notes_toggle": "Colour the notes",
     "color_notes_hint": "Each notehead takes a colour from its name — every C red, every D orange, and so on — so you can read by hue while the names sink in.",
+    "chord_symbols_toggle": "Name the chords",
+    "chord_symbols_hint": "Writes C, Am, G7 above the staff wherever the notes make a chord clear, so a bar reads as the shape it is built on — and a shape you know from one piece is the same in the next.",
     "reading_level_label": "Skill level",
     "reading_level_help": "Sets the reading aids together — pick where you are, then fine-tune any of them below.",
     "reading_level_custom_help": "Your own mix of aids. Pick a level to reset them.",

@@ -211,6 +211,8 @@
     "note_size_caption": "Suurentaa koko nuottikuvan isommiksi, helpommin luettaviksi nuoteiksi — kätevää pienellä näytöllä tai kun olet vasta aloittamassa.",
     "color_notes_toggle": "Väritä nuotit",
     "color_notes_hint": "Jokainen nuottipää saa värin nimensä mukaan — jokainen C punaisena, jokainen D oranssina ja niin edelleen — jotta voit lukea sävyjen avulla, kun nimet vielä hakevat paikkaansa.",
+    "chord_symbols_toggle": "Nimeä soinnut",
+    "chord_symbols_hint": "Kirjoittaa C, Am, G7 nuottiviivaston yläpuolelle sinne, missä nuotit muodostavat selvästi soinnun, jotta tahti luetaan muotona, josta se on rakennettu — ja yhdestä kappaleesta tuttu muoto on sama seuraavassa.",
     "reading_level_label": "Taso",
     "reading_level_help": "Säätää lukemisen apuvälineet kerralla — valitse, missä olet, ja hienosäädä niitä alla.",
     "reading_level_custom_help": "Oma yhdistelmäsi apuvälineitä. Valitse taso nollataksesi ne.",

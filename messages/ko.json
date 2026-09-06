@@ -211,6 +211,8 @@
     "note_size_caption": "악보 전체를 키워 음표를 더 크고 읽기 쉽게 만들어줘요 — 작은 화면이거나 이제 막 시작했을 때 특히 유용해요.",
     "color_notes_toggle": "음표에 색 입히기",
     "color_notes_hint": "음표 머리마다 이름에 맞는 색이 입혀져요 — C는 빨강, D는 주황, 이런 식으로요 — 이름이 익숙해지는 동안 색으로도 읽을 수 있어요.",
+    "chord_symbols_toggle": "화음 이름 표시",
+    "chord_symbols_hint": "음들이 분명히 화음을 이루는 곳마다 오선 위에 C, Am, G7을 적어, 한 마디가 그것을 이루는 모양으로 읽히게 합니다. 한 곡에서 익힌 모양은 다음 곡에서도 같습니다.",
     "reading_level_label": "레벨",
     "reading_level_help": "읽기 보조를 한 번에 설정합니다. 지금 수준을 고르고 아래에서 하나씩 조정하세요.",
     "reading_level_custom_help": "나만의 보조 조합입니다. 레벨을 고르면 초기화됩니다.",

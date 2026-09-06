@@ -3,6 +3,7 @@
 
 import { stripAccompaniment } from "../../core/accompaniment";
 import { stripBeams } from "../../core/beams";
+import { withChordSymbols } from "../../core/chordSymbols";
 import type { HandSpan } from "../../core/prefs";
 import type { Reduction } from "../../core/reduction";
 import { simplify } from "../../core/simplify";
@@ -25,6 +26,8 @@ export type ScoreSourceInputs = {
     showAccompaniment: boolean;
     reduction: Reduction | undefined;
     showBeams: boolean;
+    // Chord symbols above the staff, read off the notes where the score writes none.
+    chordSymbols: boolean;
 };
 
 // The MusicXML the engraver loads: the piece as the player is to read it.
@@ -48,5 +51,8 @@ export function prepareScoreSource(codec: XmlCodec, inputs: ScoreSourceInputs): 
     const annotated = annotateFingerings(codec, transposed, inputs.handSpan, inputs.saved);
     const played = inputs.showAccompaniment ? annotated : stripAccompaniment(codec, annotated);
     const reduced = inputs.reduction ? simplify(codec, played, inputs.reduction) : played;
-    return inputs.showBeams ? reduced : stripBeams(codec, reduced);
+    // Read after the transposition and the thinning, so the symbols name the chords of
+    // the page as it will be drawn, in its key.
+    const labelled = inputs.chordSymbols ? withChordSymbols(codec, reduced) : reduced;
+    return inputs.showBeams ? labelled : stripBeams(codec, labelled);
 }

@@ -389,6 +389,8 @@ function usePlaySessionValue({
         barNumbers,
         treadmill,
         showBeams: beamsVisible(reading.beams, grade),
+        // An aid like the colours: off for a sight-read, which reads the page cold.
+        chordSymbols: reading.chordSymbols && !sightRead.on,
         showAccompaniment: reading.showAccompaniment,
         // "" means the piece as written; the hook takes the absence rather than an empty
         // string, so there is one way of saying "no reduction" downstream.

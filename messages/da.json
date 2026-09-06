@@ -211,6 +211,8 @@
     "note_size_caption": "Forstørrer hele nodebilledet for større, lettere læselige noder — praktisk på en lille skærm, eller når du er ved at starte.",
     "color_notes_toggle": "Farvelæg noderne",
     "color_notes_hint": "Hvert nodehoved får en farve efter sit navn — hvert C rødt, hvert D orange og så videre — så du kan læse på farven, mens navnene synker ind.",
+    "chord_symbols_toggle": "Navngiv akkorderne",
+    "chord_symbols_hint": "Skriver C, Am, G7 over nodelinjen, hvor tonerne tydeligt danner en akkord, så en takt læses som den form, den er bygget af — og en form, du kender fra ét stykke, er den samme i det næste.",
     "reading_level_label": "Niveau",
     "reading_level_help": "Indstiller læsehjælpene samlet — vælg, hvor du er, og finjustér dem nedenfor.",
     "reading_level_custom_help": "Din egen blanding af hjælpemidler. Vælg et niveau for at nulstille dem.",

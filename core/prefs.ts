@@ -73,6 +73,11 @@ export type Prefs = {
     // pitch by hue. Off by default — standard black notation. The played/heard feedback
     // rides behind the notes as a halo, so the colours stay readable as you play.
     colorNotes: boolean;
+    // Chord symbols above the staff — C, Am, G7 — read off the notes where the score
+    // writes none, so a bar reads as the chord it is built on. Off by default: it is a
+    // reading aid for somebody learning shapes, and a page of symbols is noise to a reader
+    // who already hears them.
+    chordSymbols: boolean;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
     // Your own instrument makes the sound, so Plinky does not play your notes a second
@@ -270,6 +275,7 @@ function defaults(): Prefs {
         showAccompaniment: false,
         reduction: "",
         colorNotes: true,
+        chordSymbols: false,
         noteHints: "always",
         noteLabels: "all",
         instrumentSounds: false,
@@ -390,6 +396,7 @@ export function parsePrefs(raw: string | null): Prefs {
             // showing every note is the safe answer.
             reduction: oneOf(parsed.reduction, ["", ...REDUCTIONS] as const, base.reduction),
             colorNotes: bool(parsed.colorNotes, base.colorNotes),
+            chordSymbols: bool(parsed.chordSymbols, base.chordSymbols),
             noteHints: oneOf(parsed.noteHints, NOTE_HINT_CYCLE, base.noteHints),
             noteLabels: oneOf(parsed.noteLabels, NOTE_LABEL_CYCLE, base.noteLabels),
             forgiving: bool(parsed.forgiving, base.forgiving),
@@ -445,6 +452,7 @@ export function unaidedPrefs(base: Prefs): Prefs {
     return {
         ...base,
         colorNotes: false,
+        chordSymbols: false,
         noteLabels: "off",
         noteHints: "never",
         showFingerings: false,

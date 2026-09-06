@@ -66,6 +66,7 @@ const layout = {
     barNumbers: false,
     treadmill: false,
     showBeams: true,
+    chordSymbols: false,
     showAccompaniment: false,
     colorNotes: false,
     focus: null,

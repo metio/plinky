@@ -348,6 +348,13 @@ export function RunSetup() {
                             disabled={sightRead.on}
                         />
                         <SwitchField
+                            label={m.chord_symbols_toggle()}
+                            checked={reading.chordSymbols && !sightRead.on}
+                            onChange={reading.setChordSymbols}
+                            help={m.chord_symbols_hint()}
+                            disabled={sightRead.on}
+                        />
+                        <SwitchField
                             label={m.highway_toggle()}
                             checked={aids.highway}
                             onChange={reading.setHighway}

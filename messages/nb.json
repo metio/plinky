@@ -211,6 +211,8 @@
     "note_size_caption": "Forstørrer hele partituret for større og lettere leselige noter — kjekt på en liten skjerm, eller når du akkurat har begynt.",
     "color_notes_toggle": "Fargelegg tonene",
     "color_notes_hint": "Hvert notehode får en farge fra tonenavnet — hver C rød, hver D oransje, og så videre — så du kan lese etter farge mens navnene fester seg.",
+    "chord_symbols_toggle": "Navngi akkordene",
+    "chord_symbols_hint": "Skriver C, Am, G7 over notelinjen der tonene tydelig danner en akkord, så en takt leses som formen den er bygd av — og en form du kjenner fra ett stykke er den samme i det neste.",
     "reading_level_label": "Nivå",
     "reading_level_help": "Stiller lesehjelpene samlet — velg hvor du er, og finjuster dem under.",
     "reading_level_custom_help": "Din egen blanding av hjelpemidler. Velg et nivå for å tilbakestille dem.",

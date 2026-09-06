@@ -48,6 +48,8 @@ export type ReadingMode = {
     // Colour the noteheads by note name (the Boomwhacker reading aid), remembered per device.
     colorNotes: boolean;
     setColorNotes: (value: boolean) => void;
+    chordSymbols: boolean;
+    setChordSymbols: (value: boolean) => void;
     // Print the suggested fingering numbers on the staff. Seeded from the saved default,
     // flipped live in-play; the setter takes a functional update for the toggle button.
     showFingerings: boolean;
@@ -69,6 +71,7 @@ export function useReadingMode(): ReadingMode {
     const [showAccompaniment, setShowAccompaniment] = usePref("showAccompaniment");
     const [reduction, setReduction] = usePref("reduction");
     const [colorNotes, setColorNotes] = usePref("colorNotes");
+    const [chordSymbols, setChordSymbols] = usePref("chordSymbols");
     // The fingering numbers are always baked into the loaded sheet; this only flips whether
     // OSMD draws them, so it stays session state rather than a persisted preference.
     const [showFingerings, setShowFingerings] = useState(() => prefs.load().showFingerings);
@@ -96,6 +99,8 @@ export function useReadingMode(): ReadingMode {
             setReduction,
             colorNotes,
             setColorNotes,
+            chordSymbols,
+            setChordSymbols,
             showFingerings,
             setShowFingerings,
             scrollFollow,
@@ -120,6 +125,8 @@ export function useReadingMode(): ReadingMode {
             setReduction,
             colorNotes,
             setColorNotes,
+            chordSymbols,
+            setChordSymbols,
             showFingerings,
             scrollFollow,
         ],

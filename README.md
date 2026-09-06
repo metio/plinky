@@ -511,6 +511,12 @@ slur settles at its end instead of stopping dead. It is slight on purpose, and i
 plays a note louder than the page asks — what is printed is a ceiling, and interpretation
 lives underneath it.
 
+Where a score writes no chord symbols — and most do not — Plinky can read them off the
+notes and write C, Am, G7 above the staff, so a bar reads as the shape it is built on and a
+shape learned in one piece is recognised in the next. **Name the chords** in Settings, or
+in a piece's reading aids, turns it on; it names a chord only where the notes make it
+clear, and stays quiet through a suspension or a chromatic run rather than guess.
+
 Time gets the same treatment, because a performance that lands every note exactly on the
 grid sounds like a machine before it sounds like anything else. A phrase eases into its
 ending, the last bar of the piece broadens the way every player's does whether or not a

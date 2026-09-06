@@ -211,6 +211,8 @@
     "note_size_caption": "Felnagyítja az egész kottát a nagyobb, könnyebben olvasható hangjegyekért — hasznos kis képernyőn, vagy amikor még csak most kezdesz.",
     "color_notes_toggle": "Színezd a hangokat",
     "color_notes_hint": "Minden hangfej a neve szerinti színt kapja — minden C piros, minden D narancssárga, és így tovább —, hogy szín alapján is olvashasd a hangokat, amíg a nevük rögzül.",
+    "chord_symbols_toggle": "Akkordok megnevezése",
+    "chord_symbols_hint": "C, Am, G7 jelöléseket ír a vonalrendszer fölé mindenhol, ahol a hangok egyértelműen akkordot adnak, így egy ütem a formaként olvasható, amiből felépül — és az egyik darabból ismert forma a következőben ugyanaz.",
     "reading_level_label": "Szint",
     "reading_level_help": "Egyszerre állítja be az olvasási segítségeket — válaszd ki, hol tartasz, és finomítsd őket lent.",
     "reading_level_custom_help": "A saját segítség-összeállításod. Válassz szintet a visszaállításhoz.",

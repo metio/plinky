@@ -211,6 +211,8 @@
     "note_size_caption": "Förstorar hela notbilden till större, lättare lästa noter — praktiskt på en liten skärm, eller när du precis har börjat.",
     "color_notes_toggle": "Färglägg noterna",
     "color_notes_hint": "Varje nothuvud får en färg efter sitt namn — varje C rött, varje D orange, och så vidare — så att du kan läsa efter färg medan namnen sjunker in.",
+    "chord_symbols_toggle": "Namnge ackorden",
+    "chord_symbols_hint": "Skriver C, Am, G7 ovanför notraden där tonerna tydligt bildar ett ackord, så att en takt läses som formen den är byggd av — och en form du känner från ett stycke är densamma i nästa.",
     "reading_level_label": "Nivå",
     "reading_level_help": "Ställer in läshjälpen tillsammans — välj var du är och finjustera dem nedan.",
     "reading_level_custom_help": "Din egen blandning av hjälpmedel. Välj en nivå för att återställa dem.",

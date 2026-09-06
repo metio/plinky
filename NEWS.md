@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 6 September 2026
 
+**The chords, named on the page.** Turn on *Name the chords* and Plinky writes C, Am,
+G7 above the staff wherever the notes make a chord clear — read off the notes, since
+most scores write no symbols of their own — so a bar reads as the shape it is built
+on, and a shape you know from one piece is the same in the next. It stays quiet where
+the music is ambiguous rather than name a chord wrongly, and a score that carries its
+own symbols keeps them.
+
 **Chords to practise, in every key.** The Music page has always had scales and
 arpeggios to work through; now it has the seven chords of each of the twenty-four
 keys as well, played as blocks up the scale and back — root position or an
