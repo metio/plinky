@@ -510,7 +510,13 @@ const BUDGET_VENDOR_KB = 324;
 // with them Listen's human touch, the settings index, and Keep up's beat windows. Two
 // kilobytes in the score viewer, three in the incipit chunk (two chunks folded into one),
 // under one each in settings and the services. Measured at 421.0.
-const BUDGET_APP_KB = 422;
+//
+// 426. Chord names on the page: the harmony reader and the <harmony> writer ride in the
+// score viewer chunk, since a run reads them before the score is engraved, and the
+// "Name the chords" switch sits in Settings and in run set-up with twenty-six locales of
+// copy behind it. Two kilobytes in the score viewer, one across settings and the services.
+// Measured at 424.1.
+const BUDGET_APP_KB = 426;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
