@@ -48,6 +48,10 @@ export async function readExercises(path = EXERCISES_MANIFEST): Promise<Exercise
     return rowsOf<ExerciseMeta>(await readFile(path, "utf8"), path);
 }
 
+export function readExercisesSync(path = EXERCISES_MANIFEST): ExerciseMeta[] {
+    return rowsOf<ExerciseMeta>(readFileSync(path, "utf8"), path);
+}
+
 export async function writeExercises(
     rows: readonly ExerciseMeta[],
     path = EXERCISES_MANIFEST,

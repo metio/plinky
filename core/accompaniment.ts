@@ -35,17 +35,26 @@ function partElements(doc: Document): Element[] {
 // of the piano's notes — the fingering, the strip's bars — goes through this, so that on
 // an art song they all read the piano and none of them the singer written above it.
 export function pianoPart(doc: Document): Element | null {
+    return pianoParts(doc)[0] ?? null;
+}
+
+// Every <part> holding one of the played instrument's staves: one part for a piano
+// written on a grand staff, two for a piano written as two single-staff parts — the shape
+// of every generated both-hands exercise. In score order, the right hand's part first.
+export function pianoParts(doc: Document): Element[] {
     const parts = partElements(doc);
     const counts = stavesPerPart(doc);
-    const { right } = partsOf(counts);
+    const { right, left } = partsOf(counts);
+    const kept: Element[] = [];
     let running = 0;
     for (const [index, count] of counts.entries()) {
-        if (right >= running && right < running + count) {
-            return parts[index] ?? null;
+        const holds = (staff: number) => staff >= running && staff < running + count;
+        if ((holds(right) || holds(left)) && parts[index]) {
+            kept.push(parts[index] as Element);
         }
         running += count;
     }
-    return null;
+    return kept;
 }
 
 // Removes every part but the played instrument's, along with its entry in the part list
@@ -62,24 +71,26 @@ export function stripAccompaniment(codec: XmlCodec, xml: string): string {
     if (parts.length < 2) {
         return xml;
     }
-    const kept = pianoPart(doc);
-    if (!kept) {
+    const kept = pianoParts(doc);
+    if (kept.length === 0 || kept.length === parts.length) {
         return xml;
     }
-    const keptId = kept.getAttribute("id");
+    const keptIds = new Set(kept.map((part) => part.getAttribute("id")));
     for (const part of parts) {
-        if (part !== kept) {
+        if (!kept.includes(part)) {
             part.remove();
         }
     }
     for (const listed of Array.from(doc.querySelectorAll("part-list > score-part"))) {
-        if (listed.getAttribute("id") !== keptId) {
+        if (!keptIds.has(listed.getAttribute("id"))) {
             listed.remove();
         }
     }
     // A part group bracketing parts that are gone would brace a single staff system.
-    for (const group of Array.from(doc.querySelectorAll("part-list > part-group"))) {
-        group.remove();
+    if (kept.length === 1) {
+        for (const group of Array.from(doc.querySelectorAll("part-list > part-group"))) {
+            group.remove();
+        }
     }
     return codec.serialize(doc);
 }

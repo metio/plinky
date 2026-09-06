@@ -24,6 +24,8 @@ const TITLES: Record<ExerciseType, (input: { key: string }) => string> = {
     "minor-arpeggio": m.exercise_title_minor_arpeggio,
     "dom7-arpeggio": m.exercise_title_dom7_arpeggio,
     "dim7-arpeggio": m.exercise_title_dim7_arpeggio,
+    "major-chords": m.exercise_title_major_chords,
+    "minor-chords": m.exercise_title_minor_chords,
 };
 
 const FORMS: Record<ExerciseForm, () => string> = {

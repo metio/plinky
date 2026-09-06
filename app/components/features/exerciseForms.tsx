@@ -6,6 +6,7 @@ import {
     type ExerciseConfig,
     type Hands,
     type Interval,
+    hasInversions,
     isArpeggio,
     supportsIntervals,
 } from "../../../core/exerciseGen";
@@ -80,7 +81,7 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
                     </Link>
                 ))}
             </Row>
-            <Show when={isArpeggio(config.type)}>
+            <Show when={hasInversions(config.type)}>
                 <Row label={m.exercise_inversion()}>
                     {inversions.map(([inversion, label]) => (
                         <Link

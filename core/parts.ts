@@ -30,9 +30,19 @@ export type ScoreParts = {
 // vocal and chamber scores by convention, and two staves is what makes a part a keyboard
 // part. A score with no such part falls back to its last part, which for a single-part
 // score is the whole thing and reproduces the plain grand-staff case exactly.
+//
+// One exception: two parts of one staff each, and nothing else, is a piano written as
+// two parts rather than as one part with two staves — which is how every generated
+// both-hands exercise is written, and how some editors export a piano piece. Read by the
+// last-part rule, the treble was the "other" instrument and the bass the right hand: a
+// both-hands scale asked for the left hand's notes alone and sounded the right hand as
+// accompaniment.
 export function partsOf(stavesPerPart: readonly number[]): ScoreParts {
     const counts = stavesPerPart.filter((count) => Number.isInteger(count) && count > 0);
     if (counts.length === 0) {
+        return { right: 0, left: 1, other: [] };
+    }
+    if (counts.length === 2 && counts[0] === 1 && counts[1] === 1) {
         return { right: 0, left: 1, other: [] };
     }
 

@@ -61,9 +61,14 @@ describe("stripAccompaniment", () => {
         expect(ids(stripAccompaniment(domXmlCodec, xml))).toEqual(["P"]);
     });
 
-    it("falls back to the last part when nothing is written on two staves", () => {
+    it("keeps two single-staff parts, which are the two hands of a piano", () => {
         const xml = score(["A", "B"], part("A") + part("B"));
-        expect(ids(stripAccompaniment(domXmlCodec, xml))).toEqual(["B"]);
+        expect(ids(stripAccompaniment(domXmlCodec, xml))).toEqual(["A", "B"]);
+    });
+
+    it("falls back to the last part when nothing is written on two staves", () => {
+        const xml = score(["A", "B", "C"], part("A") + part("B") + part("C"));
+        expect(ids(stripAccompaniment(domXmlCodec, xml))).toEqual(["C"]);
     });
 
     it("returns malformed input unchanged", () => {
