@@ -790,6 +790,10 @@
     "tour_high_low_body": "Noten weiter oben im System liegen weiter rechts auf den Tasten. Spiel erst die tiefe, dann die hohe.",
     "score_symbols_title": "In diesem Stück",
     "score_symbols_subtitle": "Die Zeichen, die dir hier begegnen, und was jedes von dir möchte.",
+    "piece_chords_title": "Akkorde in diesem Stück",
+    "piece_chords_hint": "Die Akkorde, aus denen es gebaut ist, und die Schleife, zu der es immer wieder zurückkehrt — was man vor den Noten wissen sollte, und im nächsten Stück in dieser Tonart dasselbe ist.",
+    "piece_chords_progression": "Seine Akkordfolge",
+    "piece_chords_ear": "Diese Akkordfolge hören",
     "glossary_intro": "Die Zeichen, die dir in Noten begegnen, und was jedes davon mit dem Klang macht. Die meisten kannst du zweimal hören: wie sie geschrieben stehen, und noch einmal ohne das Zeichen.",
     "glossary_index_label": "Zeichen",
     "glossary_hear": "Anhören",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Ohne Mittelstimmen",
     "reduction_outlined": "Melodie und Bass",
     "reduction_melody": "Nur Melodie",
+    "reduction_blocked": "Linke Hand als Akkorde",
     "glossary_hear_keys": "Auf den Tasten hören",
     "theory_index_label": "Lektionen",
     "glossary_learn_more": "Lerne die Grundlage dazu"

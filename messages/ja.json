@@ -787,6 +787,10 @@
     "tour_high_low_body": "五線の上のほうにある音符は、鍵盤では右のほうにあります。低いほう、それから高いほうを弾いてみて。",
     "score_symbols_title": "この曲に出てくる記号",
     "score_symbols_subtitle": "ここで出会う記号と、それぞれが求めていること。",
+    "piece_chords_title": "この曲の和音",
+    "piece_chords_hint": "曲を支える和音と、何度も戻ってくる進行 — 音符より先に知っておく価値があり、同じ調の次の曲でも同じもの。",
+    "piece_chords_progression": "その進行",
+    "piece_chords_ear": "この進行を聴く",
     "glossary_intro": "楽譜で出会う記号と、それぞれが音に何をするか。ほとんどは二度聴けます — 書かれたとおりに、そしてもう一度、記号を外して。",
     "glossary_index_label": "記号",
     "glossary_hear": "聴いてみる",
@@ -1381,6 +1385,7 @@
     "reduction_thinned": "内声を抜く",
     "reduction_outlined": "旋律と低音",
     "reduction_melody": "旋律だけ",
+    "reduction_blocked": "左手を和音で",
     "glossary_hear_keys": "鍵盤で聴く",
     "theory_index_label": "レッスン",
     "glossary_learn_more": "この土台を学ぶ"

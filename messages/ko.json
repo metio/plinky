@@ -787,6 +787,10 @@
     "tour_high_low_body": "오선에서 위에 있는 음표는 건반에서 오른쪽에 있어요. 낮은 음을 치고, 그다음 높은 음을 쳐 보세요.",
     "score_symbols_title": "이 곡에 나오는 기호",
     "score_symbols_subtitle": "여기서 만나는 기호들과, 각각이 무엇을 요구하는지.",
+    "piece_chords_title": "이 곡의 화음",
+    "piece_chords_hint": "곡을 이루는 화음과 계속 돌아오는 진행 — 음보다 먼저 알아 둘 만하고, 같은 조의 다음 곡에서도 같은 것들.",
+    "piece_chords_progression": "이 곡의 진행",
+    "piece_chords_ear": "이 진행 들어 보기",
     "glossary_intro": "악보에서 만나는 기호들과 각각이 소리에 하는 일. 대부분은 두 번 들어볼 수 있어요. 적힌 그대로, 그리고 기호를 뺀 채로 한 번 더.",
     "glossary_index_label": "기호",
     "glossary_hear": "들어보기",
@@ -1381,6 +1385,7 @@
     "reduction_thinned": "속음 빼기",
     "reduction_outlined": "선율과 베이스",
     "reduction_melody": "선율만",
+    "reduction_blocked": "왼손을 화음으로",
     "glossary_hear_keys": "건반으로 듣기",
     "theory_index_label": "레슨",
     "glossary_learn_more": "바탕이 되는 내용 배우기"

@@ -212,6 +212,10 @@
     "tour_high_low_body": "Notes further up the staff are further right on the keys. Play the low one, then the high one.",
     "score_symbols_title": "In this piece",
     "score_symbols_subtitle": "The marks you'll meet here, and what each one asks of you.",
+    "piece_chords_title": "Chords in this piece",
+    "piece_chords_hint": "The chords it is built on and the loop it keeps coming back to — the things worth knowing before the notes, and the same in the next piece in this key.",
+    "piece_chords_progression": "Its progression",
+    "piece_chords_ear": "Hear this progression",
     "glossary_intro": "The symbols you meet in a score, and what each one does to the sound. Most can be heard twice: as written, and again with the mark taken away.",
     "glossary_index_label": "Symbols",
     "glossary_hear": "Hear it",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Inner notes out",
     "reduction_outlined": "Melody and bass",
     "reduction_melody": "Melody alone",
+    "reduction_blocked": "Left hand as chords",
     "glossary_hear_keys": "Hear it on the keys",
     "theory_index_label": "Lessons",
     "glossary_learn_more": "Learn what this builds on"

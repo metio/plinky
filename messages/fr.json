@@ -792,6 +792,10 @@
     "tour_high_low_body": "Les notes plus hautes sur la portée sont plus à droite sur les touches. Joue la grave, puis l'aiguë.",
     "score_symbols_title": "Dans ce morceau",
     "score_symbols_subtitle": "Les signes que tu croiseras ici, et ce que chacun te demande.",
+    "piece_chords_title": "Les accords de ce morceau",
+    "piece_chords_hint": "Les accords qui le construisent et la boucle à laquelle il revient sans cesse — ce qu'il vaut la peine de savoir avant les notes, et qui reste le même dans le prochain morceau dans cette tonalité.",
+    "piece_chords_progression": "Sa progression",
+    "piece_chords_ear": "Écouter cette progression",
     "glossary_intro": "Les signes que tu croises dans une partition, et ce que chacun fait au son. La plupart s'écoutent deux fois : tels qu'ils sont écrits, puis sans le signe.",
     "glossary_index_label": "Signes",
     "glossary_hear": "Écouter",
@@ -1385,6 +1389,7 @@
     "reduction_thinned": "Sans les notes intérieures",
     "reduction_outlined": "Mélodie et basse",
     "reduction_melody": "Mélodie seule",
+    "reduction_blocked": "Main gauche en accords",
     "glossary_hear_keys": "L'entendre sur les touches",
     "theory_index_label": "Leçons",
     "glossary_learn_more": "Apprendre ce sur quoi cela repose"

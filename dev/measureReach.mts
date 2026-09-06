@@ -9,7 +9,7 @@
 // the path of everything that merely wants to thin a score.
 
 import type { Reach, Reachable } from "../core/reach.ts";
-import { REDUCTIONS } from "../core/reduction.ts";
+import { THINNINGS } from "../core/reduction.ts";
 import { categoryOf, gradeOf } from "../core/scoreDifficulty.ts";
 import { simplify } from "../core/simplify.ts";
 import type { XmlCodec } from "../core/xml.ts";
@@ -38,7 +38,7 @@ export function reachableGrades(codec: XmlCodec, id: string, xml: string): Reach
     const written = gradeOf(codec, id, xml);
     const found: Reachable[] = [];
     const seen = new Set<number>();
-    for (const level of REDUCTIONS) {
+    for (const level of THINNINGS) {
         const reduced = simplify(codec, xml, level);
         if (reduced === xml) {
             continue;

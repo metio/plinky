@@ -793,6 +793,10 @@
     "tour_high_low_body": "Noty vyššie v osnove ležia viac doprava na klávesoch. Zahraj nízku, potom vysokú.",
     "score_symbols_title": "V tejto skladbe",
     "score_symbols_subtitle": "Značky, ktoré tu stretneš, a čo od teba každá chce.",
+    "piece_chords_title": "Akordy v tejto skladbe",
+    "piece_chords_hint": "Akordy, z ktorých je postavená, a slučka, ku ktorej sa stále vracia — to, čo sa oplatí vedieť skôr než noty, a čo je v ďalšej skladbe v tejto tónine rovnaké.",
+    "piece_chords_progression": "Jej postup",
+    "piece_chords_ear": "Vypočuť si tento postup",
     "glossary_intro": "Značky, ktoré stretneš v notách, a čo každá z nich urobí so zvukom. Väčšinu si môžeš vypočuť dvakrát: ako sú zapísané, a ešte raz bez značky.",
     "glossary_index_label": "Značky",
     "glossary_hear": "Vypočuť",
@@ -1387,6 +1391,7 @@
     "reduction_thinned": "Bez vnútorných tónov",
     "reduction_outlined": "Melódia a bas",
     "reduction_melody": "Len melódia",
+    "reduction_blocked": "Ľavá ruka ako akordy",
     "glossary_hear_keys": "Vypočuť na klávesoch",
     "theory_index_label": "Lekcie",
     "glossary_learn_more": "Nauč sa, na čom to stojí"

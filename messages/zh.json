@@ -788,6 +788,10 @@
     "tour_high_low_body": "五线谱上位置越高的音符，在琴键上就越靠右。先弹低的，再弹高的。",
     "score_symbols_title": "这首曲子里的记号",
     "score_symbols_subtitle": "你在这里会遇到的记号，以及每一个对你的要求。",
+    "piece_chords_title": "这首曲子的和弦",
+    "piece_chords_hint": "构成它的和弦，以及它一再回到的循环——在音符之前值得知道的事，到同一个调的下一首也是一样。",
+    "piece_chords_progression": "它的进行",
+    "piece_chords_ear": "听听这个进行",
     "glossary_intro": "你在乐谱上会遇到的记号，以及每一个对声音做了什么。大多数都能听两遍：先按写的样子，再把记号去掉听一次。",
     "glossary_index_label": "记号",
     "glossary_hear": "听一听",
@@ -1381,6 +1385,7 @@
     "reduction_thinned": "去掉内声部",
     "reduction_outlined": "旋律和低音",
     "reduction_melody": "只有旋律",
+    "reduction_blocked": "左手改弹和弦",
     "glossary_hear_keys": "在琴键上听",
     "theory_index_label": "课程",
     "glossary_learn_more": "学习它的基础"

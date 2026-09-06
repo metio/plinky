@@ -790,6 +790,10 @@
     "tour_high_low_body": "Noder højere oppe på linjerne ligger længere til højre på tangenterne. Spil den dybe, så den høje.",
     "score_symbols_title": "I dette stykke",
     "score_symbols_subtitle": "De tegn du møder her, og hvad hvert af dem beder dig om.",
+    "piece_chords_title": "Akkorder i dette stykke",
+    "piece_chords_hint": "Akkorderne det er bygget af, og den sløjfe det bliver ved med at vende tilbage til — det, der er værd at vide før tonerne, og som er det samme i det næste stykke i denne toneart.",
+    "piece_chords_progression": "Dets akkordfølge",
+    "piece_chords_ear": "Hør denne akkordfølge",
     "glossary_intro": "De tegn du møder i et nodeblad, og hvad hvert af dem gør ved klangen. De fleste kan du høre to gange: som de står skrevet, og en gang mere uden tegnet.",
     "glossary_index_label": "Tegn",
     "glossary_hear": "Lyt",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Uden mellemtoner",
     "reduction_outlined": "Melodi og bas",
     "reduction_melody": "Kun melodien",
+    "reduction_blocked": "Venstre hånd som akkorder",
     "glossary_hear_keys": "Hør det på tangenterne",
     "theory_index_label": "Lektioner",
     "glossary_learn_more": "Lær hvad det bygger på"

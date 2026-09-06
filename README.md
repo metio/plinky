@@ -511,6 +511,13 @@ slur settles at its end instead of stopping dead. It is slight on purpose, and i
 plays a note louder than the page asks — what is printed is a ceiling, and interpretation
 lives underneath it.
 
+The same reading gives a piece a chord panel before a run — the chords it is built on,
+commonest first, the loop it keeps returning to, and links to practise the key's chord set
+and to hear the progression in the ear drill — and a fourth way of thinning a piece:
+**Left hand as chords** keeps the tune as written and plays the harmony under it as plain
+block chords, one per change, so the shape of a piece is learned before the pattern that
+decorates it. Like the other thinnings it counts as practice, never as the piece.
+
 Where a score writes no chord symbols — and most do not — Plinky can read them off the
 notes and write C, Am, G7 above the staff, so a bar reads as the shape it is built on and a
 shape learned in one piece is recognised in the next. **Name the chords** in Settings, or

@@ -791,6 +791,10 @@
     "tour_high_low_body": "Notele mai sus pe portativ sunt mai la dreapta pe clape. Cântă nota joasă, apoi pe cea înaltă.",
     "score_symbols_title": "În piesa asta",
     "score_symbols_subtitle": "Semnele pe care le vei întâlni aici și ce îți cere fiecare.",
+    "piece_chords_title": "Acordurile din această piesă",
+    "piece_chords_hint": "Acordurile din care e construită și bucla la care se tot întoarce — ce merită știut înaintea notelor, și ce e la fel în următoarea piesă în această tonalitate.",
+    "piece_chords_progression": "Progresia ei",
+    "piece_chords_ear": "Ascultă această progresie",
     "glossary_intro": "Semnele pe care le întâlnești într-o partitură și ce face fiecare cu sunetul. Cele mai multe se pot asculta de două ori: așa cum sunt scrise și încă o dată fără semn.",
     "glossary_index_label": "Semne",
     "glossary_hear": "Ascultă",
@@ -1385,6 +1389,7 @@
     "reduction_thinned": "Fără notele interioare",
     "reduction_outlined": "Melodie și bas",
     "reduction_melody": "Doar melodia",
+    "reduction_blocked": "Mâna stângă în acorduri",
     "glossary_hear_keys": "Ascultă la clape",
     "theory_index_label": "Lecții",
     "glossary_learn_more": "Învață pe ce se bazează"

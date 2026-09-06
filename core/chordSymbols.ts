@@ -79,7 +79,7 @@ const EPSILON = 1e-6;
 // Spelled the way the key reads: flats in a flat key, sharps otherwise — the same rule
 // that spells a chromatic run — so an E♭ major chord in E♭ is E♭ and never D♯.
 function harmonyElement(doc: Document, span: ChordSpan): Element {
-    const flats = flatKey(span);
+    const flats = spellsFlat(span);
     const harmony = doc.createElement("harmony");
     const root = doc.createElement("root");
     root.appendChild(pitchElement(doc, "root-step", "root-alter", span.root, flats));
@@ -123,7 +123,7 @@ function pitchElement(
 // key spells like its relative major.
 const FLAT_TONICS = new Set([5, 10, 3, 8, 1, 6]);
 
-function flatKey(span: ChordSpan): boolean {
+export function spellsFlat(span: { key: ChordSpan["key"] }): boolean {
     const major = span.key.mode === "major" ? span.key.tonic : (span.key.tonic + 3) % 12;
     return FLAT_TONICS.has(major);
 }

@@ -790,6 +790,10 @@
     "tour_high_low_body": "Viivastolla ylempänä olevat nuotit ovat koskettimilla oikeammalla. Soita matala, sitten korkea.",
     "score_symbols_title": "Tässä kappaleessa",
     "score_symbols_subtitle": "Merkit, jotka täällä vastaan tulevat, ja mitä kukin niistä pyytää.",
+    "piece_chords_title": "Tämän kappaleen soinnut",
+    "piece_chords_hint": "Soinnut, joista se on rakennettu, ja kierto, johon se palaa yhä uudelleen — se, mikä kannattaa tietää ennen nuotteja, ja joka on sama seuraavassa tämän sävellajin kappaleessa.",
+    "piece_chords_progression": "Sen sointukierto",
+    "piece_chords_ear": "Kuuntele tämä sointukierto",
     "glossary_intro": "Nuoteissa vastaan tulevat merkit ja se, mitä kukin tekee soinnille. Useimmat voit kuulla kahdesti: sellaisina kuin ne on kirjoitettu, ja uudelleen ilman merkkiä.",
     "glossary_index_label": "Merkit",
     "glossary_hear": "Kuuntele",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Ilman sisä-ääniä",
     "reduction_outlined": "Melodia ja basso",
     "reduction_melody": "Vain melodia",
+    "reduction_blocked": "Vasen käsi sointuina",
     "glossary_hear_keys": "Kuuntele koskettimilla",
     "theory_index_label": "Oppitunnit",
     "glossary_learn_more": "Opi, mihin tämä nojaa"

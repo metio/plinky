@@ -18,6 +18,15 @@ export type Reduction =
     | "outlined"
     // The melody alone, the other hand resting. The last resort, and the first thing a
     // beginner can actually play.
-    | "melody";
+    | "melody"
+    // The left hand as block chords under the tune as written: the harmony held plain,
+    // before the pattern that decorates it. The one reading that writes notes rather than
+    // taking them out (core/blockChords), which is why it grades nothing and reaches
+    // nowhere — a run against it is practice toward the piece, not the piece.
+    | "blocked";
 
-export const REDUCTIONS: readonly Reduction[] = ["thinned", "outlined", "melody"];
+export const REDUCTIONS: readonly Reduction[] = ["thinned", "outlined", "melody", "blocked"];
+
+// The readings that only ever remove notes, and so can be measured for how far down they
+// take a piece (core/reach): the block chords are an arrangement, and are not.
+export const THINNINGS: readonly Reduction[] = ["thinned", "outlined", "melody"];

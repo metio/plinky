@@ -792,6 +792,10 @@
     "tour_high_low_body": "As notas mais acima na pauta ficam mais à direita nas teclas. Toca a grave e depois a aguda.",
     "score_symbols_title": "Nesta peça",
     "score_symbols_subtitle": "Os sinais que vais encontrar aqui e o que cada um te pede.",
+    "piece_chords_title": "Os acordes desta peça",
+    "piece_chords_hint": "Os acordes de que é feita e o ciclo a que volta sempre — o que vale a pena saber antes das notas, e que é o mesmo na próxima peça nesta tonalidade.",
+    "piece_chords_progression": "A sua progressão",
+    "piece_chords_ear": "Ouvir esta progressão",
     "glossary_intro": "Os sinais que encontras numa partitura e o que cada um faz ao som. A maioria podes ouvir duas vezes: como estão escritos e outra vez sem o sinal.",
     "glossary_index_label": "Sinais",
     "glossary_hear": "Ouvir",
@@ -1385,6 +1389,7 @@
     "reduction_thinned": "Sem notas interiores",
     "reduction_outlined": "Melodia e baixo",
     "reduction_melody": "Só a melodia",
+    "reduction_blocked": "Mão esquerda em acordes",
     "glossary_hear_keys": "Ouvir nas teclas",
     "theory_index_label": "Lições",
     "glossary_learn_more": "Aprende em que assenta"

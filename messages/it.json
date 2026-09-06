@@ -792,6 +792,10 @@
     "tour_high_low_body": "Le note più in alto sul pentagramma stanno più a destra sui tasti. Suona la grave, poi l'acuta.",
     "score_symbols_title": "In questo brano",
     "score_symbols_subtitle": "I segni che incontrerai qui e cosa ti chiede ciascuno.",
+    "piece_chords_title": "Gli accordi di questo brano",
+    "piece_chords_hint": "Gli accordi da cui è costruito e il giro su cui continua a tornare — le cose che vale la pena sapere prima delle note, uguali nel prossimo brano in questa tonalità.",
+    "piece_chords_progression": "La sua progressione",
+    "piece_chords_ear": "Ascoltare questa progressione",
     "glossary_intro": "I segni che incontri in uno spartito e cosa fa ciascuno al suono. Quasi tutti si possono ascoltare due volte: come sono scritti, e di nuovo senza il segno.",
     "glossary_index_label": "Segni",
     "glossary_hear": "Ascolta",
@@ -1385,6 +1389,7 @@
     "reduction_thinned": "Senza note interne",
     "reduction_outlined": "Melodia e basso",
     "reduction_melody": "Solo melodia",
+    "reduction_blocked": "Mano sinistra ad accordi",
     "glossary_hear_keys": "Ascoltarlo sui tasti",
     "theory_index_label": "Lezioni",
     "glossary_learn_more": "Impara su cosa si basa"

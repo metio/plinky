@@ -789,6 +789,10 @@
     "tour_high_low_body": "A kottában feljebb lévő hangok jobbra vannak a billentyűkön. Játszd le a mélyet, aztán a magasat.",
     "score_symbols_title": "Ebben a darabban",
     "score_symbols_subtitle": "A jelek, amikkel itt találkozol, és hogy melyik mit kér tőled.",
+    "piece_chords_title": "Akkordok ebben a darabban",
+    "piece_chords_hint": "Az akkordok, amelyekből felépül, és a kör, amelyhez újra és újra visszatér — amit a hangok előtt érdemes tudni, és ami a következő ilyen hangnemű darabban ugyanaz.",
+    "piece_chords_progression": "A menete",
+    "piece_chords_ear": "Hallgasd meg ezt a menetet",
     "glossary_intro": "A jelek, amikkel a kottában találkozol, és hogy melyik mit tesz a hanggal. A legtöbbet kétszer is meghallgathatod: ahogy le van írva, és még egyszer a jel nélkül.",
     "glossary_index_label": "Jelek",
     "glossary_hear": "Hallgasd meg",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Belső hangok nélkül",
     "reduction_outlined": "Dallam és basszus",
     "reduction_melody": "Csak a dallam",
+    "reduction_blocked": "Bal kéz akkordokként",
     "glossary_hear_keys": "Meghallgatás a billentyűkön",
     "theory_index_label": "Leckék",
     "glossary_learn_more": "Tanuld meg, mire épül"

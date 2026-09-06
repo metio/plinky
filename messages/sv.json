@@ -790,6 +790,10 @@
     "tour_high_low_body": "Noter högre upp på linjerna ligger längre till höger på tangenterna. Spela den låga, sedan den höga.",
     "score_symbols_title": "I det här stycket",
     "score_symbols_subtitle": "Tecknen du möter här, och vad vart och ett ber dig om.",
+    "piece_chords_title": "Ackorden i det här stycket",
+    "piece_chords_hint": "Ackorden det är byggt av och slingan det hela tiden återvänder till — det som är värt att veta före tonerna, och som är detsamma i nästa stycke i den här tonarten.",
+    "piece_chords_progression": "Dess ackordföljd",
+    "piece_chords_ear": "Hör den här ackordföljden",
     "glossary_intro": "Tecknen du möter i ett notblad och vad vart och ett gör med klangen. De flesta kan du höra två gånger: som de står skrivna, och en gång till utan tecknet.",
     "glossary_index_label": "Tecken",
     "glossary_hear": "Lyssna",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Utan mellantoner",
     "reduction_outlined": "Melodi och bas",
     "reduction_melody": "Bara melodin",
+    "reduction_blocked": "Vänsterhand som ackord",
     "glossary_hear_keys": "Hör det på tangenterna",
     "theory_index_label": "Lektioner",
     "glossary_learn_more": "Lär dig vad detta bygger på"

@@ -789,6 +789,10 @@
     "tour_high_low_body": "Notat më lart mbi pentagram janë më djathtas mbi taste. Luaj të ulëtën, pastaj të lartën.",
     "score_symbols_title": "Në këtë pjesë",
     "score_symbols_subtitle": "Shenjat që do të hasësh këtu dhe çfarë kërkon secila prej teje.",
+    "piece_chords_title": "Akordet e kësaj pjese",
+    "piece_chords_hint": "Akordet nga të cilat është ndërtuar dhe cikli te i cili kthehet vazhdimisht — ato që ia vlen t'i dish para notave, dhe që janë të njëjtat në pjesën tjetër në këtë tonalitet.",
+    "piece_chords_progression": "Progresioni i saj",
+    "piece_chords_ear": "Dëgjo këtë progresion",
     "glossary_intro": "Shenjat që has në një partiturë dhe çfarë i bën secila tingullit. Shumicën mund t'i dëgjosh dy herë: siç janë shkruar, dhe përsëri pa shenjën.",
     "glossary_index_label": "Shenjat",
     "glossary_hear": "Dëgjo",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Pa notat e brendshme",
     "reduction_outlined": "Melodia dhe basi",
     "reduction_melody": "Vetëm melodia",
+    "reduction_blocked": "Dora e majtë si akorde",
     "glossary_hear_keys": "Dëgjoje në tastet",
     "theory_index_label": "Mësimet",
     "glossary_learn_more": "Mëso mbi çfarë mbështetet"

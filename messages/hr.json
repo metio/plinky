@@ -792,6 +792,10 @@
     "tour_high_low_body": "Note više na crtovlju leže više desno na tipkama. Odsviraj nisku, pa visoku.",
     "score_symbols_title": "U ovoj skladbi",
     "score_symbols_subtitle": "Oznake na koje ćeš ovdje naići i što svaka od njih traži od tebe.",
+    "piece_chords_title": "Akordi u ovoj skladbi",
+    "piece_chords_hint": "Akordi od kojih je građena i petlja kojoj se stalno vraća — ono što vrijedi znati prije nota, a isto je u sljedećoj skladbi u ovom tonalitetu.",
+    "piece_chords_progression": "Njezina progresija",
+    "piece_chords_ear": "Poslušaj ovu progresiju",
     "glossary_intro": "Oznake na koje nailaziš u notama i što svaka od njih čini sa zvukom. Većinu možeš poslušati dvaput: kako su zapisane, i još jednom bez oznake.",
     "glossary_index_label": "Oznake",
     "glossary_hear": "Poslušaj",
@@ -1385,6 +1389,7 @@
     "reduction_thinned": "Bez unutarnjih tonova",
     "reduction_outlined": "Melodija i bas",
     "reduction_melody": "Samo melodija",
+    "reduction_blocked": "Lijeva ruka kao akordi",
     "glossary_hear_keys": "Poslušaj na tipkama",
     "theory_index_label": "Lekcije",
     "glossary_learn_more": "Nauči na čemu se to temelji"

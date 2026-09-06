@@ -142,6 +142,19 @@ describe("Play", () => {
         expect(screen.getByRole("switch", { name: m.race_ghost_toggle() })).toBeTruthy();
     });
 
+    it("says what the piece is built on, with a way to practise the key's chords", async () => {
+        renderPlay(bundledId("ode to joy"));
+        await screen.findByRole("button", { name: m.run_group_sheet_title() });
+        reveal(m.run_group_sheet_title);
+        expect(await screen.findByText(m.piece_chords_title())).toBeTruthy();
+        const chords = screen.getByRole("list", { name: m.piece_chords_title() });
+        expect(chords.textContent).toContain("I");
+        const set = screen
+            .getAllByRole("link")
+            .find((link) => (link.getAttribute("href") ?? "").includes("/play/chords-"));
+        expect(set).toBeTruthy();
+    });
+
     it("keeps the pace you chose for the next piece you open", async () => {
         // Keep up, its guide and the duet used to reset at every piece, so somebody who
         // always practises on the clock had to say so each time.

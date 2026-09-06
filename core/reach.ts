@@ -9,7 +9,7 @@
 // time. Shipping that to a browser would be paying, per visitor, for an answer already
 // written in the manifest.
 
-import { type Reduction, REDUCTIONS } from "./reduction";
+import { type Reduction, THINNINGS } from "./reduction";
 
 // What a reduction of this piece grades at.
 export type Reachable = {
@@ -32,7 +32,7 @@ export function easiestWayIn(reach: Reach | undefined): Reachable | null {
         return null;
     }
     let best: Reachable | null = null;
-    for (const level of REDUCTIONS) {
+    for (const level of THINNINGS) {
         const grade = reach[level];
         if (grade !== undefined && (best === null || grade < best.grade)) {
             best = { level, grade };

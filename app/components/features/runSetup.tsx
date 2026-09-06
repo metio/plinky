@@ -14,6 +14,7 @@ import { IconButton } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { ChoiceField, SwitchField } from "../ui/fields";
 import { BookIcon, EyeIcon, GradCapIcon, RotateIcon, SlidersIcon, StarIcon } from "../ui/icons";
+import { PieceChords } from "./pieceChords";
 import { ScoreSymbols } from "./scoreSymbols";
 import { levelOf } from "../../../core/readingLevel";
 import { usePrefs } from "../../hooks/usePrefs";
@@ -306,6 +307,8 @@ export function RunSetup() {
 
                     <ScoreSymbols xml={xml} />
 
+                    <PieceChords xml={xml} />
+
                     <SettingsSection
                         title={m.run_group_reading_title()}
                         hint={m.run_group_reading_hint()}
@@ -375,6 +378,7 @@ export function RunSetup() {
                                 { id: "thinned", label: m.reduction_thinned() },
                                 { id: "outlined", label: m.reduction_outlined() },
                                 { id: "melody", label: m.reduction_melody() },
+                                { id: "blocked", label: m.reduction_blocked() },
                             ]}
                             help={m.reduction_caption()}
                         />

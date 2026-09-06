@@ -794,6 +794,10 @@
     "tour_high_low_body": "Nuty wyżej na pięciolinii leżą bardziej w prawo na klawiszach. Zagraj niską, potem wysoką.",
     "score_symbols_title": "W tym utworze",
     "score_symbols_subtitle": "Znaki, które tu spotkasz, i o co każdy z nich prosi.",
+    "piece_chords_title": "Akordy w tym utworze",
+    "piece_chords_hint": "Akordy, z których jest zbudowany, i pętla, do której wciąż wraca — to, co warto wiedzieć przed nutami i co jest takie samo w następnym utworze w tej tonacji.",
+    "piece_chords_progression": "Jego progresja",
+    "piece_chords_ear": "Posłuchaj tej progresji",
     "glossary_intro": "Znaki, które spotykasz w nutach, i co każdy z nich robi z dźwiękiem. Większość usłyszysz dwa razy: tak, jak są zapisane, i jeszcze raz bez znaku.",
     "glossary_index_label": "Znaki",
     "glossary_hear": "Posłuchaj",
@@ -1387,6 +1391,7 @@
     "reduction_thinned": "Bez środkowych dźwięków",
     "reduction_outlined": "Melodia i bas",
     "reduction_melody": "Sama melodia",
+    "reduction_blocked": "Lewa ręka jako akordy",
     "glossary_hear_keys": "Posłuchaj na klawiszach",
     "theory_index_label": "Lekcje",
     "glossary_learn_more": "Poznaj podstawy tego"

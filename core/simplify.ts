@@ -22,6 +22,7 @@
 // a line between the hands or folds a broken chord into a block. It thins.
 
 import { midiOf } from "./notes";
+import { blockChords } from "./blockChords";
 import type { Reduction } from "./reduction";
 import type { XmlCodec } from "./xml";
 
@@ -168,6 +169,10 @@ function silence(note: Element): void {
 
 // A reduction of the score, or the score unchanged when there is nothing to take out.
 export function simplify(codec: XmlCodec, xml: string, level: Reduction): string {
+    // The one reading that is not a thinning: it writes the left hand anew.
+    if (level === "blocked") {
+        return blockChords(codec, xml);
+    }
     const doc = codec.parse(xml);
     if (!doc) {
         return xml;

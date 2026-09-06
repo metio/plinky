@@ -289,6 +289,7 @@ export default function Settings() {
                                 { id: "thinned", label: m.reduction_thinned() },
                                 { id: "outlined", label: m.reduction_outlined() },
                                 { id: "melody", label: m.reduction_melody() },
+                                { id: "blocked", label: m.reduction_blocked() },
                             ]}
                             help={m.reduction_caption()}
                         />

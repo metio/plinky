@@ -790,6 +790,10 @@
     "tour_high_low_body": "Noter høyere opp på linjene ligger lenger til høyre på tangentene. Spill den dype, så den høye.",
     "score_symbols_title": "I dette stykket",
     "score_symbols_subtitle": "Tegnene du møter her, og hva hvert av dem ber deg om.",
+    "piece_chords_title": "Akkordene i dette stykket",
+    "piece_chords_hint": "Akkordene det er bygd av og løkken det stadig vender tilbake til — det som er verdt å vite før tonene, og som er det samme i neste stykke i denne tonearten.",
+    "piece_chords_progression": "Akkordfølgen",
+    "piece_chords_ear": "Hør denne akkordfølgen",
     "glossary_intro": "Tegnene du møter i et noteark, og hva hvert av dem gjør med klangen. De fleste kan du høre to ganger: slik de står skrevet, og en gang til uten tegnet.",
     "glossary_index_label": "Tegn",
     "glossary_hear": "Lytt",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "Uten mellomtoner",
     "reduction_outlined": "Melodi og bass",
     "reduction_melody": "Bare melodien",
+    "reduction_blocked": "Venstre hånd som akkorder",
     "glossary_hear_keys": "Hør det på tangentene",
     "theory_index_label": "Leksjoner",
     "glossary_learn_more": "Lær hva dette bygger på"

@@ -792,6 +792,10 @@
     "tour_high_low_body": "Las notas más altas en el pentagrama están más a la derecha en las teclas. Toca la grave y luego la aguda.",
     "score_symbols_title": "En esta pieza",
     "score_symbols_subtitle": "Los signos que te encontrarás aquí y qué te pide cada uno.",
+    "piece_chords_title": "Los acordes de esta pieza",
+    "piece_chords_hint": "Los acordes de los que está hecha y el bucle al que vuelve una y otra vez — lo que conviene saber antes que las notas, y que es lo mismo en la siguiente pieza en esta tonalidad.",
+    "piece_chords_progression": "Su progresión",
+    "piece_chords_ear": "Escuchar esta progresión",
     "glossary_intro": "Los signos que te encuentras en una partitura y qué le hace cada uno al sonido. Casi todos se pueden oír dos veces: tal como están escritos y otra vez sin el signo.",
     "glossary_index_label": "Signos",
     "glossary_hear": "Escuchar",
@@ -1385,6 +1389,7 @@
     "reduction_thinned": "Sin notas interiores",
     "reduction_outlined": "Melodía y bajo",
     "reduction_melody": "Solo melodía",
+    "reduction_blocked": "Mano izquierda en acordes",
     "glossary_hear_keys": "Escucharlo en las teclas",
     "theory_index_label": "Lecciones",
     "glossary_learn_more": "Aprende en qué se apoya"

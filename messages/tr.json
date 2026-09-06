@@ -789,6 +789,10 @@
     "tour_high_low_body": "Portede daha yukarıdaki notalar tuşlarda daha sağdadır. Önce pesi, sonra tizi çal.",
     "score_symbols_title": "Bu parçada",
     "score_symbols_subtitle": "Burada karşılaşacağın işaretler ve her birinin senden istediği.",
+    "piece_chords_title": "Bu parçadaki akorlar",
+    "piece_chords_hint": "Üzerine kurulduğu akorlar ve sürekli döndüğü döngü — notalardan önce bilinmeye değer olanlar, ve bu tondaki bir sonraki parçada da aynı olanlar.",
+    "piece_chords_progression": "Akor yürüyüşü",
+    "piece_chords_ear": "Bu yürüyüşü dinle",
     "glossary_intro": "Bir notada karşılaştığın işaretler ve her birinin sese ne yaptığı. Çoğunu iki kez dinleyebilirsin: yazıldığı gibi ve bir daha işaret olmadan.",
     "glossary_index_label": "İşaretler",
     "glossary_hear": "Dinle",
@@ -1383,6 +1387,7 @@
     "reduction_thinned": "İç sesler olmadan",
     "reduction_outlined": "Ezgi ve bas",
     "reduction_melody": "Yalnızca ezgi",
+    "reduction_blocked": "Sol el akor olarak",
     "glossary_hear_keys": "Tuşlarda dinle",
     "theory_index_label": "Dersler",
     "glossary_learn_more": "Neye dayandığını öğren"
