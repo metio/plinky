@@ -35,6 +35,12 @@ over a repeated section, every coloured note on the page lost its colour — inc
 the sections before it that were played and passed. Now only the bars being played
 again are cleared, in Practice, Keep up and Listen alike.
 
+**The colour keeps up after a repeat.** On the second time through a repeated
+section, the green landed a few notes behind where you were, and once the run had
+left the section no note was coloured at all — on a piece opening with three
+repeated bars, bar 4 was the last to turn green. Uncolouring the repeated bars left
+Plinky's place in the score at the top; it stays where you are now.
+
 **Two composers are two composers, in any language.** A credit joining two people
 with the Spanish *y* — "Lemoine y Carulli" — was read as one composer with an odd
 name. The catalogue now reads *y*, *e*, *et*, *und* and *och* the way it already read
