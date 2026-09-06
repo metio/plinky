@@ -8,6 +8,7 @@
         "arch": "node dev/check-architecture.mjs && node dev/check-globals.mjs",
         "brand": "node dev/build-brand.mjs",
         "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
+        "postbuild": "PLINKY_LOCALE= PLINKY_ROOT_ONLY= node dev/compile-messages.mjs",
         "build-storybook": "npm run messages && storybook build",
         "build:client": "npm run messages && node dev/build-retry.mjs",
         "build:locales": "node dev/build-locales.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
