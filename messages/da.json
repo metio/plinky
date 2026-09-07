@@ -64,8 +64,6 @@
     "meta_music_description": "Dine klaverstykker på denne enhed — søg, stjernemarkér og øv hvert stykke, og tag din egen MusicXML med.",
     "meta_home_title": "Plinky — klaverøvelse i din browser",
     "meta_home_description": "Øv klaver i din browser med et MIDI-klaver eller dit computertastatur — nodelæsning, rytme, tempo, høretræning og loop-øvelser, mens dine stykker bliver på din enhed.",
-    "meta_play_title": "Spil",
-    "meta_play_description_fallback": "Spil et stykke med dit MIDI-klaver eller computertastatur",
     "meta_play_description": "Spil \"{title}\" i din browser — nodelæs det på dit MIDI- eller computertastatur.",
     "meta_play_description_by": "Spil \"{title}\" af {composer} i din browser — nodelæs det på dit MIDI- eller computertastatur.",
     "meta_daily_title": "Daglig udfordring",

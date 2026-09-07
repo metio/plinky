@@ -15,7 +15,44 @@ export type AssetContext = {
     env: { ASSETS: { fetch: (request: Request | URL | string) => Promise<Response> } };
 };
 
+// build/client/known.json as the middleware holds it (dev/gen-known-ids.mts writes it).
+export type Known = {
+    pieces: Record<string, { title: string; composer: string; grade?: number; license?: string }>;
+    people: Record<string, { name: string; pieces: string[] }>;
+    locales: string[];
+    base: string;
+    strings: Record<
+        string,
+        {
+            playBy: string;
+            play: string;
+            person: string;
+            home: string;
+            music: string;
+            grade: string;
+            og: string;
+        }
+    >;
+};
+
+export type PagePath = { locale: string; kind: "play" | "person"; id: string };
+
+export type Described = {
+    path: string;
+    headline: string;
+    description: string;
+    lines: string[];
+    trail: { name: string; path: string }[];
+    links: { name: string; path: string }[];
+    data: Record<string, unknown>;
+};
+
 export function onRequest(context: AssetContext): Promise<Response>;
 export function exists(context: AssetContext): Promise<boolean>;
+export function parsePath(path: string): PagePath | null;
+export function describe(list: Known, page: PagePath): Described | null;
+export function documentFor(shell: string, list: Known, page: PagePath): string | null;
+export function shellFor(shell: string, list: Known, locale: string, path: string): string;
+export function localePath(pathname: string): { locale: string; path: string } | null;
 export function pickLocale(acceptLanguage: string | null | undefined, locales: string[]): string;
 export function forgetKnown(): void;

@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 7 September 2026
 
+**Every piece has a page that says what it is.** Share a link to any of the three
+thousand catalogue pieces and the preview card now names the piece and its composer,
+where it used to show the site's own card for all of them; a search engine reads the
+same. And the tab's title names the piece you are playing instead of saying "Play" for
+every piece but the two that come built in.
+
 **The recorded piano no longer changes its colour at a whisper of force.** Each key
 of the recorded grand is sixteen separate recordings, one per band of force, and a
 note one step over a band's edge played a different recording from the note before

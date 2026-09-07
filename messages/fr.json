@@ -64,8 +64,6 @@
     "meta_music_description": "Vos partitions de piano sur cet appareil — cherchez, mettez en favori et travaillez chaque morceau, et apportez vos propres fichiers MusicXML.",
     "meta_home_title": "Plinky — le piano dans votre navigateur",
     "meta_home_description": "Jouez du piano dans votre navigateur avec un clavier MIDI ou celui de votre ordinateur — déchiffrage, rythme, tempo, travail de l'oreille et exercices en boucle, avec vos partitions gardées sur votre appareil.",
-    "meta_play_title": "Jouer",
-    "meta_play_description_fallback": "Jouez un morceau avec votre piano MIDI ou le clavier de votre ordinateur",
     "meta_play_description": "Jouez « {title} » dans votre navigateur — déchiffrez-le avec votre clavier MIDI ou celui de votre ordinateur.",
     "meta_play_description_by": "Jouez « {title} » de {composer} dans votre navigateur — déchiffrez-le avec votre clavier MIDI ou celui de votre ordinateur.",
     "meta_daily_title": "Défi du jour",

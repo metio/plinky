@@ -64,8 +64,6 @@
     "meta_music_description": "A zongorakottáid ezen az eszközön — keress, csillagozz és gyakorolj minden darabot, és hozd magaddal a saját MusicXML-fájljaidat.",
     "meta_home_title": "Plinky — zongoragyakorlás a böngésződben",
     "meta_home_description": "Gyakorolj zongorázni a böngésződben MIDI-billentyűzettel vagy a számítógéped billentyűivel — lapról olvasás, ritmus, tempó, hallásfejlesztés és ismétlőgyakorlatok, a kottáid pedig az eszközödön maradnak.",
-    "meta_play_title": "Játék",
-    "meta_play_description_fallback": "Játszd el egy darabot a MIDI-zongoráddal vagy a számítógép billentyűzetén",
     "meta_play_description": "Játszd le a(z) \"{title}\" darabot a böngésződben — olvasd lapról a MIDI- vagy számítógép-billentyűzeteden.",
     "meta_play_description_by": "Játszd le {composer} \"{title}\" darabját a böngésződben — olvasd lapról a MIDI- vagy számítógép-billentyűzeteden.",
     "meta_daily_title": "Napi kihívás",

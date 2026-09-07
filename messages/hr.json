@@ -64,8 +64,6 @@
     "meta_music_description": "Tvoje klavirske note na ovom uređaju — pretraži, označi zvjezdicom i vježbaj svaku skladbu, i donesi svoj MusicXML.",
     "meta_home_title": "Plinky — vježbanje klavira u pregledniku",
     "meta_home_description": "Vježbaj klavir u pregledniku s MIDI klavijaturom ili tipkovnicom računala — čitanje s lista, ritam, tempo, trening sluha i vježbe s petljom, uz note pohranjene na tvom uređaju.",
-    "meta_play_title": "Sviraj",
-    "meta_play_description_fallback": "Sviraj skladbu na MIDI klaviru ili tipkovnici računala",
     "meta_play_description": "Sviraj \"{title}\" u pregledniku — čitaj s lista na MIDI-ju ili tipkovnici računala.",
     "meta_play_description_by": "Sviraj \"{title}\" skladatelja {composer} u pregledniku — čitaj s lista na MIDI-ju ili tipkovnici računala.",
     "meta_daily_title": "Dnevni izazov",

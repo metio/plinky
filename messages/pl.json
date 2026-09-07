@@ -64,8 +64,6 @@
     "meta_music_description": "Twoje nuty fortepianowe na tym urządzeniu — szukaj, oznaczaj gwiazdką i ćwicz każdy utwór, a własne pliki MusicXML przynieś ze sobą.",
     "meta_home_title": "Plinky — ćwiczenie gry na pianinie w przeglądarce",
     "meta_home_description": "Ćwicz grę na pianinie w przeglądarce z klawiaturą MIDI lub klawiaturą komputera — czytanie nut, rytm, tempo, trening słuchu i ćwiczenia w pętli, a twoje nuty zostają na twoim urządzeniu.",
-    "meta_play_title": "Graj",
-    "meta_play_description_fallback": "Zagraj utwór na pianinie MIDI lub klawiaturze komputera",
     "meta_play_description": "Zagraj „{title}” w przeglądarce — czytaj nuty prosto z ekranu na pianinie MIDI lub klawiaturze komputera.",
     "meta_play_description_by": "Zagraj „{title}” ({composer}) w przeglądarce — czytaj nuty prosto z ekranu na pianinie MIDI lub klawiaturze komputera.",
     "meta_daily_title": "Codzienne wyzwanie",

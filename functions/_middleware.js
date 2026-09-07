@@ -1,33 +1,36 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Answer a real page with a real status.
+// Answer a real page with a real document.
 //
 // Cloudflare Pages has one response for a path it holds no document for: it serves
 // 404.html, and it serves it with a 404 status. The deploy makes 404.html the SPA shell,
 // so a reader following a link to a piece gets the piece — the client router matches the
-// route and renders it. A crawler gets "gone" and leaves.
+// route and renders it. A crawler gets "gone" and leaves, and a link shared anywhere
+// unfurls as the site's generic card, because the shell knows nothing about the page.
 //
 // Almost the whole catalogue is in that position. Two pieces prerender to their own
-// document (the bundled scores); the other 3,144 render on the client, in each of 26
-// languages, and every one of those URLs is linked from the catalogue page. So the site
-// offers a crawler roughly eighty thousand links that all answer 404 while a reader sees
-// the page load perfectly — which is also why a shared link never unfurls a preview card.
+// document (the bundled scores); the other 3,300 render on the client, in each of 26
+// languages, and every one of those URLs is linked from the catalogue page. Prerendering
+// them is closed off by the host: a deployment may hold twenty thousand files, and the
+// catalogue in every language is eighty thousand documents.
 //
-// The document is missing. The page is not, and the status has to say which — and only
-// where the page really is there. An id from a scheme the catalogue left behind, a
-// composer whose spelling was merged into another's, a piece that never existed: those
-// are absent, and a 200 with an empty shell for them is a soft 404 that teaches a search
-// index to distrust every answer the site gives. The build writes the addresses that do
-// exist to /known.json (dev/gen-known-ids.mts); a miss that is not on it keeps its 404.
+// So the document is written here, at the edge, from build/client/known.json
+// (dev/gen-known-ids.mts): the piece's title and composer in the page's own language,
+// the canonical address and its hreflang cluster, the social card, the structured data a
+// search engine reads the page as, and a summary a reader without JavaScript can read.
+// A prerendered document is served exactly as it is; only a miss reaches the rewrite,
+// and _routes.json narrows this to the routes that render from data, so a missing image
+// stays missing — a 404 for something that really is absent is the correct answer.
 //
-// Middleware runs in front of the static files, so a prerendered document is served
-// exactly as it is and only a miss reaches the rewrite. _routes.json narrows this to the
-// routes that render from data, so a missing image stays missing: a 404 for something
-// that really is absent is the correct answer and must survive.
+// And only where the page really is there. An id from a scheme the catalogue left behind,
+// a composer whose spelling was merged into another's, a piece that never existed: those
+// are absent, and a 200 with a document for them is a soft 404 that teaches a search index
+// to distrust every answer the site gives. A miss the list does not hold keeps its 404.
 
 // A generated exercise — a scale, an arpeggio, a chord set — is built from its id and has
-// no manifest row to look up; its shape is the whole test.
+// no manifest row to look up; its shape is the whole test. It gets the shell with a 200
+// and no document of its own: its title is the exercise's own business.
 const GENERATED = /^(?:scale|arpeggio|chords)-/;
 // One fetch of the list per isolate, shared by every request it serves after.
 let knownPromise = null;
@@ -61,11 +64,13 @@ async function known(context) {
         knownPromise = context.env.ASSETS.fetch(new URL("/known.json", context.request.url))
             .then((response) => (response.ok ? response.json() : null))
             .then((list) =>
-                list
+                list?.pieces && list.people
                     ? {
-                          pieces: new Set(list.pieces),
-                          people: new Set(list.people),
+                          pieces: list.pieces,
+                          people: list.people,
                           locales: Array.isArray(list.locales) ? list.locales : [],
+                          base: list.base ?? "en",
+                          strings: list.strings ?? {},
                       }
                     : null,
             )
@@ -74,25 +79,246 @@ async function known(context) {
     return knownPromise;
 }
 
+// What the address names: the language, whether it is a piece or a composer, and which.
+// Null for any other address.
+export function parsePath(path) {
+    const match = path.match(/^\/([a-z]{2})\/(play|person)\/([^/]+)\/?$/);
+    if (!match) {
+        return null;
+    }
+    const [, locale, kind, raw] = match;
+    return { locale, kind, id: decodeURIComponent(raw) };
+}
+
 // Whether the address names a page the site has. Unknown when the list could not be
 // read: then every page is presumed real, as it always was, rather than the whole
 // catalogue going missing because one file did.
 export async function exists(context) {
-    const path = new URL(context.request.url).pathname;
-    const match = path.match(/^\/[a-z]{2}\/(play|person)\/([^/]+)\/?$/);
-    if (!match) {
+    const page = parsePath(new URL(context.request.url).pathname);
+    if (!page) {
         return true;
     }
-    const [, kind, raw] = match;
-    const id = decodeURIComponent(raw);
-    if (kind === "play" && GENERATED.test(id)) {
+    if (page.kind === "play" && GENERATED.test(page.id)) {
         return true;
     }
     const list = await known(context);
     if (list === null) {
         return true;
     }
-    return kind === "play" ? list.pieces.has(id) : list.people.has(id);
+    return Object.hasOwn(page.kind === "play" ? list.pieces : list.people, page.id);
+}
+
+const escapeHtml = (value) =>
+    String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+
+// A message with its `{name}` placeholders filled, the way paraglide fills them.
+const fill = (message, values) =>
+    message.replace(/\{(\w+)\}/g, (whole, key) => (key in values ? values[key] : whole));
+
+const SITE_NAME = "Plinky";
+
+// The page a piece or composer address names, in one language: everything the head and
+// the summary are written from. Null when the list does not hold it.
+export function describe(list, page) {
+    const strings = list.strings[page.locale] ?? list.strings[list.base] ?? {};
+    const path = `/${page.kind}/${encodeURIComponent(page.id)}/`;
+    if (page.kind === "play") {
+        const piece = list.pieces[page.id];
+        if (!piece) {
+            return null;
+        }
+        const description = piece.composer
+            ? fill(strings.playBy ?? "", { title: piece.title, composer: piece.composer })
+            : fill(strings.play ?? "", { title: piece.title });
+        const people = Object.entries(list.people).filter(([, person]) =>
+            person.pieces.includes(page.id),
+        );
+        const [firstSlug, first] = people[0] ?? [];
+        return {
+            path,
+            headline: piece.title,
+            description,
+            lines: [
+                piece.composer,
+                piece.grade === undefined ? "" : fill(strings.grade ?? "", { grade: piece.grade }),
+            ].filter(Boolean),
+            trail: [
+                { name: strings.home ?? "", path: "/" },
+                { name: strings.music ?? "", path: "/music/" },
+                ...(first ? [{ name: first.name, path: `/person/${firstSlug}/` }] : []),
+                { name: piece.title, path },
+            ],
+            links: people.map(([slug, person]) => ({
+                name: person.name,
+                path: `/person/${slug}/`,
+            })),
+            data: {
+                "@context": "https://schema.org",
+                "@type": "MusicComposition",
+                name: piece.title,
+                inLanguage: page.locale,
+                isAccessibleForFree: true,
+                ...(piece.composer
+                    ? { composer: { "@type": "Person", name: piece.composer } }
+                    : {}),
+            },
+        };
+    }
+    const person = list.people[page.id];
+    if (!person) {
+        return null;
+    }
+    const pieces = person.pieces
+        .map((id) => ({ id, ...list.pieces[id] }))
+        .filter((piece) => piece.title)
+        .sort((a, b) => (a.grade ?? 99) - (b.grade ?? 99) || a.title.localeCompare(b.title));
+    const url = (locale, to) => `https://plinky.fun/${locale}${to}`;
+    return {
+        path,
+        headline: person.name,
+        description: fill(strings.person ?? "", { name: person.name }),
+        lines: [],
+        trail: [
+            { name: strings.home ?? "", path: "/" },
+            { name: strings.music ?? "", path: "/music/" },
+            { name: person.name, path },
+        ],
+        links: pieces.map((piece) => ({ name: piece.title, path: `/play/${piece.id}/` })),
+        data: {
+            "@context": "https://schema.org",
+            "@type": "Person",
+            name: person.name,
+            url: url(page.locale, path),
+            ...(pieces.length > 0
+                ? {
+                      subjectOf: {
+                          "@type": "ItemList",
+                          numberOfItems: pieces.length,
+                          itemListElement: pieces.map((piece, index) => ({
+                              "@type": "ListItem",
+                              position: index + 1,
+                              url: url(page.locale, `/play/${piece.id}/`),
+                              name: piece.title,
+                          })),
+                      },
+                  }
+                : {}),
+        },
+    };
+}
+
+// The shell addressed to the page it is served for: the root's own canonical, cluster,
+// card URL and language replaced by this page's, each in the place the shell holds it.
+// Every client-rendered page needs this, document or none — the shell names the bare
+// root as its canonical, and once the app has run and written the page's own beside it
+// there are two, one of which points at the wrong page.
+//
+// In place, and in the app's own order, because the app hydrates the document it is
+// given: a head tag it finds where it would have written it is adopted, and one it does
+// not is written again beside the first — two titles, two descriptions, the structured
+// data twice. So this writes what app/root.tsx writes, where it writes it, and nothing
+// the app would not.
+export function shellFor(shell, list, locale, path) {
+    const origin = "https://plinky.fun";
+    const pageUrl = `${origin}/${locale}${path}`;
+    const strings = list.strings[locale] ?? list.strings[list.base] ?? {};
+    const cluster = [
+        ...list.locales.map(
+            (one) =>
+                `<link rel="alternate" hrefLang="${one}" href="${escapeHtml(`${origin}/${one}${path}`)}"/>`,
+        ),
+        `<link rel="alternate" hrefLang="x-default" href="${escapeHtml(`${origin}/${list.base}${path}`)}"/>`,
+    ].join("");
+    const alternates = list.locales
+        .filter((one) => one !== locale)
+        .map(
+            (one) =>
+                `<meta property="og:locale:alternate" content="${list.strings[one]?.og ?? "en_US"}"/>`,
+        )
+        .join("");
+    return shell
+        .replace(/<html lang="[^"]*"/, `<html lang="${escapeHtml(locale)}"`)
+        .replace(
+            /<link rel="canonical" href="[^"]*"\/?>/,
+            `<link rel="canonical" href="${escapeHtml(pageUrl)}"/>`,
+        )
+        .replace(/(<link rel="alternate" hrefLang="[^"]*" href="[^"]*"\/?>)+/, cluster)
+        .replace(
+            /<meta property="og:url" content="[^"]*"\/?>/,
+            `<meta property="og:url" content="${escapeHtml(pageUrl)}"/>`,
+        )
+        .replace(
+            /<meta property="og:locale" content="[^"]*"\/?>/,
+            `<meta property="og:locale" content="${strings.og ?? "en_US"}"/>`,
+        )
+        .replace(/(<meta property="og:locale:alternate" content="[^"]*"\/?>)+/, alternates);
+}
+
+// The path of the page an address names, with the trailing slash the documents are
+// served at, and the language in front of it — or null outside the language pages.
+export function localePath(pathname) {
+    const match = pathname.match(/^\/([a-z]{2})(\/.*)?$/);
+    if (!match) {
+        return null;
+    }
+    const rest = match[2] ?? "/";
+    return { locale: match[1], path: rest.endsWith("/") ? rest : `${rest}/` };
+}
+
+// Where the app writes a route's own tags: after the site-wide card fields, before the
+// icons. The shell's root page wrote nothing there, so this is an insertion, made where
+// the app will look for what it wrote.
+const ROUTE_TAGS_AFTER = /<meta name="twitter:image:alt" content="[^"]*"\/?>/;
+
+// The shell rewritten into the page's own document, in the shape the app's own meta()
+// would have given a page that knew its subject at build time: the same title shape,
+// the same description, the same card fields, the same structured data.
+export function documentFor(shell, list, page) {
+    const described = describe(list, page);
+    if (!described) {
+        return null;
+    }
+    const origin = "https://plinky.fun";
+    const { locale } = page;
+    const title = `${described.headline} · ${SITE_NAME}`;
+    const crumbs = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: described.trail.map((crumb, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: crumb.name,
+            item: `${origin}/${locale}${crumb.path}`,
+        })),
+    };
+    // JSON inside a script element: a "</" in a title would close the script early.
+    const json = (data) => JSON.stringify(data).replace(/</g, "\\u003c");
+    const routeTags = [
+        `<title>${escapeHtml(title)}</title>`,
+        `<meta name="description" content="${escapeHtml(described.description)}"/>`,
+        `<meta property="og:title" content="${escapeHtml(described.headline)}"/>`,
+        `<meta property="og:description" content="${escapeHtml(described.description)}"/>`,
+        `<meta name="twitter:title" content="${escapeHtml(described.headline)}"/>`,
+        `<meta name="twitter:description" content="${escapeHtml(described.description)}"/>`,
+        `<script type="application/ld+json">${json(described.data)}</script>`,
+        `<script type="application/ld+json">${json(crumbs)}</script>`,
+    ].join("");
+    const addressed = shellFor(shell, list, locale, described.path);
+    if (!ROUTE_TAGS_AFTER.test(addressed)) {
+        // A shell shaped differently from the one this was written against: the tags
+        // would land somewhere the app does not look, and be written twice. Better a
+        // page addressed correctly and untitled than one that says everything twice.
+        return addressed;
+    }
+    // No summary in the body. A <noscript> block holding the page's facts was tried, and
+    // the app hydrates the whole document: anything in the body it did not render is a
+    // mismatch, and React throws the shell away and renders from nothing. The head is
+    // where the page speaks for itself; the body is the app's.
+    return addressed.replace(ROUTE_TAGS_AFTER, (found) => `${found}${routeTags}`);
 }
 
 export async function onRequest(context) {
@@ -118,12 +344,33 @@ export async function onRequest(context) {
     if (!(await exists(context))) {
         return response;
     }
-    // The body is already right — 404.html is the shell. Only the status is wrong, and a
-    // Response's headers are immutable once it exists, so this rebuilds rather than edits.
-    return new Response(response.body, {
+    const where = localePath(url.pathname);
+    const list = where ? await known(context) : null;
+    // Addressed to the page for every language page: a piece or a composer gets its own
+    // document; anything else — a generated exercise — gets the shell that at least knows
+    // which page it is. The body is read only once something is certain to be written,
+    // since reading it and writing nothing would leave no body at all.
+    let document = null;
+    if (list?.locales.includes(where.locale)) {
+        const page = parsePath(url.pathname);
+        const shell = await response.text();
+        document =
+            page && describe(list, page) !== null
+                ? documentFor(shell, list, page)
+                : shellFor(shell, list, where.locale, where.path);
+    }
+    // The body is the shell either way; a Response's headers are immutable once it
+    // exists, so this rebuilds rather than edits. With a document, the body is the page's
+    // own and the length the shell's headers declared no longer holds.
+    const headers = new Headers(response.headers);
+    if (document !== null) {
+        headers.delete("content-length");
+        headers.set("content-type", "text/html; charset=utf-8");
+    }
+    return new Response(document ?? response.body, {
         status: 200,
         statusText: "OK",
-        headers: response.headers,
+        headers,
     });
 }
 

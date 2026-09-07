@@ -20,7 +20,7 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { assertPages, noindexPaths } from "./pages.mjs";
-import { buildSitemaps } from "./sitemap.mjs";
+import { buildSitemaps, edgeEntries } from "./sitemap.mjs";
 
 const ROOT = "build/client";
 
@@ -73,6 +73,14 @@ for (const rel of pagesUnder(ROOT, "")) {
     }
     entries.push({ locale, path: rest.length === 0 ? "/" : `/${rest.join("/")}` });
 }
+
+// And every page the edge writes a document for, which the tree cannot show: the whole
+// catalogue, in every language. A page both prerendered and listed is one page — the
+// assembly groups by path. The list is what the deploy uploads beside the site, so a
+// missing one is a build that did not run gen-known-ids, and the sitemap must not
+// quietly shrink back to the two prerendered pieces.
+const known = JSON.parse(readFileSync(join(ROOT, "known.json"), "utf8"));
+entries.push(...edgeEntries(known, settings.locales));
 
 const { index, children } = buildSitemaps({
     entries,

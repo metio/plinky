@@ -64,8 +64,6 @@
     "meta_music_description": "As tuas partituras de piano neste dispositivo — pesquisa, marca com estrela e pratica cada peça, e traz o teu próprio MusicXML.",
     "meta_home_title": "Plinky — prática de piano no teu navegador",
     "meta_home_description": "Pratica piano no navegador com um teclado MIDI ou o teclado do computador — leitura à primeira vista, ritmo, andamento, treino auditivo e exercícios em loop, com as tuas partituras guardadas no teu dispositivo.",
-    "meta_play_title": "Tocar",
-    "meta_play_description_fallback": "Toca uma peça com o teu piano MIDI ou teclado do computador",
     "meta_play_description": "Toca \"{title}\" no teu navegador — lê à primeira vista no teu teclado MIDI ou do computador.",
     "meta_play_description_by": "Toca \"{title}\" de {composer} no teu navegador — lê à primeira vista no teu teclado MIDI ou do computador.",
     "meta_daily_title": "Desafio diário",

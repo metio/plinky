@@ -64,8 +64,6 @@
     "meta_music_description": "Pianostykkene dine på denne enheten — søk, stjernemerk og øv på hvert stykke, og ta med din egen MusicXML.",
     "meta_home_title": "Plinky — pianoøving i nettleseren",
     "meta_home_description": "Øv på piano i nettleseren med et MIDI-tastatur eller datatastaturet — bladlesing, rytme, tempo, gehørtrening og loop-øvelser, med stykkene dine lagret på enheten din.",
-    "meta_play_title": "Spill",
-    "meta_play_description_fallback": "Spill et stykke med MIDI-pianoet eller datatastaturet",
     "meta_play_description": "Spill «{title}» i nettleseren — bladles det på MIDI- eller datatastaturet.",
     "meta_play_description_by": "Spill «{title}» av {composer} i nettleseren — bladles det på MIDI- eller datatastaturet.",
     "meta_daily_title": "Dagens utfordring",

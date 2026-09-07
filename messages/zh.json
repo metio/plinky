@@ -64,8 +64,6 @@
     "meta_music_description": "此设备上的钢琴乐谱——搜索、加星标、练习每一首，也可以带上你自己的 MusicXML。",
     "meta_home_title": "Plinky——在浏览器中练习钢琴",
     "meta_home_description": "用 MIDI 键盘或电脑键盘在浏览器中练习钢琴——视奏、节奏、速度、听音训练和循环练习，你的乐谱都保存在设备上。",
-    "meta_play_title": "演奏",
-    "meta_play_description_fallback": "用你的 MIDI 钢琴或电脑键盘弹一首曲子",
     "meta_play_description": "在浏览器中弹《{title}》——用你的 MIDI 或电脑键盘视奏它。",
     "meta_play_description_by": "在浏览器中弹 {composer} 的《{title}》——用你的 MIDI 或电脑键盘视奏它。",
     "meta_daily_title": "每日挑战",

@@ -64,8 +64,6 @@
     "meta_music_description": "Partiturile tale de pian, pe acest dispozitiv — caută, marchează cu o stea și exersează orice piesă, și adaugă-ți propriile fișiere MusicXML.",
     "meta_home_title": "Plinky — exersează pian în browser",
     "meta_home_description": "Exersează pianul direct în browser, cu o claviatură MIDI sau cu tastatura calculatorului — citire la prima vedere, ritm, tempo, exerciții de auz și repetiții în buclă, cu partiturile păstrate pe dispozitivul tău.",
-    "meta_play_title": "Cântă",
-    "meta_play_description_fallback": "Cântă o piesă cu pianul tău MIDI sau cu tastatura calculatorului",
     "meta_play_description": "Cântă „{title}” direct în browser — citește-o la prima vedere pe claviatura MIDI sau pe tastatura calculatorului.",
     "meta_play_description_by": "Cântă „{title}” de {composer} direct în browser — citește-o la prima vedere pe claviatura MIDI sau pe tastatura calculatorului.",
     "meta_daily_title": "Provocarea zilei",

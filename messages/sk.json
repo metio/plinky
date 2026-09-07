@@ -64,8 +64,6 @@
     "meta_music_description": "Vaše klavírne skladby na tomto zariadení — hľadajte, označujte hviezdičkou a cvičte každú skladbu, a pridajte si aj vlastné súbory MusicXML.",
     "meta_home_title": "Plinky — cvičenie klavíra v prehliadači",
     "meta_home_description": "Cvičte klavír v prehliadači s MIDI klávesnicou alebo klávesnicou počítača — čítanie z listu, rytmus, tempo, tréning sluchu a cvičenia v slučke; vaše skladby zostávajú na vašom zariadení.",
-    "meta_play_title": "Hrať",
-    "meta_play_description_fallback": "Zahrajte si skladbu na MIDI klavíri alebo klávesnici počítača",
     "meta_play_description": "Zahrajte si „{title}“ v prehliadači — čítajte z listu na MIDI klavíri alebo klávesnici počítača.",
     "meta_play_description_by": "Zahrajte si „{title}“ od {composer} v prehliadači — čítajte z listu na MIDI klavíri alebo klávesnici počítača.",
     "meta_daily_title": "Denná výzva",

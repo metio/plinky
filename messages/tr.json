@@ -64,8 +64,6 @@
     "meta_music_description": "Bu cihazdaki notaların — her parçayı ara, yıldızla, çal, kendi MusicXML dosyalarını da getir.",
     "meta_home_title": "Plinky — tarayıcında piyano çalışması",
     "meta_home_description": "MIDI klavyeyle ya da bilgisayar klavyenle tarayıcında piyano çal — deşifre, ritim, tempo, kulak eğitimi ve döngü alıştırmaları; notaların cihazında kalır.",
-    "meta_play_title": "Çal",
-    "meta_play_description_fallback": "MIDI piyanon ya da bilgisayar klavyenle bir parça çal",
     "meta_play_description": "\"{title}\" parçasını tarayıcında çal — MIDI'de ya da bilgisayar klavyende deşifre et.",
     "meta_play_description_by": "{composer} bestesi \"{title}\" parçasını tarayıcında çal — MIDI'de ya da bilgisayar klavyende deşifre et.",
     "meta_daily_title": "Günlük meydan okuma",

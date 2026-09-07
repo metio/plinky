@@ -64,8 +64,6 @@
     "meta_music_description": "Partiturat e tua të pianos, në këtë pajisje — kërko, vendos yll dhe praktiko çdo pjesë, dhe sill me vete MusicXML-in tënd.",
     "meta_home_title": "Plinky — praktikë pianoje në shfletuesin tënd",
     "meta_home_description": "Praktiko pianon në shfletues me një tastierë MIDI ose me atë të kompjuterit — lexim nga partitura, ritëm, tempo, stërvitje veshi dhe ushtrime me përsëritje, me partiturat e tua të ruajtura në pajisje.",
-    "meta_play_title": "Luaj",
-    "meta_play_description_fallback": "Luaj një pjesë me pianon tënde MIDI ose me tastierën e kompjuterit",
     "meta_play_description": "Luaj \"{title}\" në shfletuesin tënd — lexoje nga partitura në pianon tënde MIDI ose në tastierën e kompjuterit.",
     "meta_play_description_by": "Luaj \"{title}\" nga {composer} në shfletuesin tënd — lexoje nga partitura në pianon tënde MIDI ose në tastierën e kompjuterit.",
     "meta_daily_title": "Sfida ditore",

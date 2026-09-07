@@ -64,8 +64,6 @@
     "meta_music_description": "I tuoi spartiti per pianoforte su questo dispositivo — cerca, metti una stella ed esercitati su ogni brano, e porta con te i tuoi file MusicXML.",
     "meta_home_title": "Plinky — esercizi di pianoforte nel browser",
     "meta_home_description": "Esercitati al pianoforte nel browser con una tastiera MIDI o la tastiera del computer — lettura a prima vista, ritmo, tempo, allenamento dell'orecchio ed esercizi in loop, con i tuoi spartiti conservati sul tuo dispositivo.",
-    "meta_play_title": "Suona",
-    "meta_play_description_fallback": "Suona un brano con il tuo piano MIDI o la tastiera del computer",
     "meta_play_description": "Suona \"{title}\" nel browser — leggilo a prima vista con il tuo MIDI o la tastiera del computer.",
     "meta_play_description_by": "Suona \"{title}\" di {composer} nel browser — leggilo a prima vista con il tuo MIDI o la tastiera del computer.",
     "meta_daily_title": "Sfida del giorno",

@@ -64,8 +64,6 @@
     "meta_music_description": "この端末に保存されたピアノ楽譜 — 検索してスターを付けて、曲ごとに練習できます。自分の MusicXML も持ち込めます。",
     "meta_home_title": "Plinky — ブラウザでピアノ練習",
     "meta_home_description": "MIDI キーボードやパソコンのキーボードで、ブラウザでピアノを練習 — 初見、リズム、テンポ、聴音、ループ練習まで。楽譜は端末に保存されます。",
-    "meta_play_title": "演奏",
-    "meta_play_description_fallback": "MIDI ピアノかパソコンのキーボードで曲を弾いてみましょう",
     "meta_play_description": "ブラウザで「{title}」を弾いてみましょう — MIDI かパソコンのキーボードで初見演奏。",
     "meta_play_description_by": "ブラウザで {composer} の「{title}」を弾いてみましょう — MIDI かパソコンのキーボードで初見演奏。",
     "meta_daily_title": "デイリーチャレンジ",

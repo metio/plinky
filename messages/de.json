@@ -64,8 +64,6 @@
     "meta_music_description": "Deine Klaviernoten auf diesem Gerät – suche, markiere mit Sternen und übe jedes Stück, und bring dein eigenes MusicXML mit.",
     "meta_home_title": "Plinky – Klavier üben im Browser",
     "meta_home_description": "Übe Klavier im Browser mit einem MIDI-Keyboard oder deiner Computertastatur – Blattlesen, Rhythmus, Tempo, Gehörbildung und Loop-Übungen, deine Noten bleiben auf deinem Gerät.",
-    "meta_play_title": "Spielen",
-    "meta_play_description_fallback": "Spiele ein Stück mit deinem MIDI-Klavier oder deiner Computertastatur",
     "meta_play_description": "Spiele „{title}“ in deinem Browser – lies es vom Blatt auf deinem MIDI- oder Computer-Keyboard.",
     "meta_play_description_by": "Spiele „{title}“ von {composer} in deinem Browser – lies es vom Blatt auf deinem MIDI- oder Computer-Keyboard.",
     "meta_daily_title": "Tägliche Herausforderung",

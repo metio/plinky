@@ -1,23 +1,30 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// The addresses the site can actually answer under /play and /person, written beside the
-// site for the edge middleware to read (functions/_middleware.js).
+// The catalogue as the edge sees it, written beside the site for functions/_middleware.js.
 //
-// A page with no prerendered document renders on the client, so the static host answers
-// its address with a 404 and the middleware corrects that to a 200. Corrected for every
-// address, that also blesses a piece that never existed, an id from a scheme the
-// catalogue left behind, a composer whose spelling was merged into another's: a crawler
-// gets a 200 with an empty shell and records a soft 404, and a search index learns not to
-// trust the site's own answers. This file is what tells a real page from a missing one.
+// Two pieces prerender to their own document; the other three thousand, and most of the
+// composers, render on the client. The static host answers those addresses with a 404 and
+// the middleware writes the document instead — a real title, a real description, the
+// hreflang cluster, the structured data and a summary a reader without JavaScript can
+// read — from what this file holds. Prerendering them would be the straightforward
+// answer, and it is closed: Cloudflare Pages caps a deployment at twenty thousand files,
+// and three thousand pieces in twenty-six languages are eighty thousand documents.
 //
-// Written by the build rather than at deploy because the composer index and the bundled
-// pieces are TypeScript modules, and the deploy runs with nothing installed.
+// So the file is the catalogue's metadata, not its ids alone. It is also what tells a real
+// page from a missing one: an id from a scheme the catalogue left behind, a composer whose
+// spelling was merged into another's, a piece that never existed — a document written for
+// those would be a soft 404 that teaches a search index to distrust every answer the site
+// gives, so a miss that is not listed here keeps its 404.
+//
+// Written by the build rather than at deploy because the composer index, the bundled
+// pieces and the messages are all TypeScript or JSON the deploy runs without.
 
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { PEOPLE_INDEX } from "../core/peopleIndex.ts";
-import { personSlugs } from "../core/person.ts";
+import { canonicalPeople, personSlugs } from "../core/person.ts";
 import { readScoreMetaFromText } from "../core/scoreMeta.ts";
+import { ogLocale } from "../core/site.ts";
 import { songId } from "../core/songId.ts";
 
 const OUT = "build/client";
@@ -25,46 +32,111 @@ const OUT = "build/client";
 // content-fingerprint id and the same credit, without reaching into the app's layer.
 const BUNDLED = "scores";
 
-function bundledPieces(): { id: string; composer: string }[] {
+type Row = { id: string; title: string; composer: string; grade?: number; license?: string };
+
+function bundledPieces(): Row[] {
     return readdirSync(BUNDLED)
         .filter((name) => name.endsWith(".musicxml"))
         .map((name) => {
             const xml = readFileSync(`${BUNDLED}/${name}`, "utf8");
-            return { id: songId(xml), composer: readScoreMetaFromText(xml).composer };
+            const meta = readScoreMetaFromText(xml);
+            return { id: songId(xml), title: meta.title, composer: meta.composer };
         });
 }
 
-export type KnownIds = { pieces: string[]; people: string[]; locales: string[] };
+// A piece as the edge describes it: its title, the people credited in the plain form the
+// app's own meta description uses, its grade, and the licence it travels under.
+export type KnownPiece = { title: string; composer: string; grade?: number; license?: string };
+export type KnownPerson = { name: string; pieces: string[] };
+// The strings a document needs in the reader's language, as the app's own messages say
+// them. Each holds `{title}`, `{composer}` and `{name}` placeholders where the message
+// does; the middleware fills them in.
+export type KnownStrings = {
+    playBy: string;
+    play: string;
+    person: string;
+    home: string;
+    music: string;
+    grade: string;
+    og: string;
+};
+export type KnownIds = {
+    pieces: Record<string, KnownPiece>;
+    people: Record<string, KnownPerson>;
+    locales: string[];
+    base: string;
+    strings: Record<string, KnownStrings>;
+};
+
+// The messages read straight from their JSON rather than through paraglide, whose
+// compiled output is per-locale and gitignored — and this runs once, for all of them.
+function stringsFor(locale: string): KnownStrings {
+    const messages = JSON.parse(readFileSync(`messages/${locale}.json`, "utf8")) as Record<
+        string,
+        string
+    >;
+    const need = (key: string): string => {
+        const value = messages[key];
+        if (typeof value !== "string" || value === "") {
+            throw new Error(
+                `messages/${locale}.json: ${key} is missing, so the edge documents in ${locale} would be blank`,
+            );
+        }
+        return value;
+    };
+    return {
+        playBy: need("meta_play_description_by"),
+        play: need("meta_play_description"),
+        person: need("meta_person_description"),
+        home: need("nav_today"),
+        music: need("music_title"),
+        grade: need("score_grade"),
+        og: ogLocale(locale),
+    };
+}
 
 export function knownIds(): KnownIds {
-    const songs = JSON.parse(readFileSync("public/songs/manifest.json", "utf8")) as {
-        id: string;
-        composer: string;
-    }[];
-    const exercises = JSON.parse(readFileSync("public/exercises/manifest.json", "utf8")) as {
-        id: string;
-    }[];
-    const bundled = bundledPieces();
-    const pieces = new Set<string>([
-        ...songs.map((song) => song.id),
-        ...exercises.map((exercise) => exercise.id),
-        ...bundled.map((score) => score.id),
-    ]);
-    // Every composer credited anywhere resolves to a page, whether the index lists them
-    // (it holds the people above its floor) or the page is built from the pieces alone.
-    const people = new Set<string>(Object.keys(PEOPLE_INDEX));
-    for (const credit of [...songs.map((s) => s.composer), ...bundled.map((s) => s.composer)]) {
-        for (const slug of personSlugs(credit)) {
-            if (slug) {
-                people.add(slug);
-            }
-        }
+    const songs = JSON.parse(readFileSync("public/songs/manifest.json", "utf8")) as Row[];
+    const exercises = JSON.parse(readFileSync("public/exercises/manifest.json", "utf8")) as Row[];
+    const pieces: Record<string, KnownPiece> = {};
+    const people: Record<string, KnownPerson> = {};
+    // Every composer the index lists has a page whether or not a piece here still credits
+    // them; the pieces fill the rest in, so a composer below the index's floor is a page
+    // too — built from the pieces alone, exactly as the client builds it.
+    for (const [slug, entry] of Object.entries(PEOPLE_INDEX)) {
+        people[slug] = { name: entry.name, pieces: [] };
     }
-    // The languages the site speaks, for the middleware to send a visitor to theirs.
-    const { locales } = JSON.parse(readFileSync("project.inlang/settings.json", "utf8")) as {
-        locales: string[];
+    for (const row of [...songs, ...exercises, ...bundledPieces()]) {
+        const names = canonicalPeople(row.composer ?? "");
+        pieces[row.id] = {
+            title: row.title,
+            composer: names.join(", "),
+            ...(row.grade === undefined ? {} : { grade: row.grade }),
+            ...(row.license ? { license: row.license } : {}),
+        };
+        personSlugs(row.composer ?? "").forEach((slug, index) => {
+            if (!slug) {
+                return;
+            }
+            people[slug] ??= { name: names[index] ?? slug, pieces: [] };
+            if (!people[slug].pieces.includes(row.id)) {
+                people[slug].pieces.push(row.id);
+            }
+        });
+    }
+    // The languages the site speaks, for the middleware to send a visitor to theirs and to
+    // name every alternate of a page.
+    const { locales, baseLocale } = JSON.parse(
+        readFileSync("project.inlang/settings.json", "utf8"),
+    ) as { locales: string[]; baseLocale: string };
+    const strings = Object.fromEntries(locales.map((locale) => [locale, stringsFor(locale)]));
+    return {
+        pieces: Object.fromEntries(Object.entries(pieces).sort(([a], [b]) => a.localeCompare(b))),
+        people: Object.fromEntries(Object.entries(people).sort(([a], [b]) => a.localeCompare(b))),
+        locales,
+        base: baseLocale,
+        strings,
     };
-    return { pieces: [...pieces].sort(), people: [...people].sort(), locales };
 }
 
 export function writeKnownIds(out = OUT): KnownIds {
@@ -77,6 +149,6 @@ export function writeKnownIds(out = OUT): KnownIds {
 if (process.argv[1]?.endsWith("gen-known-ids.mts")) {
     const { pieces, people, locales } = writeKnownIds();
     console.log(
-        `known.json: ${pieces.length} pieces, ${people.length} people, ${locales.length} languages.`,
+        `known.json: ${Object.keys(pieces).length} pieces, ${Object.keys(people).length} people, ${locales.length} languages.`,
     );
 }

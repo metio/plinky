@@ -64,8 +64,6 @@
     "meta_music_description": "Your piano scores on this device — search, star, and practise every piece, and bring your own MusicXML along.",
     "meta_home_title": "Plinky — piano practice in your browser",
     "meta_home_description": "Practise piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear training, and loop drills, with your scores kept on your device.",
-    "meta_play_title": "Play",
-    "meta_play_description_fallback": "Play a piece with your MIDI piano or computer keyboard",
     "meta_play_description": "Play \"{title}\" in your browser — sight-read it on your MIDI or computer keyboard.",
     "meta_play_description_by": "Play \"{title}\" by {composer} in your browser — sight-read it on your MIDI or computer keyboard.",
     "meta_daily_title": "Daily challenge",

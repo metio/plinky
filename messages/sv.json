@@ -64,8 +64,6 @@
     "meta_music_description": "Dina pianostycken på den här enheten — sök, stjärnmärk och öva på varje stycke, och ta med din egen MusicXML.",
     "meta_home_title": "Plinky — pianoövning i webbläsaren",
     "meta_home_description": "Öva piano i webbläsaren med ett MIDI-piano eller datorns tangentbord — notläsning, rytm, tempo, gehörsträning och loopövningar, med dina stycken sparade på din egen enhet.",
-    "meta_play_title": "Spela",
-    "meta_play_description_fallback": "Spela ett stycke med ditt MIDI-piano eller datorns tangentbord",
     "meta_play_description": "Spela \"{title}\" i webbläsaren — läs det direkt från bladet på ditt MIDI-piano eller datorns tangentbord.",
     "meta_play_description_by": "Spela \"{title}\" av {composer} i webbläsaren — läs det direkt från bladet på ditt MIDI-piano eller datorns tangentbord.",
     "meta_daily_title": "Daglig utmaning",

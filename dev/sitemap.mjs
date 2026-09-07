@@ -31,6 +31,20 @@ export function pageUrl(siteUrl, locale, path) {
 const alternate = (hreflang, href) =>
     `    <xhtml:link rel="alternate" hreflang="${escapeXml(hreflang)}" href="${escapeXml(href)}"/>`;
 
+// The pages the edge writes documents for rather than the build: every piece and every
+// composer in build/client/known.json (dev/gen-known-ids.mts), in every language the site
+// speaks. They have no file in the tree, so walking the tree cannot find them, and a
+// sitemap that names only the prerendered two pieces tells a search engine the catalogue
+// is two pieces long. A generated exercise is not among them: it has no document of its
+// own at the edge either.
+export function edgeEntries(known, locales) {
+    const paths = [
+        ...Object.keys(known.pieces ?? {}).map((id) => `/play/${id}`),
+        ...Object.keys(known.people ?? {}).map((slug) => `/person/${slug}`),
+    ];
+    return locales.flatMap((locale) => paths.map((path) => ({ locale, path })));
+}
+
 // One `<urlset>` per locale, plus the `<sitemapindex>` pointing at them.
 //
 //   entries  — `{ locale, path }` pairs, `path` canonical (locale-stripped), "/" for the

@@ -64,8 +64,6 @@
     "meta_music_description": "Je pianostukken op dit apparaat — zoek, geef sterren en oefen elk stuk, en breng je eigen MusicXML mee.",
     "meta_home_title": "Plinky — pianospelen oefenen in je browser",
     "meta_home_description": "Oefen piano in je browser met een MIDI-toetsenbord of je computertoetsenbord — bladlezen, ritme, tempo, gehoortraining en lusoefeningen, met je stukken bewaard op je apparaat.",
-    "meta_play_title": "Spelen",
-    "meta_play_description_fallback": "Speel een stuk met je MIDI-piano of computertoetsenbord",
     "meta_play_description": "Speel \"{title}\" in je browser — lees het van blad op je MIDI- of computertoetsenbord.",
     "meta_play_description_by": "Speel \"{title}\" van {composer} in je browser — lees het van blad op je MIDI- of computertoetsenbord.",
     "meta_daily_title": "Dagelijkse uitdaging",

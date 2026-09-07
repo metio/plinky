@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 // @ts-expect-error - plain JS module; vitest resolves the source
-import { buildSitemaps, pageUrl } from "./sitemap.mjs";
+import { buildSitemaps, edgeEntries, pageUrl } from "./sitemap.mjs";
 
 // The sitemap is the one artefact no gate can see the effect of: a wrong URL, a missing
 // alternate or a page that contradicts its own robots meta all render as a perfectly valid
@@ -148,5 +148,41 @@ describe("buildSitemaps", () => {
         // Every URL carries the whole hreflang cluster, so the byte cap arrives long
         // before the URL cap on a site with many locales.
         expect(() => build({ maxBytes: 200 })).toThrow(/over the 200/);
+    });
+});
+
+describe("edgeEntries", () => {
+    it("names every piece and every composer in every language", () => {
+        const known = {
+            pieces: { abc: { title: "A" }, def: { title: "D" } },
+            people: { "carl-czerny": { name: "Carl Czerny", pieces: ["abc"] } },
+        };
+        expect(edgeEntries(known, ["en", "de"])).toEqual([
+            { locale: "en", path: "/play/abc" },
+            { locale: "en", path: "/play/def" },
+            { locale: "en", path: "/person/carl-czerny" },
+            { locale: "de", path: "/play/abc" },
+            { locale: "de", path: "/play/def" },
+            { locale: "de", path: "/person/carl-czerny" },
+        ]);
+    });
+
+    it("folds into the prerendered pages as one cluster per path", () => {
+        // A prerendered piece is also on the list; the sitemap must name it once per
+        // language, with one cluster, not twice.
+        const { children } = buildSitemaps({
+            entries: [
+                { locale: "en", path: "/play/abc" },
+                ...edgeEntries({ pieces: { abc: {} }, people: {} }, ["en", "de"]),
+            ],
+            siteUrl: SITE,
+            baseLocale: "en",
+            lastmod: LASTMOD,
+        });
+        expect(children.get("en")?.match(/<url>/g)).toHaveLength(1);
+        expect(children.get("de")?.match(/<url>/g)).toHaveLength(1);
+        expect(children.get("de")).toContain(
+            'hreflang="en" href="https://plinky.fun/en/play/abc/"',
+        );
     });
 });

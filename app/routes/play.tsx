@@ -21,6 +21,7 @@ import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { ScoreSkeleton } from "../components/ui/scoreSkeleton";
 import { TransposeProvider } from "../components/features/transposeContext";
+import { useDocumentHead } from "../hooks/useDocumentHead";
 import { useScore } from "../hooks/useScore";
 // meta() runs outside the React tree (the router calls it statically), so it
 // cannot receive injected services — the real adapter is wired here directly,
@@ -48,7 +49,13 @@ export function meta({ params }: Route.MetaArgs) {
     // indexable instead of every play page sharing a generic shell.
     const score = resolveScore(browserStore, params.scoreId);
     if (!score) {
-        return routeMeta(m.meta_play_title(), m.meta_play_description_fallback());
+        // A catalogue piece, or a generated exercise: unknown here, known once it has
+        // loaded, when the page writes its own head (useDocumentHead below). Nothing is
+        // written meanwhile, and deliberately so. The edge already served this address a
+        // document naming the piece; a placeholder title here would be hydrated over it,
+        // and a title that differs from the document's is a mismatch React answers by
+        // throwing the whole document away and rendering again from nothing.
+        return [];
     }
     // Cleaned, like the heading a reader sees. These carried the raw credit, so a piece
     // whose page read "Carl Czerny" was described to a search engine as "C. Czerny
@@ -106,6 +113,20 @@ function PlayPage({ scoreId }: { scoreId: string }) {
     // seed the controls, and the player owns them from the first frame onward, so a later
     // address change must not reach in and undo what they have since chosen.
     const [options] = useState(() => readPlayOptions((key) => searchParams.get(key)));
+    // The head, once the piece is known. meta() above writes it for a bundled piece; for
+    // the rest of the catalogue it could only write "Play", and the document kept saying
+    // so with the piece on screen — which is the title a crawler that runs the app reads.
+    useDocumentHead(
+        score ? score.title : null,
+        score
+            ? score.composer
+                ? m.meta_play_description_by({
+                      title: score.title,
+                      composer: composerCreditText(score.composer),
+                  })
+                : m.meta_play_description({ title: score.title })
+            : null,
+    );
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.
     const [transpose, setTranspose] = useState(options.transpose ?? 0);

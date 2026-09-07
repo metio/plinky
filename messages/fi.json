@@ -64,8 +64,6 @@
     "meta_music_description": "Pianonuottisi tällä laitteella — hae, tähditä ja harjoittele mitä tahansa kappaletta, ja tuo mukaan omat MusicXML-tiedostosi.",
     "meta_home_title": "Plinky — pianonharjoittelua selaimessa",
     "meta_home_description": "Harjoittele pianoa selaimessa MIDI-koskettimistolla tai tietokoneen näppäimistöllä — nuotinlukua, rytmiä, tempoa, kuuloharjoittelua ja silmukkaharjoituksia, nuottisi säilyvät laitteellasi.",
-    "meta_play_title": "Soita",
-    "meta_play_description_fallback": "Soita kappaletta MIDI-pianolla tai tietokoneen näppäimistöllä",
     "meta_play_description": "Soita \"{title}\" selaimessasi — lue nuoteista ja soita se MIDI- tai tietokoneen näppäimistöllä.",
     "meta_play_description_by": "Soita \"{title}\", säveltäjänä {composer}, selaimessasi — lue nuoteista ja soita se MIDI- tai tietokoneen näppäimistöllä.",
     "meta_daily_title": "Päivän haaste",

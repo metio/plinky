@@ -64,8 +64,6 @@
     "meta_music_description": "이 기기에 있는 당신의 피아노 악보 — 검색하고 별표를 달아가며 연습하고, 직접 만든 MusicXML도 가져와 보세요.",
     "meta_home_title": "Plinky — 브라우저에서 하는 피아노 연습",
     "meta_home_description": "MIDI 키보드나 컴퓨터 키보드로 브라우저에서 피아노를 연습해 보세요 — 초견, 리듬, 템포, 청음, 반복 연습까지. 악보는 기기에 그대로 남아요.",
-    "meta_play_title": "연주",
-    "meta_play_description_fallback": "MIDI 피아노나 컴퓨터 키보드로 한 곡을 연주해 보세요",
     "meta_play_description": "브라우저에서 \"{title}\"을(를) 연주해 보세요 — MIDI나 컴퓨터 키보드로 초견해 보세요.",
     "meta_play_description_by": "브라우저에서 {composer}의 \"{title}\"을(를) 연주해 보세요 — MIDI나 컴퓨터 키보드로 초견해 보세요.",
     "meta_daily_title": "오늘의 도전",
