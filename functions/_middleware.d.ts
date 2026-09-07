@@ -17,4 +17,5 @@ export type AssetContext = {
 
 export function onRequest(context: AssetContext): Promise<Response>;
 export function exists(context: AssetContext): Promise<boolean>;
+export function pickLocale(acceptLanguage: string | null | undefined, locales: string[]): string;
 export function forgetKnown(): void;

@@ -32,12 +32,42 @@ const GENERATED = /^(?:scale|arpeggio|chords)-/;
 // One fetch of the list per isolate, shared by every request it serves after.
 let knownPromise = null;
 
+// The language a visitor asked for, from the Accept-Language header, among those the site
+// speaks: the first listed preference whose language tag matches, region ignored, so
+// de-AT is German and zh-TW is Chinese. English when nothing matches or nothing is sent,
+// which is also what a crawler gets — and English is the site's own language, the one
+// every page names as its default alternate.
+export function pickLocale(acceptLanguage, locales) {
+    const wanted = (acceptLanguage ?? "")
+        .split(",")
+        .map((part) => {
+            const [tag, ...params] = part.trim().split(";");
+            const q = params.map((param) => param.trim()).find((param) => param.startsWith("q="));
+            return { tag: (tag ?? "").toLowerCase(), q: q ? Number(q.slice(2)) : 1 };
+        })
+        .filter((one) => one.tag !== "" && one.tag !== "*" && one.q > 0)
+        .sort((a, b) => b.q - a.q);
+    for (const { tag } of wanted) {
+        const language = tag.split("-")[0];
+        if (locales.includes(language)) {
+            return language;
+        }
+    }
+    return "en";
+}
+
 async function known(context) {
     if (knownPromise === null) {
         knownPromise = context.env.ASSETS.fetch(new URL("/known.json", context.request.url))
             .then((response) => (response.ok ? response.json() : null))
             .then((list) =>
-                list ? { pieces: new Set(list.pieces), people: new Set(list.people) } : null,
+                list
+                    ? {
+                          pieces: new Set(list.pieces),
+                          people: new Set(list.people),
+                          locales: Array.isArray(list.locales) ? list.locales : [],
+                      }
+                    : null,
             )
             .catch(() => null);
     }
@@ -66,6 +96,21 @@ export async function exists(context) {
 }
 
 export async function onRequest(context) {
+    const url = new URL(context.request.url);
+    // The bare root has no page of its own: it names the language pages, and a visitor
+    // belongs on theirs. Sent there at the edge, so a crawler follows a redirect to a real
+    // page instead of reading a shell whose only content is the script that would have
+    // sent a browser on. The answer depends on the header, so it is a 302 and says so.
+    if (url.pathname === "/") {
+        const list = await known(context);
+        if (list !== null && list.locales.length > 0) {
+            const locale = pickLocale(context.request.headers.get("accept-language"), list.locales);
+            return new Response(null, {
+                status: 302,
+                headers: { location: `${url.origin}/${locale}/`, vary: "Accept-Language" },
+            });
+        }
+    }
     const response = await context.next();
     if (response.status !== 404) {
         return response;

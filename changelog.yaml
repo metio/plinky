@@ -4,6 +4,11 @@
 - date: 2026-09-07
   entries:
     - |-
+      **plinky.fun opens in your language straight away.** The bare address used to load
+      an empty page first and only then send you to your language. It is sent on before
+      anything loads now, in the language your browser asks for, or English — which is
+      also what a search engine is shown, instead of a blank page.
+    - |-
       **One piano for the whole run.** With the recorded grand piano on, its recordings
       arrive a note at a time, and a note whose recording landed mid-piece switched from the
       built-in voice to the recording under your hands — a repeated section sounded like a

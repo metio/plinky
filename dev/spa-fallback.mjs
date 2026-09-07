@@ -39,7 +39,13 @@ export function routeRules(locales, prefixes) {
                 "catalogue page keeps its 404",
         );
     }
-    const include = locales.flatMap((locale) => prefixes.map((prefix) => `/${locale}${prefix}/*`));
+    // The bare root goes to the middleware too: it answers with a redirect to the
+    // visitor's language, so a crawler is sent to a real page rather than reading an
+    // empty shell whose only content is the script that would have redirected a browser.
+    const include = [
+        "/",
+        ...locales.flatMap((locale) => prefixes.map((prefix) => `/${locale}${prefix}/*`)),
+    ];
     if (include.length > ROUTE_RULE_LIMIT) {
         throw new Error(
             `_routes.json would need ${include.length} rules (${locales.length} languages ` +

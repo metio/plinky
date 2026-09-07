@@ -2,10 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { forgetKnown, onRequest } from "./_middleware.js";
+import { forgetKnown, onRequest, pickLocale } from "./_middleware.js";
 
 // The known-address list the build writes beside the site, as the asset binding serves it.
-const KNOWN = { pieces: ["47xd2XDpYFCy", "aZSWdZeRKnuA"], people: ["frederic-chopin"] };
+const KNOWN = {
+    pieces: ["47xd2XDpYFCy", "aZSWdZeRKnuA"],
+    people: ["frederic-chopin"],
+    locales: ["en", "de", "zh", "pt"],
+};
 
 // The asset server's answer for the request, which is all the middleware ever sees, over
 // an asset binding that holds the known list (or, when `listStatus` says so, does not).
@@ -15,9 +19,10 @@ function served(
     body: string | null,
     headers: Record<string, string> = {},
     listStatus = 200,
+    requestHeaders: Record<string, string> = {},
 ) {
     return {
-        request: new Request(`https://plinky.fun${path}`),
+        request: new Request(`https://plinky.fun${path}`, { headers: requestHeaders }),
         next: async () => new Response(body, { status, headers }),
         env: {
             ASSETS: {
@@ -108,5 +113,40 @@ describe("onRequest", () => {
 
     it("corrects a miss on any other route it is handed, as before", async () => {
         expect((await onRequest(served("/en/music/", 404, "shell"))).status).toBe(200);
+    });
+
+    it("sends the bare root to the visitor's language, and to English otherwise", async () => {
+        const german = await onRequest(
+            served("/", 200, "root shell", {}, 200, { "accept-language": "de-AT,de;q=0.9,en;q=0.8" }),
+        );
+        expect(german.status).toBe(302);
+        expect(german.headers.get("location")).toBe("https://plinky.fun/de/");
+        expect(german.headers.get("vary")).toBe("Accept-Language");
+        const crawler = await onRequest(served("/", 200, "root shell"));
+        expect(crawler.headers.get("location")).toBe("https://plinky.fun/en/");
+    });
+
+    it("serves the root's own document when the list cannot be read", async () => {
+        const response = await onRequest(served("/", 200, "root shell", {}, 500));
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe("root shell");
+    });
+});
+
+describe("pickLocale", () => {
+    const LOCALES = ["en", "de", "zh", "pt"];
+    it("takes the first preference the site speaks, region ignored", () => {
+        expect(pickLocale("fr-CH,fr;q=0.9,de;q=0.8", LOCALES)).toBe("de");
+        expect(pickLocale("zh-TW", LOCALES)).toBe("zh");
+        expect(pickLocale("pt-BR,en;q=0.5", LOCALES)).toBe("pt");
+    });
+    it("orders by weight rather than by position", () => {
+        expect(pickLocale("en;q=0.3,de;q=0.9", LOCALES)).toBe("de");
+    });
+    it("falls back to English", () => {
+        expect(pickLocale("fr,it", LOCALES)).toBe("en");
+        expect(pickLocale("*", LOCALES)).toBe("en");
+        expect(pickLocale(null, LOCALES)).toBe("en");
+        expect(pickLocale("", LOCALES)).toBe("en");
     });
 });

@@ -34,7 +34,7 @@ function bundledPieces(): { id: string; composer: string }[] {
         });
 }
 
-export type KnownIds = { pieces: string[]; people: string[] };
+export type KnownIds = { pieces: string[]; people: string[]; locales: string[] };
 
 export function knownIds(): KnownIds {
     const songs = JSON.parse(readFileSync("public/songs/manifest.json", "utf8")) as {
@@ -60,7 +60,11 @@ export function knownIds(): KnownIds {
             }
         }
     }
-    return { pieces: [...pieces].sort(), people: [...people].sort() };
+    // The languages the site speaks, for the middleware to send a visitor to theirs.
+    const { locales } = JSON.parse(readFileSync("project.inlang/settings.json", "utf8")) as {
+        locales: string[];
+    };
+    return { pieces: [...pieces].sort(), people: [...people].sort(), locales };
 }
 
 export function writeKnownIds(out = OUT): KnownIds {
@@ -71,6 +75,8 @@ export function writeKnownIds(out = OUT): KnownIds {
 }
 
 if (process.argv[1]?.endsWith("gen-known-ids.mts")) {
-    const { pieces, people } = writeKnownIds();
-    console.log(`known.json: ${pieces.length} pieces, ${people.length} people.`);
+    const { pieces, people, locales } = writeKnownIds();
+    console.log(
+        `known.json: ${pieces.length} pieces, ${people.length} people, ${locales.length} languages.`,
+    );
 }

@@ -13,7 +13,8 @@ const LOCALES: string[] = JSON.parse(readFileSync("project.inlang/settings.json"
 describe("routeRules", () => {
     it("covers every dynamic route in every language", () => {
         const { include } = routeRules(LOCALES, ["/play", "/person"]);
-        expect(include).toHaveLength(LOCALES.length * 2);
+        expect(include).toHaveLength(LOCALES.length * 2 + 1);
+        expect(include).toContain("/");
         for (const locale of LOCALES) {
             expect(include).toContain(`/${locale}/play/*`);
             expect(include).toContain(`/${locale}/person/*`);
@@ -47,7 +48,11 @@ describe("routeRules", () => {
         // The middleware turns 404 into 200 wherever it runs, so where it runs is the
         // whole safety argument: a missing image must stay missing.
         const { include } = routeRules(LOCALES, dynamicPrefixes());
-        expect(include.every((rule) => /^\/[a-z-]+\/(play|person)\/\*$/.test(rule))).toBe(true);
+        // Only the bare root, which the middleware redirects, and the localised pages
+        // that render from data.
+        expect(
+            include.every((rule) => rule === "/" || /^\/[a-z-]+\/(play|person)\/\*$/.test(rule)),
+        ).toBe(true);
         expect(include).not.toContain("/*");
     });
 });
