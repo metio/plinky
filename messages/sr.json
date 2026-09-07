@@ -1395,5 +1395,9 @@
     "reduction_blocked": "Лева рука као акорди",
     "glossary_hear_keys": "Послушај на диркама",
     "theory_index_label": "Лекције",
-    "glossary_learn_more": "Научи на чему се то заснива"
+    "glossary_learn_more": "Научи на чему се то заснива",
+    "offline_title": "Још није на овом уређају",
+    "offline_body": "Ова страница овде још није отворена са везом, па без мреже нема шта да се прикаже. Све што си већ отворио и даље ради.",
+    "offline_retry": "Покушај поново",
+    "offline_home": "Назад на Plinky"
 }

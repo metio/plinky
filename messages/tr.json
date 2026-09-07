@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Sol el akor olarak",
     "glossary_hear_keys": "Tuşlarda dinle",
     "theory_index_label": "Dersler",
-    "glossary_learn_more": "Neye dayandığını öğren"
+    "glossary_learn_more": "Neye dayandığını öğren",
+    "offline_title": "Henüz bu cihazda yok",
+    "offline_body": "Bu sayfa burada bağlantıyla hiç açılmadı, bu yüzden bağlantı olmadan gösterilecek bir şey yok. Daha önce açtığın her şey çalışmaya devam ediyor.",
+    "offline_retry": "Tekrar dene",
+    "offline_home": "Plinky’ye dön"
 }

@@ -1391,5 +1391,9 @@
     "reduction_blocked": "左手を和音で",
     "glossary_hear_keys": "鍵盤で聴く",
     "theory_index_label": "レッスン",
-    "glossary_learn_more": "この土台を学ぶ"
+    "glossary_learn_more": "この土台を学ぶ",
+    "offline_title": "このデバイスにはまだありません",
+    "offline_body": "このページはオンライン時にここで開かれたことがないため、接続なしでは表示できるものがありません。すでに開いたものは引き続き使えます。",
+    "offline_retry": "もう一度試す",
+    "offline_home": "Plinky に戻る"
 }

@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Left hand as chords",
     "glossary_hear_keys": "Hear it on the keys",
     "theory_index_label": "Lessons",
-    "glossary_learn_more": "Learn what this builds on"
+    "glossary_learn_more": "Learn what this builds on",
+    "offline_title": "Not on this device yet",
+    "offline_body": "This page hasn’t been opened here while online, so there’s nothing to show without a connection. Everything you’ve already opened still works.",
+    "offline_retry": "Try again",
+    "offline_home": "Back to Plinky"
 }

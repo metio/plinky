@@ -19,6 +19,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { OFFLINE_MESSAGES } from "./stamp-sw.mjs";
 
 const settings = JSON.parse(readFileSync("./project.inlang/settings.json", "utf8"));
 const { baseLocale, locales } = settings;
@@ -67,7 +68,9 @@ const problems = [];
 // output would count every key by definition, so it is skipped). Tests count as
 // references: they read the same catalogue through the same accessor.
 function referencedKeys() {
-    const referenced = new Set();
+    // The offline page reads the catalogue too, through the stamp rather than the
+    // accessor: its copy is written into a static document at build time.
+    const referenced = new Set(Object.values(OFFLINE_MESSAGES));
     const accessor = /\bm\.([a-z0-9_]+)/g;
     const stack = ["app"];
     while (stack.length > 0) {

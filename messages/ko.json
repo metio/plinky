@@ -1391,5 +1391,9 @@
     "reduction_blocked": "왼손을 화음으로",
     "glossary_hear_keys": "건반으로 듣기",
     "theory_index_label": "레슨",
-    "glossary_learn_more": "바탕이 되는 내용 배우기"
+    "glossary_learn_more": "바탕이 되는 내용 배우기",
+    "offline_title": "아직 이 기기에 없어요",
+    "offline_body": "이 페이지는 온라인 상태에서 여기서 열린 적이 없어서, 연결 없이는 보여줄 내용이 없어요. 이미 열어 본 것들은 계속 쓸 수 있어요.",
+    "offline_retry": "다시 시도",
+    "offline_home": "Plinky로 돌아가기"
 }

@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Bal kéz akkordokként",
     "glossary_hear_keys": "Meghallgatás a billentyűkön",
     "theory_index_label": "Leckék",
-    "glossary_learn_more": "Tanuld meg, mire épül"
+    "glossary_learn_more": "Tanuld meg, mire épül",
+    "offline_title": "Még nincs ezen az eszközön",
+    "offline_body": "Ezt az oldalt itt még nem nyitottad meg kapcsolattal, így kapcsolat nélkül nincs mit mutatni. Minden, amit már megnyitottál, továbbra is működik.",
+    "offline_retry": "Próbáld újra",
+    "offline_home": "Vissza a Plinkyhez"
 }

@@ -1395,5 +1395,9 @@
     "reduction_blocked": "Mâna stângă în acorduri",
     "glossary_hear_keys": "Ascultă la clape",
     "theory_index_label": "Lecții",
-    "glossary_learn_more": "Învață pe ce se bazează"
+    "glossary_learn_more": "Învață pe ce se bazează",
+    "offline_title": "Încă nu e pe acest dispozitiv",
+    "offline_body": "Această pagină nu a fost deschisă aici cu conexiune, așa că fără rețea nu e nimic de afișat. Tot ce ai deschis deja funcționează în continuare.",
+    "offline_retry": "Încearcă din nou",
+    "offline_home": "Înapoi la Plinky"
 }

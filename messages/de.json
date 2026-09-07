@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Linke Hand als Akkorde",
     "glossary_hear_keys": "Auf den Tasten hören",
     "theory_index_label": "Lektionen",
-    "glossary_learn_more": "Lerne die Grundlage dazu"
+    "glossary_learn_more": "Lerne die Grundlage dazu",
+    "offline_title": "Noch nicht auf diesem Gerät",
+    "offline_body": "Diese Seite wurde hier noch nie mit Verbindung geöffnet, darum gibt es ohne Netz nichts zu zeigen. Alles, was du schon geöffnet hast, funktioniert weiter.",
+    "offline_retry": "Noch einmal versuchen",
+    "offline_home": "Zurück zu Plinky"
 }

@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 7 September 2026
+
+**Offline, a page you haven't opened says so.** Every page and piece you have
+opened keeps working without a connection. A page you had never opened on that
+device used to reload itself over and over and show nothing; now it says the page
+isn't on this device yet, and offers to try again or head back.
+
 ## 6 September 2026
 
 **A chord set no longer offers contrary motion.** On a chord set the *Contrary*

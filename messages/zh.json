@@ -1391,5 +1391,9 @@
     "reduction_blocked": "左手改弹和弦",
     "glossary_hear_keys": "在琴键上听",
     "theory_index_label": "课程",
-    "glossary_learn_more": "学习它的基础"
+    "glossary_learn_more": "学习它的基础",
+    "offline_title": "此设备上还没有这个页面",
+    "offline_body": "这个页面从未在联网时打开过，所以离线时没有内容可显示。你已经打开过的内容仍然可以使用。",
+    "offline_retry": "再试一次",
+    "offline_home": "返回 Plinky"
 }

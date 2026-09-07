@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Dora e majtë si akorde",
     "glossary_hear_keys": "Dëgjoje në tastet",
     "theory_index_label": "Mësimet",
-    "glossary_learn_more": "Mëso mbi çfarë mbështetet"
+    "glossary_learn_more": "Mëso mbi çfarë mbështetet",
+    "offline_title": "Ende nuk është në këtë pajisje",
+    "offline_body": "Kjo faqe nuk është hapur kurrë këtu me lidhje, kështu që pa rrjet s’ka çfarë të shfaqet. Gjithçka që ke hapur tashmë vazhdon të punojë.",
+    "offline_retry": "Provo përsëri",
+    "offline_home": "Kthehu te Plinky"
 }

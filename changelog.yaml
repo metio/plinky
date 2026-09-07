@@ -1,6 +1,13 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-09-07
+  entries:
+    - |-
+      **Offline, a page you haven't opened says so.** Every page and piece you have
+      opened keeps working without a connection. A page you had never opened on that
+      device used to reload itself over and over and show nothing; now it says the page
+      isn't on this device yet, and offers to try again or head back.
 - date: 2026-09-06
   entries:
     - |-

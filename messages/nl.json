@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Linkerhand als akkoorden",
     "glossary_hear_keys": "Op de toetsen horen",
     "theory_index_label": "Lessen",
-    "glossary_learn_more": "Leer waar dit op steunt"
+    "glossary_learn_more": "Leer waar dit op steunt",
+    "offline_title": "Nog niet op dit apparaat",
+    "offline_body": "Deze pagina is hier nog nooit met verbinding geopend, dus zonder verbinding valt er niets te tonen. Alles wat je al eerder hebt geopend werkt gewoon.",
+    "offline_retry": "Opnieuw proberen",
+    "offline_home": "Terug naar Plinky"
 }

@@ -21,6 +21,11 @@ const CACHE = "plinky-__BUILD_HASH__";
 // The generic shell for routes that were not prerendered to their own document.
 const SPA_FALLBACK = "/__spa-fallback.html";
 
+// What a page never opened on this device gets when there is no network. A static
+// document with its copy stamped in for every language (dev/stamp-sw.mjs), so it needs
+// no chunk of its own to render.
+const OFFLINE_PAGE = "/offline.html";
+
 // The hashed shell chunks the prerendered documents load, stamped in at build time
 // (dev/stamp-sw.mjs) as newline-joined URLs. Precaching them at install means a new build's
 // cache holds what its HTML references, so the app still boots offline after a background
@@ -35,7 +40,9 @@ self.addEventListener("install", (event) => {
         caches
             .open(CACHE)
             .then((cache) =>
-                Promise.allSettled(["/", SPA_FALLBACK, ...PRECACHE].map((url) => cache.add(url))),
+                Promise.allSettled(
+                    ["/", SPA_FALLBACK, OFFLINE_PAGE, ...PRECACHE].map((url) => cache.add(url)),
+                ),
             ),
     );
     // Deliberately no skipWaiting() here: a new build parks in "waiting" instead of
@@ -65,6 +72,25 @@ self.addEventListener("activate", (event) => {
     );
 });
 
+// Where a route's code last failed to arrive. React Router answers a route module that
+// will not load by reloading the page, unconditionally, and a reload with no network gets
+// the same cached shell, the same missing module and the same reload: a loop that never
+// paints and never ends. The worker sees both halves of it, the module fetch that failed
+// and the navigation that follows from the same page, so remembering the one lets it
+// answer the other with the offline page instead of the shell. Scoped to the page that
+// missed and to the seconds a reload takes, so a tab on a page it does hold is unaffected.
+let missing = { url: "", at: 0 };
+const RELOAD_WINDOW_MS = 10_000;
+
+async function noteMissingModule(event) {
+    const client = event.clientId ? await self.clients.get(event.clientId) : null;
+    missing = { url: client?.url ?? "", at: Date.now() };
+}
+
+function reloadingAfterMiss(request) {
+    return missing.url !== "" && missing.url === request.url && Date.now() - missing.at < RELOAD_WINDOW_MS;
+}
+
 function isImmutable(url) {
     // Hashed build chunks carry a content hash; song files (.mxl) are named by their
     // content CID. Neither can change at a given URL, so a cached copy never stales.
@@ -92,6 +118,12 @@ self.addEventListener("fetch", (event) => {
                     }
                     return response;
                 } catch {
+                    if (reloadingAfterMiss(request)) {
+                        const offline = await cache.match(OFFLINE_PAGE);
+                        if (offline) {
+                            return offline;
+                        }
+                    }
                     return (
                         (await cache.match(request)) ??
                         (await cache.match(SPA_FALLBACK)) ??
@@ -111,7 +143,15 @@ self.addEventListener("fetch", (event) => {
                 if (cached) {
                     return cached;
                 }
-                const response = await fetch(request);
+                let response;
+                try {
+                    response = await fetch(request);
+                } catch (error) {
+                    if (url.pathname.endsWith(".js")) {
+                        await noteMissingModule(event);
+                    }
+                    throw error;
+                }
                 if (response.ok) {
                     const cache = await caches.open(CACHE);
                     cache.put(request, response.clone());

@@ -1397,5 +1397,9 @@
     "reduction_blocked": "Lewa ręka jako akordy",
     "glossary_hear_keys": "Posłuchaj na klawiszach",
     "theory_index_label": "Lekcje",
-    "glossary_learn_more": "Poznaj podstawy tego"
+    "glossary_learn_more": "Poznaj podstawy tego",
+    "offline_title": "Jeszcze nie ma tego na tym urządzeniu",
+    "offline_body": "Ta strona nie została tu jeszcze otwarta z połączeniem, więc bez sieci nie ma czego pokazać. Wszystko, co już otworzyłeś, nadal działa.",
+    "offline_retry": "Spróbuj ponownie",
+    "offline_home": "Wróć do Plinky"
 }

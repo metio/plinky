@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Venstre hånd som akkorder",
     "glossary_hear_keys": "Hør det på tangenterne",
     "theory_index_label": "Lektioner",
-    "glossary_learn_more": "Lær hvad det bygger på"
+    "glossary_learn_more": "Lær hvad det bygger på",
+    "offline_title": "Ikke på denne enhed endnu",
+    "offline_body": "Denne side er aldrig blevet åbnet her med forbindelse, så uden net er der ikke noget at vise. Alt, du allerede har åbnet, virker stadig.",
+    "offline_retry": "Prøv igen",
+    "offline_home": "Tilbage til Plinky"
 }

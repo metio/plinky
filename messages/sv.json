@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Vänsterhand som ackord",
     "glossary_hear_keys": "Hör det på tangenterna",
     "theory_index_label": "Lektioner",
-    "glossary_learn_more": "Lär dig vad detta bygger på"
+    "glossary_learn_more": "Lär dig vad detta bygger på",
+    "offline_title": "Inte på den här enheten än",
+    "offline_body": "Den här sidan har aldrig öppnats här med uppkoppling, så utan nät finns inget att visa. Allt du redan har öppnat fungerar fortfarande.",
+    "offline_retry": "Försök igen",
+    "offline_home": "Tillbaka till Plinky"
 }

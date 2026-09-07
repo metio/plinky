@@ -1393,5 +1393,9 @@
     "reduction_blocked": "Vasen käsi sointuina",
     "glossary_hear_keys": "Kuuntele koskettimilla",
     "theory_index_label": "Oppitunnit",
-    "glossary_learn_more": "Opi, mihin tämä nojaa"
+    "glossary_learn_more": "Opi, mihin tämä nojaa",
+    "offline_title": "Ei vielä tällä laitteella",
+    "offline_body": "Tätä sivua ei ole avattu täällä yhteyden kanssa, joten ilman yhteyttä ei ole mitään näytettävää. Kaikki, minkä olet jo avannut, toimii edelleen.",
+    "offline_retry": "Yritä uudelleen",
+    "offline_home": "Takaisin Plinkyyn"
 }

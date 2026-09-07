@@ -1395,5 +1395,9 @@
     "reduction_blocked": "Mão esquerda em acordes",
     "glossary_hear_keys": "Ouvir nas teclas",
     "theory_index_label": "Lições",
-    "glossary_learn_more": "Aprende em que assenta"
+    "glossary_learn_more": "Aprende em que assenta",
+    "offline_title": "Ainda não está neste dispositivo",
+    "offline_body": "Esta página nunca foi aberta aqui com ligação, por isso sem rede não há nada para mostrar. Tudo o que já abriste continua a funcionar.",
+    "offline_retry": "Tentar de novo",
+    "offline_home": "Voltar ao Plinky"
 }

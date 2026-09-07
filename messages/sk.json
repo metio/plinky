@@ -1397,5 +1397,9 @@
     "reduction_blocked": "Ľavá ruka ako akordy",
     "glossary_hear_keys": "Vypočuť na klávesoch",
     "theory_index_label": "Lekcie",
-    "glossary_learn_more": "Nauč sa, na čom to stojí"
+    "glossary_learn_more": "Nauč sa, na čom to stojí",
+    "offline_title": "Na tomto zariadení zatiaľ nie je",
+    "offline_body": "Táto stránka tu ešte nebola otvorená s pripojením, takže bez siete nie je čo zobraziť. Všetko, čo si už otvoril, funguje ďalej.",
+    "offline_retry": "Skúsiť znova",
+    "offline_home": "Späť na Plinky"
 }
