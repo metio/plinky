@@ -609,7 +609,7 @@ function scheduleExtra(
     // Velocity is not how hard the key came UP, and a knock is the same sound however hard
     // the note was struck — so the lookup asks at a middling force and takes whatever
     // recording covers the key.
-    const sample = samples?.().source?.extraFor(note, 90, kind) ?? null;
+    const sample = currentSource()?.extraFor(note, 90, kind) ?? null;
     if (!sample || level <= 0) {
         return;
     }
@@ -727,13 +727,29 @@ export function audioContext(): BaseAudioContext | null {
 //
 // A note-on asks and takes what is there THIS INSTANT: a recording still being fetched is a
 // note the synthesised voice plays, and the difference between the two is smaller than the
-// difference between a note that sounds and one that waits.
-let samples: (() => { source: SampleLookup | null }) | null = null;
+// difference between a note that sounds and one that waits. Inside a run that trade goes
+// the other way — the same passage must sound like one piano — so a run commits to an
+// instrument when it starts (commitVoice) and the note-by-note answer applies outside one.
+let samples: (() => { source: SampleLookup | null; settled: boolean }) | null = null;
+// The instrument a run committed to: the recordings, or none for the synthesised voice.
+// Null until the first commit, which is the note-by-note answer.
+let committed: { source: SampleLookup | null } | null = null;
 
 // Hand the engine the recordings to play from. Not a hook and not a subscription: one
-// module-level wire, set once at the composition root.
-export function playFromSamples(lookup: () => { source: SampleLookup | null }): void {
+// module-level wire, set once at the composition root. `settled` says whether every
+// recording asked for has arrived, which is what a run may commit to.
+export function playFromSamples(
+    lookup: () => { source: SampleLookup | null; settled: boolean },
+): void {
     samples = lookup;
+    committed = null;
+}
+
+function currentSource(): SampleLookup | null {
+    if (committed !== null) {
+        return committed.source;
+    }
+    return samples?.().source ?? null;
 }
 
 // The recording for a note, or nothing. Exported so the offline render behind the video
@@ -745,12 +761,16 @@ export function sampleVoiceFor(pitch: number, velocity: number): SampleVoice | u
 
 function voiceFor(pitch: number, velocity: number): SampleVoice | undefined {
     return (
-        samples?.().source?.voiceFor(pitch, Math.max(1, Math.min(127, Math.round(velocity)))) ??
+        currentSource()?.voiceFor(pitch, Math.max(1, Math.min(127, Math.round(velocity)))) ??
         undefined
     );
 }
 
 export const webAudioEngine: AudioEngine = {
+    commitVoice() {
+        const now = samples?.();
+        committed = { source: now?.settled ? now.source : null };
+    },
     now() {
         return context()?.currentTime ?? null;
     },

@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 7 September 2026
 
+**One piano for the whole run.** With the recorded grand piano on, its recordings
+arrive a note at a time, and a note whose recording landed mid-piece switched from the
+built-in voice to the recording under your hands — a repeated section sounded like a
+different instrument the second time through. A run now decides its instrument when
+it starts and keeps to it; recordings that arrive during a run play from the next one.
+
 **A link to a piece that isn't there says so.** An address for a piece or a
 composer the catalogue does not have — an old link from before the catalogue's
 pieces were renamed, say — used to load an empty page that claimed to be fine.

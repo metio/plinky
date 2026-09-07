@@ -91,7 +91,8 @@ async function loadSamples(base: string, notes: { pitch: number; velocity: numbe
             // between the fetch and the file.
             context: async () => new OfflineAudioContext(2, 1, 48_000),
         });
-        playFromSamples(() => ({ source: sampleLookup(samples) }));
+        // The render waits for every recording before it starts, so the pack is settled.
+        playFromSamples(() => ({ source: sampleLookup(samples), settled: true }));
         shared = { base, samples };
     }
     // Only the regions this piece needs that are not already decoded; prepare skips what

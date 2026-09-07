@@ -48,7 +48,7 @@ const engineWith = async (
     vi.stubGlobal("AudioContext", FakeContext);
     vi.resetModules();
     const engine = await import("./webAudioEngine");
-    engine.playFromSamples(() => ({ source: source as never }));
+    engine.playFromSamples(() => ({ source: source as never, settled: true }));
     engine.webAudioEngine.resume();
     return engine.webAudioEngine;
 };

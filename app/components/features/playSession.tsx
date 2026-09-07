@@ -1016,6 +1016,7 @@ function usePlaySessionValue({
         if (onStage) {
             hidden.conceal();
         }
+        synth.commitVoice();
         listenPlayback.start(from, at);
     };
 
@@ -1029,6 +1030,7 @@ function usePlaySessionValue({
         if (score.painted()) {
             score.wipePaint();
         }
+        synth.commitVoice();
         listenPlayback.start(0);
     };
 
@@ -1068,6 +1070,7 @@ function usePlaySessionValue({
             score.wipePaint();
         }
         const accompany = duet && activeHand !== "both";
+        synth.commitVoice();
         keepUp.start({ hand: activeHand, guideNotes, accompany });
     };
 
@@ -1077,6 +1080,7 @@ function usePlaySessionValue({
     // self-paced matcher stops so the replay owns the cursor.
     const replayTake = (take: Take) => {
         matcher.stop();
+        synth.commitVoice();
         listenPlayback.replay(take);
     };
 
@@ -1151,6 +1155,8 @@ function usePlaySessionValue({
             }
             // With the section loop on, Practice drills the selected bars on repeat, the
             // same range Listen laps, instead of running the whole piece once.
+            // One piano for the whole run, whatever arrives while it plays.
+            synth.commitVoice();
             matcher.start(
                 from,
                 loop.on ? { from: loop.from, to: loop.to } : null,

@@ -4,6 +4,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { MidiProvider } from "../contexts/midi";
 import { ServicesProvider } from "../contexts/services";
@@ -32,11 +33,12 @@ function storeGhost(onsetsMs: number[]) {
 async function mountAndStart() {
     vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
     const input = fakeMidiInput();
+    const audio = fakeAudioEngine();
     const props = { params: { scoreId: STUDY } } as unknown as Route.ComponentProps;
     render(
         <MemoryRouter>
             <ServicesProvider
-                services={{ midi: fakeMidi({ permission: "granted", inputs: [input] }) }}
+                services={{ midi: fakeMidi({ permission: "granted", inputs: [input] }), audio }}
             >
                 <MidiProvider>
                     <Play {...props} />
@@ -49,6 +51,9 @@ async function mountAndStart() {
         .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000 })
         .toBe(false);
     fireEvent.click(practice);
+    // A run decides its instrument as it starts, so a recording arriving mid-run cannot
+    // change the piano under the player's hands.
+    await waitFor(() => expect(audio.committed).toBeGreaterThanOrEqual(1));
     return input;
 }
 

@@ -151,7 +151,9 @@ function defaultSamples(overrides: Partial<AppServices>): SampleSource {
     });
     // The engine asks this at every note-on. Handing it over here rather than importing it
     // there keeps the engine's one job — making a sound — free of where recordings live.
-    playFromSamples(() => ({ source: sampleLookup(source) }));
+    // Settled once no fetch is in flight: everything the piece asked for has arrived, or
+    // failed and will not. What a run may commit to.
+    playFromSamples(() => ({ source: sampleLookup(source), settled: !source.state().loading }));
     return source;
 }
 

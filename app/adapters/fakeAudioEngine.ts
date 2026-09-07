@@ -19,6 +19,8 @@ export type FakeAudioEngine = AudioEngine & {
     pedals: Array<{ pedal: PedalKind; down: boolean }>;
     clicks: Array<{ time: number; kind: ClickKind; gain: number }>;
     resumed: number;
+    // How many runs committed to an instrument.
+    committed: number;
     // Stands in for a context the browser has suspended — before the first gesture, or
     // across an interruption.
     asleep: boolean;
@@ -39,6 +41,7 @@ export function fakeAudioEngine(): FakeAudioEngine {
         pedals: [],
         clicks: [],
         resumed: 0,
+        committed: 0,
         asleep: false,
         unlocked: 0,
         silenced: 0,
@@ -87,6 +90,9 @@ export function fakeAudioEngine(): FakeAudioEngine {
         },
         setRoom(wet) {
             engine.room = wet;
+        },
+        commitVoice() {
+            engine.committed += 1;
         },
     };
     return engine;

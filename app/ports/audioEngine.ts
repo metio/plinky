@@ -83,6 +83,13 @@ export interface AudioEngine {
     // where the volume preference is folded into each strike's `gain` instead: there is one
     // room, and every voice already in it is in the same one.
     setRoom(wet: number): void;
+    // Decide the instrument for the performance that starts now — the recordings, if every
+    // one the piece asked for has arrived, else the synthesised voice — and keep to it until
+    // the next decision. Without this a recording that lands mid-piece changes the sound
+    // under the player's hands, and a repeated section sounds like a different piano the
+    // second time through. Called at the start of a run; between runs the engine answers
+    // note by note with whatever is there.
+    commitVoice(): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted. Returns
     // a cancel that silences the click if it has not sounded yet: a track queued whole on
     // the audio clock — a count-in and a run — can then be taken off it again when the

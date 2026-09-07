@@ -49,6 +49,8 @@ export type UseSynthResult = {
     // Silence every live voice and drop all held/pedal state — the panic a play surface
     // calls on teardown so a guide voice can never ring on past the run.
     silenceAll: () => void;
+    // The instrument for the run that starts now; see AudioEngine.commitVoice.
+    commitVoice: () => void;
 };
 
 // Decides what a note should sound like — loudness from velocity and the volume
@@ -148,8 +150,9 @@ export function useSynth(): UseSynthResult {
 
     // A stable result so callers can list the synth in an effect's dependencies without the
     // effect re-firing every render.
+    const commitVoice = useCallback(() => audio.commitVoice(), [audio]);
     return useMemo(
-        () => ({ playNote, pressNote, releaseNote, setPedal, silenceAll }),
-        [playNote, pressNote, releaseNote, setPedal, silenceAll],
+        () => ({ playNote, pressNote, releaseNote, setPedal, silenceAll, commitVoice }),
+        [playNote, pressNote, releaseNote, setPedal, silenceAll, commitVoice],
     );
 }
