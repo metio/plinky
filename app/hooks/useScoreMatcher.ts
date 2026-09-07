@@ -308,6 +308,18 @@ export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): 
     return collectMatchSteps(osmd, hand).map((step) => step.pitches);
 }
 
+// Whether the visual cursor stands somewhere other than the step's own position: past the
+// end, in another bar, or at another printed onset. An ordinal is not read here, since
+// measuring it walks the cursor; the bar and the onset are enough to notice a drift.
+function cursorAstray(osmd: OpenSheetMusicDisplay, step: MatchStep): boolean {
+    const iterator = osmd.cursor.iterator;
+    return (
+        iterator.EndReached ||
+        iterator.CurrentMeasureIndex !== step.bar ||
+        Math.abs((iterator.currentTimeStamp?.RealValue ?? 0) - step.whole) > WHOLE_EPSILON
+    );
+}
+
 // Step the visual cursor to the next playable position for the hand — rests, and
 // the stretches where only the other hand sounds, are skipped exactly the way the
 // step collector skipped them.
@@ -674,6 +686,14 @@ export function useScoreMatcher(
                 }
                 if (event.kind !== "cleared") {
                     continue;
+                }
+                // The surface paints the cleared position under the cursor, so the cursor
+                // has to be on it. It is walked in step with the run, but anything that
+                // walks the score in between — a relayout's prefetch, a collection — leaves
+                // it at the top; a cursor found away from the step's own position is put
+                // there first, or the colour lands on whatever note the cursor drifted to.
+                if (cursorAstray(osmd, event.step)) {
+                    seekToOrdinal(osmd.cursor, event.step.position);
                 }
                 optionsRef.current.onCorrect?.({
                     pitches: event.playedPitches,
