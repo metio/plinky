@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 7 September 2026
 
+**Listen's highlight stays on the note that is sounding.** Opening the play surface
+full screen while Listen played sent its cursor back to the top, so from then on the
+highlight sat one note behind the music and, at every repeat, the section's last note
+stayed blue on the second pass. The highlight now follows the music wherever the
+cursor has been put, and the blue trail is laid before a repeat wipes the section.
+
 **Chords the way pieces use them.** A chord set now has three more dials on its
 page. *Sevenths* stacks one more third on every chord of the key, so the four-note
 chords a piece is built on get the same practice as the triads. *Open* spreads each

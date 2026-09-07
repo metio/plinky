@@ -6,6 +6,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
+import { litHalos } from "../lib/scoreColor";
 import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
 
 // The painting reaches into OSMD's rendered SVG, which only exists in a real
@@ -13,7 +14,7 @@ import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
 // jsdom. highlightCursorNotes returns one painted part so a step counts as painted.
 vi.mock("../lib/scoreColor", () => ({
     highlightCursorNotes: () => [{ element: {}, prior: null }],
-    litHalos: () => {},
+    litHalos: vi.fn(),
 }));
 
 // One voice at a position: a MIDI pitch on a staff (0 = right, 1 = left) with a
@@ -206,6 +207,42 @@ describe("useKeepUp", () => {
 
         expect(markPainted).toHaveBeenCalled();
         result.current.stop();
+    });
+
+    it("settles the section's last beat before a repeat wipes the section", () => {
+        // On the tick that sends the run back, the beat just closed is the section's
+        // last. Its verdict normally waits on the late-strike timer; landing after the
+        // rewind's uncolouring it would leave that one note coloured on every pass, so
+        // the rewind settles it first.
+        const osmd = fakeOsmd(
+            [[{ midi: 60, staff: 0 }], [{ midi: 62, staff: 0 }], [{ midi: 60, staff: 0 }]],
+            [0, 0.25, 0],
+        );
+        const onRewind = vi.fn();
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote: () => {} },
+                tempo: () => 240,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                markPainted: () => {},
+                onFinish: () => {},
+                onRewind,
+            }),
+        );
+        act(() => result.current.start({ hand: "both", guideNotes: false, accompany: false }));
+        // Count-in, the first beat, the second; the third tick is the rewind.
+        act(() => vi.advanceTimersByTime(300));
+        act(() => vi.advanceTimersByTime(250));
+        vi.mocked(litHalos).mockClear();
+        act(() => vi.advanceTimersByTime(250));
+        expect(onRewind).toHaveBeenCalledTimes(1);
+        const rewoundAt = onRewind.mock.invocationCallOrder[0]!;
+        const verdicts = vi.mocked(litHalos).mock.invocationCallOrder;
+        expect(verdicts.length).toBeGreaterThan(0);
+        expect(verdicts.every((at) => at < rewoundAt)).toBe(true);
+        act(() => result.current.stop());
     });
 
     it("surfaces the open beat's pitches for the keyboard, and clears them on stop", () => {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useRef } from "react";
+import { withCursorKept } from "../lib/scoreCursor";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import type { ScoreMarks } from "../../core/musicxmlMarks";
 import { performanceOf } from "../../core/scorePerformance";
@@ -59,6 +60,12 @@ export function useSamplePrefetch({
         // plays from, so what is fetched is what will sound. Which recordings that means is
         // the source's question: it holds the manifest, and waiting for one here is what
         // made this never run at all.
-        void samples.prepare(performanceOf(collectMatchSteps(osmd, "both", marksRef.current)));
+        // Read with the cursor put back afterwards: this runs when a render finishes,
+        // which a relayout mid-Listen also is, and a walk that left the cursor at the top
+        // would have the transport highlight one note behind the music from then on.
+        const steps = withCursorKept(osmd.cursor, () =>
+            collectMatchSteps(osmd, "both", marksRef.current),
+        );
+        void samples.prepare(performanceOf(steps));
     }, [getOsmd, samples]);
 }

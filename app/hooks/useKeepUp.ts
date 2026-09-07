@@ -321,6 +321,11 @@ export function useKeepUp({
                 // trail stops saying how far this pass has got.
                 const previous = steps[step - 1];
                 if (previous !== undefined && jumpsBack(previous, current)) {
+                    // The beat just closed is the section's last, and its verdict would
+                    // otherwise land after the uncolouring, on its late-strike timer, and
+                    // leave that one note coloured every pass. Its verdict is settled from
+                    // what has arrived, so the rewind clears a finished trail.
+                    settle();
                     onRewind?.({ from: current.whole, to: previous.whole });
                 }
                 onPosition?.(current.whole);

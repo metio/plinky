@@ -10,6 +10,7 @@ import {
     seekToOrdinal,
     seekToWhole,
     stepLengths,
+    withCursorKept,
 } from "./scoreCursor";
 
 // A stub cursor over a fixed list of positions, each a (bar, whole-note onset)
@@ -110,5 +111,26 @@ describe("seeking by cursor position", () => {
     it("reads a reset cursor as position 0 and a run-off cursor as the count", () => {
         expect(cursorOrdinal(stubCursor(repeated))).toBe(0);
         expect(cursorOrdinal(stubCursor(repeated, 5))).toBe(5);
+    });
+
+    it("puts the cursor back where it stood after a walk that leaves it reset", () => {
+        const cursor = stubCursor(positions, 3);
+        const seen = withCursorKept(cursor, () => {
+            cursor.reset();
+            while (!cursor.iterator.EndReached) {
+                cursor.next();
+            }
+            cursor.reset();
+            return "walked";
+        });
+        expect(seen).toBe("walked");
+        expect(cursorWhole(cursor)).toBe(0.75);
+        expect(cursorOrdinal(cursor)).toBe(3);
+    });
+
+    it("leaves a cursor that had run off the end off the end", () => {
+        const cursor = stubCursor(positions, positions.length);
+        withCursorKept(cursor, () => cursor.reset());
+        expect(cursor.iterator.EndReached).toBe(true);
     });
 });

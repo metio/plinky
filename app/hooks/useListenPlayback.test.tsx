@@ -11,6 +11,7 @@ import type { Take } from "../../core/takes";
 import { listenPerformanceOf } from "../../core/listenPerformance";
 import { seekToOrdinal } from "../lib/scoreCursor";
 import { collectListenSteps } from "../lib/listenSteps";
+import { trailNotes } from "../lib/scoreColor";
 import { useListenPlayback } from "./useListenPlayback";
 
 // The colour helpers walk real OSMD graphics; stub them so the fake score
@@ -870,6 +871,37 @@ describe("Listen over a written repeat", () => {
         // Named by the span it sends the music back over, so only those bars are wiped.
         const [span] = onRewind.mock.calls[0] as [{ from: number; to: number }];
         expect(span.from).toBeLessThan(span.to);
+    });
+
+    it("lays the trail on the note it leaves before the rewind wipes the section", () => {
+        // The tick that sends playback back leaves the section's last note. Its trail
+        // must be laid first and wiped with the rest; laid afterwards, that one note
+        // would stay blue on every pass.
+        const onRewind = vi.fn();
+        const osmd = fakeOsmd(5, {}, undefined, REPEATED_ONSETS);
+        const { result } = renderHook(() =>
+            useListenPlayback({
+                getOsmd: () => osmd,
+                synth: { playNote },
+                tempo: () => 120,
+                loop: () => loopState,
+                onLap,
+                onRewind,
+                centerCursor: () => {},
+                markPainted: () => {},
+                isPracticing: () => false,
+            }),
+        );
+        act(() => result.current.start(0));
+        act(() => void vi.advanceTimersByTime(500));
+        act(() => void vi.advanceTimersByTime(500));
+        expect(onRewind).toHaveBeenCalledTimes(1);
+        const rewoundAt = onRewind.mock.invocationCallOrder[0]!;
+        const trails = vi.mocked(trailNotes).mock.invocationCallOrder;
+        // The trail for the second step (the section's last) is the last trail laid
+        // before the rewind, and none is laid between the rewind and the next tick.
+        expect(trails.some((at) => at < rewoundAt)).toBe(true);
+        expect(trails.filter((at) => at > rewoundAt)).toHaveLength(0);
     });
 
     it("stays quiet on a score that never repeats", () => {

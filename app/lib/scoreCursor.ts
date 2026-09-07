@@ -78,6 +78,26 @@ export function cursorOrdinal(cursor: CursorLike): number {
     return total - ahead;
 }
 
+// Runs a walk that leaves the cursor reset — every collector does — and puts the cursor
+// back where it stood. A walk taken while a transport is driving the cursor otherwise
+// drops it to the top: Listen highlighted one note behind the music for a whole piece,
+// and left the last note of every repeated section blue, because the sample prefetch
+// walked the score once the full-screen relayout had finished. The position is measured
+// as an ordinal, the one place that names a pass through a repeat.
+export function withCursorKept<T>(cursor: CursorLike, walk: () => T): T {
+    const ended = cursor.iterator.EndReached;
+    const standing = cursorOrdinal(cursor);
+    try {
+        return walk();
+    } finally {
+        if (ended) {
+            seekToOrdinal(cursor, Number.MAX_SAFE_INTEGER);
+        } else {
+            seekToOrdinal(cursor, standing);
+        }
+    }
+}
+
 // The notated lengths under the cursor as quarter-note counts — what a playback
 // step dwells on. Rests count too, so a written gap keeps its own length.
 export function stepLengths(notes: Iterable<{ Length: { RealValue: number } }>): number[] {

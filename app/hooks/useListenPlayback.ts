@@ -225,6 +225,13 @@ export function useListenPlayback({
                 return;
             }
             const current = steps[step]!;
+            // The note just heard joins the blue trail — the cursor box alone is easy to
+            // lose, and the trail records which stretches the computer played once it
+            // moves on. Laid BEFORE the rewind below looks at the trail: on the tick that
+            // sends playback back, the note being left is the repeated section's last, and
+            // a trail laid after the uncolouring would leave that one note blue every pass.
+            trailNotes(highlightRef.current, LISTENED_COLOR);
+            markPainted();
             // A step printed EARLIER than the one before it means the repeat barline has
             // sent playback back. The bars ahead are still blue from the first pass, so the
             // trail stops saying where the music has reached at the exact moment the score
@@ -239,11 +246,18 @@ export function useListenPlayback({
                     ? NOTHING_SOUNDING
                     : new Map(current.notes.map((note) => [note.pitch, note.hand])),
             );
-            // Light the notes now sounding so the eye can follow the music, leaving a
-            // blue trail on the ones just heard — the cursor box alone is easy to lose,
-            // and the trail records which stretches the computer played once it moves on.
-            trailNotes(highlightRef.current, LISTENED_COLOR);
-            markPainted();
+            // Light the notes now sounding so the eye can follow the music. The cursor is
+            // walked in step with the clock, but anything that walks the score between
+            // ticks leaves it at the top; a cursor found somewhere other than this step's
+            // own position is put there first, so the highlight and the trail stay on the
+            // notes that are sounding.
+            if (
+                cursor.iterator.EndReached ||
+                cursor.iterator.CurrentMeasureIndex !== current.measureIndex ||
+                Math.abs((cursor.iterator.currentTimeStamp?.RealValue ?? 0) - current.whole) > 1e-6
+            ) {
+                seekToOrdinal(cursor, current.position);
+            }
             highlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
             // How each note sounds: its written length and touch at this position's tempo,
             // less what the texture, the line and the soft pedal take off it, and — with

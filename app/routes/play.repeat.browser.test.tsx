@@ -52,6 +52,38 @@ async function mountAndStart() {
     return input;
 }
 
+describe("Listen over a repeated opening", () => {
+    it("wipes the section's last note along with the rest when the repeat sends it back", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const input = fakeMidiInput();
+        const props = { params: { scoreId: STUDY } } as unknown as Route.ComponentProps;
+        render(
+            <MemoryRouter>
+                <ServicesProvider
+                    services={{ midi: fakeMidi({ permission: "granted", inputs: [input] }) }}
+                >
+                    <MidiProvider>
+                        <Play {...props} />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
+        await expect
+            .poll(() => (listen as HTMLButtonElement).disabled, { timeout: 30000 })
+            .toBe(false);
+        fireEvent.click(listen);
+        // Three whole-note bars at the study's tempo lay three blue halos and one
+        // highlight, then the repeat sends playback back...
+        await waitFor(() => expect(halos()).toBeGreaterThanOrEqual(3), { timeout: 20000 });
+        // ...and on that tick every halo inside the section goes, the last note's
+        // included; only the highlight on the note now sounding remains.
+        await waitFor(() => expect(halos()).toBeLessThanOrEqual(1), { timeout: 20000 });
+        // The same control stops what it started.
+        fireEvent.click(listen);
+    });
+});
+
 describe("Play over a repeated opening", () => {
     it("keeps the bars uncoloured when the ghost leaves them after the repeat", async () => {
         // The ghost is a little behind the player: it leaves the third bar only after the
