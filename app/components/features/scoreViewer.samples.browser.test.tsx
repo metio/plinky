@@ -85,9 +85,16 @@ describe("a piece opening with the recorded piano on", () => {
         await expect.poll(() => samples.prepared.length, { timeout: 30000 }).toBeGreaterThan(0);
         const asked = samples.prepared.flat();
         // The notes the score writes, not a guess about the register: E4, G4 and the C3
-        // underneath, each with the velocity the performance gives it.
-        expect(asked.map((note) => note.pitch).sort((a, b) => a - b)).toEqual([48, 64, 67]);
+        // underneath — each at every force a performance of the piece gives it, since the
+        // human touch shades a note by its place and a recording is one force of one key.
+        const pitches = [...new Set(asked.map((note) => note.pitch))].sort((a, b) => a - b);
+        expect(pitches).toEqual([48, 64, 67]);
         expect(asked.every((note) => note.velocity > 0)).toBe(true);
+        // The C3 under the tune is shaded softer than the tune, so it is asked for at
+        // more than one force.
+        expect(
+            new Set(asked.filter((note) => note.pitch === 48).map((n) => n.velocity)).size,
+        ).toBeGreaterThan(1);
     });
 
     // Its own timeout, longer than the poll inside it. A poll may not outlast the test

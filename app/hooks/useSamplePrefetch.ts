@@ -80,10 +80,18 @@ export function useSamplePrefetch({
         // recording that is not here, and a note the synthesised voice covers for. With
         // and without the touch, since the setting can change between here and the run.
         const startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
-        void samples.prepare([
+        // A key at a force names one recording however many performances ask for it.
+        const asked = new Map<string, { pitch: number; velocity: number }>();
+        for (const note of [
             ...performanceOf(written),
             ...listenPerformanceOf(listened, { startBpm, shaped: true }),
             ...listenPerformanceOf(listened, { startBpm, shaped: false }),
-        ]);
+        ]) {
+            asked.set(`${note.pitch}@${note.velocity}`, {
+                pitch: note.pitch,
+                velocity: note.velocity,
+            });
+        }
+        void samples.prepare([...asked.values()]);
     }, [getOsmd, samples]);
 }
