@@ -154,7 +154,14 @@ export const ci = {
         collect: {
             staticDistDir: "./build/client",
             url: [...staticPaths().map(url), url(PLAY_SAMPLE)],
-            numberOfRuns: 1,
+            // Two runs of each page, asserted on the better of them. Layout shift and the
+            // performance score are measured, not computed: a font arriving a frame late or
+            // a busy runner moves them, and one run that happened to shift a tenth of the
+            // viewport failed a branch that had not touched the page. A number a page
+            // reaches on either of two runs is what the page is capable of; a number it
+            // fails on both is a regression. Twenty-two pages twice fits well inside the
+            // job's twenty-minute cancel.
+            numberOfRuns: 2,
             settings: {
                 preset: "desktop",
                 onlyCategories: ["performance", "best-practices", "seo"],
