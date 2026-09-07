@@ -520,7 +520,20 @@ const BUDGET_VENDOR_KB = 324;
 // 428. Left hand as chords: the block-chord rewrite is one more reduction the score viewer
 // applies before engraving, and the piece's chord panel in run set-up carries its own copy
 // across every locale. Two kilobytes in the score viewer. Measured at 426.7.
-const BUDGET_APP_KB = 428;
+//
+// The figure above is what main last weighed, and the ledger goes on recording every raise
+// of it. What fails the build is no longer the figure itself but the figure plus a margin:
+// a feature's worth of copy in twenty-six languages is a kilobyte or two, and a ratchet set
+// a kilobyte above the last measurement tripped on five branches in two days, each costing
+// a CI round-trip and a commit that raised it by the same kilobyte. Sixteen kilobytes is
+// past anything a feature has ever added here and below the smallest thing worth stopping:
+// a dependency landing in the app chunk, or the encoders leaking out of their on-demand
+// chunk, weigh more than that. Growth inside the margin prints its delta and passes; the
+// recorded figure moves, with a paragraph here, when a change crosses the margin — which is
+// still a decision, made every dozen features rather than every one.
+const APP_RECORDED_KB = 428;
+const APP_HEADROOM_KB = 16;
+const BUDGET_APP_KB = APP_RECORDED_KB + APP_HEADROOM_KB;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
@@ -586,9 +599,11 @@ console.log("Largest client chunks (gzipped):");
 for (const chunk of chunks.slice(0, 8)) {
     console.log(`  ${kb(chunk.gz).padStart(7)} KB  ${chunk.name}`);
 }
+const drift = app / 1024 - APP_RECORDED_KB;
 console.log(
     `Total ${kb(total)} KB · vendor/OSMD ${kb(vendor)} KB · on-demand ${kb(onDemand)} KB · ` +
-        `app ${kb(app)} KB (budgets: app ${BUDGET_APP_KB}, vendor ${BUDGET_VENDOR_KB})`,
+        `app ${kb(app)} KB (recorded ${APP_RECORDED_KB}, ${drift >= 0 ? "+" : ""}${drift.toFixed(1)} ` +
+        `of ${APP_HEADROOM_KB} KB headroom; vendor budget ${BUDGET_VENDOR_KB})`,
 );
 
 const problems = [];
@@ -596,7 +611,10 @@ if (vendor / 1024 > BUDGET_VENDOR_KB) {
     problems.push(`vendor ${kb(vendor)} KB exceeds the ${BUDGET_VENDOR_KB} KB budget`);
 }
 if (app / 1024 > BUDGET_APP_KB) {
-    problems.push(`app ${kb(app)} KB exceeds the ${BUDGET_APP_KB} KB budget`);
+    problems.push(
+        `app ${kb(app)} KB is more than ${APP_HEADROOM_KB} KB over the recorded ${APP_RECORDED_KB} KB — ` +
+            "record the new figure in dev/check-bundle-size.mjs with a paragraph saying what it bought",
+    );
 }
 if (problems.length > 0) {
     console.error(

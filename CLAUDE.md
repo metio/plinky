@@ -281,7 +281,11 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   unlisted page is simply never audited while both gates still pass. What is *not*
   derived, because it cannot be read off the source: which pages arrive carrying the
   notation machinery (measure it — a wrong guess fails loudly in `lighthouserc.js`), and
-  the bundle-size ratchet, which exists to make a human decide.
+  the bundle-size gate, which fails only when the app grows more than sixteen
+  kilobytes past the figure main last recorded — a margin a feature's copy never
+  reaches and a stray dependency always does — and asks for the figure to be
+  re-recorded, with its reason, when it does. Lighthouse's per-page script limits
+  carry the same margin.
 - **Colour is a token, never a hue.** `app/app.css` names every colour for its
   role — `muted`, `line`, `accent-solid`, `danger-surface`, plus the domain ones
   (`paper`, `ghost`, `hand-left`, `band-*`) — and each resolves to a light value

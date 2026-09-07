@@ -110,7 +110,14 @@ const named = [...new Set([...notation, ...noindex])];
 // 663,552 — over by 457 bytes, the touch model and Keep up's beat windows. Both raised
 // deliberately, in step with the app bundle's own ratchet (dev/check-bundle-size.mjs),
 // which weighed the same change at four kilobytes gzipped over a hundred and thirty commits.
-const SCRIPT_LIGHT = 270336;
+// The two figures below are what main last measured, and each is asserted with sixteen
+// kibibytes of headroom — the same rule as the app bundle's own gate
+// (dev/check-bundle-size.mjs): a feature's copy in Greek is a kilobyte, and a limit set
+// right at the last measurement failed one branch after another for it. The figure moves,
+// with a paragraph here, when a page grows past the margin.
+const HEADROOM = 16 * 1024;
+const SCRIPT_LIGHT_RECORDED = 270336;
+const SCRIPT_LIGHT = SCRIPT_LIGHT_RECORDED + HEADROOM;
 //
 // 652 KiB → 658 KiB: the chords program. Chord names on the page, the left hand as chords
 // and the piece's chord panel all ride into the play page — the harmony reader, the
@@ -118,7 +125,8 @@ const SCRIPT_LIGHT = 270336;
 // two switches with their copy in Greek. Measured 670,194 against 667,648 with the left
 // hand as chords, and the progression transfer above it weighs one kilobyte more in the
 // app bundle; the app ratchet moved 422 → 428 for the same commits.
-const SCRIPT_NOTATION = 673792;
+const SCRIPT_NOTATION_RECORDED = 673792;
+const SCRIPT_NOTATION = SCRIPT_NOTATION_RECORDED + HEADROOM;
 
 const common = {
     "categories:best-practices": ["error", { minScore: 0.9 }],
