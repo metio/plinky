@@ -1,0 +1,24 @@
+{
+    "$comment": "Pages that once existed and where a reader holding their address is sent now. `from` is the old path in canonical (unprefixed) form; a trailing /* carries whatever followed it onto the new path — and must not share its head with a page that still exists, since the rule would catch that page's own address too (the old per-exercise rhythm trainer is left out for that reason). Read by dev/gen-redirects.mjs at deploy.",
+    "routes": [
+        { "from": "/you", "to": "/stats" },
+        { "from": "/progress", "to": "/stats" },
+        { "from": "/grades", "to": "/learn" },
+        { "from": "/tracks", "to": "/learn" },
+        { "from": "/path", "to": "/learn" },
+        { "from": "/curriculums", "to": "/learn" },
+        { "from": "/methods", "to": "/learn" },
+        { "from": "/board", "to": "/daily" },
+        { "from": "/sprint", "to": "/daily" },
+        { "from": "/library/import", "to": "/music" },
+        { "from": "/library", "to": "/music" },
+        { "from": "/import", "to": "/music" },
+        { "from": "/scores", "to": "/music" },
+        { "from": "/songs", "to": "/music" },
+        { "from": "/fingering", "to": "/music" },
+        { "from": "/loop/*", "to": "/play/*" },
+        { "from": "/practice/*", "to": "/play/*" },
+        { "from": "/tempo/*", "to": "/play/*" },
+        { "from": "/time-trial/*", "to": "/play/*" }
+    ]
+}

@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 7 September 2026
 
+**Old links land where the page went.** A link to a page that has since moved —
+the old You page, the Library, the separate trainers — or a link from before Plinky
+spoke twenty-six languages, with no language in its address, used to answer with
+"not found" until the app had loaded and sent you on. It is sent on straight away
+now, so a bookmark or a search result still opens the right page.
+
 **Listen's highlight stays on the note that is sounding.** Opening the play surface
 full screen while Listen played sent its cursor back to the top, so from then on the
 highlight sat one note behind the music and, at every repeat, the section's last note

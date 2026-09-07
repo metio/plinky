@@ -28,8 +28,9 @@ on:
     # dev/pages.mjs, which react-router.config.ts imports to decide WHICH PAGES EXIST;
     # project.inlang/settings.json, the locale list the matrix below is built from, so a new
     # language would have deployed nothing; flake.nix and flake.lock, the toolchain
-    # everything is built with; and dev/merge-locale-artifacts.mjs, dev/stamp-sw.mjs and
-    # dev/gen-sitemap.mjs, which the deploy job runs over the output it uploads.
+    # everything is built with; and dev/merge-locale-artifacts.mjs, dev/stamp-sw.mjs,
+    # dev/gen-sitemap.mjs, dev/spa-fallback.mjs and dev/gen-redirects.mjs, which the deploy
+    # job runs over the output it uploads.
     #
     # The cost is the build matrix running for a commit that changes only prose. That is
     # cheap, it is CI's own hardware, and it buys back the one thing worth having here:
@@ -124,6 +125,11 @@ jobs:
         # middleware corrects its status — Pages would otherwise serve a real page with
         # a 404. See dev/spa-fallback.mjs.
         run: nix develop --command node dev/spa-fallback.mjs
+      - name: Add redirects
+        # Every address the site used to answer at — a retired page, a link with no
+        # language in it — sent on with a 301, so a crawler follows it rather than
+        # recording a 404. See dev/gen-redirects.mjs.
+        run: nix develop --command node dev/gen-redirects.mjs
       - name: Deploy Website
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

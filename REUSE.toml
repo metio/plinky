@@ -83,6 +83,7 @@ path = [
     "dev/catalog-people-distinct.json",
     "dev/grade-anchors.json",
     "dev/builtin-assignments.json",
+    "dev/retired-routes.json",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
