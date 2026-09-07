@@ -52,11 +52,12 @@ describe("buildSitemaps", () => {
         }
     });
 
-    it("stamps lastmod on every index entry as well as every URL", () => {
+    it("dates the index entries and leaves the pages undated", () => {
+        // The build knows when it ran, not when a page's content changed; a page date
+        // that moved with every deploy taught the crawler to ignore the field.
         const { index, children } = build();
-
         expect([...index.matchAll(/<lastmod>2026-08-07<\/lastmod>/g)]).toHaveLength(3);
-        expect(children.get("en")).toContain(`<lastmod>${LASTMOD}</lastmod>`);
+        expect(children.get("en")).not.toContain("<lastmod>");
     });
 
     it("declares both namespaces the hreflang alternates need", () => {

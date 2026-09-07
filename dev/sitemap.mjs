@@ -85,7 +85,7 @@ export function buildSitemaps({
             byLocale
                 .get(locale)
                 .push(
-                    `  <url>\n    <loc>${escapeXml(pageUrl(siteUrl, locale, path))}</loc>\n    <lastmod>${escapeXml(lastmod)}</lastmod>\n${cluster}\n  </url>\n`,
+                    `  <url>\n    <loc>${escapeXml(pageUrl(siteUrl, locale, path))}</loc>\n${cluster}\n  </url>\n`,
                 );
         }
     }
@@ -110,8 +110,11 @@ export function buildSitemaps({
         children.set(locale, child);
     }
 
-    // The index carries each child's <lastmod> as well, so a crawler can tell which
-    // locales moved without fetching all 26 children to find out.
+    // A page carries no <lastmod>. The only date the build knows is its own, and stamping
+    // that on ten thousand pages several times a day says every page changed every time,
+    // which a crawler soon learns to disbelieve — and a date it disbelieves is worse than
+    // none, since it stops reading the field where it might have been true. The index
+    // entries keep theirs: "this language's sitemap was regenerated today" is exactly so.
     const body = [...children.keys()]
         .map(
             (locale) =>

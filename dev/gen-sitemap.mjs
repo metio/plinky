@@ -31,9 +31,9 @@ const baseLocale = settings.baseLocale;
 // Single source of truth for the origin: read it from site.ts rather than duplicate.
 const SITE_URL = readFileSync("core/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)[1];
 
-// The build date, stamped on every URL as <lastmod>. A deploy ships the latest commit
-// as one build, so the whole tree shares this date — an honest "last generated" signal
-// for crawl scheduling in the W3C date form the sitemap spec accepts.
+// The build date, stamped on each child sitemap's index entry as <lastmod>: the day the
+// sitemap itself was regenerated, in the W3C date form the spec accepts. Not on the pages
+// — the build cannot say when a page's content changed, only when it was built.
 const LASTMOD = new Date().toISOString().slice(0, 10);
 
 // Collect the directory of every prerendered index.html (the bare-root redirect
