@@ -31,7 +31,13 @@ import { resolveScore } from "../lib/catalog";
 import { warmEngraver } from "../lib/warmEngraver";
 import { parseExerciseId } from "../../core/exerciseGen";
 
-import { breadcrumbData, musicCompositionData, routeMeta } from "../../core/site";
+import {
+    breadcrumbData,
+    imageMeta,
+    musicCompositionData,
+    pieceImage,
+    routeMeta,
+} from "../../core/site";
 
 // Reaching this module means a piece is being opened, and a piece always needs engraving.
 // Starting the fetch here overlaps it with the rest of the page's startup instead of
@@ -42,6 +48,14 @@ import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
 import { useSearchParams } from "react-router";
 import { readPlayOptions } from "../../core/playOptions";
+
+// Which pieces have a card of their own, for the layout to stand its site-wide card
+// down: every piece the catalogue holds. A generated exercise is built from its id and
+// has none, so its link shows the site's.
+export const handle = {
+    cardFor: (params: { scoreId?: string }) =>
+        params.scoreId !== undefined && !parseExerciseId(params.scoreId),
+};
 
 export function meta({ params }: Route.MetaArgs) {
     // Bundled scores resolve at prerender (no localStorage), so each one gets its
@@ -79,6 +93,7 @@ export function meta({ params }: Route.MetaArgs) {
     ];
     return [
         ...routeMeta(score.title, description),
+        ...imageMeta(pieceImage(score.id), score.title),
         { "script:ld+json": musicCompositionData(score.title, credit, locale) },
         { "script:ld+json": breadcrumbData(locale, trail) },
     ];
@@ -126,6 +141,9 @@ function PlayPage({ scoreId }: { scoreId: string }) {
                   })
                 : m.meta_play_description({ title: score.title })
             : null,
+        // A card is painted for every piece the catalogue holds; a generated exercise is
+        // built from its id and has none, so its link shows the site's own.
+        score && !parseExerciseId(score.id) ? pieceImage(score.id) : null,
     );
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.

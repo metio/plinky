@@ -18,7 +18,11 @@ import { pageTitle } from "../../core/site";
 // tags meta() produced, and a second <title> beside the first is two titles, not one.
 // A tag the head lacks — a page reached by navigating, where no document was served
 // for it — is written fresh; one the document brought is filled in.
-export function useDocumentHead(headline: string | null, description: string | null) {
+export function useDocumentHead(
+    headline: string | null,
+    description: string | null,
+    image: string | null = null,
+) {
     useEffect(() => {
         if (headline === null) {
             return;
@@ -30,6 +34,10 @@ export function useDocumentHead(headline: string | null, description: string | n
             ["property", "og:description", description],
             ["name", "twitter:title", headline],
             ["name", "twitter:description", description],
+            ["property", "og:image", image],
+            ["property", "og:image:alt", image === null ? null : headline],
+            ["name", "twitter:image", image],
+            ["name", "twitter:image:alt", image === null ? null : headline],
         ] as const) {
             if (content === null) {
                 continue;
@@ -46,5 +54,5 @@ export function useDocumentHead(headline: string | null, description: string | n
                 tag.setAttribute("content", content);
             }
         }
-    }, [headline, description]);
+    }, [headline, description, image]);
 }

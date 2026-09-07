@@ -65,6 +65,8 @@ const SHELL =
     '<meta property="og:url" content="https://plinky.fun/"/><meta property="og:locale" content="en_US"/>' +
     '<meta property="og:locale:alternate" content="de_DE"/>' +
     '<meta property="og:image" content="https://plinky.fun/og.png"/>' +
+    '<meta property="og:image:alt" content="Plinky — piano practice in your browser"/>' +
+    '<meta name="twitter:image" content="https://plinky.fun/og.png"/>' +
     '<meta name="twitter:image:alt" content="Plinky — piano practice in your browser"/>' +
     '<link rel="icon" href="/favicon.ico" sizes="32x32"/></head><body><div id="root"></div></body></html>';
 
@@ -258,6 +260,15 @@ describe("documentFor", () => {
         // The other languages as card alternates, this one not among them.
         expect(html).toContain('<meta property="og:locale:alternate" content="en_US"/>');
         expect(html).not.toContain('<meta property="og:locale:alternate" content="de_DE"/>');
+    });
+
+    it("shows a piece's own card, and the site's for a composer", () => {
+        expect(html).toContain('<meta property="og:image" content="https://plinky.fun/og/47xd2XDpYFCy.png"/>');
+        expect(html).toContain('<meta property="og:image:alt" content="Ode to Joy"/>');
+        expect(html).toContain('<meta name="twitter:image" content="https://plinky.fun/og/47xd2XDpYFCy.png"/>');
+        expect(html).not.toContain("https://plinky.fun/og.png");
+        const person = documentFor(SHELL, KNOWN, { locale: "en", kind: "person", id: "frederic-chopin" }) ?? "";
+        expect(person).toContain('<meta property="og:image" content="https://plinky.fun/og.png"/>');
     });
 
     it("writes the route's tags where the app writes them, in the app's order", () => {

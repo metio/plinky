@@ -307,7 +307,29 @@ export function documentFor(shell, list, page) {
         `<script type="application/ld+json">${json(described.data)}</script>`,
         `<script type="application/ld+json">${json(crumbs)}</script>`,
     ].join("");
-    const addressed = shellFor(shell, list, locale, described.path);
+    // A piece's card, painted per piece at build (dev/gen-og.mts): the shell carries the
+    // site's, and a link to a piece should show the piece. A composer has no card yet.
+    const withCard =
+        page.kind === "play"
+            ? shell
+                  .replace(
+                      /<meta property="og:image" content="[^"]*"\/?>/,
+                      `<meta property="og:image" content="${escapeHtml(`${origin}/og/${encodeURIComponent(page.id)}.png`)}"/>`,
+                  )
+                  .replace(
+                      /<meta property="og:image:alt" content="[^"]*"\/?>/,
+                      `<meta property="og:image:alt" content="${escapeHtml(described.headline)}"/>`,
+                  )
+                  .replace(
+                      /<meta name="twitter:image" content="[^"]*"\/?>/,
+                      `<meta name="twitter:image" content="${escapeHtml(`${origin}/og/${encodeURIComponent(page.id)}.png`)}"/>`,
+                  )
+                  .replace(
+                      /<meta name="twitter:image:alt" content="[^"]*"\/?>/,
+                      `<meta name="twitter:image:alt" content="${escapeHtml(described.headline)}"/>`,
+                  )
+            : shell;
+    const addressed = shellFor(withCard, list, locale, described.path);
     if (!ROUTE_TAGS_AFTER.test(addressed)) {
         // A shell shaped differently from the one this was written against: the tags
         // would land somewhere the app does not look, and be written twice. Better a

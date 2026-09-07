@@ -2,7 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "react-router";
+import {
+    Links,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    useLocation,
+    useMatches,
+} from "react-router";
 
 import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/ui/localizedLink";
@@ -212,6 +220,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const { pathname } = useLocation();
     const locale = getLocale();
     const pageUrl = `${SITE_URL}${pathname}`;
+    // Whether the page has a card of its own — a piece's, painted per piece, which the
+    // route names through its handle (a route's meta is not visible here). The site's
+    // card is written only where none is: two og:image tags is a coin toss over which one
+    // a shared link shows.
+    const ownImage = useMatches().some((match) => {
+        const handle = match.handle as
+            | { cardFor?: (params: Record<string, string | undefined>) => boolean }
+            | undefined;
+        return handle?.cardFor?.(match.params) === true;
+    });
     const canonical = new URL(`${SITE_URL}${deLocalizeHref(pathname)}`);
     const hasNavigator = typeof navigator !== "undefined";
     const iosLike = hasNavigator && isIosLike(navigator.userAgent, navigator.maxTouchPoints ?? 0);
@@ -262,15 +280,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             content={ogLocale(alternate)}
                         />
                     ))}
-                <meta property="og:image" content={`${SITE_URL}/og.png`} />
-                <meta property="og:image:width" content="1200" />
-                <meta property="og:image:height" content="630" />
-                {/* The card is the same site-wide brand image on every page, so its
-                    alt is the brand line — already translated for every locale. */}
-                <meta property="og:image:alt" content={m.meta_home_title()} />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:image" content={`${SITE_URL}/og.png`} />
-                <meta name="twitter:image:alt" content={m.meta_home_title()} />
+                {!ownImage && (
+                    <>
+                        <meta property="og:image" content={`${SITE_URL}/og.png`} />
+                        <meta property="og:image:width" content="1200" />
+                        <meta property="og:image:height" content="630" />
+                        {/* The card is the site-wide brand image, so its alt is the
+                            brand line — already translated for every locale. */}
+                        <meta property="og:image:alt" content={m.meta_home_title()} />
+                        <meta name="twitter:image" content={`${SITE_URL}/og.png`} />
+                        <meta name="twitter:image:alt" content={m.meta_home_title()} />
+                    </>
+                )}
                 <Meta />
                 <Links />
                 {/* Cloudflare Web Analytics: page views and Core Web Vitals, measured

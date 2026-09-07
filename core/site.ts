@@ -47,6 +47,25 @@ export function routeMeta(headline: string, description: string) {
         ...socialMeta(headline, description),
     ];
 }
+// The card a piece's link unfurls as, painted per piece at build (dev/gen-og.mts).
+export function pieceImage(id: string): string {
+    return `${SITE_URL}/og/${encodeURIComponent(id)}.png`;
+}
+
+// The card tags for a page with a picture of its own. The layout writes the site's card
+// for every page and stands down where a route writes these — two og:image tags is a
+// coin toss over which one a link shows.
+export function imageMeta(url: string, alt: string) {
+    return [
+        { property: "og:image", content: url },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: alt },
+        { name: "twitter:image", content: url },
+        { name: "twitter:image:alt", content: alt },
+    ];
+}
+
 // Keeps a page out of search results while still letting crawlers follow its
 // links (noindex, follow) — for pages that must stay reachable but have no place
 // in the index: the legal notices, and personal/utility surfaces. Append it to a

@@ -73,6 +73,11 @@ jobs:
         run: nix develop --command npm run build:client
         env:
           PLINKY_ROOT_ONLY: "1"
+      - name: Paint piece cards
+        # One card per catalogue piece, the picture its link unfurls as. Painted here,
+        # once, rather than in every language's build: the card is language-neutral.
+        # See dev/gen-og.mts.
+        run: nix develop --command npm run og
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: site-root
@@ -130,6 +135,11 @@ jobs:
         # language in it — sent on with a 301, so a crawler follows it rather than
         # recording a 404. See dev/gen-redirects.mjs.
         run: nix develop --command node dev/gen-redirects.mjs
+      - name: Count the upload
+        # Cloudflare Pages refuses a deployment past twenty thousand files, and the pages
+        # in every language plus a card per piece are most of the way there. See
+        # dev/check-deploy-files.mjs.
+        run: nix develop --command node dev/check-deploy-files.mjs
       - name: Deploy Website
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

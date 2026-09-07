@@ -64,6 +64,9 @@ jobs:
         # The same 301s production carries for retired and unlocalised addresses, so a
         # preview answers old links the way the live site will. See dev/gen-redirects.mjs.
         run: nix develop --command node dev/gen-redirects.mjs
+      - name: Count the upload
+        # The same cap production is checked against. See dev/check-deploy-files.mjs.
+        run: nix develop --command node dev/check-deploy-files.mjs
       - name: Derive a preview slug from the branch
         id: slug
         # A branch ref isn't a valid DNS label (slashes, case, length), so normalise it:

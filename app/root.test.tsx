@@ -77,6 +77,35 @@ describe("Layout", () => {
         expect(document.documentElement.classList.contains("dark")).toBe(true);
     });
 
+    it("writes the site's card only where the page brought none of its own", () => {
+        const images = () => [
+            ...document.head.querySelectorAll('meta[property="og:image"]'),
+            ...document.body.querySelectorAll('meta[property="og:image"]'),
+        ];
+        renderLayout();
+        expect(images().map((tag) => tag.getAttribute("content"))).toEqual([
+            "https://plinky.fun/og.png",
+        ]);
+        cleanup();
+        document.head.replaceChildren();
+        const Stub = createRoutesStub([
+            {
+                path: "/",
+                handle: { cardFor: () => true },
+                meta: () => [{ property: "og:image", content: "https://plinky.fun/og/x.png" }],
+                Component: () => (
+                    <Layout>
+                        <div data-testid="page" />
+                    </Layout>
+                ),
+            },
+        ]);
+        render(<Stub />);
+        expect(images().map((tag) => tag.getAttribute("content"))).toEqual([
+            "https://plinky.fun/og/x.png",
+        ]);
+    });
+
     it("emits one hreflang alternate per locale plus the x-default", () => {
         const { container } = renderLayout();
         // React hoists head-worthy <link> tags; count them wherever they land.
