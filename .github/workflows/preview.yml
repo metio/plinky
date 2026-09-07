@@ -60,6 +60,10 @@ jobs:
         # middleware corrects its status — Pages would otherwise serve a real page with
         # a 404. See dev/spa-fallback.mjs.
         run: nix develop --command node dev/spa-fallback.mjs
+      - name: Add redirects
+        # The same 301s production carries for retired and unlocalised addresses, so a
+        # preview answers old links the way the live site will. See dev/gen-redirects.mjs.
+        run: nix develop --command node dev/gen-redirects.mjs
       - name: Derive a preview slug from the branch
         id: slug
         # A branch ref isn't a valid DNS label (slashes, case, length), so normalise it:
