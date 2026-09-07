@@ -1399,5 +1399,8 @@
     "offline_title": "Pas encore sur cet appareil",
     "offline_body": "Cette page n’a jamais été ouverte ici avec une connexion, il n’y a donc rien à afficher hors ligne. Tout ce que tu as déjà ouvert fonctionne toujours.",
     "offline_retry": "Réessayer",
-    "offline_home": "Retour à Plinky"
+    "offline_home": "Retour à Plinky",
+    "settings_offline": "Hors ligne",
+    "keep_offline_toggle": "Garder Plinky sur cet appareil",
+    "keep_offline_hint": "Récupère toutes les pages à chaque visite, environ un mégaoctet quand une nouvelle version sort, pour qu’il ne manque rien quand tu t’exerces sans connexion. Les morceaux que tu ouvres sont gardés au fur et à mesure."
 }

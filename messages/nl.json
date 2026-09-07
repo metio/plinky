@@ -1397,5 +1397,8 @@
     "offline_title": "Nog niet op dit apparaat",
     "offline_body": "Deze pagina is hier nog nooit met verbinding geopend, dus zonder verbinding valt er niets te tonen. Alles wat je al eerder hebt geopend werkt gewoon.",
     "offline_retry": "Opnieuw proberen",
-    "offline_home": "Terug naar Plinky"
+    "offline_home": "Terug naar Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Plinky op dit apparaat bewaren",
+    "keep_offline_hint": "Haalt bij elk bezoek alle pagina’s op, ongeveer een megabyte wanneer er een nieuwe versie uitkomt, zodat er niets ontbreekt als je zonder verbinding oefent. Stukken die je opent worden gaandeweg bewaard."
 }

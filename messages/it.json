@@ -1399,5 +1399,8 @@
     "offline_title": "Non ancora su questo dispositivo",
     "offline_body": "Questa pagina non è mai stata aperta qui con una connessione, quindi senza rete non c’è nulla da mostrare. Tutto ciò che hai già aperto continua a funzionare.",
     "offline_retry": "Riprova",
-    "offline_home": "Torna a Plinky"
+    "offline_home": "Torna a Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Tieni Plinky su questo dispositivo",
+    "keep_offline_hint": "Scarica tutte le pagine a ogni visita, circa un megabyte quando esce una nuova versione, così non manca nulla quando ti eserciti senza connessione. I brani che apri vengono conservati man mano."
 }

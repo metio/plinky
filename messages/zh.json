@@ -1395,5 +1395,8 @@
     "offline_title": "此设备上还没有这个页面",
     "offline_body": "这个页面从未在联网时打开过，所以离线时没有内容可显示。你已经打开过的内容仍然可以使用。",
     "offline_retry": "再试一次",
-    "offline_home": "返回 Plinky"
+    "offline_home": "返回 Plinky",
+    "settings_offline": "离线",
+    "keep_offline_toggle": "把 Plinky 保存在此设备上",
+    "keep_offline_hint": "每次访问都会获取所有页面，新版本发布时约一兆字节，这样离线练习时什么都不缺。你打开过的乐曲会随时保存。"
 }

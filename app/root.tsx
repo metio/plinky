@@ -8,6 +8,7 @@ import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { FaultRecorder } from "./components/features/faultRecorder";
 import { StorageBanner } from "./components/features/storageBanner";
+import { KeepOffline } from "./components/features/keepOffline";
 import { UpdateBanner } from "./components/features/updateBanner";
 import { MilestoneBannerHost } from "./components/features/milestoneBanner";
 import { MilestoneProvider } from "./contexts/milestone";
@@ -17,6 +18,7 @@ import { browserStore, storageHealth } from "./adapters/browserStore";
 import { runActivity } from "./lib/activity";
 import { describeError, issueUrl, REPO_ISSUES } from "./lib/errorReport";
 import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
+import { keepOfflineAnnouncer } from "./lib/keepOffline";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
 import { applyTheme } from "./lib/theme";
@@ -100,6 +102,19 @@ export const links: Route.LinksFunction = () => [
 // composition root's wiring — it owns navigator.serviceWorker, window.location and
 // the timers, and hands components downstream only the boolean and the "apply"
 // callback.
+// Sends the keep-offline request to whichever worker is in charge. In dev there is no
+// worker, and a browser without one has nothing to keep, so both are a quiet no-op.
+const announceKeepOffline = (locale: string): void => {
+    if (
+        !import.meta.env.PROD ||
+        typeof navigator === "undefined" ||
+        !("serviceWorker" in navigator)
+    ) {
+        return;
+    }
+    void keepOfflineAnnouncer(navigator.serviceWorker)(locale);
+};
+
 function useServiceWorkerUpdate() {
     const [watcher, setWatcher] = useState<SwUpdateWatcher | null>(null);
 
@@ -289,6 +304,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         is nothing to announce. What is worth saying is the opposite: this
                         device can no longer receive updates at all. */}
                     <UpdateBanner updateBroken={updateBroken} />
+                    {/* The worker is a browser global, so the announcer is built here and
+                        handed down; the component only decides when to send. */}
+                    <KeepOffline announce={announceKeepOffline} />
                     {/* iOS is decided at this composition root and passed down, so
                         the hint component reads no browser global of its own. */}
                     <SoundHint iosLike={iosLike} inAppBrowser={inAppBrowser} />

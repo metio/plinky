@@ -1397,5 +1397,8 @@
     "offline_title": "Inte på den här enheten än",
     "offline_body": "Den här sidan har aldrig öppnats här med uppkoppling, så utan nät finns inget att visa. Allt du redan har öppnat fungerar fortfarande.",
     "offline_retry": "Försök igen",
-    "offline_home": "Tillbaka till Plinky"
+    "offline_home": "Tillbaka till Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Behåll Plinky på den här enheten",
+    "keep_offline_hint": "Hämtar alla sidor vid varje besök, ungefär en megabyte när en ny version kommer, så att inget saknas när du övar utan uppkoppling. Stycken du öppnar sparas efter hand."
 }

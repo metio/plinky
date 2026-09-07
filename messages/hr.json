@@ -1399,5 +1399,8 @@
     "offline_title": "Još nije na ovom uređaju",
     "offline_body": "Ova stranica ovdje još nije otvorena s vezom, pa bez mreže nema što prikazati. Sve što si već otvorio i dalje radi.",
     "offline_retry": "Pokušaj ponovno",
-    "offline_home": "Natrag na Plinky"
+    "offline_home": "Natrag na Plinky",
+    "settings_offline": "Izvan mreže",
+    "keep_offline_toggle": "Zadrži Plinky na ovom uređaju",
+    "keep_offline_hint": "Dohvaća sve stranice pri svakom posjetu, oko jedan megabajt kad izađe nova verzija, tako da ništa ne nedostaje kad vježbaš bez veze. Skladbe koje otvoriš čuvaju se usput."
 }

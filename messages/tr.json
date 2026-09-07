@@ -1397,5 +1397,8 @@
     "offline_title": "Henüz bu cihazda yok",
     "offline_body": "Bu sayfa burada bağlantıyla hiç açılmadı, bu yüzden bağlantı olmadan gösterilecek bir şey yok. Daha önce açtığın her şey çalışmaya devam ediyor.",
     "offline_retry": "Tekrar dene",
-    "offline_home": "Plinky’ye dön"
+    "offline_home": "Plinky’ye dön",
+    "settings_offline": "Çevrimdışı",
+    "keep_offline_toggle": "Plinky’yi bu cihazda tut",
+    "keep_offline_hint": "Her ziyarette tüm sayfaları alır; yeni bir sürüm çıktığında yaklaşık bir megabayt, böylece bağlantısız çalışırken hiçbir şey eksik olmaz. Açtığın parçalar zaten anında saklanır."
 }

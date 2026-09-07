@@ -1397,5 +1397,8 @@
     "offline_title": "Ei vielä tällä laitteella",
     "offline_body": "Tätä sivua ei ole avattu täällä yhteyden kanssa, joten ilman yhteyttä ei ole mitään näytettävää. Kaikki, minkä olet jo avannut, toimii edelleen.",
     "offline_retry": "Yritä uudelleen",
-    "offline_home": "Takaisin Plinkyyn"
+    "offline_home": "Takaisin Plinkyyn",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Pidä Plinky tällä laitteella",
+    "keep_offline_hint": "Hakee kaikki sivut jokaisella käynnillä, noin megatavun uuden version ilmestyessä, jotta mitään ei puutu, kun harjoittelet ilman yhteyttä. Avaamasi kappaleet säilyvät sitä mukaa."
 }

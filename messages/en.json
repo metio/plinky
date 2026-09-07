@@ -1397,5 +1397,8 @@
     "offline_title": "Not on this device yet",
     "offline_body": "This page hasn’t been opened here while online, so there’s nothing to show without a connection. Everything you’ve already opened still works.",
     "offline_retry": "Try again",
-    "offline_home": "Back to Plinky"
+    "offline_home": "Back to Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Keep Plinky on this device",
+    "keep_offline_hint": "Fetches every page on each visit, about a megabyte when a new version ships, so nothing is missing when you practise without a connection. Pieces you open are kept as you go."
 }

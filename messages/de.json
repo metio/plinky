@@ -1397,5 +1397,8 @@
     "offline_title": "Noch nicht auf diesem Gerät",
     "offline_body": "Diese Seite wurde hier noch nie mit Verbindung geöffnet, darum gibt es ohne Netz nichts zu zeigen. Alles, was du schon geöffnet hast, funktioniert weiter.",
     "offline_retry": "Noch einmal versuchen",
-    "offline_home": "Zurück zu Plinky"
+    "offline_home": "Zurück zu Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Plinky auf diesem Gerät behalten",
+    "keep_offline_hint": "Lädt bei jedem Besuch alle Seiten, etwa ein Megabyte, wenn eine neue Version erscheint, damit ohne Verbindung nichts fehlt. Stücke, die du öffnest, bleiben ohnehin erhalten."
 }

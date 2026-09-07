@@ -1397,5 +1397,8 @@
     "offline_title": "Ende nuk është në këtë pajisje",
     "offline_body": "Kjo faqe nuk është hapur kurrë këtu me lidhje, kështu që pa rrjet s’ka çfarë të shfaqet. Gjithçka që ke hapur tashmë vazhdon të punojë.",
     "offline_retry": "Provo përsëri",
-    "offline_home": "Kthehu te Plinky"
+    "offline_home": "Kthehu te Plinky",
+    "settings_offline": "Jashtë linje",
+    "keep_offline_toggle": "Mbaje Plinky në këtë pajisje",
+    "keep_offline_hint": "Merr të gjitha faqet në çdo vizitë, rreth një megabajt kur del një version i ri, që të mos mungojë asgjë kur ushtron pa lidhje. Pjesët që hap ruhen gjatë rrugës."
 }

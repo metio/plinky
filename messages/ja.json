@@ -1395,5 +1395,8 @@
     "offline_title": "このデバイスにはまだありません",
     "offline_body": "このページはオンライン時にここで開かれたことがないため、接続なしでは表示できるものがありません。すでに開いたものは引き続き使えます。",
     "offline_retry": "もう一度試す",
-    "offline_home": "Plinky に戻る"
+    "offline_home": "Plinky に戻る",
+    "settings_offline": "オフライン",
+    "keep_offline_toggle": "このデバイスに Plinky を保存する",
+    "keep_offline_hint": "訪問のたびにすべてのページを取得します。新しいバージョンが出たときは約 1 MB で、接続なしで練習しても足りないものがありません。開いた曲はその都度保存されます。"
 }

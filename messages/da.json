@@ -1397,5 +1397,8 @@
     "offline_title": "Ikke på denne enhed endnu",
     "offline_body": "Denne side er aldrig blevet åbnet her med forbindelse, så uden net er der ikke noget at vise. Alt, du allerede har åbnet, virker stadig.",
     "offline_retry": "Prøv igen",
-    "offline_home": "Tilbage til Plinky"
+    "offline_home": "Tilbage til Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Behold Plinky på denne enhed",
+    "keep_offline_hint": "Henter alle sider ved hvert besøg, cirka en megabyte når en ny version udkommer, så intet mangler, når du øver uden forbindelse. Stykker, du åbner, gemmes undervejs."
 }

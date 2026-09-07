@@ -5,16 +5,17 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { beforeEach, describe, expect, it } from "vitest";
 
-// The worker as shipped, run against a fake browser: a cache that is a map of URLs, a
-// network that can be cut, and the clients the worker asks about. Every strategy in
-// public/sw.js is exercised by dispatching fetch events the way the browser would, so
-// what a player gets with no network is asserted on the file the deploy ships rather
-// than on a description of it.
+// The worker as shipped, run against a fake browser: named caches that are maps of URLs,
+// a network that can be cut, and the clients the worker asks about. Every strategy in
+// public/sw.js is exercised by dispatching the events the browser would, so what a player
+// gets with no network is asserted on the file the deploy ships rather than on a
+// description of it.
 
 const ORIGIN = "https://plinky.fun";
 const SOURCE = readFileSync("public/sw.js", "utf8")
     .replace("__BUILD_HASH__", "test")
     .replace("__PRECACHE__", "/assets/entry-abc.js");
+const CACHE = "plinky-test";
 
 type Handler = (event: FetchEventLike) => void;
 type FetchEventLike = {
@@ -23,27 +24,28 @@ type FetchEventLike = {
     respondWith: (response: Promise<Response>) => void;
     waitUntil: (work: Promise<unknown>) => void;
 };
+type WaitEvent = { waitUntil: (work: Promise<unknown>) => void; data?: unknown };
 
 type World = {
     fetchEvent: (path: string, mode: "navigate" | "cors", clientId?: string) => Promise<Response>;
     install: () => Promise<void>;
-    network: { online: boolean; served: Map<string, string> };
-    cache: Map<string, Response>;
+    activate: () => Promise<void>;
+    message: (data: unknown) => Promise<void>;
+    network: { online: boolean; served: Map<string, string>; requested: string[] };
+    caches: Map<string, Map<string, Response>>;
     clients: Map<string, string>;
 };
 
 function makeWorld(): World {
-    const cache = new Map<string, Response>();
-    const network = { online: true, served: new Map<string, string>() };
+    const caches = new Map<string, Map<string, Response>>();
+    const network = { online: true, served: new Map<string, string>(), requested: [] as string[] };
     const clients = new Map<string, string>();
-    const handlers: Record<
-        string,
-        Handler | ((event: { waitUntil: (p: Promise<unknown>) => void }) => void)
-    > = {};
+    const handlers: Record<string, (event: never) => void> = {};
     const keyOf = (request: { url: string } | string) =>
         typeof request === "string" ? new URL(request, ORIGIN).href : request.url;
     const fetch = async (request: { url: string } | string) => {
         const url = keyOf(request);
+        network.requested.push(new URL(url).pathname);
         if (!network.online) {
             throw new TypeError("Failed to fetch");
         }
@@ -52,26 +54,32 @@ function makeWorld(): World {
             ? new Response("not found", { status: 404 })
             : new Response(body, { status: 200 });
     };
-    const cacheApi = {
-        async add(url: string) {
-            const response = await fetch(url);
-            if (response.ok) {
-                cache.set(keyOf(url), response);
-            }
-        },
-        async put(request: { url: string }, response: Response) {
-            cache.set(keyOf(request), response);
-        },
-        async match(request: { url: string } | string) {
-            return cache.get(keyOf(request))?.clone();
-        },
-        async keys() {
-            return [...cache.keys()].map((url) => ({ url }));
-        },
+    const open = (name: string) => {
+        if (!caches.has(name)) {
+            caches.set(name, new Map());
+        }
+        const store = caches.get(name)!;
+        return {
+            async add(url: string) {
+                const response = await fetch(url);
+                if (response.ok) {
+                    store.set(keyOf(url), response);
+                }
+            },
+            async put(request: { url: string }, response: Response) {
+                store.set(keyOf(request), response);
+            },
+            async match(request: { url: string } | string) {
+                return store.get(keyOf(request))?.clone();
+            },
+            async keys() {
+                return [...store.keys()].map((url) => ({ url }));
+            },
+        };
     };
     const self = {
         location: { origin: ORIGIN },
-        addEventListener(type: string, handler: Handler) {
+        addEventListener(type: string, handler: (event: never) => void) {
             handlers[type] = handler;
         },
         clients: {
@@ -86,16 +94,24 @@ function makeWorld(): World {
     const context = vm.createContext({
         self,
         caches: {
-            async open() {
-                return cacheApi;
+            async open(name: string) {
+                return open(name);
             },
             async keys() {
-                return ["plinky-test"];
+                return [...caches.keys()];
             },
-            async delete() {
-                return true;
+            async delete(name: string) {
+                return caches.delete(name);
             },
-            match: cacheApi.match,
+            async match(request: { url: string } | string) {
+                for (const store of caches.values()) {
+                    const held = store.get(keyOf(request));
+                    if (held) {
+                        return held.clone();
+                    }
+                }
+                return undefined;
+            },
         },
         fetch,
         Response,
@@ -103,21 +119,26 @@ function makeWorld(): World {
         Date,
         Promise,
         console,
+        encodeURIComponent,
     });
     vm.runInContext(SOURCE, context);
+    const waited = async (type: string, data?: unknown) => {
+        let pending: Promise<unknown> = Promise.resolve();
+        (handlers[type] as (event: WaitEvent) => void)({
+            data,
+            waitUntil: (work) => {
+                pending = work;
+            },
+        });
+        await pending;
+    };
     return {
         network,
-        cache,
+        caches,
         clients,
-        async install() {
-            let pending: Promise<unknown> = Promise.resolve();
-            (handlers.install as (event: { waitUntil: (p: Promise<unknown>) => void }) => void)({
-                waitUntil: (work) => {
-                    pending = work;
-                },
-            });
-            await pending;
-        },
+        install: () => waited("install"),
+        activate: () => waited("activate"),
+        message: (data) => waited("message", data),
         fetchEvent(path, mode, clientId = "") {
             let answered: Promise<Response> | null = null;
             (handlers.fetch as Handler)({
@@ -137,6 +158,7 @@ function makeWorld(): World {
 }
 
 let world: World;
+const held = (path: string) => world.caches.get(CACHE)?.has(`${ORIGIN}${path}`) ?? false;
 
 beforeEach(async () => {
     world = makeWorld();
@@ -196,8 +218,8 @@ describe("the service worker with no network", () => {
 
 describe("the service worker with a network", () => {
     it("precaches the offline page at install", () => {
-        expect(world.cache.has(`${ORIGIN}/offline.html`)).toBe(true);
-        expect(world.cache.has(`${ORIGIN}/assets/entry-abc.js`)).toBe(true);
+        expect(held("/offline.html")).toBe(true);
+        expect(held("/assets/entry-abc.js")).toBe(true);
     });
 
     it("serves a hashed asset from the cache once fetched", async () => {
@@ -205,5 +227,58 @@ describe("the service worker with a network", () => {
         await world.fetchEvent("/assets/play-123.js", "cors");
         world.network.online = false;
         expect(await (await world.fetchEvent("/assets/play-123.js", "cors")).text()).toBe("play");
+    });
+});
+
+describe("keeping a language on the device", () => {
+    beforeEach(() => {
+        world.network.served.set(
+            "/offline/de.json",
+            JSON.stringify([
+                "/assets/entry-abc.js",
+                "/assets/settings-xyz.js",
+                "/de/",
+                "/songs/index/00.json",
+            ]),
+        );
+        world.network.served.set("/assets/settings-xyz.js", "settings");
+        world.network.served.set("/de/", "german home");
+        world.network.served.set("/songs/index/00.json", "[]");
+    });
+
+    it("fetches everything on the language's list that it does not already hold", async () => {
+        await world.message({ type: "KEEP_OFFLINE", locale: "de" });
+        expect(held("/assets/settings-xyz.js")).toBe(true);
+        expect(held("/de/")).toBe(true);
+        expect(held("/songs/index/00.json")).toBe(true);
+        // The entry chunk was precached at install and is not asked for again.
+        expect(world.network.requested.filter((p) => p === "/assets/entry-abc.js")).toHaveLength(1);
+    });
+
+    it("then serves a never-opened page with no network", async () => {
+        await world.message({ type: "KEEP_OFFLINE", locale: "de" });
+        world.network.online = false;
+        expect(await (await world.fetchEvent("/assets/settings-xyz.js", "cors")).text()).toBe(
+            "settings",
+        );
+    });
+
+    it("ignores a language it has no list for", async () => {
+        await world.message({ type: "KEEP_OFFLINE", locale: "xx" });
+        expect(held("/assets/settings-xyz.js")).toBe(false);
+    });
+});
+
+describe("a new build taking over", () => {
+    it("carries the hashed assets it still ships over from the old cache", async () => {
+        const old = world.caches;
+        old.set("plinky-old", new Map());
+        old.get("plinky-old")!.set(`${ORIGIN}/assets/shared-111.js`, new Response("shared"));
+        old.get("plinky-old")!.set(`${ORIGIN}/de/`, new Response("stale page"));
+        await world.activate();
+        expect(world.caches.has("plinky-old")).toBe(false);
+        expect(held("/assets/shared-111.js")).toBe(true);
+        // Un-hashed pages are not carried: they may have changed under the same URL.
+        expect(held("/de/")).toBe(false);
     });
 });

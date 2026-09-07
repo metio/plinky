@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 7 September 2026
 
+**Keep Plinky on this device.** A new switch in Settings fetches every page of the
+app on each visit — about a megabyte when a new version ships, and nothing when
+it hasn't — so wherever you practise without a connection, every page is there.
+Pieces you open are kept as you go, as they always were.
+
 **The ghost no longer recolours a bar a repeat has cleared.** Racing your own
 earlier run, the ghost's marker moves along the staff, and when it left a note you
 had already played it painted that note green again — even after a repeat had
@@ -1960,6 +1965,7 @@ asked for hints only after a slip, that's when the keys light too — and during
 sight-read they stay dark like every other reading aid.
 
 The older switch that mirrors what Plinky *has* played is still there; it's now called
+
 **Follow along on my keyboard**, which is what it always did.
 
 ## 11 August 2026

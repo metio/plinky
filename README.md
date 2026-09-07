@@ -787,7 +787,9 @@ the page in Safari instead.
 
 Plinky installs from your browser like an app, and every page and piece you have opened
 keeps working without a connection. A page you have never opened on that device says so
-plainly and offers to try again, rather than showing a blank screen. When
+plainly and offers to try again, rather than showing a blank screen. If you practise
+somewhere without a connection, *Keep Plinky on this device* in Settings fetches every
+page on each visit, so nothing is missing when you go offline. When
 a new version ships it waits quietly rather than reloading mid-task: a banner
 offers it, and the app updates only when you choose to reload. Even when an
 update arrives from another tab, a reload never interrupts a run in progress —

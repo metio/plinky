@@ -57,13 +57,46 @@ self.addEventListener("message", (event) => {
     if (event.data?.type === "SKIP_WAITING") {
         self.skipWaiting();
     }
+    if (event.data?.type === "KEEP_OFFLINE" && typeof event.data.locale === "string") {
+        event.waitUntil(keepOffline(event.data.locale));
+    }
 });
+
+// Fetch everything a language's pages need into the current cache, so every page works
+// without a connection and not only the ones already opened. The list is written per
+// language at deploy (dev/stamp-sw.mjs) from the build's own route manifest, so it names
+// exactly this build's chunks; the app sends the message on every visit while the
+// setting is on, which is what keeps the cache current across deploys. What is already
+// held is not fetched again, so a visit with nothing new costs one small request.
+const KEEP_AT_ONCE = 6;
+
+async function keepOffline(locale) {
+    const list = await fetch(`/offline/${encodeURIComponent(locale)}.json`);
+    if (!list.ok) {
+        return;
+    }
+    const urls = await list.json();
+    const cache = await caches.open(CACHE);
+    const wanted = [];
+    for (const url of urls) {
+        if (!(await cache.match(url))) {
+            wanted.push(url);
+        }
+    }
+    // A few at a time rather than all at once: a couple of hundred requests fired
+    // together would stall the page the reader is on.
+    for (let at = 0; at < wanted.length; at += KEEP_AT_ONCE) {
+        await Promise.allSettled(wanted.slice(at, at + KEEP_AT_ONCE).map((url) => cache.add(url)));
+    }
+}
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(
         (async () => {
+            const current = await caches.open(CACHE);
             for (const key of await caches.keys()) {
                 if (key !== CACHE) {
+                    await carryOver(await caches.open(key), current);
                     await caches.delete(key);
                 }
             }
@@ -71,6 +104,23 @@ self.addEventListener("activate", (event) => {
         })(),
     );
 });
+
+// Hashed assets the previous build also shipped move into the new cache instead of being
+// fetched again. Their names carry a content hash, so a URL both builds know is the same
+// bytes; a chunk the new build dropped is never requested and costs nothing but space
+// until the next activate. Without this, every deploy emptied the cache and a device
+// keeping the whole app offline downloaded all of it again, unchanged chunks included.
+async function carryOver(previous, current) {
+    for (const request of await previous.keys()) {
+        if (!isImmutable(new URL(request.url))) {
+            continue;
+        }
+        const held = await previous.match(request);
+        if (held && !(await current.match(request))) {
+            await current.put(request, held);
+        }
+    }
+}
 
 // Where a route's code last failed to arrive. React Router answers a route module that
 // will not load by reloading the page, unconditionally, and a reload with no network gets

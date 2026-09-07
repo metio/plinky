@@ -1397,5 +1397,8 @@
     "offline_title": "Még nincs ezen az eszközön",
     "offline_body": "Ezt az oldalt itt még nem nyitottad meg kapcsolattal, így kapcsolat nélkül nincs mit mutatni. Minden, amit már megnyitottál, továbbra is működik.",
     "offline_retry": "Próbáld újra",
-    "offline_home": "Vissza a Plinkyhez"
+    "offline_home": "Vissza a Plinkyhez",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Plinky megtartása ezen az eszközön",
+    "keep_offline_hint": "Minden látogatáskor letölti az összes oldalt, új verziónál nagyjából egy megabájtot, hogy kapcsolat nélkül gyakorolva se hiányozzon semmi. A megnyitott darabok menet közben megmaradnak."
 }

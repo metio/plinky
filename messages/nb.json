@@ -1397,5 +1397,8 @@
     "offline_title": "Ikke på denne enheten ennå",
     "offline_body": "Denne siden har aldri blitt åpnet her med nett, så uten tilkobling er det ingenting å vise. Alt du allerede har åpnet, fungerer fortsatt.",
     "offline_retry": "Prøv igjen",
-    "offline_home": "Tilbake til Plinky"
+    "offline_home": "Tilbake til Plinky",
+    "settings_offline": "Frakoblet",
+    "keep_offline_toggle": "Behold Plinky på denne enheten",
+    "keep_offline_hint": "Henter alle sidene ved hvert besøk, omtrent én megabyte når en ny versjon kommer, så ingenting mangler når du øver uten tilkobling. Stykker du åpner, beholdes underveis."
 }

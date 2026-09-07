@@ -1399,5 +1399,8 @@
     "offline_title": "Ainda não está neste dispositivo",
     "offline_body": "Esta página nunca foi aberta aqui com ligação, por isso sem rede não há nada para mostrar. Tudo o que já abriste continua a funcionar.",
     "offline_retry": "Tentar de novo",
-    "offline_home": "Voltar ao Plinky"
+    "offline_home": "Voltar ao Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Manter o Plinky neste dispositivo",
+    "keep_offline_hint": "Vai buscar todas as páginas em cada visita, cerca de um megabyte quando sai uma versão nova, para que nada falte quando praticas sem ligação. As peças que abres ficam guardadas à medida que avanças."
 }

@@ -20,3 +20,5 @@ export function stampOfflinePage(
     out?: string,
     messagesDir?: string,
 ): Record<string, OfflineStrings>;
+export function offlineList(locale: string, out?: string): string[];
+export function writeOfflineLists(locales: string[], out?: string): Record<string, number>;

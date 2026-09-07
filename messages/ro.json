@@ -1399,5 +1399,8 @@
     "offline_title": "Încă nu e pe acest dispozitiv",
     "offline_body": "Această pagină nu a fost deschisă aici cu conexiune, așa că fără rețea nu e nimic de afișat. Tot ce ai deschis deja funcționează în continuare.",
     "offline_retry": "Încearcă din nou",
-    "offline_home": "Înapoi la Plinky"
+    "offline_home": "Înapoi la Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Păstrează Plinky pe acest dispozitiv",
+    "keep_offline_hint": "Aduce toate paginile la fiecare vizită, cam un megabyte când apare o versiune nouă, ca să nu lipsească nimic când exersezi fără conexiune. Piesele pe care le deschizi se păstrează pe parcurs."
 }

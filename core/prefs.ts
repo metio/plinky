@@ -78,6 +78,10 @@ export type Prefs = {
     // reading aid for somebody learning shapes, and a page of symbols is noise to a reader
     // who already hears them.
     chordSymbols: boolean;
+    // Keep every page of the app on this device, fetched afresh on each visit, so
+    // going offline loses nothing. Off by default: it is about a megabyte per update,
+    // which only somebody who practises without a connection has a reason to spend.
+    keepOffline: boolean;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
     // Your own instrument makes the sound, so Plinky does not play your notes a second
@@ -276,6 +280,7 @@ function defaults(): Prefs {
         reduction: "",
         colorNotes: true,
         chordSymbols: false,
+        keepOffline: false,
         noteHints: "always",
         noteLabels: "all",
         instrumentSounds: false,
@@ -397,6 +402,7 @@ export function parsePrefs(raw: string | null): Prefs {
             reduction: oneOf(parsed.reduction, ["", ...REDUCTIONS] as const, base.reduction),
             colorNotes: bool(parsed.colorNotes, base.colorNotes),
             chordSymbols: bool(parsed.chordSymbols, base.chordSymbols),
+            keepOffline: bool(parsed.keepOffline, base.keepOffline),
             noteHints: oneOf(parsed.noteHints, NOTE_HINT_CYCLE, base.noteHints),
             noteLabels: oneOf(parsed.noteLabels, NOTE_LABEL_CYCLE, base.noteLabels),
             forgiving: bool(parsed.forgiving, base.forgiving),

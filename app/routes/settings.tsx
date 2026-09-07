@@ -6,6 +6,7 @@ import { linkClasses } from "../components/ui/classes";
 import { ChoiceField, SliderField, SwitchField } from "../components/ui/fields";
 import {
     BookIcon,
+    DownloadIcon,
     FingersIcon,
     GradCapIcon,
     KeysIcon,
@@ -119,6 +120,7 @@ export default function Settings() {
             label: m.settings_group_device(),
             items: [
                 { anchor: "appearance", title: m.settings_appearance() },
+                { anchor: "offline", title: m.settings_offline() },
                 { anchor: "backup", title: m.progress_backup_heading() },
                 { anchor: "help", title: m.settings_help() },
                 { anchor: "danger", title: m.settings_danger_heading() },
@@ -544,6 +546,19 @@ export default function Settings() {
                                 <KeyboardFinishPicker />
                             </FeatureBoundary>
                         </SettingsSection>
+                    </SettingsSection>
+
+                    <SettingsSection
+                        anchor="offline"
+                        title={m.settings_offline()}
+                        icon={<DownloadIcon className={ICON} />}
+                    >
+                        <SwitchField
+                            label={m.keep_offline_toggle()}
+                            checked={prefs.keepOffline}
+                            onChange={(keepOffline) => update({ keepOffline })}
+                            help={m.keep_offline_hint()}
+                        />
                     </SettingsSection>
 
                     <FeatureBoundary feature="ProgressBackup">

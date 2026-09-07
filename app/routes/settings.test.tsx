@@ -90,6 +90,15 @@ describe("Settings", () => {
         expect(switchOn(m.settings_play_sounds)).toBe(false);
     });
 
+    it("keeps the app on the device only once asked", () => {
+        const { services } = mount();
+        expect(services.prefs.load().keepOffline).toBe(false);
+        expect(switchOn(m.keep_offline_toggle)).toBe(false);
+
+        toggle(m.keep_offline_toggle);
+        expect(services.prefs.load().keepOffline).toBe(true);
+    });
+
     it("turns the human touch off through the prefs store, and on by default", () => {
         const { services } = mount();
         expect(services.prefs.load().listenShaping).toBe(true);

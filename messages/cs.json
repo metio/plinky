@@ -1401,5 +1401,8 @@
     "offline_title": "Na tomto zařízení zatím není",
     "offline_body": "Tato stránka tu ještě nebyla otevřena s připojením, takže bez sítě není co zobrazit. Všechno, co jsi už otevřel, dál funguje.",
     "offline_retry": "Zkusit znovu",
-    "offline_home": "Zpět na Plinky"
+    "offline_home": "Zpět na Plinky",
+    "settings_offline": "Offline",
+    "keep_offline_toggle": "Ponechat Plinky na tomto zařízení",
+    "keep_offline_hint": "Při každé návštěvě stáhne všechny stránky, zhruba megabajt, když vyjde nová verze, aby při cvičení bez připojení nic nechybělo. Skladby, které otevřeš, se ukládají průběžně."
 }
