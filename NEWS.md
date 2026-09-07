@@ -20,6 +20,7 @@ drawn beside your colours rather than in place of them.
 **Listen picks up on the pass it stopped on.** Stopping Listen inside a repeated
 section and starting it again used to play the section from its first time
 through, whatever the blue trail said. It carries on from the pass you stopped on.
+
 **Offline, a page you haven't opened says so.** Every page and piece you have
 opened keeps working without a connection. A page you had never opened on that
 device used to reload itself over and over and show nothing; now it says the page
