@@ -40,7 +40,8 @@ describe("redirectRules", () => {
     it("sends an address with no language to the English page, and leaves the root alone", () => {
         expect(rules).toContain("/music /en/music/ 301");
         expect(rules).toContain("/music/ /en/music/ 301");
-        expect(rules).toContain("/play/* /en/play/:splat 301");
+        expect(rules).toContain("/play/:id /en/play/:id/ 301");
+        expect(rules).toContain("/play/:id/ /en/play/:id/ 301");
         expect(rules.some((rule) => rule.startsWith("/ "))).toBe(false);
     });
 });

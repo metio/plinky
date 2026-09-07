@@ -46,6 +46,12 @@ const spellings = (path) => (path === "/" ? ["/"] : [path, `${path}/`]);
 // other language loses nothing to a crawler.
 export function redirectRules(retired, pages, prefixes, defaultLocale = DEFAULT_LOCALE) {
     const rules = [];
+    // A piece or a composer named with no language: the id is one segment, so a
+    // placeholder carries it, in both spellings.
+    for (const prefix of prefixes) {
+        rules.push(`${prefix}/:id /${defaultLocale}${prefix}/:id/ 301`);
+        rules.push(`${prefix}/:id/ /${defaultLocale}${prefix}/:id/ 301`);
+    }
     for (const { from, to } of retired) {
         if (from.endsWith("/*")) {
             const head = from.slice(0, -2);
@@ -68,9 +74,6 @@ export function redirectRules(retired, pages, prefixes, defaultLocale = DEFAULT_
         for (const spelled of spellings(page)) {
             rules.push(`${spelled} /${defaultLocale}${page}/ 301`);
         }
-    }
-    for (const prefix of prefixes) {
-        rules.push(`${prefix}/* /${defaultLocale}${prefix}/:splat 301`);
     }
     return rules;
 }
