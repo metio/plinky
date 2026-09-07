@@ -57,12 +57,12 @@ export type AudioEncodingConfig = {
     bitrate: number;
 };
 
-// An audio codec paired with the name mp4-muxer knows it by.
+// An audio codec paired with the name the container writer knows it by.
 export type AudioCodecChoice = { codec: string; container: "aac" | "opus" };
 
 // AAC-LC, the plain stereo audio every player expects inside an MP4, comes
 // first — but the AAC encoder is licensed and plain Chromium ships without it,
-// so Opus (which mp4-muxer can also carry in an MP4, and every modern player
+// so Opus (which an MP4 can also carry, and every modern player
 // decodes) is the fallback that keeps the export working there. Order is the
 // preference: the first codec the engine can encode wins.
 export const AUDIO_CODECS: readonly AudioCodecChoice[] = [
