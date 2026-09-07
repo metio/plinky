@@ -70,7 +70,7 @@ import { useSightRead } from "../../hooks/useSightRead";
 import { useVanishingBars } from "../../hooks/useVanishingBars";
 import { useSynth } from "../../hooks/useSynth";
 import { useTempoControls } from "../../hooks/useTempoControls";
-import { cursorWhole, seekToBar } from "../../lib/scoreCursor";
+import { cursorOrdinal, cursorWhole, seekToBar, seekToOrdinal } from "../../lib/scoreCursor";
 import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
@@ -516,6 +516,18 @@ function usePlaySessionValue({
     // hand off at, so switching between them (or leaving and re-entering the play surface)
     // continues here rather than rewinding.
     const resumePoint = () => cursorWhole(getOsmd()?.cursor);
+    // The same place as a cursor position counted from the top, which is the one that
+    // tells the two passes of a repeat apart. Measuring it walks the cursor, so it is
+    // put back where it stood. -1 past the end, where there is nothing to resume.
+    const resumeOrdinal = () => {
+        const cursor = getOsmd()?.cursor;
+        if (!cursor || cursor.iterator.EndReached) {
+            return -1;
+        }
+        const at = cursorOrdinal(cursor);
+        seekToOrdinal(cursor, at);
+        return at;
+    };
 
     // Tempo-locked play-along ("keep up"): the clock advances the cursor and scores each
     // beat; finishing drops out of full screen so the result comes into view.
@@ -727,7 +739,6 @@ function usePlaySessionValue({
         getOsmd,
         practicing: matcher.practicing,
         complete: matcher.complete,
-        done: matcher.done,
         runStartedAt,
     });
 
@@ -990,6 +1001,7 @@ function usePlaySessionValue({
             return;
         }
         const from = resumePoint();
+        const at = resumeOrdinal();
         if (onStage) {
             enterPlayFullscreen();
         }
@@ -1004,7 +1016,7 @@ function usePlaySessionValue({
         if (onStage) {
             hidden.conceal();
         }
-        listenPlayback.start(from);
+        listenPlayback.start(from, at);
     };
 
     // Restart Listen from the top (or the loop's start bar). The trail wipes like a

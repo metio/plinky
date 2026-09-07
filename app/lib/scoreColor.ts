@@ -259,6 +259,60 @@ export function litHalos(marks: readonly HaloMark[]): void {
     }
 }
 
+// The ghost's mark: an outline in the ghost's colour drawn over the notes it has reached,
+// as its own element beside the halo rather than in place of it. The halo is the run's
+// record of what was played, and a repeat can uncolour it while the ghost is sitting on the
+// note; a mark that replaced the halo would have to put something back when it left, and
+// could only guess what. Its own element leaves nothing to restore.
+const ghostMarks = new WeakMap<Element, SVGRectElement>();
+const GHOST_MARK_CLASS = "plinky-ghost-mark";
+
+export function markGhost(elements: readonly SVGElement[], color: string): void {
+    const scales = new Map<SVGSVGElement, ReturnType<typeof svgScale>>();
+    const placed: { element: SVGElement; svg: SVGSVGElement; box: DOMRect }[] = [];
+    for (const element of elements) {
+        const svg = element.ownerSVGElement;
+        if (!svg) {
+            continue;
+        }
+        if (!scales.has(svg)) {
+            scales.set(svg, svgScale(svg));
+        }
+        placed.push({ element, svg, box: element.getBoundingClientRect() });
+    }
+    for (const { element, svg, box } of placed) {
+        const { rect: svgRect, sx, sy } = scales.get(svg)!;
+        let mark = ghostMarks.get(element);
+        if (!mark?.isConnected) {
+            mark = document.createElementNS(SVG_NS, "rect");
+            mark.setAttribute("class", GHOST_MARK_CLASS);
+            mark.setAttribute("rx", "3");
+            mark.setAttribute("fill", "none");
+            mark.setAttribute("stroke-width", "2");
+            mark.setAttribute("pointer-events", "none");
+            ghostMarks.set(element, mark);
+        }
+        mark.setAttribute("x", String((box.left - svgRect.left) * sx - HALO_PAD));
+        mark.setAttribute("y", String((box.top - svgRect.top) * sy - HALO_PAD));
+        mark.setAttribute("width", String(box.width * sx + HALO_PAD * 2));
+        mark.setAttribute("height", String(box.height * sy + HALO_PAD * 2));
+        mark.setAttribute("stroke", color);
+        // On top of the engraving: the outline sits outside the notehead's box, so it
+        // covers nothing, and a halo lit later cannot bury it.
+        svg.appendChild(mark);
+    }
+}
+
+export function unmarkGhost(elements: readonly SVGElement[]): void {
+    for (const element of elements) {
+        const mark = ghostMarks.get(element);
+        if (mark) {
+            mark.remove();
+            ghostMarks.delete(element);
+        }
+    }
+}
+
 // Lift a notehead's halo, if it has one.
 export function clearHalo(element: SVGElement): void {
     const halo = halos.get(element);

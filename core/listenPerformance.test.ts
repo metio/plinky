@@ -40,6 +40,7 @@ const step = (pitches: number[], over: Partial<ListenStep> = {}): ListenStep => 
     lengths: [1],
     whole: 0,
     measureIndex: 0,
+    position: 0,
     bpm: 120,
     stretch: 1,
     soft: false,

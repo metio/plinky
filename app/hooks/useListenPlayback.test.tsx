@@ -9,6 +9,7 @@ import { NOMINAL_BPM } from "../../core/elapsed";
 import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import type { Take } from "../../core/takes";
 import { listenPerformanceOf } from "../../core/listenPerformance";
+import { seekToOrdinal } from "../lib/scoreCursor";
 import { collectListenSteps } from "../lib/listenSteps";
 import { useListenPlayback } from "./useListenPlayback";
 
@@ -21,6 +22,7 @@ vi.mock("../lib/scoreColor", () => ({
 }));
 vi.mock("../lib/scoreCursor", () => ({
     seekToBar: vi.fn(),
+    seekToOrdinal: vi.fn(),
     seekToWhole: vi.fn(),
 }));
 
@@ -191,6 +193,7 @@ describe("collectListenSteps", () => {
             lengths: [1],
             whole: 0,
             measureIndex: 0,
+            position: 0,
             soft: false,
             contour: 1,
             bpm: NOMINAL_BPM,
@@ -464,6 +467,20 @@ describe("useListenPlayback", () => {
         expect(onPosition).toHaveBeenNthCalledWith(2, 0.25);
         act(() => void vi.advanceTimersByTime(500));
         expect(onPosition).toHaveBeenNthCalledWith(3, 0.5);
+    });
+
+    it("resumes on the pass it stopped on, not the first pass of the same bar", () => {
+        // Bars 1–2 repeated, then bar 3: the walk is C D C D E and the onsets rewind. A stop
+        // on the second D stands at position 3; an onset alone would name the first D.
+        const osmd = fakeOsmd(5, {}, undefined, [0, 0.25, 0, 0.25, 0.5]);
+        const { result } = mount(osmd);
+
+        act(() => result.current.start(0.25, 3));
+        expect(seekToOrdinal).toHaveBeenCalledWith(osmd.cursor, 3);
+        expect(onPosition).toHaveBeenNthCalledWith(1, 0.25);
+        act(() => void vi.advanceTimersByTime(500));
+        // The next position is bar 3, not the first pass again.
+        expect(onPosition).toHaveBeenNthCalledWith(2, 0.5);
     });
 
     it("ignores a second start while one walk owns the cursor", () => {

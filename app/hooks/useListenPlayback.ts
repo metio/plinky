@@ -20,7 +20,7 @@ import {
     restoreNotes,
     trailNotes,
 } from "../lib/scoreColor";
-import { seekToBar, seekToWhole } from "../lib/scoreCursor";
+import { seekToBar, seekToOrdinal, seekToWhole } from "../lib/scoreCursor";
 import { useTimerChain } from "./useTimerChain";
 
 // The synth slice playback needs: Listen scales sustain by tempo, a replay
@@ -152,7 +152,10 @@ export function useListenPlayback({
     // Listen from a notated onset in whole notes (0 = the top; an active loop's
     // start bar wins): walk the cursor one voice-entry at a time, sounding the
     // notes under it and waiting their notated duration at the chosen tempo.
-    const start = (from: number) => {
+    // `at` is the cursor position to resume on, where the caller knows it: an onset
+    // names two places on a repeated piece, and a stop on the second pass must not
+    // start the first again.
+    const start = (from: number, at = -1) => {
         const osmd = getOsmd();
         if (!osmd || activeRef.current) {
             return;
@@ -176,9 +179,13 @@ export function useListenPlayback({
                 steps.findIndex((position) => position.measureIndex >= bar - 1),
             );
         let step: number;
+        const anchored = at >= 0 ? steps.findIndex((position) => position.position === at) : -1;
         if (loop().on) {
             seekToBar(cursor, loop().from);
             step = barStart(loop().from);
+        } else if (anchored >= 0) {
+            seekToOrdinal(cursor, at);
+            step = anchored;
         } else if (from > 0) {
             seekToWhole(cursor, from);
             step = Math.max(
@@ -321,7 +328,7 @@ export function useListenPlayback({
     // or the play session's contexts change value on every note.
     const api = useLatest({ active, start, replay, stop });
     const activeNow = useCallback(() => api.current.active(), []);
-    const startAt = useCallback((from: number) => api.current.start(from), []);
+    const startAt = useCallback((from: number, at?: number) => api.current.start(from, at), []);
     const replayTake = useCallback((take: Take) => api.current.replay(take), []);
     const stopNow = useCallback(() => api.current.stop(), []);
     return useMemo(

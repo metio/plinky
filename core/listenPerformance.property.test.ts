@@ -37,6 +37,7 @@ const listenStep: fc.Arbitrary<ListenStep> = fc.record({
     }),
     whole: fc.double({ min: 0, max: 100, noNaN: true }),
     measureIndex: fc.nat({ max: 200 }),
+    position: fc.nat({ max: 2000 }),
     bpm: fc.integer({ min: 20, max: 300 }),
     stretch: fc.double({ min: 1, max: 3, noNaN: true }),
     soft: fc.boolean(),

@@ -64,6 +64,10 @@ export type ListenStep = {
     // of the live cursor's iterator.
     whole: number;
     measureIndex: number;
+    // The cursor position the step was read at, counted from the top of the walk. A
+    // printed onset names two places on a repeated piece; this names one, so a stop
+    // inside a repeat resumes on the pass it was on.
+    position: number;
     // The tempo in force here and how much longer than written the position is held, so
     // playback follows a tempo change and waits at a fermata — the same reading the
     // graded run measures against, or the two would ask for different performances.

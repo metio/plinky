@@ -10,7 +10,9 @@ import {
     collectNoteElements,
     haloColor,
     litHalos,
+    markGhost,
     paintPlayedNotes,
+    unmarkGhost,
 } from "./scoreColor";
 
 // A bar before a repeated pair, the pair, and a bar after. Whole notes in four-four, so
@@ -99,5 +101,33 @@ describe("uncolouring the bars a repeat plays again", () => {
             PLAYED_COLOR,
             PLAYED_COLOR,
         ]);
+    });
+});
+
+describe("the ghost's mark beside the run's colour", () => {
+    it("leaves the halo as it found it, whether painted, cleared or never lit", async () => {
+        host = document.createElement("div");
+        host.style.width = "800px";
+        document.body.appendChild(host);
+        const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
+        await osmd.load(XML);
+        osmd.render();
+        const [c, d] = [...new Set(collectNoteElements(osmd, "both").flat())] as SVGGElement[];
+
+        litHalos([{ element: c!, color: PLAYED_COLOR }]);
+        markGhost([c!, d!], "#123456");
+        expect(document.querySelectorAll("rect.plinky-ghost-mark")).toHaveLength(2);
+        // The repeat uncolours C while the ghost sits on it.
+        clearHalosWithin(osmd, { from: 0, to: 0 });
+        unmarkGhost([c!, d!]);
+        expect(document.querySelectorAll("rect.plinky-ghost-mark")).toHaveLength(0);
+        expect(haloColor(c!)).toBeNull();
+        expect(haloColor(d!)).toBeNull();
+
+        // And a colour the run painted stays when the ghost leaves.
+        litHalos([{ element: d!, color: PLAYED_COLOR }]);
+        markGhost([d!], "#123456");
+        unmarkGhost([d!]);
+        expect(haloColor(d!)).toBe(PLAYED_COLOR);
     });
 });

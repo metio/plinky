@@ -12,10 +12,10 @@ import {
     type RaceVerdict,
 } from "../../core/ghost";
 import type { Hand } from "../../core/matcher";
-import { GHOST_COLOR, PLAYED_COLOR } from "../../core/scoreCanvas";
+import { GHOST_COLOR } from "../../core/scoreCanvas";
 import { fastestTakeOnsets } from "../../core/takes";
 import { useServices } from "../contexts/services";
-import { clearHalo, collectNoteElements, litHalos } from "../lib/scoreColor";
+import { collectNoteElements, markGhost, unmarkGhost } from "../lib/scoreColor";
 
 // The ghost race: a previous run's note onsets replayed against the clock while
 // you practice, shown as a moving marker on the staff and a position on the race
@@ -29,17 +29,14 @@ export function useGhostRace({
     getOsmd,
     practicing,
     complete,
-    done,
     runStartedAt,
 }: {
     id: string;
     canShareGhost?: boolean;
     getOsmd: () => OpenSheetMusicDisplay | null;
-    // The matcher's run state: whether a run is live, whether it finished, and
-    // how many positions the player has cleared (the restore colour boundary).
+    // The matcher's run state: whether a run is live and whether it finished.
     practicing: boolean;
     complete: boolean;
-    done: number;
     // Wall-clock of the run's first note — the race's starting gun; 0 until it
     // lands, which holds the ghost at the line.
     runStartedAt: () => number;
@@ -118,33 +115,28 @@ export function useGhostRace({
         }
     }, [complete, ghost, runStartedAt, scheduler]);
 
-    // Move the ghost's halo onto the note it has currently reached, restoring the one it
-    // leaves to green if the player has already played it there, else clearing it.
-    // Captured note groups outlive a render, so this lights the real staff.
+    // Move the ghost's mark onto the note it has currently reached. The mark is its own
+    // outline beside the note's halo, so leaving a note means lifting the mark and nothing
+    // else: the halo the run painted there — or that a repeat has since uncoloured — is
+    // not the ghost's to put back. Captured note groups outlive a render, so this marks
+    // the real staff.
     useEffect(() => {
         const steps = ghostNotesRef.current;
         if (steps.length === 0) {
             return;
         }
-        // A note blanked for ear-mode practice (visibility hidden) must not be lit — the
-        // ghost runs ahead on the clock, so a halo behind a concealed note would give its
-        // position away before the player has found it.
+        // A note blanked for ear-mode practice (visibility hidden) must not be marked —
+        // the ghost runs ahead on the clock, so an outline around a concealed note would
+        // give its position away before the player has found it.
         const concealed = (element: SVGGElement) => element.getAttribute("visibility") === "hidden";
-        const restore = (step: number) => {
-            const shown = (steps[step] ?? []).filter((element) => !concealed(element));
-            if (done > step) {
-                litHalos(shown.map((element) => ({ element, color: PLAYED_COLOR })));
-            } else {
-                for (const element of shown) {
-                    clearHalo(element);
-                }
-            }
+        const leave = (step: number) => {
+            unmarkGhost(steps[step] ?? []);
         };
         const previous = ghostMarkRef.current;
         // Off the staff once the race is over or paused.
         if (!ghost || !practicing || complete) {
             if (previous >= 0) {
-                restore(previous);
+                leave(previous);
                 ghostMarkRef.current = -1;
             }
             return;
@@ -154,15 +146,14 @@ export function useGhostRace({
             return;
         }
         if (previous >= 0) {
-            restore(previous);
+            leave(previous);
         }
-        litHalos(
-            (steps[target] ?? [])
-                .filter((element) => !concealed(element))
-                .map((element) => ({ element, color: GHOST_COLOR })),
+        markGhost(
+            (steps[target] ?? []).filter((element) => !concealed(element)),
+            GHOST_COLOR,
         );
         ghostMarkRef.current = target;
-    }, [ghostDone, ghost, practicing, complete, done]);
+    }, [ghostDone, ghost, practicing, complete]);
 
     // Arm the race for a starting run: resolve the ghost to chase, then capture each
     // step's rendered notes (post-render) so its colour can mark, and move along, the

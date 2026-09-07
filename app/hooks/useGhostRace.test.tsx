@@ -36,14 +36,13 @@ function harness(options: { search?: string; services?: Partial<AppServices> } =
             <ServicesProvider services={services}>{children}</ServicesProvider>
         </MemoryRouter>
     );
-    const render = (props: { practicing: boolean; complete?: boolean; done?: number }) =>
+    const render = (props: { practicing: boolean; complete?: boolean }) =>
         useGhostRace({
             id: SONG,
             canShareGhost: true,
             getOsmd: () => null,
             practicing: props.practicing,
             complete: props.complete ?? false,
-            done: props.done ?? 0,
             runStartedAt: () => startedAt,
         });
     return {
@@ -54,7 +53,7 @@ function harness(options: { search?: string; services?: Partial<AppServices> } =
         },
         ...renderHook(render, {
             wrapper,
-            initialProps: { practicing: false, complete: false, done: 0 },
+            initialProps: { practicing: false, complete: false },
         }),
     };
 }
@@ -65,7 +64,7 @@ describe("useGhostRace", () => {
         services.ghosts.save(SONG, [0, 1000, 2000, 3000]);
 
         act(() => {
-            rerender({ practicing: true, complete: false, done: 0 });
+            rerender({ practicing: true, complete: false });
         });
         act(() => {
             result.current.arm({ partial: false, raceGhost: true, hand: "both" });
@@ -88,7 +87,7 @@ describe("useGhostRace", () => {
         services.ghosts.save(SONG, [0, 1000]);
 
         act(() => {
-            rerender({ practicing: true, complete: false, done: 0 });
+            rerender({ practicing: true, complete: false });
         });
         act(() => {
             result.current.arm({ partial: false, raceGhost: true, hand: "both" });
@@ -104,7 +103,7 @@ describe("useGhostRace", () => {
         services.ghosts.save(SONG, [0, 1000]);
 
         act(() => {
-            rerender({ practicing: true, complete: false, done: 0 });
+            rerender({ practicing: true, complete: false });
         });
         act(() => {
             result.current.arm({ partial: false, raceGhost: true, hand: "both" });
@@ -112,12 +111,12 @@ describe("useGhostRace", () => {
         expect(scheduler.pending().timers).toBe(1);
 
         act(() => {
-            rerender({ practicing: false, complete: false, done: 0 });
+            rerender({ practicing: false, complete: false });
         });
         expect(scheduler.pending().timers).toBe(0);
 
         act(() => {
-            rerender({ practicing: true, complete: false, done: 0 });
+            rerender({ practicing: true, complete: false });
         });
         unmount();
         expect(scheduler.pending().timers).toBe(0);
@@ -158,7 +157,6 @@ describe("useGhostRace", () => {
                     getOsmd: () => null,
                     practicing: false,
                     complete: false,
-                    done: 0,
                     runStartedAt: () => 0,
                 }),
             {
@@ -176,7 +174,7 @@ describe("useGhostRace", () => {
         const { result, rerender, services } = harness();
         services.ghosts.save(SONG, [0, 1000]);
         act(() => {
-            rerender({ practicing: true, complete: false, done: 0 });
+            rerender({ practicing: true, complete: false });
         });
 
         for (const options of [

@@ -136,6 +136,7 @@ export function collectListenSteps(
                 lengths: timed,
                 whole,
                 measureIndex: position.measureIndex,
+                position: at,
                 bpm: position.bpm,
                 stretch: position.stretch,
                 advancesCursor: order === groups.length - 1,
