@@ -86,6 +86,58 @@ export function regionFor(
     return nearest;
 }
 
+// How wide the crossfade between two velocity layers is, in velocity units either side of
+// the boundary. A pack records a key in sixteen layers, each a separate strike, and two
+// neighbouring recordings differ in colour as much as in loudness. Chosen by band alone,
+// a note one unit over a boundary is a different piano from the note before it — which is
+// how a phrase's crest of ninety after two notes of eighty-four put a stranger's piano on
+// the third note of a study. Within this distance of a boundary both recordings sound,
+// each at the share of the distance it owns, so the colour moves with the force.
+export const LAYER_FADE = 4;
+
+// A recording with the share of the note it carries. The shares are powers: they sum to
+// one, so two recordings at half each are as loud as one at full.
+export type LayerBlend = { region: SampleRegion; share: number };
+
+// The recording for this key at this force, and the neighbouring layer's recording when
+// the force lands within LAYER_FADE of the boundary between them. One entry when it does
+// not, or when there is no neighbour on that side; nothing when the pack covers neither.
+export function blendFor(
+    regions: readonly SampleRegion[],
+    pitch: number,
+    velocity: number,
+): LayerBlend[] {
+    const region = regionFor(regions, pitch, velocity);
+    if (!region) {
+        return [];
+    }
+    // Only a recording of the same key can be blended with: a neighbour of another key
+    // is a shift as well as a layer, and the ear hears the shift.
+    const sameKey = regions.filter(
+        (other) =>
+            other !== region && other.keyCentre === region.keyCentre && other.kind === region.kind,
+    );
+    const above = sameKey.find((other) => other.lowVelocity === region.highVelocity + 1);
+    const below = sameKey.find((other) => other.highVelocity === region.lowVelocity - 1);
+    const upperEdge = region.highVelocity + 0.5;
+    const lowerEdge = region.lowVelocity - 0.5;
+    if (above && velocity > upperEdge - LAYER_FADE) {
+        const share = (velocity - (upperEdge - LAYER_FADE)) / (2 * LAYER_FADE);
+        return [
+            { region, share: 1 - share },
+            { region: above, share },
+        ];
+    }
+    if (below && velocity < lowerEdge + LAYER_FADE) {
+        const share = (lowerEdge + LAYER_FADE - velocity) / (2 * LAYER_FADE);
+        return [
+            { region, share: 1 - share },
+            { region: below, share },
+        ];
+    }
+    return [{ region, share: 1 }];
+}
+
 // How fast to play a recording to make it sound at this pitch. The grid is sampled every
 // minor third, so nothing is shifted more than a tone — the range where a piano still
 // sounds like the piano it was recorded from.
@@ -120,11 +172,14 @@ export function regionsNeeded(
 ): SampleRegion[] {
     const wanted = new Map<string, SampleRegion>();
     for (const note of notes) {
-        const region = kind
-            ? extrasFor(regions, note.pitch, note.velocity, kind)
-            : regionFor(regions, note.pitch, note.velocity);
-        if (region) {
-            wanted.set(region.file, region);
+        // A struck note may blend two layers, and both have to be here for it to.
+        const chosen = kind
+            ? [extrasFor(regions, note.pitch, note.velocity, kind)]
+            : blendFor(regions, note.pitch, note.velocity).map((blend) => blend.region);
+        for (const region of chosen) {
+            if (region) {
+                wanted.set(region.file, region);
+            }
         }
     }
     return [...wanted.values()];

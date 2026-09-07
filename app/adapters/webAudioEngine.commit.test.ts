@@ -88,3 +88,31 @@ describe("the instrument a run commits to", () => {
         expect(samples.asked()).toBe(1);
     });
 });
+
+describe("a note that blends two layers", () => {
+    it("plays both recordings as one note", async () => {
+        const fake = fakeAudioContext();
+        const FakeContext = function FakeContext() {
+            return fake.context as unknown as AudioContext;
+        } as unknown as typeof AudioContext;
+        vi.stubGlobal("AudioContext", FakeContext);
+        vi.resetModules();
+        const engine = await import("./webAudioEngine");
+        const buffer = { duration: 0.4 } as AudioBuffer;
+        engine.playFromSamples(() => ({
+            source: {
+                voiceFor: () => ({
+                    buffer,
+                    rate: 1,
+                    share: 0.6,
+                    blend: { buffer, rate: 1, share: 0.4 },
+                }),
+                extraFor: () => null,
+            } as never,
+            settled: true,
+        }));
+        engine.webAudioEngine.resume();
+        strike(engine.webAudioEngine);
+        expect(fake.recordingsPlayed()).toBe(2);
+    });
+});

@@ -3,13 +3,14 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    blendFor,
     extrasFor,
-    samplesEnabled,
     playbackRateFor,
     regionFor,
     regionsNeeded,
-    type SampleRegion,
     sampleCredit,
+    type SampleRegion,
+    samplesEnabled,
 } from "./sampledPiano";
 
 // A miniature of the library's own shape: two key centres a minor third apart, each split
@@ -71,6 +72,36 @@ describe("regionFor", () => {
     });
 });
 
+describe("blendFor", () => {
+    // Two layers of one key meeting at 64|65, and a layer of another key.
+    it("is the one recording well inside a layer", () => {
+        expect(blendFor(REGIONS, 60, 40)).toEqual([{ region: REGIONS[0], share: 1 }]);
+    });
+
+    it("blends the neighbouring layer in within the fade of the boundary, by share", () => {
+        const at = blendFor(REGIONS, 60, 64);
+        expect(at.map((one) => one.region.file)).toEqual(["C4v4.opus", "C4v12.opus"]);
+        expect(at[0]!.share + at[1]!.share).toBeCloseTo(1);
+        // Right on the edge the two are nearly even; a step further in, the lower wins.
+        expect(at[1]!.share).toBeCloseTo(0.4375);
+        expect(blendFor(REGIONS, 60, 62)[1]!.share).toBeCloseTo(0.1875);
+        // From the other side the upper layer is the main one and the lower joins.
+        const above = blendFor(REGIONS, 60, 66);
+        expect(above.map((one) => one.region.file)).toEqual(["C4v12.opus", "C4v4.opus"]);
+        expect(above[1]!.share).toBeCloseTo(0.3125);
+    });
+
+    it("never blends across keys, where a shift would be heard", () => {
+        // The lowest layer has no neighbour below; a recording of another key is not one.
+        expect(blendFor(REGIONS, 60, 2)).toHaveLength(1);
+        expect(blendFor(REGIONS, 60, 127)).toHaveLength(1);
+    });
+
+    it("has nothing from an empty manifest", () => {
+        expect(blendFor([], 60, 64)).toEqual([]);
+    });
+});
+
 describe("playbackRateFor", () => {
     it("plays a recording at its own speed when it is the note that was recorded", () => {
         expect(playbackRateFor(60, 60)).toBe(1);
@@ -84,6 +115,11 @@ describe("playbackRateFor", () => {
 });
 
 describe("regionsNeeded", () => {
+    it("asks for both layers a note near a boundary will blend", () => {
+        const files = regionsNeeded(REGIONS, [{ pitch: 60, velocity: 64 }]).map((one) => one.file);
+        expect(files.sort()).toEqual(["C4v12.opus", "C4v4.opus"]);
+    });
+
     it("names each recording once, however often the piece asks for it", () => {
         const notes = [
             { pitch: 60, velocity: 40 },

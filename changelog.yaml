@@ -4,6 +4,17 @@
 - date: 2026-09-07
   entries:
     - |-
+      **The recorded piano no longer changes its colour at a whisper of force.** Each key
+      of the recorded grand is sixteen separate recordings, one per band of force, and a
+      note one step over a band's edge played a different recording from the note before
+      it — the same note, a different piano. Near an edge both recordings now sound
+      together, each at its share, so the colour moves with the force instead of jumping.
+      And the recordings fetched for a piece are now the ones Listen will actually play:
+      the human touch shades each note's force by its place in the phrase, and the fetch
+      had only asked for the written force, so the notes it shaded quieter were covered
+      by the built-in voice — which is what made a repeated passage sound muffled the
+      second time through.
+    - |-
       **plinky.fun opens in your language straight away.** The bare address used to load
       an empty page first and only then send you to your language. It is sent on before
       anything loads now, in the language your browser asks for, or English — which is

@@ -57,6 +57,19 @@ describe("sampleLookup", () => {
         expect(sampleLookup(source).voiceFor(60, 40)).toBeNull();
     });
 
+    it("blends the neighbouring layer in near a boundary, once it has arrived", () => {
+        const source = fakeSampleSource(MANIFEST);
+        source.put("C4v4.opus");
+        // Alone, the recording is the whole note even though the force sits on the edge.
+        const alone = sampleLookup(source).voiceFor(60, 64);
+        expect(alone?.blend).toBeUndefined();
+        source.put("C4v12.opus");
+        const blended = sampleLookup(source).voiceFor(60, 64);
+        expect(blended?.share).toBeCloseTo(0.5625);
+        expect(blended?.blend?.share).toBeCloseTo(0.4375);
+        expect(blended?.blend?.rate).toBe(1);
+    });
+
     it("offers nothing without a manifest, which is how a device starts", () => {
         const source = fakeSampleSource(null);
         source.put("C4v4.opus");

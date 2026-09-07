@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {
+    blendFor,
     type ExtraKind,
     extrasFor,
     playbackRateFor,
-    regionFor,
     type SampleRegion,
 } from "../../core/sampledPiano";
 import type { SampleLookup, SampleSource, SampleVoice } from "../ports/sampleSource";
@@ -40,7 +40,20 @@ export function sampleLookup(source: SampleSource): SampleLookup {
     return {
         voiceFor(pitch, velocity) {
             const manifest = pack();
-            return manifest ? voiceOf(regionFor(manifest.notes, pitch, velocity), pitch) : null;
+            if (!manifest) {
+                return null;
+            }
+            const [main, other] = blendFor(manifest.notes, pitch, velocity);
+            const voice = voiceOf(main?.region ?? null, pitch);
+            if (!voice || !main) {
+                return null;
+            }
+            // The neighbouring layer joins only once it has arrived; until then the note
+            // is the one recording at its full share, as it would be away from a boundary.
+            const second = other ? voiceOf(other.region, pitch) : null;
+            return second && other
+                ? { ...voice, share: main.share, blend: { ...second, share: other.share } }
+                : voice;
         },
         extraFor(pitch, velocity, kind: ExtraKind) {
             const manifest = pack();

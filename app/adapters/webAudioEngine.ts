@@ -389,20 +389,38 @@ const SAMPLE_TRIM = 1.9;
 // envelope opens at its level before anything is connected, and the source joins a graph
 // that already reaches the room. A source connected to a gain still at zero, or to one not
 // yet wired to the destination, plays silence into nothing.
+// The recording, and the neighbouring layer's recording where the force landed near a
+// boundary, each at the square root of its share so the two together are as loud as one:
+// both feed the one envelope, so the damper and the release treat them as the note they
+// are.
 function sampledVoice(
     ctx: BaseAudioContext,
     sample: SampleVoice,
     level: number,
     at: number,
-): { source: AudioBufferSourceNode; envelope: GainNode } {
-    const source = ctx.createBufferSource();
-    source.buffer = sample.buffer;
-    source.playbackRate.value = sample.rate;
+): { sources: AudioBufferSourceNode[]; envelope: GainNode } {
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(level, at);
     envelope.connect(room(ctx));
-    source.connect(envelope);
-    return { source, envelope };
+    const layers = [
+        { buffer: sample.buffer, rate: sample.rate, share: sample.share ?? 1 },
+        ...(sample.blend ? [sample.blend] : []),
+    ];
+    const sources = layers.map((layer) => {
+        const source = ctx.createBufferSource();
+        source.buffer = layer.buffer;
+        source.playbackRate.value = layer.rate;
+        if (layer.share < 1) {
+            const share = ctx.createGain();
+            share.gain.value = Math.sqrt(Math.max(0, layer.share));
+            source.connect(share);
+            share.connect(envelope);
+        } else {
+            source.connect(envelope);
+        }
+        return source;
+    });
+    return { sources, envelope };
 }
 
 function sampledLevel(gain: number, velocity: number): number {
@@ -417,7 +435,7 @@ function renderSampledStrike(
 ): StruckStrike {
     const now = ctx.currentTime + Math.max(0, delay);
     const level = sampledLevel(gain, velocity);
-    const { source, envelope } = sampledVoice(ctx, sample, level, now);
+    const { sources, envelope } = sampledVoice(ctx, sample, level, now);
     const damperFrom = now + Math.max(0.05, duration);
     envelope.gain.setValueAtTime(level, damperFrom);
     envelope.gain.exponentialRampToValueAtTime(0.0001, damperFrom + DAMPER_S);
@@ -437,11 +455,12 @@ function renderSampledStrike(
         scheduleExtra(ctx, note, "resonance", level * RESONANCE_LEVEL, now);
     }
 
-    source.connect(envelope);
-    source.start(now);
     const releaseEnd = damperFrom + DAMPER_S;
-    source.stop(releaseEnd + 0.03);
-    return { envelope, oscillators: [source], releaseEnd };
+    for (const source of sources) {
+        source.start(now);
+        source.stop(releaseEnd + 0.03);
+    }
+    return { envelope, oscillators: sources, releaseEnd };
 }
 
 // Live sustaining voices, keyed by MIDI note — one per note at a time; re-pressing a held
@@ -510,15 +529,17 @@ function buildSampledVoice(
     // voice is holding: two calls could only ever agree, and a change to one is a change
     // the other silently disagrees with.
     const level = sampledLevel(gain, velocity);
-    const { source, envelope } = sampledVoice(ctx, sample, level, now);
-    source.start(now);
+    const { sources, envelope } = sampledVoice(ctx, sample, level, now);
     // Long enough that a held key never runs out of recording before the player lifts it;
     // the buffer simply ends if they hold it longer than the string rang.
     const endsAt = now + sample.buffer.duration;
-    source.stop(endsAt);
+    for (const source of sources) {
+        source.start(now);
+        source.stop(endsAt);
+    }
     return {
         envelope,
-        oscillators: [source],
+        oscillators: sources,
         frequency,
         startedAt: now,
         endsAt,
@@ -613,9 +634,10 @@ function scheduleExtra(
     if (!sample || level <= 0) {
         return;
     }
-    const { source } = sampledVoice(ctx, sample, level, at);
-    source.start(at);
-    source.stop(at + sample.buffer.duration);
+    for (const source of sampledVoice(ctx, sample, level, at).sources) {
+        source.start(at);
+        source.stop(at + sample.buffer.duration);
+    }
 }
 
 // The live case: right now, on the shared context.

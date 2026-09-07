@@ -5,8 +5,13 @@ import { useCallback, useRef } from "react";
 import { withCursorKept } from "../lib/scoreCursor";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import type { ScoreMarks } from "../../core/musicxmlMarks";
+import { NOMINAL_BPM } from "../../core/elapsed";
+import { listenPerformanceOf } from "../../core/listenPerformance";
+import { tempoAt } from "../../core/musicxmlMarks";
 import { performanceOf } from "../../core/scorePerformance";
 import { useSampleSource } from "../contexts/services";
+import { collectListenSteps } from "../lib/listenSteps";
+import { readStartTempo } from "../lib/scoreExpression";
 import { collectMatchSteps } from "./useScoreMatcher";
 
 // Fetches the recordings this piece will ask for, while it is being read rather than while
@@ -63,9 +68,22 @@ export function useSamplePrefetch({
         // Read with the cursor put back afterwards: this runs when a render finishes,
         // which a relayout mid-Listen also is, and a walk that left the cursor at the top
         // would have the transport highlight one note behind the music from then on.
-        const steps = withCursorKept(osmd.cursor, () =>
-            collectMatchSteps(osmd, "both", marksRef.current),
-        );
-        void samples.prepare(performanceOf(steps));
+        const marks = marksRef.current;
+        const { written, listened } = withCursorKept(osmd.cursor, () => ({
+            written: collectMatchSteps(osmd, "both", marks),
+            listened: collectListenSteps(osmd, marks),
+        }));
+        // Two performances, because two things play the piece. Practice sounds the notes
+        // at the force the page asks for; Listen plays them with the human touch, which
+        // moves each note's force by its place in the bar and the phrase — and a pack is
+        // sixteen recordings per key by force, so a force the fetch did not foresee is a
+        // recording that is not here, and a note the synthesised voice covers for. With
+        // and without the touch, since the setting can change between here and the run.
+        const startBpm = tempoAt(marks.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
+        void samples.prepare([
+            ...performanceOf(written),
+            ...listenPerformanceOf(listened, { startBpm, shaped: true }),
+            ...listenPerformanceOf(listened, { startBpm, shaped: false }),
+        ]);
     }, [getOsmd, samples]);
 }
