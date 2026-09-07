@@ -1,7 +1,7 @@
 {
     "name": "Plinky",
     "short_name": "Plinky",
-    "description": "Practice piano with your MIDI keyboard.",
+    "description": "Piano practice in your browser — with a MIDI keyboard or your computer keys.",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",

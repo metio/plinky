@@ -1,3 +1,4 @@
+import { CHANNELS } from "./social";
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -54,6 +55,8 @@ export function noindexMeta() {
     return { name: "robots", content: "noindex, follow" };
 }
 
+export const SITE_TAGLINE = "Piano practice in your browser";
+
 export const SITE_DESCRIPTION =
     "Practice piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear-training, and loop drills, with your scores kept on your device.";
 
@@ -80,7 +83,12 @@ export function structuredData(locale: string) {
             "MIDI keyboard and computer-keyboard input",
             "Graded practice with progress tracking",
         ],
+        // The one line the name travels with, everywhere it is written.
+        slogan: SITE_TAGLINE,
         publisher: { "@type": "Organization", name: "metio", url: "https://github.com/metio" },
+        // The profiles that are Plinky's own, so a search engine ties them to the site
+        // rather than to whichever page mentions the name first.
+        sameAs: CHANNELS.map((channel) => channel.href),
     };
 }
 

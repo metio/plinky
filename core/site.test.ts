@@ -53,6 +53,14 @@ describe("structuredData", () => {
         expect(data.isAccessibleForFree).toBe(true);
         expect(data.offers.price).toBe("0");
     });
+
+    it("names the site's own profiles and its one line", () => {
+        const data = structuredData("en");
+        expect(data.slogan).toBe("Piano practice in your browser");
+        expect(data.sameAs).toContain("https://www.youtube.com/@PlinkyPiano");
+        expect(data.sameAs).toContain("https://github.com/metio/plinky");
+        expect(data.sameAs).toHaveLength(5);
+    });
 });
 
 describe("musicCompositionData", () => {
