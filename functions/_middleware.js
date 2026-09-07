@@ -14,15 +14,63 @@
 // offers a crawler roughly eighty thousand links that all answer 404 while a reader sees
 // the page load perfectly — which is also why a shared link never unfurls a preview card.
 //
-// The document is missing. The page is not, and the status has to say which.
+// The document is missing. The page is not, and the status has to say which — and only
+// where the page really is there. An id from a scheme the catalogue left behind, a
+// composer whose spelling was merged into another's, a piece that never existed: those
+// are absent, and a 200 with an empty shell for them is a soft 404 that teaches a search
+// index to distrust every answer the site gives. The build writes the addresses that do
+// exist to /known.json (dev/gen-known-ids.mts); a miss that is not on it keeps its 404.
 //
 // Middleware runs in front of the static files, so a prerendered document is served
 // exactly as it is and only a miss reaches the rewrite. _routes.json narrows this to the
 // routes that render from data, so a missing image stays missing: a 404 for something
 // that really is absent is the correct answer and must survive.
+
+// A generated exercise — a scale, an arpeggio, a chord set — is built from its id and has
+// no manifest row to look up; its shape is the whole test.
+const GENERATED = /^(?:scale|arpeggio|chords)-/;
+// One fetch of the list per isolate, shared by every request it serves after.
+let knownPromise = null;
+
+async function known(context) {
+    if (knownPromise === null) {
+        knownPromise = context.env.ASSETS.fetch(new URL("/known.json", context.request.url))
+            .then((response) => (response.ok ? response.json() : null))
+            .then((list) =>
+                list ? { pieces: new Set(list.pieces), people: new Set(list.people) } : null,
+            )
+            .catch(() => null);
+    }
+    return knownPromise;
+}
+
+// Whether the address names a page the site has. Unknown when the list could not be
+// read: then every page is presumed real, as it always was, rather than the whole
+// catalogue going missing because one file did.
+export async function exists(context) {
+    const path = new URL(context.request.url).pathname;
+    const match = path.match(/^\/[a-z]{2}\/(play|person)\/([^/]+)\/?$/);
+    if (!match) {
+        return true;
+    }
+    const [, kind, raw] = match;
+    const id = decodeURIComponent(raw);
+    if (kind === "play" && GENERATED.test(id)) {
+        return true;
+    }
+    const list = await known(context);
+    if (list === null) {
+        return true;
+    }
+    return kind === "play" ? list.pieces.has(id) : list.people.has(id);
+}
+
 export async function onRequest(context) {
     const response = await context.next();
     if (response.status !== 404) {
+        return response;
+    }
+    if (!(await exists(context))) {
         return response;
     }
     // The body is already right — 404.html is the shell. Only the status is wrong, and a
@@ -32,4 +80,9 @@ export async function onRequest(context) {
         statusText: "OK",
         headers: response.headers,
     });
+}
+
+// For the test alone: the list is read once per isolate, and a test needs a fresh read.
+export function forgetKnown() {
+    knownPromise = null;
 }

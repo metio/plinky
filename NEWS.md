@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 7 September 2026
 
+**A link to a piece that isn't there says so.** An address for a piece or a
+composer the catalogue does not have — an old link from before the catalogue's
+pieces were renamed, say — used to load an empty page that claimed to be fine.
+It answers "not found" now, so a browser, a search engine and a bookmark all learn
+the truth, while every piece and composer that exists opens exactly as before.
+
 **Old links land where the page went.** A link to a page that has since moved —
 the old You page, the Library, the separate trainers — or a link from before Plinky
 spoke twenty-six languages, with no language in its address, used to answer with
