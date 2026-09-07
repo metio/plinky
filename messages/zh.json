@@ -1398,5 +1398,19 @@
     "offline_home": "返回 Plinky",
     "settings_offline": "离线",
     "keep_offline_toggle": "把 Plinky 保存在此设备上",
-    "keep_offline_hint": "每次访问都会获取所有页面，新版本发布时约一兆字节，这样离线练习时什么都不缺。你打开过的乐曲会随时保存。"
+    "keep_offline_hint": "每次访问都会获取所有页面，新版本发布时约一兆字节，这样离线练习时什么都不缺。你打开过的乐曲会随时保存。",
+    "exercise_stack": "和弦",
+    "exercise_stack_triads": "三和弦",
+    "exercise_stack_sevenths": "七和弦",
+    "exercise_voicing": "排列",
+    "exercise_voicing_close": "密集",
+    "exercise_voicing_open": "开放",
+    "exercise_pattern": "型",
+    "exercise_pattern_block": "柱式",
+    "exercise_pattern_alberti": "阿尔贝蒂",
+    "exercise_pattern_broken": "分解",
+    "exercise_form_sevenths": "七和弦",
+    "exercise_form_open": "开放排列",
+    "exercise_form_alberti": "阿尔贝蒂低音",
+    "exercise_form_broken": "分解和弦"
 }

@@ -1400,5 +1400,19 @@
     "offline_home": "Vissza a Plinkyhez",
     "settings_offline": "Offline",
     "keep_offline_toggle": "Plinky megtartása ezen az eszközön",
-    "keep_offline_hint": "Minden látogatáskor letölti az összes oldalt, új verziónál nagyjából egy megabájtot, hogy kapcsolat nélkül gyakorolva se hiányozzon semmi. A megnyitott darabok menet közben megmaradnak."
+    "keep_offline_hint": "Minden látogatáskor letölti az összes oldalt, új verziónál nagyjából egy megabájtot, hogy kapcsolat nélkül gyakorolva se hiányozzon semmi. A megnyitott darabok menet közben megmaradnak.",
+    "exercise_stack": "Akkordok",
+    "exercise_stack_triads": "Hármashangzatok",
+    "exercise_stack_sevenths": "Négyeshangzatok",
+    "exercise_voicing": "Fekvés",
+    "exercise_voicing_close": "Szűk",
+    "exercise_voicing_open": "Tág",
+    "exercise_pattern": "Minta",
+    "exercise_pattern_block": "Tömb",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "Felbontott",
+    "exercise_form_sevenths": "négyeshangzatok",
+    "exercise_form_open": "tág fekvés",
+    "exercise_form_alberti": "Alberti-basszus",
+    "exercise_form_broken": "felbontott akkordok"
 }

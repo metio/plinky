@@ -1404,5 +1404,19 @@
     "offline_home": "Назад к Plinky",
     "settings_offline": "Офлайн",
     "keep_offline_toggle": "Хранить Plinky на этом устройстве",
-    "keep_offline_hint": "Загружает все страницы при каждом посещении, около мегабайта при выходе новой версии, чтобы ничего не отсутствовало, когда ты занимаешься без подключения. Открытые пьесы сохраняются по ходу."
+    "keep_offline_hint": "Загружает все страницы при каждом посещении, около мегабайта при выходе новой версии, чтобы ничего не отсутствовало, когда ты занимаешься без подключения. Открытые пьесы сохраняются по ходу.",
+    "exercise_stack": "Аккорды",
+    "exercise_stack_triads": "Трезвучия",
+    "exercise_stack_sevenths": "Септаккорды",
+    "exercise_voicing": "Расположение",
+    "exercise_voicing_close": "Тесное",
+    "exercise_voicing_open": "Широкое",
+    "exercise_pattern": "Фигура",
+    "exercise_pattern_block": "Блок",
+    "exercise_pattern_alberti": "Альберти",
+    "exercise_pattern_broken": "Разложенный",
+    "exercise_form_sevenths": "септаккорды",
+    "exercise_form_open": "широкое расположение",
+    "exercise_form_alberti": "альбертиевы басы",
+    "exercise_form_broken": "разложенные аккорды"
 }

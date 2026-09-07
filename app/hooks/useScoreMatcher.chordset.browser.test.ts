@@ -46,4 +46,22 @@ describe("a chord set on the play page", () => {
             48, 52, 55,
         ]);
     });
+
+    it("engraves the dialled forms the way the generator spelled them", async () => {
+        // Sevenths in open position as an Alberti bass: one bar per chord, four single
+        // notes, reaching root, top, middle, top of C E G B opened to C G E B.
+        const config = parseExerciseId("chords-c-major.1r7oa");
+        expect(config).not.toBeNull();
+        const osmd = await engrave(generateExercise(config!));
+        const steps = collectMatchSteps(osmd, "both");
+        expect(steps).toHaveLength(60);
+        expect(steps.slice(0, 4).map((step) => step.pitches)).toEqual([[60], [83], [67], [83]]);
+        // A broken triad in the left hand, one octave down.
+        const broken = await engrave(generateExercise(parseExerciseId("chords-c-major.1lk")!));
+        expect(
+            collectMatchSteps(broken, "both")
+                .slice(0, 4)
+                .map((step) => step.pitches),
+        ).toEqual([[48], [52], [55], [52]]);
+    });
 });

@@ -200,7 +200,8 @@ one-tap **review session** walks you through everything that's fading, and you c
 ## Features, one by one
 
 - **Music** — the catalogue: bundled scales, arpeggios, the seven chords of every key
-  as block-chord sets, and familiar tunes like *Twinkle, Twinkle* and *Ode to Joy*, plus
+  as block-chord sets — each with dials for sevenths, open position and a broken or
+  Alberti pattern — and familiar tunes like *Twinkle, Twinkle* and *Ode to Joy*, plus
   anything you import, in two tabs.
   **Search** finds something to play: search, star, filter by kind, grade, or what's
   **due now**, and open one to practise. **Manage** grows and safeguards the library:

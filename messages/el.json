@@ -1400,5 +1400,19 @@
     "offline_home": "Πίσω στο Plinky",
     "settings_offline": "Εκτός σύνδεσης",
     "keep_offline_toggle": "Κράτα το Plinky σε αυτή τη συσκευή",
-    "keep_offline_hint": "Κατεβάζει όλες τις σελίδες σε κάθε επίσκεψη, περίπου ένα megabyte όταν βγαίνει νέα έκδοση, ώστε να μη λείπει τίποτα όταν εξασκείσαι χωρίς σύνδεση. Τα κομμάτια που ανοίγεις κρατιούνται καθώς προχωράς."
+    "keep_offline_hint": "Κατεβάζει όλες τις σελίδες σε κάθε επίσκεψη, περίπου ένα megabyte όταν βγαίνει νέα έκδοση, ώστε να μη λείπει τίποτα όταν εξασκείσαι χωρίς σύνδεση. Τα κομμάτια που ανοίγεις κρατιούνται καθώς προχωράς.",
+    "exercise_stack": "Συγχορδίες",
+    "exercise_stack_triads": "Τρίφωνες",
+    "exercise_stack_sevenths": "Έβδομης",
+    "exercise_voicing": "Θέση",
+    "exercise_voicing_close": "Κλειστή",
+    "exercise_voicing_open": "Ανοιχτή",
+    "exercise_pattern": "Μοτίβο",
+    "exercise_pattern_block": "Συμπαγής",
+    "exercise_pattern_alberti": "Αλμπέρτι",
+    "exercise_pattern_broken": "Σπασμένη",
+    "exercise_form_sevenths": "συγχορδίες έβδομης",
+    "exercise_form_open": "ανοιχτή θέση",
+    "exercise_form_alberti": "μπάσο Αλμπέρτι",
+    "exercise_form_broken": "σπασμένες συγχορδίες"
 }

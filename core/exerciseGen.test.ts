@@ -187,6 +187,55 @@ describe("chord sets", () => {
         expect(parseExerciseId("chords-a-minor")).toEqual(
             config({ type: "minor-chords", key: "a" }),
         );
+        const dialled = config({ stack: "seventh", voicing: "open", pattern: "alberti" });
+        expect(buildExerciseId(dialled)).toBe("chords-c-major.1r7oa");
+        expect(parseExerciseId("chords-c-major.1r7oa")).toEqual(dialled);
+        expect(parseExerciseId("chords-c-major.2bi1k")).toEqual(
+            config({ octaves: 2, hands: "both", inversion: 1, pattern: "broken" }),
+        );
+    });
+
+    it("stacks a seventh on every chord of the key", () => {
+        const positions = positionSequence(generateExercise(config({ stack: "seventh" })));
+        expect(positions[0]).toEqual([60, 64, 67, 71]);
+        // V7: the dominant seventh the key is built around.
+        expect(positions[4]).toEqual([67, 71, 74, 77]);
+        // First inversion carries the root up: E G B C.
+        expect(
+            positionSequence(generateExercise(config({ stack: "seventh", inversion: 1 })))[0],
+        ).toEqual([64, 67, 71, 72]);
+    });
+
+    it("opens a chord to root, fifth and tenth", () => {
+        expect(positionSequence(generateExercise(config({ voicing: "open" })))[0]).toEqual([
+            60, 67, 76,
+        ]);
+        expect(
+            positionSequence(generateExercise(config({ voicing: "open", stack: "seventh" })))[0],
+        ).toEqual([60, 67, 76, 83]);
+    });
+
+    it("spells a chord out as a bar of Alberti bass or a broken chord", () => {
+        const alberti = positionSequence(generateExercise(config({ pattern: "alberti" })));
+        // Fifteen chords, four beats each.
+        expect(alberti).toHaveLength(60);
+        expect(alberti.slice(0, 4)).toEqual([[60], [67], [64], [67]]);
+        const broken = positionSequence(generateExercise(config({ pattern: "broken" })));
+        expect(broken.slice(0, 4)).toEqual([[60], [64], [67], [64]]);
+        // A seventh's broken form climbs through all four tones.
+        expect(
+            positionSequence(
+                generateExercise(config({ pattern: "broken", stack: "seventh" })),
+            ).slice(0, 4),
+        ).toEqual([[60], [64], [67], [71]]);
+    });
+
+    it("carries none of the chord dials on a scale, whatever the id asked for", () => {
+        // The nearest real exercise, as every other inapplicable form resolves.
+        expect(parseExerciseId("scale-c-major.1r7oa")).toEqual(parseExerciseId("scale-c-major"));
+        expect(buildExerciseId({ ...config({ type: "major-scale", pattern: "alberti" }) })).toBe(
+            "scale-c-major",
+        );
     });
 });
 

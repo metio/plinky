@@ -1402,5 +1402,19 @@
     "offline_home": "Voltar ao Plinky",
     "settings_offline": "Offline",
     "keep_offline_toggle": "Manter o Plinky neste dispositivo",
-    "keep_offline_hint": "Vai buscar todas as páginas em cada visita, cerca de um megabyte quando sai uma versão nova, para que nada falte quando praticas sem ligação. As peças que abres ficam guardadas à medida que avanças."
+    "keep_offline_hint": "Vai buscar todas as páginas em cada visita, cerca de um megabyte quando sai uma versão nova, para que nada falte quando praticas sem ligação. As peças que abres ficam guardadas à medida que avanças.",
+    "exercise_stack": "Acordes",
+    "exercise_stack_triads": "Tríades",
+    "exercise_stack_sevenths": "Sétimas",
+    "exercise_voicing": "Disposição",
+    "exercise_voicing_close": "Fechada",
+    "exercise_voicing_open": "Aberta",
+    "exercise_pattern": "Padrão",
+    "exercise_pattern_block": "Bloco",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "Arpejado",
+    "exercise_form_sevenths": "acordes de sétima",
+    "exercise_form_open": "posição aberta",
+    "exercise_form_alberti": "baixo de Alberti",
+    "exercise_form_broken": "acordes arpejados"
 }

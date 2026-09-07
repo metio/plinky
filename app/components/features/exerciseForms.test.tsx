@@ -63,3 +63,21 @@ describe("ExerciseForms hand controls", () => {
         expect(screen.queryByRole("link", { name: m.exercise_hand_contrary() })).toBeNull();
     });
 });
+
+describe("ExerciseForms chord dials", () => {
+    it("offers the stack, the voicing and the pattern on a chord set only", () => {
+        renderForms(config({ type: "major-chords" }));
+        expect(screen.getByRole("link", { name: m.exercise_stack_sevenths() })).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.exercise_voicing_open() })).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.exercise_pattern_alberti() })).toBeTruthy();
+        cleanup();
+        renderForms(config({ type: "major-arpeggio" }));
+        expect(screen.queryByRole("link", { name: m.exercise_pattern_alberti() })).toBeNull();
+    });
+
+    it("links each dial to the exercise it names", () => {
+        renderForms(config({ type: "major-chords", hands: "both" }));
+        const alberti = screen.getByRole("link", { name: m.exercise_pattern_alberti() });
+        expect(alberti.getAttribute("href")).toContain("/play/chords-c-major.1ba");
+    });
+});

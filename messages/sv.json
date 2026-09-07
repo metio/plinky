@@ -1400,5 +1400,19 @@
     "offline_home": "Tillbaka till Plinky",
     "settings_offline": "Offline",
     "keep_offline_toggle": "Behåll Plinky på den här enheten",
-    "keep_offline_hint": "Hämtar alla sidor vid varje besök, ungefär en megabyte när en ny version kommer, så att inget saknas när du övar utan uppkoppling. Stycken du öppnar sparas efter hand."
+    "keep_offline_hint": "Hämtar alla sidor vid varje besök, ungefär en megabyte när en ny version kommer, så att inget saknas när du övar utan uppkoppling. Stycken du öppnar sparas efter hand.",
+    "exercise_stack": "Ackord",
+    "exercise_stack_triads": "Treklanger",
+    "exercise_stack_sevenths": "Septimackord",
+    "exercise_voicing": "Läge",
+    "exercise_voicing_close": "Trångt",
+    "exercise_voicing_open": "Spritt",
+    "exercise_pattern": "Mönster",
+    "exercise_pattern_block": "Block",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "Brutet",
+    "exercise_form_sevenths": "septimackord",
+    "exercise_form_open": "spritt läge",
+    "exercise_form_alberti": "Albertibas",
+    "exercise_form_broken": "brutna ackord"
 }

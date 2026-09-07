@@ -1404,5 +1404,19 @@
     "offline_home": "Späť na Plinky",
     "settings_offline": "Offline",
     "keep_offline_toggle": "Ponechať Plinky na tomto zariadení",
-    "keep_offline_hint": "Pri každej návšteve stiahne všetky stránky, zhruba megabajt, keď vyjde nová verzia, aby pri cvičení bez pripojenia nič nechýbalo. Skladby, ktoré otvoríš, sa ukladajú priebežne."
+    "keep_offline_hint": "Pri každej návšteve stiahne všetky stránky, zhruba megabajt, keď vyjde nová verzia, aby pri cvičení bez pripojenia nič nechýbalo. Skladby, ktoré otvoríš, sa ukladajú priebežne.",
+    "exercise_stack": "Akordy",
+    "exercise_stack_triads": "Kvintakordy",
+    "exercise_stack_sevenths": "Septakordy",
+    "exercise_voicing": "Poloha",
+    "exercise_voicing_close": "Úzka",
+    "exercise_voicing_open": "Široká",
+    "exercise_pattern": "Vzor",
+    "exercise_pattern_block": "Blok",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "Rozložený",
+    "exercise_form_sevenths": "septakordy",
+    "exercise_form_open": "široká poloha",
+    "exercise_form_alberti": "Albertiho bas",
+    "exercise_form_broken": "rozložené akordy"
 }

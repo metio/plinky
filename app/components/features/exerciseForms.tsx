@@ -3,10 +3,14 @@
 
 import {
     buildExerciseId,
+    type ChordPattern,
+    type ChordStack,
+    type ChordVoicing,
     type ExerciseConfig,
     type Hands,
-    type Interval,
     hasInversions,
+    type Interval,
+    isChords,
     supportsContrary,
     supportsIntervals,
 } from "../../../core/exerciseGen";
@@ -56,6 +60,19 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
     ];
     // Double stops don't combine with contrary motion.
     const showIntervals = supportsIntervals(config.type) && config.hands !== "contrary";
+    const stacks: [ChordStack, string][] = [
+        ["triad", m.exercise_stack_triads()],
+        ["seventh", m.exercise_stack_sevenths()],
+    ];
+    const voicings: [ChordVoicing, string][] = [
+        ["close", m.exercise_voicing_close()],
+        ["open", m.exercise_voicing_open()],
+    ];
+    const patterns: [ChordPattern, string][] = [
+        ["block", m.exercise_pattern_block()],
+        ["alberti", m.exercise_pattern_alberti()],
+        ["broken", m.exercise_pattern_broken()],
+    ];
 
     return (
         <div className="space-y-2 rounded-lg border border-line p-3">
@@ -88,6 +105,41 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
                             key={inversion}
                             to={to({ inversion })}
                             className={`${BTN} ${config.inversion === inversion ? ON : OFF}`}
+                        >
+                            {label}
+                        </Link>
+                    ))}
+                </Row>
+            </Show>
+            <Show when={isChords(config.type)}>
+                <Row label={m.exercise_stack()}>
+                    {stacks.map(([stack, label]) => (
+                        <Link
+                            key={stack}
+                            to={to({ stack })}
+                            className={`${BTN} ${(config.stack ?? "triad") === stack ? ON : OFF}`}
+                        >
+                            {label}
+                        </Link>
+                    ))}
+                </Row>
+                <Row label={m.exercise_voicing()}>
+                    {voicings.map(([voicing, label]) => (
+                        <Link
+                            key={voicing}
+                            to={to({ voicing })}
+                            className={`${BTN} ${(config.voicing ?? "close") === voicing ? ON : OFF}`}
+                        >
+                            {label}
+                        </Link>
+                    ))}
+                </Row>
+                <Row label={m.exercise_pattern()}>
+                    {patterns.map(([pattern, label]) => (
+                        <Link
+                            key={pattern}
+                            to={to({ pattern })}
+                            className={`${BTN} ${(config.pattern ?? "block") === pattern ? ON : OFF}`}
                         >
                             {label}
                         </Link>

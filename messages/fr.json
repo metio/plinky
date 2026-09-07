@@ -1402,5 +1402,19 @@
     "offline_home": "Retour à Plinky",
     "settings_offline": "Hors ligne",
     "keep_offline_toggle": "Garder Plinky sur cet appareil",
-    "keep_offline_hint": "Récupère toutes les pages à chaque visite, environ un mégaoctet quand une nouvelle version sort, pour qu’il ne manque rien quand tu t’exerces sans connexion. Les morceaux que tu ouvres sont gardés au fur et à mesure."
+    "keep_offline_hint": "Récupère toutes les pages à chaque visite, environ un mégaoctet quand une nouvelle version sort, pour qu’il ne manque rien quand tu t’exerces sans connexion. Les morceaux que tu ouvres sont gardés au fur et à mesure.",
+    "exercise_stack": "Accords",
+    "exercise_stack_triads": "Triades",
+    "exercise_stack_sevenths": "Septièmes",
+    "exercise_voicing": "Position",
+    "exercise_voicing_close": "Serrée",
+    "exercise_voicing_open": "Large",
+    "exercise_pattern": "Motif",
+    "exercise_pattern_block": "Plaqué",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "Brisé",
+    "exercise_form_sevenths": "accords de septième",
+    "exercise_form_open": "position large",
+    "exercise_form_alberti": "basse d’Alberti",
+    "exercise_form_broken": "accords brisés"
 }

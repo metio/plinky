@@ -1400,5 +1400,19 @@
     "offline_home": "Plinky’ye dön",
     "settings_offline": "Çevrimdışı",
     "keep_offline_toggle": "Plinky’yi bu cihazda tut",
-    "keep_offline_hint": "Her ziyarette tüm sayfaları alır; yeni bir sürüm çıktığında yaklaşık bir megabayt, böylece bağlantısız çalışırken hiçbir şey eksik olmaz. Açtığın parçalar zaten anında saklanır."
+    "keep_offline_hint": "Her ziyarette tüm sayfaları alır; yeni bir sürüm çıktığında yaklaşık bir megabayt, böylece bağlantısız çalışırken hiçbir şey eksik olmaz. Açtığın parçalar zaten anında saklanır.",
+    "exercise_stack": "Akorlar",
+    "exercise_stack_triads": "Üçlüler",
+    "exercise_stack_sevenths": "Yedililer",
+    "exercise_voicing": "Dizilim",
+    "exercise_voicing_close": "Kapalı",
+    "exercise_voicing_open": "Açık",
+    "exercise_pattern": "Kalıp",
+    "exercise_pattern_block": "Blok",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "Kırık",
+    "exercise_form_sevenths": "yedili akorlar",
+    "exercise_form_open": "açık dizilim",
+    "exercise_form_alberti": "Alberti bası",
+    "exercise_form_broken": "kırık akorlar"
 }

@@ -1398,5 +1398,19 @@
     "offline_home": "Plinky로 돌아가기",
     "settings_offline": "오프라인",
     "keep_offline_toggle": "이 기기에 Plinky 보관하기",
-    "keep_offline_hint": "방문할 때마다 모든 페이지를 가져와요. 새 버전이 나올 때 약 1MB 정도이며, 연결 없이 연습할 때 빠지는 것이 없어요. 열어 본 곡은 그때그때 보관돼요."
+    "keep_offline_hint": "방문할 때마다 모든 페이지를 가져와요. 새 버전이 나올 때 약 1MB 정도이며, 연결 없이 연습할 때 빠지는 것이 없어요. 열어 본 곡은 그때그때 보관돼요.",
+    "exercise_stack": "화음",
+    "exercise_stack_triads": "3화음",
+    "exercise_stack_sevenths": "7화음",
+    "exercise_voicing": "배치",
+    "exercise_voicing_close": "밀집",
+    "exercise_voicing_open": "개리",
+    "exercise_pattern": "패턴",
+    "exercise_pattern_block": "블록",
+    "exercise_pattern_alberti": "알베르티",
+    "exercise_pattern_broken": "분산",
+    "exercise_form_sevenths": "7화음",
+    "exercise_form_open": "개리 배치",
+    "exercise_form_alberti": "알베르티 베이스",
+    "exercise_form_broken": "분산 화음"
 }

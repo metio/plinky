@@ -47,3 +47,19 @@ export const Contrary: Story = { args: { config: config({ hands: "contrary" }) }
 export const Widest: Story = {
     args: { config: config({ octaves: 2, hands: "both", interval: "sixths" }) },
 };
+
+// A chord set carries three rows of its own — the stack, the voicing and the pattern —
+// and the inversion row an arpeggio has; here every one of them is turned away from
+// the plain form.
+export const ChordSet: Story = {
+    args: {
+        config: config({
+            type: "major-chords",
+            hands: "both",
+            inversion: 1,
+            stack: "seventh",
+            voicing: "open",
+            pattern: "alberti",
+        }),
+    },
+};

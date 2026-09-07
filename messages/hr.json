@@ -1402,5 +1402,19 @@
     "offline_home": "Natrag na Plinky",
     "settings_offline": "Izvan mreže",
     "keep_offline_toggle": "Zadrži Plinky na ovom uređaju",
-    "keep_offline_hint": "Dohvaća sve stranice pri svakom posjetu, oko jedan megabajt kad izađe nova verzija, tako da ništa ne nedostaje kad vježbaš bez veze. Skladbe koje otvoriš čuvaju se usput."
+    "keep_offline_hint": "Dohvaća sve stranice pri svakom posjetu, oko jedan megabajt kad izađe nova verzija, tako da ništa ne nedostaje kad vježbaš bez veze. Skladbe koje otvoriš čuvaju se usput.",
+    "exercise_stack": "Akordi",
+    "exercise_stack_triads": "Trozvuci",
+    "exercise_stack_sevenths": "Četverozvuci",
+    "exercise_voicing": "Slog",
+    "exercise_voicing_close": "Uski",
+    "exercise_voicing_open": "Široki",
+    "exercise_pattern": "Uzorak",
+    "exercise_pattern_block": "Blok",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "Razloženo",
+    "exercise_form_sevenths": "četverozvuci",
+    "exercise_form_open": "široki slog",
+    "exercise_form_alberti": "Albertijev bas",
+    "exercise_form_broken": "razloženi akordi"
 }

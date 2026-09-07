@@ -1398,5 +1398,19 @@
     "offline_home": "Plinky に戻る",
     "settings_offline": "オフライン",
     "keep_offline_toggle": "このデバイスに Plinky を保存する",
-    "keep_offline_hint": "訪問のたびにすべてのページを取得します。新しいバージョンが出たときは約 1 MB で、接続なしで練習しても足りないものがありません。開いた曲はその都度保存されます。"
+    "keep_offline_hint": "訪問のたびにすべてのページを取得します。新しいバージョンが出たときは約 1 MB で、接続なしで練習しても足りないものがありません。開いた曲はその都度保存されます。",
+    "exercise_stack": "和音",
+    "exercise_stack_triads": "三和音",
+    "exercise_stack_sevenths": "七の和音",
+    "exercise_voicing": "配置",
+    "exercise_voicing_close": "密集",
+    "exercise_voicing_open": "開離",
+    "exercise_pattern": "型",
+    "exercise_pattern_block": "ブロック",
+    "exercise_pattern_alberti": "アルベルティ",
+    "exercise_pattern_broken": "分散",
+    "exercise_form_sevenths": "七の和音",
+    "exercise_form_open": "開離配置",
+    "exercise_form_alberti": "アルベルティ・バス",
+    "exercise_form_broken": "分散和音"
 }

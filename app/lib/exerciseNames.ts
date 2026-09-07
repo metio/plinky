@@ -37,6 +37,10 @@ const FORMS: Record<ExerciseForm, () => string> = {
     contrary: m.exercise_form_contrary,
     "inversion-1": m.exercise_form_first_inversion,
     "inversion-2": m.exercise_form_second_inversion,
+    sevenths: m.exercise_form_sevenths,
+    open: m.exercise_form_open,
+    alberti: m.exercise_form_alberti,
+    broken: m.exercise_form_broken,
 };
 
 export function exerciseName(config: ExerciseConfig): string {

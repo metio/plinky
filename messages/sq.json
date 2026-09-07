@@ -1400,5 +1400,19 @@
     "offline_home": "Kthehu te Plinky",
     "settings_offline": "Jashtë linje",
     "keep_offline_toggle": "Mbaje Plinky në këtë pajisje",
-    "keep_offline_hint": "Merr të gjitha faqet në çdo vizitë, rreth një megabajt kur del një version i ri, që të mos mungojë asgjë kur ushtron pa lidhje. Pjesët që hap ruhen gjatë rrugës."
+    "keep_offline_hint": "Merr të gjitha faqet në çdo vizitë, rreth një megabajt kur del një version i ri, që të mos mungojë asgjë kur ushtron pa lidhje. Pjesët që hap ruhen gjatë rrugës.",
+    "exercise_stack": "Akorde",
+    "exercise_stack_triads": "Treshe",
+    "exercise_stack_sevenths": "Të shtatës",
+    "exercise_voicing": "Pozicion",
+    "exercise_voicing_close": "I ngushtë",
+    "exercise_voicing_open": "I hapur",
+    "exercise_pattern": "Model",
+    "exercise_pattern_block": "Bllok",
+    "exercise_pattern_alberti": "Alberti",
+    "exercise_pattern_broken": "I thyer",
+    "exercise_form_sevenths": "akorde të shtatës",
+    "exercise_form_open": "pozicion i hapur",
+    "exercise_form_alberti": "bas Alberti",
+    "exercise_form_broken": "akorde të thyera"
 }

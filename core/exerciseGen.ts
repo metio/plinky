@@ -30,13 +30,30 @@ export type Hands = "right" | "left" | "both" | "contrary";
 
 export type Interval = "single" | "thirds" | "sixths";
 
+// The three dials only a chord set has. Absent means the plain form — a triad in close
+// position, played as a block — so the shelf's stored tiles and every other kind of
+// exercise carry nothing they have no use for.
+//
+// A pattern is the order the chord's tones are played in, one to a beat, so a chord
+// becomes a bar: an Alberti bass rocks bottom–top–middle–top, a broken chord climbs
+// bottom–middle–top–middle. That is how most left hands actually meet a chord.
+export type ChordPattern = "block" | "alberti" | "broken";
+// Open position lifts the middle tone an octave — root, fifth, tenth — which is where a
+// hand's reach grows: the shape spans a tenth instead of a fifth.
+export type ChordVoicing = "close" | "open";
+// A seventh stacks one more third: the four-note chords a key is built from.
+export type ChordStack = "triad" | "seventh";
+
 export type ExerciseConfig = {
     type: ExerciseType;
     key: string; // slug, e.g. "c", "csharp", "bflat"
     octaves: 1 | 2;
     hands: Hands;
-    inversion: 0 | 1 | 2; // arpeggios only
+    inversion: 0 | 1 | 2; // arpeggios and chords
     interval: Interval; // supported scales only
+    pattern?: ChordPattern; // chords only
+    voicing?: ChordVoicing; // chords only
+    stack?: ChordStack; // chords only
 };
 
 type Note = { letter: string; octave: number; alter: number };
@@ -249,21 +266,53 @@ function arpeggioLine(
 // bottom, second the fifth, with the lower tones carried an octave up. The line then
 // starts higher and the shape is the one a hand keeps while the bass moves — what a player
 // who has the root positions needs next.
-function chordLine(tonic: string, fifths: number, octaves: number, inversion: number): Note[][] {
-    // Two octaves past the run, so the top chord's upper tones and any inversion's
-    // carried tones are still on the line.
-    const scale = diatonic(tonic, fifths, octaves + 2, 1);
+function chordLine(
+    tonic: string,
+    fifths: number,
+    octaves: number,
+    inversion: number,
+    stack: ChordStack,
+    voicing: ChordVoicing,
+    pattern: ChordPattern,
+): Note[][] {
+    // Three octaves past the run, so the top chord's upper tones, an inversion's carried
+    // tones and an open voicing's lifted tone are all still on the line. The chord is
+    // built as scale degrees and only read off the line at the end, so every shaping —
+    // the rotation, the lift — is a matter of adding seven.
+    const scale = diatonic(tonic, fifths, octaves + 3, 1);
+    const size = stack === "seventh" ? 4 : 3;
     const up: Note[][] = [];
     for (let degree = 0; degree <= octaves * 7; degree++) {
-        const tones = [scale[degree]!, scale[degree + 2]!, scale[degree + 4]!];
+        const tones = Array.from({ length: size }, (_, at) => degree + at * 2);
         // Rotating carries the tones taken off the bottom up an octave: seven degrees on.
         const rotated = [
             ...tones.slice(inversion),
-            ...tones.slice(0, inversion).map((_, at) => scale[degree + at * 2 + 7]!),
+            ...tones.slice(0, inversion).map((tone) => tone + 7),
         ];
-        up.push(rotated);
+        // Open position: the second tone from the bottom goes up an octave, and so does
+        // a seventh's top, so the shape reads bottom, fifth, tenth (and the seventh above).
+        const voiced =
+            voicing === "open"
+                ? [rotated[0]!, rotated[2]!, rotated[1]! + 7, ...rotated.slice(3).map((t) => t + 7)]
+                : rotated;
+        up.push(voiced.map((tone) => scale[tone]!));
     }
-    return up.concat([...up].reverse().slice(1));
+    const chords = up.concat([...up].reverse().slice(1));
+    return chords.flatMap((chord) => spellOutPattern(chord, pattern));
+}
+
+// The order a chord's tones are played in under a pattern, by their place from the bottom
+// up: a block is the chord itself; the two broken forms take four beats, so the chord
+// fills a bar. With a seventh the top tone is the seventh, which is what the pattern
+// reaches for at the top.
+function spellOutPattern(chord: Note[], pattern: ChordPattern): Note[][] {
+    if (pattern === "block") {
+        return [chord];
+    }
+    const top = chord.length - 1;
+    const order =
+        pattern === "alberti" ? [0, top, 1, top] : chord.length === 4 ? [0, 1, 2, 3] : [0, 1, 2, 1];
+    return order.map((at) => [chord[at]!]);
 }
 const shiftOctave = (notes: Note[], by: number): Note[] =>
     notes.map((n) => ({ ...n, octave: n.octave + by }));
@@ -347,7 +396,7 @@ const isScale = (type: ExerciseType): boolean => type.endsWith("-scale");
 // them in parallel — so a form offering the choice there would offer a button that
 // changes nothing but the id it lands on.
 export const supportsContrary = (type: ExerciseType): boolean => isScale(type);
-const isChords = (type: ExerciseType): boolean => type.endsWith("-chords");
+export const isChords = (type: ExerciseType): boolean => type.endsWith("-chords");
 // Whether the form has inversions to choose between: a chord shape does, and so does an
 // arpeggio, which is a chord shape spread out; a scale has no bottom note to rotate.
 export const hasInversions = (type: ExerciseType): boolean => isArpeggio(type) || isChords(type);
@@ -366,12 +415,18 @@ export const hasInversions = (type: ExerciseType): boolean => isArpeggio(type) |
 function normalizeExercise(config: ExerciseConfig): ExerciseConfig {
     const hands: Hands =
         config.hands === "contrary" && !supportsContrary(config.type) ? "both" : config.hands;
+    const { pattern, voicing, stack, ...rest } = config;
     return {
-        ...config,
+        ...rest,
         hands,
         inversion: hasInversions(config.type) ? config.inversion : 0,
         interval:
             supportsIntervals(config.type) && hands !== "contrary" ? config.interval : "single",
+        // The chord dials exist only on a chord set, and only when they say something:
+        // the plain form carries none, so it names the same exercise it always has.
+        ...(isChords(config.type) && pattern && pattern !== "block" ? { pattern } : {}),
+        ...(isChords(config.type) && voicing && voicing !== "close" ? { voicing } : {}),
+        ...(isChords(config.type) && stack && stack !== "triad" ? { stack } : {}),
     };
 }
 // Which of the two key tables a type is read against. Minor and major name their keys
@@ -406,7 +461,15 @@ export function generateExercise(raw: ExerciseConfig): string {
           : arpeggioLine(config.type, tonic, fx, config.octaves, config.inversion);
     // Normalisation has already cleared the interval wherever double stops do not apply.
     const main: Note[][] = isChords(config.type)
-        ? chordLine(tonic, fifths, config.octaves, config.inversion)
+        ? chordLine(
+              tonic,
+              fifths,
+              config.octaves,
+              config.inversion,
+              config.stack ?? "triad",
+              config.voicing ?? "close",
+              config.pattern ?? "block",
+          )
         : config.interval !== "single"
           ? doubleStops(
                 config.type,
@@ -470,7 +533,11 @@ export type ExerciseForm =
     | "both-hands"
     | "contrary"
     | "inversion-1"
-    | "inversion-2";
+    | "inversion-2"
+    | "sevenths"
+    | "open"
+    | "alberti"
+    | "broken";
 
 export type ExerciseTitle = { key: string; type: ExerciseType; forms: ExerciseForm[] };
 
@@ -485,6 +552,10 @@ export function exerciseTitleParts(raw: ExerciseConfig): ExerciseTitle {
     if (config.hands === "contrary") forms.push("contrary");
     if (config.inversion === 1) forms.push("inversion-1");
     if (config.inversion === 2) forms.push("inversion-2");
+    if (config.stack === "seventh") forms.push("sevenths");
+    if (config.voicing === "open") forms.push("open");
+    if (config.pattern === "alberti") forms.push("alberti");
+    if (config.pattern === "broken") forms.push("broken");
     return { key: keyName(config.key), type: config.type, forms };
 }
 
@@ -507,6 +578,10 @@ const FORM_LABEL: Record<ExerciseForm, string> = {
     contrary: "contrary motion",
     "inversion-1": "1st inversion",
     "inversion-2": "2nd inversion",
+    sevenths: "sevenths",
+    open: "open position",
+    alberti: "Alberti bass",
+    broken: "broken chords",
 };
 
 // --- id <-> config ----------------------------------------------------------
@@ -531,6 +606,10 @@ const CODE_HAND: Record<string, Hands> = { r: "right", l: "left", b: "both", c: 
 // the slot after the hand: i1/i2 for inversions, t/s for thirds/sixths.
 const INTERVAL_CODE: Record<Interval, string> = { single: "", thirds: "t", sixths: "s" };
 const CODE_INTERVAL: Record<string, Interval> = { t: "thirds", s: "sixths" };
+// A chord set's own dials follow, each a letter only when it says something: 7 for
+// sevenths, o for open position, a or k for an Alberti or a broken pattern.
+const PATTERN_CODE: Record<ChordPattern, string> = { block: "", alberti: "a", broken: "k" };
+const CODE_PATTERN: Record<string, ChordPattern> = { a: "alberti", k: "broken" };
 
 // The exercise's name. Normalised first, so two configs that generate the same score
 // share one id — and, because the slot after the hand carries either an inversion or an
@@ -539,14 +618,16 @@ export function buildExerciseId(raw: ExerciseConfig): string {
     const config = normalizeExercise(raw);
     const [kind, mode] = TYPE_TO_PARTS[config.type];
     const base = `${kind}-${config.key}-${mode}`;
+    const chordDials = `${config.stack === "seventh" ? "7" : ""}${config.voicing === "open" ? "o" : ""}${PATTERN_CODE[config.pattern ?? "block"]}`;
     const canonical =
         config.octaves === 1 &&
         config.hands === "right" &&
         config.inversion === 0 &&
-        config.interval === "single";
+        config.interval === "single" &&
+        chordDials === "";
     if (canonical) return base;
     const extra = config.inversion ? `i${config.inversion}` : INTERVAL_CODE[config.interval];
-    return `${base}.${config.octaves}${HAND_CODE[config.hands]}${extra}`;
+    return `${base}.${config.octaves}${HAND_CODE[config.hands]}${extra}${chordDials}`;
 }
 
 export function parseExerciseId(id: string): ExerciseConfig | null {
@@ -587,19 +668,35 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
     let hands: Hands = "right";
     let inversion: 0 | 1 | 2 = 0;
     let interval: Interval = "single";
+    let stack: ChordStack = "triad";
+    let voicing: ChordVoicing = "close";
+    let pattern: ChordPattern = "block";
     if (formPart) {
-        const match = formPart.match(/^([12])([rlbc])(?:i([12])|([ts]))?$/);
+        const match = formPart.match(/^([12])([rlbc])(?:i([12])|([ts]))?(7)?(o)?([ak])?$/);
         if (!match) return null;
         octaves = Number(match[1]) as 1 | 2;
         hands = CODE_HAND[match[2]!]!;
         inversion = (match[3] ? Number(match[3]) : 0) as 0 | 1 | 2;
         interval = match[4] ? CODE_INTERVAL[match[4]]! : "single";
+        stack = match[5] ? "seventh" : "triad";
+        voicing = match[6] ? "open" : "close";
+        pattern = match[7] ? CODE_PATTERN[match[7]]! : "block";
     }
     // A hand-written id may name a form the exercise has no version of — an inversion of
     // a scale, contrary motion on an arpeggio. It resolves to the nearest real exercise
     // rather than to nothing, so the link still opens something playable, and building an
     // id back from the result yields that exercise's own canonical name.
-    return normalizeExercise({ type, key, octaves, hands, inversion, interval });
+    return normalizeExercise({
+        type,
+        key,
+        octaves,
+        hands,
+        inversion,
+        interval,
+        pattern,
+        voicing,
+        stack,
+    });
 }
 
 // The browsable tiles: one per (type, key) in its canonical form.

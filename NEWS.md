@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 7 September 2026
 
+**Chords the way pieces use them.** A chord set now has three more dials on its
+page. *Sevenths* stacks one more third on every chord of the key, so the four-note
+chords a piece is built on get the same practice as the triads. *Open* spreads each
+chord to root, fifth and tenth — the shape where a hand's reach grows, and the grade
+follows the reach. And *Pattern* plays each chord as a bar of Alberti bass or a
+broken chord, one tone to a beat, which is how most left hands actually meet a
+chord. Every combination has its own address, so a link opens the same exercise
+for anyone.
+
 **Keep Plinky on this device.** A new switch in Settings fetches every page of the
 app on each visit — about a megabyte when a new version ships, and nothing when
 it hasn't — so wherever you practise without a connection, every page is there.
