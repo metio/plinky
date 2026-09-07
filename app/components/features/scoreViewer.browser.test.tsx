@@ -981,11 +981,12 @@ describe("ScoreViewer", () => {
         fireEvent.click(practiceButton);
         // The race track appears...
         expect(await screen.findByRole("img", { name: /race/i })).toBeTruthy();
-        // ...and the ghost lights its current note with a halo on the rendered staff.
+        // ...and the ghost outlines its current note on the rendered staff, beside any
+        // halo the run paints rather than in place of it.
         await waitFor(
             () =>
                 expect(
-                    container.querySelector(`.plinky-note-halo[fill="${GHOST_COLOR}"]`),
+                    container.querySelector(`.plinky-ghost-mark[stroke="${GHOST_COLOR}"]`),
                 ).toBeTruthy(),
             { timeout: 30000 },
         );
