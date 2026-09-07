@@ -4,7 +4,7 @@
 import type { VideoExporter, VideoExportInput } from "../ports/videoExporter";
 
 // The composition root's video capability: a thin shell that pulls the real
-// WebCodecs adapter (and its muxer dependency) in on first use, so the encode
+// WebCodecs adapter (and the container writer under it) in on first use, so the encode
 // machinery never rides in the eager bundle — exporting a video is a rare,
 // deliberate act, and the bundle budget is a per-visitor cost.
 export const lazyVideoExporter: VideoExporter = {

@@ -28,18 +28,18 @@ requireSingleLocaleBuild("the size gate");
 
 const VENDOR = /opensheetmusicdisplay/;
 // Chunks fetched only by a rare, deliberate act — the export encoders (the WebCodecs
-// adapters, the offline render they share, and mp4-muxer under both) load on first use,
+// adapters, the offline render they share, and the container writer under both) load on first use,
 // never on a page visit — so like OSMD they are budgeted apart from the per-visitor app
 // weight.
 //
 // Named by module rather than by one chunk, because which module gives the chunk its name
-// is Rollup's decision and it changes: the moment a second adapter imported the muxer, the
+// is Rollup's decision and it changes: the moment a second adapter imported the writer, the
 // machinery moved into a shared chunk called after the render they share, and a pattern
 // naming only the video adapter stopped matching it. Nothing broke loudly — the ten
 // kilobytes simply reappeared inside the app figure and read as a regression in whatever
 // change happened to be in flight. Hence the assertions below.
 const ON_DEMAND = /webCodecsVideo|webAudioFile|webCodecsAudio|offlineAudio/;
-// The least the encoders can weigh: the muxer alone is nine kilobytes gzipped. A match
+// The least the encoders can weigh: the writer alone is several kilobytes gzipped. A match
 // below this is a thin adapter chunk still answering to the pattern while the machinery
 // under it has moved to a chunk with a new name — which is how the shared encoder chunk
 // came to be counted as app weight a second time, with the "no match" check silent.

@@ -1,7 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ArrayBufferTarget, Muxer } from "mp4-muxer";
+import {
+    BufferTarget,
+    EncodedAudioPacketSource,
+    EncodedPacket,
+    EncodedVideoPacketSource,
+    Mp4OutputFormat,
+    Output,
+} from "mediabunny";
 import type { VideoExporter } from "../ports/videoExporter";
 import { frameTimesMs } from "../../core/videoFrames";
 import { audioConfig, pickAudioCodec, videoConfig } from "../../core/videoEncoding";
@@ -10,7 +17,7 @@ import { feedAudio, probeAudioCodec, withEncoders } from "./webCodecsAudio";
 
 // The WebCodecs implementation of the video-file seam: frames painted onto an
 // OffscreenCanvas go through VideoEncoder (H.264), the soundtrack through
-// AudioEncoder (AAC), and mp4-muxer zips both into an in-memory MP4 — the one
+// AudioEncoder (AAC), and mediabunny zips both into an in-memory MP4 — the one
 // container that pastes into every chat and social feed. Everything runs
 // faster than real time and off the page's audio context. Chromium carries
 // both encoders today; supported() asks the engine about the exact
@@ -42,23 +49,18 @@ export const webCodecsVideoExporter: VideoExporter = {
         if (!audioCodec) {
             throw new Error("no encodable audio codec; supported() would have said no");
         }
-        const muxer = new Muxer({
-            target: new ArrayBufferTarget(),
-            video: { codec: "avc", width: input.width, height: input.height },
-            audio: {
-                codec: audioCodec.container,
-                sampleRate: audio.sampleRate,
-                numberOfChannels: audio.numberOfChannels,
-            },
-            // The whole file assembles in memory, so the moov atom lands up
-            // front and the result streams from the first byte.
-            fastStart: "in-memory",
-            // Firefox's H.264 encoder emits its first chunk with a small
-            // non-zero DTS, which the muxer's default strict mode rejects
-            // (killing the whole export); offsetting each track so its first
-            // sample sits at zero is a no-op on engines that already emit 0.
-            firstTimestampBehavior: "offset",
+        // The whole file assembles in memory, so the moov atom lands up front and the
+        // result streams from the first byte. A track whose first chunk sits at a small
+        // non-zero time — Firefox's H.264 encoder does this — is shifted to zero and given
+        // an edit list, so nothing here has to offset it.
+        const output = new Output({
+            format: new Mp4OutputFormat({ fastStart: "in-memory" }),
+            target: new BufferTarget(),
         });
+        const videoSource = new EncodedVideoPacketSource("avc");
+        const audioSource = new EncodedAudioPacketSource(audioCodec.container);
+        output.addVideoTrack(videoSource, { frameRate: input.fps });
+        output.addAudioTrack(audioSource);
 
         // Encoder errors surface through the callback; keep the first one and
         // fail the export with it rather than hanging on flush.
@@ -66,20 +68,35 @@ export const webCodecsVideoExporter: VideoExporter = {
         const fail = (error: Error) => {
             failure = failure ?? error;
         };
+        // The encoders hand chunks over synchronously and the writer takes packets one at
+        // a time in decode order, so each track queues its packets behind the last: the
+        // order the encoder emitted is the order the file gets, and the writer's
+        // backpressure is honoured before the file is finalised.
+        let videoQueue: Promise<void> = Promise.resolve();
+        let audioQueue: Promise<void> = Promise.resolve();
 
         const videoEncoder = new VideoEncoder({
-            output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+            output: (chunk, meta) => {
+                videoQueue = videoQueue
+                    .then(() => videoSource.add(EncodedPacket.fromEncodedChunk(chunk), meta))
+                    .catch(fail);
+            },
             error: fail,
         });
         const audioEncoder = new AudioEncoder({
-            output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+            output: (chunk, meta) => {
+                audioQueue = audioQueue
+                    .then(() => audioSource.add(EncodedPacket.fromEncodedChunk(chunk), meta))
+                    .catch(fail);
+            },
             error: fail,
         });
+        await output.start();
         await withEncoders([videoEncoder, audioEncoder], async () => {
             videoEncoder.configure(videoConfig(input));
             audioEncoder.configure(audioConfig(audioCodec.codec, audio));
 
-            // Audio first: it's cheap, and the muxer interleaves by timestamp.
+            // Audio first: it's cheap, and the writer interleaves by timestamp.
             feedAudio(audioEncoder, audio);
 
             const canvas = new OffscreenCanvas(input.width, input.height);
@@ -119,11 +136,16 @@ export const webCodecsVideoExporter: VideoExporter = {
                 throw failure;
             }
             await Promise.all([videoEncoder.flush(), audioEncoder.flush()]);
+            await Promise.all([videoQueue, audioQueue]);
         });
         if (failure) {
             throw failure;
         }
-        muxer.finalize();
-        return new Blob([muxer.target.buffer], { type: "video/mp4" });
+        await output.finalize();
+        const bytes = output.target.buffer;
+        if (!bytes) {
+            throw new Error("the writer finalised nothing");
+        }
+        return new Blob([bytes as BlobPart], { type: "video/mp4" });
     },
 };

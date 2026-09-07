@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ArrayBufferTarget, Muxer } from "mp4-muxer";
+import {
+    BufferTarget,
+    EncodedAudioPacketSource,
+    EncodedPacket,
+    Mp4OutputFormat,
+    Output,
+} from "mediabunny";
 import type { AudioExport, AudioExporter } from "../ports/audioExporter";
 import { type AudioCodecChoice, audioConfig, pickAudioCodec } from "../../core/videoEncoding";
 import { wavBytes } from "../../core/wavFile";
@@ -12,39 +18,41 @@ import { feedAudio, probeAudioCodec, withEncoders } from "./webCodecsAudio";
 // sounds, encoded on its own.
 //
 // Everything here is already in the building. renderTakeAudio produces the take's audio,
-// core/videoEncoding picks the codec the engine will take, and mp4-muxer writes the
+// core/videoEncoding picks the codec the engine will take, and mediabunny writes the
 // container — the video export is these three plus a picture. So an audio file is not a
 // second renderer with its own idea of how a take sounds; it is the same take, minus the
 // frames, and a person who exports both gets two files that agree.
 //
-// MP3 is not among the choices, and cannot be: every engine decodes it and none encodes it.
-// Offering it would mean shipping an encoder to produce a format larger than AAC at the
-// same quality and no more playable.
+// MP3 is not among the choices: no engine encodes it, and AAC is smaller at the same
+// quality and no less playable. The writer could carry one from an encoder shipped with
+// the app; that is a decision about weight, not a limit of the container.
 
-// Feed the encoder in ~85ms slabs, as the video export does.
 // The take as an MP4 holding nothing but sound — an .m4a, which is what that is called.
 async function encoded(audio: AudioBuffer, codec: AudioCodecChoice): Promise<Blob> {
-    const muxer = new Muxer({
-        target: new ArrayBufferTarget(),
-        audio: {
-            codec: codec.container,
-            sampleRate: audio.sampleRate,
-            numberOfChannels: audio.numberOfChannels,
-        },
-        fastStart: "in-memory",
-        // Some engines emit a first chunk at a small non-zero timestamp, which the muxer's
-        // strict mode rejects outright; offsetting is a no-op where the first chunk is
-        // already at zero. The video export needs this for the same reason.
-        firstTimestampBehavior: "offset",
+    // A first chunk at a small non-zero time — some engines emit one — is shifted to zero
+    // by the writer and noted in an edit list, as the video export relies on too.
+    const output = new Output({
+        format: new Mp4OutputFormat({ fastStart: "in-memory" }),
+        target: new BufferTarget(),
     });
+    const source = new EncodedAudioPacketSource(codec.container);
+    output.addAudioTrack(source);
 
     let failure: Error | null = null;
+    const fail = (error: Error) => {
+        failure = failure ?? error;
+    };
+    // Packets go to the writer one at a time in the order the encoder emitted them.
+    let queue: Promise<void> = Promise.resolve();
     const encoder = new AudioEncoder({
-        output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
-        error: (error) => {
-            failure = failure ?? error;
+        output: (chunk, meta) => {
+            queue = queue
+                .then(() => source.add(EncodedPacket.fromEncodedChunk(chunk), meta))
+                .catch(fail);
         },
+        error: fail,
     });
+    await output.start();
     await withEncoders([encoder], async () => {
         encoder.configure(audioConfig(codec.codec, audio));
         feedAudio(encoder, audio);
@@ -52,12 +60,17 @@ async function encoded(audio: AudioBuffer, codec: AudioCodecChoice): Promise<Blo
             throw failure;
         }
         await encoder.flush();
+        await queue;
     });
     if (failure) {
         throw failure;
     }
-    muxer.finalize();
-    return new Blob([muxer.target.buffer], { type: "audio/mp4" });
+    await output.finalize();
+    const bytes = output.target.buffer;
+    if (!bytes) {
+        throw new Error("the writer finalised nothing");
+    }
+    return new Blob([bytes as BlobPart], { type: "audio/mp4" });
 }
 
 export const webAudioFileExporter: AudioExporter = {
@@ -69,8 +82,8 @@ export const webAudioFileExporter: AudioExporter = {
                 return { blob: await encoded(audio, codec), extension: "m4a" };
             } catch {
                 // The probe said yes and the encoder said no — a configuration accepted in
-                // principle and refused in practice, or a muxer that would not take the
-                // chunks. Falling through to WAV is better than failing an export that a
+                // principle and refused in practice, or a writer that would not take the
+                // packets. Falling through to WAV is better than failing an export that a
                 // format needing no encoder at all can still satisfy.
             }
         }
