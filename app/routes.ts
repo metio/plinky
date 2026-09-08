@@ -36,6 +36,7 @@ export default [
         route("tools", "routes/tools.tsx"),
         route("theory", "routes/theory.tsx"),
         route("about", "routes/about.tsx"),
+        route("news", "routes/news.tsx"),
         route("impressum", "routes/impressum.tsx"),
         route("datenschutz", "routes/datenschutz.tsx"),
         route("person/:slug", "routes/person.tsx"),

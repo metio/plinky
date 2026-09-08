@@ -901,6 +901,26 @@ from the same data the app reads (`functions/_middleware.js`), carrying the comp
 name, their pieces and their structured data. A crawler or a link unfurler that runs no
 JavaScript sees a real person; the app fills the fuller detail in over it once it loads.
 
+## What is new
+
+`/news` is the changelog, on the site. Plinky has no version numbers, no tags and no
+release days — every push to main deploys — so `changelog.yaml` is the only record of what
+changed, and it is written by hand at the time or not at all.
+
+Three readers, one list. `NEWS.md` is rendered from it, the weekly round-up posted to the
+subreddit reads the same entries, and the page renders it too. The page's own document
+carries the newest two releases (`core/newsLatest.ts`, generated beside `NEWS.md` and
+checked by the same gate) so it says something before anything is fetched; the rest of the
+list arrives from `/news.json`, because the whole archive is a hundred and sixty kilobytes
+and belongs nowhere near a bundle.
+
+The entries are Markdown, and the page renders four constructs of it — bold, links, inline
+code and paragraphs — by parsing the text into parts and writing elements
+(`core/newsMarkup.ts`). Not a Markdown library, which is a hundred kilobytes for four
+things, and not raw HTML, which would be an injection waiting for the day somebody pastes
+a link into the changelog. Anything else renders as the characters it is, which is the
+failure a reader can see and somebody can fix.
+
 ## Being found
 
 Every page is in a sitemap, and every deploy also tells the search engines directly which

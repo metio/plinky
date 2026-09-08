@@ -34,6 +34,15 @@ export function SiteFooter() {
                         />
                         {m.nav_about()}
                     </Link>
+                    {/* What changed, and when. Plinky has no versions and no releases, so
+                        this page is the only record there is — and it used to be a file
+                        on a code host, which is not somewhere a player goes. */}
+                    <Link
+                        to="/news"
+                        className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent-ring"
+                    >
+                        {m.news_title()}
+                    </Link>
                 </div>
                 {/* The provider information German law requires, reachable from every page.
                 The labels are the German legal terms, kept as-is in every language. */}

@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 8 September 2026
 
+**What changed, and when, is now a page on the site.** Plinky has no version numbers
+and no release days — everything goes live the moment it is finished — so this list
+is the only record there is, and until now reading it meant leaving for a file on a
+code-hosting site. It is at [What is new](/news/), linked from the footer of every
+page — and that address sends you to your own language.
+
 **The catalogue has shelves.** Looking for something at your level, or something
 that sounds like a particular century, meant setting filters on the Music page and
 remembering what you had set. Every grade now has a page of its own — grade 3 is at

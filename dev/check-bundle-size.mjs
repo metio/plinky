@@ -521,6 +521,16 @@ const BUDGET_VENDOR_KB = 324;
 // applies before engraving, and the piece's chord panel in run set-up carries its own copy
 // across every locale. Two kilobytes in the score viewer. Measured at 426.7.
 //
+// 439. The pages a search engine can find. Four things in one push: the composer pages
+// say who the composer was, which is a fetched file and the hook that writes the richer
+// structured data over the document's; the catalogue grew twelve shelves, a page shared by
+// two routes with the era arithmetic behind it; the changelog became a page, with the
+// little Markdown parser it renders through; and each carries its own copy in twenty-six
+// languages, which is most of the weight — twelve new messages for the shelves and three
+// for the news page, plus the newest two releases the news document ships with so it says
+// something before anything is fetched. The archive itself is fetched and weighs nothing
+// here. Measured at 439.4.
+//
 // The figure above is what main last weighed, and the ledger goes on recording every raise
 // of it. What fails the build is no longer the figure itself but the figure plus a margin:
 // a feature's worth of copy in twenty-six languages is a kilobyte or two, and a ratchet set
@@ -531,7 +541,7 @@ const BUDGET_VENDOR_KB = 324;
 // chunk, weigh more than that. Growth inside the margin prints its delta and passes; the
 // recorded figure moves, with a paragraph here, when a change crosses the margin — which is
 // still a decision, made every dozen features rather than every one.
-const APP_RECORDED_KB = 428;
+const APP_RECORDED_KB = 439;
 const APP_HEADROOM_KB = 16;
 const BUDGET_APP_KB = APP_RECORDED_KB + APP_HEADROOM_KB;
 
