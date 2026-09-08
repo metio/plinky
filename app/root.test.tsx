@@ -10,8 +10,12 @@ import { locales, overwriteGetLocale } from "./paraglide/runtime.js";
 import { ErrorBoundary, Layout, links } from "./root";
 import { THEME_STORAGE_KEY } from "./stores/themeStore";
 
-const hasFontPreload = () =>
-    links().some((link) => "as" in link && link.as === "font" && link.rel === "preload");
+const fontPreload = (): string | null => {
+    const found = links().find(
+        (link) => "as" in link && link.as === "font" && link.rel === "preload",
+    );
+    return found && "href" in found ? String(found.href) : null;
+};
 
 afterEach(() => {
     cleanup();
@@ -22,18 +26,31 @@ afterEach(() => {
 
 describe("root links", () => {
     it("preloads the Latin font for a Latin-script locale", () => {
-        overwriteGetLocale(() => "en");
-        expect(hasFontPreload()).toBe(true);
-        overwriteGetLocale(() => "de");
-        expect(hasFontPreload()).toBe(true);
+        for (const locale of ["en", "de"] as const) {
+            overwriteGetLocale(() => locale);
+            expect(fontPreload()).toMatch(/latin/);
+        }
     });
 
-    it("omits the Latin preload where the page's text comes from another subset", () => {
-        // Cyrillic, Greek, and CJK pages paint their primary text from a different
-        // Inter subset or a system font, so the Latin preload would only compete.
-        for (const locale of ["ru", "uk", "sr", "el", "ja", "ko", "zh"] as const) {
+    it("preloads the subset the page's own text is drawn from", () => {
+        // Naming the wrong subset is worse than naming none: the page spends its
+        // connection on bytes it never draws with, and the subset that does paint it is
+        // discovered from the stylesheet afterwards — so the text paints in a fallback and
+        // reflows when Inter lands. On a page of paragraphs that moves a whole viewport
+        // of them, which is how it first showed up: as layout shift on the Greek /news.
+        overwriteGetLocale(() => "el");
+        expect(fontPreload()).toMatch(/greek/);
+        for (const locale of ["ru", "uk", "sr"] as const) {
             overwriteGetLocale(() => locale);
-            expect(hasFontPreload()).toBe(false);
+            expect(fontPreload()).toMatch(/cyrillic/);
+        }
+    });
+
+    it("preloads nothing where the reader's own system fonts draw the page", () => {
+        // Asking for Inter on a CJK page is a download nothing renders from.
+        for (const locale of ["ja", "ko", "zh"] as const) {
+            overwriteGetLocale(() => locale);
+            expect(fontPreload()).toBeNull();
         }
     });
 });

@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 8 September 2026
 
+**Text stops jumping on Greek, Russian, Ukrainian and Serbian pages.** Every page
+fetches the slice of its typeface that covers the script it is written in, and those
+four were waiting for the stylesheet to be read before asking for theirs. The page
+painted in a stand-in font and then re-laid itself out when the real one arrived,
+which on a long page moved everything you were reading. Each language now asks for
+its own slice straight away.
+
 **A shared link lands, whatever shape it is in.** An address without a language in
 it — the shape a link takes when it is copied out of somewhere that stripped it —
 now finds the page for the shelves, the composers and the glossary marks too, rather
