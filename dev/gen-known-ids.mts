@@ -58,6 +58,13 @@ export type KnownStrings = {
     home: string;
     music: string;
     grade: string;
+    hubGrade: string;
+    hubGradeAbout: string;
+    hubEra_baroque: string;
+    hubEra_classical: string;
+    hubEra_romantic: string;
+    hubEra_modern: string;
+    hubEraAbout: string;
     og: string;
 };
 export type KnownIds = {
@@ -91,6 +98,13 @@ function stringsFor(locale: string): KnownStrings {
         home: need("nav_today"),
         music: need("music_title"),
         grade: need("score_grade"),
+        hubGrade: need("hub_grade_title"),
+        hubGradeAbout: need("hub_grade_intro"),
+        hubEra_baroque: need("hub_era_title_baroque"),
+        hubEra_classical: need("hub_era_title_classical"),
+        hubEra_romantic: need("hub_era_title_romantic"),
+        hubEra_modern: need("hub_era_title_modern"),
+        hubEraAbout: need("hub_era_intro"),
         og: ogLocale(locale),
     };
 }

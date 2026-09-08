@@ -25,6 +25,7 @@ import { PageHeader } from "../components/ui/pageHeader";
 import { sectionHeadingClasses } from "../components/ui/classes";
 import { YourTakes } from "../components/features/yourTakes";
 import { ComposerList } from "../components/features/composerList";
+import { HubLinks } from "./musicHub";
 import { fieldClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
@@ -221,6 +222,11 @@ export default function MusicRoute() {
                                     {m.music_show_more()}
                                 </Button>
                             </Show>
+
+                            {/* The shelves, as pages rather than as filter state. A
+                                filter lives in this page's memory; a shelf has an
+                                address, so it can be linked to, shared, and found. */}
+                            <HubLinks />
                         </>
                     )}
                 </>

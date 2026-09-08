@@ -17,6 +17,11 @@ export default [
         route("ear", "routes/ear.tsx"),
         route("rhythm", "routes/rhythm.tsx"),
         route("music", "routes/music.tsx"),
+        // The catalogue by the two things somebody actually asks it for: a level and a
+        // sound. Each shelf is a page of its own so it has an address to link to and to
+        // be found at, rather than living only inside the filters on /music.
+        route("music/grade/:grade", "routes/musicHub.tsx", { id: "grade-hub" }),
+        route("music/era/:era", "routes/musicHub.tsx", { id: "era-hub" }),
         route("assignments", "routes/assignments.tsx"),
         route("collect", "routes/collect.tsx"),
         route("stats", "routes/stats.tsx"),

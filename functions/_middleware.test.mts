@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { beforeEach, describe, expect, it } from "vitest";
+import { ERAS as CORE_ERAS, HUB_GRADES as CORE_GRADES } from "../core/musicHubs";
 import {
+    HUB_ERAS,
+    HUB_GRADES,
     type Known,
     describe as describePage,
     documentFor,
@@ -38,6 +41,13 @@ const KNOWN: Known = {
             home: "Today",
             music: "Music",
             grade: "Grade {grade}",
+            hubGrade: "Grade {grade} piano pieces",
+            hubGradeAbout: "Everything graded {grade}.",
+            hubEra_baroque: "Baroque piano pieces",
+            hubEra_classical: "Classical piano pieces",
+            hubEra_romantic: "Romantic piano pieces",
+            hubEra_modern: "Modern piano pieces",
+            hubEraAbout: "Pieces by the composers of this period.",
             og: "en_US",
         },
         de: {
@@ -47,10 +57,17 @@ const KNOWN: Known = {
             home: "Heute",
             music: "Musik",
             grade: "Stufe {grade}",
+            hubGrade: "Klavierstücke der Stufe {grade}",
+            hubGradeAbout: "Alles mit Stufe {grade}.",
+            hubEra_baroque: "Barocke Klavierstücke",
+            hubEra_classical: "Klassische Klavierstücke",
+            hubEra_romantic: "Romantische Klavierstücke",
+            hubEra_modern: "Moderne Klavierstücke",
+            hubEraAbout: "Stücke der Komponistinnen und Komponisten dieser Zeit.",
             og: "de_DE",
         },
-        zh: { playBy: "{title}", play: "{title}", person: "{name}", home: "今天", music: "音乐", grade: "{grade}", og: "zh_CN" },
-        pt: { playBy: "{title}", play: "{title}", person: "{name}", home: "Hoje", music: "Música", grade: "{grade}", og: "pt_PT" },
+        zh: { playBy: "{title}", play: "{title}", person: "{name}", home: "今天", music: "音乐", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", og: "zh_CN" },
+        pt: { playBy: "{title}", play: "{title}", person: "{name}", home: "Hoje", music: "Música", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", og: "pt_PT" },
     },
 };
 
@@ -82,6 +99,9 @@ const PEOPLE = {
         wikipedia: "https://en.wikipedia.org/wiki/Fr%C3%A9d%C3%A9ric_Chopin",
         id: "Q1268",
     },
+    "ludwig-van-beethoven": { about: "German composer", born: 1770, died: 1827, id: "Q255" },
+    // Placed nowhere: no birth year, so no era shelf holds their pieces.
+    "no-pieces": { about: "Somebody undated" },
 };
 
 // The asset server's answer for the request, which is all the middleware ever sees, over
@@ -473,5 +493,88 @@ describe("pickLocale", () => {
         expect(pickLocale("*", LOCALES)).toBe("en");
         expect(pickLocale(null, LOCALES)).toBe("en");
         expect(pickLocale("", LOCALES)).toBe("en");
+    });
+});
+
+describe("the catalogue's shelves", () => {
+    it("reads a grade and an era out of an address", () => {
+        expect(parsePath("/en/music/grade/3/")).toEqual({ locale: "en", kind: "grade", id: "3" });
+        expect(parsePath("/de/music/era/romantic/")).toEqual({
+            locale: "de",
+            kind: "era",
+            id: "romantic",
+        });
+    });
+
+    it("reads nothing out of an address that is not a shelf", () => {
+        // /music itself is a prerendered page and must keep being served as one.
+        expect(parsePath("/en/music/")).toBeNull();
+        expect(parsePath("/en/music/grade/")).toBeNull();
+        expect(parsePath("/en/music/style/jazz/")).toBeNull();
+        expect(parsePath("/en/music/grade/3/extra/")).toBeNull();
+    });
+
+    it("holds one grade's pieces, easiest first", () => {
+        const shelf = describePage(KNOWN, { locale: "en", kind: "grade", id: "7" });
+        expect(shelf?.headline).toBe("Grade 7 piano pieces");
+        expect(shelf?.links.map((link) => link.name)).toEqual(["Nocturne <Op. 9>"]);
+        expect(shelf?.data.mainEntity).toMatchObject({ numberOfItems: 1 });
+    });
+
+    it("holds an era's pieces, through the composers born in it", () => {
+        const shelf = describePage(KNOWN, { locale: "en", kind: "era", id: "romantic" }, PEOPLE);
+        expect(shelf?.headline).toBe("Romantic piano pieces");
+        expect(shelf?.links.map((link) => link.path)).toEqual(["/play/ZgIdHVhH0mUb/"]);
+        // Beethoven was born in 1770, so his pieces are on the Classical shelf, not this one.
+        const classical = describePage(KNOWN, { locale: "en", kind: "era", id: "classical" }, PEOPLE);
+        expect(classical?.links).toHaveLength(2);
+    });
+
+    it("answers with an empty shelf rather than no page", () => {
+        // The catalogue moves. A grade with nothing in it today is a page saying so, where
+        // a 404 would say the address was never real.
+        const shelf = describePage(KNOWN, { locale: "en", kind: "grade", id: "1" });
+        expect(shelf?.headline).toBe("Grade 1 piano pieces");
+        expect(shelf?.links).toEqual([]);
+        expect(shelf?.data.mainEntity).toMatchObject({ numberOfItems: 0 });
+    });
+
+    it("describes a shelf in the reader's own language", () => {
+        const shelf = describePage(KNOWN, { locale: "de", kind: "grade", id: "7" });
+        expect(shelf?.headline).toBe("Klavierstücke der Stufe 7");
+        expect(shelf?.trail.map((crumb) => crumb.name)).toEqual([
+            "Heute",
+            "Musik",
+            "Klavierstücke der Stufe 7",
+        ]);
+    });
+
+    it("describes no shelf outside the grades and the eras", () => {
+        expect(describePage(KNOWN, { locale: "en", kind: "grade", id: "9" })).toBeNull();
+        expect(describePage(KNOWN, { locale: "en", kind: "era", id: "renaissance" })).toBeNull();
+    });
+
+    it("agrees with the app about which shelves exist", () => {
+        // Two copies of one list: the app's, and this file's, because the edge runs
+        // JavaScript nothing compiles. A shelf added to one and not the other is a page
+        // the app renders and the edge answers 404 for.
+        expect(HUB_GRADES).toEqual(CORE_GRADES.map(String));
+        expect(HUB_ERAS).toEqual([...CORE_ERAS]);
+    });
+
+    it("writes a shelf its own document", async () => {
+        const response = await onRequest(served("/en/music/grade/7/", 404, SHELL, SHELL_HEADERS));
+        expect(response.status).toBe(200);
+        const html = await response.text();
+        expect(html).toContain("<title>Grade 7 piano pieces · Plinky</title>");
+        expect(html).toContain(
+            '<link rel="canonical" href="https://plinky.fun/en/music/grade/7/"/>',
+        );
+        expect(html).toContain('"@type":"CollectionPage"');
+    });
+
+    it("keeps the 404 for a shelf the site does not have", async () => {
+        const response = await onRequest(served("/en/music/grade/9/", 404, SHELL, SHELL_HEADERS));
+        expect(response.status).toBe(404);
     });
 });

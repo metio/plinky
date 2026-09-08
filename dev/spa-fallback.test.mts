@@ -24,7 +24,15 @@ describe("routeRules", () => {
     it("names the routes the app actually declares", () => {
         // The prefixes are read from app/routes.ts, so this pins the reading rather than a
         // copy of it: a dynamic route added to the table has to show up here.
-        expect(dynamicPrefixes().toSorted()).toEqual(["/person", "/play"]);
+        expect(dynamicPrefixes().toSorted()).toEqual(["/music", "/person", "/play"]);
+    });
+
+    it("folds a nested dynamic route onto its first segment", () => {
+        // The shelves live under /music/grade/:grade and /music/era/:era. Writing a rule
+        // for each of those is four prefixes across twenty-six languages, which is over
+        // Cloudflare's hundred and makes the deploy refuse the set outright.
+        expect(dynamicPrefixes()).not.toContain("/music/grade");
+        expect(dynamicPrefixes()).not.toContain("/music/era");
     });
 
     it("stays inside Cloudflare's rule cap for the languages actually shipped", () => {
@@ -51,7 +59,9 @@ describe("routeRules", () => {
         // Only the bare root, which the middleware redirects, and the localised pages
         // that render from data.
         expect(
-            include.every((rule) => rule === "/" || /^\/[a-z-]+\/(play|person)\/\*$/.test(rule)),
+            include.every(
+                (rule) => rule === "/" || /^\/[a-z-]+\/(play|person|music)\/\*$/.test(rule),
+            ),
         ).toBe(true);
         expect(include).not.toContain("/*");
     });

@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 8 September 2026
 
+**The catalogue has shelves.** Looking for something at your level, or something
+that sounds like a particular century, meant setting filters on the Music page and
+remembering what you had set. Every grade now has a page of its own — grade 3 is at
+`/music/grade/3` — and so does each of the four periods, from the Baroque to the
+modern. Each shelf lists its pieces easiest first, links to all the others, and has
+an address you can bookmark or send to somebody.
+
 **The composer pages say who the composer was.** Four hundred of them carried a name
 and a list of pieces and nothing else. Each now opens with a line saying who the
 person was and when they lived — Polish composer and pianist, 1810 to 1849 — with a

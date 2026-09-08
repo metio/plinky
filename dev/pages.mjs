@@ -82,10 +82,19 @@ export function dynamicPaths() {
         .map((page) => page.path);
 }
 
-// The path up to the first parameter — "/play" for "/play/:scoreId". That prefix is what a
-// URL pattern can be written against, since the parameter is whatever the data says.
+// The first segment of each parameterised route — "/play" for "/play/:scoreId", "/music"
+// for "/music/grade/:grade". That prefix is what a URL pattern can be written against,
+// since the parameter is whatever the data says.
+//
+// The first segment rather than the whole path up to the parameter, because Cloudflare
+// allows a hundred routing rules and each prefix costs one per language: four prefixes
+// across twenty-six languages is a hundred and five, and the deploy refuses to emit a
+// truncated set. Folding the shelves under "/music" costs the middleware a pass over
+// /music itself, which is a prerendered file it hands straight back.
 export function dynamicPrefixes() {
-    return [...new Set(dynamicPaths().map((path) => path.slice(0, path.indexOf("/:"))))];
+    return [
+        ...new Set(dynamicPaths().map((path) => `/${path.split("/").filter(Boolean)[0] ?? ""}`)),
+    ];
 }
 
 // The exact call a route makes to opt out of the index. Matching the call rather than the

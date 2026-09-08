@@ -98,9 +98,24 @@ async function described(context, locale) {
     return peoplePromises.get(locale);
 }
 
-// What the address names: the language, whether it is a piece or a composer, and which.
+// The shelves the catalogue can be browsed by, kept here rather than imported from
+// core/musicHubs: the middleware is plain JavaScript the edge runs with no build step, so
+// it carries its own copy of the two lists. They are short and they are pinned by a test
+// that reads the core module, so a shelf added there without being added here fails
+// rather than answering 404 at the edge while the app renders it.
+export const HUB_GRADES = ["1", "2", "3", "4", "5", "6", "7", "8"];
+export const HUB_ERAS = ["baroque", "classical", "romantic", "modern"];
+// Born before, per era: the same bounds core/musicHubs sets, for the same reason.
+const ERA_UNTIL = { baroque: 1710, classical: 1800, romantic: 1870, modern: Infinity };
+
+// What the address names: the language, which kind of page, and which one of them.
 // Null for any other address.
 export function parsePath(path) {
+    const shelf = path.match(/^\/([a-z]{2})\/music\/(grade|era)\/([^/]+)\/?$/);
+    if (shelf) {
+        const [, locale, kind, raw] = shelf;
+        return { locale, kind, id: decodeURIComponent(raw) };
+    }
     const match = path.match(/^\/([a-z]{2})\/(play|person)\/([^/]+)\/?$/);
     if (!match) {
         return null;
@@ -119,6 +134,15 @@ export async function exists(context) {
     }
     if (page.kind === "play" && GENERATED.test(page.id)) {
         return true;
+    }
+    // A shelf's address needs no catalogue to be judged: the grades and the eras are
+    // fixed, and one outside them is a page the site does not have whatever the
+    // catalogue holds today. An empty shelf is still a real page.
+    if (page.kind === "grade") {
+        return HUB_GRADES.includes(page.id);
+    }
+    if (page.kind === "era") {
+        return HUB_ERAS.includes(page.id);
     }
     const list = await known(context);
     if (list === null) {
@@ -140,10 +164,101 @@ const fill = (message, values) =>
 
 const SITE_NAME = "Plinky";
 
+// One shelf of the catalogue: a grade, or an era.
+//
+// A grade's pieces are read straight off the catalogue. An era's are read through its
+// composers — the people file gives each of them a birth year, and the catalogue already
+// maps a composer to their pieces, so a piece is on the shelf when anybody credited on it
+// was born in the period. That is the same rule the page applies to the manifest's
+// credits, read from the other end.
+function shelf(list, page, strings, people) {
+    const path = `/music/${page.kind}/${encodeURIComponent(page.id)}/`;
+    const origin = "https://plinky.fun";
+    const url = (to) => `${origin}/${page.locale}${to}`;
+    let ids;
+    let headline;
+    let description;
+    if (page.kind === "grade") {
+        if (!HUB_GRADES.includes(page.id)) {
+            return null;
+        }
+        ids = Object.keys(list.pieces).filter(
+            (id) => String(list.pieces[id].grade ?? "") === page.id,
+        );
+        headline = fill(strings.hubGrade ?? "", { grade: page.id });
+        description = fill(strings.hubGradeAbout ?? "", { grade: page.id });
+    } else {
+        if (!HUB_ERAS.includes(page.id)) {
+            return null;
+        }
+        const born = people ?? {};
+        const here = new Set();
+        for (const [slug, about] of Object.entries(born)) {
+            const year = about?.born;
+            if (typeof year !== "number") {
+                continue;
+            }
+            const era = HUB_ERAS.find((one) => year < ERA_UNTIL[one]);
+            if (era === page.id) {
+                here.add(slug);
+            }
+        }
+        const found = new Set();
+        for (const slug of here) {
+            for (const id of list.people[slug]?.pieces ?? []) {
+                found.add(id);
+            }
+        }
+        ids = [...found];
+        headline = strings[`hubEra_${page.id}`] ?? "";
+        description = strings.hubEraAbout ?? "";
+    }
+    const pieces = ids
+        .map((id) => ({ id, ...list.pieces[id] }))
+        .filter((piece) => piece.title)
+        .sort((a, b) => (a.grade ?? 0) - (b.grade ?? 0) || a.title.localeCompare(b.title));
+    return {
+        path,
+        headline,
+        description,
+        lines: [],
+        trail: [
+            { name: strings.home ?? "", path: "/" },
+            { name: strings.music ?? "", path: "/music/" },
+            { name: headline, path },
+        ],
+        links: pieces.map((piece) => ({ name: piece.title, path: `/play/${piece.id}/` })),
+        data: {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: headline,
+            description,
+            url: url(path),
+            inLanguage: page.locale,
+            mainEntity: {
+                "@type": "ItemList",
+                numberOfItems: pieces.length,
+                // The same cap core/site.ts applies, and for the same reason: the page's
+                // own links are what a crawler follows, and a block naming six hundred
+                // pieces is larger than the page it describes.
+                itemListElement: pieces.slice(0, 50).map((piece, index) => ({
+                    "@type": "ListItem",
+                    position: index + 1,
+                    url: url(`/play/${piece.id}/`),
+                    name: piece.title,
+                })),
+            },
+        },
+    };
+}
+
 // The page a piece or composer address names, in one language: everything the head and
 // the summary are written from. Null when the list does not hold it.
 export function describe(list, page, about = null) {
     const strings = list.strings[page.locale] ?? list.strings[list.base] ?? {};
+    if (page.kind === "grade" || page.kind === "era") {
+        return shelf(list, page, strings, about);
+    }
     const path = `/${page.kind}/${encodeURIComponent(page.id)}/`;
     if (page.kind === "play") {
         const piece = list.pieces[page.id];
@@ -421,12 +536,16 @@ export async function onRequest(context) {
     let document = null;
     if (list?.locales.includes(where.locale)) {
         const page = parsePath(url.pathname);
-        // A composer's own details, read only for a composer's page — a piece's document
-        // needs nothing from it, and every fetch here is a fetch on the way to a reader.
-        const about =
-            page?.kind === "person"
-                ? ((await described(context, where.locale))[page.id] ?? null)
-                : null;
+        // The composers' details, read only where a page is written from them — a piece's
+        // document needs nothing from the file, and every fetch here is a fetch on the way
+        // to a reader. A composer page takes its own entry; an era shelf takes the whole
+        // file, since the shelf is defined by everybody's dates.
+        let about = null;
+        if (page?.kind === "person") {
+            about = (await described(context, where.locale))[page.id] ?? null;
+        } else if (page?.kind === "era") {
+            about = await described(context, where.locale);
+        }
         const shell = await response.text();
         document =
             page && describe(list, page, about) !== null

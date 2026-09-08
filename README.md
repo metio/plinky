@@ -862,6 +862,20 @@ live in `public/`, the copy is translated with the rest of the UI), with a short
 note on why Plinky is a calm place to play rather than one more thing to keep a
 streak on.
 
+## Browsing by grade and by era
+
+The catalogue answers the two things somebody actually asks it for. `/music/grade/3`
+holds every piece graded 3, easiest first; `/music/era/romantic` holds the pieces of the
+composers born in that period, and there are shelves for the Baroque, the Classical era
+and the modern one beside it. Each shelf links to all the others, and the Music page
+links to every one of them, so a level or a period is an address to share rather than a
+filter that lives in one tab's memory.
+
+An era is read from the composer's birth year — the date Wikidata reliably holds for
+these people, where a harvested score rarely records when it was written. That makes the
+boundaries a working approximation: somebody born in 1795 wrote Romantic music and lands
+under Classical here. A piece credited to two people is on both their shelves.
+
 ## Composer pages
 
 Every composer credited in the catalogue gets a page at `/person/<name>` —

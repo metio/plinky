@@ -398,6 +398,17 @@ describe("a credit that names more than one person", () => {
         expect(canonicalPeople("Henry Lemoine")).toEqual(["Henri Lemoine"]);
     });
 
+    it("reads no credit off Object's prototype", () => {
+        // The hand-kept pairs are looked up by the credit itself, and every object answers
+        // for "constructor" and "toString" whether or not anybody put them there. A score
+        // credited that way is a name like any other, not a function pretending to be two
+        // composers — which is what the composer list then threw on while building itself.
+        for (const name of ["constructor", "toString", "valueOf", "hasOwnProperty"]) {
+            expect(canonicalPeople(name).every((part) => typeof part === "string")).toBe(true);
+            expect(() => personSlugs(name)).not.toThrow();
+        }
+    });
+
     it("canonicalises each name in its own right", () => {
         // "Bach" alone would sort away from himself; each part goes through the same
         // aliasing a lone credit does — which is why the bare surname on the other side of

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
+import { ERAS, HUB_GRADES } from "../core/musicHubs";
 // @ts-expect-error - plain JS module; vitest resolves the source
 import { buildSitemaps, edgeEntries, pageUrl } from "./sitemap.mjs";
 
@@ -157,7 +158,10 @@ describe("edgeEntries", () => {
             pieces: { abc: { title: "A" }, def: { title: "D" } },
             people: { "carl-czerny": { name: "Carl Czerny", pieces: ["abc"] } },
         };
-        expect(edgeEntries(known, ["en", "de"])).toEqual([
+        const found = edgeEntries(known, ["en", "de"]);
+        expect(
+            found.filter((entry: { path: string }) => !entry.path.startsWith("/music/")),
+        ).toEqual([
             { locale: "en", path: "/play/abc" },
             { locale: "en", path: "/play/def" },
             { locale: "en", path: "/person/carl-czerny" },
@@ -165,6 +169,23 @@ describe("edgeEntries", () => {
             { locale: "de", path: "/play/def" },
             { locale: "de", path: "/person/carl-czerny" },
         ]);
+    });
+
+    it("names every shelf, in every language, exactly once", () => {
+        // The shelves have no file in the tree either, and no piece or composer to be
+        // derived from — a sitemap built from the catalogue alone would leave the twelve
+        // pages a visitor browses by out of it entirely.
+        const paths = edgeEntries({ pieces: {}, people: {} }, ["en", "de"]);
+        const expected = [
+            ...HUB_GRADES.map((grade) => `/music/grade/${grade}`),
+            ...ERAS.map((era) => `/music/era/${era}`),
+        ];
+        expect(
+            paths
+                .filter((entry: { locale: string }) => entry.locale === "en")
+                .map((entry: { path: string }) => entry.path),
+        ).toEqual(expected);
+        expect(paths).toHaveLength(expected.length * 2);
     });
 
     it("folds into the prerendered pages as one cluster per path", () => {
@@ -179,8 +200,11 @@ describe("edgeEntries", () => {
             baseLocale: "en",
             lastmod: LASTMOD,
         });
-        expect(children.get("en")?.match(/<url>/g)).toHaveLength(1);
-        expect(children.get("de")?.match(/<url>/g)).toHaveLength(1);
+        // The shelves ride along on every call, so the piece is what is counted here.
+        const pieceUrls = (xml: string | undefined) =>
+            (xml ?? "").match(/<loc>[^<]*\/play\/[^<]*<\/loc>/g) ?? [];
+        expect(pieceUrls(children.get("en"))).toHaveLength(1);
+        expect(pieceUrls(children.get("de"))).toHaveLength(1);
         expect(children.get("de")).toContain(
             'hreflang="en" href="https://plinky.fun/en/play/abc/"',
         );

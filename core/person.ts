@@ -442,7 +442,12 @@ function cleaned(raw: string): string {
 // canonicalizes to "" — no page.
 export function canonicalComposer(raw: string): string {
     const name = cleaned(spaceInitials(raw));
-    return ALIASES[name.toLowerCase()] ?? name;
+    // Own-property only. Every object answers for "constructor" and "toString" whether or
+    // not anybody put them in the alias table, so a score credited that way — a player's
+    // own import, or a corpus row with a machine-written credit — canonicalises to a
+    // function, and everything downstream that treats a name as a string throws.
+    const key = name.toLowerCase();
+    return Object.hasOwn(ALIASES, key) ? (ALIASES[key] as string) : name;
 }
 
 // Attribution markers that name a tradition, not a human — they canonicalize
@@ -533,9 +538,13 @@ export function personSlugs(raw: string): string[] {
 // away from himself.
 export function canonicalPeople(raw: string): string[] {
     const cleaned = canonicalComposer(raw);
-    const joint = JOINT_CREDITS[cleaned.toLowerCase()];
-    if (joint) {
-        return joint;
+    // Own-property only. A bare lookup answers for every name on Object's prototype, so a
+    // score credited "constructor" — a player's own import, or a corpus row with a
+    // machine-written credit — comes back holding a function where two names should be,
+    // and the composer list throws while building itself.
+    const key = cleaned.toLowerCase();
+    if (Object.hasOwn(JOINT_CREDITS, key)) {
+        return JOINT_CREDITS[key] as string[];
     }
     // The conjunction in each language a credit arrives in: "Lemoine y Carulli" names two
     // people as surely as "Joplin and Hayden" does. Matched as a whole word between

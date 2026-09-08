@@ -37,10 +37,19 @@ const alternate = (hreflang, href) =>
 // sitemap that names only the prerendered two pieces tells a search engine the catalogue
 // is two pieces long. A generated exercise is not among them: it has no document of its
 // own at the edge either.
+// The shelves, which have no file in the tree either. Kept as literals rather than
+// imported from core/musicHubs, which is TypeScript this script cannot load — and pinned
+// by a test that reads the core module, so a shelf added there and not here fails.
+const HUB_PATHS = [
+    ...[1, 2, 3, 4, 5, 6, 7, 8].map((grade) => `/music/grade/${grade}`),
+    ...["baroque", "classical", "romantic", "modern"].map((era) => `/music/era/${era}`),
+];
+
 export function edgeEntries(known, locales) {
     const paths = [
         ...Object.keys(known.pieces ?? {}).map((id) => `/play/${id}`),
         ...Object.keys(known.people ?? {}).map((slug) => `/person/${slug}`),
+        ...HUB_PATHS,
     ];
     return locales.flatMap((locale) => paths.map((path) => ({ locale, path })));
 }

@@ -231,6 +231,42 @@ export function personData(
     };
 }
 
+// A shelf of the catalogue as schema.org data: a page that is a list, and the list.
+//
+// The pieces are capped. A grade holds several hundred, and a structured-data block
+// naming every one of them is far larger than the page it describes and tells a search
+// engine nothing the first fifty did not — the page's own links are what the crawler
+// follows. `numberOfItems` still states the true size, so the sample is not read as the
+// whole shelf.
+const SHELF_SAMPLE = 50;
+
+export function collectionData(
+    locale: string,
+    path: string,
+    name: string,
+    description: string,
+    pieces: { id: string; title: string }[],
+) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name,
+        description,
+        url: localeUrl(locale, path),
+        inLanguage: locale,
+        mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: pieces.length,
+            itemListElement: pieces.slice(0, SHELF_SAMPLE).map((piece, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                url: localeUrl(locale, `/play/${piece.id}/`),
+                name: piece.title,
+            })),
+        },
+    };
+}
+
 // A breadcrumb trail as schema.org data, so a search result shows the page's place
 // in the hierarchy (Home › Library › Composer). Each crumb is a localized name and
 // a locale-relative path; the origin and locale prefix are added here.
