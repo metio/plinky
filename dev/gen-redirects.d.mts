@@ -6,8 +6,7 @@
 
 export type RetiredRoute = { from: string; to: string };
 
-export const STATIC_RULE_LIMIT: number;
-export const DYNAMIC_RULE_LIMIT: number;
+export const REDIRECT_RULE_LIMIT: number;
 
 export function readRetired(path?: string): RetiredRoute[];
 export function redirectRules(
@@ -16,8 +15,8 @@ export function redirectRules(
     dynamic: string[],
     defaultLocale?: string,
 ): string[];
-export function countRules(rules: string[]): { dynamic: number; fixed: number };
+export function countRules(rules: string[]): { dynamic: number; fixed: number; total: number };
 export function writeRedirects(
     out?: string,
     retiredPath?: string,
-): { dynamic: number; fixed: number };
+): { dynamic: number; fixed: number; total: number };

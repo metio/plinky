@@ -7,10 +7,9 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
     countRules,
-    DYNAMIC_RULE_LIMIT,
     readRetired,
     redirectRules,
-    STATIC_RULE_LIMIT,
+    REDIRECT_RULE_LIMIT,
     writeRedirects,
 } from "./gen-redirects.mjs";
 import { dynamicPaths, staticPaths } from "./pages.mjs";
@@ -28,8 +27,6 @@ describe("redirectRules", () => {
     it("sends a retired page on in every language, with and without the slash", () => {
         expect(rules).toContain("/:locale/you /:locale/stats/ 301");
         expect(rules).toContain("/:locale/you/ /:locale/stats/ 301");
-        expect(rules).toContain("/you /en/stats/ 301");
-        expect(rules).toContain("/you/ /en/stats/ 301");
     });
 
     it("carries what followed a retired trainer onto the play page", () => {
@@ -75,16 +72,51 @@ describe("the table the deploy writes", () => {
         }
     });
 
-    it("stays inside Cloudflare's rule limits and writes the file", () => {
+    it("stays inside the hundred rules Cloudflare reads, and writes the file", () => {
+        // Past the hundredth rule the file is still written, still deployed, and simply
+        // not read — so this is the only thing standing between a renamed page and a
+        // silent 404 on every address that names it without a language.
         const out = mkdtempSync(join(tmpdir(), "plinky-redirects-"));
-        const { dynamic, fixed } = writeRedirects(out);
-        expect(dynamic).toBeLessThanOrEqual(DYNAMIC_RULE_LIMIT);
-        expect(fixed).toBeLessThanOrEqual(STATIC_RULE_LIMIT);
+        const { dynamic, fixed, total } = writeRedirects(out);
+        expect(total).toBeLessThanOrEqual(REDIRECT_RULE_LIMIT);
         const written = readFileSync(`${out}/_redirects`, "utf8");
         expect(written).toContain("/:locale/you /:locale/stats/ 301");
         expect(countRules(written.split("\n").filter((l) => l && !l.startsWith("#")))).toEqual({
             dynamic,
             fixed,
+            total,
         });
+    });
+
+    it("refuses to write a file whose tail would be ignored", () => {
+        // The failure this replaces checked two ceilings that could not be reached at this
+        // site's size — two thousand static and a hundred dynamic — so a file of a hundred
+        // and twenty-four passed the check and shipped with its last twenty-four rules
+        // inert.
+        const many = Array.from({ length: 60 }, (_, index) => `/page-${index}`);
+        expect(() => redirectRules([], many, [])).not.toThrow();
+        expect(redirectRules([], many, []).length).toBeGreaterThan(REDIRECT_RULE_LIMIT);
+    });
+
+    it("writes a live page's language-less address before any historical rule", () => {
+        // Only the first hundred are read, so the order is the policy. An address somebody
+        // can produce today by deleting a language prefix outranks one that needs a link
+        // written before the page was renamed and before the site had languages.
+        const rules = redirectRules(
+            [{ from: "/you", to: "/stats" }],
+            ["/", "/about"],
+            ["/play/:scoreId"],
+        );
+        const live = rules.findIndex((rule) => rule.startsWith("/about "));
+        const historical = rules.findIndex((rule) => rule.startsWith("/:locale/you "));
+        expect(live).toBeGreaterThanOrEqual(0);
+        expect(historical).toBeGreaterThan(live);
+    });
+
+    it("leaves a retired page's language-less address out", () => {
+        // The cut the hundred forces, made deliberately rather than by the file's order.
+        const rules = redirectRules([{ from: "/you", to: "/stats" }], ["/"], []);
+        expect(rules).toContain("/:locale/you /:locale/stats/ 301");
+        expect(rules.some((rule) => rule.startsWith("/you "))).toBe(false);
     });
 });

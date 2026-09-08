@@ -943,6 +943,15 @@ language, covering the whole catalogue — the pieces, the composers and the she
 the full set of hreflang alternates so the twenty-six versions of a page read as one page
 rather than as duplicates of each other.
 
+An address with no language in it — the shape a link takes when it is copied out of
+somewhere that stripped the prefix — is sent on with a 301 rather than answering 404, and
+so is every page that has been renamed. Cloudflare Pages reads the **first hundred** rules
+of `_redirects` and ignores the rest without saying so, which is a hundred fewer than it
+sounds: a live page costs two rules and a renamed one costs two more per language shape.
+`dev/gen-redirects.mjs` fails the build past that hundred rather than letting the file's
+own order decide what stops working, and writes the rules in order of what they are worth
+— every live page first, then the historical ones.
+
 Nothing the site links to redirects. The site redirects generously — an address with no
 language, a page that was retired, a spelling without the trailing slash — and each of
 those is a hop a crawler follows before it reads anything, which is right for a link
