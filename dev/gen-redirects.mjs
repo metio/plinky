@@ -21,7 +21,7 @@
 // here can only ever redirect an address that would otherwise be a 404.
 
 import { readFileSync, writeFileSync } from "node:fs";
-import { dynamicPrefixes, staticPaths } from "./pages.mjs";
+import { dynamicPaths, staticPaths } from "./pages.mjs";
 
 const OUT = "build/client";
 const RETIRED = "dev/retired-routes.json";
@@ -44,13 +44,17 @@ const spellings = (path) => (path === "/" ? ["/"] : [path, `${path}/`]);
 // unlocalised address goes to English — the language the site is written in — because
 // nothing here can read the visitor's own, and a 301 to a page whose hreflang names every
 // other language loses nothing to a crawler.
-export function redirectRules(retired, pages, prefixes, defaultLocale = DEFAULT_LOCALE) {
+export function redirectRules(retired, pages, dynamic, defaultLocale = DEFAULT_LOCALE) {
     const rules = [];
-    // A piece or a composer named with no language: the id is one segment, so a
-    // placeholder carries it, in both spellings.
-    for (const prefix of prefixes) {
-        rules.push(`${prefix}/:id /${defaultLocale}${prefix}/:id/ 301`);
-        rules.push(`${prefix}/:id/ /${defaultLocale}${prefix}/:id/ 301`);
+    // A piece, a composer, a shelf or a glossary mark named with no language. The whole
+    // route is used rather than its first segment: a shelf is /music/grade/3, and a rule
+    // written against /music would carry one segment where three are needed and leave the
+    // address a 404. Cloudflare's placeholders match a segment each, so the shape of the
+    // route is the shape of the rule.
+    for (const route of dynamic) {
+        const shape = route.replace(/:[A-Za-z]+/, ":id");
+        rules.push(`${shape} /${defaultLocale}${shape}/ 301`);
+        rules.push(`${shape}/ /${defaultLocale}${shape}/ 301`);
     }
     for (const { from, to } of retired) {
         if (from.endsWith("/*")) {
@@ -84,7 +88,7 @@ export function countRules(rules) {
 }
 
 export function writeRedirects(out = OUT, retiredPath = RETIRED) {
-    const rules = redirectRules(readRetired(retiredPath), staticPaths(), dynamicPrefixes());
+    const rules = redirectRules(readRetired(retiredPath), staticPaths(), dynamicPaths());
     const { dynamic, fixed } = countRules(rules);
     if (dynamic > DYNAMIC_RULE_LIMIT || fixed > STATIC_RULE_LIMIT) {
         throw new Error(

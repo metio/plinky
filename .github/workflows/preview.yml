@@ -64,6 +64,12 @@ jobs:
         # The same 301s production carries for retired and unlocalised addresses, so a
         # preview answers old links the way the live site will. See dev/gen-redirects.mjs.
         run: nix develop --command node dev/gen-redirects.mjs
+      - name: Check the links
+        # Every internal link in the tree names the address that answers, rather than one
+        # the host redirects to. A page that links to its own site through a 301 spends a
+        # crawl on a hop, and Search Console records where it was sent from as a page that
+        # redirects rather than as a page. See dev/check-links.mjs.
+        run: nix develop --command node dev/check-links.mjs
       - name: Count the upload
         # The same cap production is checked against. See dev/check-deploy-files.mjs.
         run: nix develop --command node dev/check-deploy-files.mjs

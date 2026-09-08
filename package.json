@@ -30,6 +30,7 @@
         "nav": "node dev/nav-graph.mjs",
         "og": "tsx dev/gen-og.mts",
         "indexnow": "node dev/submit-indexnow.mjs",
+        "links": "node dev/check-links.mjs",
         "news": "tsx dev/changelog.mts",
         "news:check": "tsx dev/changelog.mts --check",
         "people:dupes": "tsx dev/person-dupes.mts",

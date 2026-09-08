@@ -140,6 +140,12 @@ jobs:
         # language in it — sent on with a 301, so a crawler follows it rather than
         # recording a 404. See dev/gen-redirects.mjs.
         run: nix develop --command node dev/gen-redirects.mjs
+      - name: Check the links
+        # Every internal link in the tree names the address that answers, rather than one
+        # the host redirects to. A page that links to its own site through a 301 spends a
+        # crawl on a hop, and Search Console records where it was sent from as a page that
+        # redirects rather than as a page. See dev/check-links.mjs.
+        run: nix develop --command node dev/check-links.mjs
       - name: Count the upload
         # Cloudflare Pages refuses a deployment past twenty thousand files, and the pages
         # in every language plus a card per piece are most of the way there. See

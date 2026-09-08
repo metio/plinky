@@ -943,6 +943,15 @@ language, covering the whole catalogue — the pieces, the composers and the she
 the full set of hreflang alternates so the twenty-six versions of a page read as one page
 rather than as duplicates of each other.
 
+Nothing the site links to redirects. The site redirects generously — an address with no
+language, a page that was retired, a spelling without the trailing slash — and each of
+those is a hop a crawler follows before it reads anything, which is right for a link
+somebody kept and wrong for one the site writes itself. Every in-app URL is built through
+one helper that adds the language and the slash, and `npm run links` checks the tree about
+to be uploaded rather than trusting that: both deploys run it before the upload, so a link
+written by hand somewhere the helper does not reach stops the deploy instead of costing a
+crawl.
+
 The direct half is [IndexNow](https://www.indexnow.org/): after a successful deploy, the
 job posts the addresses whose content this push actually rewrote, and Bing, Yandex and
 Seznam fetch them within the hour. The mapping is narrow on purpose — a route's own

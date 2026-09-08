@@ -13,7 +13,7 @@ export function readRetired(path?: string): RetiredRoute[];
 export function redirectRules(
     retired: RetiredRoute[],
     pages: string[],
-    prefixes: string[],
+    dynamic: string[],
     defaultLocale?: string,
 ): string[];
 export function countRules(rules: string[]): { dynamic: number; fixed: number };

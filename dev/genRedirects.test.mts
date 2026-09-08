@@ -13,7 +13,7 @@ import {
     STATIC_RULE_LIMIT,
     writeRedirects,
 } from "./gen-redirects.mjs";
-import { dynamicPrefixes, staticPaths } from "./pages.mjs";
+import { dynamicPaths, staticPaths } from "./pages.mjs";
 
 describe("redirectRules", () => {
     const rules = redirectRules(
@@ -22,7 +22,7 @@ describe("redirectRules", () => {
             { from: "/loop/*", to: "/play/*" },
         ],
         ["/", "/music"],
-        ["/play"],
+        ["/play/:scoreId", "/music/grade/:grade", "/glossary/:term"],
     );
 
     it("sends a retired page on in every language, with and without the slash", () => {
@@ -44,11 +44,21 @@ describe("redirectRules", () => {
         expect(rules).toContain("/play/:id/ /en/play/:id/ 301");
         expect(rules.some((rule) => rule.startsWith("/ "))).toBe(false);
     });
+
+    it("keeps the whole shape of a route that is more than one segment deep", () => {
+        // A shelf is /music/grade/3. A rule written against /music alone carries one
+        // segment where three are needed, and the address a reader was sent stays a 404.
+        expect(rules).toContain("/music/grade/:id /en/music/grade/:id/ 301");
+        expect(rules).toContain("/glossary/:id /en/glossary/:id/ 301");
+    });
 });
 
 describe("the table the deploy writes", () => {
     it("names only pages that exist now as destinations", () => {
-        const pages = new Set([...staticPaths(), ...dynamicPrefixes()]);
+        const pages = new Set([
+            ...staticPaths(),
+            ...dynamicPaths().map((path: string) => path.slice(0, path.indexOf("/:"))),
+        ]);
         for (const { to } of readRetired()) {
             const target = to.endsWith("/*") ? to.slice(0, -2) : to;
             expect(pages.has(target), `${to} is not a page`).toBe(true);
