@@ -7,9 +7,11 @@ import { headingFor, type Release } from "../../core/changelog";
 import { LATEST_RELEASES } from "../../core/newsLatest";
 import { type Part, paragraphs } from "../../core/newsMarkup";
 import { routeMeta } from "../../core/site";
+import { INTER_LATIN, fontPreload, interSubsetFor } from "../lib/fontPreload";
 import { useAsyncEffect } from "../hooks/useAsyncEffect";
 import { useNewsSource } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/news";
 
 // What changed, on the site rather than in a file on a code-hosting service.
@@ -21,6 +23,17 @@ import type { Route } from "./+types/news";
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.news_title(), m.meta_news_description());
 }
+
+// The entries are written in English on every page of the site — there is one changelog,
+// not twenty-six — so this page's body text is drawn from the Latin subset whatever
+// language its headings and chrome are in. Every other page's text is the reader's own
+// language, which is why this is asked for here rather than in the root.
+//
+// Without it the subset is discovered from the stylesheet, and the page repaints in a
+// fallback first: on a Greek run that was a single shift of 0.157 against a budget of 0.1,
+// because a page of dense prose has a whole viewport of it to move.
+export const links: Route.LinksFunction = () =>
+    interSubsetFor(getLocale()) === INTER_LATIN ? [] : [fontPreload(INTER_LATIN)];
 
 function Inline({ parts }: { parts: Part[] }) {
     return (
@@ -78,7 +91,11 @@ export default function NewsRoute() {
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.news_title()} hint={m.news_intro()} />
 
-            <div className="space-y-10">
+            {/* One changelog, written in English, on a page whose chrome is in the
+                reader's language. Saying so is what stops a screen reader pronouncing
+                English prose by Greek or Russian rules, and it tells the browser which
+                script the text below is in. */}
+            <div lang="en" className="space-y-10">
                 {releases.map((release) => (
                     <section key={`${release.date}:${release.label ?? ""}`} className="space-y-3">
                         <h2 className="font-semibold text-lg">

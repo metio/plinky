@@ -45,9 +45,6 @@ import {
 // Latin/Cyrillic/Greek subsets via unicode-range, so each locale only downloads
 // the subset it needs; the Latin file is preloaded below. Bundling it removes
 // the render-blocking Google Fonts request.
-import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
-import interGreek from "@fontsource-variable/inter/files/inter-greek-wght-normal.woff2?url";
-import interCyrillic from "@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2?url";
 import "@fontsource-variable/inter/wght.css";
 // The display face, for the wordmark and page titles only (see --font-display).
 // Fredoka carries the wordmark's own letterforms and covers Latin only. Comfortaa sits
@@ -58,35 +55,8 @@ import "@fontsource-variable/fredoka/wght.css";
 import "@fontsource-variable/comfortaa/wght.css";
 import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
+import { fontPreload, interSubsetFor } from "./lib/fontPreload";
 import { SiteHeader } from "./components/features/siteHeader";
-
-// Which Inter subset actually paints a locale's text, so the preload names that file and
-// no other. Latin is the default; Greek and Cyrillic each have their own subset, and CJK
-// has none — those pages fall back to system fonts, so there is nothing to preload and a
-// preload would only compete with what does paint them.
-//
-// Naming the wrong subset is worse than naming none. A Greek page preloading the Latin
-// file spends the connection on bytes it never draws with, and the Greek subset is then
-// discovered from the stylesheet and arrives late — so the page paints in a fallback and
-// reflows when Inter lands. On a text-light page that is a flicker; on a page of
-// paragraphs it moves a whole viewport of them, which is a sixth of the layout shift
-// budget on /news alone.
-const INTER_SUBSET: Record<string, string> = {
-    el: interGreek,
-    ru: interCyrillic,
-    uk: interCyrillic,
-    sr: interCyrillic,
-};
-// Fonts of their own: CJK text is drawn by the reader's system fonts, and asking for
-// Inter would be a download nothing renders from.
-const SYSTEM_FONT_LOCALES = new Set(["ja", "ko", "zh"]);
-
-function interSubsetFor(locale: string): string | null {
-    if (SYSTEM_FONT_LOCALES.has(locale)) {
-        return null;
-    }
-    return INTER_SUBSET[locale] ?? interLatin;
-}
 
 // The layout renders outside the services provider (it IS the provider's
 // parent), so it reads the theme through its own store instance over the real
@@ -111,22 +81,13 @@ export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
     { rel: "manifest", href: "/manifest.webmanifest" },
     { rel: "apple-touch-icon", href: "/icon-180.png" },
-    // Preload the variable font subset this locale's text is actually drawn from, so it
+    // Preload the variable font subset this locale's interface text is drawn from, so it
     // paints in Inter without a swap; the href is the same hashed asset the bundled
-    // @font-face resolves to.
+    // @font-face resolves to. A page whose CONTENT is in another script asks for that
+    // subset itself (app/lib/fontPreload.ts).
     ...(() => {
         const subset = interSubsetFor(getLocale());
-        return subset === null
-            ? []
-            : [
-                  {
-                      rel: "preload",
-                      as: "font",
-                      type: "font/woff2",
-                      href: subset,
-                      crossOrigin: "anonymous",
-                  } as const,
-              ];
+        return subset === null ? [] : [fontPreload(subset)];
     })(),
 ];
 
