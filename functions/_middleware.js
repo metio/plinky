@@ -32,8 +32,10 @@
 // no manifest row to look up; its shape is the whole test. It gets the shell with a 200
 // and no document of its own: its title is the exercise's own business.
 const GENERATED = /^(?:scale|arpeggio|chords)-/;
-// One fetch of the list per isolate, shared by every request it serves after.
+// One fetch of the list per isolate, shared by every request it serves after; and one per
+// language of what the composer pages say about their composers.
 let knownPromise = null;
+const peoplePromises = new Map();
 
 // The language a visitor asked for, from the Accept-Language header, among those the site
 // speaks: the first listed preference whose language tag matches, region ignored, so
@@ -77,6 +79,23 @@ async function known(context) {
             .catch(() => null);
     }
     return knownPromise;
+}
+
+// What a composer page says about its composer, in one language: the line, the dates and
+// the records that identify them (dev/gen-people.mts writes one file per language). Empty
+// when the file cannot be read — a composer page without it is the page as it was, which
+// is a name and a list.
+async function described(context, locale) {
+    if (!peoplePromises.has(locale)) {
+        peoplePromises.set(
+            locale,
+            context.env.ASSETS.fetch(new URL(`/people/${locale}.json`, context.request.url))
+                .then((response) => (response.ok ? response.json() : {}))
+                .then((people) => (people && typeof people === "object" ? people : {}))
+                .catch(() => ({})),
+        );
+    }
+    return peoplePromises.get(locale);
 }
 
 // What the address names: the language, whether it is a piece or a composer, and which.
@@ -123,7 +142,7 @@ const SITE_NAME = "Plinky";
 
 // The page a piece or composer address names, in one language: everything the head and
 // the summary are written from. Null when the list does not hold it.
-export function describe(list, page) {
+export function describe(list, page, about = null) {
     const strings = list.strings[page.locale] ?? list.strings[list.base] ?? {};
     const path = `/${page.kind}/${encodeURIComponent(page.id)}/`;
     if (page.kind === "play") {
@@ -172,6 +191,12 @@ export function describe(list, page) {
     if (!person) {
         return null;
     }
+    const sameAs = about
+        ? [
+              ...(about.id ? [`https://www.wikidata.org/wiki/${about.id}`] : []),
+              ...(about.wikipedia ? [about.wikipedia] : []),
+          ]
+        : [];
     const pieces = person.pieces
         .map((id) => ({ id, ...list.pieces[id] }))
         .filter((piece) => piece.title)
@@ -193,6 +218,10 @@ export function describe(list, page) {
             "@type": "Person",
             name: person.name,
             url: url(page.locale, path),
+            ...(about?.about ? { description: about.about } : {}),
+            ...(about?.born === undefined ? {} : { birthDate: String(about.born) }),
+            ...(about?.died === undefined ? {} : { deathDate: String(about.died) }),
+            ...(sameAs.length > 0 ? { sameAs } : {}),
             ...(pieces.length > 0
                 ? {
                       subjectOf: {
@@ -274,11 +303,20 @@ export function localePath(pathname) {
 // the app will look for what it wrote.
 const ROUTE_TAGS_AFTER = /<meta name="twitter:image:alt" content="[^"]*"\/?>/;
 
+// Where the app writes a route's structured data: after the two theme bootstrap scripts,
+// immediately before the analytics beacon. React reconciles the head's children by
+// position within a tag name, so a script element in the wrong place is not merely
+// misplaced — the app's first ld+json block is matched against the document's first
+// script, whatever that script is, and its type attribute lands on the theme bootstrap
+// while the block the edge wrote disappears. The blocks therefore go exactly where a
+// prerendered page carries them.
+const LD_BEFORE = /<script type="module" src="https:\/\/static\.cloudflareinsights\.com/;
+
 // The shell rewritten into the page's own document, in the shape the app's own meta()
 // would have given a page that knew its subject at build time: the same title shape,
 // the same description, the same card fields, the same structured data.
-export function documentFor(shell, list, page) {
-    const described = describe(list, page);
+export function documentFor(shell, list, page, about = null) {
+    const described = describe(list, page, about);
     if (!described) {
         return null;
     }
@@ -304,6 +342,8 @@ export function documentFor(shell, list, page) {
         `<meta property="og:description" content="${escapeHtml(described.description)}"/>`,
         `<meta name="twitter:title" content="${escapeHtml(described.headline)}"/>`,
         `<meta name="twitter:description" content="${escapeHtml(described.description)}"/>`,
+    ].join("");
+    const structuredData = [
         `<script type="application/ld+json">${json(described.data)}</script>`,
         `<script type="application/ld+json">${json(crumbs)}</script>`,
     ].join("");
@@ -340,7 +380,13 @@ export function documentFor(shell, list, page) {
     // the app hydrates the whole document: anything in the body it did not render is a
     // mismatch, and React throws the shell away and renders from nothing. The head is
     // where the page speaks for itself; the body is the app's.
-    return addressed.replace(ROUTE_TAGS_AFTER, (found) => `${found}${routeTags}`);
+    const titled = addressed.replace(ROUTE_TAGS_AFTER, (found) => `${found}${routeTags}`);
+    // The beacon is the app's own last head script, so it is the anchor. A shell without
+    // it keeps its title and its card and goes without structured data, rather than
+    // carrying blocks somewhere React will reconcile the wrong element against them.
+    return LD_BEFORE.test(titled)
+        ? titled.replace(LD_BEFORE, (found) => `${structuredData}${found}`)
+        : titled;
 }
 
 export async function onRequest(context) {
@@ -375,10 +421,16 @@ export async function onRequest(context) {
     let document = null;
     if (list?.locales.includes(where.locale)) {
         const page = parsePath(url.pathname);
+        // A composer's own details, read only for a composer's page — a piece's document
+        // needs nothing from it, and every fetch here is a fetch on the way to a reader.
+        const about =
+            page?.kind === "person"
+                ? ((await described(context, where.locale))[page.id] ?? null)
+                : null;
         const shell = await response.text();
         document =
-            page && describe(list, page) !== null
-                ? documentFor(shell, list, page)
+            page && describe(list, page, about) !== null
+                ? documentFor(shell, list, page, about)
                 : shellFor(shell, list, where.locale, where.path);
     }
     // The body is the shell either way; a Response's headers are immutable once it
@@ -396,7 +448,8 @@ export async function onRequest(context) {
     });
 }
 
-// For the test alone: the list is read once per isolate, and a test needs a fresh read.
+// For the test alone: both files are read once per isolate, and a test needs a fresh read.
 export function forgetKnown() {
     knownPromise = null;
+    peoplePromises.clear();
 }

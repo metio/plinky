@@ -37,6 +37,16 @@ export type Known = {
 
 export type PagePath = { locale: string; kind: "play" | "person"; id: string };
 
+// One composer's details, as build/client/people/<locale>.json holds them
+// (dev/gen-people.mts writes it; core/personAbout is the same shape).
+export type PersonAbout = {
+    about?: string;
+    born?: number;
+    died?: number;
+    wikipedia?: string;
+    id?: string;
+};
+
 export type Described = {
     path: string;
     headline: string;
@@ -50,8 +60,13 @@ export type Described = {
 export function onRequest(context: AssetContext): Promise<Response>;
 export function exists(context: AssetContext): Promise<boolean>;
 export function parsePath(path: string): PagePath | null;
-export function describe(list: Known, page: PagePath): Described | null;
-export function documentFor(shell: string, list: Known, page: PagePath): string | null;
+export function describe(list: Known, page: PagePath, about?: PersonAbout | null): Described | null;
+export function documentFor(
+    shell: string,
+    list: Known,
+    page: PagePath,
+    about?: PersonAbout | null,
+): string | null;
 export function shellFor(shell: string, list: Known, locale: string, path: string): string;
 export function localePath(pathname: string): { locale: string; path: string } | null;
 export function pickLocale(acceptLanguage: string | null | undefined, locales: string[]): string;

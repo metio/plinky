@@ -872,12 +872,20 @@ across the source corpora ("J.S. Bach", "Johann Sebastian Bach (1685 - 1750)",
 page, and credits that are really work numbers or traditions rather than people get
 no page at all.
 
-The catalogue credits 542 of them. Those with three pieces or more arrive as a static
-document carrying their name, their piece count and their structured data, so a
-crawler or a link unfurler that runs no JavaScript still sees a real person; the piece
-list itself fills in a moment later. Composers below that line still have a working
-page — it simply renders on the client like everything else, because a page listing
-one piece is thin whoever is reading it.
+Each page opens with a line saying who the person was and when they lived, and links
+to their Wikipedia article in the language you are reading. That comes from
+[Wikidata](https://www.wikidata.org/), which publishes it under CC0; `npm run
+people:wikidata` matches the catalogue's composers against it and
+`dev/people-wikidata.json` holds the result, so a hand correction survives the next
+run. Three hundred and forty-five of the four hundred credited composers are placed;
+the rest keep a page with their name and their pieces.
+
+Every one of those pages arrives as a real document rather than an empty shell. There
+is no file in the tree for them — four hundred composers in twenty-six languages is ten
+thousand pages, most of a deployment's file allowance — so the edge writes each one
+from the same data the app reads (`functions/_middleware.js`), carrying the composer's
+name, their pieces and their structured data. A crawler or a link unfurler that runs no
+JavaScript sees a real person; the app fills the fuller detail in over it once it loads.
 
 ## Follow Plinky
 

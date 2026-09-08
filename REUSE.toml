@@ -89,6 +89,15 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
+# What Wikidata says about the composers the catalogue credits — a line, the years, and
+# the article to read next, collected by `npm run people:wikidata`. Wikidata's own data is
+# released under CC0, and this is a copy of it rather than a work of ours.
+[[annotations]]
+path = ["dev/people-wikidata.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "Wikidata contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
 [[annotations]]
 path = ["public/songs/manifest.json"]
 precedence = "override"

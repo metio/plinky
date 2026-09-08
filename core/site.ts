@@ -1,3 +1,4 @@
+import { type PersonAbout, sameAsFor } from "./personAbout";
 import { CHANNELS } from "./social";
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -195,12 +196,21 @@ function localeUrl(locale: string, path: string): string {
 export function personData(
     person: { slug: string; name: string; pieces: { id: string; title: string }[] },
     locale: string,
+    // What is known about the person beyond their pieces, where the catalogue could place
+    // them (core/personAbout). `sameAs` is the half that matters most: it says this page
+    // and that record are one person, which is what makes four hundred generated pages
+    // four hundred known people rather than four hundred strings that look like names.
+    about: PersonAbout | null = null,
 ) {
     return {
         "@context": "https://schema.org",
         "@type": "Person",
         name: person.name,
         url: localeUrl(locale, `/person/${person.slug}/`),
+        ...(about?.about ? { description: about.about } : {}),
+        ...(about?.born === undefined ? {} : { birthDate: String(about.born) }),
+        ...(about?.died === undefined ? {} : { deathDate: String(about.died) }),
+        ...(about && sameAsFor(about).length > 0 ? { sameAs: sameAsFor(about) } : {}),
         // The list is omitted rather than published empty: at prerender a catalogue
         // composer is known by name before their pieces are, and an ItemList declaring
         // zero items describes the page wrongly instead of describing it partially.

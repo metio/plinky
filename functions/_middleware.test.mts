@@ -68,7 +68,21 @@ const SHELL =
     '<meta property="og:image:alt" content="Plinky — piano practice in your browser"/>' +
     '<meta name="twitter:image" content="https://plinky.fun/og.png"/>' +
     '<meta name="twitter:image:alt" content="Plinky — piano practice in your browser"/>' +
-    '<link rel="icon" href="/favicon.ico" sizes="32x32"/></head><body><div id="root"></div></body></html>';
+    '<link rel="icon" href="/favicon.ico" sizes="32x32"/>' +
+    '<script>/* theme */</script><script>/* history */</script>' +
+    '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"></script>' +
+    '</head><body><div id="root"></div></body></html>';
+
+// What the composer pages say about their composers, in one language.
+const PEOPLE = {
+    "frederic-chopin": {
+        about: "Polish composer and pianist",
+        born: 1810,
+        died: 1849,
+        wikipedia: "https://en.wikipedia.org/wiki/Fr%C3%A9d%C3%A9ric_Chopin",
+        id: "Q1268",
+    },
+};
 
 // The asset server's answer for the request, which is all the middleware ever sees, over
 // an asset binding that holds the known list (or, when `listStatus` says so, does not).
@@ -89,6 +103,9 @@ function served(
                     const url = new URL(typeof request === "string" ? request : request.toString());
                     if (url.pathname === "/known.json" && listStatus === 200) {
                         return new Response(JSON.stringify(KNOWN), { status: 200 });
+                    }
+                    if (url.pathname === "/people/en.json" && listStatus === 200) {
+                        return new Response(JSON.stringify(PEOPLE), { status: 200 });
                     }
                     return new Response("not found", { status: listStatus === 200 ? 404 : listStatus });
                 },
@@ -130,6 +147,34 @@ describe("onRequest", () => {
         ]) {
             expect((await onRequest(served(path, 404, "shell"))).status).toBe(404);
         }
+    });
+
+    it("says who a composer was, and which records they are", async () => {
+        const response = await onRequest(served("/en/person/frederic-chopin/", 404, SHELL));
+        const html = await response.text();
+        expect(html).toContain("Polish composer and pianist");
+        const person = JSON.parse(
+            html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)?.[1] ?? "null",
+        );
+        expect(person).toMatchObject({
+            "@type": "Person",
+            description: "Polish composer and pianist",
+            birthDate: "1810",
+            deathDate: "1849",
+            sameAs: [
+                "https://www.wikidata.org/wiki/Q1268",
+                "https://en.wikipedia.org/wiki/Fr%C3%A9d%C3%A9ric_Chopin",
+            ],
+        });
+    });
+
+    it("writes a composer's page whatever the language file holds", async () => {
+        // German has no file here; the page is still the page it always was.
+        const response = await onRequest(served("/de/person/frederic-chopin/", 404, SHELL));
+        const html = await response.text();
+        expect(response.status).toBe(200);
+        expect(html).toContain("<title>Frédéric Chopin · Plinky</title>");
+        expect(html).not.toContain("sameAs");
     });
 
     it("answers a composer the site has, in any language the site speaks", async () => {
@@ -273,7 +318,7 @@ describe("documentFor", () => {
 
     it("writes the route's tags where the app writes them, in the app's order", () => {
         // Adopted by hydration only where the app would have written them itself: right
-        // after the site-wide card fields, title first, the structured data last.
+        // after the site-wide card fields, title first, and the icons after them.
         const after = html.slice(html.indexOf('<meta name="twitter:image:alt"'));
         const order = [
             "<title>",
@@ -282,11 +327,37 @@ describe("documentFor", () => {
             '<meta property="og:description"',
             '<meta name="twitter:title"',
             '<meta name="twitter:description"',
-            '<script type="application/ld+json">',
             '<link rel="icon"',
         ].map((tag) => after.indexOf(tag));
         expect(order.every((index) => index > 0)).toBe(true);
         expect([...order].sort((a, b) => a - b)).toEqual(order);
+    });
+
+    it("writes the structured data after the bootstrap scripts, before the beacon", () => {
+        // React pairs head scripts by position, so a block written before the theme
+        // bootstrap is reconciled against the bootstrap: the app's ld+json type lands on
+        // that script and the block the edge wrote is gone. A prerendered page carries
+        // them here, so an edge-written one carries them here too.
+        const scripts = [...html.matchAll(/<script[^>]*>/g)].map((match) => match[0]);
+        expect(scripts).toEqual([
+            "<script>",
+            "<script>",
+            '<script type="application/ld+json">',
+            '<script type="application/ld+json">',
+            '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js">',
+        ]);
+    });
+
+    it("leaves a shell with no beacon titled but without structured data", () => {
+        // The anchor is the app's last head script. Without it there is no position that
+        // can be trusted, and a page says who it is without the machine-readable half.
+        const noBeacon = SHELL.replace(
+            '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"></script>',
+            "",
+        );
+        const written = documentFor(noBeacon, KNOWN, page) ?? "";
+        expect(written).toContain("<title>");
+        expect(written).not.toContain("application/ld+json");
     });
 
     it("keeps the canonical and the cluster where the shell held them", () => {

@@ -83,6 +83,12 @@ trak = "trak"
 # entry added would flag a new one — "ikvnpg9wpYUe" did. The cost is that the short "why"
 # notes in them go unchecked, which is the same bargain the manifest already makes.
 #
+# dev/people-wikidata.json is the same bargain in a different form: it holds each placed
+# composer's one-line description in all twenty-six languages, straight from Wikidata, so
+# every entry carries prose typos only knows how to read as English ("compositore austriaco").
+# It is fetched rather than written, and a correction here would be overwritten by the
+# next run of `npm run people:wikidata`.
+#
 # dev/promo/pieces.mjs is the same shape: a hand-kept list pairing those ids with the piece
 # titles and composer names the corpora use, so it carries both the letter runs
 # ("xrKmwOtUbwed") and real-world names in several languages.
@@ -93,6 +99,7 @@ extend-exclude = [
     "dev/catalog-duplicates.json",
     "dev/catalog-flagged.json",
     "dev/catalog-people-distinct.json",
+    "dev/people-wikidata.json",
     "dev/promo/pieces.mjs",
     "messages/*",
     "!messages/en.json",

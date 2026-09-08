@@ -5,9 +5,6 @@ import { readFileSync, readdirSync } from "node:fs";
 import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
 import { staticPaths } from "./dev/pages.mjs";
-import { PEOPLE_INDEX } from "./core/peopleIndex";
-import { personSlug } from "./core/person";
-import { readScoreMetaFromText } from "./core/scoreMeta";
 import { songId } from "./core/songId";
 
 // Every page the route table defines, read from it rather than restated here: a route
@@ -15,38 +12,24 @@ import { songId } from "./core/songId";
 // generateStaticLocalizedUrls expands each into one prefixed path per locale.
 const BASE_PATHS = staticPaths();
 
-// Every bundled score's id and composer, read once. The id is the content
-// fingerprint, matching loadBundledScores in app/lib/catalog.ts; the composer
-// (pure text pass, no parser) drives the person pages below.
+// Every bundled score's id, read once: the content fingerprint, matching
+// loadBundledScores in app/lib/catalog.ts.
 const BUNDLED_SCORES = readdirSync("scores")
     .filter((name) => name.endsWith(".musicxml"))
-    .map((name) => {
-        const xml = readFileSync(`scores/${name}`, "utf8");
-        return { id: songId(xml), composer: readScoreMetaFromText(xml).composer };
-    });
+    .map((name) => ({ id: songId(readFileSync(`scores/${name}`, "utf8")) }));
 
 // Prerender a play page for every bundled score so each piece is indexable with its own
 // title and structured data. User-imported scores stay client-only.
 const BUNDLED_PLAY_PATHS = BUNDLED_SCORES.map((score) => `/play/${score.id}`);
 
-// Prerender a page for every composer the bundled catalogue credits, so each is a
-// crawlable, sitemap-listed entity (name, their pieces, Person + BreadcrumbList
-// structured data) rather than a JavaScript-only shell. One slug per composer,
-// deduped; attribution markers ("Traditional") slug to "" and are skipped.
-// Plus every composer the shipped catalogue credits with enough pieces to be worth a
-// static document — read from the baked index (dev/bake-people.mts), which is derived
-// from the same manifests the app loads. The floor keeps a page that would list one or
-// two pieces off the sitemap: thin for a reader, thin for a crawler, and multiplied by
-// every locale it is a build cost with nothing on the other side. A composer below the
-// floor still has a working page; it simply renders on the client like any other.
-const CATALOGUE_PERSON_SLUGS = Object.keys(PEOPLE_INDEX);
-
-const PERSON_PATHS = [
-    ...new Set([
-        ...BUNDLED_SCORES.map((score) => personSlug(score.composer)).filter(Boolean),
-        ...CATALOGUE_PERSON_SLUGS,
-    ]),
-].map((slug) => `/person/${slug}`);
+// Composer pages are not prerendered, and deliberately so. There are four hundred of
+// them, which in twenty-six languages is ten thousand documents — most of a Cloudflare
+// Pages deployment's twenty-thousand-file allowance, spent on pages whose whole content
+// arrives from two fetched files anyway. The edge writes each one instead
+// (functions/_middleware.js), from the same data and in more detail than a prerender
+// could: the composer's name, their pieces, and who they were, in the page's own
+// language. They are in the sitemap all the same — dev/gen-sitemap.mjs reads them from
+// the catalogue the edge reads, not from the tree.
 
 export default {
     // SPA mode: no server, hydrated on the client.
@@ -58,7 +41,7 @@ export default {
     // a client redirect to the visitor's locale. Prerendering runs serially
     // (concurrency 1), which entry.server relies on to pin getLocale per page.
     prerender() {
-        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS, ...PERSON_PATHS];
+        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS];
         const localized = generateStaticLocalizedUrls(paths).map((url) => url.pathname);
         // A per-locale build (PLINKY_LOCALE=de) pins getLocale to its language, so
         // it can only render its own pages correctly — prerender just those. The

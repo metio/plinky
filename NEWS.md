@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 8 September 2026
+
+**The composer pages say who the composer was.** Four hundred of them carried a name
+and a list of pieces and nothing else. Each now opens with a line saying who the
+person was and when they lived — Polish composer and pianist, 1810 to 1849 — with a
+link to their Wikipedia article in the language you are reading, for the three
+hundred and forty-five the catalogue could place. The wording comes from Wikidata,
+which publishes it for anyone to use.
+
 ## 7 September 2026
 
 **Every piece has a page that says what it is.** Share a link to any of the three

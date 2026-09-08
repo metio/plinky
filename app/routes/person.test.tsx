@@ -128,6 +128,60 @@ describe("PersonPage", () => {
         expect(screen.getAllByRole("link", { name: /Menuet|Air|My Own/ })).toHaveLength(3);
     });
 
+    it("says who the composer was, and offers the article to read next", async () => {
+        // A page that is a name over a list says nothing about the person whose name it
+        // carries, and there are four hundred of them.
+        server.use(
+            http.get("*/songs/manifest.json", () => HttpResponse.json(MANIFEST)),
+            http.get("*/people/en.json", () =>
+                HttpResponse.json({
+                    "erik-satie": {
+                        about: "French composer",
+                        born: 1866,
+                        died: 1925,
+                        wikipedia: "https://en.wikipedia.org/wiki/Erik_Satie",
+                        id: "Q1203",
+                    },
+                }),
+            ),
+        );
+        renderWithServices(pageAt("erik-satie"));
+
+        expect(await screen.findByText(/French composer \(1866–1925\)/)).toBeTruthy();
+        const article = screen.getByRole("link", { name: "Read more on Wikipedia" });
+        expect(article.getAttribute("href")).toBe("https://en.wikipedia.org/wiki/Erik_Satie");
+        expect(article.getAttribute("rel")).toContain("noopener");
+        // And the records that say this page and that person are the same, which is what
+        // a search engine reads as identity.
+        await expect
+            .poll(() =>
+                [...document.head.querySelectorAll('script[type="application/ld+json"]')]
+                    .map((tag) => JSON.parse(tag.textContent ?? "null"))
+                    .find((data) => data?.["@type"] === "Person"),
+            )
+            .toMatchObject({
+                name: "Erik Satie",
+                description: "French composer",
+                birthDate: "1866",
+                deathDate: "1925",
+                sameAs: [
+                    "https://www.wikidata.org/wiki/Q1203",
+                    "https://en.wikipedia.org/wiki/Erik_Satie",
+                ],
+            });
+    });
+
+    it("is the page it always was for a composer nothing is known about", async () => {
+        server.use(
+            http.get("*/songs/manifest.json", () => HttpResponse.json(MANIFEST)),
+            http.get("*/people/en.json", () => HttpResponse.json({})),
+        );
+        renderWithServices(pageAt("erik-satie"));
+
+        expect(await screen.findByRole("heading", { name: "Erik Satie" })).toBeTruthy();
+        expect(screen.queryByRole("link", { name: "Read more on Wikipedia" })).toBeNull();
+    });
+
     it("says so when the slug matches nobody", async () => {
         server.use(http.get("*/songs/manifest.json", () => HttpResponse.json(MANIFEST)));
         renderWithServices(pageAt("nobody-here"));

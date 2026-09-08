@@ -6,11 +6,14 @@ import { usePrefs } from "../hooks/usePrefs";
 import { useParams } from "react-router";
 import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../core/person";
 import { BakedIncipit } from "../components/ui/incipit";
+import { Show } from "../components/features/conditional";
 import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, personData, routeMeta } from "../../core/site";
+import { aboutFor, aboutLine, type PersonAbout } from "../../core/personAbout";
+import { useStructuredData } from "../hooks/useStructuredData";
 import { loadBundledScores, loadUserScores } from "../lib/catalog";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
-import { useExerciseSource, useSongSource, useStore } from "../contexts/services";
+import { useExerciseSource, usePeopleSource, useSongSource, useStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/person";
@@ -62,17 +65,12 @@ export function meta({ params }: Route.MetaArgs) {
     const tags: Record<string, unknown>[] = [
         ...routeMeta(name || m.person_eyebrow(), m.meta_person_description({ name })),
     ];
-    if (person) {
-        const locale = getLocale();
-        tags.push({ "script:ld+json": personData(person, locale) });
-        tags.push({
-            "script:ld+json": breadcrumbData(locale, [
-                { name: m.nav_today(), path: "/" },
-                { name: m.music_title(), path: "/music/" },
-                { name: person.name, path: `/person/${person.slug}/` },
-            ]),
-        });
-    }
+    // No structured data here. The edge writes this page's document
+    // (functions/_middleware.js), and a `<script>` React renders into the head is not
+    // reconciled against the one already there the way a title or a meta tag is — it is
+    // appended, leaving the page saying who the composer is twice. The page writes both
+    // blocks after mount instead (useStructuredData below), which is also the only moment
+    // it knows the composer's dates and the records that identify them.
     return tags;
 }
 
@@ -91,6 +89,9 @@ export default function PersonPage() {
     // presence is three exercises, was the first to have a page at all and so the first to
     // show it.
     const exercises = useExerciseSource();
+    // Who this person was, in the reader's language — fetched, since four hundred
+    // composers described in twenty-six languages is not something to put in a bundle.
+    const people = usePeopleSource();
     // And the scores the player brought themselves. The comment here used to say imports
     // "layer on top once the manifest loads" and nothing ever laid them on: a piece you
     // imported credited to Chopin counted towards him on the library's composer list and
@@ -107,6 +108,31 @@ export default function PersonPage() {
     // stating nothing — the count is right in the static HTML, and the list itself
     // arrives a beat later.
     const known = indexedPerson(slug ?? "");
+    const [about, setAbout] = useState<PersonAbout | null>(null);
+    const locale = getLocale();
+    useAsyncEffect(
+        (alive) => {
+            setAbout(null);
+            people.about(locale).then((described) => {
+                if (alive() && described) {
+                    setAbout(aboutFor(described, slug ?? ""));
+                }
+            });
+        },
+        [people.about, locale, slug],
+    );
+    // Written once the person is known, and only from here — see meta() above.
+    useStructuredData("Person", person ? personData(person, locale, about) : null);
+    useStructuredData(
+        "BreadcrumbList",
+        person
+            ? breadcrumbData(locale, [
+                  { name: m.nav_today(), path: "/" },
+                  { name: m.music_title(), path: "/music/" },
+                  { name: person.name, path: `/person/${person.slug}/` },
+              ])
+            : null,
+    );
 
     useAsyncEffect(
         (alive) => {
@@ -147,6 +173,13 @@ export default function PersonPage() {
         [songs.manifest, exercises.manifest, store, slug],
     );
 
+    const line = about
+        ? aboutLine(about, {
+              born: (year) => m.person_born({ year }),
+              died: (year) => m.person_died({ year }),
+          })
+        : "";
+
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader
@@ -158,6 +191,29 @@ export default function PersonPage() {
                         : undefined
                 }
             />
+
+            {/* Who they were, and where to read more. A page that is a name over a list
+                says nothing about the person whose name it carries — and there are four
+                hundred of them. The line is Wikidata's own, under CC0, in the reader's
+                language where it has one. */}
+            <Show when={about !== null && (line !== "" || about?.wikipedia !== undefined)}>
+                <p className="text-sm text-muted">
+                    {line}
+                    {about?.wikipedia && (
+                        <>
+                            {line && " · "}
+                            <a
+                                href={about.wikipedia}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-medium text-accent-strong hover:underline"
+                            >
+                                {m.person_wikipedia()}
+                            </a>
+                        </>
+                    )}
+                </p>
+            </Show>
 
             {person ? (
                 <ul className="space-y-1.5">

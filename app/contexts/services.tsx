@@ -50,6 +50,7 @@ import { createErrorLogStore, type ErrorLogStore } from "../stores/errorLogStore
 import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
 import { createPracticeLogStore, type PracticeLogStore } from "../stores/practiceLogStore";
 import { createSongSource, type SongSource } from "../stores/songSource";
+import { createPeopleSource, type PeopleSource } from "../stores/peopleSource";
 import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
 import { type ActivitySignal, runActivity } from "../lib/activity";
@@ -115,6 +116,8 @@ export type AppServices = {
     // and the exercise manifest + generated/fetched pieces.
     songs: SongSource;
     exercises: ExerciseSource;
+    // What the composer pages say about their composers, per language (see PeopleSource).
+    people: PeopleSource;
     // The "a run is in progress" signal: screens begin/end it, the composition
     // root reads it to hold a service-worker reload until the app is idle.
     // Turns a take into a shareable MP4 where the engine can encode one.
@@ -203,6 +206,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         scheduler,
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher),
+        people: overrides.people ?? createPeopleSource(fetcher),
         exercises: overrides.exercises ?? createExerciseSource(fetcher, exerciseName),
         video: overrides.video ?? lazyVideoExporter,
         audioFile: overrides.audioFile ?? lazyAudioExporter,
@@ -250,6 +254,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     xml: true,
     songs: true,
     exercises: true,
+    people: true,
     video: true,
     audioFile: true,
     activity: true,
@@ -390,6 +395,10 @@ export function useSongSource(): SongSource {
 
 export function useExerciseSource(): ExerciseSource {
     return useServices().exercises;
+}
+
+export function usePeopleSource(): PeopleSource {
+    return useServices().people;
 }
 
 export function useVideoExporter(): VideoExporter {
