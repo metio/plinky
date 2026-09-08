@@ -862,19 +862,32 @@ live in `public/`, the copy is translated with the rest of the UI), with a short
 note on why Plinky is a calm place to play rather than one more thing to keep a
 streak on.
 
-## Browsing by grade and by era
+## Browsing by grade, era and work
 
-The catalogue answers the two things somebody actually asks it for. `/music/grade/3`
-holds every piece graded 3, easiest first; `/music/era/romantic` holds the pieces of the
-composers born in that period, and there are shelves for the Baroque, the Classical era
-and the modern one beside it. Each shelf links to all the others, and the Music page
-links to every one of them, so a level or a period is an address to share rather than a
-filter that lives in one tab's memory.
+The catalogue answers the three things somebody asks it for. `/music/grade/3` holds every
+piece graded 3, easiest first; `/music/era/romantic` holds the pieces of the composers born
+in that period; and `/music/collection/bach-inventions` holds one named work, in the order
+you would work through it rather than easiest first — a book of studies is a sequence, and
+sorting it by difficulty would be rewriting the book. The named works are the same
+twenty-three the app already offers as built-in assignments, so this is not a second list
+to maintain. Each shelf links to all the others, and the Music page links to every one.
 
-An era is read from the composer's birth year — the date Wikidata reliably holds for
-these people, where a harvested score rarely records when it was written. That makes the
+An era is read from the composer's birth year — the date Wikidata reliably holds for these
+people, where a harvested score rarely records when it was written. That makes the
 boundaries a working approximation: somebody born in 1795 wrote Romantic music and lands
 under Classical here. A piece credited to two people is on both their shelves.
+
+## What a piece page says
+
+A piece names its grade, how many bars it runs to, how it is counted and how fast it goes.
+All of it is read off the score the page already holds (`core/pieceFacts.ts`), so it costs
+no fetch and cannot disagree with the notation below it; the catalogue bakes the same
+numbers from the same source, which is how the document the edge writes and the page the
+app renders end up carrying the same sentence. The grade is a link to that grade's shelf.
+
+Without them, three thousand piece pages were one sentence with two words swapped — thin
+for a reader deciding whether to open it, and matching a search for the title and nothing
+else.
 
 ## Composer pages
 
@@ -901,7 +914,7 @@ from the same data the app reads (`functions/_middleware.js`), carrying the comp
 name, their pieces and their structured data. A crawler or a link unfurler that runs no
 JavaScript sees a real person; the app fills the fuller detail in over it once it loads.
 
-## Every mark at its own address
+## Every mark and every lesson at its own address
 
 The glossary explains nineteen marks, and each has a page: `/glossary/fermata` opens on
 the fermata, with its engraving, the keyboard under it and both readings of the phrase.
@@ -909,7 +922,12 @@ Picking a mark from the list writes its address, so what is on screen is what th
 names — a page somebody can send, bookmark, or come back to, and one a search engine can
 answer "what does a fermata mean" with.
 
-All of them are prerendered, in all twenty-six languages, which is under five hundred
+The fourteen theory lessons work the same way: `/theory/octave` is that lesson on its own,
+with the way back to the rest of the course, and `/theory` still reads top to bottom as it
+always did. "What is an octave" is a question people type into a search engine, and the
+answer was a paragraph two thirds of the way down a page of fourteen.
+
+All of them are prerendered, in all twenty-six languages, which is under nine hundred
 documents. That is the reason they are not written at the edge like the pieces and the
 composers are: the set is small and fixed, and a prerendered route needs no entry in
 `_routes.json` — Cloudflare allows a hundred routing rules and a dynamic prefix costs one

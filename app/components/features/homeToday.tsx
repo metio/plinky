@@ -636,16 +636,25 @@ export function HomeToday() {
             </Moment>
 
             <Moment label={m.today_moment_learn()}>
-                <Row
-                    to={
-                        session.learn === "theory" && session.nextLesson
-                            ? `${LEARN_PICK_HREF.theory}#${session.nextLesson}`
-                            : LEARN_PICK_HREF[session.learn]
-                    }
-                    icon="💡"
-                    label={LEARN_LABEL[session.learn]()}
-                    hint={LEARN_BLURB[session.learn]()}
-                />
+                {/* The next lesson's own page, rather than the course scrolled to it.
+                    Written out as an address rather than built from a constant, because
+                    the navigation gate reads these links out of the source: a lesson it
+                    cannot see a link to counts as three taps away when it is one. */}
+                {session.learn === "theory" && session.nextLesson ? (
+                    <Row
+                        to={`/theory/${session.nextLesson}/`}
+                        icon="💡"
+                        label={LEARN_LABEL.theory()}
+                        hint={LEARN_BLURB.theory()}
+                    />
+                ) : (
+                    <Row
+                        to={LEARN_PICK_HREF[session.learn]}
+                        icon="💡"
+                        label={LEARN_LABEL[session.learn]()}
+                        hint={LEARN_BLURB[session.learn]()}
+                    />
+                )}
             </Moment>
 
             {/* The way out, for somebody who fancies none of it. Quiet on purpose: the

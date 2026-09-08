@@ -8,8 +8,9 @@ import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../co
 import { BakedIncipit } from "../components/ui/incipit";
 import { Show } from "../components/features/conditional";
 import { indexedPerson } from "../../core/peopleIndex";
-import { breadcrumbData, personData, routeMeta } from "../../core/site";
+import { breadcrumbData, imageMeta, personData, personImage, routeMeta } from "../../core/site";
 import { aboutFor, aboutLine, type PersonAbout } from "../../core/personAbout";
+import { type Era, eraOf } from "../../core/musicHubs";
 import { useStructuredData } from "../hooks/useStructuredData";
 import { loadBundledScores, loadUserScores } from "../lib/catalog";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
@@ -56,6 +57,21 @@ function knownPerson(slug: string): Person | null {
     return indexed ? { slug, name: indexed.name, pieces: [] } : null;
 }
 
+// What each era is called, in the reader's language. The same four names the shelves
+// carry, read from one place so a page and the shelf it links to never disagree.
+const ERA_TITLES: Record<Era, () => string> = {
+    baroque: m.hub_era_title_baroque,
+    classical: m.hub_era_title_classical,
+    romantic: m.hub_era_title_romantic,
+    modern: m.hub_era_title_modern,
+};
+
+// This page paints its own card, so the layout stands its site-wide one down — two
+// og:image tags is a coin toss over which a link shows.
+export const handle = {
+    cardFor: (params: { slug?: string }) => params.slug !== undefined,
+};
+
 export function meta({ params }: Route.MetaArgs) {
     const slug = params.slug ?? "";
     // The bundled composer resolves at prerender, so a bundled composer's page
@@ -64,6 +80,9 @@ export function meta({ params }: Route.MetaArgs) {
     const name = person?.name ?? nameFromSlug(slug);
     const tags: Record<string, unknown>[] = [
         ...routeMeta(name || m.person_eyebrow(), m.meta_person_description({ name })),
+        // The composer's own card, painted per composer at build. A link to a person
+        // should unfurl as that person, not as the site's one picture.
+        ...(person ? imageMeta(personImage(person.slug), person.name) : []),
     ];
     // No structured data here. The edge writes this page's document
     // (functions/_middleware.js), and a `<script>` React renders into the head is not
@@ -173,6 +192,9 @@ export default function PersonPage() {
         [songs.manifest, exercises.manifest, store, slug],
     );
 
+    // The era this composer belongs to, from the birth year the page already fetched — so
+    // a reader who arrived for one composer can step out to the period around them.
+    const era = about ? eraOf(about.born) : null;
     const line = about
         ? aboutLine(about, {
               born: (year) => m.person_born({ year }),
@@ -210,6 +232,17 @@ export default function PersonPage() {
                             >
                                 {m.person_wikipedia()}
                             </a>
+                        </>
+                    )}
+                    {era && (
+                        <>
+                            {" · "}
+                            <Link
+                                to={`/music/era/${era}/`}
+                                className="font-medium text-accent-strong hover:underline"
+                            >
+                                {ERA_TITLES[era]()}
+                            </Link>
                         </>
                     )}
                 </p>

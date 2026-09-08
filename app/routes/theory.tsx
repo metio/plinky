@@ -4,12 +4,13 @@
 import { TheoryIndex } from "../components/features/theoryIndex";
 
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
-import { routeMeta, webPageData } from "../../core/site";
+import { breadcrumbData, routeMeta, webPageData } from "../../core/site";
 import { NOTE_TEXT, noteNameOf } from "../../core/theory";
 import {
     type Demo,
     type Lesson,
     LESSONS,
+    lessonById,
     lessonsIn,
     UNITS,
     type UnitId,
@@ -22,6 +23,7 @@ import { SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useTheoryStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+import { useParams } from "react-router";
 import type { Route } from "./+types/theory";
 import { linkClasses, sectionHeadingClasses } from "../components/ui/classes";
 import { LinkedText, slot } from "../components/ui/linkedText";
@@ -30,14 +32,42 @@ import { PageHeader } from "../components/ui/pageHeader";
 import { Card } from "../components/ui/card";
 import { useScrollToHash } from "../hooks/useScrollToHash";
 
-export function meta(_args: Route.MetaArgs) {
+export function meta({ params }: Route.MetaArgs) {
+    const locale = getLocale();
+    // One lesson's own page. Every one of them is prerendered, so this is what a reader
+    // and a crawler are handed before any script runs — and what the app renders over on
+    // hydration, so the two say the same thing by construction.
+    const lesson = params.lesson ? lessonById(params.lesson) : null;
+    if (lesson) {
+        const title = LESSON_TITLE[lesson.id]?.() ?? "";
+        const body = LESSON_BODY[lesson.id]?.() ?? "";
+        return [
+            ...routeMeta(title, body),
+            {
+                "script:ld+json": webPageData(
+                    title,
+                    body,
+                    locale,
+                    `/theory/${lesson.id}/`,
+                    "LearningResource",
+                ),
+            },
+            {
+                "script:ld+json": breadcrumbData(locale, [
+                    { name: m.nav_today(), path: "/" },
+                    { name: m.theory_title(), path: "/theory/" },
+                    { name: title, path: `/theory/${lesson.id}/` },
+                ]),
+            },
+        ];
+    }
     return [
         ...routeMeta(m.theory_title(), m.meta_theory_description()),
         {
             "script:ld+json": webPageData(
                 m.theory_title(),
                 m.meta_theory_description(),
-                getLocale(),
+                locale,
                 "/theory/",
                 "WebPage",
             ),
@@ -115,6 +145,47 @@ function LessonDemo({ demo, onPlay }: { demo: Demo; onPlay: () => void }) {
     );
 }
 
+// One lesson, at an address of its own.
+//
+// "What is an octave" is a question somebody types into a search engine, and the answer
+// was a paragraph two thirds of the way down a page of fourteen — findable by scrolling
+// and by nothing else. The course itself is unchanged and still reads top to bottom at
+// /theory; this is the same lesson, alone, with the way back to the rest of it.
+function OneLesson({ lesson }: { lesson: Lesson }) {
+    const index = LESSONS.findIndex((one) => one.id === lesson.id) + 1;
+    return (
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <PageHeader
+                eyebrow={UNIT_NAME[lesson.unit]()}
+                title={LESSON_TITLE[lesson.id]?.() ?? ""}
+                hint={LESSON_BODY[lesson.id]?.()}
+            />
+            <ul className="space-y-4">
+                <LessonCard lesson={lesson} index={index} />
+            </ul>
+            <nav className="space-y-2">
+                <h2 className={sectionHeadingClasses}>{m.theory_title()}</h2>
+                <ul className="flex flex-wrap gap-2">
+                    {LESSONS.map((one) => (
+                        <li key={one.id}>
+                            <LocalizedLink
+                                to={`/theory/${one.id}/`}
+                                className={`rounded-full border border-line px-3 py-1 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30 ${
+                                    one.id === lesson.id
+                                        ? "border-accent-line-strong bg-accent-surface/50 font-medium"
+                                        : ""
+                                }`}
+                            >
+                                {LESSON_TITLE[one.id]?.()}
+                            </LocalizedLink>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        </main>
+    );
+}
+
 function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
     const theory = useTheoryStore();
     return (
@@ -159,6 +230,11 @@ export default function TheoryRoute() {
     // The day's practice links to a single lesson; a client-router navigation does not
     // scroll to a hash on its own.
     useScrollToHash();
+    const params = useParams();
+    const only = params.lesson ? lessonById(params.lesson) : null;
+    if (only) {
+        return <OneLesson lesson={only} />;
+    }
     let counter = 0;
     return (
         // Wider than the rest of the app, and two columns, for the same reason the

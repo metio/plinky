@@ -6,6 +6,7 @@ import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
 import { staticPaths } from "./dev/pages.mjs";
 import { GLOSSARY } from "./core/glossary";
+import { LESSONS } from "./core/theoryCourse";
 import { songId } from "./core/songId";
 
 // Every page the route table defines, read from it rather than restated here: a route
@@ -34,11 +35,15 @@ const BUNDLED_PLAY_PATHS = BUNDLED_SCORES.map((score) => `/play/${score.id}`);
 // fourth dynamic prefix would have been a hundred and five.
 const GLOSSARY_PATHS = GLOSSARY.map((entry) => `/glossary/${entry.id}`);
 
+// And each theory lesson, for the same reasons: fourteen of them, a fixed set, and each
+// one the answer to a question somebody asks a search engine in those words.
+const THEORY_PATHS = LESSONS.map((lesson) => `/theory/${lesson.id}`);
+
 // The dynamic routes above whose every page is prerendered, so the SPA fallback needs no
 // routing rule for them. Read from here by dev/pages.mjs, which is the file that hands the
 // prefixes to dev/spa-fallback.mjs — the decision is made once, where prerendering is
 // decided, rather than restated where it is consumed.
-export const PRERENDERED_DYNAMIC = ["/glossary/:term"];
+export const PRERENDERED_DYNAMIC = ["/glossary/:term", "/theory/:lesson"];
 
 // Composer pages are not prerendered, and deliberately so. There are four hundred of
 // them, which in twenty-six languages is ten thousand documents — most of a Cloudflare
@@ -59,7 +64,7 @@ export default {
     // a client redirect to the visitor's locale. Prerendering runs serially
     // (concurrency 1), which entry.server relies on to pin getLocale per page.
     prerender() {
-        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS, ...GLOSSARY_PATHS];
+        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS, ...GLOSSARY_PATHS, ...THEORY_PATHS];
         const localized = generateStaticLocalizedUrls(paths).map((url) => url.pathname);
         // A per-locale build (PLINKY_LOCALE=de) pins getLocale to its language, so
         // it can only render its own pages correctly — prerender just those. The

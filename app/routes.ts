@@ -22,6 +22,10 @@ export default [
         // be found at, rather than living only inside the filters on /music.
         route("music/grade/:grade", "routes/musicHub.tsx", { id: "grade-hub" }),
         route("music/era/:era", "routes/musicHub.tsx", { id: "era-hub" }),
+        // And by the work a piece belongs to. A book of studies or a suite is the thing
+        // somebody actually goes looking for — "Bach inventions", "Czerny op. 599" — and
+        // the catalogue already knows which pieces make each one up.
+        route("music/collection/:collection", "routes/musicHub.tsx", { id: "collection-hub" }),
         route("assignments", "routes/assignments.tsx"),
         route("collect", "routes/collect.tsx"),
         route("stats", "routes/stats.tsx"),
@@ -40,6 +44,10 @@ export default [
         route("glossary/:term", "routes/glossary.tsx", { id: "glossary-term" }),
         route("tools", "routes/tools.tsx"),
         route("theory", "routes/theory.tsx"),
+        // Each lesson at an address of its own. "What is an octave" is a question people
+        // type into a search engine, and the answer was a paragraph two thirds of the way
+        // down a page of fourteen.
+        route("theory/:lesson", "routes/theory.tsx", { id: "theory-lesson" }),
         route("about", "routes/about.tsx"),
         route("news", "routes/news.tsx"),
         route("impressum", "routes/impressum.tsx"),

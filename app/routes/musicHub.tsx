@@ -14,8 +14,10 @@ import {
     HUB_GRADES,
     type HubGrade,
     erasOf,
+    hubCollection,
     hubEra,
     hubGrade,
+    piecesOfCollection,
     piecesOfEra,
     piecesOfGrade,
 } from "../../core/musicHubs";
@@ -34,12 +36,20 @@ import { getLocale } from "../paraglide/runtime.js";
 // hold. Which one is being read is the parameter that is present — the route table names
 // them, so nothing here has to guess.
 
-type Shelf = { facet: "grade"; grade: HubGrade } | { facet: "era"; era: Era };
+type Shelf =
+    | { facet: "grade"; grade: HubGrade }
+    | { facet: "era"; era: Era }
+    // A work carries its own name rather than a slug, because the name is a proper noun
+    // the catalogue owns and the page has nothing of its own to call it by.
+    | { facet: "collection"; collection: string; name: string };
 
 // The shelf an address names, or nothing at all. An unknown grade or era is a real 404
 // rather than an empty page: a shelf that never existed should not answer, or a search
 // index learns that every address on the site returns something.
-export function shelfFor(params: { grade?: string; era?: string }): Shelf | null {
+export function shelfFor(
+    params: { grade?: string; era?: string; collection?: string },
+    works: { id: string; name: string }[] = [],
+): Shelf | null {
     if (params.grade !== undefined) {
         const grade = hubGrade(params.grade);
         return grade === null ? null : { facet: "grade", grade };
@@ -48,11 +58,32 @@ export function shelfFor(params: { grade?: string; era?: string }): Shelf | null
         const era = hubEra(params.era);
         return era === null ? null : { facet: "era", era };
     }
+    if (params.collection !== undefined) {
+        // The set of works is catalogue data, so until it is fetched the page cannot say
+        // whether an address names one. It shows the address's own slug meanwhile rather
+        // than an error, and the name arrives with the list.
+        const found = works.find((work) => work.id === params.collection);
+        const id = hubCollection(
+            params.collection,
+            works.map((work) => work.id),
+        );
+        if (works.length > 0 && id === null) {
+            return null;
+        }
+        return {
+            facet: "collection",
+            collection: params.collection,
+            name: found?.name ?? "",
+        };
+    }
     return null;
 }
 
 // The shelf's own address, its heading, and the line under it.
 export function shelfTitle(shelf: Shelf): string {
+    if (shelf.facet === "collection") {
+        return shelf.name;
+    }
     if (shelf.facet === "grade") {
         return m.hub_grade_title({ grade: shelf.grade });
     }
@@ -65,10 +96,16 @@ export function shelfTitle(shelf: Shelf): string {
 }
 
 export function shelfIntro(shelf: Shelf): string {
+    if (shelf.facet === "collection") {
+        return m.hub_collection_intro({ name: shelf.name });
+    }
     return shelf.facet === "grade" ? m.hub_grade_intro({ grade: shelf.grade }) : m.hub_era_intro();
 }
 
 export function shelfPath(shelf: Shelf): string {
+    if (shelf.facet === "collection") {
+        return `/music/collection/${shelf.collection}/`;
+    }
     return shelf.facet === "grade" ? `/music/grade/${shelf.grade}/` : `/music/era/${shelf.era}/`;
 }
 
@@ -79,34 +116,53 @@ export function shelfPath(shelf: Shelf): string {
 
 type Piece = { id: string; title: string; composer: string; grade?: number; incipit?: string };
 
+// The named works, fetched once and shared by everything that lists them.
+function useNamedWorks(): { id: string; name: string }[] {
+    const songs = useSongSource();
+    const [works, setWorks] = useState<{ id: string; name: string }[]>([]);
+    useAsyncEffect(
+        (alive) => {
+            songs.builtins().then((found) => {
+                if (alive() && found) {
+                    setWorks(found.map((work) => ({ id: work.id, name: work.name })));
+                }
+            });
+        },
+        [songs.builtins],
+    );
+    return works;
+}
+
 export default function MusicHubRoute() {
     const params = useParams();
     // The two parameters as plain strings, because the shelf they describe is rebuilt on
     // every render and an effect keyed on the object would run on every render with it.
     const gradeParam = params.grade;
     const eraParam = params.era;
-    const shelf = shelfFor(params);
+    const collectionParam = params.collection;
     const songs = useSongSource();
     const exercises = useExerciseSource();
     const people = usePeopleSource();
     const { prefs } = usePrefs();
     const locale = getLocale();
     const [pieces, setPieces] = useState<Piece[] | null>(null);
+    // The shelf's own title, when the address names a work: its name is catalogue data.
+    const works = useNamedWorks();
+    const shelf = shelfFor(params, works);
 
     useAsyncEffect(
         (alive) => {
             setPieces(null);
-            const here = shelfFor({ grade: gradeParam, era: eraParam });
-            if (!here) {
-                return;
-            }
+            const facet =
+                gradeParam !== undefined ? "grade" : eraParam !== undefined ? "era" : "collection";
             (async () => {
-                // The composers' dates come from the same file a composer page reads, so
-                // an era shelf costs one fetch more than a grade shelf and no new data.
-                const [manifest, studies, described] = await Promise.all([
+                // Each shelf costs only the data it needs: a composer's dates for an era,
+                // the set's own piece list for a work, neither for a grade.
+                const [manifest, studies, described, builtins] = await Promise.all([
                     songs.manifest(),
                     exercises.manifest(),
-                    here.facet === "era" ? people.about(locale) : Promise.resolve(null),
+                    facet === "era" ? people.about(locale) : Promise.resolve(null),
+                    facet === "collection" ? songs.builtins() : Promise.resolve(null),
                 ]);
                 if (!alive()) {
                     return;
@@ -118,14 +174,30 @@ export default function MusicHubRoute() {
                         composer: study.composer ?? "",
                     })),
                 ];
-                setPieces(
-                    here.facet === "grade"
-                        ? piecesOfGrade(all, here.grade)
-                        : piecesOfEra(all, here.era, erasOf(described ?? {})),
-                );
+                if (facet === "grade") {
+                    const grade = hubGrade(gradeParam ?? "");
+                    setPieces(grade === null ? [] : piecesOfGrade(all, grade));
+                    return;
+                }
+                if (facet === "era") {
+                    const era = hubEra(eraParam ?? "");
+                    setPieces(era === null ? [] : piecesOfEra(all, era, erasOf(described ?? {})));
+                    return;
+                }
+                const work = (builtins ?? []).find((one) => one.id === collectionParam);
+                setPieces(work ? piecesOfCollection(all, work.items) : []);
             })();
         },
-        [songs.manifest, exercises.manifest, people.about, locale, gradeParam, eraParam],
+        [
+            songs.manifest,
+            songs.builtins,
+            exercises.manifest,
+            people.about,
+            locale,
+            gradeParam,
+            eraParam,
+            collectionParam,
+        ],
     );
 
     const title = shelf ? shelfTitle(shelf) : null;
@@ -213,6 +285,10 @@ export default function MusicHubRoute() {
 // is a dead end for a reader and a leaf for a crawler; linked to each other they are one
 // browsable surface, and the grade somebody landed on is one tap from the grade below it.
 export function HubLinks({ here }: { here?: Shelf }) {
+    // The named works are catalogue data, so this reads them itself rather than being
+    // handed them: the same list belongs at the foot of every shelf and of the Music page,
+    // and the song source answers the second caller from the first one's fetch.
+    const works = useNamedWorks();
     const chip =
         "rounded-full border border-line px-3 py-1 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30";
     const current = "border-accent-line-strong bg-accent-surface/50 font-medium";
@@ -260,6 +336,27 @@ export function HubLinks({ here }: { here?: Shelf }) {
                     })}
                 </ul>
             </div>
+            {works.length > 0 && (
+                <div className="space-y-2">
+                    <h2 className={sectionHeadingClasses}>{m.hub_by_collection()}</h2>
+                    <ul className="flex flex-wrap gap-2">
+                        {works.map((work) => (
+                            <li key={work.id}>
+                                <Link
+                                    to={`/music/collection/${work.id}/`}
+                                    className={`${chip} ${
+                                        here?.facet === "collection" && here.collection === work.id
+                                            ? current
+                                            : ""
+                                    }`}
+                                >
+                                    {work.name}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </nav>
     );
 }

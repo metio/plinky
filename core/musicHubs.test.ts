@@ -8,8 +8,10 @@ import {
     eraOf,
     erasOfPiece,
     erasOf,
+    hubCollection,
     hubEra,
     hubGrade,
+    piecesOfCollection,
     piecesOfEra,
     piecesOfGrade,
     sortPieces,
@@ -105,6 +107,33 @@ describe("which shelf a piece belongs on", () => {
         // A composer credited "constructor" would otherwise inherit Object's, and every
         // piece by them would land on whichever era that resolved to.
         expect(erasOfPiece("constructor", eras)).toEqual([]);
+    });
+});
+
+describe("a named work's shelf", () => {
+    const pieces = [
+        { id: "b", title: "Second", composer: "Bach", grade: 5 },
+        { id: "a", title: "First", composer: "Bach", grade: 2 },
+        { id: "z", title: "Elsewhere", composer: "Bach", grade: 1 },
+    ];
+
+    it("keeps the order the work itself gives, not the easiest first", () => {
+        // A grade shelf is a pile to choose from; a book of studies is a sequence. Sorting
+        // Bach's inventions by difficulty would be rewriting the book.
+        expect(piecesOfCollection(pieces, ["b", "a"]).map((piece) => piece.id)).toEqual(["b", "a"]);
+    });
+
+    it("leaves out a piece the catalogue no longer holds", () => {
+        expect(piecesOfCollection(pieces, ["a", "missing", "b"]).map((p) => p.id)).toEqual([
+            "a",
+            "b",
+        ]);
+    });
+
+    it("answers for a work the catalogue names and nothing else", () => {
+        expect(hubCollection("bach-inventions", ["bach-inventions"])).toBe("bach-inventions");
+        expect(hubCollection("nonesuch", ["bach-inventions"])).toBeNull();
+        expect(hubCollection("constructor", ["bach-inventions"])).toBeNull();
     });
 });
 

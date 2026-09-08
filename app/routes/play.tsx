@@ -6,6 +6,11 @@ import { Attribution } from "../components/ui/attribution";
 import { ScoreIncipit } from "../components/features/scoreIncipit";
 import { Button } from "../components/ui/button";
 import { ComposerCredit, composerCreditText } from "../components/ui/composerCredit";
+import { ScoreGradeLink } from "../components/features/scoreGrade";
+import { PieceFactsLine } from "../components/features/pieceFacts";
+import { hasFacts, readPieceFacts } from "../../core/pieceFacts";
+import { gradeOf } from "../../core/scoreDifficulty";
+import { useXmlCodec } from "../contexts/services";
 import { attributionFor } from "../../core/attribution";
 import { canonicalPeople, personSlug } from "../../core/person";
 import { licenseLine, provenanceLine } from "../../core/videoScene";
@@ -57,6 +62,27 @@ export const handle = {
         params.scoreId !== undefined && !parseExerciseId(params.scoreId),
 };
 
+// The piece's description, in one place, because meta() writes it for a bundled piece and
+// the hook writes it for the rest of the catalogue — and a page whose two writers disagree
+// is a page that says one thing to a crawler and another to the reader.
+//
+// The facts are what make three thousand of these distinct. Without them every piece page
+// is the same sentence with two words swapped, which matches a search for the title and
+// nothing else.
+function describePiece(
+    title: string,
+    composer: string,
+    facts: { grade: number; bars: number; tempo: number } | null,
+): string {
+    const credit = composerCreditText(composer);
+    const said = composer
+        ? m.meta_play_description_by({ title, composer: credit })
+        : m.meta_play_description({ title });
+    return facts
+        ? `${said} ${m.meta_play_facts({ grade: facts.grade, bars: facts.bars, tempo: facts.tempo })}`
+        : said;
+}
+
 export function meta({ params }: Route.MetaArgs) {
     // Bundled scores resolve at prerender (no localStorage), so each one gets its
     // own title, description, and structured data — making the catalogue's pieces
@@ -75,9 +101,9 @@ export function meta({ params }: Route.MetaArgs) {
     // whose page read "Carl Czerny" was described to a search engine as "C. Czerny
     // Op.599 No.1" — the one place a bad credit escaped the app.
     const credit = composerCreditText(score.composer);
-    const description = score.composer
-        ? m.meta_play_description_by({ title: score.title, composer: credit })
-        : m.meta_play_description({ title: score.title });
+    // Prerender has no codec injected, so a bundled piece is described without its
+    // numbers rather than with wrong ones; the hook fills them in once the app is running.
+    const description = describePiece(score.title, score.composer, null);
     const locale = getLocale();
     // The piece's place in the catalogue: Home › Library › [Composer] › Piece. A trail
     // holds one crumb, so a piece two people share is filed under the first of them —
@@ -128,19 +154,25 @@ function PlayPage({ scoreId }: { scoreId: string }) {
     // seed the controls, and the player owns them from the first frame onward, so a later
     // address change must not reach in and undo what they have since chosen.
     const [options] = useState(() => readPlayOptions((key) => searchParams.get(key)));
+    // What the piece is, in numbers, read off the score the page already holds — the same
+    // three the catalogue bakes and the edge writes into the document, so the description
+    // a crawler is served and the one the running app writes over it are the same sentence.
+    const headCodec = useXmlCodec();
+    const readFacts = score ? readPieceFacts(headCodec, score.xml) : null;
+    const headFacts =
+        score && readFacts && hasFacts(readFacts)
+            ? {
+                  grade: gradeOf(headCodec, score.id, score.xml),
+                  bars: readFacts.bars,
+                  tempo: readFacts.tempo,
+              }
+            : null;
     // The head, once the piece is known. meta() above writes it for a bundled piece; for
     // the rest of the catalogue it could only write "Play", and the document kept saying
     // so with the piece on screen — which is the title a crawler that runs the app reads.
     useDocumentHead(
         score ? score.title : null,
-        score
-            ? score.composer
-                ? m.meta_play_description_by({
-                      title: score.title,
-                      composer: composerCreditText(score.composer),
-                  })
-                : m.meta_play_description({ title: score.title })
-            : null,
+        score ? describePiece(score.title, score.composer, headFacts) : null,
         // A card is painted for every piece the catalogue holds; a generated exercise is
         // built from its id and has none, so its link shows the site's own.
         score && !parseExerciseId(score.id) ? pieceImage(score.id) : null,
@@ -193,6 +225,18 @@ function PlayPage({ scoreId }: { scoreId: string }) {
                                 linkClassName="hover:text-accent-strong hover:underline"
                             />
                         )}
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            {/* The grade, and through it everything else at that level. A
+                                piece page naming a level with no way to see the rest of
+                                it sends the reader back to the catalogue to filter by
+                                hand. */}
+                            <ScoreGradeLink id={score.id} xml={score.xml} />
+                            {/* What the piece is, in numbers. Three thousand piece pages
+                                said a title, a composer and nothing else — thin for a
+                                reader deciding whether to open it, and identical in shape
+                                to every other one. */}
+                            <PieceFactsLine xml={score.xml} />
+                        </div>
                         {/* The piece's opening bar, under its name — the mark a
                             thematic catalogue would file it by. */}
                         <ScoreIncipit xml={score.xml} title={score.title} />

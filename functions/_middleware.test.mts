@@ -18,7 +18,13 @@ const KNOWN: Known = {
     pieces: {
         "47xd2XDpYFCy": { title: "Ode to Joy", composer: "Ludwig van Beethoven", grade: 2 },
         aZSWdZeRKnuA: { title: "Für Elise", composer: "Ludwig van Beethoven", grade: 5 },
-        ZgIdHVhH0mUb: { title: "Nocturne <Op. 9>", composer: "Frédéric Chopin", grade: 7 },
+        ZgIdHVhH0mUb: {
+            title: "Nocturne <Op. 9>",
+            composer: "Frédéric Chopin",
+            grade: 7,
+            bars: 34,
+            tempo: 66,
+        },
         nocomposer00: { title: "Greensleeves", composer: "" },
     },
     people: {
@@ -29,12 +35,19 @@ const KNOWN: Known = {
         },
         "no-pieces": { name: "No Pieces", pieces: [] },
     },
+    collections: {
+        "beethoven-two": {
+            name: "Beethoven — Two pieces",
+            pieces: ["aZSWdZeRKnuA", "47xd2XDpYFCy"],
+        },
+    },
     locales: ["en", "de", "zh", "pt"],
     base: "en",
     strings: {
         en: {
             playBy: 'Play "{title}" by {composer} in your browser.',
             play: 'Play "{title}" in your browser.',
+            playFacts: "Grade {grade}, {bars} bars, {tempo} beats per minute.",
             person: "{name}’s pieces on Plinky.",
             home: "Today",
             music: "Music",
@@ -46,11 +59,13 @@ const KNOWN: Known = {
             hubEra_romantic: "Romantic piano pieces",
             hubEra_modern: "Modern piano pieces",
             hubEraAbout: "Pieces by the composers of this period.",
+            hubCollection: "Every piece in {name}.",
             og: "en_US",
         },
         de: {
             playBy: "Spiele „{title}“ von {composer} im Browser.",
             play: "Spiele „{title}“ im Browser.",
+            playFacts: "Stufe {grade}, {bars} Takte, {tempo} Schläge pro Minute.",
             person: "Stücke von {name} auf Plinky.",
             home: "Heute",
             music: "Musik",
@@ -62,10 +77,11 @@ const KNOWN: Known = {
             hubEra_romantic: "Romantische Klavierstücke",
             hubEra_modern: "Moderne Klavierstücke",
             hubEraAbout: "Stücke der Komponistinnen und Komponisten dieser Zeit.",
+            hubCollection: "Stücke aus {name}.",
             og: "de_DE",
         },
-        zh: { playBy: "{title}", play: "{title}", person: "{name}", home: "今天", music: "音乐", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", og: "zh_CN" },
-        pt: { playBy: "{title}", play: "{title}", person: "{name}", home: "Hoje", music: "Música", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", og: "pt_PT" },
+        zh: { playBy: "{title}", play: "{title}", playFacts: "", person: "{name}", home: "今天", music: "音乐", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", hubCollection: "{name}", og: "zh_CN" },
+        pt: { playBy: "{title}", play: "{title}", playFacts: "", person: "{name}", home: "Hoje", music: "Música", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", hubCollection: "{name}", og: "pt_PT" },
     },
 };
 
@@ -330,8 +346,17 @@ describe("documentFor", () => {
         expect(html).toContain('<meta property="og:image:alt" content="Ode to Joy"/>');
         expect(html).toContain('<meta name="twitter:image" content="https://plinky.fun/og/47xd2XDpYFCy.png"/>');
         expect(html).not.toContain("https://plinky.fun/og.png");
-        const person = documentFor(SHELL, KNOWN, { locale: "en", kind: "person", id: "frederic-chopin" }) ?? "";
-        expect(person).toContain('<meta property="og:image" content="https://plinky.fun/og.png"/>');
+        const person =
+            documentFor(SHELL, KNOWN, { locale: "en", kind: "person", id: "frederic-chopin" }) ?? "";
+        // A composer has a card of their own too, under a folder so a slug can never
+        // collide with a piece id.
+        expect(person).toContain(
+            '<meta property="og:image" content="https://plinky.fun/og/person/frederic-chopin.png"/>',
+        );
+        expect(person).not.toContain("https://plinky.fun/og.png");
+        // A shelf has none, so it keeps the site's.
+        const shelf = documentFor(SHELL, KNOWN, { locale: "en", kind: "grade", id: "7" }) ?? "";
+        expect(shelf).toContain('<meta property="og:image" content="https://plinky.fun/og.png"/>');
     });
 
     it("writes the route's tags where the app writes them, in the app's order", () => {
@@ -509,6 +534,11 @@ describe("the catalogue's shelves", () => {
         expect(parsePath("/en/music/")).toBeNull();
         expect(parsePath("/en/music/grade/")).toBeNull();
         expect(parsePath("/en/music/style/jazz/")).toBeNull();
+        expect(parsePath("/en/music/collection/bach-inventions/")).toEqual({
+            locale: "en",
+            kind: "collection",
+            id: "bach-inventions",
+        });
         expect(parsePath("/en/music/grade/3/extra/")).toBeNull();
     });
 
@@ -550,6 +580,65 @@ describe("the catalogue's shelves", () => {
     it("describes no shelf outside the grades and the eras", () => {
         expect(describePage(KNOWN, { locale: "en", kind: "grade", id: "9" })).toBeNull();
         expect(describePage(KNOWN, { locale: "en", kind: "era", id: "renaissance" })).toBeNull();
+    });
+
+    it("says what a piece is, in numbers, so three thousand pages do not read alike", () => {
+        const piece = describePage(KNOWN, { locale: "en", kind: "play", id: "ZgIdHVhH0mUb" });
+        expect(piece?.description).toBe(
+            'Play "Nocturne <Op. 9>" by Frédéric Chopin in your browser. ' +
+                "Grade 7, 34 bars, 66 beats per minute.",
+        );
+    });
+
+    it("leaves the numbers out of a piece the catalogue has not measured", () => {
+        // A row without them is described as it always was, rather than with zeroes.
+        const piece = describePage(KNOWN, { locale: "en", kind: "play", id: "nocomposer00" });
+        expect(piece?.description).toBe('Play "Greensleeves" in your browser.');
+    });
+
+    it("holds a named work's pieces in the work's own order", () => {
+        // Not easiest-first like the other shelves: a book of studies is a sequence, and
+        // the bake already put it in the order somebody works through it. Here the second
+        // piece is the easier one, and it stays second.
+        const shelf = describePage(KNOWN, { locale: "en", kind: "collection", id: "beethoven-two" });
+        expect(shelf?.headline).toBe("Beethoven — Two pieces");
+        expect(shelf?.links.map((link) => link.path)).toEqual([
+            "/play/aZSWdZeRKnuA/",
+            "/play/47xd2XDpYFCy/",
+        ]);
+    });
+
+    it("names a work the same in every language, and the chrome in the reader's", () => {
+        // The name is a composer and a work — a proper noun the catalogue owns, so there
+        // is nothing to translate and nothing to get wrong.
+        const en = describePage(KNOWN, { locale: "en", kind: "collection", id: "beethoven-two" });
+        const de = describePage(KNOWN, { locale: "de", kind: "collection", id: "beethoven-two" });
+        expect(de?.headline).toBe(en?.headline);
+        expect(de?.description).toBe("Stücke aus Beethoven — Two pieces.");
+        expect(de?.trail.map((crumb) => crumb.name)).toEqual([
+            "Heute",
+            "Musik",
+            "Beethoven — Two pieces",
+        ]);
+    });
+
+    it("describes no work the catalogue does not hold", () => {
+        expect(describePage(KNOWN, { locale: "en", kind: "collection", id: "nonesuch" })).toBeNull();
+        expect(
+            describePage(KNOWN, { locale: "en", kind: "collection", id: "constructor" }),
+        ).toBeNull();
+    });
+
+    it("writes a work its own document, and keeps the 404 for one it does not hold", async () => {
+        const found = await onRequest(
+            served("/en/music/collection/beethoven-two/", 404, SHELL, SHELL_HEADERS),
+        );
+        expect(found.status).toBe(200);
+        expect(await found.text()).toContain("<title>Beethoven — Two pieces · Plinky</title>");
+        const missing = await onRequest(
+            served("/en/music/collection/nonesuch/", 404, SHELL, SHELL_HEADERS),
+        );
+        expect(missing.status).toBe(404);
     });
 
     it("agrees with the app about which shelves exist", () => {

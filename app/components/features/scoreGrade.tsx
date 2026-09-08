@@ -4,6 +4,7 @@
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { easiestWayIn, type Reach } from "../../../core/reach";
 import { useXmlCodec } from "../../contexts/services";
+import { LocalizedLink as Link } from "../ui/localizedLink";
 import { m } from "../../paraglide/messages.js";
 
 // The computed 1–8 grade of a score, as a small chip — so a learner can pick
@@ -40,6 +41,25 @@ export function ScoreGrade({
 }) {
     const xmlCodec = useXmlCodec();
     return <GradeChip grade={gradeOf(xmlCodec, id, xml)} className={className} />;
+}
+
+// The same chip, as the way to everything else at that level.
+//
+// A piece page that names a grade and stops leaves the reader to go back to the catalogue
+// and filter for it by hand. The shelf is a page, so the number can simply be the door to
+// it — and it gives the piece pages, which are the deepest and most numerous on the site,
+// a link back up to something worth crawling.
+export function ScoreGradeLink({ id, xml }: { id: string; xml: string }) {
+    const xmlCodec = useXmlCodec();
+    const grade = gradeOf(xmlCodec, id, xml);
+    return (
+        <Link
+            to={`/music/grade/${grade}/`}
+            className="inline-block rounded-full focus-visible:ring-2 focus-visible:ring-accent-ring"
+        >
+            <GradeChip grade={grade} className="hover:brightness-95" />
+        </Link>
+    );
 }
 
 // The gentlest reading of a piece that is above where somebody is standing.

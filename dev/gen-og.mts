@@ -18,7 +18,15 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { chromium } from "playwright";
 import { canonicalPeople } from "../core/person.ts";
 import { decodeIncipit, type Incipit, readIncipit } from "../core/incipit.ts";
-import { CARD_HEIGHT, CARD_WIDTH, type PieceCard, pieceCardHtml } from "../core/ogCard.ts";
+import {
+    CARD_HEIGHT,
+    CARD_WIDTH,
+    type PieceCard,
+    personCardHtml,
+    pieceCardHtml,
+} from "../core/ogCard.ts";
+import { PEOPLE_INDEX } from "../core/peopleIndex.ts";
+import { lifespan } from "../core/personAbout.ts";
 import { readScoreMetaFromText } from "../core/scoreMeta.ts";
 import { songId } from "../core/songId.ts";
 import { tokenValue } from "./brandTokens.mjs";
@@ -26,6 +34,8 @@ import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { readExercisesSync, readSongsSync } from "./manifest.mts";
 
 const OUT = "build/client/og";
+// What Wikidata says about each composer, the same file the composer pages read.
+const WIKIDATA = "dev/people-wikidata.json";
 const BUNDLED = "scores";
 
 export type CardJob = PieceCard & { id: string };
@@ -51,6 +61,34 @@ export function cardJobs(): CardJob[] {
         add(songId(xml), meta.title, meta.composer, readIncipit(linkedomXmlCodec, xml));
     }
     return jobs.sort((a, b) => a.id.localeCompare(b.id));
+}
+
+// One card per composer. The line under the name is the base language's, because a card is
+// one image for every language the page is read in — the same bargain the piece cards
+// make, and the name is the same word everywhere regardless.
+export type PersonJob = { slug: string; name: string; line: string; pieces: string };
+
+export function personJobs(): PersonJob[] {
+    const about = JSON.parse(readFileSync(WIKIDATA, "utf8")) as Record<
+        string,
+        { born?: number; died?: number; about?: Record<string, string> }
+    >;
+    return Object.entries(PEOPLE_INDEX)
+        .map(([slug, entry]) => {
+            const found = about[slug];
+            const years = lifespan(
+                { born: found?.born, died: found?.died },
+                { born: (year) => `born ${year}`, died: (year) => `died ${year}` },
+            );
+            const said = found?.about?.en ?? "";
+            return {
+                slug,
+                name: entry.name,
+                line: said && years ? `${said} (${years})` : said || years,
+                pieces: entry.pieces === 1 ? "1 piece" : `${entry.pieces} pieces`,
+            };
+        })
+        .sort((a, b) => a.slug.localeCompare(b.slug));
 }
 
 async function main() {
@@ -107,9 +145,35 @@ async function main() {
         await page.close();
     };
     await Promise.all(Array.from({ length: LANES }, lane));
+
+    // And one per composer, into a folder of their own so a slug can never collide with a
+    // piece id.
+    const people = limit > 0 ? personJobs().slice(0, limit) : personJobs();
+    mkdirSync(`${OUT}/person`, { recursive: true });
+    const waiting = people.filter((job) => !existsSync(`${OUT}/person/${job.slug}.png`));
+    let faces_painted = 0;
+    let after = 0;
+    const personLane = async () => {
+        const page = await browser.newPage({
+            viewport: { width: CARD_WIDTH, height: CARD_HEIGHT },
+            deviceScaleFactor: 1,
+        });
+        while (after < waiting.length) {
+            const job = waiting[after++] as PersonJob;
+            await page.setContent(
+                `<style>${faces}html,body{margin:0;padding:0}</style>${personCardHtml(job, { palette, fonts, mark, host })}`,
+            );
+            await page.evaluate(() => document.fonts.ready);
+            writeFileSync(`${OUT}/person/${job.slug}.png`, await page.screenshot({ type: "png" }));
+            faces_painted += 1;
+        }
+        await page.close();
+    };
+    await Promise.all(Array.from({ length: LANES }, personLane));
     await browser.close();
     console.log(
-        `${OUT}: ${painted} card(s) painted, ${jobs.length - pending.length} already there, ${jobs.length} pieces.`,
+        `${OUT}: ${painted} of ${jobs.length} piece card(s) painted, ` +
+            `${faces_painted} of ${people.length} composer card(s).`,
     );
 }
 

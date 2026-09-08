@@ -53,6 +53,12 @@ export function pieceImage(id: string): string {
     return `${SITE_URL}/og/${encodeURIComponent(id)}.png`;
 }
 
+// A composer's own card, painted per composer at build (dev/gen-og.mts). Under its own
+// folder so a composer slug can never collide with a piece id.
+export function personImage(slug: string): string {
+    return `${SITE_URL}/og/person/${encodeURIComponent(slug)}.png`;
+}
+
 // The card tags for a page with a picture of its own. The layout writes the site's card
 // for every page and stands down where a route writes these — two og:image tags is a
 // coin toss over which one a link shows.
@@ -151,13 +157,14 @@ export function ogLocale(locale: string): string {
 // about, help, and practice-surface pages. It names the page as part of the Plinky
 // site (so search engines tie it to the site entity) rather than leaving it a bare,
 // context-free screen. `type` narrows it where a page has a standard specialization
-// (an AboutPage), defaulting to a plain WebPage.
+// (an AboutPage), defaulting to a plain WebPage. A theory lesson is a LearningResource,
+// which is what says the page teaches something rather than merely describing it.
 export function webPageData(
     name: string,
     description: string,
     locale: string,
     path: string,
-    type: "WebPage" | "AboutPage" | "CollectionPage" = "WebPage",
+    type: "WebPage" | "AboutPage" | "CollectionPage" | "LearningResource" = "WebPage",
 ) {
     return {
         "@context": "https://schema.org",

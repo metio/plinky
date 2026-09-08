@@ -17,8 +17,19 @@ export type AssetContext = {
 
 // build/client/known.json as the middleware holds it (dev/gen-known-ids.mts writes it).
 export type Known = {
-    pieces: Record<string, { title: string; composer: string; grade?: number; license?: string }>;
+    pieces: Record<
+        string,
+        {
+            title: string;
+            composer: string;
+            grade?: number;
+            license?: string;
+            bars?: number;
+            tempo?: number;
+        }
+    >;
     people: Record<string, { name: string; pieces: string[] }>;
+    collections: Record<string, { name: string; pieces: string[] }>;
     locales: string[];
     base: string;
     strings: Record<
@@ -26,6 +37,7 @@ export type Known = {
         {
             playBy: string;
             play: string;
+            playFacts: string;
             person: string;
             home: string;
             music: string;
@@ -37,6 +49,7 @@ export type Known = {
             hubEra_romantic: string;
             hubEra_modern: string;
             hubEraAbout: string;
+            hubCollection: string;
             og: string;
         }
     >;
@@ -44,7 +57,7 @@ export type Known = {
 
 export type PagePath = {
     locale: string;
-    kind: "play" | "person" | "grade" | "era";
+    kind: "play" | "person" | "grade" | "era" | "collection";
     id: string;
 };
 

@@ -16,7 +16,11 @@ import { renderWithServices } from "../testing/renderWithServices";
 import { m } from "../paraglide/messages.js";
 import Music from "./music";
 
-const source = <T,>(): T => ({ manifest: () => Promise.resolve([]) }) as unknown as T;
+// A catalogue source with nothing in it. Both calls are answered, not just the manifest:
+// the shelf links at the foot of the page read the named works, and a fake that stops at
+// the manifest throws where the real one would return an empty list.
+const source = <T,>(): T =>
+    ({ manifest: () => Promise.resolve([]), builtins: () => Promise.resolve([]) }) as unknown as T;
 
 const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
 

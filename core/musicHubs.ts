@@ -94,6 +94,13 @@ export function erasOfPiece(composer: string, eras: Record<string, Era>): Era[] 
     return found;
 }
 
+// A collection's slug is its id in dev/builtin-assignments.json, which is already a
+// stable, readable, hyphenated string ("bach-inventions") chosen by hand. Nothing derives
+// it from the name, so re-wording a work's name never moves its address.
+export function hubCollection(value: string, known: readonly string[]): string | null {
+    return known.includes(value) ? value : null;
+}
+
 export type HubPiece = { id: string; title: string; composer: string; grade?: number };
 
 // One shelf's pieces, each piece once, easiest first and then by title — so the page opens
@@ -120,6 +127,15 @@ export function sortPieces<T extends HubPiece>(pieces: T[]): T[] {
 
 export function piecesOfGrade<T extends HubPiece>(pieces: T[], grade: HubGrade): T[] {
     return sortPieces(pieces.filter((piece) => piece.grade === grade));
+}
+
+// One named work's pieces, in the order the set itself gives them — gentlest first, which
+// is how somebody works through a book of studies. Deliberately NOT sorted like the other
+// shelves: a grade shelf is a pile to choose from and a collection is a sequence, and
+// reordering Bach's inventions by difficulty would be rewriting the book.
+export function piecesOfCollection<T extends HubPiece>(pieces: T[], items: readonly string[]): T[] {
+    const byId = new Map(pieces.map((piece) => [piece.id, piece]));
+    return items.map((id) => byId.get(id)).filter((piece): piece is T => piece !== undefined);
 }
 
 export function piecesOfEra<T extends HubPiece>(

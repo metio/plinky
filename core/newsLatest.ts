@@ -14,6 +14,22 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**The books of studies have pages of their own.** Bach's two-part inventions,\nCzerny's op. 821, the Goldberg variations and twenty more: each is now a page listing\nevery piece of it the catalogue holds, in the order you would work through them. They\nare linked from the foot of the Music page and from every shelf.",
+                twip: true,
+            },
+            {
+                body: "**A piece page says what the piece is.** Under the title you now get its grade, how\nmany bars it runs to, how it is counted and how fast it goes — and the grade is a\nlink to everything else at that level, so finding another piece your size is one tap\nrather than a trip back through the filters.",
+                twip: true,
+            },
+            {
+                body: '**Each theory lesson has its own address.** "What is an octave" was a paragraph two\nthirds of the way down a page of fourteen lessons. Each is now a page you can link\nto, and the course still reads top to bottom where it always did.',
+                twip: true,
+            },
+            {
+                body: "**A composer's link shows the composer.** Sharing a composer page used to unfurl as\nthe site's own picture; each of the four hundred now has a card with their name, who\nthey were and how much of theirs there is to play.",
+                twip: true,
+            },
+            {
                 body: '**The composer directory stopped listing things that are not composers.** Now that\nevery credited name has a page of its own, the odd ones in the harvested scores\nbecame visible: a page for "Public Domain", one for "a breeze", one for the choir\nthat recorded a carol. Those are gone. Credits naming two people at once are two\npeople again, so Bellini and Chopin each keep their own page; a catalogue number\nleft on the end of a name no longer makes a second Bartók; and initials that meant\nsomebody already in the catalogue now lead to them, so Rachmaninoff\'s pieces are all\nin one place.',
                 twip: true,
             },

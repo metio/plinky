@@ -55,6 +55,43 @@ export function titleSize(title: string): number {
     return 44;
 }
 
+// A composer's card: their name, the line saying who they were, and how much of theirs the
+// catalogue holds. The same frame as a piece's, because it is the same site and the two
+// unfurl side by side in a feed — what changes is that a person has no opening bar, so the
+// space the staff would occupy carries the count instead.
+export type PersonCard = {
+    name: string;
+    // Who they were and when, as the page prints it. Empty for a composer the catalogue
+    // could not place, and then the card simply carries the name.
+    line: string;
+    pieces: string;
+};
+
+export function personCardHtml(
+    card: PersonCard,
+    {
+        palette,
+        fonts,
+        mark,
+        host,
+    }: { palette: CardPalette; fonts: CardFonts; mark: string; host: string },
+): string {
+    return (
+        `<div style="width:${CARD_WIDTH}px;height:${CARD_HEIGHT}px;background:${palette.paper};display:flex;flex-direction:column;justify-content:space-between;padding:56px 64px;box-sizing:border-box;position:relative;overflow:hidden">` +
+        `<div style="position:absolute;left:0;top:0;bottom:0;width:18px;background:${palette.accent}"></div>` +
+        `<div style="display:flex;flex-direction:column;gap:18px;min-width:0">` +
+        `<div style="${fonts.display};font-size:${titleSize(card.name)}px;line-height:1.1;color:${palette.ink};letter-spacing:-0.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word">${escapeHtml(card.name)}</div>` +
+        (card.line
+            ? `<div style="${fonts.body};font-size:34px;color:${palette.muted};line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(card.line)}</div>`
+            : "") +
+        `</div>` +
+        `<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:32px">` +
+        `<div style="${fonts.body};font-size:40px;color:${palette.accent};display:flex;align-items:center;min-height:200px">${escapeHtml(card.pieces)}</div>` +
+        `<div style="display:flex;align-items:center;gap:16px;flex:none"><img src="${mark}" alt="" style="width:72px;height:72px;display:block"><span style="${fonts.body};font-size:28px;color:${palette.muted}">${escapeHtml(host)}</span></div>` +
+        `</div></div>`
+    );
+}
+
 // The whole card as HTML, sized exactly to the image it becomes. `mark` is the site's
 // icon as a data URI, so the render does not depend on where the browser thinks its
 // document lives; `host` names the site in the corner.

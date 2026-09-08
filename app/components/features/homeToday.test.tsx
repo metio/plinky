@@ -33,7 +33,7 @@ const exercises = { manifest: () => Promise.resolve([]) };
 // An empty song manifest makes the known-piece set ready, so unresolvable step
 // ids read as missing; without it the default source's failed fetch keeps the
 // set indeterminate.
-const songs = { manifest: () => Promise.resolve([]) };
+const songs = { manifest: () => Promise.resolve([]), builtins: () => Promise.resolve([]) };
 
 afterEach(() => {
     cleanup();

@@ -70,6 +70,13 @@ async function known(context) {
                     ? {
                           pieces: list.pieces,
                           people: list.people,
+                          // Named works are newer than the two above, so they are read
+                          // defensively: a deployment whose known.json predates them is
+                          // a site without collection pages, not a site without a
+                          // catalogue. Every field this rebuild forgets is a feature the
+                          // edge silently loses, which is how the collections arrived
+                          // working in describe() and 404ing in the browser.
+                          collections: list.collections ?? {},
                           locales: Array.isArray(list.locales) ? list.locales : [],
                           base: list.base ?? "en",
                           strings: list.strings ?? {},
@@ -111,7 +118,7 @@ const ERA_UNTIL = { baroque: 1710, classical: 1800, romantic: 1870, modern: Infi
 // What the address names: the language, which kind of page, and which one of them.
 // Null for any other address.
 export function parsePath(path) {
-    const shelf = path.match(/^\/([a-z]{2})\/music\/(grade|era)\/([^/]+)\/?$/);
+    const shelf = path.match(/^\/([a-z]{2})\/music\/(grade|era|collection)\/([^/]+)\/?$/);
     if (shelf) {
         const [, locale, kind, raw] = shelf;
         return { locale, kind, id: decodeURIComponent(raw) };
@@ -143,6 +150,10 @@ export async function exists(context) {
     }
     if (page.kind === "era") {
         return HUB_ERAS.includes(page.id);
+    }
+    if (page.kind === "collection") {
+        const list = await known(context);
+        return list === null || Object.hasOwn(list.collections ?? {}, page.id);
     }
     const list = await known(context);
     if (list === null) {
@@ -178,7 +189,21 @@ function shelf(list, page, strings, people) {
     let ids;
     let headline;
     let description;
-    if (page.kind === "grade") {
+    if (page.kind === "collection") {
+        // Own-property only: every object answers for "constructor", and a bare lookup
+        // there hands back a function whose `pieces` is undefined — which crashes the
+        // shelf rather than answering the 404 the address deserves.
+        const works = list.collections ?? {};
+        const work = Object.hasOwn(works, page.id) ? works[page.id] : null;
+        if (!work) {
+            return null;
+        }
+        ids = work.pieces;
+        // The work's own name, which is a composer and a title — the same words in every
+        // language, so there is nothing here to translate and nothing to get wrong.
+        headline = work.name;
+        description = fill(strings.hubCollection ?? "", { name: work.name });
+    } else if (page.kind === "grade") {
         if (!HUB_GRADES.includes(page.id)) {
             return null;
         }
@@ -213,10 +238,16 @@ function shelf(list, page, strings, people) {
         headline = strings[`hubEra_${page.id}`] ?? "";
         description = strings.hubEraAbout ?? "";
     }
-    const pieces = ids
-        .map((id) => ({ id, ...list.pieces[id] }))
-        .filter((piece) => piece.title)
-        .sort((a, b) => (a.grade ?? 0) - (b.grade ?? 0) || a.title.localeCompare(b.title));
+    const found = ids.map((id) => ({ id, ...list.pieces[id] })).filter((piece) => piece.title);
+    // A grade or an era is a pile to choose from, so the easiest comes first. A named work
+    // is a sequence, and the bake already put it in the order somebody works through it —
+    // sorting Bach's inventions by difficulty would be rewriting the book.
+    const pieces =
+        page.kind === "collection"
+            ? found
+            : [...found].sort(
+                  (a, b) => (a.grade ?? 0) - (b.grade ?? 0) || a.title.localeCompare(b.title),
+              );
     return {
         path,
         headline,
@@ -256,7 +287,7 @@ function shelf(list, page, strings, people) {
 // the summary are written from. Null when the list does not hold it.
 export function describe(list, page, about = null) {
     const strings = list.strings[page.locale] ?? list.strings[list.base] ?? {};
-    if (page.kind === "grade" || page.kind === "era") {
+    if (page.kind === "grade" || page.kind === "era" || page.kind === "collection") {
         return shelf(list, page, strings, about);
     }
     const path = `/${page.kind}/${encodeURIComponent(page.id)}/`;
@@ -265,9 +296,22 @@ export function describe(list, page, about = null) {
         if (!piece) {
             return null;
         }
-        const description = piece.composer
+        const said = piece.composer
             ? fill(strings.playBy ?? "", { title: piece.title, composer: piece.composer })
             : fill(strings.play ?? "", { title: piece.title });
+        // What the piece is, in numbers. Without them three thousand piece pages carry the
+        // same sentence with two words swapped, which matches a search for the title and
+        // nothing else. The page reads the same three off the score it holds, so the
+        // document a crawler is served and the one the running app writes agree.
+        const facts =
+            piece.grade !== undefined && piece.bars !== undefined && piece.tempo !== undefined
+                ? fill(strings.playFacts ?? "", {
+                      grade: piece.grade,
+                      bars: piece.bars,
+                      tempo: piece.tempo,
+                  })
+                : "";
+        const description = facts ? `${said} ${facts}` : said;
         const people = Object.entries(list.people).filter(([, person]) =>
             person.pieces.includes(page.id),
         );
@@ -462,14 +506,20 @@ export function documentFor(shell, list, page, about = null) {
         `<script type="application/ld+json">${json(described.data)}</script>`,
         `<script type="application/ld+json">${json(crumbs)}</script>`,
     ].join("");
-    // A piece's card, painted per piece at build (dev/gen-og.mts): the shell carries the
-    // site's, and a link to a piece should show the piece. A composer has no card yet.
-    const withCard =
+    // The page's own card, painted per piece and per composer at build (dev/gen-og.mts):
+    // the shell carries the site's, and a link to a piece should show the piece.
+    const cardUrl =
         page.kind === "play"
+            ? `${origin}/og/${encodeURIComponent(page.id)}.png`
+            : page.kind === "person"
+              ? `${origin}/og/person/${encodeURIComponent(page.id)}.png`
+              : null;
+    const withCard =
+        cardUrl !== null
             ? shell
                   .replace(
                       /<meta property="og:image" content="[^"]*"\/?>/,
-                      `<meta property="og:image" content="${escapeHtml(`${origin}/og/${encodeURIComponent(page.id)}.png`)}"/>`,
+                      `<meta property="og:image" content="${escapeHtml(cardUrl)}"/>`,
                   )
                   .replace(
                       /<meta property="og:image:alt" content="[^"]*"\/?>/,
@@ -477,7 +527,7 @@ export function documentFor(shell, list, page, about = null) {
                   )
                   .replace(
                       /<meta name="twitter:image" content="[^"]*"\/?>/,
-                      `<meta name="twitter:image" content="${escapeHtml(`${origin}/og/${encodeURIComponent(page.id)}.png`)}"/>`,
+                      `<meta name="twitter:image" content="${escapeHtml(cardUrl)}"/>`,
                   )
                   .replace(
                       /<meta name="twitter:image:alt" content="[^"]*"\/?>/,

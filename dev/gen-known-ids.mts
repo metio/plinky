@@ -32,7 +32,15 @@ const OUT = "build/client";
 // content-fingerprint id and the same credit, without reaching into the app's layer.
 const BUNDLED = "scores";
 
-type Row = { id: string; title: string; composer: string; grade?: number; license?: string };
+type Row = {
+    id: string;
+    title: string;
+    composer: string;
+    grade?: number;
+    license?: string;
+    bars?: number;
+    tempo?: number;
+};
 
 function bundledPieces(): Row[] {
     return readdirSync(BUNDLED)
@@ -46,14 +54,30 @@ function bundledPieces(): Row[] {
 
 // A piece as the edge describes it: its title, the people credited in the plain form the
 // app's own meta description uses, its grade, and the licence it travels under.
-export type KnownPiece = { title: string; composer: string; grade?: number; license?: string };
+export type KnownPiece = {
+    title: string;
+    composer: string;
+    grade?: number;
+    license?: string;
+    // What the piece is, in numbers. The page reads the same three off the score it
+    // already holds; the edge has no notation, so it carries them here — and the two must
+    // agree, or a crawler is served one description and the running app writes another.
+    bars?: number;
+    tempo?: number;
+};
 export type KnownPerson = { name: string; pieces: string[] };
+// A named work the catalogue holds enough of to be worth working through as one thing,
+// as build/client/songs/builtin-assignments.json resolves it. The name is a proper noun
+// — a composer and a work — so it is the same in every language and the edge writes it
+// verbatim; only the chrome around it is translated.
+export type KnownCollection = { name: string; pieces: string[] };
 // The strings a document needs in the reader's language, as the app's own messages say
 // them. Each holds `{title}`, `{composer}` and `{name}` placeholders where the message
 // does; the middleware fills them in.
 export type KnownStrings = {
     playBy: string;
     play: string;
+    playFacts: string;
     person: string;
     home: string;
     music: string;
@@ -65,11 +89,13 @@ export type KnownStrings = {
     hubEra_romantic: string;
     hubEra_modern: string;
     hubEraAbout: string;
+    hubCollection: string;
     og: string;
 };
 export type KnownIds = {
     pieces: Record<string, KnownPiece>;
     people: Record<string, KnownPerson>;
+    collections: Record<string, KnownCollection>;
     locales: string[];
     base: string;
     strings: Record<string, KnownStrings>;
@@ -94,10 +120,12 @@ function stringsFor(locale: string): KnownStrings {
     return {
         playBy: need("meta_play_description_by"),
         play: need("meta_play_description"),
+        playFacts: need("meta_play_facts"),
         person: need("meta_person_description"),
         home: need("nav_today"),
         music: need("music_title"),
         grade: need("score_grade"),
+        hubCollection: need("hub_collection_intro"),
         hubGrade: need("hub_grade_title"),
         hubGradeAbout: need("hub_grade_intro"),
         hubEra_baroque: need("hub_era_title_baroque"),
@@ -127,6 +155,8 @@ export function knownIds(): KnownIds {
             composer: names.join(", "),
             ...(row.grade === undefined ? {} : { grade: row.grade }),
             ...(row.license ? { license: row.license } : {}),
+            ...(row.bars === undefined ? {} : { bars: row.bars }),
+            ...(row.tempo === undefined ? {} : { tempo: row.tempo }),
         };
         personSlugs(row.composer ?? "").forEach((slug, index) => {
             if (!slug) {
@@ -138,6 +168,16 @@ export function knownIds(): KnownIds {
             }
         });
     }
+    // The named works, in the order the bake resolved them: gentlest first within a set,
+    // which is the order somebody works through it.
+    const works = JSON.parse(readFileSync("public/songs/builtin-assignments.json", "utf8")) as {
+        id: string;
+        name: string;
+        items: string[];
+    }[];
+    const collections: Record<string, KnownCollection> = Object.fromEntries(
+        works.map((work) => [work.id, { name: work.name, pieces: work.items }]),
+    );
     // The languages the site speaks, for the middleware to send a visitor to theirs and to
     // name every alternate of a page.
     const { locales, baseLocale } = JSON.parse(
@@ -147,6 +187,7 @@ export function knownIds(): KnownIds {
     return {
         pieces: Object.fromEntries(Object.entries(pieces).sort(([a], [b]) => a.localeCompare(b))),
         people: Object.fromEntries(Object.entries(people).sort(([a], [b]) => a.localeCompare(b))),
+        collections,
         locales,
         base: baseLocale,
         strings,

@@ -10,6 +10,24 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 8 September 2026
 
+**The books of studies have pages of their own.** Bach's two-part inventions,
+Czerny's op. 821, the Goldberg variations and twenty more: each is now a page listing
+every piece of it the catalogue holds, in the order you would work through them. They
+are linked from the foot of the Music page and from every shelf.
+
+**A piece page says what the piece is.** Under the title you now get its grade, how
+many bars it runs to, how it is counted and how fast it goes — and the grade is a
+link to everything else at that level, so finding another piece your size is one tap
+rather than a trip back through the filters.
+
+**Each theory lesson has its own address.** "What is an octave" was a paragraph two
+thirds of the way down a page of fourteen lessons. Each is now a page you can link
+to, and the course still reads top to bottom where it always did.
+
+**A composer's link shows the composer.** Sharing a composer page used to unfurl as
+the site's own picture; each of the four hundred now has a card with their name, who
+they were and how much of theirs there is to play.
+
 **The composer directory stopped listing things that are not composers.** Now that
 every credited name has a page of its own, the odd ones in the harvested scores
 became visible: a page for "Public Domain", one for "a breeze", one for the choir

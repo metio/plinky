@@ -46,10 +46,14 @@ const HUB_PATHS = [
 ];
 
 export function edgeEntries(known, locales) {
+    // The named works, read from the catalogue rather than restated: a set added to
+    // dev/builtin-assignments.json is in the sitemap the moment the bake resolves it.
+    const works = Object.keys(known.collections ?? {}).map((id) => `/music/collection/${id}`);
     const paths = [
         ...Object.keys(known.pieces ?? {}).map((id) => `/play/${id}`),
         ...Object.keys(known.people ?? {}).map((slug) => `/person/${slug}`),
         ...HUB_PATHS,
+        ...works,
     ];
     return locales.flatMap((locale) => paths.map((path) => ({ locale, path })));
 }
