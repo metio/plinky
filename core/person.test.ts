@@ -398,6 +398,81 @@ describe("a credit that names more than one person", () => {
         expect(canonicalPeople("Henry Lemoine")).toEqual(["Henri Lemoine"]);
     });
 
+    it("takes a slash as two people whether or not it is spaced", () => {
+        // "Bellini/Chopin" written tight read as one composer nobody has heard of, while
+        // the real pair sat elsewhere in the directory with their own pieces.
+        expect(canonicalPeople("Bellini/Chopin")).toEqual(["Vincenzo Bellini", "Frédéric Chopin"]);
+        expect(canonicalPeople("Palestrina/Bovicelli")).toEqual([
+            "Giovanni Pierluigi da Palestrina",
+            "Giovanni Battista Bovicelli",
+        ]);
+        expect(canonicalPeople("Bach / Marcello")).toEqual([
+            "Johann Sebastian Bach",
+            "Alessandro Marcello",
+        ]);
+    });
+
+    it("drops a catalogue number whichever catalogue it is from", () => {
+        // Opus and number were known; a composer's own catalogue was not, so "Bartók
+        // Béla, Sz. 107" held three pieces beside the five under Béla Bartók.
+        expect(canonicalPeople("Bartók Béla, Sz. 107")).toEqual(["Béla Bartók"]);
+        expect(canonicalPeople("Georg Friedrich Händel, HWV 434")).toEqual([
+            "George Frideric Handel",
+        ]);
+        // And still keeps a name that comes after the number rather than before it.
+        expect(canonicalPeople("Op 39, No. 15 Johannes Brahms")).toEqual(["Johannes Brahms"]);
+    });
+
+    it("drops a title in front of a name", () => {
+        expect(canonicalPeople("Prof Bell / Traditional")).toEqual(["Bell", "Traditional"]);
+        expect(canonicalPeople("Dr. Johann Faust")).toEqual(["Johann Faust"]);
+    });
+
+    it("strips the punctuation an aside leaves behind it", () => {
+        // The dates went and left a comma and a space; the space kept the comma out of
+        // reach of the rule meant to remove it, so the page carried it and the slug did not.
+        expect(canonicalPeople("Tomás Rua Ó Súilleabháin,(1785-1848)")).toEqual([
+            "Tomás Rua Ó Súilleabháin",
+        ]);
+    });
+
+    it("gives no page to a credit that names no person", () => {
+        for (const raw of [
+            "a breeze",
+            "from Morceaux de Fantaisie, Op.3",
+            "after Corelli",
+            "Public Domain (PianoXML typeset)",
+            "Translated by John Sullivan Dwight 1858",
+            "Traditonnel Noël: les petits chanteurs à la croix de bois",
+        ]) {
+            expect(personSlugs(raw), raw).toEqual([]);
+        }
+    });
+
+    it("reads every spelling of a tradition as one, including the French", () => {
+        // "traditionnelle?" was "traditionnell" with an optional "e" — neither the
+        // masculine spelling nor the misspelling one credit actually carries.
+        for (const raw of ["Traditionnel", "Traditionnelle", "Traditonnel", "Traditional"]) {
+            expect(personSlugs(raw), raw).toEqual([]);
+        }
+        // A word that merely starts the same way is still somebody's.
+        expect(personSlugs("Traditi Family")).not.toEqual([]);
+    });
+
+    it("merges a spelling that reaches a composer by another road", () => {
+        expect(canonicalPeople("Fr-Chopin. Op.66.")).toEqual(["Frédéric Chopin"]);
+        expect(canonicalPeople("S.Rachmaninov")).toEqual(["Sergei Rachmaninoff"]);
+        expect(canonicalPeople("Peter Tchkovsky")).toEqual(["Pyotr Ilyich Tchaikovsky"]);
+        expect(canonicalPeople("J. Nowakowski")).toEqual(["Józef Nowakowski"]);
+    });
+
+    it("leaves a name it cannot finish alone rather than guessing at it", () => {
+        // Initials are all some credits give, and inventing the rest would put a person
+        // in the catalogue under a name nothing supports.
+        expect(canonicalPeople("F. W. Getter")).toEqual(["F. W. Getter"]);
+        expect(canonicalPeople("J. P. Storm")).toEqual(["J. P. Storm"]);
+    });
+
     it("reads no credit off Object's prototype", () => {
         // The hand-kept pairs are looked up by the credit itself, and every object answers
         // for "constructor" and "toString" whether or not anybody put them there. A score

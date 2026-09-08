@@ -306,6 +306,18 @@ const ALIASES: Record<string, string> = {
     // and unlike the dated and catalogue-numbered credits around it, nothing else here
     // reduces it, so it reached the page verbatim. A hedge is not part of a credit.
     "traditional i think": "Traditional",
+
+    // Spellings that reach the same person by another road: an initial where the corpus
+    // had the full name, a surname on its own once a joint credit is split, and one
+    // misspelling. Each was a page of its own with a single piece on it, a few rows from
+    // the composer it belongs to.
+    "fr-chopin": "Frédéric Chopin",
+    "s. rachmaninov": "Sergei Rachmaninoff",
+    "peter tchkovsky": "Pyotr Ilyich Tchaikovsky",
+    "j. nowakowski": "Józef Nowakowski",
+    bellini: "Vincenzo Bellini",
+    palestrina: "Giovanni Pierluigi da Palestrina",
+    bovicelli: "Giovanni Battista Bovicelli",
 };
 
 // Initials written tight spread to the spaced form, so every spelling of the same
@@ -360,19 +372,35 @@ function cleaned(raw: string): string {
         /^[\s,.]*(worte\s*&\s*musik|music|musik|musique|tune|melody|air|composed\s+by|original\s+song\s+by|words\s+and\s+music\s+by|examples\s+by|arranged\s+by|by)\b\s*:?\s*/i,
         "",
     );
+    // A title in front of the name. "Prof Bell" is Bell, addressed politely by whoever
+    // typed the credit — and left in, it sorts under P and cannot meet the same person
+    // credited any other way.
+    name = name.replace(
+        /^[\s,.]*\b(prof|professor|dr|rev|revd|sir|mr|mrs|ms|mme|madame)\b\.?\s+/i,
+        "",
+    );
     // Who wrote the WORDS, and everything after them. A song credit routinely names both
     // halves — "Tune: Trad ScotlandWords: Robert Burns" — and a piano catalogue credits
     // the music: the lyricist wrote no notes. No word boundary in front, because the
     // harvest welds the second label straight onto the end of the first half.
     name = name.replace(/(words|lyrics|text|worte|poem|poetry|dichtung)\s*:.*$/i, "");
-    const LEADING_WORK = /^[\s,.]*\b(op|opus|no|nr|bwv|kv|k)\b\.?\s*[\d.]+[\s,.]*/i;
+    // Every catalogue whose numbers turn up in this corpus's credits. Opus and number are
+    // the common ones; the rest are a composer's own catalogue — Bartók's Sz., Handel's
+    // HWV, Vivaldi's RV, Haydn's Hob., Bruckner's WAB, Beethoven's WoO. A number from any
+    // of them names the piece, and left on the end it made a page of its own: "Bartók
+    // Béla, Sz. 107" sat three pieces deep beside the five under Béla Bartók.
+    const CATALOGUE = "op|opus|no|nr|bwv|kv|k|sz|hob|hwv|rv|wab|woo|anh";
+    const LEADING_WORK = new RegExp(`^[\\s,.]*\\b(${CATALOGUE})\\b\\.?\\s*[\\d.]+[\\s,.]*`, "i");
     while (LEADING_WORK.test(name)) {
         name = name.replace(LEADING_WORK, "");
     }
     // Then a trailing one, which takes everything after it — but only if a name is left
     // in front. Otherwise the credit was nothing but a work number and there is no
     // composer to keep.
-    const withoutWork = name.replace(/[\s,]*\b(op|opus|no|nr|bwv|kv|k)\b\.?\s*\d+[\d.\s]*.*$/i, "");
+    const withoutWork = name.replace(
+        new RegExp(`[\\s,]*\\b(${CATALOGUE})\\b\\.?\\s*\\d+[\\d.\\s]*.*$`, "i"),
+        "",
+    );
     if (withoutWork.trim().length > 0) {
         name = withoutWork;
     }
@@ -431,8 +459,14 @@ function cleaned(raw: string): string {
     // "MacKay" have too little before the break and too much after it.
     name = name.replace(/^(\p{Lu}\p{Ll}{2,})(?:\p{Lu}\p{Ll}?){1,3}$/u, "$1");
     // A trailing full stop is punctuation from the credit line, never part of a name.
+    //
+    // Trimmed before the punctuation goes, because an aside removed from the end leaves a
+    // space behind it: "Tomás Rua Ó Súilleabháin,(1785-1848)" became "Tomás Rua Ó
+    // Súilleabháin, " and the comma was no longer at the end for the rule to see. The
+    // page carried the comma; the slug, built from the letters, did not.
     return name
         .replace(/\s+/g, " ")
+        .trim()
         .replace(/[.,;:]+$/, "")
         .trim();
 }
@@ -459,8 +493,13 @@ export function canonicalComposer(raw: string): string {
 // a composer page for E Minor.
 const A_KEY = /^[a-g][\u266f\u266d#b]?\s*(major|minor|dur|moll)$/i;
 
+// The French spellings are written out rather than squeezed into one optional letter.
+// "traditionnelle?" reads as "traditionnell" with an optional "e" — which is neither the
+// masculine "traditionnel" nor the misspelling "traditonnel" a credit here actually
+// carries, so both walked past it into a page of their own.
+// "Public domain" is a licence: a fact about the score, and about nobody.
 const NOT_A_PERSON =
-    /\b(trad|traditional|traditionnelle?|tradicional|anonymous|anonymus|anonyme|anonimo|anónimo|anon|volkslied|gregorian[ao]?|gregoriana|plainchant|folk(\s?song|\s?tune)?|spiritual|shanty|misc|hymn\s?tune)\b/i;
+    /\b(trad|traditional|traditi?onnel(le)?|tradicional|anonymous|anonymus|anonyme|anonimo|anónimo|anon|volkslied|gregorian[ao]?|gregoriana|plainchant|folk(\s?song|\s?tune)?|spiritual|shanty|misc|hymn\s?tune|public\s?domain)\b/i;
 
 // The longest a credit can be and still be somebody's name. Real ones run well under
 // this — the catalogue's longest genuine composer is "Corona Elisabeth Wilhelmine
@@ -483,7 +522,18 @@ function cannotBeAPerson(name: string): boolean {
         name.length > LONGEST_NAME ||
         /https?:|www\.|@/.test(name) ||
         // Nothing to read as a name: a bare catalogue code, or digits alone.
-        !/\p{L}/u.test(name)
+        !/\p{L}/u.test(name) ||
+        // Where the music came from, not who wrote it: "from Morceaux de Fantaisie",
+        // "after Corelli". The work it names is somebody's, but the credit does not say
+        // whose, and a page headed "from Morceaux de Fantaisie" answers nobody's question.
+        /^(from|after|based\s+on)\b/i.test(name) ||
+        // Who put the words into another language. A translator wrote no notes, and the
+        // piece they are credited on has a composer of its own — "Translated by John
+        // Sullivan Dwight" is on a carol Adolphe Adam wrote.
+        /^(translated|translation)\b/i.test(name) ||
+        // Not one capital letter in it. Every name in the catalogue has at least one, and
+        // what arrives without is a fragment of a sentence: one credit reads "a breeze".
+        !/\p{Lu}/u.test(name)
     );
 }
 
@@ -550,7 +600,10 @@ export function canonicalPeople(raw: string): string[] {
     // people as surely as "Joplin and Hayden" does. Matched as a whole word between
     // spaces, so "Ortega y Gasset" — one person, Spanish compound surname — would split
     // wrongly too; a credit like that belongs in JOINT_CREDITS, as the hyphenated pairs do.
-    const parts = cleaned.split(/\s+\/\s+|\s+&\s+|\s+\b(?:and|y|e|et|und|och)\b\s+/i);
+    // The slash needs no spaces around it. "Bellini/Chopin" and "Palestrina/Bovicelli" are
+    // two people written tight, and read as one they made a page for a composer nobody has
+    // heard of — while the real pair sat elsewhere in the directory with their own pieces.
+    const parts = cleaned.split(/\s*\/\s*|\s+&\s+|\s+\b(?:and|y|e|et|und|och)\b\s+/i);
     return parts.length === 1
         ? [cleaned]
         : parts.map((part) => canonicalComposer(part.trim())).filter((part) => part !== "");

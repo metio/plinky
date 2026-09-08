@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: '**The composer directory stopped listing things that are not composers.** Now that\nevery credited name has a page of its own, the odd ones in the harvested scores\nbecame visible: a page for "Public Domain", one for "a breeze", one for the choir\nthat recorded a carol. Those are gone. Credits naming two people at once are two\npeople again, so Bellini and Chopin each keep their own page; a catalogue number\nleft on the end of a name no longer makes a second Bartók; and initials that meant\nsomebody already in the catalogue now lead to them, so Rachmaninoff\'s pieces are all\nin one place.',
+                twip: true,
+            },
+            {
                 body: '**Links without a language in them work again.** An address like `plinky.fun/about`\n— the shape a link takes when it is copied out of somewhere that dropped the\nlanguage — had quietly stopped working for a dozen pages, including Help, the\nglossary and the two legal pages, and answered "page not found" instead of sending\nyou to your own language. All of them are back.',
                 twip: true,
             },
