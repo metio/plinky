@@ -82,6 +82,25 @@ export function dynamicPaths() {
         .map((page) => page.path);
 }
 
+// The dynamic routes react-router.config.ts prerenders in full, read from its own
+// declaration rather than restated here. A route with every page already written needs no
+// SPA-fallback rule, and Cloudflare's hundred-rule cap makes that the difference between
+// a deploy and a refusal.
+const CONFIG = "react-router.config.ts";
+
+export function prerenderedDynamic() {
+    const source = readFileSync(CONFIG, "utf8");
+    const match = source.match(/export const PRERENDERED_DYNAMIC = \[([^\]]*)\]/);
+    if (!match) {
+        throw new Error(
+            `${CONFIG}: no PRERENDERED_DYNAMIC export — the SPA fallback cannot tell which ` +
+                "dynamic routes are already written, and would ask Cloudflare for rules it " +
+                "does not allow",
+        );
+    }
+    return [...match[1].matchAll(/"([^"]+)"/g)].map((found) => found[1]);
+}
+
 // The first segment of each parameterised route — "/play" for "/play/:scoreId", "/music"
 // for "/music/grade/:grade". That prefix is what a URL pattern can be written against,
 // since the parameter is whatever the data says.
@@ -92,8 +111,13 @@ export function dynamicPaths() {
 // truncated set. Folding the shelves under "/music" costs the middleware a pass over
 // /music itself, which is a prerendered file it hands straight back.
 export function dynamicPrefixes() {
+    const written = new Set(prerenderedDynamic());
     return [
-        ...new Set(dynamicPaths().map((path) => `/${path.split("/").filter(Boolean)[0] ?? ""}`)),
+        ...new Set(
+            dynamicPaths()
+                .filter((path) => !written.has(path))
+                .map((path) => `/${path.split("/").filter(Boolean)[0] ?? ""}`),
+        ),
     ];
 }
 
@@ -139,6 +163,19 @@ export function assertPages() {
             `${ROUTES}: found ${calls} route calls but parsed ${pages.length} pages — ` +
                 "the route table's shape has changed and dev/pages.mjs can no longer read it",
         );
+    }
+    // Every route named as fully prerendered must actually be a dynamic route in the
+    // table. A name that has gone stale — a route renamed, a page retired — silently
+    // removes that prefix's SPA-fallback rules, and every one of its pages keeps the 404
+    // Cloudflare attaches to a path with no file.
+    const dynamic = new Set(dynamicPaths());
+    for (const path of prerenderedDynamic()) {
+        if (!dynamic.has(path)) {
+            throw new Error(
+                `${CONFIG}: PRERENDERED_DYNAMIC names ${path}, which ${ROUTES} does not ` +
+                    "declare as a dynamic route",
+            );
+        }
     }
     // A parsed module that does not exist means the paths are being read off the wrong
     // argument, which would otherwise surface as a mystery 404 much later.

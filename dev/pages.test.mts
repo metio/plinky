@@ -34,7 +34,7 @@ describe("the derived page list", () => {
         const paths = staticPaths();
 
         expect(paths.some((path: string) => path.includes(":"))).toBe(false);
-        expect(readPages().filter((page: { dynamic?: boolean }) => page.dynamic).length).toBe(4);
+        expect(readPages().filter((page: { dynamic?: boolean }) => page.dynamic).length).toBe(5);
     });
 
     it("pairs every page with a route module that exists", () => {

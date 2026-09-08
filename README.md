@@ -901,6 +901,20 @@ from the same data the app reads (`functions/_middleware.js`), carrying the comp
 name, their pieces and their structured data. A crawler or a link unfurler that runs no
 JavaScript sees a real person; the app fills the fuller detail in over it once it loads.
 
+## Every mark at its own address
+
+The glossary explains nineteen marks, and each has a page: `/glossary/fermata` opens on
+the fermata, with its engraving, the keyboard under it and both readings of the phrase.
+Picking a mark from the list writes its address, so what is on screen is what the URL
+names — a page somebody can send, bookmark, or come back to, and one a search engine can
+answer "what does a fermata mean" with.
+
+All of them are prerendered, in all twenty-six languages, which is under five hundred
+documents. That is the reason they are not written at the edge like the pieces and the
+composers are: the set is small and fixed, and a prerendered route needs no entry in
+`_routes.json` — Cloudflare allows a hundred routing rules and a dynamic prefix costs one
+per language, so a fourth prefix would have been a hundred and five.
+
 ## What is new
 
 `/news` is the changelog, on the site. Plinky has no version numbers, no tags and no

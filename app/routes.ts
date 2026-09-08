@@ -33,6 +33,11 @@ export default [
         route("basics", "routes/basics.tsx"),
         route("help", "routes/help.tsx"),
         route("glossary", "routes/glossary.tsx"),
+        // Every mark at an address of its own. "What does a fermata mean" is a
+        // question somebody types into a search engine, and it has an answer here that
+        // can be heard — which a page reachable only by tapping through a list cannot
+        // be found by, whatever it holds.
+        route("glossary/:term", "routes/glossary.tsx", { id: "glossary-term" }),
         route("tools", "routes/tools.tsx"),
         route("theory", "routes/theory.tsx"),
         route("about", "routes/about.tsx"),

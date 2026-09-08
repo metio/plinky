@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 8 September 2026
 
+**Every mark in the glossary has a page of its own.** Tapping a symbol used to change
+what was on screen and nothing else, so there was no way to send somebody the answer
+— or to come back to it. Each mark now has its own address, and picking one from the
+list writes it there: a fermata is at `/glossary/fermata`, with its engraving, its
+keyboard and both readings of the phrase, exactly as before.
+
 **What changed, and when, is now a page on the site.** Plinky has no version numbers
 and no release days — everything goes live the moment it is finished — so this list
 is the only record there is, and until now reading it meant leaving for a file on a

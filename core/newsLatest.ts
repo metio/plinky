@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**Every mark in the glossary has a page of its own.** Tapping a symbol used to change\nwhat was on screen and nothing else, so there was no way to send somebody the answer\n— or to come back to it. Each mark now has its own address, and picking one from the\nlist writes it there: a fermata is at `/glossary/fermata`, with its engraving, its\nkeyboard and both readings of the phrase, exactly as before.",
+                twip: true,
+            },
+            {
                 body: "**What changed, and when, is now a page on the site.** Plinky has no version numbers\nand no release days — everything goes live the moment it is finished — so this list\nis the only record there is, and until now reading it meant leaving for a file on a\ncode-hosting site. It is at [What is new](/news/), linked from the footer of every\npage — and that address sends you to your own language.",
                 twip: true,
             },

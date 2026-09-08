@@ -27,6 +27,13 @@ describe("routeRules", () => {
         expect(dynamicPrefixes().toSorted()).toEqual(["/music", "/person", "/play"]);
     });
 
+    it("asks for no rules for a dynamic route that is prerendered in full", () => {
+        // Every glossary mark has a document of its own, so the middleware never sees
+        // those addresses — and asking for their rules would be a fourth prefix, which
+        // across twenty-six languages is five rules more than Cloudflare allows.
+        expect(dynamicPrefixes()).not.toContain("/glossary");
+    });
+
     it("folds a nested dynamic route onto its first segment", () => {
         // The shelves live under /music/grade/:grade and /music/era/:era. Writing a rule
         // for each of those is four prefixes across twenty-six languages, which is over

@@ -231,6 +231,34 @@ export function personData(
     };
 }
 
+// One mark in the glossary as schema.org data: a term, and the set it belongs to.
+//
+// DefinedTerm is what a dictionary entry is, and naming the set is what says this is one
+// entry of nineteen rather than a page that happens to explain a word — which is the
+// difference between a search result that answers "what does a fermata mean" and one that
+// lands somebody in the middle of a list.
+export function definedTermData(
+    locale: string,
+    path: string,
+    name: string,
+    description: string,
+    setName: string,
+) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "DefinedTerm",
+        name,
+        description,
+        url: localeUrl(locale, path),
+        inLanguage: locale,
+        inDefinedTermSet: {
+            "@type": "DefinedTermSet",
+            name: setName,
+            url: localeUrl(locale, "/glossary/"),
+        },
+    };
+}
+
 // A shelf of the catalogue as schema.org data: a page that is a list, and the list.
 //
 // The pieces are capped. A grade holds several hundred, and a structured-data block

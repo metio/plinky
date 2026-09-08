@@ -5,6 +5,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
 import { staticPaths } from "./dev/pages.mjs";
+import { GLOSSARY } from "./core/glossary";
 import { songId } from "./core/songId";
 
 // Every page the route table defines, read from it rather than restated here: a route
@@ -21,6 +22,23 @@ const BUNDLED_SCORES = readdirSync("scores")
 // Prerender a play page for every bundled score so each piece is indexable with its own
 // title and structured data. User-imported scores stay client-only.
 const BUNDLED_PLAY_PATHS = BUNDLED_SCORES.map((score) => `/play/${score.id}`);
+
+// Every mark the glossary explains, at an address of its own. Nineteen of them, which in
+// twenty-six languages is under five hundred documents — nothing beside a deployment's
+// twenty-thousand-file allowance, and each one is a real page carrying the mark's name,
+// what it asks of you, its engraving and its structured data with no JavaScript at all.
+//
+// Prerendered rather than written at the edge, unlike the pieces and the composers: the
+// set is fixed and small, and a prerendered route needs no entry in _routes.json —
+// Cloudflare allows a hundred routing rules and a prefix costs one per language, so a
+// fourth dynamic prefix would have been a hundred and five.
+const GLOSSARY_PATHS = GLOSSARY.map((entry) => `/glossary/${entry.id}`);
+
+// The dynamic routes above whose every page is prerendered, so the SPA fallback needs no
+// routing rule for them. Read from here by dev/pages.mjs, which is the file that hands the
+// prefixes to dev/spa-fallback.mjs — the decision is made once, where prerendering is
+// decided, rather than restated where it is consumed.
+export const PRERENDERED_DYNAMIC = ["/glossary/:term"];
 
 // Composer pages are not prerendered, and deliberately so. There are four hundred of
 // them, which in twenty-six languages is ten thousand documents — most of a Cloudflare
@@ -41,7 +59,7 @@ export default {
     // a client redirect to the visitor's locale. Prerendering runs serially
     // (concurrency 1), which entry.server relies on to pin getLocale per page.
     prerender() {
-        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS];
+        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS, ...GLOSSARY_PATHS];
         const localized = generateStaticLocalizedUrls(paths).map((url) => url.pathname);
         // A per-locale build (PLINKY_LOCALE=de) pins getLocale to its language, so
         // it can only render its own pages correctly — prerender just those. The

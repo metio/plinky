@@ -4,7 +4,7 @@
 import { demoOf } from "../../core/theoryDemo";
 import { SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useSeededState } from "../hooks/useSeededState";
 import {
     entryById,
@@ -15,7 +15,7 @@ import {
 } from "../../core/glossary";
 import { outOfView } from "../../core/followScroll";
 import { buildSnippet, type Snippet } from "../../core/glossaryScore";
-import { routeMeta, webPageData } from "../../core/site";
+import { breadcrumbData, definedTermData, routeMeta, webPageData } from "../../core/site";
 import { GlossaryDetail } from "../components/features/glossaryDetail";
 import { GlossaryIndex } from "../components/features/glossaryIndex";
 import { NotationExample } from "../components/features/notationExample";
@@ -23,20 +23,47 @@ import { FeatureBoundary } from "../components/features/featureBoundary";
 import { useScheduler } from "../contexts/services";
 import { useSynth } from "../hooks/useSynth";
 import type { SchedulerHandle } from "../ports/scheduler";
-import { symbolName } from "../lib/glossaryLabels";
+import { symbolGloss, symbolName } from "../lib/glossaryLabels";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/glossary";
 import { PageHeader } from "../components/ui/pageHeader";
+import { localizedHref } from "../components/ui/href";
 
-export function meta(_args: Route.MetaArgs) {
+export function meta({ params }: Route.MetaArgs) {
+    const locale = getLocale();
+    // A mark's own page. Every one of them is prerendered, so this is what a reader and a
+    // crawler are handed before any script runs — and it is also what the app renders
+    // over on hydration, so the two say the same thing by construction.
+    const mark = entryById(params.term ?? "");
+    if (mark) {
+        return [
+            ...routeMeta(symbolName(mark.id), symbolGloss(mark.id)),
+            {
+                "script:ld+json": definedTermData(
+                    locale,
+                    `/glossary/${mark.id}/`,
+                    symbolName(mark.id),
+                    symbolGloss(mark.id),
+                    m.glossary_title(),
+                ),
+            },
+            {
+                "script:ld+json": breadcrumbData(locale, [
+                    { name: m.nav_today(), path: "/" },
+                    { name: m.glossary_title(), path: "/glossary/" },
+                    { name: symbolName(mark.id), path: `/glossary/${mark.id}/` },
+                ]),
+            },
+        ];
+    }
     return [
         ...routeMeta(m.glossary_title(), m.meta_glossary_description()),
         {
             "script:ld+json": webPageData(
                 m.glossary_title(),
                 m.meta_glossary_description(),
-                getLocale(),
+                locale,
                 "/glossary/",
                 "CollectionPage",
             ),
@@ -57,11 +84,21 @@ export default function Glossary() {
     // answer is the first thing on screen rather than something to hunt for. An unknown
     // or absent name simply opens the first entry.
     const [params] = useSearchParams();
+    // The mark's own address (/glossary/fermata) if that is how the page was reached,
+    // and the older query link otherwise. Both name the same page; the address is the one
+    // a search engine can hold, and the one choosing a mark writes.
+    const route = useParams();
+    const navigate = useNavigate();
+    const named = route.term ?? params.get("symbol");
     const [selected, setSelected] = useSeededState(
-        params.get("symbol"),
+        named,
         (symbol) => entryById(symbol ?? "")?.id ?? FIRST.id,
     );
     const entry = entryById(selected) ?? FIRST;
+    // Whether the address names one mark. The head for it is written by meta() above,
+    // which both the prerendered document and the running app go through — so a mark's
+    // page says the same thing before and after its script loads.
+    const onTerm = route.term !== undefined && entryById(route.term) !== null;
     const synth = useSynth();
     const scheduler = useScheduler();
 
@@ -108,6 +145,10 @@ export default function Glossary() {
 
     const choose = (id: string) => {
         setSelected(id);
+        // And write it into the address, so the mark on screen is the mark the URL names.
+        // A page whose content is chosen by a tap and never recorded anywhere is a page
+        // nobody can link to, bookmark, or come back to.
+        navigate(localizedHref(`/glossary/${id}/`), { replace: !onTerm });
         // Stacked on a phone, the list runs the height of the screen and the mark's
         // explanation sits under all of it, so a tap looks like it did nothing. Bring the
         // detail up — only when it is ENTIRELY off screen. On the two-column layout the
@@ -145,7 +186,10 @@ export default function Glossary() {
         // two columns, and the list of marks beside its detail needs the room. Everything
         // else is a single column and shares one frame.
         <main className="mx-auto max-w-4xl space-y-6 p-6 font-sans">
-            <PageHeader title={m.glossary_title()} hint={m.glossary_intro()} />
+            <PageHeader
+                title={onTerm ? symbolName(entry.id) : m.glossary_title()}
+                hint={onTerm ? symbolGloss(entry.id) : m.glossary_intro()}
+            />
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
                 <GlossaryIndex selected={entry.id} onSelect={choose} />
