@@ -86,5 +86,3 @@ export function shellFor(shell: string, list: Known, locale: string, path: strin
 export function localePath(pathname: string): { locale: string; path: string } | null;
 export function pickLocale(acceptLanguage: string | null | undefined, locales: string[]): string;
 export function forgetKnown(): void;
-export const HUB_GRADES: string[];
-export const HUB_ERAS: string[];

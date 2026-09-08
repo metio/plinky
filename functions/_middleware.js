@@ -103,8 +103,8 @@ async function described(context, locale) {
 // it carries its own copy of the two lists. They are short and they are pinned by a test
 // that reads the core module, so a shelf added there without being added here fails
 // rather than answering 404 at the edge while the app renders it.
-export const HUB_GRADES = ["1", "2", "3", "4", "5", "6", "7", "8"];
-export const HUB_ERAS = ["baroque", "classical", "romantic", "modern"];
+const HUB_GRADES = ["1", "2", "3", "4", "5", "6", "7", "8"];
+const HUB_ERAS = ["baroque", "classical", "romantic", "modern"];
 // Born before, per era: the same bounds core/musicHubs sets, for the same reason.
 const ERA_UNTIL = { baroque: 1710, classical: 1800, romantic: 1870, modern: Infinity };
 

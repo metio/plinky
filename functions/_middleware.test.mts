@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { ERAS as CORE_ERAS, HUB_GRADES as CORE_GRADES } from "../core/musicHubs";
+import { ERAS, HUB_GRADES } from "../core/musicHubs";
 import {
-    HUB_ERAS,
-    HUB_GRADES,
     type Known,
     describe as describePage,
     documentFor,
@@ -558,8 +556,24 @@ describe("the catalogue's shelves", () => {
         // Two copies of one list: the app's, and this file's, because the edge runs
         // JavaScript nothing compiles. A shelf added to one and not the other is a page
         // the app renders and the edge answers 404 for.
-        expect(HUB_GRADES).toEqual(CORE_GRADES.map(String));
-        expect(HUB_ERAS).toEqual([...CORE_ERAS]);
+        //
+        // Compared through describe() rather than by exporting the lists, because
+        // everything in functions/ is bundled for the edge and an exported constant
+        // needs a real value in the declaration file beside it — which is a thing a
+        // declaration file cannot carry, and the deploy refuses the build.
+        for (const grade of HUB_GRADES) {
+            expect(
+                describePage(KNOWN, { locale: "en", kind: "grade", id: String(grade) }),
+            ).not.toBeNull();
+        }
+        for (const era of ERAS) {
+            expect(describePage(KNOWN, { locale: "en", kind: "era", id: era }, PEOPLE)).not.toBeNull();
+        }
+        // And nothing on either side of them.
+        expect(describePage(KNOWN, { locale: "en", kind: "grade", id: "0" })).toBeNull();
+        expect(
+            describePage(KNOWN, { locale: "en", kind: "grade", id: String(HUB_GRADES.length + 1) }),
+        ).toBeNull();
     });
 
     it("writes a shelf its own document", async () => {
