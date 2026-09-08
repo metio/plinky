@@ -901,6 +901,29 @@ from the same data the app reads (`functions/_middleware.js`), carrying the comp
 name, their pieces and their structured data. A crawler or a link unfurler that runs no
 JavaScript sees a real person; the app fills the fuller detail in over it once it loads.
 
+## Being found
+
+Every page is in a sitemap, and every deploy also tells the search engines directly which
+addresses it changed. The sitemap at `/sitemap.xml` is an index over one file per
+language, covering the whole catalogue — the pieces, the composers and the shelves — with
+the full set of hreflang alternates so the twenty-six versions of a page read as one page
+rather than as duplicates of each other.
+
+The direct half is [IndexNow](https://www.indexnow.org/): after a successful deploy, the
+job posts the addresses whose content this push actually rewrote, and Bing, Yandex and
+Seznam fetch them within the hour. The mapping is narrow on purpose — a route's own
+module, a language's messages, and the catalogue rows behind the piece pages — because an
+endpoint sent the whole site on every push is an endpoint that learns to ignore the site.
+`npm run indexnow -- <previous commit> HEAD --dry-run` prints what a push would submit
+without submitting it. Google does not take part in IndexNow; the sitemap is its half,
+which is why both exist.
+
+Bing Webmaster Tools is a separate, account-bound thing: IndexNow submissions are accepted
+on the strength of the key file at `/f20affed073f07eb6d5c409f78c1ee70.txt` and need no
+account, but seeing the reports needs the site added at
+<https://www.bing.com/webmasters> by whoever owns it. Import from Google Search Console is
+the quickest route, since the domain is already verified there.
+
 ## Follow Plinky
 
 Every page ends with a slim footer linking to Plinky's own channels —

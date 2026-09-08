@@ -11,6 +11,15 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
+# The IndexNow key file. Its whole content is the key, which is how a search engine
+# checks that whoever submitted a URL controls the site — a comment or a header in it
+# would fail that check, so the declaration has to live here.
+[[annotations]]
+path = ["public/f20affed073f07eb6d5c409f78c1ee70.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
 # flake.lock is nix-generated JSON; it pins the toolchain both CI and local
 # shells resolve from flake.nix.
 [[annotations]]

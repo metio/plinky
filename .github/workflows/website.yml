@@ -116,6 +116,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # The whole history, because the IndexNow step below diffs this commit against
+          # the one the live site was built from to work out which addresses changed. A
+          # shallow clone has neither commit's tree to compare.
+          fetch-depth: 0
       - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
@@ -157,3 +162,9 @@ jobs:
           --branch=main
           --commit-hash=${{ github.sha }}
           --commit-dirty=true
+      - name: Tell the search engines
+        # After the deploy, never before: the addresses submitted have to be live when an
+        # engine fetches them. Only the pages this push actually rewrote, and never a
+        # failure that goes red — the site is already up. See dev/submit-indexnow.mjs.
+        if: ${{ github.event_name == 'push' }}
+        run: nix develop --command node dev/submit-indexnow.mjs ${{ github.event.before }} ${{ github.sha }}
