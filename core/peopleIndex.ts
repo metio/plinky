@@ -61,7 +61,6 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "august-eberhardt-muller": { name: "August Eberhardt Müller", pieces: 1 },
     "augusta-browne": { name: "Augusta Browne", pieces: 3 },
     "augusta-holmes": { name: "Augusta Holmès", pieces: 72 },
-    avertissement: { name: "Avertissement", pieces: 1 },
     "bartholomaus-gesius": { name: "Bartholomäus Gesius", pieces: 1 },
     "bedrich-smetana": { name: "Bedřich Smetana", pieces: 3 },
     "bela-bartok": { name: "Béla Bartók", pieces: 8 },

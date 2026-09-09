@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 9 September 2026 — evening
+
+**Two more credits that were never anybody's name.** One score had put a notice to
+the singer where the composer goes, so a warning in French had a composer page of
+its own. Another carried its whole upload heading as a title — the composer at the
+front and the channel that arranged it at the back — so Vivaldi's Summer was filed
+under a name that never wrote a note of it. Both now say what they are.
+
 ## 9 September 2026
 
 **A piece page shows its grade once.** It had started saying it twice, a few pixels

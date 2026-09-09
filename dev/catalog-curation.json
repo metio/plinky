@@ -478,5 +478,15 @@
         "title": "Kupffer Schmitt",
         "why": "The title was the archive’s cataloguing note, not the piece’s name: “Bezeichnung standardisiert: Kupffer Schmitt;” says the designation has been standardised, and the score’s own subtitle reads “48. / Kupffer Schmitt”. The credit is the archive’s formula for an unknown author, “Urheber unbekannt, 1720 belegt”, whose date the cleaning takes away and leaves “belegt” hanging on the end.",
         "composer": "Urheber unbekannt"
+    },
+    {
+        "id": "dxUg9RvduQtp",
+        "composer": "Auteur inconnu",
+        "why": "The credit is the score's own heading, not a name: the MusicXML creator field reads “Avertissement :” and the notice it announces follows in the credit lines — advice to stand up straight and follow your singing teacher. Nothing in the file names an author, so the credit becomes the French formula for one who is unknown, which reads as a credit and never as a person."
+    },
+    {
+        "id": "QRlkcBIr2euI",
+        "title": "Summer (The Four Seasons)",
+        "why": "The title was a MuseScore upload's own heading, carrying the composer at the front and the channel that arranged it at the back: “Vivaldi - Summer (The Four Seasons) - Rousseau”. The credit already names Vivaldi, so repeating him in the title said it twice and the trailing name read as a second composer."
     }
 ]
