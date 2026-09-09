@@ -2,6 +2,18 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-09-09
+  label: night
+  entries:
+    - |-
+      **The theory course opens on a lesson, and every lesson is a link.** The list down
+      the side used to jump you around one very long page. Each of the fourteen lessons
+      now has a page of its own and the list points straight at it, so you can open one in
+      a new tab, send it to somebody, or find it by searching for the question it answers.
+      Opening the course lands on the first lesson rather than on all of them at once, the
+      way the glossary has always opened on the first mark — and the glossary's list is
+      made of real links now too.
+
+- date: 2026-09-09
   label: evening
   entries:
     - |-

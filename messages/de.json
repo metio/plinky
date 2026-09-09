@@ -1230,7 +1230,7 @@
     "theory_unit_harmony": "Wie Akkorde entstehen",
     "theory_hear_it": "Anhören",
     "theory_hear_them": "Nacheinander hören",
-    "theory_outro": "Das ist der ganze Kurs — alle {count} Lektionen. Das {glossary} benennt die Zeichen selbst, und die {tools} sind da, wenn du etwas ausprobieren willst.",
+    "theory_outro": "Das {glossary} benennt die Zeichen selbst, und die {tools} sind da, wenn du etwas ausprobieren willst.",
     "theory_signature_reads": "{key}-Dur hat {notes}.",
     "theory_staff_title": "Ein Notensystem ist ein Bild der Tastatur",
     "theory_staff_body": "Die fünf Linien und die vier Zwischenräume dazwischen sind neun benachbarte weiße Tasten. Weiter oben auf der Seite heißt weiter rechts am Klavier, und eine Note eine Stufe über einer anderen ist die nächste weiße Taste nach oben. Das ist die ganze Idee — alles andere ist ein Detail darauf.",

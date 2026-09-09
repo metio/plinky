@@ -1228,7 +1228,7 @@
     "theory_unit_harmony": "Hogyan működnek az akkordok",
     "theory_hear_it": "Hallgasd meg",
     "theory_hear_them": "Hallgasd meg sorban",
-    "theory_outro": "Ennyi az egész tanfolyam — mind a(z) {count} lecke. A {glossary} magukat a jeleket nevezi meg, a {tools} pedig ott van, ha ki akarsz próbálni valamit.",
+    "theory_outro": "A {glossary} magukat a jeleket nevezi meg, a {tools} pedig ott van, ha ki akarsz próbálni valamit.",
     "theory_signature_reads": "A {key} dúrban ez áll a kulcs után: {notes}.",
     "theory_staff_title": "A vonalrendszer a billentyűzet képe",
     "theory_staff_body": "Az öt vonal és a köztük lévő négy vonalköz kilenc szomszédos fehér billentyű. Feljebb a lapon annyit tesz: jobbra a zongorán, és az egy lépéssel feljebb ülő hang a következő fehér billentyű. Ennyi az egész ötlet — minden más csak részlet ezen felül.",

@@ -4,8 +4,7 @@
 import { demoOf } from "../../core/theoryDemo";
 import { SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router";
-import { useSeededState } from "../hooks/useSeededState";
+import { useParams, useSearchParams } from "react-router";
 import {
     entryById,
     GLOSSARY,
@@ -28,7 +27,6 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/glossary";
 import { PageHeader } from "../components/ui/pageHeader";
-import { localizedHref } from "../components/ui/href";
 
 export function meta({ params }: Route.MetaArgs) {
     const locale = getLocale();
@@ -86,15 +84,15 @@ export default function Glossary() {
     const [params] = useSearchParams();
     // The mark's own address (/glossary/fermata) if that is how the page was reached,
     // and the older query link otherwise. Both name the same page; the address is the one
-    // a search engine can hold, and the one choosing a mark writes.
+    // a search engine can hold, and the one the index links to.
+    //
+    // The address IS the state. Choosing a mark used to set a value here and write the URL
+    // afterwards, which meant the page could show one mark while the address named another
+    // if either half failed. Reading straight from the route removes the second copy, and
+    // the back button works because it is the only copy.
     const route = useParams();
-    const navigate = useNavigate();
     const named = route.term ?? params.get("symbol");
-    const [selected, setSelected] = useSeededState(
-        named,
-        (symbol) => entryById(symbol ?? "")?.id ?? FIRST.id,
-    );
-    const entry = entryById(selected) ?? FIRST;
+    const entry = entryById(named ?? "") ?? FIRST;
     // Whether the address names one mark. The head for it is written by meta() above,
     // which both the prerendered document and the running app go through — so a mark's
     // page says the same thing before and after its script loads.
@@ -143,16 +141,37 @@ export default function Glossary() {
 
     const detailRef = useRef<HTMLDivElement>(null);
 
-    const choose = (id: string) => {
-        setSelected(id);
-        // And write it into the address, so the mark on screen is the mark the URL names.
-        // A page whose content is chosen by a tap and never recorded anywhere is a page
-        // nobody can link to, bookmark, or come back to.
-        navigate(localizedHref(`/glossary/${id}/`), { replace: !onTerm });
-        // Stacked on a phone, the list runs the height of the screen and the mark's
-        // explanation sits under all of it, so a tap looks like it did nothing. Bring the
-        // detail up — only when it is ENTIRELY off screen. On the two-column layout the
-        // detail is beside the list and always partly visible, so nothing moves there.
+    // Choosing a mark is a navigation, so what a click handler used to do on the way out
+    // now happens when the mark being read changes. The previous phrase may still be
+    // ringing and it belongs to a symbol no longer on screen, so the new one's buttons
+    // should be ready immediately. The timer is JS and the strikes are on the audio clock:
+    // cancelling the one and leaving the other sounding under the new symbol's reading is
+    // exactly the mush this prevents. Harmless on the first render, where nothing sounds.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: entry.id is the trigger, not a read — the body only touches refs
+    useEffect(() => {
+        if (until.current) {
+            scheduler.cancel(until.current);
+            until.current = null;
+        }
+        synth.silenceAll();
+        setSounding(false);
+    }, [entry.id, scheduler, synth]);
+
+    // Stacked on a phone, the list runs the height of the screen and the mark's
+    // explanation sits under all of it, so a tap looks like it did nothing. Bring the
+    // detail up — only when it is ENTIRELY off screen. On the two-column layout the detail
+    // is beside the list and always partly visible, so nothing moves there.
+    //
+    // Never on arrival, only on a change: somebody opening /glossary/fermata directly has
+    // not tapped anything, and a page that scrolls itself the moment it loads has taken the
+    // top of itself away from a reader who never asked.
+    const arrived = useRef(false);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: entry.id is the trigger, not a read — the body only touches refs
+    useEffect(() => {
+        if (!arrived.current) {
+            arrived.current = true;
+            return;
+        }
         const frame = scheduler.frame(() => {
             const box = detailRef.current?.getBoundingClientRect();
             if (box && outOfView(box.top, box.bottom, window.innerHeight)) {
@@ -165,18 +184,7 @@ export default function Glossary() {
             }
             scheduler.cancelFrame(frame);
         });
-        // The previous phrase may still be ringing, but it belongs to a symbol no longer
-        // on screen — the new one's buttons should be ready immediately.
-        if (until.current) {
-            scheduler.cancel(until.current);
-            until.current = null;
-        }
-        // The timer is JS, the strikes are on the audio clock: cancelling the one leaves the
-        // other sounding under the new symbol's reading, which is the mush the rest exists
-        // to prevent.
-        synth.silenceAll();
-        setSounding(false);
-    };
+    }, [entry.id, scheduler]);
 
     // Leaving the page mid-phrase must not let the rest of it play over the next one.
     useEffect(() => () => synth.silenceAll(), [synth]);
@@ -188,11 +196,14 @@ export default function Glossary() {
         <main className="mx-auto max-w-4xl space-y-6 p-6 font-sans">
             <PageHeader
                 title={onTerm ? symbolName(entry.id) : m.glossary_title()}
-                hint={onTerm ? symbolGloss(entry.id) : m.glossary_intro()}
+                // No hint on a mark's own page: the entry beside it opens with the very
+                // same sentence, and the address naming one mark is exactly when the two
+                // would sit a few pixels apart saying the same thing.
+                hint={onTerm ? undefined : m.glossary_intro()}
             />
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
-                <GlossaryIndex selected={entry.id} onSelect={choose} />
+                <GlossaryIndex selected={entry.id} />
                 <div ref={detailRef}>
                     <GlossaryDetail
                         entry={entry}

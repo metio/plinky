@@ -1230,7 +1230,7 @@
     "theory_unit_harmony": "Sådan virker akkorder",
     "theory_hear_it": "Lyt",
     "theory_hear_them": "Hør dem efter hinanden",
-    "theory_outro": "Det er hele kurset — alle {count} lektioner. {glossary} navngiver selve tegnene, og {tools} er der, når du vil prøve noget.",
+    "theory_outro": "{glossary} navngiver selve tegnene, og {tools} er der, når du vil prøve noget.",
     "theory_signature_reads": "{key} dur har {notes}.",
     "theory_staff_title": "Et nodesystem er et billede af klaviaturet",
     "theory_staff_body": "De fem linjer og de fire mellemrum mellem dem er ni hvide tangenter ved siden af hinanden. Højere oppe på siden betyder længere til højre på klaveret, og en node et trin over en anden er den næste hvide tangent opad. Det er hele idéen — alt andet er detaljer oven på den.",

@@ -1230,7 +1230,7 @@
     "theory_unit_harmony": "Cum funcționează acordurile",
     "theory_hear_it": "Ascultă",
     "theory_hear_them": "Ascultă-le pe rând",
-    "theory_outro": "Acesta e tot cursul — toate cele {count} lecții. {glossary} numește semnele în sine, iar {tools} sunt acolo când vrei să încerci ceva.",
+    "theory_outro": "{glossary} numește semnele în sine, iar {tools} sunt acolo când vrei să încerci ceva.",
     "theory_signature_reads": "{key} major se scrie cu {notes}.",
     "theory_staff_title": "Portativul e o poză a claviaturii",
     "theory_staff_body": "Cele cinci linii și cele patru spații dintre ele sunt nouă clape albe vecine. Mai sus pe pagină înseamnă mai la dreapta pe pian, iar o notă aflată cu o treaptă deasupra alteia este chiar clapa albă următoare. Asta e toată ideea — restul sunt amănunte peste ea.",

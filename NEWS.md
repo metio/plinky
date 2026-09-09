@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 9 September 2026 — night
+
+**The theory course opens on a lesson, and every lesson is a link.** The list down
+the side used to jump you around one very long page. Each of the fourteen lessons
+now has a page of its own and the list points straight at it, so you can open one in
+a new tab, send it to somebody, or find it by searching for the question it answers.
+Opening the course lands on the first lesson rather than on all of them at once, the
+way the glossary has always opened on the first mark — and the glossary's list is
+made of real links now too.
+
 ## 9 September 2026 — evening
 
 **Two more credits that were never anybody's name.** One score had put a notice to

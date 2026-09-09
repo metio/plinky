@@ -82,7 +82,10 @@ export function GlossaryDetail({
                     // What the gloss above leans on. The dot's explanation counts beats
                     // without ever saying what a beat is worth; the lesson does.
                     <p className="text-sm">
-                        <LocalizedLink to={`/theory#${lesson}`} className={linkClasses}>
+                        {/* The lesson's own address rather than an anchor into the course.
+                            A hash could only ever land a reader partway down a page of
+                            fourteen; this opens the one lesson the mark leans on. */}
+                        <LocalizedLink to={`/theory/${lesson}/`} className={linkClasses}>
                             {m.glossary_learn_more()}
                         </LocalizedLink>
                     </p>

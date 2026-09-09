@@ -1232,7 +1232,7 @@
     "theory_unit_harmony": "Cómo funcionan los acordes",
     "theory_hear_it": "Escuchar",
     "theory_hear_them": "Escúchalos seguidos",
-    "theory_outro": "Ese es el curso entero: las {count} lecciones. El {glossary} nombra los signos en sí, y las {tools} están ahí cuando quieras probar algo.",
+    "theory_outro": "El {glossary} nombra los signos en sí, y las {tools} están ahí cuando quieras probar algo.",
     "theory_signature_reads": "{key} mayor se escribe con {notes}.",
     "theory_staff_title": "El pentagrama es un dibujo del teclado",
     "theory_staff_body": "Las cinco líneas y los cuatro espacios entre ellas son nueve teclas blancas seguidas. Más arriba en la página es más a la derecha en el piano, y una nota un escalón por encima de otra es la siguiente tecla blanca. Esa es toda la idea; lo demás son detalles encima.",

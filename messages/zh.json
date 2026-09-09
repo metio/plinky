@@ -1228,7 +1228,7 @@
     "theory_unit_harmony": "和弦怎么来的",
     "theory_hear_it": "听一听",
     "theory_hear_them": "依次听",
-    "theory_outro": "整门课就是这些——全部 {count} 节。{glossary}会告诉你这些记号本身叫什么，想动手试试的时候还有{tools}。",
+    "theory_outro": "{glossary}会告诉你这些记号本身叫什么，想动手试试的时候还有{tools}。",
     "theory_signature_reads": "{key} 大调写作 {notes}。",
     "theory_staff_title": "五线谱是键盘的一幅图",
     "theory_staff_body": "五条线和它们之间的四个间，就是相邻的九个白键。在纸上越高，在钢琴上就越靠右；一个音比另一个高一级，就是往上数的下一个白键。整件事就是这样——其余的都是建在它上面的细节。",

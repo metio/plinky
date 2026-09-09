@@ -1240,7 +1240,7 @@
     "theory_unit_harmony": "How chords work",
     "theory_hear_it": "Hear it",
     "theory_hear_them": "Hear them in turn",
-    "theory_outro": "That is the whole course — all {count} lessons. The {glossary} names the marks themselves, and the {tools} are there when you want to try something out.",
+    "theory_outro": "The {glossary} names the marks themselves, and the {tools} are there when you want to try something out.",
     "theory_signature_reads": "{key} major writes {notes}.",
     "theory_staff_title": "A stave is a picture of a keyboard",
     "theory_staff_body": "The five lines and the four gaps between them are nine neighbouring white keys. Higher on the page means further right on the piano, and a note sitting one step above another is the very next white key up. That is the whole idea — everything else is a detail on top of it.",

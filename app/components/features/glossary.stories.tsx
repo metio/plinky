@@ -69,7 +69,7 @@ export const Sounding: Story = {
 export const Index: Story = {
     render: () => (
         <div className="max-w-56">
-            <GlossaryIndex selected="staccato" onSelect={() => {}} />
+            <GlossaryIndex selected="staccato" />
         </div>
     ),
 };

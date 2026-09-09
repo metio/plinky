@@ -1234,7 +1234,7 @@
     "theory_unit_harmony": "Jak działają akordy",
     "theory_hear_it": "Posłuchaj",
     "theory_hear_them": "Posłuchaj po kolei",
-    "theory_outro": "To cały kurs — wszystkie {count} lekcji. {glossary} nazywa same znaki, a {tools} są wtedy, gdy chcesz czegoś spróbować.",
+    "theory_outro": "{glossary} nazywa same znaki, a {tools} są wtedy, gdy chcesz czegoś spróbować.",
     "theory_signature_reads": "{key} dur zapisuje {notes}.",
     "theory_staff_title": "Pięciolinia to obrazek klawiatury",
     "theory_staff_body": "Pięć linii i cztery pola między nimi to dziewięć sąsiadujących białych klawiszy. Wyżej na kartce znaczy dalej w prawo na fortepianie, a nuta o stopień wyżej od innej to najbliższy biały klawisz w górę. I to cała idea — reszta to szczegóły na jej wierzchu.",

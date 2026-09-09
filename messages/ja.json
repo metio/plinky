@@ -1226,7 +1226,7 @@
     "theory_unit_harmony": "和音のしくみ",
     "theory_hear_it": "聴いてみる",
     "theory_hear_them": "続けて聴く",
-    "theory_outro": "コースはこれで全部——{count}本すべてです。記号そのものの名前は{glossary}にあり、何か試してみたくなったら{tools}があります。",
+    "theory_outro": "記号そのものの名前は{glossary}にあり、何か試してみたくなったら{tools}があります。",
     "theory_signature_reads": "{key} 長調に付くのは {notes}。",
     "theory_staff_title": "五線は鍵盤の絵",
     "theory_staff_body": "5本の線と、そのあいだの4つの間は、隣り合う9つの白鍵です。ページの上のほうはピアノの右のほう。そして1つ上に乗っている音符は、すぐ隣の白鍵です。考え方はこれがすべてで、あとはその上に乗る細かい話にすぎません。",

@@ -1228,7 +1228,7 @@
     "theory_unit_harmony": "Si funksionojnë akordet",
     "theory_hear_it": "Dëgjo",
     "theory_hear_them": "Dëgjoji me radhë",
-    "theory_outro": "Ky është i gjithë kursi — të {count} mësimet. {glossary} u vë emrin vetë shenjave, dhe {tools} janë aty kur do të provosh diçka.",
+    "theory_outro": "{glossary} u vë emrin vetë shenjave, dhe {tools} janë aty kur do të provosh diçka.",
     "theory_signature_reads": "{key} madhore shkruhet me {notes}.",
     "theory_staff_title": "Pentagrami është një figurë e tastierës",
     "theory_staff_body": "Pesë vijat dhe katër hapësirat mes tyre janë nëntë taste të bardha njëri pas tjetrit. Më lart mbi faqe do të thotë më djathtas mbi piano, dhe një notë një shkallë mbi një tjetër është pikërisht tasti i bardhë që vjen. Kjo është e gjithë ideja — çdo gjë tjetër është hollësi mbi të.",

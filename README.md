@@ -323,7 +323,7 @@ one-tap **review session** walks you through everything that's fading, and you c
   how long they are held, and an entry that leans on something links to the lesson teaching
   it: the dot's explanation counts beats without saying what a beat is worth, and lesson
   four does. The theory course gained the glossary's index in return — fourteen lessons down
-  the side, numbered and grouped, for coming back to one rather than scrolling to it.
+  the side, numbered and grouped, each one a link to its own page.
 
 - **Thinning a piece you can't play yet** — a reading aid in Settings that takes the inner
   notes out of every score, so something above your hands is playable today: *inner notes
@@ -923,9 +923,13 @@ names — a page somebody can send, bookmark, or come back to, and one a search 
 answer "what does a fermata mean" with.
 
 The fourteen theory lessons work the same way: `/theory/octave` is that lesson on its own,
-with the way back to the rest of the course, and `/theory` still reads top to bottom as it
-always did. "What is an octave" is a question people type into a search engine, and the
-answer was a paragraph two thirds of the way down a page of fourteen.
+with the rest of the course listed beside it, and `/theory` opens the first one. "What is
+an octave" is a question people type into a search engine, and the answer was a paragraph
+two thirds of the way down a page of fourteen.
+
+Both indexes are lists of links rather than of taps. A mark or a lesson can be opened in a
+new tab, copied out of the address bar and followed by a crawler, and neither page now says
+the same paragraph twice a few pixels apart.
 
 All of them are prerendered, in all twenty-six languages, which is under nine hundred
 documents. That is the reason they are not written at the edge like the pieces and the

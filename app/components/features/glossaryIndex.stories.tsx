@@ -14,7 +14,6 @@ const meta: Meta<typeof GlossaryIndex> = {
             </div>
         ),
     ],
-    args: { onSelect: () => {} },
 };
 export default meta;
 

@@ -4,7 +4,7 @@
 
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter, useNavigate } from "react-router";
+import { MemoryRouter, Route, Routes, useNavigate } from "react-router";
 import { entryById, GLOSSARY, performSnippet } from "../../core/glossary";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { memoryStore } from "../adapters/memoryStore";
@@ -34,13 +34,26 @@ function must(id: string) {
 
 afterEach(cleanup);
 
+// The address is the page's only state, so the tests need the route table that reads it:
+// under a bare router `useParams` is empty and every entry looks like the first one.
+// These mirror app/routes.ts — the locale segment, then the page with and without a mark.
+function routes(children: React.ReactNode) {
+    return (
+        <Routes>
+            <Route path=":locale">
+                <Route path="glossary" element={<Glossary />} />
+                <Route path="glossary/:term" element={<Glossary />} />
+            </Route>
+            <Route path="*" element={<>{children}</>} />
+        </Routes>
+    );
+}
+
 function mountAt(search: string) {
     const audio = fakeAudioEngine();
     const scheduler = fakeScheduler();
     return renderWithServices(
-        <MemoryRouter initialEntries={[`/en/glossary/${search}`]}>
-            <Glossary />
-        </MemoryRouter>,
+        <MemoryRouter initialEntries={[`/en/glossary/${search}`]}>{routes(null)}</MemoryRouter>,
         { store: memoryStore(), audio, scheduler },
     );
 }
@@ -49,9 +62,7 @@ function mount() {
     const audio = fakeAudioEngine();
     const scheduler = fakeScheduler();
     const view = renderWithServices(
-        <MemoryRouter>
-            <Glossary />
-        </MemoryRouter>,
+        <MemoryRouter initialEntries={["/en/glossary"]}>{routes(null)}</MemoryRouter>,
         { store: memoryStore(), audio, scheduler },
     );
     return { audio, scheduler, ...view };
@@ -67,7 +78,7 @@ describe("Glossary", () => {
         for (const entry of GLOSSARY) {
             const name = symbolName(entry.id);
             expect(`${entry.id}: ${name}`).not.toBe(`${entry.id}: ${entry.id}`);
-            expect(screen.getByRole("button", { name })).toBeTruthy();
+            expect(screen.getByRole("link", { name })).toBeTruthy();
         }
     });
 
@@ -82,9 +93,9 @@ describe("Glossary", () => {
         );
         expect(
             screen
-                .getByRole("button", { name: m.glossary_staccato_name() })
+                .getByRole("link", { name: m.glossary_staccato_name() })
                 .getAttribute("aria-current"),
-        ).toBe("true");
+        ).toBe("page");
     });
 
     it("opens the first symbol when the link names one that does not exist", () => {
@@ -99,10 +110,10 @@ describe("Glossary", () => {
     it("marks the selected symbol and swaps the reading when another is chosen", () => {
         mount();
 
-        const staccato = screen.getByRole("button", { name: m.glossary_staccato_name() });
+        const staccato = screen.getByRole("link", { name: m.glossary_staccato_name() });
         fireEvent.click(staccato);
 
-        expect(staccato.getAttribute("aria-current")).toBe("true");
+        expect(staccato.getAttribute("aria-current")).toBe("page");
         expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
             m.glossary_staccato_name(),
         );
@@ -113,12 +124,12 @@ describe("Glossary", () => {
         mount();
 
         // Staccato clips the notes, so there is something to compare.
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_staccato_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_staccato_name() }));
         expect(screen.queryByRole("button", { name: m.glossary_hear_plain() })).toBeTruthy();
 
         // A slur instructs the hands and leaves the written lengths alone, so it does not
         // pretend to have a "without" reading.
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_slur_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_slur_name() }));
         expect(screen.queryByRole("button", { name: m.glossary_hear_plain() })).toBeNull();
         expect(screen.queryByRole("button", { name: m.glossary_hear() })).toBeTruthy();
     });
@@ -126,7 +137,7 @@ describe("Glossary", () => {
     it("sounds the example's notes when asked to play it", () => {
         const view = mount();
 
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_staccato_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_staccato_name() }));
         fireEvent.click(screen.getByRole("button", { name: m.glossary_hear() }));
 
         expect(view.audio.strikes.map((strike) => strike.note)).toEqual(
@@ -137,7 +148,7 @@ describe("Glossary", () => {
     it("plays the plain reading differently from the marked one", async () => {
         const view = mount();
 
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_accent_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_accent_name() }));
         fireEvent.click(screen.getByRole("button", { name: m.glossary_hear() }));
         const marked = [...view.audio.strikes];
         view.audio.strikes.length = 0;
@@ -171,7 +182,7 @@ describe("Glossary", () => {
         // Strikes are scheduled ahead on the audio clock, so a second press mid-phrase
         // would lay one reading over the other — and the pair is the whole explanation.
         const view = mount();
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_staccato_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_staccato_name() }));
         const hear = screen.getByRole("button", { name: m.glossary_hear() });
 
         fireEvent.click(hear);
@@ -200,7 +211,7 @@ describe("Glossary", () => {
         fireEvent.click(screen.getByRole("button", { name: m.glossary_hear() }));
         const silenced = () => view.audio.silenced;
         const before = silenced();
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_accent_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_accent_name() }));
         expect(silenced()).toBeGreaterThan(before);
         const after = silenced();
         view.unmount();
@@ -223,11 +234,11 @@ describe("Glossary", () => {
         }
         renderWithServices(
             <MemoryRouter
-                initialEntries={["/en/glossary/?symbol=slur", "/en/glossary/?symbol=staccato"]}
+                initialEntries={["/en/glossary?symbol=slur", "/en/glossary?symbol=staccato"]}
                 initialIndex={1}
             >
                 <Back />
-                <Glossary />
+                {routes(null)}
             </MemoryRouter>,
             { store: memoryStore(), audio, scheduler },
         );
@@ -242,13 +253,13 @@ describe("Glossary", () => {
         // The phrase still ringing belongs to a symbol no longer on screen, so waiting it
         // out would leave the new symbol's buttons dead for no reason the reader can see.
         const view = mount();
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_staccato_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_staccato_name() }));
         fireEvent.click(screen.getByRole("button", { name: m.glossary_hear() }));
         expect(
             screen.getByRole("button", { name: m.glossary_hear() }).hasAttribute("disabled"),
         ).toBe(true);
 
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_accent_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_accent_name() }));
 
         expect(
             screen.getByRole("button", { name: m.glossary_hear() }).hasAttribute("disabled"),
@@ -265,7 +276,7 @@ describe("Glossary", () => {
         const heading = screen.getByRole("heading", { level: 2 });
         expect(document.activeElement).not.toBe(heading);
 
-        fireEvent.click(screen.getByRole("button", { name: m.glossary_slur_name() }));
+        fireEvent.click(screen.getByRole("link", { name: m.glossary_slur_name() }));
 
         expect(document.activeElement).toBe(screen.getByRole("heading", { level: 2 }));
     });

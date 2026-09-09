@@ -1230,7 +1230,7 @@
     "theory_unit_harmony": "Så fungerar ackord",
     "theory_hear_it": "Lyssna",
     "theory_hear_them": "Hör dem i tur och ordning",
-    "theory_outro": "Det är hela kursen — alla {count} lektionerna. {glossary} namnger själva tecknen, och {tools} finns där när du vill prova något.",
+    "theory_outro": "{glossary} namnger själva tecknen, och {tools} finns där när du vill prova något.",
     "theory_signature_reads": "{key}-dur skrivs med {notes}.",
     "theory_staff_title": "Notsystemet är en bild av klaviaturen",
     "theory_staff_body": "De fem linjerna och de fyra mellanrummen mellan dem är nio vita tangenter i rad. Högre upp på pappret betyder längre till höger på pianot, och en not ett steg ovanför en annan är nästa vita tangent uppåt. Mer än så är det inte — allt annat är detaljer ovanpå.",

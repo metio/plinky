@@ -25,12 +25,11 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { useParams } from "react-router";
 import type { Route } from "./+types/theory";
-import { linkClasses, sectionHeadingClasses } from "../components/ui/classes";
+import { linkClasses } from "../components/ui/classes";
 import { LinkedText, slot } from "../components/ui/linkedText";
 import { LocalizedLink } from "../components/ui/localizedLink";
 import { PageHeader } from "../components/ui/pageHeader";
 import { Card } from "../components/ui/card";
-import { useScrollToHash } from "../hooks/useScrollToHash";
 
 export function meta({ params }: Route.MetaArgs) {
     const locale = getLocale();
@@ -104,6 +103,10 @@ const LESSON_NUMBER = new Map(
     UNITS.flatMap((unit) => lessonsIn(unit)).map((lesson, at) => [lesson.id, at + 1]),
 );
 
+// Where the course opens. A lesson is written to be read after the one before it, so the
+// first is the one to land on when the address names none.
+const FIRST = LESSONS[0] as Lesson;
+
 const LESSON_BODY: Record<string, () => string> = {
     staff: () => m.theory_staff_body(),
     values: () => m.theory_values_body(),
@@ -145,47 +148,6 @@ function LessonDemo({ demo, onPlay }: { demo: Demo; onPlay: () => void }) {
     );
 }
 
-// One lesson, at an address of its own.
-//
-// "What is an octave" is a question somebody types into a search engine, and the answer
-// was a paragraph two thirds of the way down a page of fourteen — findable by scrolling
-// and by nothing else. The course itself is unchanged and still reads top to bottom at
-// /theory; this is the same lesson, alone, with the way back to the rest of it.
-function OneLesson({ lesson }: { lesson: Lesson }) {
-    const index = LESSONS.findIndex((one) => one.id === lesson.id) + 1;
-    return (
-        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <PageHeader
-                eyebrow={UNIT_NAME[lesson.unit]()}
-                title={LESSON_TITLE[lesson.id]?.() ?? ""}
-                hint={LESSON_BODY[lesson.id]?.()}
-            />
-            <ul className="space-y-4">
-                <LessonCard lesson={lesson} index={index} />
-            </ul>
-            <nav className="space-y-2">
-                <h2 className={sectionHeadingClasses}>{m.theory_title()}</h2>
-                <ul className="flex flex-wrap gap-2">
-                    {LESSONS.map((one) => (
-                        <li key={one.id}>
-                            <LocalizedLink
-                                to={`/theory/${one.id}/`}
-                                className={`rounded-full border border-line px-3 py-1 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30 ${
-                                    one.id === lesson.id
-                                        ? "border-accent-line-strong bg-accent-surface/50 font-medium"
-                                        : ""
-                                }`}
-                            >
-                                {LESSON_TITLE[one.id]?.()}
-                            </LocalizedLink>
-                        </li>
-                    ))}
-                </ul>
-            </nav>
-        </main>
-    );
-}
-
 function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
     const theory = useTheoryStore();
     return (
@@ -195,9 +157,13 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
             <Card className="space-y-3">
                 <div className="flex flex-wrap items-baseline gap-x-3">
                     <span className="font-mono text-xs tabular-nums text-muted">{index}</span>
-                    <h3 className="text-base font-semibold text-ink">
+                    {/* Level two, not three. The unit headings that used to sit between
+                        this and the page title are gone with the fourteen-lesson scroll,
+                        so a third level here skips one — which is what the axe sweep
+                        reports and what a screen reader's outline actually loses. */}
+                    <h2 className="text-base font-semibold text-ink">
                         {LESSON_TITLE[lesson.id]?.()}
-                    </h3>
+                    </h2>
                 </div>
                 <p className="max-w-prose text-sm leading-relaxed text-body">
                     {LESSON_BODY[lesson.id]?.()}
@@ -227,50 +193,41 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
 // something to play — the glossary says what a mark means, this says why the music is
 // built that way.
 export default function TheoryRoute() {
-    // The day's practice links to a single lesson; a client-router navigation does not
-    // scroll to a hash on its own.
-    useScrollToHash();
+    // The address IS the state, the same way it is on the glossary. /theory opens the
+    // first lesson, because that is where a course starts and an empty frame beside a
+    // list of fourteen titles teaches nobody anything.
+    //
+    // One lesson at a time, rather than all fourteen down one page. Every lesson is
+    // prerendered at its own address; rendering them here as well put each one at two
+    // addresses, and of the two the index is the stronger page — so the course competed
+    // with itself for exactly the question a single lesson exists to answer.
     const params = useParams();
-    const only = params.lesson ? lessonById(params.lesson) : null;
-    if (only) {
-        return <OneLesson lesson={only} />;
-    }
-    let counter = 0;
+    const lesson = (params.lesson ? lessonById(params.lesson) : null) ?? FIRST;
+    // Whether the address names one lesson. The head for it is written by meta() above,
+    // which the prerendered document and the running app both go through.
+    const onLesson = params.lesson !== undefined && lessonById(params.lesson) !== null;
     return (
         // Wider than the rest of the app, and two columns, for the same reason the
-        // glossary is: an index down the side needs the room. The course still reads top
-        // to bottom; the index is for coming BACK to a lesson, not for taking them out of
-        // order.
-        <main className="mx-auto max-w-4xl space-y-8 p-6 font-sans">
-            <PageHeader title={m.theory_title()} hint={m.theory_intro({ count: LESSONS.length })} />
+        // glossary is: an index down the side needs the room.
+        <main className="mx-auto max-w-4xl space-y-6 p-6 font-sans">
+            <PageHeader
+                eyebrow={onLesson ? UNIT_NAME[lesson.unit]() : undefined}
+                title={onLesson ? (LESSON_TITLE[lesson.id]?.() ?? "") : m.theory_title()}
+                // No hint on a lesson's own page, for the reason the glossary has none:
+                // the card below opens with this exact paragraph.
+                hint={onLesson ? undefined : m.theory_intro({ count: LESSONS.length })}
+            />
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
-                <TheoryIndex titles={LESSON_TITLE} numbers={LESSON_NUMBER} />
-                <div className="space-y-8">
-                    {UNITS.map((unit) => (
-                        <section key={unit} className="space-y-3">
-                            <h2 className={sectionHeadingClasses}>{UNIT_NAME[unit]()}</h2>
-                            <ul className="space-y-4">
-                                {lessonsIn(unit).map((lesson) => {
-                                    counter += 1;
-                                    return (
-                                        <LessonCard
-                                            key={lesson.id}
-                                            lesson={lesson}
-                                            index={counter}
-                                        />
-                                    );
-                                })}
-                            </ul>
-                        </section>
-                    ))}
-                </div>
+                <TheoryIndex titles={LESSON_TITLE} numbers={LESSON_NUMBER} selected={lesson.id} />
+                <ul className="space-y-4">
+                    <LessonCard lesson={lesson} index={LESSON_NUMBER.get(lesson.id) ?? 1} />
+                </ul>
             </div>
 
             <p className="text-sm text-muted">
                 <LinkedText
                     text={m.theory_outro({
-                        count: LESSONS.length,
                         glossary: slot("glossary"),
                         tools: slot("tools"),
                     })}

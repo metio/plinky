@@ -5,6 +5,7 @@ import { CATEGORIES, entriesIn } from "../../../core/glossary";
 import { CATEGORY_NAMES, symbolName } from "../../lib/glossaryLabels";
 import { m } from "../../paraglide/messages.js";
 import { sectionLabelClasses } from "../ui/classes";
+import { LocalizedLink } from "../ui/localizedLink";
 
 // The way in: every symbol, grouped by what it controls.
 //
@@ -12,13 +13,13 @@ import { sectionLabelClasses } from "../ui/classes";
 // curved line can see that marks come in four kinds — how long, how you touch it, how
 // loud, where you are — and that a curve is about touch, before reading a single entry.
 // An alphabetical list would sort `slur` next to `staccato` and tell them nothing.
-export function GlossaryIndex({
-    selected,
-    onSelect,
-}: {
-    selected: string;
-    onSelect: (id: string) => void;
-}) {
+//
+// Links, not buttons. Every mark is prerendered at its own address and the page it opens
+// says the mark's name in its title, so choosing one is a navigation and should behave
+// like one: it can be opened in a new tab, copied, bookmarked and followed by a crawler.
+// A button carrying a click handler is none of those things, which left fifty pages
+// reachable from the sitemap and from nowhere a reader could point at.
+export function GlossaryIndex({ selected }: { selected: string }) {
     return (
         <nav aria-label={m.glossary_index_label()} className="space-y-5">
             {CATEGORIES.map((category) => (
@@ -32,13 +33,12 @@ export function GlossaryIndex({
                             const current = entry.id === selected;
                             return (
                                 <li key={entry.id}>
-                                    <button
-                                        type="button"
-                                        onClick={() => onSelect(entry.id)}
-                                        // aria-current marks the one being read, which is
-                                        // what a screen reader needs here — these are
-                                        // in-page selections, not links to elsewhere.
-                                        aria-current={current ? "true" : undefined}
+                                    <LocalizedLink
+                                        to={`/glossary/${entry.id}/`}
+                                        // The mark being read is the page you are on, so
+                                        // this is aria-current="page" rather than the bare
+                                        // "true" an in-page selection would carry.
+                                        aria-current={current ? "page" : undefined}
                                         className={`flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm transition-colors ${
                                             current
                                                 ? "bg-accent-fill font-medium text-accent-ink"
@@ -46,7 +46,7 @@ export function GlossaryIndex({
                                         }`}
                                     >
                                         {symbolName(entry.id)}
-                                    </button>
+                                    </LocalizedLink>
                                 </li>
                             );
                         })}

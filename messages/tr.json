@@ -1228,7 +1228,7 @@
     "theory_unit_harmony": "Akorlar nasıl işler",
     "theory_hear_it": "Dinle",
     "theory_hear_them": "Sırayla dinle",
-    "theory_outro": "Kursun tamamı bu — {count} dersin hepsi. İşaretlerin kendi adlarını {glossary} veriyor, bir şey denemek istediğinde de {tools} orada.",
+    "theory_outro": "İşaretlerin kendi adlarını {glossary} veriyor, bir şey denemek istediğinde de {tools} orada.",
     "theory_signature_reads": "{key} majör {notes} ile yazılır.",
     "theory_staff_title": "Porte, klavyenin resmidir",
     "theory_staff_body": "Beş çizgi ve aralarındaki dört boşluk, yan yana dokuz beyaz tuştur. Sayfada yukarı çıkmak piyanoda sağa gitmek demek; bir notanın bir basamak üstündeki nota, bir sonraki beyaz tuştur. Bütün fikir bu — geri kalan her şey bunun üstüne eklenen ayrıntı.",

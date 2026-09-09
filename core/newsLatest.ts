@@ -11,24 +11,20 @@ import type { Release } from "./changelog";
 export const LATEST_RELEASES: Release[] = [
     {
         date: "2026-09-09",
-        label: "evening",
+        label: "night",
         entries: [
             {
-                body: "**Two more credits that were never anybody's name.** One score had put a notice to\nthe singer where the composer goes, so a warning in French had a composer page of\nits own. Another carried its whole upload heading as a title — the composer at the\nfront and the channel that arranged it at the back — so Vivaldi's Summer was filed\nunder a name that never wrote a note of it. Both now say what they are.",
+                body: "**The theory course opens on a lesson, and every lesson is a link.** The list down\nthe side used to jump you around one very long page. Each of the fourteen lessons\nnow has a page of its own and the list points straight at it, so you can open one in\na new tab, send it to somebody, or find it by searching for the question it answers.\nOpening the course lands on the first lesson rather than on all of them at once, the\nway the glossary has always opened on the first mark — and the glossary's list is\nmade of real links now too.",
                 twip: true,
             },
         ],
     },
     {
         date: "2026-09-09",
-        label: null,
+        label: "evening",
         entries: [
             {
-                body: "**A piece page shows its grade once.** It had started saying it twice, a few pixels\napart — once beside the title and once beside the piece's other numbers. The one\nthat stays is the one that takes you to everything else at that level.",
-                twip: true,
-            },
-            {
-                body: "**One more page that was not a composer, and a piece that was not called what it\nsaid.** An archive's note for an unknown author had become a composer with a page of\nits own, and its single piece carried the archive's cataloguing line as its title.\nThe piece is called \"Kupffer Schmitt\", which is what its own score calls it.",
+                body: "**Two more credits that were never anybody's name.** One score had put a notice to\nthe singer where the composer goes, so a warning in French had a composer page of\nits own. Another carried its whole upload heading as a title — the composer at the\nfront and the channel that arranged it at the back — so Vivaldi's Summer was filed\nunder a name that never wrote a note of it. Both now say what they are.",
                 twip: true,
             },
         ],

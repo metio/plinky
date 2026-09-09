@@ -1232,7 +1232,7 @@
     "theory_unit_harmony": "Jak fungují akordy",
     "theory_hear_it": "Poslechnout",
     "theory_hear_them": "Poslechni si je po sobě",
-    "theory_outro": "To je celý kurz — všech {count} lekcí. {glossary} pojmenovává samotné značky a {tools} jsou tu, když si chceš něco vyzkoušet.",
+    "theory_outro": "{glossary} pojmenovává samotné značky a {tools} jsou tu, když si chceš něco vyzkoušet.",
     "theory_signature_reads": "{key} dur má {notes}.",
     "theory_staff_title": "Notová osnova je obrázek klaviatury",
     "theory_staff_body": "Pět linek a čtyři mezery mezi nimi je devět sousedních bílých kláves. Výš na papíře znamená víc doprava na klavíru a nota o krok nad jinou je hned další bílá klávesa nahoru. To je celý princip — všechno ostatní je jen detail navrch.",
