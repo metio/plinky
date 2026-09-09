@@ -472,5 +472,11 @@
         "title": "The Entertainer (shortened)",
         "composer": "Scott Joplin",
         "why": "Two rows are both The Entertainer. This one is seventy-four bars against the other's hundred and fifty-two, and its score is credited \"(edit)\" — an abridged setting, which the title should say rather than leaving the two indistinguishable."
+    },
+    {
+        "id": "a1XnKMmBaLPM",
+        "title": "Kupffer Schmitt",
+        "why": "The title was the archive’s cataloguing note, not the piece’s name: “Bezeichnung standardisiert: Kupffer Schmitt;” says the designation has been standardised, and the score’s own subtitle reads “48. / Kupffer Schmitt”. The credit is the archive’s formula for an unknown author, “Urheber unbekannt, 1720 belegt”, whose date the cleaning takes away and leaves “belegt” hanging on the end.",
+        "composer": "Urheber unbekannt"
     }
 ]

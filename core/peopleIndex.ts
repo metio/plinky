@@ -391,7 +391,6 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "tomas-rua-o-suilleabhain": { name: "Tomás Rua Ó Súilleabháin", pieces: 1 },
     "truman-wetmore": { name: "Truman Wetmore", pieces: 2 },
     "turlough-o-carolan": { name: "Turlough O'Carolan", pieces: 9 },
-    "urheber-unbekannt-belegt": { name: "Urheber unbekannt belegt", pieces: 1 },
     "vincenzo-bellini": { name: "Vincenzo Bellini", pieces: 1 },
     "virginia-gabriel": { name: "Virginia Gabriel", pieces: 4 },
     "walford-davies": { name: "Walford Davies", pieces: 9 },

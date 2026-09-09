@@ -438,6 +438,12 @@ describe("a credit that names more than one person", () => {
 
     it("gives no page to a credit that names no person", () => {
         for (const raw of [
+            // An archive's formula for an unknown author, in its own language. The date
+            // rules reduce "Urheber unbekannt, 1720 belegt" to this, and it is the
+            // opposite of a name however it is spelled.
+            "Urheber unbekannt belegt",
+            "Unknown",
+            "Composer unknown",
             "a breeze",
             "from Morceaux de Fantaisie, Op.3",
             "after Corelli",
@@ -447,6 +453,11 @@ describe("a credit that names more than one person", () => {
         ]) {
             expect(personSlugs(raw), raw).toEqual([]);
         }
+    });
+
+    it("keeps a name that merely contains one of those words", () => {
+        // The words are matched whole. A surname that happens to hold one is somebody's.
+        expect(personSlugs("Frank Unknownsson")).toEqual(["frank-unknownsson"]);
     });
 
     it("reads every spelling of a tradition as one, including the French", () => {

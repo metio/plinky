@@ -8,6 +8,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 9 September 2026
+
+**A piece page shows its grade once.** It had started saying it twice, a few pixels
+apart — once beside the title and once beside the piece's other numbers. The one
+that stays is the one that takes you to everything else at that level.
+
+**One more page that was not a composer, and a piece that was not called what it
+said.** An archive's note for an unknown author had become a composer with a page of
+its own, and its single piece carried the archive's cataloguing line as its title.
+The piece is called "Kupffer Schmitt", which is what its own score calls it.
+
 ## 8 September 2026
 
 **The books of studies have pages of their own.** Bach's two-part inventions,

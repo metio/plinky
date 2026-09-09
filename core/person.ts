@@ -497,9 +497,12 @@ const A_KEY = /^[a-g][\u266f\u266d#b]?\s*(major|minor|dur|moll)$/i;
 // "traditionnelle?" reads as "traditionnell" with an optional "e" — which is neither the
 // masculine "traditionnel" nor the misspelling "traditonnel" a credit here actually
 // carries, so both walked past it into a page of their own.
-// "Public domain" is a licence: a fact about the score, and about nobody.
+// "Public domain" is a licence: a fact about the score, and about nobody. So is a note
+// saying the author is not known — the archives the corpora draw on write it in their own
+// language and their own formula ("Urheber unbekannt, 1720 belegt", which the date rules
+// reduce to "Urheber unbekannt belegt"), and every one of them is the opposite of a name.
 const NOT_A_PERSON =
-    /\b(trad|traditional|traditi?onnel(le)?|tradicional|anonymous|anonymus|anonyme|anonimo|anónimo|anon|volkslied|gregorian[ao]?|gregoriana|plainchant|folk(\s?song|\s?tune)?|spiritual|shanty|misc|hymn\s?tune|public\s?domain)\b/i;
+    /\b(trad|traditional|traditi?onnel(le)?|tradicional|anonymous|anonymus|anonyme|anonimo|anónimo|anon|volkslied|gregorian[ao]?|gregoriana|plainchant|folk(\s?song|\s?tune)?|spiritual|shanty|misc|hymn\s?tune|public\s?domain|urheber|unbekannt|unknown|unattributed|inconnu|desconocido|sconosciuto)\b/i;
 
 // The longest a credit can be and still be somebody's name. Real ones run well under
 // this — the catalogue's longest genuine composer is "Corona Elisabeth Wilhelmine
