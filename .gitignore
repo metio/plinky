@@ -4,7 +4,8 @@
 /.idea/
 /.ilo.rc
 /.claude/settings.local.json
-/node_modules/
+# Unanchored, so it reaches every sub-project's tree too — worker/ installs its own.
+node_modules/
 /.react-router/
 /build/
 /coverage/
