@@ -29,21 +29,7 @@ export function GradeChip({ grade, className }: { grade: number; className?: str
     );
 }
 
-// Computes a score's grade from its MusicXML, then chips it.
-export function ScoreGrade({
-    id,
-    xml,
-    className,
-}: {
-    id: string;
-    xml: string;
-    className?: string;
-}) {
-    const xmlCodec = useXmlCodec();
-    return <GradeChip grade={gradeOf(xmlCodec, id, xml)} className={className} />;
-}
-
-// The same chip, as the way to everything else at that level.
+// A score's grade, computed from its MusicXML, as the way to everything else at that level.
 //
 // A piece page that names a grade and stops leaves the reader to go back to the catalogue
 // and filter for it by hand. The shelf is a page, so the number can simply be the door to

@@ -22,7 +22,6 @@ import { MarkLearnedButton } from "../components/features/markLearnedButton";
 import { type PlayMode, PlayModeBar } from "../components/features/playModeBar";
 import { FavoriteButton } from "../components/features/favoriteButton";
 import { ExportMenu } from "../components/features/exportMenu";
-import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { ScoreSkeleton } from "../components/ui/scoreSkeleton";
 import { TransposeProvider } from "../components/features/transposeContext";
@@ -203,7 +202,6 @@ function PlayPage({ scoreId }: { scoreId: string }) {
                                 you can act on while playing it rather than an errand in
                                 the library. */}
                                 <FavoriteButton id={score.id} />
-                                <ScoreGrade id={score.id} xml={score.xml} />
                             </div>
                             {/* The piece's secondary actions, on the title line so a
                             short title's empty space is used rather than taking a row
