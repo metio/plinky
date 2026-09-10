@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { holdScaleFor } from "../../../core/midi";
-import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
+import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
-import { useSynth } from "../../hooks/useSynth";
+import { useVoicedInput } from "../../hooks/useVoicedInput";
 import { Keyboard } from "../ui/keyboard";
 import { ChordReadout } from "./chordReadout";
 import { MidiBadge } from "./midiBadge";
@@ -23,7 +22,6 @@ const TO = 72;
 // notes played in succession don't smear into each other. The keys rise in a one-time
 // ripple on load; that and the press are the only motion, both dropped for reduce-motion.
 export function HeroKeyboard() {
-    const synth = useSynth();
     const labels = useNoteLabels();
     const theme = useKeyboardTheme();
     const finish = useKeyboardFinish();
@@ -32,17 +30,10 @@ export function HeroKeyboard() {
     const { pressKey, releaseKey } = useMidiConnection();
     const heldNotes = useHeldNotes();
 
-    // Sound the app's own piano voice for whatever the funnel reports — a live voice on
-    // note-on, released on note-off — so the hold shapes the sound exactly as it does in
-    // the trainer. Notes outside this octave (from a full MIDI keyboard) still sound.
-    useMidiInput({
-        // The landing page's keyboard is playable, by design.
-        keys: true,
-        onNoteOn: (event) =>
-            synth.pressNote(event.note, { velocity: event.velocity, device: event.device }),
-        // A tap on the hero rings on a little (holdScaleFor) so even a quick click sings.
-        onNoteOff: (event) => synth.releaseNote(event.note, holdScaleFor(event.device)),
-    });
+    // Sound the app's own piano voice for whatever the funnel reports, so the hold shapes
+    // the sound exactly as it does in the trainer. Notes outside this octave (from a full
+    // MIDI keyboard) still sound, and so do the pedals.
+    useVoicedInput();
 
     // A key still held when the hero unmounts never delivers its pointer-up; the shared
     // Keyboard releases its own on-screen sources on teardown, so its voice does not ring

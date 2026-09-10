@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**The Piano page makes a sound.** A key pressed there lit up and that was all:\nwhatever you played, on the screen, the computer keys or a MIDI piano without\nspeakers of its own, was silent, and the pedals did nothing. Every note now sounds on\nthe same piano as the rest of Plinky, for as long as you hold it, and all three pedals\nwork. The pedals work on the keyboard on the home page now too.",
+                twip: true,
+            },
+            {
                 body: "**A play-along or a sight-read after a finished run starts properly.** Finish a\npiece at your own pace, then switch to Keep up or turn on sight-reading and press\nPractice, and the full screen used to close again straight away, taking the count-in\nor the reading time with it. The finished run now stays finished, and the next one\ngets the stage to itself. It could also be counted a second time and wipe the ghost\nyou race; that has gone too.",
                 twip: true,
             },

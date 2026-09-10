@@ -17,11 +17,10 @@ import {
     tourProgress,
 } from "../../../core/keyboardTour";
 import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../../core/glossaryScore";
-import { holdScaleFor } from "../../../core/midi";
 import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
-import { useSynth } from "../../hooks/useSynth";
+import { useVoicedInput } from "../../hooks/useVoicedInput";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Keyboard } from "../ui/keyboard";
@@ -75,7 +74,6 @@ function staffXml(step: TourStep): string | null {
 
 export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     const [state, setState] = useState(beginTour);
-    const synth = useSynth();
     const labels = useNoteLabels();
     const theme = useKeyboardTheme();
     const finish = useKeyboardFinish();
@@ -89,14 +87,11 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     // and the on-screen keys are the same thing as far as a step is concerned.
     const heard = useCallback((note: number) => setState((current) => observe(current, note)), []);
 
+    useVoicedInput();
     useMidiInput({
         // The tour teaches the computer-keyboard map, so it has to hear it.
         keys: true,
-        onNoteOn: (event) => {
-            synth.pressNote(event.note, { velocity: event.velocity, device: event.device });
-            heard(event.note);
-        },
-        onNoteOff: (event) => synth.releaseNote(event.note, holdScaleFor(event.device)),
+        onNoteOn: (event) => heard(event.note),
     });
 
     const xml = useMemo(() => (step ? staffXml(step) : null), [step]);

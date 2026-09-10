@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 10 September 2026
 
+**The Piano page makes a sound.** A key pressed there lit up and that was all:
+whatever you played, on the screen, the computer keys or a MIDI piano without
+speakers of its own, was silent, and the pedals did nothing. Every note now sounds on
+the same piano as the rest of Plinky, for as long as you hold it, and all three pedals
+work. The pedals work on the keyboard on the home page now too.
+
 **A play-along or a sight-read after a finished run starts properly.** Finish a
 piece at your own pace, then switch to Keep up or turn on sight-reading and press
 Practice, and the full screen used to close again straight away, taking the count-in

@@ -6,6 +6,7 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { useMidiInput } from "../contexts/midi";
 import { PianoKeyboard } from "../components/features/pianoKeyboard";
 import { PageHeader } from "../components/ui/pageHeader";
+import { useVoicedInput } from "../hooks/useVoicedInput";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -50,6 +51,10 @@ export default function Piano() {
     const [keyWindow, setKeyWindow] = useState<Span>(() =>
         followKeyboardWindow(null, 60, SPAN, REACH),
     );
+
+    // The sound. The keybed only lights what the funnel holds; nothing about drawing a key
+    // makes it heard, so the page voices the funnel itself, pedals and all.
+    useVoicedInput();
 
     // The computer keyboard is an instrument here, which every surface has to say for
     // itself: elsewhere the letter keys belong to the page, and taking them from a page

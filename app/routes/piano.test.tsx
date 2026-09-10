@@ -22,13 +22,14 @@ afterEach(() => {
 // The page's whole job is that the computer keyboard plays, so the provider is real and
 // only the device seam is faked — a fake provider would make every assertion here vacuous.
 function mount() {
+    const audio = fakeAudioEngine();
     const services = createServices({
-        audio: fakeAudioEngine(),
+        audio,
         midi: fakeMidi(),
         store: memoryStore(),
         activity: createActivitySignal(),
     });
-    return render(
+    const view = render(
         <ServicesProvider services={services}>
             <MidiProvider>
                 <MemoryRouter>
@@ -37,6 +38,7 @@ function mount() {
             </MidiProvider>
         </ServicesProvider>,
     );
+    return { ...view, audio };
 }
 
 const press = (key: string, code: string, shiftKey = false) =>
@@ -68,6 +70,43 @@ describe("piano route", () => {
             "true",
         );
         release("z", "KeyZ");
+    });
+
+    it("sounds what is played, for as long as it is held", () => {
+        const { audio } = mount();
+        // A lit key and no sound is a picture of a piano. The press opens a live voice and
+        // the key-up ends it, stretched a little the way every imprecise input is.
+        press("z", "KeyZ");
+        expect(audio.voices).toContainEqual({ kind: "press", note: 60, gain: expect.any(Number) });
+        release("z", "KeyZ");
+        expect(audio.voices.at(-1)).toMatchObject({ kind: "release", note: 60 });
+        expect((audio.voices.at(-1) as { holdScale: number }).holdScale).toBeGreaterThan(1);
+    });
+
+    it("sounds a note from a MIDI piano too", () => {
+        const { audio } = mount();
+        act(() => {
+            window.__plinky?.play(67);
+        });
+        expect(audio.voices).toContainEqual({ kind: "press", note: 67, gain: expect.any(Number) });
+        act(() => {
+            window.__plinky?.release(67);
+        });
+        expect(audio.voices.at(-1)).toEqual({ kind: "release", note: 67, holdScale: 1 });
+    });
+
+    it("hands all three pedals to the sound", () => {
+        const { audio } = mount();
+        for (const pedal of ["sustain", "sostenuto", "soft"] as const) {
+            act(() => {
+                window.__plinky?.pedal(pedal, true);
+            });
+            expect(audio.pedals.at(-1)).toEqual({ pedal, down: true });
+            act(() => {
+                window.__plinky?.pedal(pedal, false);
+            });
+            expect(audio.pedals.at(-1)).toEqual({ pedal, down: false });
+        }
     });
 
     it("follows the playing up the keyboard rather than stopping at the window's edge", () => {
