@@ -74,9 +74,19 @@ export function letterMin(letter: Letter): number {
     }
 }
 
+// How early, as a fraction of the interval, a passing run may land and still count as
+// the review. A tenth of a one-day interval is 2.4 hours, enough for someone who
+// practises at about the same time each day to sit down a little early; a tenth of a
+// six-month interval is eighteen days, which is still a check on retention. Since the
+// shortest interval is a day, no two passes less than 21.6 hours apart can both count,
+// so replaying a piece within one sitting never schedules it further out.
+const EARLY_REVIEW_FRACTION = 0.1;
+
 // Folds a finished run's score into the mastery state: always tracks the best
 // score, marks a score learned the first time it clears the threshold, and on a
-// later review grows the interval when it passes or resets it when it fails.
+// later review grows the interval when it passes or resets it when it fails. A
+// pass made before the review has come due keeps the schedule it had: what the
+// interval measures is retention across the gap, and a replay has not crossed one.
 export function applyRun(
     current: Mastery | null,
     score: number,
@@ -101,6 +111,10 @@ export function applyRun(
         };
     }
 
+    const early = now < base.reviewAt - EARLY_REVIEW_FRACTION * base.intervalDays * DAY_MS;
+    if (passed && early) {
+        return { ...base, bestScore, updatedAt: now };
+    }
     const intervalDays = passed
         ? Math.min(
               MAX_INTERVAL_DAYS,

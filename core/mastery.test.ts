@@ -115,6 +115,40 @@ describe("applyRun", () => {
         expect(next.reviewAt).toBe(NOW + DAY + next.intervalDays * DAY);
     });
 
+    it("does not count repeat plays in one sitting as spaced reviews", () => {
+        let state = applyRun(null, 90, 85, NOW);
+        for (let i = 1; i <= 6; i++) {
+            state = applyRun(state, 90, 85, NOW + i * 10 * 60_000);
+        }
+        expect(state.intervalDays).toBe(1);
+        expect(state.reviewAt).toBe(NOW + DAY);
+        expect(state.updatedAt).toBe(NOW + 60 * 60_000);
+    });
+
+    it("keeps the schedule on an early pass but records a better score", () => {
+        const before = learned({ bestScore: 86, intervalDays: 10, reviewAt: NOW + 5 * DAY });
+        const next = applyRun(before, 97, 85, NOW);
+        expect(next.intervalDays).toBe(10);
+        expect(next.reviewAt).toBe(NOW + 5 * DAY);
+        expect(next.bestScore).toBe(97);
+        expect(next.updatedAt).toBe(NOW);
+    });
+
+    it("counts a pass sitting down a little early on the day a review is due", () => {
+        // A tenth of a one-day interval is 2.4 hours: two hours early still counts.
+        const before = learned({ intervalDays: 1, reviewAt: NOW + 2 * 60 * 60_000 });
+        const next = applyRun(before, 90, 85, NOW);
+        expect(next.intervalDays).toBe(2);
+        expect(next.reviewAt).toBe(NOW + 2 * DAY);
+    });
+
+    it("still resets on a failing run made before the review is due", () => {
+        const before = learned({ intervalDays: 30, reviewAt: NOW + 20 * DAY });
+        const next = applyRun(before, 60, 85, NOW);
+        expect(next.intervalDays).toBe(1);
+        expect(next.reviewAt).toBe(NOW + DAY);
+    });
+
     it("resets the interval on a failing review", () => {
         const learned: Mastery = {
             bestScore: 95,

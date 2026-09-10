@@ -77,6 +77,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Chord names and block chords are spelled the way the music is.** In a minor key with\nflats, the chord that leads home borrowed a flat it never has: D minor's A major over\nC sharp was labelled A/D♭, and with block chords on, the left hand was written with\nD♭ and G♭ where the key signature and the right hand said C♯ and F♯. Pieces in F♯\nmajor or C♯ major had their chords named in flats under a key signature full of\nsharps. Every chord is now spelled note by note from its place in the key, so the\nsymbol, the block chord and the rest of the page agree.",
                 twip: true,
             },
+            {
+                body: "**Playing a piece again straight away no longer pushes its review months away.** Once\na piece was learned, every good run counted as a review, so playing it six times in\none sitting scheduled the next review half a year out, and the piece went quiet as\nthough you had kept it for months. A run now moves the review further out only once\nthe review has come due, or nearly. Playing again before then still keeps your best\nscore, and a run that goes badly still brings the review back to tomorrow.",
+                twip: true,
+            },
         ],
     },
     {
