@@ -942,13 +942,14 @@ export const webAudioEngine: AudioEngine = {
             // too — otherwise a note scheduled ahead would sound on past the panic.
             silenceStrikes(ctx);
         }
-        // Clear all state regardless of context so a later press starts fresh and no
-        // stale key/pedal flag keeps a future voice alive.
+        // Clear the voices and keys regardless of context so a later press starts fresh and
+        // no stale key keeps a future voice alive. The pedals stay: they are where the
+        // player's foot is, which a run ending does not change, and a MIDI piano will not
+        // say so again until the foot moves. A sounding surface re-reads them from the
+        // input as it opens (useHeldPedals), so one missed while nothing was sounding
+        // cannot linger either.
         voices.clear();
         keyDown.clear();
-        sustainDown = false;
-        softDown = false;
-        sostenutoHeld = new Set();
     },
     setRoom(wet) {
         wetLevel = Math.max(0, wet);

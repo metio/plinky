@@ -46,8 +46,9 @@ export type UseSynthResult = {
     releaseNote: (note: number, holdScale?: number) => void;
     // Move one of the three pedals for live voices.
     setPedal: (pedal: PedalKind, down: boolean) => void;
-    // Silence every live voice and drop all held/pedal state — the panic a play surface
-    // calls on teardown so a guide voice can never ring on past the run.
+    // Silence every live voice and drop the held keys — the panic a play surface calls on
+    // teardown so a guide voice can never ring on past the run. The pedals stay where the
+    // player's foot has them; see AudioEngine.allNotesOff.
     silenceAll: () => void;
     // The instrument for the run that starts now; see AudioEngine.commitVoice.
     commitVoice: () => void;

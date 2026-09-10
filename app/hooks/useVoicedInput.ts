@@ -3,6 +3,7 @@
 
 import { holdScaleFor } from "../../core/midi";
 import { useMidiInput } from "../contexts/midi";
+import { useHeldPedals } from "./useHeldPedals";
 import { useSynth } from "./useSynth";
 
 // The instrument, sounding: whatever the input funnel carries — a MIDI piano, the computer
@@ -18,6 +19,7 @@ import { useSynth } from "./useSynth";
 // playing, and the computer keyboard is one of the instruments.
 export function useVoicedInput(): void {
     const synth = useSynth();
+    useHeldPedals();
     useMidiInput({
         keys: true,
         onNoteOn: (event) =>

@@ -72,10 +72,13 @@ export interface AudioEngine {
     // Move one of the three pedals. Sustain holds every released voice, sostenuto holds only
     // the notes sounding when it was pressed, and soft gentles notes struck while it's down.
     setPedal(pedal: PedalKind, down: boolean): void;
-    // Silence every live voice at once and drop all held-key and pedal state — a panic for
-    // when a play surface tears down or a run ends, so no voice can ring on. The engine
-    // state is a process-lifetime singleton, so nothing else guarantees this on unmount or
-    // route change. Idempotent; safe with no audio context.
+    // Silence every live voice at once and drop the held-key state — a panic for when a play
+    // surface tears down or a run ends, so no voice can ring on. The engine state is a
+    // process-lifetime singleton, so nothing else guarantees this on unmount or route
+    // change. The pedals are left where they are: they are the player's foot, which a run
+    // ending does not move, and a MIDI piano sends a pedal only when it changes, so a pedal
+    // dropped here would stay dropped under a foot still holding it. Idempotent; safe with
+    // no audio context.
     allNotesOff(): void;
     // How much of the room is heard around the instrument, as a final wet gain (0 = dry).
     //

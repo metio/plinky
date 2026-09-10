@@ -83,7 +83,7 @@ describe("useSynth", () => {
     });
 
     it("panics all voices through the engine, even muted", () => {
-        // silenceAll clears voice and pedal state, which must happen regardless of the
+        // silenceAll clears the voices and held keys, which must happen regardless of the
         // volume preference — a muted session opened no voice, but the panic still runs.
         const { audio, synth } = harness({ sound: false });
         synth.silenceAll();

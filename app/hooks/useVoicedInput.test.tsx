@@ -71,8 +71,18 @@ describe("useVoicedInput", () => {
         expect(loud.gain).toBeGreaterThan(soft.gain);
     });
 
+    it("starts the engine where the player's pedals are", () => {
+        const { audio } = mount();
+        expect(audio.pedals).toEqual([
+            { pedal: "sustain", down: false },
+            { pedal: "sostenuto", down: false },
+            { pedal: "soft", down: false },
+        ]);
+    });
+
     it("moves the engine's pedals with the player's", () => {
         const { audio } = mount();
+        audio.pedals.length = 0;
         act(() => {
             window.__plinky?.pedal("sustain", true);
             window.__plinky?.pedal("soft", true);
@@ -87,6 +97,7 @@ describe("useVoicedInput", () => {
 
     it("sounds nothing when muted, while the pedals still track", () => {
         const { audio } = mount({ sound: false });
+        audio.pedals.length = 0;
         act(() => {
             window.__plinky?.play(60);
             window.__plinky?.pedal("sustain", true);

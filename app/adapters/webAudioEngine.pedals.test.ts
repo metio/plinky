@@ -65,6 +65,63 @@ describe("the sostenuto pedal", () => {
     });
 });
 
+describe("a panic with a pedal held", () => {
+    // A panic is a run ending or a surface tearing down; the player's foot has not moved.
+    // Web MIDI sends only pedal changes, so a pedal the engine forgot here stays forgotten
+    // until the foot comes up and goes down again.
+    it("keeps the sustain pedal down for the notes played after it", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake);
+        engine.resume();
+
+        engine.setPedal("sustain", true);
+        engine.allNotesOff();
+        engine.press(60, 0.3, 90);
+        engine.release(60);
+
+        expect(fake.ringingAt(1)).toBeGreaterThan(0);
+    });
+
+    it("keeps the notes the sostenuto caught held", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake);
+        engine.resume();
+
+        engine.press(60, 0.3, 90);
+        engine.setPedal("sostenuto", true);
+        engine.allNotesOff();
+        engine.press(60, 0.3, 90);
+        engine.release(60);
+
+        expect(fake.ringingAt(1)).toBeGreaterThan(0);
+    });
+
+    it("still silences everything that was sounding", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake);
+        engine.resume();
+
+        engine.setPedal("sustain", true);
+        engine.press(60, 0.3, 90);
+        engine.release(60);
+        engine.allNotesOff();
+
+        expect(fake.ringingAt(1)).toBe(0);
+    });
+
+    it("leaves an un-pedalled note to end on its key-up", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake);
+        engine.resume();
+
+        engine.allNotesOff();
+        engine.press(60, 0.3, 90);
+        engine.release(60);
+
+        expect(fake.ringingAt(2)).toBe(0);
+    });
+});
+
 describe("a note left under the sustain pedal", () => {
     it("falls silent on its own, with the pedal still down", async () => {
         // Reported from a real piano over USB MIDI: hold the damper pedal too long — which
@@ -131,6 +188,20 @@ describe("a note left under the sustain pedal", () => {
         // added nothing to the count.
         expect(lowStillRinging).toBeGreaterThan(0);
         expect(bothAt9).toBe(lowStillRinging);
+    });
+
+    it("lifting the pedal after a panic still ends a note that is ringing", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake);
+        engine.resume();
+
+        engine.setPedal("sustain", true);
+        engine.allNotesOff();
+        engine.press(60, 0.3, 90);
+        engine.release(60);
+        engine.setPedal("sustain", false);
+
+        expect(fake.ringingAt(2)).toBe(0);
     });
 
     it("lifting the pedal still ends a note that is ringing", async () => {

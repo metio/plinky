@@ -51,6 +51,7 @@ import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useEndRun } from "../../hooks/useEndRun";
+import { useHeldPedals } from "../../hooks/useHeldPedals";
 import { useVoiceCommitment } from "../../hooks/useVoiceCommitment";
 import { useLatest } from "../../hooks/useLatest";
 import { useLatestPress } from "../../hooks/useLatestPress";
@@ -739,6 +740,9 @@ function usePlaySessionValue({
     // The play surface: the computer keyboard is one of the three ways to play here,
     // so it takes the keys it needs while this is mounted.
     useMidiInput({ ...funnel.listener, keys: true });
+    // The funnel moves the engine's pedals as they change; a pedal already held when the
+    // surface opens has no change left to send.
+    useHeldPedals();
     const connected = useMidiConnected();
 
     // The ghost race — a previous run replayed against the clock on the staff and the
