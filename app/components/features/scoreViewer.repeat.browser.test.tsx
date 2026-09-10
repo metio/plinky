@@ -106,6 +106,42 @@ describe("the read-ahead drill over a written repeat", () => {
     });
 });
 
+// Where the visual cursor stands along the staff, in the score's own coordinates, so the
+// treadmill scrolling the page does not move it.
+const cursorLeft = () =>
+    (document.querySelector('img[id^="cursorImg"]') as HTMLElement | null)?.style.left ?? "";
+
+describe("a section loop over part of a written repeat", () => {
+    it("keeps the cursor on the bar the loop plays next, on the second pass", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        render(
+            <MemoryRouter>
+                <ServicesProvider services={{ midi: fakeMidi() }}>
+                    <MidiProvider>
+                        <ScoreViewer
+                            id="repeat"
+                            xml={REPEATED}
+                            title="Repeat"
+                            credit=""
+                            options={{ loop: { from: 1, to: 1 } }}
+                        />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        fireEvent.click(await awaitReady());
+        // The loop is bar one, both passes of it: C, then C again.
+        await expect.poll(cursorLeft, { timeout: 30000 }).not.toBe("");
+        const onBarOne = cursorLeft();
+
+        await strike("C 4");
+        await expect.poll(halos, { timeout: 30000 }).toBeGreaterThan(0);
+        // The score goes on to D here and the run goes on to the second pass's C, which is
+        // printed where the first one was. The cursor follows the run.
+        expect(cursorLeft()).toBe(onBarOne);
+    });
+});
+
 describe("a handoff from Listen on the repeat's second pass", () => {
     it("continues on the pass Listen was playing rather than the first", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);

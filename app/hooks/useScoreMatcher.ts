@@ -54,8 +54,8 @@ import {
     type UpcomingStep,
     previewIndex,
     resumeIndex,
+    standsOn,
     upcomingSteps,
-    WHOLE_EPSILON,
     jumpsBack,
 } from "../../core/matcher";
 
@@ -314,10 +314,13 @@ export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): 
 // measuring it walks the cursor; the bar and the onset are enough to notice a drift.
 function cursorAstray(osmd: OpenSheetMusicDisplay, step: MatchStep): boolean {
     const iterator = osmd.cursor.iterator;
-    return (
-        iterator.EndReached ||
-        iterator.CurrentMeasureIndex !== step.bar ||
-        Math.abs((iterator.currentTimeStamp?.RealValue ?? 0) - step.whole) > WHOLE_EPSILON
+    return !standsOn(
+        {
+            ended: iterator.EndReached,
+            bar: iterator.CurrentMeasureIndex,
+            whole: iterator.currentTimeStamp?.RealValue ?? 0,
+        },
+        step,
     );
 }
 
@@ -705,11 +708,20 @@ export function useScoreMatcher(
                     staffTimes: staffArrivals(event),
                     pitchTimes: event.arrivals,
                 });
+                // The step the run goes on to, when there is one.
+                const following = runStepsRef.current[event.ordinal + 1];
                 // Mirror the reducer's advance onto the visual cursor — unless the step
                 // just cleared was an ornament, which is printed on the very note it
                 // decorates, so the cursor has not left that note yet.
                 if (event.step.advancesCursor) {
                     advanceCursor(osmd, runHandRef.current);
+                    // The score's next position and the run's next step differ where a
+                    // section loop keeps both passes of a repeat and skips the bars printed
+                    // between them. The cursor goes where the run goes, or its box and the
+                    // treadmill sit on a bar the run is not asking for.
+                    if (following !== undefined && cursorAstray(osmd, following)) {
+                        seekToOrdinal(osmd.cursor, following.position);
+                    }
                 }
                 setDone((value) => value + 1);
                 // A new position clears the per-position miss flag, so the "reveal
@@ -718,7 +730,6 @@ export function useScoreMatcher(
                 // And if the position after this one is printed EARLIER than it, a repeat
                 // barline has sent the run back. Announced rather than acted on here, for
                 // the same reason the lap is: the halos belong to the surface.
-                const following = runStepsRef.current[event.ordinal + 1];
                 if (following !== undefined && jumpsBack(event.step, following)) {
                     optionsRef.current.onRewind?.({
                         from: following.whole,

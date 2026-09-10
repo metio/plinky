@@ -454,6 +454,22 @@ describe("a run over a repeat", () => {
         expect(correct.map((info) => info.index)).toEqual([2, 3, 6, 7]);
     });
 
+    it("keeps the cursor on the loop's next step where the loop jumps a pass", () => {
+        // A loop over bar 1 keeps both of its passes: steps 0, 1, then 4, 5. Past step 1
+        // the score goes on to bar 2, but the run goes on to the second pass of bar 1, and
+        // the cursor has to go with the run.
+        const handle = fakeOsmd(PASSES, WHOLES, BARS);
+        const { result } = renderHook(() => useScoreMatcher(() => handle.osmd));
+        act(() => result.current.start(0, { from: 1, to: 1 }));
+        act(() => result.current.registerNote(60));
+        expect(handle.at()).toBe(1);
+        act(() => result.current.registerNote(62));
+        expect(handle.at()).toBe(4);
+        // Inside the pass the cursor walks on as the score does.
+        act(() => result.current.registerNote(60));
+        expect(handle.at()).toBe(5);
+    });
+
     it("names the step a repeat or a lap returns to among the whole piece's", () => {
         const { osmd } = fakeOsmd(PASSES, WHOLES, BARS);
         const rewinds: { from: number; to: number; index: number }[] = [];

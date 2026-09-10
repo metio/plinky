@@ -279,6 +279,21 @@ export function resumeIndex(steps: readonly { position: number }[], ordinal: num
     return steps.findIndex((step) => step.position >= ordinal);
 }
 
+// Whether a place on the score is a step's own: its bar, at its printed onset. A place past
+// the end belongs to no step. Only the bar and the onset are compared, because measuring
+// a cursor's ordinal walks it; two passes of a repeat share both, and a cursor on either
+// pass looks the same on the page.
+export function standsOn(
+    place: { ended: boolean; bar: number; whole: number },
+    step: { bar: number; whole: number },
+): boolean {
+    return (
+        !place.ended &&
+        place.bar === step.bar &&
+        Math.abs(place.whole - step.whole) <= WHOLE_EPSILON
+    );
+}
+
 export type UpcomingStep = {
     index: number;
     pitches: number[];

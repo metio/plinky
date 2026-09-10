@@ -28,6 +28,11 @@ had already disappeared, and they stayed gone, so the second time through had to
 played from memory. They now reappear as the run returns to them, and vanish again
 once you have moved on.
 
+**A loop over part of a repeat keeps the cursor on the bar you are playing.** Loop
+a few bars inside a repeated passage, and after the first time through the cursor
+box and the scrolling moved on to the bar printed next, while the notes you were
+asked for came from the start of the loop again. The cursor now goes back with you.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

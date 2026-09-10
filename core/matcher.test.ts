@@ -19,6 +19,7 @@ import {
     jumpsBack,
     previewIndex,
     resumeIndex,
+    standsOn,
 } from "./matcher";
 import { GRAND_STAFF, partsOf } from "./parts";
 
@@ -542,6 +543,31 @@ describe("previewIndex", () => {
             walked.push(at);
         }
         expect(walked).toEqual([0, 1, 2]);
+    });
+});
+
+describe("standsOn", () => {
+    // The second quarter of bar 1 in 4/4: bar 1 starts one whole note in.
+    const step = { bar: 1, whole: 1.25 };
+
+    it("holds on the step's own bar and onset", () => {
+        expect(standsOn({ ended: false, bar: 1, whole: 1.25 }, step)).toBe(true);
+        // A printed onset read back through floating point is still the same onset.
+        expect(standsOn({ ended: false, bar: 1, whole: 1.25 + 1e-9 }, step)).toBe(true);
+    });
+
+    it("fails on the bar the score prints next when the run has gone elsewhere", () => {
+        // A loop over bar 1 of a repeated opening: the score goes on to bar 2, the run
+        // back to bar 1's second pass.
+        expect(standsOn({ ended: false, bar: 2, whole: 2 }, { bar: 1, whole: 1 })).toBe(false);
+    });
+
+    it("fails at another onset in the same bar", () => {
+        expect(standsOn({ ended: false, bar: 1, whole: 1.5 }, step)).toBe(false);
+    });
+
+    it("fails past the end, wherever the cursor last reported standing", () => {
+        expect(standsOn({ ended: true, bar: 1, whole: 1.25 }, step)).toBe(false);
     });
 });
 
