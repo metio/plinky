@@ -98,6 +98,8 @@ export function documentFor(
 export function shellFor(shell: string, list: Known, locale: string, path: string): string;
 export function localePath(pathname: string): { locale: string; path: string } | null;
 export function pickLocale(acceptLanguage: string | null | undefined, locales: string[]): string;
-export const LOCALE_COOKIE: string;
+// `declare`, because Cloudflare's Pages build bundles this file as TypeScript source too, and
+// esbuild refuses a bare `export const` without an initializer.
+export declare const LOCALE_COOKIE: string;
 export function chosenLocale(cookieHeader: string | null | undefined, locales: string[]): string | null;
 export function forgetKnown(): void;
