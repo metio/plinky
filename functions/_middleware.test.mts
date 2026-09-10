@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { beforeEach, describe, expect, it } from "vitest";
+import { cookieName } from "../app/paraglide/runtime.js";
 import { ERAS, HUB_GRADES } from "../core/musicHubs";
 import {
+    chosenLocale,
     type Known,
+    LOCALE_COOKIE,
     describe as describePage,
     documentFor,
     forgetKnown,
@@ -289,15 +292,60 @@ describe("onRequest", () => {
         );
         expect(german.status).toBe(302);
         expect(german.headers.get("location")).toBe("https://plinky.fun/de/");
-        expect(german.headers.get("vary")).toBe("Accept-Language");
+        expect(german.headers.get("vary")).toBe("Cookie, Accept-Language");
         const crawler = await onRequest(served("/", 200, "root shell"));
         expect(crawler.headers.get("location")).toBe("https://plinky.fun/en/");
+    });
+
+    it("sends the bare root to the language the player picked, over the browser's", async () => {
+        const chosen = await onRequest(
+            served("/", 200, "root shell", {}, 200, {
+                "accept-language": "de-AT,de;q=0.9",
+                cookie: `theme=dark; ${LOCALE_COOKIE}=pt; other=1`,
+            }),
+        );
+        expect(chosen.status).toBe(302);
+        expect(chosen.headers.get("location")).toBe("https://plinky.fun/pt/");
+        expect(chosen.headers.get("vary")).toBe("Cookie, Accept-Language");
+    });
+
+    it("falls back to the browser's language when the picked one is not spoken", async () => {
+        const stale = await onRequest(
+            served("/", 200, "root shell", {}, 200, {
+                "accept-language": "de",
+                cookie: `${LOCALE_COOKIE}=xx`,
+            }),
+        );
+        expect(stale.headers.get("location")).toBe("https://plinky.fun/de/");
     });
 
     it("serves the root's own document when the list cannot be read", async () => {
         const response = await onRequest(served("/", 200, "root shell", {}, 500));
         expect(response.status).toBe(200);
         expect(await response.text()).toBe("root shell");
+    });
+});
+
+describe("chosenLocale", () => {
+    const LOCALES = ["en", "de", "pt"];
+
+    it("reads the cookie the app's language switcher writes", () => {
+        expect(LOCALE_COOKIE).toBe(cookieName);
+    });
+
+    it("finds the choice among other cookies, spaced or not", () => {
+        expect(chosenLocale(`${LOCALE_COOKIE}=de`, LOCALES)).toBe("de");
+        expect(chosenLocale(`a=1;${LOCALE_COOKIE}=pt;b=2`, LOCALES)).toBe("pt");
+        expect(chosenLocale(`a=1;  ${LOCALE_COOKIE}=en `, LOCALES)).toBe("en");
+    });
+
+    it("has no choice without the cookie, or with one naming a language not spoken", () => {
+        expect(chosenLocale(null, LOCALES)).toBeNull();
+        expect(chosenLocale("", LOCALES)).toBeNull();
+        expect(chosenLocale("theme=dark", LOCALES)).toBeNull();
+        expect(chosenLocale(`${LOCALE_COOKIE}=xx`, LOCALES)).toBeNull();
+        expect(chosenLocale(`${LOCALE_COOKIE}=`, LOCALES)).toBeNull();
+        expect(chosenLocale(`X${LOCALE_COOKIE}=de`, LOCALES)).toBeNull();
     });
 });
 

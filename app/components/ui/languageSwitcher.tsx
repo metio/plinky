@@ -7,9 +7,9 @@ import { m } from "../../paraglide/messages.js";
 import { getLocale, locales, setLocale } from "../../paraglide/runtime.js";
 
 // Switching the locale navigates to the same page under the new language's prefix
-// and reloads, so every string re-renders. The choice is persisted by the
-// localStorage strategy, which is what a later visit to the bare "/" reads to
-// reopen in this language rather than the browser's.
+// and reloads, so every string re-renders. The choice is persisted in the locale
+// cookie, which the edge reads when a later visit asks for the bare "/", so it
+// reopens in this language rather than the browser's.
 export function LanguageSwitcher() {
     return (
         <select

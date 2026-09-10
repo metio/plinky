@@ -49,6 +49,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**The recorded grand piano you downloaded stays downloaded.** Every time Plinky\nupdated, the recordings kept on your device were thrown away with the old version, so\na piano fetched for a flight could be gone by take-off, and with no network every note\nfell back to the plainer piano. They now stay on your device through updates.",
                 twip: true,
             },
+            {
+                body: "**Plinky opens in the language you picked.** Choose a language in Settings and then\ncome back to plinky.fun, or open Plinky from your home screen, and it opened in your\nbrowser's language instead, every time. It now remembers your choice and opens in it.\nIf you picked a language before today, pick it once more and it sticks.",
+                twip: true,
+            },
         ],
     },
     {

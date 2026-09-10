@@ -64,6 +64,11 @@ updated, the recordings kept on your device were thrown away with the old versio
 a piano fetched for a flight could be gone by take-off, and with no network every note
 fell back to the plainer piano. They now stay on your device through updates.
 
+**Plinky opens in the language you picked.** Choose a language in Settings and then
+come back to plinky.fun, or open Plinky from your home screen, and it opened in your
+browser's language instead, every time. It now remembers your choice and opens in it.
+If you picked a language before today, pick it once more and it sticks.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

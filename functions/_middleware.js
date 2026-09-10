@@ -61,6 +61,24 @@ export function pickLocale(acceptLanguage, locales) {
     return "en";
 }
 
+// The cookie the app's language switcher writes (paraglide's `cookie` strategy, set up in
+// dev/compile-messages.mjs). The edge runs with no build step, so the name is repeated
+// here; a test reads it off the compiled runtime.
+export const LOCALE_COOKIE = "PARAGLIDE_LOCALE";
+
+// The language the player last picked, from the Cookie header, when it is one the site
+// speaks. Null for no cookie, or one naming a language the site no longer has.
+export function chosenLocale(cookieHeader, locales) {
+    for (const part of (cookieHeader ?? "").split(";")) {
+        const [name, ...value] = part.trim().split("=");
+        if (name === LOCALE_COOKIE) {
+            const locale = value.join("=").trim();
+            return locales.includes(locale) ? locale : null;
+        }
+    }
+    return null;
+}
+
 async function known(context) {
     if (knownPromise === null) {
         knownPromise = context.env.ASSETS.fetch(new URL("/known.json", context.request.url))
@@ -559,14 +577,19 @@ export async function onRequest(context) {
     // The bare root has no page of its own: it names the language pages, and a visitor
     // belongs on theirs. Sent there at the edge, so a crawler follows a redirect to a real
     // page instead of reading a shell whose only content is the script that would have
-    // sent a browser on. The answer depends on the header, so it is a 302 and says so.
+    // sent a browser on. A language the player picked in the app comes first, and the
+    // browser's languages only when they have picked none. The answer depends on both
+    // headers, so it is a 302 and says so.
     if (url.pathname === "/") {
         const list = await known(context);
         if (list !== null && list.locales.length > 0) {
-            const locale = pickLocale(context.request.headers.get("accept-language"), list.locales);
+            const { headers } = context.request;
+            const locale =
+                chosenLocale(headers.get("cookie"), list.locales) ??
+                pickLocale(headers.get("accept-language"), list.locales);
             return new Response(null, {
                 status: 302,
-                headers: { location: `${url.origin}/${locale}/`, vary: "Accept-Language" },
+                headers: { location: `${url.origin}/${locale}/`, vary: "Cookie, Accept-Language" },
             });
         }
     }

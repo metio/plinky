@@ -98,4 +98,6 @@ export function documentFor(
 export function shellFor(shell: string, list: Known, locale: string, path: string): string;
 export function localePath(pathname: string): { locale: string; path: string } | null;
 export function pickLocale(acceptLanguage: string | null | undefined, locales: string[]): string;
+export const LOCALE_COOKIE: string;
+export function chosenLocale(cookieHeader: string | null | undefined, locales: string[]): string | null;
 export function forgetKnown(): void;

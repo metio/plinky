@@ -80,6 +80,9 @@ function inputKey() {
     // the range installs a new compiler under the same range, and a stamp keyed on the
     // range would keep serving the old compiler's output.
     hash.update(installedCompilerVersion());
+    // This file itself, since it holds the compile options: a changed strategy with the
+    // same messages is a different runtime.
+    hash.update(readFileSync(new URL(import.meta.url)));
     return hash.digest("hex");
 }
 
@@ -105,12 +108,15 @@ await compile({
     outdir: "./app/paraglide",
     // Order is the whole behaviour. `url` first: a /de/ link renders German for
     // whoever opens it, so a shared link is honest regardless of the reader's own
-    // choice. `localStorage` next, so a bare "/" reopens in the language the player
-    // picked — setLocale writes it (it does not short-circuit on a pinned static
-    // locale, so the write works from a per-locale build too), and only the
-    // all-locales root build ever has to read it. `preferredLanguage` then serves a
-    // first-time visitor, who has nothing stored yet.
-    strategy: ["url", "localStorage", "preferredLanguage", "baseLocale"],
+    // choice. `cookie` next, so a bare "/" reopens in the language the player picked:
+    // the edge answers "/" itself with a redirect (functions/_middleware.js) and can
+    // read a cookie where it cannot read localStorage. setLocale writes every strategy
+    // it lists (it does not short-circuit on a pinned static locale, so the write works
+    // from a per-locale build too). `localStorage` stays behind it for the root
+    // document served offline, where a choice made before the cookie existed is the
+    // only record. `preferredLanguage` then serves a first-time visitor, who has
+    // nothing stored yet.
+    strategy: ["url", "cookie", "localStorage", "preferredLanguage", "baseLocale"],
     urlPatterns,
     emitTsDeclarations: true,
     // Per-locale builds: `PLINKY_LOCALE=de npm run build` pins the compiled

@@ -3,10 +3,17 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
-import { getLocaleForUrl, localStorageKey, strategy } from "../paraglide/runtime.js";
+import { cookieName, getLocaleForUrl, localStorageKey, strategy } from "../paraglide/runtime.js";
+
+// The runtime reads the choice off document.cookie, so that is what a test has to write.
+function setLocaleCookie(value: string, attributes = "") {
+    // biome-ignore lint/suspicious/noDocumentCookie: the runtime under test reads document.cookie
+    document.cookie = `${cookieName}=${value}; path=/${attributes}`;
+}
 
 afterEach(() => {
     localStorage.clear();
+    setLocaleCookie("", "; max-age=0");
 });
 
 // The bare "/" resolves the locale through the strategy chain, and the order of that
@@ -18,15 +25,28 @@ describe("locale resolution at the bare root", () => {
         // Position is the contract: url must outrank the stored choice so a shared
         // /de/ link stays German for whoever opens it, and the stored choice must
         // outrank the browser so a returning player reopens in the language they picked.
-        expect(strategy.indexOf("url")).toBeLessThan(strategy.indexOf("localStorage"));
+        // The cookie is the record the edge reads, so it comes before localStorage.
+        expect(strategy.indexOf("url")).toBeLessThan(strategy.indexOf("cookie"));
+        expect(strategy.indexOf("cookie")).toBeLessThan(strategy.indexOf("localStorage"));
         expect(strategy.indexOf("localStorage")).toBeLessThan(
             strategy.indexOf("preferredLanguage"),
         );
     });
 
     it("reopens in the language the player chose", () => {
+        setLocaleCookie("de");
+        expect(getLocaleForUrl("http://localhost:3000/")).toBe("de");
+    });
+
+    it("still reopens in a choice held only in localStorage", () => {
         localStorage.setItem(localStorageKey, "de");
         expect(getLocaleForUrl("http://localhost:3000/")).toBe("de");
+    });
+
+    it("takes the cookie over localStorage when the two disagree", () => {
+        setLocaleCookie("pt");
+        localStorage.setItem(localStorageKey, "de");
+        expect(getLocaleForUrl("http://localhost:3000/")).toBe("pt");
     });
 
     it("follows the browser when the player has chosen nothing yet", () => {
