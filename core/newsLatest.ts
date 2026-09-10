@@ -50,7 +50,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**Plinky opens in the language you picked.** Choose a language in Settings and then\ncome back to plinky.fun, or open Plinky from your home screen, and it opened in your\nbrowser's language instead, every time. It now remembers your choice and opens in it.\nIf you picked a language before today, pick it once more and it sticks.",
+                body: "**Plinky opens in the language you picked.** Choose a language in Settings and then\ncome back to plinky.fun, or open Plinky from your home screen, and it opened in your\nbrowser's language instead, every time. It now remembers your choice and opens in it,\nincluding a language you picked before today.",
                 twip: true,
             },
         ],

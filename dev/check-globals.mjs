@@ -17,6 +17,7 @@ import { join } from "node:path";
 // files are always allowed: they exercise the real thing on purpose.
 const CONFINED = {
     localStorage: ["app/adapters/browserStore.ts", "app/testing/deniedStorage.ts"],
+    "document.cookie": ["app/adapters/browserCookie.ts"],
     // The sentinel for navigator.storage. `persist` itself cannot be confined — two
     // components already name a local helper that — but every correct use asks
     // `persisted()` first, both because it is the cheap answer when the grant already

@@ -66,8 +66,8 @@ fell back to the plainer piano. They now stay on your device through updates.
 
 **Plinky opens in the language you picked.** Choose a language in Settings and then
 come back to plinky.fun, or open Plinky from your home screen, and it opened in your
-browser's language instead, every time. It now remembers your choice and opens in it.
-If you picked a language before today, pick it once more and it sticks.
+browser's language instead, every time. It now remembers your choice and opens in it,
+including a language you picked before today.
 
 ## 9 September 2026 — night
 
