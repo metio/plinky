@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import type { Grade } from "../../core/grade";
 import type { Hand } from "../../core/matcher";
 import { flushHolds, type RunCapture } from "../../core/runCapture";
+import { runSettled } from "../../core/runEnd";
 import { compositionFromRun, type RunStep, type Take } from "../../core/takes";
 
 // Keeping a finished run without anyone pressing Save. Finishing a piece and later
@@ -124,7 +125,10 @@ export function useTakeAutosave(options: TakeAutosaveOptions): TakeAutosave {
     // is a value this effect visibly depends on — a run finishing with no key still
     // down has to wake it, and it would not if `complete` were not read.
     useEffect(() => {
-        if (!options.complete || options.ephemeral || options.holdingNote) {
+        if (
+            options.ephemeral ||
+            !runSettled({ complete: options.complete, holdingNote: options.holdingNote })
+        ) {
             return;
         }
         api.saveIfOwed();

@@ -36,7 +36,14 @@ const midiFake = { midi: fakeMidi() };
 
 // The Runs tab lives with the route (the mode bar), so the harness mirrors that
 // wiring: the Runs button switches the view, replay switches it back.
-function Harness({ xml, ...props }: { xml: string; beatsPerBar?: number }) {
+function Harness({
+    xml,
+    ...props
+}: {
+    xml: string;
+    beatsPerBar?: number;
+    onRunComplete?: () => void;
+}) {
     const [runsView, setRunsView] = useState(false);
     // The Runs tab lives with the route's mode bar; this stand-in button plays
     // that part so the surface can be driven the way the page drives it.
@@ -59,7 +66,12 @@ function Harness({ xml, ...props }: { xml: string; beatsPerBar?: number }) {
 
 const mount = (
     xml: string,
-    props: Partial<{ beatsPerBar: number; options: PlayOptions; initialTempo: number }> = {},
+    props: Partial<{
+        beatsPerBar: number;
+        options: PlayOptions;
+        initialTempo: number;
+        onRunComplete: () => void;
+    }> = {},
 ) =>
     render(
         <MemoryRouter>
@@ -87,6 +99,24 @@ const enterAndListen = async () => {
     fireEvent.click(await awaitReady());
     fireEvent.click(screen.getByRole("button", { name: "Listen" }));
 };
+
+// A one-bar phrase whose every note is C5, so the same key clears each position.
+const fourCs = () =>
+    generateDrill({ ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 }, () => 0);
+
+// Play fourCs through to its grade: Practice, four presses of C5, and the result panel up.
+const finishSelfPacedRun = async () => {
+    fireEvent.click(await awaitReady());
+    const key = await screen.findByLabelText("C 5");
+    for (let i = 0; i < 4; i++) {
+        fireEvent.pointerDown(key);
+        fireEvent.pointerUp(key);
+    }
+    await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
+};
+
+// Long enough for the renders and effects a press sets off to have run.
+const settle = () => new Promise((resolve) => setTimeout(resolve, 250));
 
 // OSMD renders only in a real browser, so this runs in the browser project.
 afterEach(() => {
@@ -351,6 +381,26 @@ describe("ScoreViewer", () => {
         await screen.findByText(/kept up with/i, undefined, { timeout: 30000 });
         // The stale self-paced grade panel is gone; only the keep-up card remains.
         expect(screen.queryByText("Accuracy")).toBeNull();
+    });
+
+    it("plays along after a finished self-paced run instead of dropping straight out of it", async () => {
+        // The finished run's completion must not carry over to the play-along that
+        // follows it: read by the next render, it closes full screen, and closing full
+        // screen stops the play-along during its count-in.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        mount(fourCs(), { beatsPerBar: 4 });
+        await finishSelfPacedRun();
+
+        reveal(m.run_group_practice_title);
+        choose(m.run_pace_label, m.keep_up_toggle);
+        fireEvent.click(await awaitReady());
+
+        expect(await screen.findByRole("button", { name: "Exit full screen" })).toBeTruthy();
+        await settle();
+        expect(screen.queryByRole("button", { name: "Exit full screen" })).not.toBeNull();
+        expect(
+            await screen.findByText(/kept up with 0 of/i, undefined, { timeout: 30000 }),
+        ).toBeTruthy();
     });
 
     it("puts the cursor at a tapped bar while the loop is off, to start from there", async () => {
@@ -1476,6 +1526,50 @@ describe("ScoreViewer", () => {
             expect(
                 screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"),
             ).toBe("true");
+        });
+
+        it("studies the piece again after a finished run, on the play surface", async () => {
+            // A finished run followed by a sight-read: the countdown enters full screen,
+            // and the run before it having completed must not close it again.
+            vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+            mount(fourCs(), { beatsPerBar: 4 });
+            await finishSelfPacedRun();
+            reveal(m.run_group_practice_title);
+            fireEvent.click(screen.getByRole("switch", { name: m.sight_read() }));
+
+            fireEvent.click(await awaitReady());
+
+            expect(await screen.findByText(/Reading it through/)).toBeTruthy();
+            await settle();
+            expect(screen.queryByText(/Reading it through/)).not.toBeNull();
+            expect(screen.queryByRole("button", { name: "Exit full screen" })).not.toBeNull();
+        });
+
+        it("grades the finished run once when a sight-read follows it", async () => {
+            // The countdown before the next run begins with a fresh, empty capture. The
+            // run before it is graded already, and grading it again from that capture
+            // would count it twice and overwrite its ghost with nothing.
+            vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+            const onRunComplete = vi.fn();
+            mount(fourCs(), { beatsPerBar: 4, onRunComplete });
+            await finishSelfPacedRun();
+            expect(onRunComplete).toHaveBeenCalledTimes(1);
+            const ghosts = createGhostStore(browserStore);
+            const ghost = ghosts.load("t");
+            expect(ghost?.length).toBe(4);
+            reveal(m.run_group_practice_title);
+            fireEvent.click(screen.getByRole("switch", { name: m.sight_read() }));
+
+            fireEvent.click(await awaitReady());
+            await screen.findByText(/Reading it through/);
+            // A key touched and let go while the piece is being studied.
+            const key = screen.getByLabelText("C 5");
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+            await settle();
+
+            expect(onRunComplete).toHaveBeenCalledTimes(1);
+            expect(ghosts.load("t")).toEqual(ghost);
         });
 
         it("gives the piece back when the countdown is abandoned", async () => {

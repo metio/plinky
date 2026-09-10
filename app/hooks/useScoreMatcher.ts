@@ -480,6 +480,14 @@ export function useScoreMatcher(
         setPracticing(false);
     }, [getOsmd]);
 
+    // Forget that the last run finished. Stopping leaves the completion standing, since a
+    // stopped run that finished is still the finished run its result panel describes; this
+    // is for the moment something else takes the surface, when the completion no longer
+    // describes anything on it.
+    const reset = useCallback(() => {
+        setComplete(false);
+    }, []);
+
     // The lookahead for a surface that walks the music without grading it — Listen. The
     // notes highway draws whatever is coming next, and "what is coming next" is the same
     // question whoever is asking: the same steps, off the same engraving. Tying it to a
@@ -773,6 +781,7 @@ export function useScoreMatcher(
         bar,
         start,
         stop,
+        reset,
         registerNote,
         preview,
         resetPreview,

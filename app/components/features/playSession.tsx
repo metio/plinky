@@ -14,6 +14,7 @@ import {
 } from "react";
 import { beamsVisible } from "../../../core/beams";
 import type { PlayOptions } from "../../../core/playOptions";
+import { runSettled } from "../../../core/runEnd";
 import { tempoScale } from "../../../core/runOutcome";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
@@ -933,8 +934,12 @@ function usePlaySessionValue({
     // player has already left on their own. The exit waits while the player still holds
     // a key so the final note rings out for as long as it is held rather than being cut
     // off the instant the last note lands; releasing it drops out of full screen.
+    //
+    // Only for the run that is on the surface. Anything that takes the stage after a
+    // finished run forgets its completion (endFinishedRun below); left standing, it would
+    // close the full screen the next run had just opened.
     useEffect(() => {
-        if (matcher.complete && fullscreen && !holdingNote) {
+        if (fullscreen && runSettled({ complete: matcher.complete, holdingNote })) {
             exitFullscreen();
         }
     }, [matcher.complete, fullscreen, holdingNote, exitFullscreen]);
@@ -988,6 +993,18 @@ function usePlaySessionValue({
         }
     };
 
+    // A finished run is over once something else takes the stage. Its grade and take are
+    // settled first, because both wait on the keys coming up and a key may still be down;
+    // then its completion goes. Kept, it would read as the new run's: the full screen just
+    // opened would close again, stopping a play-along in its count-in or a sight-read in
+    // its study, and the grading latch the new run clears would face a finished run whose
+    // capture has already been replaced.
+    const endFinishedRun = () => {
+        grading.gradeIfOwed();
+        takes.saveIfOwed();
+        matcher.reset();
+    };
+
     // Start Listen: the play surface goes full screen, any self-paced run stops, and the
     // transport walks the cursor from wherever it sits — the note Practice was on when
     // handing over, or where a paused run left off — instead of rewinding, so play can pass
@@ -1003,6 +1020,9 @@ function usePlaySessionValue({
         const from = resumePoint();
         const at = resumeOrdinal();
         if (onStage) {
+            // On stage after a finished run means its final note is still held; Listen
+            // takes the surface from it.
+            endFinishedRun();
             enterPlayFullscreen();
         }
         matcher.stop();
@@ -1055,6 +1075,7 @@ function usePlaySessionValue({
         // self-paced run does. Refusing made the button dead: press Listen, press Practice,
         // and nothing at all happened — no run, no full screen, no reason given.
         listenPlayback.stop();
+        endFinishedRun();
         enterPlayFullscreen();
         matcher.stop();
         // Before the play-along takes the cursor over: collecting the lookahead walks it,
@@ -1099,8 +1120,7 @@ function usePlaySessionValue({
         // it first, closing its hold at this instant, exactly as leaving the surface does —
         // and grade it first, since the grade waits for the keys to come up and the take
         // reads the grade at the moment it is saved.
-        grading.gradeIfOwed();
-        takes.saveIfOwed();
+        endFinishedRun();
         // Take over at the cursor's current position when resuming (handing over from
         // Listen, or continuing a run stopped partway); Restart passes resume=false to
         // begin at the top. The top of a fresh piece reads as 0 either way.

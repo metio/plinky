@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { cadence } from "../../core/cadence";
 import type { Grade } from "../../core/grade";
 import { flushHolds, type RunCapture } from "../../core/runCapture";
+import { runSettled } from "../../core/runEnd";
 import { deriveRunOutcome, type RunOutcome, tempoScale } from "../../core/runOutcome";
 import { sectionScores } from "../../core/sectionBest";
 import type { AppServices } from "../contexts/services";
@@ -200,7 +201,7 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
     // rather than left to gradeIfOwed so every value it turns on is one this effect
     // visibly depends on — the same shape the take autosave uses, for the same reason.
     useEffect(() => {
-        if (!options.complete || options.holdingNote) {
+        if (!runSettled({ complete: options.complete, holdingNote: options.holdingNote })) {
             return;
         }
         gradeIfOwed();

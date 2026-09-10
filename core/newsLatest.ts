@@ -10,21 +10,21 @@ import type { Release } from "./changelog";
 
 export const LATEST_RELEASES: Release[] = [
     {
-        date: "2026-09-09",
-        label: "night",
+        date: "2026-09-10",
+        label: null,
         entries: [
             {
-                body: "**The theory course opens on a lesson, and every lesson is a link.** The list down\nthe side used to jump you around one very long page. Each of the fourteen lessons\nnow has a page of its own and the list points straight at it, so you can open one in\na new tab, send it to somebody, or find it by searching for the question it answers.\nOpening the course lands on the first lesson rather than on all of them at once, the\nway the glossary has always opened on the first mark — and the glossary's list is\nmade of real links now too.",
+                body: "**A play-along or a sight-read after a finished run starts properly.** Finish a\npiece at your own pace, then switch to Keep up or turn on sight-reading and press\nPractice, and the full screen used to close again straight away, taking the count-in\nor the reading time with it. The finished run now stays finished, and the next one\ngets the stage to itself. It could also be counted a second time and wipe the ghost\nyou race; that has gone too.",
                 twip: true,
             },
         ],
     },
     {
         date: "2026-09-09",
-        label: "evening",
+        label: "night",
         entries: [
             {
-                body: "**Two more credits that were never anybody's name.** One score had put a notice to\nthe singer where the composer goes, so a warning in French had a composer page of\nits own. Another carried its whole upload heading as a title — the composer at the\nfront and the channel that arranged it at the back — so Vivaldi's Summer was filed\nunder a name that never wrote a note of it. Both now say what they are.",
+                body: "**The theory course opens on a lesson, and every lesson is a link.** The list down\nthe side used to jump you around one very long page. Each of the fourteen lessons\nnow has a page of its own and the list points straight at it, so you can open one in\na new tab, send it to somebody, or find it by searching for the question it answers.\nOpening the course lands on the first lesson rather than on all of them at once, the\nway the glossary has always opened on the first mark — and the glossary's list is\nmade of real links now too.",
                 twip: true,
             },
         ],

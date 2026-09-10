@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 10 September 2026
+
+**A play-along or a sight-read after a finished run starts properly.** Finish a
+piece at your own pace, then switch to Keep up or turn on sight-reading and press
+Practice, and the full screen used to close again straight away, taking the count-in
+or the reading time with it. The finished run now stays finished, and the next one
+gets the stage to itself. It could also be counted a second time and wipe the ghost
+you race; that has gone too.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down
