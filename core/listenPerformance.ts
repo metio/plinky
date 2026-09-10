@@ -8,7 +8,8 @@ import { type GlissandoSpan, glissandoNotes } from "./glissando";
 import type { Hand2 } from "./matcher";
 import { type OrnamentKind, ornamentNotes } from "./ornament";
 import { SOFT_SCALE } from "./pedal";
-import { effectiveTempo, listenStepMs } from "./playback";
+import { quartersMs } from "./elapsed";
+import { effectiveTempo, listenStepMs, MIN_STEP_MS } from "./playback";
 import { fingeringOfHands } from "./scorePerformance";
 import { noteDelayMs, rubatoStretch, touchVelocity } from "./touch";
 import { type TremoloSpan, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
@@ -386,6 +387,84 @@ export function finalBarProgress(steps: readonly ListenStep[], index: number): n
     return count <= 1 ? 1 : (index - first) / (count - 1);
 }
 
+// The steps one position was spelled out into — a rolled chord's notes, an ornament's or a
+// tremolo's figure, a beat and the graces leaning on it: consecutive steps at one cursor
+// position, every one but the last holding the cursor where it is.
+export function subStepsOf(
+    steps: readonly ListenStep[],
+    index: number,
+): { from: number; to: number } {
+    const joined = (earlier: ListenStep | undefined, later: ListenStep | undefined) =>
+        earlier !== undefined &&
+        later !== undefined &&
+        !earlier.advancesCursor &&
+        earlier.position === later.position;
+    let from = index;
+    while (joined(steps[from - 1], steps[from])) {
+        from -= 1;
+    }
+    let to = index;
+    while (joined(steps[to], steps[to + 1])) {
+        to += 1;
+    }
+    return { from, to };
+}
+
+// A step's length as written, with no floor under it: the shortest length at it, or a
+// beat when nothing is listed, exactly as listenStepMs reads it.
+function writtenStepMs(lengths: readonly number[], tempo: number, stretch: number): number {
+    const nextOnset = lengths.length > 0 ? Math.min(...lengths) : 1;
+    return Math.max(0, nextOnset * quartersMs(1, tempo) * stretch);
+}
+
+// How long one sub-step of a position holds, so that together they last exactly what the
+// position is written to last — its sub-steps' written lengths added up, under the same
+// MIN_STEP_MS floor a single step gets.
+//
+// A roll's spread is a fixed fraction of a beat, so above about 90 bpm it is shorter than
+// that floor, and so are the notes of a quick figure. Floored one by one, each would
+// overstay by the difference while the last still counted on having its written share, and
+// the position would end late — every rolled chord and every grace pushing the rest of
+// the piece further behind the onsets a graded run and Keep up count against. So the
+// earlier sub-steps keep the floor while the position has room for it and the last takes
+// what is left; a position too short to give each its floor shares its time out in the
+// written proportions instead. Where nothing needs the floor, every sub-step holds exactly
+// what it always did.
+function subStepAdvanceMs(
+    steps: readonly ListenStep[],
+    index: number,
+    tempo: number,
+    stretchAt: (at: number) => number,
+): number {
+    const step = steps[index] as ListenStep;
+    const { from, to } = subStepsOf(steps, index);
+    if (from === to) {
+        return listenStepMs(step.lengths, tempo, stretchAt(index));
+    }
+    const written: number[] = [];
+    for (let at = from; at <= to; at++) {
+        written.push(writtenStepMs((steps[at] as ListenStep).lengths, tempo, stretchAt(at)));
+    }
+    const total = written.reduce((sum, ms) => sum + ms, 0);
+    const positionMs = Math.max(MIN_STEP_MS, total);
+    const earlier = written.slice(0, -1).map((ms) => Math.max(MIN_STEP_MS, ms));
+    const taken = earlier.reduce((sum, ms) => sum + ms, 0);
+    const offset = index - from;
+    if (taken < positionMs) {
+        if (index < to) {
+            return earlier[offset] as number;
+        }
+        const lastWritten = written[offset] as number;
+        const floored = earlier.some((ms, at) => ms !== written[at]);
+        return !floored && lastWritten >= MIN_STEP_MS
+            ? listenStepMs(step.lengths, tempo, stretchAt(index))
+            : positionMs - taken;
+    }
+    return total > 0
+        ? ((written[offset] as number) * positionMs) / total
+        : positionMs / written.length;
+}
+
 // One position performed: every note with its own moment, length and touch, and how long
 // the position holds before the next. The one function Listen, the clip renderer and the
 // video export sound a step through, so they cannot come to play three performances.
@@ -400,8 +479,15 @@ export function performListenStep(
     shaped = true,
 ): { played: PlayedNote[]; advanceMs: number } {
     const step = steps[index] as ListenStep;
-    const rubato = shaped ? rubatoStretch(step.phrase, finalBarProgress(steps, index)) : 1;
-    const advanceMs = listenStepMs(step.lengths, tempo, step.stretch * rubato);
+    const rubatoAt = (at: number) =>
+        shaped ? rubatoStretch(steps[at]?.phrase ?? 0, finalBarProgress(steps, at)) : 1;
+    const rubato = rubatoAt(index);
+    const advanceMs = subStepAdvanceMs(
+        steps,
+        index,
+        tempo,
+        (at) => (steps[at]?.stretch ?? 1) * rubatoAt(at),
+    );
     const tune = Math.max(...step.notes.map((note) => note.pitch));
     const played = step.notes.map((note) => {
         const { durationSeconds, velocity, voiced } = performListenNote(step, note, tempo);

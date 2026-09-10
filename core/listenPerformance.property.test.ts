@@ -14,6 +14,8 @@ import {
     spellOutOrnament,
 } from "./listenPerformance";
 import type { OrnamentKind } from "./ornament";
+import { listenStepMs, MIN_STEP_MS } from "./playback";
+import { quartersMs } from "./elapsed";
 
 const pitches = fc.integer({ min: 21, max: 108 });
 
@@ -172,6 +174,93 @@ describe("the listening performance, whatever the page says", () => {
                     expect(figure.filter((one) => one.advancesCursor).length).toBe(
                         step.advancesCursor ? 1 : 0,
                     );
+                },
+            ),
+        );
+    });
+
+    // The written onsets are what a graded run and Keep up count against, so Listen may
+    // not drift from them: however a position is spelled out, and at any tempo, its
+    // sub-steps hold exactly as long as the position struck plainly.
+    it("holds a rolled chord exactly as long as the same chord struck together", () => {
+        fc.assert(
+            fc.property(
+                listenStep.filter((step) => step.notes.length > 1),
+                fc.integer({ min: 20, max: 400 }),
+                fc.boolean(),
+                (plain, tempo, shaped) => {
+                    // A position after it in a later bar, so the last bar's broadening
+                    // reads the same for the chord whether it is rolled or not.
+                    const after = { ...plain, measureIndex: plain.measureIndex + 1, position: -1 };
+                    const rolled = rollChord({ ...plain, advancesCursor: true });
+                    const split = [...rolled, after];
+                    const held = rolled.reduce(
+                        (sum, _, index) =>
+                            sum + performListenStep(split, index, tempo, shaped).advanceMs,
+                        0,
+                    );
+                    const struck = performListenStep(
+                        [{ ...plain, advancesCursor: true }, after],
+                        0,
+                        tempo,
+                        shaped,
+                    ).advanceMs;
+                    expect(held).toBeCloseTo(struck, 6);
+                },
+            ),
+        );
+    });
+
+    it("holds any position's sub-steps for their written time together, never less than zero", () => {
+        fc.assert(
+            fc.property(
+                fc.array(fc.double({ min: 0, max: 2, noNaN: true }), {
+                    minLength: 2,
+                    maxLength: 12,
+                }),
+                fc.integer({ min: 20, max: 400 }),
+                fc.double({ min: 1, max: 3, noNaN: true }),
+                (lengths, tempo, stretch) => {
+                    const split: ListenStep[] = lengths.map((length, index) => ({
+                        notes: [],
+                        dynamicVolume: null,
+                        lengths: [length],
+                        whole: 0,
+                        measureIndex: 0,
+                        position: 7,
+                        bpm: tempo,
+                        stretch,
+                        soft: false,
+                        contour: 1,
+                        advancesCursor: index === lengths.length - 1,
+                        interpretation: 1,
+                        phrase: 0,
+                    }));
+                    const held = split.map(
+                        (_, index) => performListenStep(split, index, tempo, false).advanceMs,
+                    );
+                    const written = lengths.reduce(
+                        (sum, length) => sum + length * quartersMs(1, tempo) * stretch,
+                        0,
+                    );
+                    const total = held.reduce((sum, ms) => sum + ms, 0);
+                    expect(total).toBeCloseTo(Math.max(MIN_STEP_MS, written), 6);
+                    for (const ms of held) {
+                        expect(ms).toBeGreaterThanOrEqual(0);
+                    }
+                    // Where no sub-step is short of the floor, each keeps its own length.
+                    if (
+                        lengths.every(
+                            (length) => listenStepMs([length], tempo, stretch) > MIN_STEP_MS,
+                        )
+                    ) {
+                        for (const [index, length] of lengths.entries()) {
+                            expect(held[index]).toBeCloseTo(
+                                listenStepMs([length], tempo, stretch),
+                                9,
+                            );
+                        }
+                    }
                 },
             ),
         );

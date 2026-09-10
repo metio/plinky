@@ -61,6 +61,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: '**With "Keep going" on, a note you skipped counts as missed.** Moving on to the next\nnote never stops you, and it still does not. But the note you left behind was scored\nas a right one, played cleanly, so a run with half its notes skipped could earn an A,\nmark the piece learned and take its star. A skipped note now counts against accuracy\nand flow like any other miss, and a run where you play every note grades exactly as\nit would with the switch off.',
                 twip: true,
             },
+            {
+                body: "**Listen keeps time through rolled chords and grace notes.** At a lively tempo every\nrolled chord, every grace note and every very quick trill or tremolo held on a hair\nlonger than written, and the piece fell a little further behind the metronome each\ntime — nearly two seconds by the end of a piece full of them, in Listen, in videos\nyou export and in the clips. They now take exactly their written time.",
+                twip: true,
+            },
         ],
     },
     {

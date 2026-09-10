@@ -74,6 +74,12 @@
       mark the piece learned and take its star. A skipped note now counts against accuracy
       and flow like any other miss, and a run where you play every note grades exactly as
       it would with the switch off.
+    - |-
+      **Listen keeps time through rolled chords and grace notes.** At a lively tempo every
+      rolled chord, every grace note and every very quick trill or tremolo held on a hair
+      longer than written, and the piece fell a little further behind the metronome each
+      time — nearly two seconds by the end of a piece full of them, in Listen, in videos
+      you export and in the clips. They now take exactly their written time.
 
 - date: 2026-09-09
   label: night

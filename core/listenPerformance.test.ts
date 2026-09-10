@@ -18,9 +18,11 @@ import {
     spellOutGlissando,
     spellOutOrnament,
     spellOutTremolo,
+    subStepsOf,
     tremoloAt,
 } from "./listenPerformance";
 import { SOFT_SCALE } from "./pedal";
+import { listenStepMs, MIN_STEP_MS } from "./playback";
 
 const note = (pitch: number, over: Partial<ListenNote> = {}): ListenNote => ({
     pitch,
@@ -233,6 +235,61 @@ describe("rollChord", () => {
     it("leaves a single note alone", () => {
         const single = step([60]);
         expect(rollChord(single)).toEqual([single]);
+    });
+});
+
+describe("a position spelled out into sub-steps", () => {
+    const advances = (steps: ListenStep[], tempo: number) =>
+        steps.map((_, index) => performListenStep(steps, index, tempo, false).advanceMs);
+    const sum = (values: number[]) => values.reduce((total, one) => total + one, 0);
+
+    it("holds a rolled chord for its written length at a tempo that floors its spread", () => {
+        // A roll's spread is 0.06 of a beat: 20 ms at 180 bpm, under the 40 ms floor.
+        const rolled = rollChord(step([60, 64, 67, 72], { lengths: [1], bpm: 180 }));
+        const held = advances(rolled, 180);
+        expect(held.slice(0, -1)).toEqual([MIN_STEP_MS, MIN_STEP_MS, MIN_STEP_MS]);
+        expect(sum(held)).toBeCloseTo(listenStepMs([1], 180), 9);
+    });
+
+    it("shares a position too short for every floor out in its written proportions", () => {
+        // A semiquaver at 180 bpm is 83 ms, too short for three 40 ms floors and a last note.
+        const rolled = rollChord(step([60, 64, 67, 72], { lengths: [0.25], bpm: 180 }));
+        const held = advances(rolled, 180);
+        expect(sum(held)).toBeCloseTo(listenStepMs([0.25], 180), 9);
+        expect(held.every((ms) => ms > 0)).toBe(true);
+        expect(held[0]).toBeCloseTo(held[1] as number, 9);
+    });
+
+    it("leaves every sub-step as it was when none of them needs the floor", () => {
+        // At 60 bpm the spread is 60 ms, clear of the floor.
+        const rolled = rollChord(step([60, 64, 67], { lengths: [1], bpm: 60 }));
+        expect(advances(rolled, 60)).toEqual(rolled.map((one) => listenStepMs(one.lengths, 60)));
+    });
+
+    it("keeps the note after a rolled chord on its written onset", () => {
+        const rolled = rollChord(step([60, 64, 67, 72], { lengths: [1], bpm: 180, position: 0 }));
+        const after = step([74], { lengths: [1], bpm: 180, position: 1, whole: 0.25 });
+        const played = listenPerformanceOf([...rolled, after], { startBpm: 180, shaped: false });
+        const onset = played.find((one) => one.pitch === 74)?.startMs ?? 0;
+        expect(onset).toBeCloseTo(listenStepMs([1], 180), 6);
+    });
+
+    it("keeps a beat and its graces to the beat's own length", () => {
+        // Two graces of a sixteenth of a beat each ahead of the rest of a crotchet, at
+        // 160 bpm: 23 ms apiece, under the floor.
+        const graces = [
+            step([62], { lengths: [0.0625], position: 3, advancesCursor: false }),
+            step([64], { lengths: [0.0625], position: 3, advancesCursor: false }),
+        ];
+        const beat = step([60], { lengths: [0.875], position: 3 });
+        expect(sum(advances([...graces, beat], 160))).toBeCloseTo(listenStepMs([1], 160), 9);
+    });
+
+    it("does not join the steps of two positions", () => {
+        const one = step([60], { position: 0, advancesCursor: false });
+        const two = step([62], { position: 1 });
+        expect(subStepsOf([one, two], 0)).toEqual({ from: 0, to: 0 });
+        expect(subStepsOf([one, two], 1)).toEqual({ from: 1, to: 1 });
     });
 });
 
