@@ -58,7 +58,7 @@ describe("stamping a build", () => {
         expect(hash).toMatch(/^[0-9a-f]{12}$/);
         expect(precache).toEqual(["/assets/entry.client-abc123.js", "/assets/root-def456.css"]);
         const sw = readFileSync(`${out}/sw.js`, "utf8");
-        expect(sw).toContain(`plinky-${hash}`);
+        expect(sw).toContain(`"plinky-build-${hash}"`);
         expect(sw).not.toContain("__BUILD_HASH__");
         expect(sw).not.toContain("__PRECACHE__");
     });

@@ -212,7 +212,7 @@ if (process.argv[1]?.endsWith("stamp-sw.mjs")) {
             ? "no language's pages to keep"
             : `keep-offline lists for ${sizes.length} languages of ${Math.min(...sizes)}–${Math.max(...sizes)} URLs`;
     console.log(
-        `Stamped service worker cache: plinky-${hash} (${precache.length} shell assets); ` +
+        `Stamped service worker cache: plinky-build-${hash} (${precache.length} shell assets); ` +
             `offline page in ${Object.keys(copy).length} languages; ${kept}`,
     );
 }

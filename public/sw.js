@@ -16,7 +16,17 @@
 // The cache name carries a build hash stamped in at build time (dev/stamp-sw.mjs),
 // so every deploy yields a new cache that the activate handler swaps to, evicting
 // HTML that points at hashed chunks the deploy has since removed.
-const CACHE = "plinky-__BUILD_HASH__";
+const CACHE = "plinky-build-__BUILD_HASH__";
+
+// Which caches are a build's, and so the activate handler's to evict. Cache Storage is
+// shared with the page, which keeps caches of its own on the origin — the piano
+// recordings in "plinky-piano-v1", fetched once and meant to outlast every deploy — so
+// eviction touches only names this worker creates. The second arm is the names earlier
+// workers created ("plinky-v1", then "plinky-" and a twelve-digit build hash), so a device
+// still holding one has it evicted like any other old build.
+function isBuildCache(name) {
+    return name.startsWith("plinky-build-") || /^plinky-(?:v1|[0-9a-f]{12})$/.test(name);
+}
 
 // The generic shell for routes that were not prerendered to their own document.
 const SPA_FALLBACK = "/__spa-fallback.html";
@@ -95,7 +105,7 @@ self.addEventListener("activate", (event) => {
         (async () => {
             const current = await caches.open(CACHE);
             for (const key of await caches.keys()) {
-                if (key !== CACHE) {
+                if (key !== CACHE && isBuildCache(key)) {
                     await carryOver(await caches.open(key), current);
                     await caches.delete(key);
                 }

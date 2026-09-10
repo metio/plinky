@@ -59,6 +59,11 @@ a few bars inside a repeated passage, and after the first time through the curso
 box and the scrolling moved on to the bar printed next, while the notes you were
 asked for came from the start of the loop again. The cursor now goes back with you.
 
+**The recorded grand piano you downloaded stays downloaded.** Every time Plinky
+updated, the recordings kept on your device were thrown away with the old version, so
+a piano fetched for a flight could be gone by take-off, and with no network every note
+fell back to the plainer piano. They now stay on your device through updates.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

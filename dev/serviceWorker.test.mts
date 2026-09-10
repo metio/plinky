@@ -15,7 +15,7 @@ const ORIGIN = "https://plinky.fun";
 const SOURCE = readFileSync("public/sw.js", "utf8")
     .replace("__BUILD_HASH__", "test")
     .replace("__PRECACHE__", "/assets/entry-abc.js");
-const CACHE = "plinky-test";
+const CACHE = "plinky-build-test";
 
 type Handler = (event: FetchEventLike) => void;
 type FetchEventLike = {
@@ -272,13 +272,48 @@ describe("keeping a language on the device", () => {
 describe("a new build taking over", () => {
     it("carries the hashed assets it still ships over from the old cache", async () => {
         const old = world.caches;
-        old.set("plinky-old", new Map());
-        old.get("plinky-old")!.set(`${ORIGIN}/assets/shared-111.js`, new Response("shared"));
-        old.get("plinky-old")!.set(`${ORIGIN}/de/`, new Response("stale page"));
+        old.set("plinky-build-old", new Map());
+        old.get("plinky-build-old")!.set(`${ORIGIN}/assets/shared-111.js`, new Response("shared"));
+        old.get("plinky-build-old")!.set(`${ORIGIN}/de/`, new Response("stale page"));
         await world.activate();
-        expect(world.caches.has("plinky-old")).toBe(false);
+        expect(world.caches.has("plinky-build-old")).toBe(false);
         expect(held("/assets/shared-111.js")).toBe(true);
         // Un-hashed pages are not carried: they may have changed under the same URL.
         expect(held("/de/")).toBe(false);
+    });
+
+    it.each(["plinky-v1", "plinky-0123456789ab"])(
+        "evicts %s, a build cache named the way earlier workers named them",
+        async (name) => {
+            world.caches.set(
+                name,
+                new Map([[`${ORIGIN}/assets/kept-222.js`, new Response("kept")]]),
+            );
+            await world.activate();
+            expect(world.caches.has(name)).toBe(false);
+            expect(held("/assets/kept-222.js")).toBe(true);
+        },
+    );
+
+    it("keeps the piano recordings the page stored in a cache of its own", async () => {
+        const recording = "https://samples.plinky.fun/v1/C4v8.m4a";
+        world.caches.set("plinky-piano-v1", new Map([[recording, new Response("C4")]]));
+        await world.activate();
+        const piano = world.caches.get("plinky-piano-v1");
+        expect(piano?.has(recording)).toBe(true);
+        expect(await piano?.get(recording)?.text()).toBe("C4");
+        // Nor are they copied into the build's cache, which the next deploy evicts.
+        expect(world.caches.get(CACHE)?.has(recording)).toBe(false);
+    });
+
+    it("keeps a cache whose name is not a build's at all", async () => {
+        world.caches.set("someone-else", new Map([[`${ORIGIN}/x`, new Response("x")]]));
+        await world.activate();
+        expect(world.caches.has("someone-else")).toBe(true);
+    });
+
+    it("keeps its own cache and what it holds", async () => {
+        await world.activate();
+        expect(held("/offline.html")).toBe(true);
     });
 });

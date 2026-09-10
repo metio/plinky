@@ -45,6 +45,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A loop over part of a repeat keeps the cursor on the bar you are playing.** Loop\na few bars inside a repeated passage, and after the first time through the cursor\nbox and the scrolling moved on to the bar printed next, while the notes you were\nasked for came from the start of the loop again. The cursor now goes back with you.",
                 twip: true,
             },
+            {
+                body: "**The recorded grand piano you downloaded stays downloaded.** Every time Plinky\nupdated, the recordings kept on your device were thrown away with the old version, so\na piano fetched for a flight could be gone by take-off, and with no network every note\nfell back to the plainer piano. They now stay on your device through updates.",
+                twip: true,
+            },
         ],
     },
     {
