@@ -69,6 +69,11 @@ come back to plinky.fun, or open Plinky from your home screen, and it opened in 
 browser's language instead, every time. It now remembers your choice and opens in it,
 including a language you picked before today.
 
+**A repeated note played a touch early counts in Keep up.** Rush the second of two
+same notes by a hair, as the C C of Twinkle Twinkle invites, and Keep up took it for
+the first C struck again, then marked the second one missed. It now goes to the beat
+it was meant for, exactly as a note played a touch late always did.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

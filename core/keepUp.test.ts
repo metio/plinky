@@ -137,6 +137,82 @@ describe("the beat's window", () => {
         state = strikeKeepUp(state, 60, 1540).state;
         expect(state.struck).toEqual([60]);
     });
+
+    it("gives a repeated pitch struck a hair early to the beat that asks for it next", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], { at: 1000, dwellMs: 500, next: [60] });
+        state = strikeKeepUp(state, 60, 1010).state;
+        const early = strikeKeepUp(state, 60, 1500 - KEEP_UP_EARLY_MS + 60);
+        expect(early.expected).toBe(true);
+        expect(early.caught).toBe(false);
+        state = closeKeepUpStep(early.state, 1500).state;
+        state = openKeepUpStep(state, [60], { at: 1500, dwellMs: 500, next: [] });
+        expect(state.struck).toEqual([60]);
+        const settled = settleKeepUp(closeKeepUpStep(state, 2000).state);
+        expect(settled.state.hits).toEqual([true, true]);
+    });
+
+    it("keeps a repeated pitch for the open beat while that beat still owes it", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], { at: 1000, dwellMs: 500, next: [60] });
+        const owed = strikeKeepUp(state, 60, 1500 - KEEP_UP_EARLY_MS + 60);
+        expect(owed.caught).toBe(true);
+        state = closeKeepUpStep(owed.state, 1500).state;
+        state = openKeepUpStep(state, [60], { at: 1500, dwellMs: 500, next: [] });
+        expect(state.struck).toEqual([]);
+        expect(state.closing?.struck).toEqual([60]);
+    });
+
+    it("reads a re-strike of a repeated pitch well before the next beat as the same note", () => {
+        let state = openKeepUpStep(startKeepUp(), [60], { at: 1000, dwellMs: 500, next: [60] });
+        state = strikeKeepUp(state, 60, 1010).state;
+        state = strikeKeepUp(state, 60, 1500 - KEEP_UP_EARLY_MS - 10).state;
+        expect(state.early).toEqual([]);
+        state = closeKeepUpStep(state, 1500).state;
+        state = openKeepUpStep(state, [60], { at: 1500, dwellMs: 500, next: [] });
+        expect(state.struck).toEqual([]);
+    });
+});
+
+describe("the early window, as a property", () => {
+    // A narrow range, so the beats share pitches as often as repeated notes and held
+    // chord tones make them share in music.
+    const pitch = fc.integer({ min: 60, max: 64 });
+    const pitches = fc.uniqueArray(pitch, { maxLength: 4 });
+
+    // Rushing is the mirror of dragging: a strike inside a beat's early window reaches
+    // the beat, whatever the beat before it asked for or already had.
+    it("never loses a strike inside a beat's early window", () => {
+        fc.assert(
+            fc.property(
+                pitches,
+                pitches,
+                pitches,
+                pitch,
+                fc.integer({ min: 0, max: KEEP_UP_EARLY_MS }),
+                (before, struckBefore, following, extra, ahead) => {
+                    const next = [...new Set([...following, extra])];
+                    const note = next[next.length - 1] ?? extra;
+                    let state = openKeepUpStep(startKeepUp(), before, {
+                        at: 1000,
+                        dwellMs: 500,
+                        next,
+                    });
+                    for (const earlier of struckBefore) {
+                        state = strikeKeepUp(state, earlier, 1010).state;
+                    }
+                    const owedBefore = before.includes(note) && !state.struck.includes(note);
+                    const strike = strikeKeepUp(state, note, 1500 - ahead);
+                    expect(strike.expected).toBe(true);
+                    state = closeKeepUpStep(strike.state, 1500).state;
+                    state = openKeepUpStep(state, next, { at: 1500, dwellMs: 500, next: [] });
+                    if (owedBefore) {
+                        expect(state.closing?.struck).toContain(note);
+                    } else {
+                        expect(state.struck).toContain(note);
+                    }
+                },
+            ),
+        );
+    });
 });
 
 describe("keep-up reducer properties", () => {

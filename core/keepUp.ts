@@ -109,7 +109,11 @@ export function strikeKeepUp(
             caught: false,
         };
     }
-    if (state.expected.includes(note)) {
+    const nearlyNext = state.next.includes(note) && state.closesAt - at <= KEEP_UP_EARLY_MS;
+    // A pitch the open beat already has, struck again a hair before a beat that asks for
+    // it too, is that beat's note played early — a repeated note rushed slightly — rather
+    // than a re-strike of this one.
+    if (state.expected.includes(note) && !(nearlyNext && state.struck.includes(note))) {
         const struck = state.struck.includes(note) ? state.struck : [...state.struck, note];
         return {
             state: { ...state, struck },
@@ -117,7 +121,7 @@ export function strikeKeepUp(
             caught: complete(state.expected, struck),
         };
     }
-    if (state.next.includes(note) && state.closesAt - at <= KEEP_UP_EARLY_MS) {
+    if (nearlyNext) {
         const early = state.early.includes(note) ? state.early : [...state.early, note];
         return { state: { ...state, early }, expected: true, caught: false };
     }
