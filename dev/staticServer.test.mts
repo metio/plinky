@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { MIME_TYPES, resolveFile, serveStatic } from "./staticServer.mjs";
+import { MIME_TYPES, neverBuilt, requestPath, resolveFile, serveStatic } from "./staticServer.mjs";
 
 let root = "";
 beforeEach(() => {
@@ -59,5 +59,47 @@ describe("serveStatic", () => {
         } finally {
             await served.close();
         }
+    });
+});
+
+describe("requestPath", () => {
+    it("drops the query, decodes escapes and normalises", () => {
+        expect(requestPath("/en/?x=1")).toBe("/en/");
+        expect(requestPath("/en/caf%C3%A9/")).toBe("/en/café/");
+        expect(requestPath("/en//music/../stats/")).toBe("/en/stats/");
+    });
+});
+
+describe("neverBuilt", () => {
+    it("names the pages the shell was served for, by the path they were requested at", () => {
+        const pages = ["/en/", "/en/music/", "/en/stats/"];
+        expect(neverBuilt(pages, new Set(["/en/music/"]))).toEqual(["/en/music/"]);
+    });
+
+    it("names none when every page was its own document", () => {
+        expect(neverBuilt(["/en/", "/en/music/"], new Set(["/assets/missing.js"]))).toEqual([]);
+    });
+
+    it("matches a page whose path carries an escape", () => {
+        expect(neverBuilt(["/en/caf%C3%A9/"], new Set([requestPath("/en/caf%C3%A9/")]))).toEqual([
+            "/en/caf%C3%A9/",
+        ]);
+    });
+
+    it("reports the audited page a served tree is missing", async () => {
+        const fellBack = new Set<string>();
+        const served = await serveStatic(root, {
+            fallback: "spa",
+            onFallback: (p) => fellBack.add(p),
+        });
+        const pages = ["/en/", "/en/music/"];
+        try {
+            for (const page of pages) {
+                expect((await fetch(`http://localhost:${served.port}${page}`)).status).toBe(200);
+            }
+        } finally {
+            await served.close();
+        }
+        expect(neverBuilt(pages, fellBack)).toEqual(["/en/music/"]);
     });
 });

@@ -26,10 +26,25 @@ export const MIME_TYPES = {
     ".webmanifest": "application/manifest+json",
 };
 
+// A request's path as the server reads it: query dropped, escapes decoded, normalised.
+// Both the file lookup and `onFallback` use this form, so a gate that names its pages by
+// path can compare them with what the server reports.
+export function requestPath(path) {
+    return normalize(decodeURIComponent(path.split("?")[0] ?? "/"));
+}
+
+// The pages among `pages` that were answered with the shell, given the paths `onFallback`
+// reported. A page is matched by its own path, which is what was requested and reported —
+// never by the index.html it would have resolved to, since a page that was never built
+// resolved to nothing.
+export function neverBuilt(pages, fellBack) {
+    return pages.filter((page) => fellBack.has(requestPath(page)));
+}
+
 // The file under `root` a request path resolves to, or null when there is none: the
 // path itself, or its directory's index.html.
 export function resolveFile(root, path) {
-    const clean = normalize(decodeURIComponent(path.split("?")[0] ?? "/"));
+    const clean = requestPath(path);
     const inside = join(root, clean);
     if (!inside.startsWith(normalize(root))) {
         return null;
@@ -50,7 +65,7 @@ export function serveStatic(root, { fallback = "404", onFallback, port = 0, host
         const path = request.url ?? "/";
         let file = resolveFile(root, path);
         if (file === null && fallback === "spa") {
-            onFallback?.(normalize(decodeURIComponent(path.split("?")[0] ?? "/")));
+            onFallback?.(requestPath(path));
             file = join(root, "index.html");
         }
         if (file === null || !existsSync(file)) {

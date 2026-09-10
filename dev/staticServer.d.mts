@@ -5,6 +5,10 @@ import type { Server } from "node:http";
 
 export const MIME_TYPES: Record<string, string>;
 
+export function requestPath(path: string): string;
+
+export function neverBuilt(pages: readonly string[], fellBack: ReadonlySet<string>): string[];
+
 export function resolveFile(root: string, path: string): string | null;
 
 export function serveStatic(

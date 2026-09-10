@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import lighthouserc from "../lighthouserc.js";
 import { requireSingleLocaleBuild } from "./single-locale-build.mjs";
-import { serveStatic } from "./staticServer.mjs";
+import { neverBuilt, serveStatic } from "./staticServer.mjs";
 
 // The npm script builds the single locale first, so this only fires when the script is
 // run by hand over a tree something else left behind — an all-locales build serves each
@@ -29,15 +29,15 @@ const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
 const PAGES = lighthouserc.ci.collect.url.map((url) => new URL(url).pathname);
 const axeSrc = readFileSync("node_modules/axe-core/axe.min.js", "utf8");
 
-// Which document each request actually got, so a page that fell through to the SPA shell
+// Every path the server answered with the SPA shell, so a page that fell through to it
 // cannot be audited as though it were the page.
-const served = new Map();
+const fellBack = new Set();
 
 // A static server matching how Cloudflare Pages serves the build: directory URLs map
 // to their index.html, and unknown paths fall back to the SPA shell.
 const { server } = await serveStatic(ROOT, {
     fallback: "spa",
-    onFallback: (path) => served.set(path, "fallback"),
+    onFallback: (path) => fellBack.add(path),
     port: PORT,
 });
 
@@ -45,7 +45,6 @@ const browser = await chromium.launch({
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
 });
 let total = 0;
-const unbuilt = [];
 console.log(`axe (${MODE} mode):`);
 for (const path of PAGES) {
     const ctx = await browser.newContext({ colorScheme: MODE });
@@ -69,11 +68,6 @@ for (const path of PAGES) {
     );
     const count = result.violations.reduce((sum, v) => sum + v.nodes.length, 0);
     total += count;
-    // The page's own document, or the shell standing in for one that was never built.
-    const wanted = path.endsWith("/") ? `${path}index.html` : path;
-    if (served.get(wanted) === "fallback") {
-        unbuilt.push(path);
-    }
     console.log(`  ${path} — violations: ${count}`);
     for (const v of result.violations) {
         console.log(`    [${v.id}] ${v.nodes.length}× — ${v.help}`);
@@ -86,6 +80,8 @@ for (const path of PAGES) {
 await browser.close();
 server.close();
 console.log(`TOTAL (${MODE}): ${total}`);
+// Pages the shell stood in for, because they were never built.
+const unbuilt = neverBuilt(PAGES, fellBack);
 if (unbuilt.length > 0) {
     console.error(
         `\n${unbuilt.length} of the ${PAGES.length} audited pages were never built, so axe ` +
