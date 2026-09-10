@@ -8,6 +8,7 @@ import {
     type MatchEvent,
     type MatchStep,
     expectedPitches,
+    gradedTally,
     matchNote,
     resumeIndex,
     startMatch,
@@ -97,6 +98,36 @@ describe("matcher properties", () => {
                     expect(cleared.map((e) => (e.kind === "cleared" ? e.ordinal : -1))).toEqual(
                         cleared.map((_, i) => i),
                     );
+                },
+            ),
+        );
+    });
+
+    it("tallies as right only the positions played in full", () => {
+        fc.assert(
+            fc.property(
+                stepsArb,
+                fc.array(pitch, { maxLength: 40 }),
+                fc.boolean(),
+                (steps, notes, forgiving) => {
+                    const { state, events } = play(steps, notes, forgiving);
+                    const cleared = events.filter((e) => e.kind === "cleared");
+                    const short = cleared.filter(
+                        (e) => !e.step.pitches.every((p) => e.playedPitches.includes(p)),
+                    );
+                    // A strict run never moves on without the notes, so it never misses.
+                    expect(state.missed).toBe(forgiving ? short.length : 0);
+                    const tally = gradedTally({
+                        positions: cleared.length,
+                        wrong: state.wrong,
+                        missed: state.missed,
+                    });
+                    expect(tally.correct).toBe(cleared.length - short.length);
+                    expect(tally.wrong).toBe(state.wrong + short.length);
+                    // No position short of its notes reads as a clean first try.
+                    for (const e of short) {
+                        expect(e.wrongBefore).toBeGreaterThan(0);
+                    }
                 },
             ),
         );

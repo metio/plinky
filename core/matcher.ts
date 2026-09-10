@@ -185,6 +185,10 @@ export type MatcherState = {
     // Wrong notes at the current position so far — zero at a clear means a
     // clean first try, the signal Flow and per-segment accuracy build from.
     sinceWrong: number;
+    // Positions the forgiving advance moved past before all their notes were played. The
+    // run never waits on them, and they are not right notes either: the grade counts each
+    // one as a miss (see gradedTally).
+    missed: number;
     complete: boolean;
 };
 
@@ -205,6 +209,9 @@ export type ClearedEvent = {
     // all played equally, and a score that accents one of them asks for exactly that, so
     // one velocity for the position would hide both the instruction and the performance.
     velocities: number[];
+    // Wrong notes struck here before the position cleared, plus one when the forgiving
+    // advance moved on without it being played in full: a note missed is a stumble at
+    // that position, so it is neither a clean first try for Flow nor a hit on the strip.
     wrongBefore: number;
 };
 
@@ -215,7 +222,31 @@ export type MatchEvent =
     | { kind: "wrong"; note: number };
 
 export function startMatch(steps: MatchStep[]): MatcherState {
-    return { steps, index: 0, hit: [], wrong: 0, sinceWrong: 0, complete: steps.length === 0 };
+    return {
+        steps,
+        index: 0,
+        hit: [],
+        wrong: 0,
+        sinceWrong: 0,
+        missed: 0,
+        complete: steps.length === 0,
+    };
+}
+
+// What a finished run is graded on: positions played in full are right, and a position
+// the forgiving advance skipped is a miss alongside the wrong notes. Forgiving promises
+// that a missed note does not stop the run, never that it counts as played. A run with
+// nothing skipped tallies exactly as a strict one does.
+export function gradedTally({
+    positions,
+    wrong,
+    missed,
+}: {
+    positions: number;
+    wrong: number;
+    missed: number;
+}): { correct: number; wrong: number } {
+    return { correct: Math.max(0, positions - missed), wrong: wrong + missed };
 }
 
 // The pitches expected at the current position — empty once complete.
@@ -363,6 +394,8 @@ function clear(
     playedPitches: number[],
     events: MatchEvent[],
     at: number,
+    // The forgiving advance is moving past this position before it was played in full.
+    skipped = false,
 ): MatcherState {
     const step = state.steps[state.index];
     if (!step) {
@@ -384,7 +417,7 @@ function clear(
         velocities: playedPitches.map(
             (pitch) => state.hit.find((arrival) => arrival.note === pitch)?.velocity ?? 0,
         ),
-        wrongBefore: state.sinceWrong,
+        wrongBefore: state.sinceWrong + (skipped ? 1 : 0),
     });
     const index = state.index + 1;
     return {
@@ -392,6 +425,7 @@ function clear(
         index,
         hit: [],
         sinceWrong: 0,
+        missed: state.missed + (skipped ? 1 : 0),
         complete: index >= state.steps.length,
     };
 }
@@ -431,11 +465,14 @@ export function matchNote(
     }
 
     if (forgiving && state.steps[state.index + 1]?.pitches.includes(note)) {
+        // The current position cannot be complete here, or its last pitch would have
+        // cleared it: moving on is always a skip.
         let next = clear(
             state,
             state.hit.map((arrival) => arrival.note),
             events,
             at,
+            true,
         );
         if (!next.complete) {
             const nextExpected = expectedPitches(next);

@@ -306,10 +306,17 @@ describe("useScoreMatcher", () => {
         act(() => result.current.registerNote(62));
         expect(result.current.done).toBe(1);
         expect(result.current.expected).toEqual([62, 50]);
+        // Moving on does not make the fluffed chord a right one: it is counted as missed.
+        expect(result.current.missed).toBe(1);
 
         act(() => result.current.registerNote(50));
         expect(result.current.complete).toBe(true);
         expect(result.current.done).toBe(2);
+        expect(result.current.missed).toBe(1);
+
+        // A new run starts with nothing missed.
+        act(() => result.current.start());
+        expect(result.current.missed).toBe(0);
     });
 
     it("strict mode does not advance on the next note, so a slip blocks", () => {

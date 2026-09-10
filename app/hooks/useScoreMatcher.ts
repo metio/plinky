@@ -71,6 +71,7 @@ const EMPTY_STATE: Omit<MatcherState, "steps" | "index"> = {
     hit: [],
     wrong: 0,
     sinceWrong: 0,
+    missed: 0,
     complete: false,
 };
 
@@ -435,6 +436,8 @@ export function useScoreMatcher(
     const [done, setDone] = useState(0);
     const [total, setTotal] = useState(0);
     const [wrong, setWrong] = useState(0);
+    // Positions the forgiving advance moved past before they were played in full.
+    const [missed, setMissed] = useState(0);
     // Whether the player has missed at the current position (drives the "reveal on
     // mistake" hint), and the most recent wrong note with a bump counter so the
     // keyboard re-flashes it even when the same wrong key is hit twice running.
@@ -641,6 +644,7 @@ export function useScoreMatcher(
             setTotal(steps.length);
             setDone(0);
             setWrong(0);
+            setMissed(0);
             setMissedHere(false);
             setComplete(false);
             setRange(stepRange(steps));
@@ -724,6 +728,7 @@ export function useScoreMatcher(
                     }
                 }
                 setDone((value) => value + 1);
+                setMissed(next.missed);
                 // A new position clears the per-position miss flag, so the "reveal
                 // on mistake" hint hides again until the next slip.
                 setMissedHere(false);
@@ -771,6 +776,7 @@ export function useScoreMatcher(
         done,
         total,
         wrong,
+        missed,
         missedHere,
         lastWrong,
         range,

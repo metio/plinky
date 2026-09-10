@@ -14,6 +14,7 @@ import {
 } from "react";
 import { beamsVisible } from "../../../core/beams";
 import type { PlayOptions } from "../../../core/playOptions";
+import { gradedTally } from "../../../core/matcher";
 import { runSettled } from "../../../core/runEnd";
 import { tempoScale } from "../../../core/runOutcome";
 import { gradeOf } from "../../../core/scoreDifficulty";
@@ -863,8 +864,11 @@ function usePlaySessionValue({
     const grading = useRunGrading({
         complete: matcher.complete,
         holdingNote,
-        correct: matcher.total,
-        wrong: matcher.wrong,
+        ...gradedTally({
+            positions: matcher.total,
+            wrong: matcher.wrong,
+            missed: matcher.missed,
+        }),
         capture: recorder.capture,
         runTempo: recorder.tempo,
         intendedTempo: initialTempo,

@@ -7,6 +7,7 @@ import {
     askedFor,
     currentBar,
     expectedPitches,
+    gradedTally,
     isPracticedHand,
     matchNote,
     staffArrivals,
@@ -21,7 +22,9 @@ import {
     resumeIndex,
     standsOn,
 } from "./matcher";
+import { applyRun, letterMin } from "./mastery";
 import { GRAND_STAFF, partsOf } from "./parts";
+import { deriveRunOutcome, type OutcomeNote } from "./runOutcome";
 
 const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep => ({
     pitches,
@@ -380,6 +383,96 @@ describe("when each pitch of a position landed", () => {
         const result = matchNote(state, 67, 2000, true);
         const [event] = cleared(result.events);
         expect(event?.arrivals.every((at) => at === 2000)).toBe(true);
+    });
+});
+
+describe("grading a forgiving run", () => {
+    // Single notes alternating between two keys, so the next position's key is never the
+    // current one's.
+    const piece = (length: number) =>
+        Array.from({ length }, (_, index) => step([index % 2 === 0 ? 60 : 62]));
+
+    // Grade a run the way a finished run is graded, with every played note landing exactly
+    // on its notated onset, so accuracy and flow are the only dimensions that can fall.
+    function grade(strikes: number[], length: number, forgiving: boolean) {
+        let state = startMatch(piece(length));
+        const events: ClearedEvent[] = [];
+        for (const note of strikes) {
+            const result = matchNote(state, note, 0, forgiving);
+            state = result.state;
+            events.push(...cleared(result.events));
+        }
+        const notes: OutcomeNote[] = events.map((event) => ({
+            targetMs: event.ordinal * 500,
+            playedMs: event.ordinal * 500,
+            wrongBefore: event.wrongBefore,
+            staves: [0],
+            velocity: 80,
+        }));
+        const tally = gradedTally({ positions: length, wrong: state.wrong, missed: state.missed });
+        const outcome = deriveRunOutcome({
+            notes,
+            ...tally,
+            imprecise: false,
+            intendedTempo: 120,
+            runTempo: 120,
+        });
+        return { state, events, tally, grade: outcome.grade };
+    }
+
+    it("counts a position it moved past as a miss, not a right note", () => {
+        const { state, events } = grade([62], 2, true);
+        expect(state.missed).toBe(1);
+        expect(events[0]?.wrongBefore).toBe(1);
+        expect(events[1]?.wrongBefore).toBe(0);
+        expect(gradedTally({ positions: 2, wrong: 0, missed: 1 })).toEqual({
+            correct: 1,
+            wrong: 1,
+        });
+    });
+
+    it("counts a half-played chord it moved past as a miss", () => {
+        let state = startMatch([step([60, 64]), step([67])]);
+        state = matchNote(state, 60, 0, true).state;
+        const result = matchNote(state, 67, 0, true);
+        expect(result.state.missed).toBe(1);
+        expect(cleared(result.events)[0]?.wrongBefore).toBe(1);
+    });
+
+    it("adds the skip to wrong notes already struck at the position", () => {
+        let state = startMatch(piece(2));
+        state = matchNote(state, 70, 0, true).state;
+        const [skipped] = cleared(matchNote(state, 62, 0, true).events);
+        expect(skipped?.wrongBefore).toBe(2);
+    });
+
+    it("cannot earn an A or mark a piece learned with half its notes skipped", () => {
+        // Only the odd positions are struck: each strike moves past the position before it.
+        const strikes = Array.from({ length: 50 }, () => 62);
+        const { state, tally, grade: run } = grade(strikes, 100, true);
+        expect(state.complete).toBe(true);
+        expect(state.missed).toBe(50);
+        expect(tally).toEqual({ correct: 50, wrong: 50 });
+        expect(run.accuracy).toBe(50);
+        expect(run.flow).toBeLessThanOrEqual(50);
+        expect(["A", "S"]).not.toContain(run.letter);
+        const mastery = applyRun(null, run.score, letterMin("A"), 0);
+        expect(mastery.learned).toBe(false);
+    });
+
+    it("grades a fully played forgiving run exactly as a strict one", () => {
+        const strikes = piece(40).map((position) => position.pitches[0] as number);
+        const forgiving = grade(strikes, 40, true);
+        const strict = grade(strikes, 40, false);
+        expect(forgiving.state.missed).toBe(0);
+        expect(forgiving.events).toEqual(strict.events);
+        expect(forgiving.tally).toEqual(strict.tally);
+        expect(forgiving.tally).toEqual({ correct: 40, wrong: 0 });
+        expect(forgiving.grade).toEqual(strict.grade);
+    });
+
+    it("never tallies below zero right notes", () => {
+        expect(gradedTally({ positions: 0, wrong: 0, missed: 3 }).correct).toBe(0);
     });
 });
 

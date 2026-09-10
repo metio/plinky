@@ -57,6 +57,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A repeated note played a touch early counts in Keep up.** Rush the second of two\nsame notes by a hair, as the C C of Twinkle Twinkle invites, and Keep up took it for\nthe first C struck again, then marked the second one missed. It now goes to the beat\nit was meant for, exactly as a note played a touch late always did.",
                 twip: true,
             },
+            {
+                body: '**With "Keep going" on, a note you skipped counts as missed.** Moving on to the next\nnote never stops you, and it still does not. But the note you left behind was scored\nas a right one, played cleanly, so a run with half its notes skipped could earn an A,\nmark the piece learned and take its star. A skipped note now counts against accuracy\nand flow like any other miss, and a run where you play every note grades exactly as\nit would with the switch off.',
+                twip: true,
+            },
         ],
     },
     {
