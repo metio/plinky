@@ -87,6 +87,12 @@ longer than written, and the piece fell a little further behind the metronome ea
 time — nearly two seconds by the end of a piece full of them, in Listen, in videos
 you export and in the clips. They now take exactly their written time.
 
+**Listen plays a transposed piece's tremolos and glissandos in the new key.** Move a
+piece up or down and press Listen, and a tremolo still shook between the chords of the
+key it was written in, a few notes away from the ones on the page, while a glissando
+swept towards the old arrival note. Both now sound in the key you chose, exactly where
+the staff shows them.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

@@ -26,8 +26,7 @@ import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import type { Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
-import { readScoreMarks } from "../../../core/musicxmlMarks";
-import { transposeFifths } from "../../../core/ornament";
+import { readScoreMarks, transposeScoreMarks } from "../../../core/musicxmlMarks";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
@@ -341,26 +340,12 @@ function usePlaySessionValue({
     // dynamics, the arches, the pedal, the octave lines and the key. Parsed once per piece
     // — the parse is the cost, and every surface asking separately would pay it again.
     //
-    // From the untransposed document, because that is what the file says; the key is then
-    // moved to wherever the transposition put the music, so an ornament in a transposed
-    // piece reaches into the key actually being played.
-    const marks = useMemo(() => {
-        const read = readScoreMarks(xmlCodec.parse(xml));
-        if (transpose === 0) {
-            return read;
-        }
-        // Every key the piece passes through moves, not only the one it opens in — a piece
-        // that changes key is still in a different key after being transposed, and an
-        // ornament there spells its auxiliary note from that one.
-        return {
-            ...read,
-            fifths: transposeFifths(read.fifths, transpose),
-            keys: read.keys.map((point) => ({
-                ...point,
-                fifths: transposeFifths(point.fifths, transpose),
-            })),
-        };
-    }, [xml, transpose, xmlCodec]);
+    // From the untransposed document, because that is what the file says; every key and
+    // every pitch a mark carries is then moved to wherever the transposition put the music.
+    const marks = useMemo(
+        () => transposeScoreMarks(readScoreMarks(xmlCodec.parse(xml)), transpose),
+        [xml, transpose, xmlCodec],
+    );
 
     // Which hand to practice — the hands-separate selector only appears for the
     // grand-staff (two-staff) scores it applies to (the staff count comes from the score).

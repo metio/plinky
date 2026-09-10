@@ -65,6 +65,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Listen keeps time through rolled chords and grace notes.** At a lively tempo every\nrolled chord, every grace note and every very quick trill or tremolo held on a hair\nlonger than written, and the piece fell a little further behind the metronome each\ntime — nearly two seconds by the end of a piece full of them, in Listen, in videos\nyou export and in the clips. They now take exactly their written time.",
                 twip: true,
             },
+            {
+                body: "**Listen plays a transposed piece's tremolos and glissandos in the new key.** Move a\npiece up or down and press Listen, and a tremolo still shook between the chords of the\nkey it was written in, a few notes away from the ones on the page, while a glissando\nswept towards the old arrival note. Both now sound in the key you chose, exactly where\nthe staff shows them.",
+                twip: true,
+            },
         ],
     },
     {

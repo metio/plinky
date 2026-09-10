@@ -14,6 +14,7 @@ import { child, text } from "./musicxmlDom";
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
 import { type GlissandoSpan, readGlissandos } from "./glissando";
+import { transposeFifths } from "./ornament";
 import type { PedalSpan, SoftSpan } from "./pedal";
 import { readTremolos, type TremoloSpan } from "./tremolo";
 import type { SlurSpan } from "./slur";
@@ -440,5 +441,38 @@ export function readScoreMarks(doc: Document | null): ScoreMarks {
         bars: timeline.bars,
         fifths: readFifths(doc),
         keys: timeline.keys,
+    };
+}
+
+// The marks of a score read from its file, moved to wherever a transposition put the music.
+//
+// The marks are read from the untransposed document, because that is what the file says,
+// while the notes they are laid over come off the engraver in the key being played. So
+// every mark that carries a pitch moves with them — the tremolo's chords, the glissando's
+// ends — and so does every key the piece passes through, since an ornament or a sweep in a
+// transposed piece reaches into the key actually being played. A mark that carries only a
+// time (a slur, a pedal, a dynamic) is the same in every key and is left as it is.
+export function transposeScoreMarks(marks: ScoreMarks, semitones: number): ScoreMarks {
+    if (semitones === 0) {
+        return marks;
+    }
+    const move = (pitches: readonly number[]) => pitches.map((pitch) => pitch + semitones);
+    return {
+        ...marks,
+        tremolos: marks.tremolos.map((span) => ({
+            ...span,
+            pitches: move(span.pitches),
+            pair: span.pair?.map((chord) => ({ ...chord, pitches: move(chord.pitches) })) ?? null,
+        })),
+        glissandos: marks.glissandos.map((span) => ({
+            ...span,
+            arrivesAt: span.arrivesAt + semitones,
+            ...(span.pitch === undefined ? {} : { pitch: span.pitch + semitones }),
+        })),
+        fifths: transposeFifths(marks.fifths, semitones),
+        keys: marks.keys.map((point) => ({
+            ...point,
+            fifths: transposeFifths(point.fifths, semitones),
+        })),
     };
 }

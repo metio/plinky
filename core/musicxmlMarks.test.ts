@@ -2,18 +2,23 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
 import {
     fifthsAt,
+    NO_SCORE_MARKS,
     readDirections,
     readFifths,
+    readScoreMarks,
     readTempoPoints,
     slurSpans,
     tempoAt,
+    transposeScoreMarks,
 } from "./musicxmlMarks";
 import { readTimeline } from "./musicxmlTimeline";
 import { pedalledAt } from "./pedal";
 import { slurredOnwardAt } from "./slur";
+import { transposeMusicXml } from "./transpose";
 
 const parse = (xml: string): Document => new DOMParser().parseFromString(xml, "application/xml");
 
@@ -261,5 +266,49 @@ describe("fifthsAt", () => {
 
     it("is C major where the piece states no key at all", () => {
         expect(fifthsAt([], 7)).toBe(0);
+    });
+});
+
+describe("transposeScoreMarks", () => {
+    // A bar that shakes a C-E third against a G-B one, then glides from D up to A.
+    const trem = (step: string, type: string, chord = false) =>
+        `<note>${chord ? "<chord/>" : ""}<pitch><step>${step}</step><octave>4</octave></pitch><duration>4</duration><notations><ornaments><tremolo type="${type}">2</tremolo></ornaments></notations></note>`;
+    const gliss = (step: string, type: string) =>
+        `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>4</duration><notations><glissando type="${type}"/></notations></note>`;
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
+<part id="P1"><measure number="1">${ATTR.replace("FIFTHS", "0")}${trem("C", "start")}${trem("E", "start", true)}${trem("G", "stop")}${trem("B", "stop", true)}${gliss("D", "start")}${gliss("A", "stop")}</measure></part></score-partwise>`;
+
+    it("puts a tremolo's chords and a glissando's ends in the key being played", () => {
+        const moved = transposeScoreMarks(readScoreMarks(parse(xml)), 3);
+        // What the same marks read off a score transposed on the page: the notes the
+        // engraver hands Listen are these, so the figure must be built from them.
+        const page = readScoreMarks(parse(transposeMusicXml(domXmlCodec, xml, 3)));
+        expect(moved.tremolos).toEqual(page.tremolos);
+        expect(moved.glissandos).toEqual(page.glissandos);
+        expect(moved.tremolos[0]?.pair?.map((chord) => chord.pitches)).toEqual([
+            [63, 67],
+            [70, 74],
+        ]);
+        expect(moved.glissandos[0]).toMatchObject({ pitch: 65, arrivesAt: 72 });
+    });
+
+    it("moves every key the piece passes through", () => {
+        const moved = transposeScoreMarks(readScoreMarks(parse(xml)), 2);
+        expect(moved.fifths).toBe(2);
+        expect(moved.keys.map((point) => point.fifths)).toEqual([2]);
+    });
+
+    it("leaves a piece nobody transposed exactly as the file wrote it", () => {
+        const read = readScoreMarks(parse(xml));
+        expect(transposeScoreMarks(read, 0)).toBe(read);
+    });
+
+    it("keeps a glissando that names no starting pitch without inventing one", () => {
+        const moved = transposeScoreMarks(
+            { ...NO_SCORE_MARKS, glissandos: [{ from: 0, to: 1, arrivesAt: 60 }] },
+            -5,
+        );
+        expect(moved.glissandos).toEqual([{ from: 0, to: 1, arrivesAt: 55 }]);
     });
 });
