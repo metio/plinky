@@ -85,11 +85,16 @@ export interface AudioEngine {
     setRoom(wet: number): void;
     // Decide the instrument for the performance that starts now — the recordings, if every
     // one the piece asked for has arrived, else the synthesised voice — and keep to it until
-    // the next decision. Without this a recording that lands mid-piece changes the sound
-    // under the player's hands, and a repeated section sounds like a different piano the
-    // second time through. Called at the start of a run; between runs the engine answers
-    // note by note with whatever is there.
+    // the performance ends (uncommitVoice) or the next one decides again. Without this a
+    // recording that lands mid-piece changes the sound under the player's hands, and a
+    // repeated section sounds like a different piano the second time through. Called at the
+    // start of a run.
     commitVoice(): void;
+    // The performance is over: answer note by note with whatever is there again. Without
+    // it, a run that committed to the synthesised voice because recordings were still
+    // arriving would keep every later note on every page synthesised, long after they had
+    // all landed. Idempotent.
+    uncommitVoice(): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted. Returns
     // a cancel that silences the click if it has not sounded yet: a track queued whole on
     // the audio clock — a count-in and a run — can then be taken off it again when the

@@ -21,6 +21,8 @@ export type FakeAudioEngine = AudioEngine & {
     resumed: number;
     // How many runs committed to an instrument.
     committed: number;
+    // Whether a commitment is standing — set by commitVoice, cleared by uncommitVoice.
+    holdingVoice: boolean;
     // Stands in for a context the browser has suspended — before the first gesture, or
     // across an interruption.
     asleep: boolean;
@@ -42,6 +44,7 @@ export function fakeAudioEngine(): FakeAudioEngine {
         clicks: [],
         resumed: 0,
         committed: 0,
+        holdingVoice: false,
         asleep: false,
         unlocked: 0,
         silenced: 0,
@@ -93,6 +96,10 @@ export function fakeAudioEngine(): FakeAudioEngine {
         },
         commitVoice() {
             engine.committed += 1;
+            engine.holdingVoice = true;
+        },
+        uncommitVoice() {
+            engine.holdingVoice = false;
         },
     };
     return engine;

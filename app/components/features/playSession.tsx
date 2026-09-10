@@ -51,6 +51,7 @@ import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useEndRun } from "../../hooks/useEndRun";
+import { useVoiceCommitment } from "../../hooks/useVoiceCommitment";
 import { useLatest } from "../../hooks/useLatest";
 import { useLatestPress } from "../../hooks/useLatestPress";
 import { useNoteFunnel } from "../../hooks/useNoteFunnel";
@@ -978,6 +979,11 @@ function usePlaySessionValue({
             keyLights.clear();
         },
     });
+
+    // Each run commits to an instrument as it starts; the commitment is let go of once
+    // nothing is playing, so between runs a note is the recorded piano whenever its
+    // recording is there.
+    useVoiceCommitment(listenPlayback.playing || keepUp.running || matcher.practicing);
 
     // A keyboard that lights its own keys shows the position the run is on, from the
     // same look-ahead the notes highway draws. `aids.noteHints` is the policy already

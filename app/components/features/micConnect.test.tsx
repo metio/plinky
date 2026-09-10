@@ -76,6 +76,7 @@ describe("MicConnect", () => {
             click: () => () => {},
             setRoom: () => {},
             commitVoice: () => {},
+            uncommitVoice: () => {},
             recentlyStruck: (note: number) => note === 60,
         };
         renderWithServices(

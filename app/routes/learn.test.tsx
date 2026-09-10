@@ -67,6 +67,7 @@ describe("the Learn page", () => {
             click: () => () => {},
             setRoom: () => {},
             commitVoice: () => {},
+            uncommitVoice: () => {},
         };
         show({ audio });
 

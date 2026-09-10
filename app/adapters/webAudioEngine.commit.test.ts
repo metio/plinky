@@ -75,6 +75,43 @@ describe("the instrument a run commits to", () => {
         expect(samples.asked()).toBe(1);
     });
 
+    it("answers note by note again once the run is over", async () => {
+        // A run that began while recordings were arriving keeps to the synthesised voice,
+        // and that choice ends with it: once they have landed, a note played after the run
+        // — on this page or any other — is the recorded piano.
+        const samples = pack();
+        const state = { source: samples.lookup, settled: false };
+        const engine = await engineWith(state);
+        engine.commitVoice();
+        state.settled = true;
+        strike(engine);
+        expect(samples.asked()).toBe(0);
+        engine.uncommitVoice();
+        strike(engine);
+        expect(samples.asked()).toBe(1);
+    });
+
+    it("keeps to the recordings for a run that ended with them", async () => {
+        // The inverse: letting go of a commitment to the recordings changes nothing that
+        // is there, since the note-by-note answer finds the same recordings.
+        const samples = pack();
+        const state = { source: samples.lookup, settled: true };
+        const engine = await engineWith(state);
+        engine.commitVoice();
+        engine.uncommitVoice();
+        strike(engine);
+        expect(samples.asked()).toBe(1);
+    });
+
+    it("lets go without a commitment to let go of", async () => {
+        const samples = pack();
+        const engine = await engineWith({ source: samples.lookup, settled: false });
+        engine.uncommitVoice();
+        engine.uncommitVoice();
+        strike(engine);
+        expect(samples.asked()).toBe(1);
+    });
+
     it("decides again at the next run", async () => {
         const samples = pack();
         const state = { source: samples.lookup, settled: false };

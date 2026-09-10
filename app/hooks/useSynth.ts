@@ -51,6 +51,8 @@ export type UseSynthResult = {
     silenceAll: () => void;
     // The instrument for the run that starts now; see AudioEngine.commitVoice.
     commitVoice: () => void;
+    // The run is over; see AudioEngine.uncommitVoice.
+    uncommitVoice: () => void;
 };
 
 // Decides what a note should sound like — loudness from velocity and the volume
@@ -151,8 +153,17 @@ export function useSynth(): UseSynthResult {
     // A stable result so callers can list the synth in an effect's dependencies without the
     // effect re-firing every render.
     const commitVoice = useCallback(() => audio.commitVoice(), [audio]);
+    const uncommitVoice = useCallback(() => audio.uncommitVoice(), [audio]);
     return useMemo(
-        () => ({ playNote, pressNote, releaseNote, setPedal, silenceAll, commitVoice }),
-        [playNote, pressNote, releaseNote, setPedal, silenceAll, commitVoice],
+        () => ({
+            playNote,
+            pressNote,
+            releaseNote,
+            setPedal,
+            silenceAll,
+            commitVoice,
+            uncommitVoice,
+        }),
+        [playNote, pressNote, releaseNote, setPedal, silenceAll, commitVoice, uncommitVoice],
     );
 }

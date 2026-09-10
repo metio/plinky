@@ -793,6 +793,9 @@ export const webAudioEngine: AudioEngine = {
         const now = samples?.();
         committed = { source: now?.settled ? now.source : null };
     },
+    uncommitVoice() {
+        committed = null;
+    },
     now() {
         return context()?.currentTime ?? null;
     },

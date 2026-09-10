@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**The recorded piano comes back after a Listen that started too soon.** Press Listen\nwhile the piece's recordings were still arriving and it plays on the plainer\nsynthesised piano, so that the whole piece sounds like one instrument. That choice\nused to outlast the Listen: every note after it, on every page, stayed on the plainer\npiano until you happened to start another run. It now lasts exactly as long as the\nrun, and the recordings are back as soon as it ends.",
+                twip: true,
+            },
+            {
                 body: "**The Piano page makes a sound.** A key pressed there lit up and that was all:\nwhatever you played, on the screen, the computer keys or a MIDI piano without\nspeakers of its own, was silent, and the pedals did nothing. Every note now sounds on\nthe same piano as the rest of Plinky, for as long as you hold it, and all three pedals\nwork. The pedals work on the keyboard on the home page now too.",
                 twip: true,
             },
