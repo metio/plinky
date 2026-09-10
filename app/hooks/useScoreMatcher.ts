@@ -53,6 +53,7 @@ import {
     staffArrivals,
     type UpcomingStep,
     previewIndex,
+    resumeIndex,
     upcomingSteps,
     WHOLE_EPSILON,
     jumpsBack,
@@ -572,25 +573,15 @@ export function useScoreMatcher(
         setUpcoming(upcomingSteps(state, HIGHWAY_LOOKAHEAD));
     }, []);
 
-    // Where the lookahead is standing, for a caller resuming a run: a printed onset names
-    // two places on a repeated piece, and handing over from Listen has to continue on the
-    // pass it was on rather than send the player back over bars they just heard.
-    const previewAnchor = useCallback(
-        () =>
-            previewRef.current && previewRef.current.at >= 0
-                ? { at: previewRef.current.at, whole: previewRef.current.whole }
-                : null,
-        [],
-    );
-
     const start = useCallback(
         // `loop` — a 1-based inclusive bar range — overrides the resume point: the run
-        // plays only that section and laps it until stopped. `anchor` is where the
-        // lookahead stands, so a resume lands on the right pass through a repeat.
+        // plays only that section and laps it until stopped. `fromOrdinal` is the cursor
+        // position the resume point was read at, which names the pass through a repeat
+        // that a printed onset cannot; without it the first pass printed there is taken.
         (
             fromWhole = 0,
             loop: { from: number; to: number } | null = null,
-            anchor: { at: number; whole: number } | null = null,
+            fromOrdinal: number | null = null,
         ) => {
             const osmd = getOsmd();
             if (!osmd) {
@@ -601,21 +592,11 @@ export function useScoreMatcher(
             // The first position at or after the resume point; -1 when none remains
             // (the cursor sits past the last note), which leaves nothing to play.
             const startIndex =
-                fromWhole > 0
-                    ? previewIndex(
-                          all,
-                          fromWhole,
-                          // Only when the lookahead is standing exactly where the resume
-                          // asks for. Anywhere else it is left over from a bar somebody
-                          // tapped or an earlier listen, and its pass is not this one — so
-                          // it is dropped and the search starts from the top, which is what
-                          // an unanchored resume should do.
-                          anchor && Math.abs(anchor.whole - fromWhole) < WHOLE_EPSILON
-                              ? anchor.at
-                              : -1,
-                          anchor?.whole ?? Number.NEGATIVE_INFINITY,
-                      )
-                    : 0;
+                fromWhole <= 0
+                    ? 0
+                    : fromOrdinal !== null && fromOrdinal >= 0
+                      ? resumeIndex(all, fromOrdinal)
+                      : previewIndex(all, fromWhole);
             // Which of the whole piece's steps the run is over, by index into `all`: a
             // section loop over repeated bars keeps both passes, which is not one
             // contiguous slice, so each step's place in the piece is kept beside it.
@@ -770,7 +751,6 @@ export function useScoreMatcher(
         practicing,
         expected,
         upcoming,
-        previewAnchor,
         done,
         total,
         wrong,

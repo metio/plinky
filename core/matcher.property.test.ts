@@ -9,6 +9,7 @@ import {
     type MatchStep,
     expectedPitches,
     matchNote,
+    resumeIndex,
     startMatch,
 } from "./matcher";
 
@@ -197,5 +198,35 @@ describe("matcher properties", () => {
         expect(first.state.complete).toBe(false);
         const second = matchNote(first.state, 60, 0, true);
         expect(second.state.complete).toBe(true);
+    });
+});
+
+describe("resumeIndex properties", () => {
+    // Cursor positions in play order: never decreasing, and shared by an ornament and its
+    // principal. A repeat adds positions rather than reusing them, so the walk rises.
+    const positionsArb = fc.array(fc.integer({ min: 0, max: 3 }), { maxLength: 12 }).map((gaps) => {
+        let at = 0;
+        return gaps.map((gap) => {
+            at += gap;
+            return { position: at };
+        });
+    });
+
+    it("starts on the first step at or past the cursor, skipping none after it", () => {
+        fc.assert(
+            fc.property(positionsArb, fc.integer({ min: 0, max: 40 }), (steps, ordinal) => {
+                const index = resumeIndex(steps, ordinal);
+                const ahead = steps.filter((step) => step.position >= ordinal).length;
+                if (index < 0) {
+                    expect(ahead).toBe(0);
+                    return;
+                }
+                expect(steps[index]!.position).toBeGreaterThanOrEqual(ordinal);
+                // Everything before it is behind the cursor, and the run it begins holds
+                // every step that is not.
+                expect(steps.slice(0, index).every((step) => step.position < ordinal)).toBe(true);
+                expect(steps.length - index).toBe(ahead);
+            }),
+        );
     });
 });

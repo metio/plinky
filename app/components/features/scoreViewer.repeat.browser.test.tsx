@@ -3,7 +3,7 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { ServicesProvider } from "../../contexts/services";
 import { MidiProvider } from "../../contexts/midi";
@@ -48,6 +48,49 @@ const strike = async (name: string) => {
 
 afterEach(() => {
     document.body.innerHTML = "";
+});
+
+const mountRepeated = () =>
+    render(
+        <MemoryRouter>
+            <ServicesProvider services={{ midi: fakeMidi() }}>
+                <MidiProvider>
+                    <ScoreViewer id="repeat" xml={REPEATED} title="Repeat" credit="" />
+                </MidiProvider>
+            </ServicesProvider>
+        </MemoryRouter>,
+    );
+
+const awaitReady = async () => {
+    const practice = await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
+    await expect
+        .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000 })
+        .toBe(false);
+    return practice;
+};
+
+describe("a handoff from Listen on the repeat's second pass", () => {
+    it("continues on the pass Listen was playing rather than the first", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        mountRepeated();
+        // Listen lives on the play surface, which Practice opens.
+        fireEvent.click(await awaitReady());
+        fireEvent.click(screen.getByRole("button", { name: "Listen" }));
+
+        // Listen's trail and highlight cover the first pass, and on the tick the repeat
+        // sends it back they come off, leaving the highlight on the second pass's C.
+        await expect.poll(halos, { timeout: 30000 }).toBeGreaterThanOrEqual(2);
+        await expect.poll(halos, { timeout: 30000 }).toBeLessThanOrEqual(1);
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+
+        // What is left of the performance is the second pass's D, then E. A run resumed
+        // on the first pass would want C D again after this D, and take E as a slip.
+        await strike("D 4");
+        await strike("E 4");
+        expect(await screen.findAllByText("Accuracy", undefined, { timeout: 30000 })).not.toEqual(
+            [],
+        );
+    });
 });
 
 describe("a run over a written repeat", () => {

@@ -17,6 +17,11 @@ or the reading time with it. The finished run now stays finished, and the next o
 gets the stage to itself. It could also be counted a second time and wipe the ghost
 you race; that has gone too.
 
+**Taking over from Listen on a repeat carries on where it was playing.** Press
+Practice while Listen is on the second time through a repeated passage, and the run
+used to send you back to the first time through, so you played bars you had just
+heard all over again. It now picks up on the same pass, at the next note.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

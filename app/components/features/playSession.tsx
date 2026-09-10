@@ -1125,6 +1125,9 @@ function usePlaySessionValue({
         // Listen, or continuing a run stopped partway); Restart passes resume=false to
         // begin at the top. The top of a fresh piece reads as 0 either way.
         const from = resume ? resumePoint() : 0;
+        // Which pass through a repeat that onset is on, read off the same cursor before
+        // anything below walks it back to the top.
+        const fromOrdinal = from > 0 ? resumeOrdinal() : null;
         const partial = from > 0;
         enterPlayFullscreen();
         listenPlayback.stop();
@@ -1181,10 +1184,9 @@ function usePlaySessionValue({
                 from,
                 loop.on ? { from: loop.from, to: loop.to } : null,
                 // Which PASS to resume on. A printed onset names two places on a repeated
-                // piece, so handing over from Listen mid-repeat used to drop the player
-                // back on the pass they had just heard. The lookahead knows which one it is
-                // standing on; it is ignored unless it is standing exactly here.
-                matcher.previewAnchor(),
+                // piece; the cursor position it was read at names one, so a handoff from
+                // Listen mid-repeat carries on over the pass that was playing.
+                fromOrdinal,
             );
         };
         // A sight-read gets its moment to take the piece in first — key, metre, shape —

@@ -270,6 +270,15 @@ export function previewIndex(
     return -1;
 }
 
+// Which step a run resumed at a cursor position starts on: the first playable one at or
+// after it. `ordinal` counts cursor positions from the top, the same count
+// `MatchStep.position` holds, so it tells the two passes of a repeat apart where a printed
+// onset cannot — the cursor Listen hands over already stands on the pass it was playing.
+// -1 when nothing playable remains.
+export function resumeIndex(steps: readonly { position: number }[], ordinal: number): number {
+    return steps.findIndex((step) => step.position >= ordinal);
+}
+
 export type UpcomingStep = {
     index: number;
     pitches: number[];

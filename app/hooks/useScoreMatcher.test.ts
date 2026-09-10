@@ -455,16 +455,24 @@ describe("a run over a repeat", () => {
     });
 
     it("puts the cursor on the second pass when a run resumes there", () => {
-        // Handed over from Listen partway through the second pass: the lookahead stands
-        // on step 5, so the reducer starts there, and the cursor has to stand on that
+        // Handed over from Listen partway through the second pass: the cursor stands on
+        // position 5, so the reducer starts there, and the cursor has to stand on that
         // pass's bar too — the printed onset alone names the first pass, and seeking
         // by it walks cursor and reducer apart at the repeat barline for the rest of
         // the run.
         const handle = fakeOsmd(PASSES, WHOLES, BARS);
         const { result } = renderHook(() => useScoreMatcher(() => handle.osmd));
-        act(() => result.current.start(0.125, null, { at: 5, whole: 0.125 }));
+        act(() => result.current.start(0.125, null, 5));
         expect(handle.at()).toBe(5);
         expect(result.current.total).toBe(5);
+    });
+
+    it("resumes on the first pass printed at an onset when no cursor position is given", () => {
+        const handle = fakeOsmd(PASSES, WHOLES, BARS);
+        const { result } = renderHook(() => useScoreMatcher(() => handle.osmd));
+        act(() => result.current.start(0.125));
+        expect(handle.at()).toBe(1);
+        expect(result.current.total).toBe(9);
     });
 });
 

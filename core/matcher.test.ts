@@ -18,6 +18,7 @@ import {
     upcomingSteps,
     jumpsBack,
     previewIndex,
+    resumeIndex,
 } from "./matcher";
 import { GRAND_STAFF, partsOf } from "./parts";
 
@@ -544,18 +545,31 @@ describe("previewIndex", () => {
     });
 });
 
-describe("previewIndex as a resume anchor", () => {
-    const REPEATED = [{ whole: 0 }, { whole: 1 }, { whole: 0 }, { whole: 1 }, { whole: 2 }];
+describe("resumeIndex", () => {
+    // C D C D E over positions 0-4, the first two bars inside a repeat.
+    const REPEATED = [0, 1, 2, 3, 4].map((position) => ({ position }));
 
-    it("resumes on the pass the anchor is standing on", () => {
-        // Listen is on the second pass, at the bar printed at 0 — position 2, not 0. The
-        // resume asks for that same onset, so the anchor holds and the run continues where
-        // the listening left off rather than replaying bars just heard.
-        expect(previewIndex(REPEATED, 0, 2, 0)).toBe(2);
-        expect(previewIndex(REPEATED, 1, 3, 1)).toBe(3);
+    it("resumes on the pass the cursor stands on", () => {
+        // Position 3 is the second pass's D; its onset is the first pass's too.
+        expect(resumeIndex(REPEATED, 3)).toBe(3);
+        expect(resumeIndex(REPEATED, 1)).toBe(1);
     });
 
-    it("resumes on the first pass when the anchor is standing there", () => {
-        expect(previewIndex(REPEATED, 0, 0, 0)).toBe(0);
+    it("starts at the next playable position past one with nothing to play", () => {
+        // Positions 1 and 2 are rests here, so the run begins on 3.
+        const gapped = [{ position: 0 }, { position: 3 }, { position: 4 }];
+        expect(resumeIndex(gapped, 1)).toBe(1);
+        expect(resumeIndex(gapped, 3)).toBe(1);
+    });
+
+    it("keeps an ornament and its principal together from the ornament", () => {
+        // Both are printed at position 1; a resume there plays the ornament first.
+        const ornamented = [{ position: 0 }, { position: 1 }, { position: 1 }, { position: 2 }];
+        expect(resumeIndex(ornamented, 1)).toBe(1);
+    });
+
+    it("answers -1 past the last playable position", () => {
+        expect(resumeIndex(REPEATED, 5)).toBe(-1);
+        expect(resumeIndex([], 0)).toBe(-1);
     });
 });
