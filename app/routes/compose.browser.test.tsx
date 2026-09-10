@@ -6,7 +6,8 @@ import { MemoryRouter, useSearchParams } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { fakeMidi } from "../adapters/fakeMidi";
-import { ServicesProvider } from "../contexts/services";
+import { type AppServices, ServicesProvider } from "../contexts/services";
+import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { m } from "../paraglide/messages.js";
 import { switchOn } from "../testing/controls";
 import Compose from "./compose";
@@ -33,13 +34,13 @@ afterEach(() => {
     localStorage.clear();
 });
 
-function mount() {
+function mount(services: Partial<AppServices> = midiFake) {
     const container = document.createElement("div");
     document.body.appendChild(container);
     mounted.push(container);
     render(
         <MemoryRouter>
-            <ServicesProvider services={midiFake}>
+            <ServicesProvider services={services}>
                 <MidiProvider>
                     <Compose />
                 </MidiProvider>
@@ -61,6 +62,21 @@ async function strike(note: number) {
 }
 
 describe("Compose", () => {
+    it("sounds what is played while it records it", async () => {
+        // The keys under the sketch are how a phone plays here at all, and a take played
+        // in silence is played blind: every note has to be heard as it goes down.
+        const audio = fakeAudioEngine();
+        mount({ ...midiFake, audio });
+        await act(async () => {
+            window.__plinky?.play(64);
+        });
+        expect(audio.voices).toContainEqual({ kind: "press", note: 64, gain: expect.any(Number) });
+        await act(async () => {
+            window.__plinky?.release(64);
+        });
+        expect(audio.voices.at(-1)).toMatchObject({ kind: "release", note: 64 });
+    });
+
     it("captures played notes, sketches a staff and checkpoints", async () => {
         mount();
         expect(await screen.findByRole("heading", { name: "Compose" })).toBeTruthy();

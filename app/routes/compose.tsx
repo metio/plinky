@@ -16,6 +16,7 @@ import { useCompositionRecorder } from "../hooks/useCompositionRecorder";
 import { useCompositionTransport } from "../hooks/useCompositionTransport";
 import { useMetronome } from "../hooks/useMetronome";
 import { useStaffSketch } from "../hooks/useStaffSketch";
+import { useVoicedInput } from "../hooks/useVoicedInput";
 import { type Composition, decodeComposition } from "../../core/composition";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { stepDurationMs, type StepValue } from "../../core/stepInput";
@@ -60,6 +61,11 @@ export default function Compose() {
     const dottable = stepValue !== "sixteenth";
     const dotted = stepDotted && dottable;
     const stepMs = stepping ? stepDurationMs(stepValue, tempo, dotted) : null;
+
+    // Every note sounds as it goes down. The recorder only writes what it hears; a take
+    // played in silence is played blind, and the keys under the sketch are how a phone
+    // plays here at all.
+    useVoicedInput();
 
     const recorder = useCompositionRecorder({
         stepMs,

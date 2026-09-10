@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**You hear what you play in Compose.** The keys under the sketch, your computer keys\nand a MIDI piano without speakers of its own all wrote notes onto the staff in\ncomplete silence, so the only way to hear a take was to stop and play it back. Every\nnote now sounds as you play it, on the same piano and with the same pedals as the\nrest of Plinky.",
+                twip: true,
+            },
+            {
                 body: "**A pedal you are holding keeps working into the next run.** Finish a run with your\nfoot still on the sustain pedal, press Practice again without lifting it, and the\nnotes were cut short as your keys came up, while the take saved from that run played\nback pedalled. The pedal now carries on from where your foot is, and a pedal you\npressed or lifted on another page is right when you get back to the keys. The same\ngoes for the soft and sostenuto pedals.",
                 twip: true,
             },

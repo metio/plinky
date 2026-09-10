@@ -572,7 +572,7 @@ catalogue and to Compose sits under the keys.
 ## Composing
 
 Play whatever you like — on a MIDI piano, your computer keys, or the on-screen
-keyboard — and Plinky records every note and sketches it onto a staff as you go. The
+keyboard — and you hear every note as Plinky records it and sketches it onto a staff. The
 playback is exactly what you played; the staff is an approximate sketch, snapped to a
 grid so it reads as notation, with simultaneous notes drawn as chords. Play along to
 the **metronome** with a one-bar count-in for a tidier rhythm, set a **checkpoint** to
