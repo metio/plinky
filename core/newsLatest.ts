@@ -53,6 +53,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Plinky opens in the language you picked.** Choose a language in Settings and then\ncome back to plinky.fun, or open Plinky from your home screen, and it opened in your\nbrowser's language instead, every time. It now remembers your choice and opens in it,\nincluding a language you picked before today.",
                 twip: true,
             },
+            {
+                body: "**A repeated note played a touch early counts in Keep up.** Rush the second of two\nsame notes by a hair, as the C C of Twinkle Twinkle invites, and Keep up took it for\nthe first C struck again, then marked the second one missed. It now goes to the beat\nit was meant for, exactly as a note played a touch late always did.",
+                twip: true,
+            },
         ],
     },
     {
