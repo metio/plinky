@@ -21,6 +21,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Taking over from Listen on a repeat carries on where it was playing.** Press\nPractice while Listen is on the second time through a repeated passage, and the run\nused to send you back to the first time through, so you played bars you had just\nheard all over again. It now picks up on the same pass, at the next note.",
                 twip: true,
             },
+            {
+                body: "**Bars that vanish behind a sight-read come back when the music goes round again.**\nWith bars vanishing on, a repeat sign or a section loop sends you back to bars that\nhad already disappeared, and they stayed gone, so the second time through had to be\nplayed from memory. They now reappear as the run returns to them, and vanish again\nonce you have moved on.",
+                twip: true,
+            },
         ],
     },
     {

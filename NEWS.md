@@ -22,6 +22,12 @@ Practice while Listen is on the second time through a repeated passage, and the 
 used to send you back to the first time through, so you played bars you had just
 heard all over again. It now picks up on the same pass, at the next note.
 
+**Bars that vanish behind a sight-read come back when the music goes round again.**
+With bars vanishing on, a repeat sign or a section loop sends you back to bars that
+had already disappeared, and they stayed gone, so the second time through had to be
+played from memory. They now reappear as the run returns to them, and vanish again
+once you have moved on.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

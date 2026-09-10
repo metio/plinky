@@ -86,6 +86,25 @@ export function vanishedSteps(measures: number[], clearedIndex: number): number[
     return gone;
 }
 
+// Which vanished steps come back when the run is sent back to an earlier step: a written
+// repeat, or a section loop coming round. Every bar from the one returned to onwards is
+// music about to be read again, so it has to be on the page; what lies before that bar is
+// still behind the run and stays gone. Both passes of a repeated bar are steps of their
+// own over one set of noteheads, and they share a bar, so they come back together.
+export function reappearingSteps(
+    measures: number[],
+    gone: Iterable<number>,
+    returnedTo: number,
+): number[] {
+    const target = measures[returnedTo];
+    if (target === undefined) {
+        return [];
+    }
+    return [...gone]
+        .filter((index) => (measures[index] ?? Number.NEGATIVE_INFINITY) >= target)
+        .sort((a, b) => a - b);
+}
+
 // Whole seconds still to study, counting down and never past either end. The clock
 // arrives as elapsed milliseconds so this stays pure: the caller owns the timer.
 export function studyRemaining(elapsedMs: number, seconds: number): number {

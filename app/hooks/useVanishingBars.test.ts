@@ -118,6 +118,45 @@ describe("useVanishingBars", () => {
         expect(hidden).toEqual([]);
     });
 
+    it("gives back the bars a rewind returns to, and hides them again on the way out", () => {
+        // Bars 0 and 1 inside a repeat, then bar 2: steps 0-3 are the first pass, 4-7 the
+        // second over the same noteheads.
+        collected = score([0, 0, 1, 1, 0, 0, 1, 1, 2]);
+        const { result } = mount();
+        act(() => result.current.arm());
+        act(() => result.current.advance(2));
+        expect(hidden.flat()).toEqual(["a0", "a1", "a4", "a5"]);
+
+        // The repeat sends the run back to step 4, the second pass's bar 0.
+        act(() => result.current.rewind(4));
+        expect(unhidden.flat()).toEqual(["a0", "a1", "a4", "a5"]);
+
+        // Leaving that bar again takes it away again, rather than finding it already gone.
+        hidden.length = 0;
+        act(() => result.current.advance(4));
+        expect(hidden).toEqual([]);
+        act(() => result.current.advance(6));
+        expect(hidden.flat()).toEqual(["a0", "a1", "a4", "a5"]);
+    });
+
+    it("keeps a bar before the one returned to out of sight", () => {
+        collected = score([0, 1, 2, 1, 2, 3]);
+        const { result } = mount();
+        act(() => result.current.arm());
+        act(() => result.current.advance(2));
+        expect(hidden.flat()).toEqual(["a0", "a1", "a3"]);
+
+        // Back to step 3, the second pass's bar 1: bar 0 is still behind the run.
+        act(() => result.current.rewind(3));
+        expect(unhidden.flat()).toEqual(["a1", "a3"]);
+    });
+
+    it("does nothing on a rewind when the drill is not armed", () => {
+        const { result } = mount();
+        act(() => result.current.rewind(0));
+        expect(unhidden).toEqual([]);
+    });
+
     it("re-hides exactly the bars already gone after the score is rebuilt", () => {
         // An in-place render mid-run detaches every element the hook is holding. Without
         // re-collecting and re-hiding, the rebuilt score comes back with every vanished

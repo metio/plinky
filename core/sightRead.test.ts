@@ -9,6 +9,7 @@ import {
     type SightReadRecord,
     sightReadAids,
     studyRemaining,
+    reappearingSteps,
     vanishedSteps,
 } from "./sightRead";
 
@@ -60,6 +61,37 @@ describe("normalizeSightRead", () => {
         const parsed = normalizeSightRead({ score: 70, letter: "C", playedAt: 5 });
 
         expect(parsed).toEqual({ score: 70, letter: "C", atTempo: false, playedAt: 5 });
+    });
+});
+
+describe("reappearingSteps", () => {
+    // A | B C :| D with the repeat opening at B, two notes a bar: the run plays A B C B C D,
+    // and both passes of B and C are steps over the same noteheads.
+    const measures = [0, 0, 1, 1, 2, 2, 1, 1, 2, 2, 3, 3];
+
+    it("brings back every vanished bar from the one the repeat returns to", () => {
+        // Reaching C hid A and B, B's second pass included, since it is the same
+        // noteheads. The repeat then sends the run back to B (step 6).
+        const gone = vanishedSteps(measures, 4);
+        expect(gone).toEqual([0, 1, 2, 3, 6, 7]);
+        // B comes back, both passes of it; A is still behind the run and stays gone.
+        expect(reappearingSteps(measures, gone, 6)).toEqual([2, 3, 6, 7]);
+    });
+
+    it("brings back both passes of a bar that vanished once over", () => {
+        // Deep into D, every earlier step is hidden, second-pass steps included.
+        const gone = vanishedSteps(measures, 10);
+        expect(reappearingSteps(measures, gone, 2)).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
+    });
+
+    it("brings back the whole range when a loop over the opening laps", () => {
+        const loop = [0, 0, 1, 1];
+        expect(reappearingSteps(loop, vanishedSteps(loop, 2), 0)).toEqual([0, 1]);
+    });
+
+    it("brings back nothing when nothing had vanished, or the step is not there", () => {
+        expect(reappearingSteps(measures, [], 2)).toEqual([]);
+        expect(reappearingSteps(measures, [0, 1], 99)).toEqual([]);
     });
 });
 

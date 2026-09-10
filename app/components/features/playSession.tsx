@@ -637,13 +637,22 @@ function usePlaySessionValue({
         // re-renders: a fresh render mid-run would replace the very note elements the run
         // is holding on to. Anything else that paints — a ghost, a keep-up window — draws
         // again on its own next tick.
-        onLap: clearPaint,
+        //
+        // The bars a lap returns to may also have vanished behind a sight-reader, and they
+        // are the next thing to read, so the drill gives them back.
+        onLap: ({ index }) => {
+            clearPaint();
+            vanishing.rewind(index);
+        },
         // A written repeat sends the reader back over bars they have already played, and
         // those bars are still green from the first pass — so the colour stops saying where
         // they are at the exact moment the score asks them to read the same music twice.
         // Same wipe, different cause: the lap is the player drilling a range, this is the
-        // page telling them to go round.
-        onRewind: clearPaint,
+        // page telling them to go round. And the same return of vanished bars.
+        onRewind: (span) => {
+            clearPaint(span);
+            vanishing.rewind(span.index);
+        },
         onCorrect: (info: CorrectInfo) => {
             // Skip the note-echo under mic input — you hear your own piano.
             if (!micListening) {

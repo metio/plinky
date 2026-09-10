@@ -395,8 +395,9 @@ export function useScoreMatcher(
         // A section loop has come round again. The run's own state rewinds here, but what
         // the run DREW on the score does not — so the second pass over the same bars starts
         // already coloured green and the trail stops meaning "how far you have got". The
-        // surface owns the paint, so it is told rather than reached into.
-        onLap?: () => void;
+        // surface owns the paint, so it is told rather than reached into. `index` is the
+        // step the lap returns to, among the whole piece's steps.
+        onLap?: (lap: { index: number }) => void;
         // A written repeat has sent the run back to bars it has already played. Same
         // problem the lap above solves and the same answer — the second pass over those
         // bars would otherwise start already coloured from the first — but a different
@@ -404,8 +405,9 @@ export function useScoreMatcher(
         // score asking. Kept apart so a consumer can answer one without answering both:
         // the lap also bumps the practice tempo, which a repeat must not.
         // A written repeat sent the run back: from the onset it returns to, over the
-        // one it leaves, in whole notes.
-        onRewind?: (span: { from: number; to: number }) => void;
+        // one it leaves, in whole notes, and the step it returns to among the whole
+        // piece's steps.
+        onRewind?: (span: { from: number; to: number; index: number }) => void;
         // A wrong note at a position: its whole-piece step index and how many wrong
         // attempts that position has absorbed so far (1 on the first slip) — what a
         // tries budget compares against.
@@ -718,7 +720,11 @@ export function useScoreMatcher(
                 // the same reason the lap is: the halos belong to the surface.
                 const following = runStepsRef.current[event.ordinal + 1];
                 if (following !== undefined && jumpsBack(event.step, following)) {
-                    optionsRef.current.onRewind?.({ from: following.whole, to: event.step.whole });
+                    optionsRef.current.onRewind?.({
+                        from: following.whole,
+                        to: event.step.whole,
+                        index: runIndicesRef.current[event.ordinal + 1] ?? 0,
+                    });
                 }
             }
             if (next.complete && runLoopRef.current) {
@@ -732,7 +738,7 @@ export function useScoreMatcher(
                 setMissedHere(false);
                 // Wipe the lap that has just ended, so the bars ahead read as unplayed
                 // again. Announced rather than done here: the halos belong to the surface.
-                optionsRef.current.onLap?.();
+                optionsRef.current.onLap?.({ index: runIndicesRef.current[0] ?? 0 });
                 publish(fresh);
                 return;
             }

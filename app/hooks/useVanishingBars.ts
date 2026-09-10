@@ -5,7 +5,7 @@ import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef } from "react";
 import type { Hand } from "../../core/matcher";
-import { vanishedSteps } from "../../core/sightRead";
+import { reappearingSteps, vanishedSteps } from "../../core/sightRead";
 import {
     collectStepNotes,
     hideNoteElements,
@@ -80,6 +80,22 @@ export function useVanishingBars(
         }
     }, []);
 
+    // The run has been sent back to `returnedTo` — a repeat barline, or a loop's lap —
+    // over bars that vanished on the way through. They are what the player reads next,
+    // so they come back; the bar tracking starts over, since the run no longer only
+    // moves forward from the bar it last left.
+    const rewind = useCallback((returnedTo: number) => {
+        if (!activeRef.current) {
+            return;
+        }
+        const back = reappearingSteps(measuresRef.current, goneRef.current, returnedTo);
+        for (const index of back) {
+            goneRef.current.delete(index);
+        }
+        unhideNoteElements(back.map((index) => stepsRef.current[index]?.elements ?? []));
+        lastMeasureRef.current = null;
+    }, []);
+
     // Re-apply after the score's noteheads were rebuilt (an in-place render, e.g.
     // toggling the printed fingering mid-run): the old elements are detached, so
     // re-collect the fresh ones and hide exactly the bars already left behind.
@@ -108,5 +124,5 @@ export function useVanishingBars(
         }
     }, []);
 
-    return { arm, advance, rearm, restore };
+    return { arm, advance, rewind, rearm, restore };
 }

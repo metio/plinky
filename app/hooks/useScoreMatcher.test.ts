@@ -454,6 +454,33 @@ describe("a run over a repeat", () => {
         expect(correct.map((info) => info.index)).toEqual([2, 3, 6, 7]);
     });
 
+    it("names the step a repeat or a lap returns to among the whole piece's", () => {
+        const { osmd } = fakeOsmd(PASSES, WHOLES, BARS);
+        const rewinds: { from: number; to: number; index: number }[] = [];
+        const laps: { index: number }[] = [];
+        const { result } = renderHook(() =>
+            useScoreMatcher(() => osmd, {
+                onRewind: (span) => rewinds.push(span),
+                onLap: (lap) => laps.push(lap),
+            }),
+        );
+        // The whole piece: clearing bar 2's last note sends the run back to step 4.
+        act(() => result.current.start());
+        for (const pitch of [60, 62, 64, 65]) {
+            act(() => result.current.registerNote(pitch));
+        }
+        expect(rewinds).toEqual([{ from: 0, to: 0.375, index: 4 }]);
+
+        // A loop over bar 2 jumps from pass one to pass two (step 6), then laps to step 2.
+        rewinds.length = 0;
+        act(() => result.current.start(0, { from: 2, to: 2 }));
+        for (const pitch of [64, 65, 64, 65]) {
+            act(() => result.current.registerNote(pitch));
+        }
+        expect(rewinds.map((span) => span.index)).toEqual([6]);
+        expect(laps).toEqual([{ index: 2 }]);
+    });
+
     it("puts the cursor on the second pass when a run resumes there", () => {
         // Handed over from Listen partway through the second pass: the cursor stands on
         // position 5, so the reducer starts there, and the cursor has to stand on that

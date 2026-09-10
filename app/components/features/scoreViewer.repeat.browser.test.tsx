@@ -7,6 +7,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { ServicesProvider } from "../../contexts/services";
 import { MidiProvider } from "../../contexts/midi";
+import { m } from "../../paraglide/messages.js";
+import { reveal, switchOn } from "../../testing/controls";
 import { ScoreViewer } from "./scoreViewer";
 
 // What a written repeat does to the colour on the page.
@@ -68,6 +70,41 @@ const awaitReady = async () => {
         .toBe(false);
     return practice;
 };
+
+// Noteheads the read-ahead drill has taken away. It hides with the visibility attribute,
+// so the spacing and the cursor stay where they were.
+const vanished = () => document.querySelectorAll('svg [visibility="hidden"]').length;
+
+describe("the read-ahead drill over a written repeat", () => {
+    it("brings back the bars the repeat sends the reader over again", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        mountRepeated();
+        await awaitReady();
+        reveal(m.run_group_practice_title);
+        fireEvent.click(screen.getByRole("switch", { name: m.sight_read() }));
+        // Bars vanish by default in sight-read mode.
+        expect(switchOn(m.sight_read_vanish)).toBe(true);
+        fireEvent.click(await awaitReady());
+        await screen.findByText(/Reading it through/);
+        await expect
+            .poll(() => screen.queryByText(/Reading it through/), { timeout: 30000 })
+            .toBeNull();
+
+        // The first pass: C, then D, which leaves bar one behind and takes it away.
+        await strike("C 4");
+        expect(vanished()).toBe(0);
+        await strike("D 4");
+
+        // Clearing that D is also where the repeat sends the run back to bar one, whose
+        // C is what the player has to read next.
+        await expect.poll(vanished, { timeout: 30000 }).toBe(0);
+
+        // The second pass vanishes the bars again as it leaves them.
+        await strike("C 4");
+        await strike("D 4");
+        await expect.poll(vanished, { timeout: 30000 }).toBeGreaterThan(0);
+    });
+});
 
 describe("a handoff from Listen on the repeat's second pass", () => {
     it("continues on the pass Listen was playing rather than the first", async () => {
