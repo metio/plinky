@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import fc from "fast-check";
 import { beforeEach, describe, expect, it } from "vitest";
 import { cookieName } from "../app/paraglide/runtime.js";
 import { ERAS, HUB_GRADES } from "../core/musicHubs";
@@ -355,6 +356,43 @@ describe("parsePath", () => {
         expect(parsePath("/en/person/frederic-chopin")).toEqual({ locale: "en", kind: "person", id: "frederic-chopin" });
         expect(parsePath("/en/music/")).toBeNull();
         expect(parsePath("/play/47xd2XDpYFCy/")).toBeNull();
+    });
+
+    it("decodes an escaped id", () => {
+        expect(parsePath("/en/person/fr%C3%A9d%C3%A9ric/")?.id).toBe("frédéric");
+    });
+
+    it.each([
+        "/en/play/%E0/",
+        "/en/person/%ZZ/",
+        "/de/music/collection/%E0/",
+        "/en/music/grade/%ZZ",
+    ])("reads nothing out of %s, whose escape does not decode", (path) => {
+        expect(parsePath(path)).toBeNull();
+    });
+
+    it("never throws, whatever the id", () => {
+        fc.assert(
+            fc.property(
+                fc.constantFrom("play", "person", "music/grade", "music/era", "music/collection"),
+                fc.string({ unit: fc.constantFrom("%", "E", "0", "Z", "a", "9", "C", "3") }),
+                (kind, id) => {
+                    expect(() => parsePath(`/en/${kind}/${id}/`)).not.toThrow();
+                },
+            ),
+        );
+    });
+});
+
+describe("an address whose escape does not decode", () => {
+    it.each([
+        "/en/play/%E0/",
+        "/en/person/%ZZ/",
+        "/en/music/collection/%E0/",
+        "/en/music/era/%ZZ/",
+    ])("keeps the 404 for %s rather than failing", async (path) => {
+        const response = await onRequest(served(path, 404, "shell", SHELL_HEADERS));
+        expect(response.status).toBe(404);
     });
 });
 

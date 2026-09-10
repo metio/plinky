@@ -133,29 +133,42 @@ const HUB_ERAS = ["baroque", "classical", "romantic", "modern"];
 // Born before, per era: the same bounds core/musicHubs sets, for the same reason.
 const ERA_UNTIL = { baroque: 1710, classical: 1800, romantic: 1870, modern: Infinity };
 
+// The language, the kind of page and the still-encoded id of an address shaped like one of
+// the pages written here. Null for any other address.
+function matchPath(path) {
+    const match =
+        path.match(/^\/([a-z]{2})\/music\/(grade|era|collection)\/([^/]+)\/?$/) ??
+        path.match(/^\/([a-z]{2})\/(play|person)\/([^/]+)\/?$/);
+    return match ? { locale: match[1], kind: match[2], raw: match[3] } : null;
+}
+
 // What the address names: the language, which kind of page, and which one of them.
-// Null for any other address.
+// Null for any other address, and for one whose id is not valid percent-encoding —
+// "%E0" or "%ZZ" names nothing, and a URL leaves such an escape as it is.
 export function parsePath(path) {
-    const shelf = path.match(/^\/([a-z]{2})\/music\/(grade|era|collection)\/([^/]+)\/?$/);
-    if (shelf) {
-        const [, locale, kind, raw] = shelf;
-        return { locale, kind, id: decodeURIComponent(raw) };
-    }
-    const match = path.match(/^\/([a-z]{2})\/(play|person)\/([^/]+)\/?$/);
-    if (!match) {
+    const matched = matchPath(path);
+    if (!matched) {
         return null;
     }
-    const [, locale, kind, raw] = match;
-    return { locale, kind, id: decodeURIComponent(raw) };
+    let id;
+    try {
+        id = decodeURIComponent(matched.raw);
+    } catch {
+        return null;
+    }
+    return { locale: matched.locale, kind: matched.kind, id };
 }
 
 // Whether the address names a page the site has. Unknown when the list could not be
 // read: then every page is presumed real, as it always was, rather than the whole
 // catalogue going missing because one file did.
 export async function exists(context) {
-    const page = parsePath(new URL(context.request.url).pathname);
+    const path = new URL(context.request.url).pathname;
+    const page = parsePath(path);
     if (!page) {
-        return true;
+        // Shaped like a page but with an id that does not decode: no page has that id.
+        // Any other address is not one this list can judge.
+        return matchPath(path) === null;
     }
     if (page.kind === "play" && GENERATED.test(page.id)) {
         return true;
