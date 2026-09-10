@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { cadence } from "../../core/cadence";
 import type { Grade } from "../../core/grade";
 import { flushHolds, type RunCapture } from "../../core/runCapture";
-import { runSettled } from "../../core/runEnd";
+import { owesGrade, runSettled } from "../../core/runEnd";
 import { deriveRunOutcome, type RunOutcome, tempoScale } from "../../core/runOutcome";
 import { sectionScores } from "../../core/sectionBest";
 import type { AppServices } from "../contexts/services";
@@ -104,7 +104,14 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
 
     const gradeIfOwed = useCallback(() => {
         const o = latest.current;
-        if (!o.complete || gradedRef.current) {
+        if (
+            !owesGrade({
+                complete: o.complete,
+                graded: gradedRef.current,
+                correct: o.correct,
+                captured: o.capture.current.notes.length,
+            })
+        ) {
             return;
         }
         gradedRef.current = true;

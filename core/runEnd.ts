@@ -24,3 +24,25 @@ export type RunEnding = {
 export function runSettled({ complete, holdingNote }: RunEnding): boolean {
     return complete && !holdingNote;
 }
+
+export type GradeClaim = {
+    // The matcher cleared the run's last position.
+    complete: boolean;
+    // This run has already been graded.
+    graded: boolean;
+    // Positions the matcher cleared, and notes the capture holds.
+    correct: number;
+    captured: number;
+};
+
+// Whether a finished run is still owed its grade.
+//
+// The counters come from the matcher and the notes from the capture, and they are two
+// halves of one run only while they agree. A run that cleared positions yet has no notes
+// captured is pairing one run's counters with the next run's fresh capture: graded, it
+// would be written to history and mastery a second time, and its empty onset list would
+// replace the ghost the player races. A run that cleared nothing has nothing to capture,
+// and is still graded.
+export function owesGrade({ complete, graded, correct, captured }: GradeClaim): boolean {
+    return complete && !graded && (correct === 0 || captured > 0);
+}

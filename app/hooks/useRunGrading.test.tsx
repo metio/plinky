@@ -208,6 +208,39 @@ describe("useRunGrading", () => {
         expect(gridOf(slow)).not.toBe(gridOf(atTempo));
     });
 
+    it("refuses a finished run whose capture holds none of the notes it cleared", () => {
+        // The matcher's counters and a capture that belongs to the next run: grading them
+        // together would count the run again and store an empty ghost over the real one.
+        const { finish, calls, result, services } = harness({
+            capture: { current: startCapture() },
+            correct: 8,
+        });
+        services.ghosts.save(SONG, [0, 500, 1000]);
+
+        finish();
+        result.current.gradeIfOwed();
+
+        expect(calls.recordResult).not.toHaveBeenCalled();
+        expect(calls.adoptOwnRun).not.toHaveBeenCalled();
+        expect(calls.onRunComplete).not.toHaveBeenCalled();
+        expect(calls.playNote).not.toHaveBeenCalled();
+        expect(result.current.finishedGrade()).toBeNull();
+        expect(services.ghosts.load(SONG)).toEqual([0, 500, 1000]);
+    });
+
+    it("grades the run once its notes are captured, after refusing an empty capture", () => {
+        // Refusing does not latch: the refusal is about the capture, not the run. The
+        // capture is a ref filled in place, so the teardown's gradeIfOwed reads the notes.
+        const capture = { current: startCapture() };
+        const { finish, calls, result } = harness({ capture, correct: 8 });
+        finish();
+        expect(calls.recordResult).not.toHaveBeenCalled();
+
+        capture.current = playedRun(8);
+        result.current.gradeIfOwed();
+        expect(calls.recordResult).toHaveBeenCalledTimes(1);
+    });
+
     it("survives a run that cleared nothing", () => {
         const { finish, calls, result } = harness({
             capture: { current: startCapture() },
