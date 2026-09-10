@@ -73,6 +73,53 @@ function setAlter(doc: Document, pitch: Element, alter: number): void {
     pitch.querySelector("octave")?.before(element);
 }
 
+// The pitches a `<harmony>` names: its root and the bass under it, each a step with an
+// optional alter and no octave. A `<degree>` is left alone, because its alter is measured
+// from the chord rather than from C — the flat ninth of C7♭9 is still the flat ninth of D7♭9.
+const HARMONY_PITCHES = [
+    ["root", "root-step", "root-alter"],
+    ["bass", "bass-step", "bass-alter"],
+] as const;
+
+// One chord-symbol pitch moved the way a note is: the letter by the same number of steps,
+// the accidental by whatever bridges the new letter to the moved pitch class — so C over E
+// a major second up reads D over F♯, as the transposed bass note under it does.
+function moveHarmonyPitch(
+    doc: Document,
+    holder: Element,
+    stepTag: string,
+    alterTag: string,
+    letterSteps: number,
+    semitones: number,
+): void {
+    const stepNode = holder.querySelector(stepTag);
+    const step = stepNode?.textContent?.trim() ?? "";
+    const letter = LETTER_INDEX[step];
+    const semitone = SEMITONE[step];
+    const alterNode = holder.querySelector(alterTag);
+    const alter = Number(alterNode?.textContent ?? "0");
+    if (!stepNode || letter === undefined || semitone === undefined || !Number.isFinite(alter)) {
+        return;
+    }
+    const newLetter = LETTERS[(((letter + letterSteps) % 7) + 7) % 7] ?? "C";
+    // With no octave to carry, the accidental is the smallest one that reaches the moved
+    // pitch class from the new letter: -6 to 5, and in practice within a double either way.
+    const gap = semitone + alter + semitones - (SEMITONE[newLetter] ?? 0);
+    const newAlter = (((gap % 12) + 18) % 12) - 6;
+    stepNode.textContent = newLetter;
+    // A `text` attribute prints a name in place of the step (H for B); it named the old one.
+    stepNode.removeAttribute("text");
+    if (newAlter === 0) {
+        alterNode?.remove();
+    } else if (alterNode) {
+        alterNode.textContent = String(newAlter);
+    } else {
+        const element = doc.createElement(alterTag);
+        element.textContent = String(newAlter);
+        stepNode.after(element);
+    }
+}
+
 export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: number): string {
     if (semitones === 0) {
         return xml;
@@ -123,6 +170,13 @@ export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: numbe
             octaveNode.textContent = String(newOctave);
         }
         setAlter(doc, pitch, newAlter);
+    }
+
+    // A written chord symbol moves with the notes under it, spelled by the same rule.
+    for (const [holderTag, stepTag, alterTag] of HARMONY_PITCHES) {
+        for (const holder of doc.querySelectorAll(`harmony > ${holderTag}`)) {
+            moveHarmonyPitch(doc, holder, stepTag, alterTag, letterSteps, semitones);
+        }
     }
 
     // Shift every key signature by the same amount so the printed key follows the

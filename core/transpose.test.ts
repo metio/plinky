@@ -126,3 +126,121 @@ describe("transposeMusicXml", () => {
         expect(transposeMusicXml(domXmlCodec, "not xml at all", 3)).toBe("not xml at all");
     });
 });
+
+describe("transposeMusicXml chord symbols", () => {
+    const harmony = (root: string, rootAlter?: number, bass?: string, bassAlter?: number) =>
+        `<harmony><root><root-step>${root}</root-step>${
+            rootAlter === undefined ? "" : `<root-alter>${rootAlter}</root-alter>`
+        }</root><kind>major</kind>${
+            bass === undefined
+                ? ""
+                : `<bass><bass-step>${bass}</bass-step>${
+                      bassAlter === undefined ? "" : `<bass-alter>${bassAlter}</bass-alter>`
+                  }</bass>`
+        }</harmony>`;
+
+    // Each symbol's root and bass as written: letter, then # or b per alter.
+    function symbols(xml: string): Array<{ root: string; bass: string | null }> {
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        const spell = (holder: Element | null, tag: string) => {
+            if (!holder) {
+                return null;
+            }
+            const step = holder.querySelector(`${tag}-step`)?.textContent ?? "";
+            const alter = Number(holder.querySelector(`${tag}-alter`)?.textContent ?? "0");
+            return `${step}${alter > 0 ? "#".repeat(alter) : "b".repeat(-alter)}`;
+        };
+        return [...doc.querySelectorAll("harmony")].map((one) => ({
+            root: spell(one.querySelector("root"), "root") ?? "",
+            bass: spell(one.querySelector("bass"), "bass"),
+        }));
+    }
+
+    it("moves a chord symbol with the notes, its bass included", () => {
+        // C over E, a major second up, is D over F♯.
+        const xml = score(harmony("C", undefined, "E") + note("E", 3) + note("C", 4), 0);
+        expect(symbols(transposeMusicXml(domXmlCodec, xml, 2))).toEqual([
+            { root: "D", bass: "F#" },
+        ]);
+    });
+
+    it("spells a symbol into a flat key with flats, the way the notes are", () => {
+        // C major up a semitone is D♭ major: G7 over B becomes A♭7 over C.
+        const xml = score(harmony("G", undefined, "B") + note("G", 4), 0);
+        const moved = transposeMusicXml(domXmlCodec, xml, 1);
+        expect(fifthsOf(moved)).toBe(-5);
+        expect(symbols(moved)).toEqual([{ root: "Ab", bass: "C" }]);
+        expect(pitches(moved)[0]?.name).toBe("Ab");
+    });
+
+    it("drops an accidental a symbol no longer needs and adds one it now does", () => {
+        // E♭ major up a major third is G major: E♭ over B♭ becomes G over D, and F♯ minor
+        // there (a borrowed chord) becomes A♯.
+        const xml = score(harmony("E", -1, "B", -1) + harmony("F", 1) + note("E", 4, -1), -3);
+        const moved = transposeMusicXml(domXmlCodec, xml, 4);
+        expect(fifthsOf(moved)).toBe(1);
+        expect(symbols(moved)).toEqual([
+            { root: "G", bass: "D" },
+            { root: "A#", bass: null },
+        ]);
+        expect(moved).not.toContain("<bass-alter>");
+    });
+
+    it("writes a new alter straight after its step, where MusicXML orders it", () => {
+        const moved = transposeMusicXml(domXmlCodec, score(harmony("C", undefined, "E")), 2);
+        expect(moved).toContain("<bass-step>F</bass-step><bass-alter>1</bass-alter>");
+    });
+
+    it("spells every symbol exactly as the same pitch written as a note", () => {
+        // The symbol and the note beside it must never disagree about a name, in any key
+        // and by any interval.
+        const spellings: Array<[string, number | undefined]> = [
+            ["C", undefined],
+            ["C", 1],
+            ["D", -1],
+            ["D", undefined],
+            ["E", -1],
+            ["E", undefined],
+            ["F", undefined],
+            ["F", 1],
+            ["G", -1],
+            ["G", undefined],
+            ["A", -1],
+            ["A", undefined],
+            ["B", -1],
+            ["B", undefined],
+        ];
+        for (const fifths of [-4, -1, 0, 2, 5]) {
+            for (let semitones = -12; semitones <= 12; semitones++) {
+                for (const [step, alter] of spellings) {
+                    const xml = score(
+                        harmony(step, alter, step, alter) + note(step, 4, alter),
+                        fifths,
+                    );
+                    const moved = transposeMusicXml(domXmlCodec, xml, semitones);
+                    const written = pitches(moved)[0]?.name;
+                    expect(symbols(moved)).toEqual([{ root: written, bass: written }]);
+                }
+            }
+        }
+    });
+
+    it("keeps a degree's alteration, which is measured from the chord", () => {
+        const xml = score(
+            `<harmony><root><root-step>C</root-step></root><kind>dominant</kind><degree><degree-value>9</degree-value><degree-alter>-1</degree-alter><degree-type>add</degree-type></degree></harmony>`,
+        );
+        const moved = transposeMusicXml(domXmlCodec, xml, 2);
+        expect(moved).toContain("<degree-alter>-1</degree-alter>");
+        expect(symbols(moved)).toEqual([{ root: "D", bass: null }]);
+    });
+
+    it("forgets a printed name that belonged to the old root", () => {
+        // German editions print B as H; after moving, the step is a different note.
+        const xml = score(
+            `<harmony><root><root-step text="H">B</root-step></root><kind>major</kind></harmony>`,
+        );
+        const moved = transposeMusicXml(domXmlCodec, xml, 2);
+        expect(moved).not.toContain('text="H"');
+        expect(symbols(moved)).toEqual([{ root: "C#", bass: null }]);
+    });
+});

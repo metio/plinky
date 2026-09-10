@@ -69,6 +69,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Listen plays a transposed piece's tremolos and glissandos in the new key.** Move a\npiece up or down and press Listen, and a tremolo still shook between the chords of the\nkey it was written in, a few notes away from the ones on the page, while a glissando\nswept towards the old arrival note. Both now sound in the key you chose, exactly where\nthe staff shows them.",
                 twip: true,
             },
+            {
+                body: "**Chord symbols move with the music when you transpose.** A piece whose score prints\nits own chord names kept them in the key it was written in, so after moving it up a\ntone the staff said D major while the symbols above it still read C, Am and G7. The\nnames now follow the notes, spelled the way the new key spells them, bass notes\nincluded.",
+                twip: true,
+            },
         ],
     },
     {

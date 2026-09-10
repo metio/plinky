@@ -93,6 +93,12 @@ key it was written in, a few notes away from the ones on the page, while a gliss
 swept towards the old arrival note. Both now sound in the key you chose, exactly where
 the staff shows them.
 
+**Chord symbols move with the music when you transpose.** A piece whose score prints
+its own chord names kept them in the key it was written in, so after moving it up a
+tone the staff said D major while the symbols above it still read C, Am and G7. The
+names now follow the notes, spelled the way the new key spells them, bass notes
+included.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down
