@@ -8,7 +8,7 @@ import { chordSetFor, summarizeChords } from "./pieceChords";
 const span = (
     numeral: string,
     at: number,
-    key = { tonic: 0, mode: "major" as const },
+    key = { tonic: 0, mode: "major" as const, fifths: 0 },
 ): ChordSpan => ({
     from: at,
     to: at + 1,
@@ -64,7 +64,7 @@ describe("summarizeChords", () => {
     it("keeps a diminished seventh chord's triad diminished", () => {
         const spans = loop(["i", "iiø7", "V7", "VI"], 1).map((one, at) => ({
             ...one,
-            key: { tonic: 9, mode: "minor" as const },
+            key: { tonic: 9, mode: "minor" as const, fifths: 0 },
             from: at,
             to: at + 1,
         }));
@@ -83,7 +83,7 @@ describe("summarizeChords", () => {
     });
 
     it("offers no ear drill for a minor piece, and its own minor chord set", () => {
-        const minor = { tonic: 9, mode: "minor" as const };
+        const minor = { tonic: 9, mode: "minor" as const, fifths: 0 };
         const summary = summarizeChords(
             loop(["i", "VI", "III", "VII"], 2).map((one) => ({ ...one, key: minor })),
         );

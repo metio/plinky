@@ -42,7 +42,9 @@ export type ChordSpan = {
     inversion: number;
     // The chord's place in its key, as the ear hears it and as it carries between keys.
     numeral: string;
-    key: { tonic: PitchClass; mode: Mode };
+    // The key, with the signature it is written under: six sharps and six flats name the
+    // same tonic, and only the signature says whether a chord in it is F♯ or G♭.
+    key: { tonic: PitchClass; mode: Mode; fifths: number };
     // How much of what sounded belonged to the chord, 0 to 1. Below about 0.6 the reading
     // is a guess: a suspension, a chromatic run, two chords in one beat.
     confidence: number;
@@ -314,7 +316,7 @@ export function readHarmony(timeline: {
             bass,
             inversion,
             numeral: fit.candidate.numeral,
-            key: { tonic, mode },
+            key: { tonic, mode, fifths },
             confidence: fit.confidence,
             weight: beat.total,
         };

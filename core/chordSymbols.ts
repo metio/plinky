@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { stavesPerPart } from "./accompaniment";
+import { type Spelling, spellChordTone } from "./chordSpelling";
 import { type ChordSpan, readHarmony } from "./harmony";
 import { readTimeline } from "./musicxmlTimeline";
-import { spellMidi } from "./notes";
 import { partsOf } from "./parts";
 import type { ChordQuality } from "./theory";
 import type { XmlCodec } from "./xml";
@@ -76,13 +76,12 @@ export function withChordSymbols(codec: XmlCodec, xml: string, least = SURE_ENOU
 
 const EPSILON = 1e-6;
 
-// Spelled the way the key reads: flats in a flat key, sharps otherwise — the same rule
-// that spells a chromatic run — so an E♭ major chord in E♭ is E♭ and never D♯.
+// Spelled the way the score writes the chord (see core/chordSpelling): E♭ major in E♭ is
+// E♭ and never D♯, and the dominant of D minor over its third is A over C♯.
 function harmonyElement(doc: Document, span: ChordSpan): Element {
-    const flats = spellsFlat(span);
     const harmony = doc.createElement("harmony");
     const root = doc.createElement("root");
-    root.appendChild(pitchElement(doc, "root-step", "root-alter", span.root, flats));
+    root.appendChild(pitchElement(doc, "root-step", "root-alter", spellChordTone(span, span.root)));
     harmony.appendChild(root);
     const kind = doc.createElement("kind");
     const known = KIND[span.quality];
@@ -93,7 +92,9 @@ function harmonyElement(doc: Document, span: ChordSpan): Element {
     harmony.appendChild(kind);
     if (span.inversion > 0) {
         const bass = doc.createElement("bass");
-        bass.appendChild(pitchElement(doc, "bass-step", "bass-alter", span.bass, flats));
+        bass.appendChild(
+            pitchElement(doc, "bass-step", "bass-alter", spellChordTone(span, span.bass)),
+        );
         harmony.appendChild(bass);
     }
     return harmony;
@@ -103,10 +104,8 @@ function pitchElement(
     doc: Document,
     stepTag: string,
     alterTag: string,
-    pitchClass: number,
-    flats: boolean,
+    { step, alter }: Spelling,
 ): DocumentFragment {
-    const { step, alter } = spellMidi(60 + pitchClass, flats);
     const fragment = doc.createDocumentFragment();
     const stepElement = doc.createElement(stepTag);
     stepElement.textContent = step;
@@ -117,13 +116,4 @@ function pitchElement(
         fragment.appendChild(alterElement);
     }
     return fragment;
-}
-
-// The flat keys, by their major tonic: F and the five flat keys round the circle. A minor
-// key spells like its relative major.
-const FLAT_TONICS = new Set([5, 10, 3, 8, 1, 6]);
-
-export function spellsFlat(span: { key: ChordSpan["key"] }): boolean {
-    const major = span.key.mode === "major" ? span.key.tonic : (span.key.tonic + 3) % 12;
-    return FLAT_TONICS.has(major);
 }

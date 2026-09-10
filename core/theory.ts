@@ -231,6 +231,35 @@ const CHORD_STACKS: Record<ChordQuality, number[]> = {
 
 export const CHORD_QUALITIES = Object.keys(CHORD_STACKS) as ChordQuality[];
 
+// The letter each tone of a stack is written on, counted in letters above the root's: a
+// third is two letters up whatever its size, so a diminished seventh on C♯ is B♭ and never
+// A♯, and a ninth is eight. One entry per tone of CHORD_STACKS, in the same order.
+const CHORD_LETTERS: Record<ChordQuality, number[]> = {
+    major: [0, 2, 4],
+    minor: [0, 2, 4],
+    diminished: [0, 2, 4],
+    augmented: [0, 2, 4],
+    "dominant-seventh": [0, 2, 4, 6],
+    "major-seventh": [0, 2, 4, 6],
+    "minor-seventh": [0, 2, 4, 6],
+    "half-diminished-seventh": [0, 2, 4, 6],
+    "diminished-seventh": [0, 2, 4, 6],
+    "minor-major-seventh": [0, 2, 4, 6],
+    "major-sixth": [0, 2, 4, 5],
+    "minor-sixth": [0, 2, 4, 5],
+    "suspended-second": [0, 1, 4],
+    "suspended-fourth": [0, 3, 4],
+    "added-ninth": [0, 2, 4, 8],
+    "dominant-ninth": [0, 2, 4, 6, 8],
+    "major-ninth": [0, 2, 4, 6, 8],
+    "minor-ninth": [0, 2, 4, 6, 8],
+};
+
+// How many letters above the root each tone of a chord is written, in stack order.
+export function chordLetterSteps(quality: ChordQuality): readonly number[] {
+    return CHORD_LETTERS[quality];
+}
+
 // The sounding notes of a chord in root position, from a root MIDI note.
 export function chordPitches(root: number, quality: ChordQuality): number[] {
     return CHORD_STACKS[quality].map((step) => root + step);

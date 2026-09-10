@@ -79,7 +79,7 @@ describe("readHarmony", () => {
         ];
         const spans = read(notes, 3);
         expect(spans.map((span) => span.numeral)).toEqual(["i", "V", "i"]);
-        expect(spans[0]?.key).toEqual({ tonic: 9, mode: "minor" });
+        expect(spans[0]?.key).toEqual({ tonic: 9, mode: "minor", fifths: 0 });
     });
 
     it("joins beats that agree and splits where the chord changes", () => {

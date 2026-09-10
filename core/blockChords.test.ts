@@ -8,9 +8,11 @@ import { blockChords } from "./blockChords";
 
 const note = (step: string, octave: number, duration: number, staff: 1 | 2, alter = 0) =>
     `<note><pitch><step>${step}</step>${alter === 0 ? "" : `<alter>${alter}</alter>`}<octave>${octave}</octave></pitch><duration>${duration}</duration><voice>${staff}</voice><type>quarter</type><staff>${staff}</staff></note>`;
+const attributes = (fifths: number) =>
+    `<attributes><divisions>4</divisions><key><fifths>${fifths}</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>`;
 const ATTR = `<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>`;
-const bar = (number: number, right: string, left: string) =>
-    `<measure number="${number}">${number === 1 ? ATTR : ""}${right}<backup><duration>16</duration></backup>${left}</measure>`;
+const bar = (number: number, right: string, left: string, fifths = 0) =>
+    `<measure number="${number}">${number === 1 ? attributes(fifths) : ""}${right}<backup><duration>16</duration></backup>${left}</measure>`;
 const score = (bars: string) =>
     `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1">${bars}</part></score-partwise>`;
 
@@ -122,6 +124,70 @@ describe("blockChords", () => {
                 ),
         );
         expect(leftHand(blockChords(domXmlCodec, pickup))).toEqual([[[]], [[48, 52, 55]]]);
+    });
+
+    // The left hand's block notes as written: letter, then # or b per alter.
+    const leftSpelled = (xml: string) =>
+        Array.from(domXmlCodec.parse(xml)?.querySelectorAll("note") ?? [])
+            .filter(
+                (one) =>
+                    one.querySelector("staff")?.textContent === "2" && one.querySelector("pitch"),
+            )
+            .map((one) => {
+                const alter = Number(one.querySelector("alter")?.textContent ?? 0);
+                return `${one.querySelector("step")?.textContent ?? ""}${alter > 0 ? "#".repeat(alter) : "b".repeat(-alter)}`;
+            });
+
+    it("writes a minor key's raised tones with the sharps the key signature's music uses", () => {
+        // G minor, then its dominant: the D major chord holds F♯, never G♭.
+        const gMinor = score(
+            bar(
+                1,
+                note("B", 4, 8, 1, -1) + note("D", 5, 8, 1),
+                note("G", 2, 4, 2) +
+                    note("D", 3, 4, 2) +
+                    note("B", 2, 4, 2, -1) +
+                    note("D", 3, 4, 2),
+                -2,
+            ) +
+                bar(
+                    2,
+                    note("A", 4, 8, 1) + note("F", 4, 8, 1, 1),
+                    note("D", 3, 4, 2) +
+                        note("A", 3, 4, 2) +
+                        note("F", 3, 4, 2, 1) +
+                        note("A", 3, 4, 2),
+                ),
+        );
+        expect(leftSpelled(blockChords(domXmlCodec, gMinor))).toEqual([
+            "G",
+            "Bb",
+            "D",
+            "D",
+            "F#",
+            "A",
+        ]);
+    });
+
+    it("spells a flat minor key's dominant over its leading tone with a sharp", () => {
+        // D minor: the A major chord's third is C♯.
+        const dMinor = score(
+            bar(
+                1,
+                note("F", 5, 8, 1) + note("A", 5, 8, 1),
+                note("D", 3, 4, 2) + note("A", 3, 4, 2) + note("F", 3, 4, 2) + note("A", 3, 4, 2),
+                -1,
+            ) +
+                bar(
+                    2,
+                    note("E", 5, 8, 1) + note("A", 5, 8, 1),
+                    note("A", 2, 4, 2) +
+                        note("E", 3, 4, 2) +
+                        note("C", 3, 4, 2, 1) +
+                        note("E", 3, 4, 2),
+                ),
+        );
+        expect(leftSpelled(blockChords(domXmlCodec, dMinor)).slice(3)).toEqual(["A", "C#", "E"]);
     });
 
     it("leaves a single-staff score alone", () => {

@@ -73,6 +73,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Chord symbols move with the music when you transpose.** A piece whose score prints\nits own chord names kept them in the key it was written in, so after moving it up a\ntone the staff said D major while the symbols above it still read C, Am and G7. The\nnames now follow the notes, spelled the way the new key spells them, bass notes\nincluded.",
                 twip: true,
             },
+            {
+                body: "**Chord names and block chords are spelled the way the music is.** In a minor key with\nflats, the chord that leads home borrowed a flat it never has: D minor's A major over\nC sharp was labelled A/D♭, and with block chords on, the left hand was written with\nD♭ and G♭ where the key signature and the right hand said C♯ and F♯. Pieces in F♯\nmajor or C♯ major had their chords named in flats under a key signature full of\nsharps. Every chord is now spelled note by note from its place in the key, so the\nsymbol, the block chord and the rest of the page agree.",
+                twip: true,
+            },
         ],
     },
     {

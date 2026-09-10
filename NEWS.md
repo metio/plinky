@@ -99,6 +99,14 @@ tone the staff said D major while the symbols above it still read C, Am and G7. 
 names now follow the notes, spelled the way the new key spells them, bass notes
 included.
 
+**Chord names and block chords are spelled the way the music is.** In a minor key with
+flats, the chord that leads home borrowed a flat it never has: D minor's A major over
+C sharp was labelled A/D♭, and with block chords on, the left hand was written with
+D♭ and G♭ where the key signature and the right hand said C♯ and F♯. Pieces in F♯
+major or C♯ major had their chords named in flats under a key signature full of
+sharps. Every chord is now spelled note by note from its place in the key, so the
+symbol, the block chord and the rest of the page agree.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

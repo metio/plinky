@@ -30,7 +30,10 @@ const harmonies = (xml: string) =>
     Array.from(domXmlCodec.parse(xml)?.querySelectorAll("harmony") ?? []).map((one) => ({
         root: `${one.querySelector("root-step")?.textContent ?? ""}${one.querySelector("root-alter")?.textContent ?? ""}`,
         kind: one.querySelector("kind")?.textContent,
-        bass: one.querySelector("bass-step")?.textContent ?? null,
+        bass:
+            one.querySelector("bass-step") === null
+                ? null
+                : `${one.querySelector("bass-step")?.textContent ?? ""}${one.querySelector("bass-alter")?.textContent ?? ""}`,
         before:
             (one.nextElementSibling?.querySelector("step")?.textContent ?? "") +
             (one.nextElementSibling?.querySelector("octave")?.textContent ?? ""),
@@ -95,6 +98,65 @@ describe("withChordSymbols", () => {
             kind: "major",
             bass: "E",
         });
+    });
+
+    // A bar in D minor to settle the mode: the tonic triad, D in the bass.
+    const dMinorBar = bar(
+        1,
+        note("F", 5, 8, 1) + note("A", 5, 8, 1),
+        note("D", 3, 4, 2) + note("A", 3, 4, 2) + note("F", 3, 4, 2) + note("A", 3, 4, 2),
+        -1,
+    );
+
+    it("spells a minor key's raised leading tone as the sharp it is written with", () => {
+        // D minor's first-inversion dominant: A major over C♯, the textbook V6 to i.
+        const dominant = bar(
+            2,
+            note("A", 5, 8, 1) + note("E", 5, 8, 1),
+            note("C", 3, 4, 2, 1) + note("A", 3, 4, 2) + note("E", 3, 4, 2) + note("A", 3, 4, 2),
+        );
+        expect(harmonies(withChordSymbols(domXmlCodec, score(dMinorBar + dominant)))).toEqual([
+            expect.objectContaining({ root: "D", kind: "minor" }),
+            expect.objectContaining({ root: "A", kind: "major", bass: "C1" }),
+        ]);
+    });
+
+    it("names the leading-tone seventh from its sharpened root in a flat minor key", () => {
+        const leading = bar(
+            2,
+            note("B", 5, 8, 1, -1) + note("G", 5, 8, 1),
+            note("C", 3, 4, 2, 1) +
+                note("E", 3, 4, 2) +
+                note("G", 3, 4, 2) +
+                note("B", 3, 4, 2, -1),
+        );
+        expect(harmonies(withChordSymbols(domXmlCodec, score(dMinorBar + leading)))[1]).toEqual(
+            expect.objectContaining({ root: "C1", kind: "diminished-seventh" }),
+        );
+    });
+
+    it("spells the six- and seven-sharp keys with sharps and six flats with flats", () => {
+        // The tonic triad of each, in root position: the names the signature spells.
+        const tonic = (
+            fifths: number,
+            root: [string, number],
+            third: [string, number],
+            fifth: [string, number],
+        ) =>
+            bar(
+                1,
+                note(third[0], 5, 8, 1, third[1]) + note(fifth[0], 5, 8, 1, fifth[1]),
+                note(root[0], 3, 4, 2, root[1]) +
+                    note(fifth[0], 3, 4, 2, fifth[1]) +
+                    note(third[0], 3, 4, 2, third[1]) +
+                    note(fifth[0], 3, 4, 2, fifth[1]),
+                fifths,
+            );
+        const rootOf = (xml: string) =>
+            harmonies(withChordSymbols(domXmlCodec, score(xml)))[0]?.root;
+        expect(rootOf(tonic(6, ["F", 1], ["A", 1], ["C", 1]))).toBe("F1");
+        expect(rootOf(tonic(7, ["C", 1], ["E", 1], ["G", 1]))).toBe("C1");
+        expect(rootOf(tonic(-6, ["G", -1], ["B", -1], ["D", -1]))).toBe("G-1");
     });
 
     it("hands back what it was given when the file is not a score", () => {

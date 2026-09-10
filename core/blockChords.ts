@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { pianoParts, stavesPerPart } from "./accompaniment";
-import { spellsFlat } from "./chordSymbols";
+import { spellChordPitch } from "./chordSpelling";
 import { type ChordSpan, readHarmony } from "./harmony";
 import { readTimeline } from "./musicxmlTimeline";
-import { spellMidi } from "./notes";
 import { partsOf } from "./parts";
 import { chordPitches, pitchClassOf } from "./theory";
 import type { XmlCodec } from "./xml";
@@ -320,17 +319,17 @@ function appendChord(
 ): void {
     const { type, dot } = typeOf(ticks, divisions);
     const pitches = span === null ? [] : voicing(span, bottomOfOctave);
-    const flats = span === null ? false : spellsFlat(span);
     const notes = pitches.length === 0 ? [null] : pitches;
     for (const [index, midi] of notes.entries()) {
         const note = doc.createElement("note");
         if (index > 0) {
             note.appendChild(doc.createElement("chord"));
         }
-        if (midi === null) {
+        if (midi === null || span === null) {
             note.appendChild(doc.createElement("rest"));
         } else {
-            const spelled = spellMidi(midi, flats);
+            // The chord's own spelling, so the notes on the staff match its symbol.
+            const spelled = spellChordPitch(span, midi);
             const pitch = doc.createElement("pitch");
             const step = doc.createElement("step");
             step.textContent = spelled.step;
