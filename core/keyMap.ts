@@ -53,6 +53,21 @@ export function keyCapOf(key: string | null): string {
     return key === " " ? "␣" : key.toUpperCase();
 }
 
+// A number-row or number-pad key, by where it sits rather than what it types.
+const NUMBER_KEY = /^(?:Digit|Numpad)([0-9])$/;
+
+// The digit a key press stands for, or null when it stands for none. A digit the layout
+// types is that digit. Failing that, the key's place decides: French AZERTY types & é " '
+// on the unshifted number row and a number pad with Num Lock off types End or ArrowDown,
+// and in both cases the key is still printed with its number. `code` names the physical
+// key (KeyboardEvent.code), `key` the glyph it produced.
+export function digitOfKey(key: string, code: string): string | null {
+    if (/^[0-9]$/.test(key)) {
+        return key;
+    }
+    return NUMBER_KEY.exec(code)?.[1] ?? null;
+}
+
 export function pedalForKey(map: KeyMap, key: string): PedalKind | null {
     const lower = key.toLowerCase();
     return PEDAL_KINDS.find((kind) => map.pedals[kind] === lower) ?? null;

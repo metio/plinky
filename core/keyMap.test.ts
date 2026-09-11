@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
     cleanKeyMap,
     DEFAULT_KEY_MAP,
+    digitOfKey,
     isDefaultKeyMap,
     keyCapOf,
     keyForSlot,
@@ -228,5 +229,43 @@ describe("keyCapOf", () => {
 
     it("shows a dash for a slot nothing is bound to", () => {
         expect(keyCapOf(null)).toBe("\u2014");
+    });
+});
+
+describe("digitOfKey", () => {
+    it("reads a digit the key types", () => {
+        expect(digitOfKey("3", "Digit3")).toBe("3");
+    });
+
+    it("reads the number-row key under a layout that types a symbol there", () => {
+        // French AZERTY, unshifted: the keys printed 1, 2, 3 and 7 type & \u00e9 " and \u00e8.
+        expect(digitOfKey("&", "Digit1")).toBe("1");
+        expect(digitOfKey("\u00e9", "Digit2")).toBe("2");
+        expect(digitOfKey('"', "Digit3")).toBe("3");
+        expect(digitOfKey("\u00e8", "Digit7")).toBe("7");
+    });
+
+    it("reads a shifted number-row key as its digit", () => {
+        // AZERTY with Shift types the digit itself; QWERTY with Shift types a symbol.
+        expect(digitOfKey("4", "Digit4")).toBe("4");
+        expect(digitOfKey("$", "Digit4")).toBe("4");
+    });
+
+    it("reads the number pad, whatever Num Lock says", () => {
+        expect(digitOfKey("5", "Numpad5")).toBe("5");
+        expect(digitOfKey("End", "Numpad1")).toBe("1");
+    });
+
+    it("trusts the digit the layout types over the key it sits on", () => {
+        // A layout that types 7 on the physical 1 key means 7.
+        expect(digitOfKey("7", "Digit1")).toBe("7");
+    });
+
+    it("reads nothing from a key that is neither a digit nor a number key", () => {
+        expect(digitOfKey("q", "KeyQ")).toBeNull();
+        expect(digitOfKey("Enter", "NumpadEnter")).toBeNull();
+        expect(digitOfKey("+", "NumpadAdd")).toBeNull();
+        expect(digitOfKey("3", "")).toBe("3");
+        expect(digitOfKey("#", "")).toBeNull();
     });
 });

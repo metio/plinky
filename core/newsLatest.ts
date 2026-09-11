@@ -14,7 +14,7 @@ export const LATEST_RELEASES: Release[] = [
         label: "night",
         entries: [
             {
-                body: "**Ear training answers from your number keys.** On a scale-degree question, typing 3\nanswers \"3\" just as clicking it does, and in melodic dictation each number you type\nfills the next note. Chord progressions take the number of the chord's degree, so 4\nis IV and 5 is V; each chord button now shows its number in the corner. A number the\nquestion doesn't offer is left alone.",
+                body: "**Ear training answers from your number keys.** On a scale-degree question, typing 3\nanswers \"3\" just as clicking it does, and in melodic dictation each number you type\nfills the next note. Chord progressions take the number of the chord's degree, so 4\nis IV and 5 is V; each chord button now shows its number in the corner. A number the\nquestion doesn't offer is left alone. The number pad works too, and so does the\nnumber row on a French keyboard, with or without Shift.",
                 twip: true,
             },
         ],

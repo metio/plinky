@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import { digitFor, optionForDigit } from "../../core/earAnswer";
+import { digitOfKey } from "../../core/keyMap";
 import { useClaimedKeys } from "../contexts/midi";
 import { useLatest } from "./useLatest";
 
@@ -49,7 +50,8 @@ export function useDigitAnswers<T extends string>(
             ) {
                 return;
             }
-            const option = optionForDigit(event.key, latest.current.options);
+            const digit = digitOfKey(event.key, event.code);
+            const option = digit === null ? null : optionForDigit(digit, latest.current.options);
             if (option === null) {
                 return;
             }

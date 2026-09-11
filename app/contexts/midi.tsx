@@ -28,7 +28,7 @@ import {
     type MidiSupport,
 } from "../../core/midi";
 import { type ConnectedInput, diffConnectedInputs } from "../../core/midiDevices";
-import { DEFAULT_KEY_MAP, type KeyMap, pedalForKey } from "../../core/keyMap";
+import { DEFAULT_KEY_MAP, digitOfKey, type KeyMap, pedalForKey } from "../../core/keyMap";
 import type { CalibrationSample } from "../../core/micCalibration";
 import type { PedalKind } from "../../core/pedals";
 import { echoChannel, noteOff, noteOn, sendable } from "../../core/midiMessage";
@@ -733,6 +733,15 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             );
         };
 
+        // A claimed digit covers the number key it sits on as well as the glyph: a surface
+        // answering digits reads the press through digitOfKey, so on AZERTY the key printed
+        // 3 answers 3 while typing ", and must not also play whatever " is bound to.
+        const claimed = (event: KeyboardEvent, key: string): boolean => {
+            const claims = claimedKeysRef.current;
+            const digit = digitOfKey(event.key, event.code);
+            return claims.has(key) || (digit !== null && claims.has(digit));
+        };
+
         const onKeyDown = (event: KeyboardEvent) => {
             const key = event.key.toLowerCase();
             if (
@@ -742,7 +751,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 event.altKey ||
                 !playingWithKeys() ||
                 wantsTheKey(event.target, key) ||
-                claimedKeysRef.current.has(key)
+                claimed(event, key)
             ) {
                 return;
             }

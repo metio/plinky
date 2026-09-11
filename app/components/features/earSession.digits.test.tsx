@@ -51,6 +51,13 @@ const press = (key: string, target: EventTarget = window) =>
         );
     });
 
+// A press as a layout reports it: the glyph it types, the physical key it sits on.
+const pressOn = (key: string, code: string, init: KeyboardEventInit = {}) =>
+    act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key, code, bubbles: true, ...init }));
+        window.dispatchEvent(new KeyboardEvent("keyup", { key, code, bubbles: true, ...init }));
+    });
+
 const unanswered = () => screen.getByText(m.ear_prompt());
 
 describe("EarSession number keys", () => {
@@ -147,6 +154,52 @@ describe("EarSession number keys", () => {
         expect(screen.queryByText(m.ear_digit_hint())).toBeNull();
         press("1");
         unanswered();
+    });
+
+    it("answers from the number row on a layout that types a symbol there", () => {
+        // French AZERTY without Shift: the key printed 3 types ".
+        mount("scale-degrees");
+        pressOn('"', "Digit3");
+        expect(screen.getByText(m.ear_verdict_close())).toBeTruthy();
+        expect(heard).toEqual([]);
+    });
+
+    it("answers from the number row with Shift held, as AZERTY types digits", () => {
+        mount("scale-degrees");
+        pressOn("1", "Digit1", { shiftKey: true });
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+        expect(heard).toEqual([]);
+    });
+
+    it("answers from the number pad", () => {
+        mount("scale-degrees");
+        pressOn("1", "Numpad1");
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+    });
+
+    it("fills a progression from the AZERTY number row", () => {
+        mount("progressions");
+        const slots = screen.getByRole("group", { name: m.ear_progression_choices() });
+        pressOn("'", "Digit4");
+        expect(within(slots).getByText("IV")).toBeTruthy();
+        expect(heard).toEqual([]);
+    });
+
+    it("never sounds a key the player bound to a note while it answers", () => {
+        const view = mount("scale-degrees");
+        // "&" — the AZERTY key printed 1 — plays the right hand's C in place of Q.
+        act(() => {
+            view.services.prefs.save({
+                ...view.services.prefs.load(),
+                keyMap: rebind(DEFAULT_KEY_MAP, "right", 0, "&"),
+            });
+        });
+        pressOn("&", "Digit1");
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+        expect(heard).toEqual([]);
+        // Answered, the question lets go of the key, and it plays the note it is bound to.
+        pressOn("&", "Digit1");
+        expect(heard).toHaveLength(1);
     });
 
     it("answers the same way when a player has bound a digit to a note", () => {

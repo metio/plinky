@@ -5,7 +5,7 @@
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_KEY_MAP, rebindPedal } from "../../core/keyMap";
+import { DEFAULT_KEY_MAP, rebind, rebindPedal } from "../../core/keyMap";
 import type { PedalKind } from "../../core/pedals";
 import { type FakeMidi, fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { memoryStore } from "../adapters/memoryStore";
@@ -713,6 +713,29 @@ describe("claimed keys", () => {
         rerender({ keys: ["3"], active: true });
         up("3", "Digit3");
         expect(result.current.heldNotes).toEqual([]);
+    });
+
+    it("withholds the number key a claimed digit sits on, whatever the layout types there", () => {
+        // French AZERTY types " on the key printed 3. A surface that claims 3 answers that
+        // press, so the instrument must not also play whatever " is bound to.
+        const store = memoryStore();
+        store.set(
+            "plinky:prefs",
+            JSON.stringify({ keyMap: rebind(DEFAULT_KEY_MAP, "right", 0, '"') }),
+        );
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <ServicesProvider services={{ midi: fakeMidi(), store }}>
+                <MidiProvider>{children}</MidiProvider>
+            </ServicesProvider>
+        );
+        const { result } = renderHook(() => useSurfaceClaiming({ keys: ["3"], active: true }), {
+            wrapper,
+        });
+        down('"', "Digit3");
+        expect(result.current.heldNotes).toEqual([]);
+        // The same glyph from another key the claim does not cover still plays.
+        down('"', "Quote");
+        expect(result.current.heldNotes).toHaveLength(1);
     });
 
     it("matches a claim whatever case the key arrives in", () => {
