@@ -7,7 +7,8 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { m } from "../paraglide/messages.js";
-import { choose } from "../testing/controls";
+import { baseLocale, overwriteGetLocale } from "../paraglide/runtime.js";
+import { choose, chosen } from "../testing/controls";
 import { switchOn, toggle } from "../testing/controls";
 import { renderWithServices } from "../testing/renderWithServices";
 import Settings, { meta } from "./settings";
@@ -156,6 +157,45 @@ describe("Settings", () => {
         expect(services.prefs.load().noteLabels).toBe("c");
         // Only the C landmarks stay labelled now.
         expect(screen.getByLabelText("D 4").textContent).not.toContain("D");
+    });
+
+    it("starts the letter names at the language's and returns to it when picked again", () => {
+        overwriteGetLocale(() => "de");
+        try {
+            const { services } = mount();
+            expect(chosen(m.settings_note_letters)).toBe("C D E F G A H");
+            expect(screen.getByLabelText("H 4")).toBeTruthy();
+
+            choose(m.settings_note_letters, "C D E F G A B");
+            expect(services.prefs.load().noteLetters).toBe("b");
+            expect(chosen(m.settings_note_letters)).toBe("C D E F G A B");
+            expect(screen.getByLabelText("B 4")).toBeTruthy();
+
+            // The language's own choice again is the way back to following the language.
+            choose(m.settings_note_letters, "C D E F G A H");
+            expect(services.prefs.load().noteLetters).toBe("auto");
+            expect(screen.getByLabelText("H 4")).toBeTruthy();
+        } finally {
+            overwriteGetLocale(() => baseLocale);
+        }
+    });
+
+    it("starts the letter names at B on an English page", () => {
+        mount();
+        expect(chosen(m.settings_note_letters)).toBe("C D E F G A B");
+    });
+
+    it("hides the letter names while do re mi names the notes", () => {
+        overwriteGetLocale(() => "fr");
+        try {
+            const { services } = mount();
+            expect(screen.queryByRole("tablist", { name: m.settings_note_letters() })).toBeNull();
+            choose(m.settings_note_labels, m.note_labels_all);
+            expect(services.prefs.load().noteLabels).toBe("all");
+            expect(screen.getByRole("tablist", { name: m.settings_note_letters() })).toBeTruthy();
+        } finally {
+            overwriteGetLocale(() => baseLocale);
+        }
     });
 
     it("stays in sync with a save made by a nested panel", () => {

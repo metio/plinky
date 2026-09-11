@@ -23,6 +23,24 @@ describe("ReadingLevel", () => {
         }
     });
 
+    it("keeps a player's do re mi when a level names every key", () => {
+        const { services } = renderWithServices(<ReadingLevel />);
+        act(() => {
+            services.prefs.save({ ...services.prefs.load(), noteLabels: "solfege" });
+        });
+        choose(m.reading_level_label, m.reading_level_sight_reader);
+        expect(services.prefs.load().noteLabels).toBe("off");
+        choose(m.reading_level_label, m.reading_level_learning);
+        // Off names nothing, so the level falls back to the language's own naming.
+        expect(services.prefs.load().noteLabels).toBe("auto");
+        act(() => {
+            services.prefs.save({ ...services.prefs.load(), noteLabels: "solfege" });
+        });
+        choose(m.reading_level_label, m.reading_level_starter);
+        expect(services.prefs.load().noteLabels).toBe("solfege");
+        expect(chosen(m.reading_level_label)).toBe(m.reading_level_starter());
+    });
+
     it("leaves personal prefs untouched when a level is applied", () => {
         const { services } = renderWithServices(<ReadingLevel />);
         services.prefs.save({ ...services.prefs.load(), volume: 33, sound: false });

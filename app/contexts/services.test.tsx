@@ -5,7 +5,10 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { memoryStore } from "../adapters/memoryStore";
-import { ServicesProvider, useStore } from "./services";
+import { m } from "../paraglide/messages.js";
+import type { ExerciseConfig } from "../../core/exerciseGen";
+import type { ExerciseMeta } from "../stores/exerciseSource";
+import { createServices, ServicesProvider, useStore } from "./services";
 
 // A "performing" component: it uses a capability (persistence) but has no idea where
 // it came from — no import of an adapter, no global. That is exactly what makes it
@@ -57,5 +60,43 @@ describe("ServicesProvider", () => {
         );
         expect(seen).toHaveLength(2);
         expect(seen[1]).toBe(seen[0]);
+    });
+
+    // The composition root names a generated scale through the player's stored choice, so
+    // a change in Settings reaches the next list of exercises drawn.
+    it("titles a generated scale in the note names the player chose", async () => {
+        const config: ExerciseConfig = {
+            type: "major-scale",
+            key: "b",
+            octaves: 1,
+            hands: "right",
+            inversion: 0,
+            interval: "single",
+        };
+        const meta: ExerciseMeta = {
+            id: "ex-b",
+            title: "B major scale",
+            grade: 1,
+            cost: 1,
+            kind: "scale-arpeggio",
+            config,
+            tempo: 80,
+            beatsPerBar: 4,
+        };
+        const services = createServices({
+            store: memoryStore(),
+            fetcher: (url) =>
+                Promise.resolve(
+                    url.endsWith("manifest.json")
+                        ? Response.json([meta])
+                        : new Response(null, { status: 404 }),
+                ),
+        });
+        const title = async () => (await services.exercises.manifest())?.[0]?.title;
+        expect(await title()).toMatch(/^B /);
+        services.prefs.save({ ...services.prefs.load(), noteLetters: "h" });
+        expect(await title()).toMatch(/^H /);
+        services.prefs.save({ ...services.prefs.load(), noteLabels: "solfege" });
+        expect(await title()).toMatch(new RegExp(`^${m.solfege_si()}`, "i"));
     });
 });

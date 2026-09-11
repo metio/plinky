@@ -7,6 +7,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { EAR_ITEMS, EAR_SESSION_ROUNDS } from "../../../core/earCatalog";
 import type { EarExerciseId } from "../../../core/earExercise";
 import { markLearned } from "../../../core/mastery";
+import { spokenNoteIn } from "../../../core/noteNaming";
+import { localNaming } from "../../lib/noteNames";
+import { noteWords } from "../ui/noteWords";
 import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
 import type { AppServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
@@ -181,7 +184,11 @@ describe("EarSession", () => {
         mount({ exercise: "perfect-pitch" });
         press(m.ear_start());
         expect(screen.getByRole("group", { name: m.ear_keyboard_label() })).toBeTruthy();
-        expect(screen.queryByRole("button", { name: "C♯" })).toBeNull();
+        // A key is named as a screen reader says it, so the black key is looked for by
+        // its spoken name.
+        expect(
+            screen.queryByRole("button", { name: spokenNoteIn(61, localNaming(), noteWords()) }),
+        ).toBeNull();
         press("G");
         expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
     });
