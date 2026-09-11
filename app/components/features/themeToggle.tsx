@@ -8,14 +8,13 @@ import { applyTheme } from "../../lib/theme";
 import { m } from "../../paraglide/messages.js";
 
 const ORDER: Theme[] = ["system", "light", "dark"];
-const LABEL: Record<Theme, () => string> = {
-    system: m.theme_system,
-    light: m.theme_light,
-    dark: m.theme_dark,
-};
 // The picture sits outside the messages so the accessible name can carry the theme's
 // translated name alone: a screen reader reads an emoji out by its description.
-const ICON: Record<Theme, string> = { system: "🖥️", light: "☀️", dark: "🌙" };
+const THEMES: Record<Theme, { icon: string; label: () => string }> = {
+    system: { icon: "🖥️", label: m.theme_system },
+    light: { icon: "☀️", label: m.theme_light },
+    dark: { icon: "🌙", label: m.theme_dark },
+};
 
 export function ThemeToggle() {
     const themeStore = useThemeStore();
@@ -36,10 +35,10 @@ export function ThemeToggle() {
         <button
             type="button"
             onClick={cycle}
-            aria-label={m.theme_aria({ theme: LABEL[theme]() })}
+            aria-label={m.theme_aria({ theme: THEMES[theme].label() })}
             className="text-sm text-muted hover:text-ink"
         >
-            {ICON[theme]} {LABEL[theme]()}
+            {THEMES[theme].icon} {THEMES[theme].label()}
         </button>
     );
 }

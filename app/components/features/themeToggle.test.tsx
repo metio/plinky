@@ -34,13 +34,17 @@ describe("ThemeToggle", () => {
         overwriteGetLocale(() => "de");
         render(<ThemeToggle />);
 
-        for (const name of [m.theme_system, m.theme_light, m.theme_dark]) {
+        for (const [icon, name] of [
+            ["🖥️", m.theme_system],
+            ["☀️", m.theme_light],
+            ["🌙", m.theme_dark],
+        ] as const) {
             const button = screen.getByRole("button", { name: m.theme_aria({ theme: name() }) });
             const label = button.getAttribute("aria-label") ?? "";
             expect(label).not.toMatch(/\p{Extended_Pictographic}/u);
             expect(label).not.toMatch(/\b(system|light|dark)\b/);
             // The visible label still leads with the theme's picture.
-            expect(button.textContent).toContain(name());
+            expect(button.textContent).toBe(`${icon} ${name()}`);
             fireEvent.click(button);
         }
     });
