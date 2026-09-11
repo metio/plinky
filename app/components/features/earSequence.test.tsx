@@ -6,6 +6,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ChordDegree } from "../../../core/theory";
 import { m } from "../../paraglide/messages.js";
+import { DIGIT_LEGEND } from "./earDigitHint";
 import { EarSequence } from "./earSequence";
 
 afterEach(cleanup);
@@ -49,6 +50,24 @@ describe("EarSequence announcements", () => {
         press("IV");
         fireEvent.click(screen.getByRole("button", { name: m.ear_progression_undo() }));
         expect(screen.getByRole("status").textContent).toBe("");
+    });
+});
+
+describe("EarSequence digit legends", () => {
+    it("shows a numeral's corner digit under the same rule as the hint explaining it", () => {
+        render(
+            <EarSequence
+                sequence={SEQUENCE}
+                choices={VOCAB}
+                settled={false}
+                onComplete={() => {}}
+                label="progression"
+            />,
+        );
+        const badge = screen.getByRole("button", { name: "IV" }).querySelector("[aria-hidden]");
+        expect(badge?.textContent).toBe("4");
+        expect(badge?.className).toContain(DIGIT_LEGEND);
+        expect(screen.getByText(m.ear_digit_hint()).className).toContain(DIGIT_LEGEND);
     });
 });
 

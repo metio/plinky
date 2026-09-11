@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { digitFor } from "../../../core/earAnswer";
 import { useDigitAnswers } from "../../hooks/useDigitAnswers";
-import { EarDigitHint } from "./earDigitHint";
+import { DIGIT_LEGEND, EarDigitHint } from "./earDigitHint";
 import { UndoIcon } from "../ui/icons";
 import { IconButton } from "../ui/button";
 import { VERDICT_BOX } from "./earVerdict";
@@ -156,7 +156,7 @@ export function EarSequence<T extends string>({
                             {digit !== null && digit !== degree ? (
                                 <span
                                     aria-hidden="true"
-                                    className="absolute top-1 right-1.5 text-[10px] leading-none font-normal text-muted tabular-nums"
+                                    className={`absolute top-1 right-1.5 text-[10px] leading-none font-normal text-muted tabular-nums ${DIGIT_LEGEND}`}
                                 >
                                     {digit}
                                 </span>
