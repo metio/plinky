@@ -31,25 +31,51 @@ type World = {
     install: () => Promise<void>;
     activate: () => Promise<void>;
     message: (data: unknown) => Promise<void>;
-    network: { online: boolean; served: Map<string, string>; requested: string[] };
+    network: {
+        online: boolean;
+        served: Map<string, string>;
+        redirects: Map<string, string>;
+        requested: string[];
+    };
     caches: Map<string, Map<string, Response>>;
     clients: Map<string, string>;
 };
 
+// A response the network reached through a redirect carries the flag the way a browser's
+// does, and a cache hands it back still carrying it, as the Cache API does.
+const redirected = (response: Response) =>
+    Object.defineProperty(response, "redirected", { value: true });
+const copy = (response: Response) =>
+    response.redirected ? redirected(response.clone()) : response.clone();
+
 function makeWorld(): World {
     const caches = new Map<string, Map<string, Response>>();
-    const network = { online: true, served: new Map<string, string>(), requested: [] as string[] };
+    const network = {
+        online: true,
+        served: new Map<string, string>(),
+        redirects: new Map<string, string>(),
+        requested: [] as string[],
+    };
     const clients = new Map<string, string>();
     const handlers: Record<string, (event: never) => void> = {};
     const keyOf = (request: { url: string } | string) =>
         typeof request === "string" ? new URL(request, ORIGIN).href : request.url;
-    const fetch = async (request: { url: string } | string) => {
-        const url = keyOf(request);
-        network.requested.push(new URL(url).pathname);
+    const fetch = async (request: { url: string; mode?: string } | string): Promise<Response> => {
+        const path = new URL(keyOf(request)).pathname;
+        network.requested.push(path);
         if (!network.online) {
             throw new TypeError("Failed to fetch");
         }
-        const body = network.served.get(new URL(url).pathname);
+        const target = network.redirects.get(path);
+        if (target !== undefined) {
+            // A navigation is handed the redirect itself, which is not ok and so is never
+            // cached; every other fetch, cache.add's included, follows it.
+            if (typeof request !== "string" && request.mode === "navigate") {
+                return new Response(null, { status: 302, headers: { location: target } });
+            }
+            return redirected(await fetch(target));
+        }
+        const body = network.served.get(path);
         return body === undefined
             ? new Response("not found", { status: 404 })
             : new Response(body, { status: 200 });
@@ -70,7 +96,8 @@ function makeWorld(): World {
                 store.set(keyOf(request), response);
             },
             async match(request: { url: string } | string) {
-                return store.get(keyOf(request))?.clone();
+                const found = store.get(keyOf(request));
+                return found ? copy(found) : undefined;
             },
             async keys() {
                 return [...store.keys()].map((url) => ({ url }));
@@ -107,7 +134,7 @@ function makeWorld(): World {
                 for (const store of caches.values()) {
                     const held = store.get(keyOf(request));
                     if (held) {
-                        return held.clone();
+                        return copy(held);
                     }
                 }
                 return undefined;
@@ -149,10 +176,18 @@ function makeWorld(): World {
                 },
                 waitUntil: () => {},
             });
-            if (answered === null) {
+            const pending = answered as Promise<Response> | null;
+            if (pending === null) {
                 throw new Error(`the worker did not respond to ${path}`);
             }
-            return answered;
+            // A navigation's redirect mode is "manual", and the browser turns a worker's
+            // answer that arrived through a redirect into a network error.
+            return pending.then((response) => {
+                if (mode === "navigate" && response.redirected) {
+                    throw new TypeError(`a navigation to ${path} was answered through a redirect`);
+                }
+                return response;
+            });
         },
     };
 }
@@ -213,6 +248,61 @@ describe("the service worker with no network", () => {
         } finally {
             Date.now = realNow;
         }
+    });
+});
+
+// What the deploy really answers: the edge sends the bare "/" on to a language's page, and
+// the host sends a path ending in ".html" on to the same path without it. cache.add follows
+// both, so each fallback install stores arrived through a redirect.
+describe("the service worker with no network, behind the redirects the host answers with", () => {
+    beforeEach(async () => {
+        world = makeWorld();
+        world.network.redirects.set("/", "/en/");
+        world.network.redirects.set("/__spa-fallback.html", "/__spa-fallback");
+        world.network.redirects.set("/offline.html", "/offline");
+        world.network.served.set("/en/", "english home");
+        world.network.served.set("/__spa-fallback", "spa shell");
+        world.network.served.set("/offline", "offline page");
+        world.network.served.set("/assets/entry-abc.js", "entry");
+        await world.install();
+    });
+
+    it("opens at the bare root, where the installed app starts", async () => {
+        world.network.online = false;
+        const response = await world.fetchEvent("/", "navigate");
+        expect(response.redirected).toBe(false);
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe("english home");
+    });
+
+    it("serves the shell for a page it has never seen", async () => {
+        world.network.online = false;
+        expect(await (await world.fetchEvent("/en/settings/", "navigate")).text()).toBe(
+            "spa shell",
+        );
+    });
+
+    it("answers the reload after a missing route module with the offline page", async () => {
+        world.network.online = false;
+        world.clients.set("tab", `${ORIGIN}/en/settings/`);
+        await expect(world.fetchEvent("/assets/settings-xyz.js", "cors", "tab")).rejects.toThrow();
+        expect(await (await world.fetchEvent("/en/settings/", "navigate")).text()).toBe(
+            "offline page",
+        );
+    });
+
+    it("falls back to the root's page when it holds no shell", async () => {
+        world.caches.get(CACHE)?.delete(`${ORIGIN}/__spa-fallback.html`);
+        world.network.online = false;
+        expect(await (await world.fetchEvent("/en/settings/", "navigate")).text()).toBe(
+            "english home",
+        );
+    });
+
+    it("keeps the root's page when the root is opened online, which answers a redirect", async () => {
+        expect((await world.fetchEvent("/", "navigate")).status).toBe(302);
+        world.network.online = false;
+        expect(await (await world.fetchEvent("/", "navigate")).text()).toBe("english home");
     });
 });
 

@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 10 September 2026
 
+**Plinky opens without a connection, from its icon too.** With no network, opening
+Plinky from its icon on your home screen, or opening a page you had never visited on
+that device, showed your browser's own error page in place of Plinky. Both now open
+Plinky, and the pages you have visited open as they always did.
+
 **Notes you are holding stop when you leave the page.** Hold a chord on the Piano
 page, in Compose, in the keyboard tour or on the home page's keyboard and follow a
 link away, and those notes rang on through their whole fade on the next page, whether

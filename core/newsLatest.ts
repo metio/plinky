@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**Plinky opens without a connection, from its icon too.** With no network, opening\nPlinky from its icon on your home screen, or opening a page you had never visited on\nthat device, showed your browser's own error page in place of Plinky. Both now open\nPlinky, and the pages you have visited open as they always did.",
+                twip: true,
+            },
+            {
                 body: "**Notes you are holding stop when you leave the page.** Hold a chord on the Piano\npage, in Compose, in the keyboard tour or on the home page's keyboard and follow a\nlink away, and those notes rang on through their whole fade on the next page, whether\nyou were holding them on a MIDI piano or on the keys on screen. They now end as you\nleave.",
                 twip: true,
             },

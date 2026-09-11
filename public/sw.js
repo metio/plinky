@@ -151,6 +151,23 @@ function reloadingAfterMiss(request) {
     return missing.url !== "" && missing.url === request.url && Date.now() - missing.at < RELOAD_WINDOW_MS;
 }
 
+// A cached response a navigation can be answered with. A navigation's redirect mode is
+// "manual", and a service worker that answers one with a response that arrived through a
+// redirect gets a network error in its place: the player sees the browser's own error page.
+// Every fallback install stores arrived that way — the edge sends the bare "/" on to a
+// language's page, and the host sends "/offline.html" and "/__spa-fallback.html" on to the
+// same paths without ".html" — because cache.add follows the redirect and keeps the flag.
+// Rebuilt from its body and headers, the response is the same page with no redirect behind it.
+function navigable(response) {
+    return response.redirected
+        ? new Response(response.body, {
+              status: response.status,
+              statusText: response.statusText,
+              headers: response.headers,
+          })
+        : response;
+}
+
 function isImmutable(url) {
     // Hashed build chunks carry a content hash; song files (.mxl) are named by their
     // content CID. Neither can change at a given URL, so a cached copy never stales.
@@ -181,15 +198,14 @@ self.addEventListener("fetch", (event) => {
                     if (reloadingAfterMiss(request)) {
                         const offline = await cache.match(OFFLINE_PAGE);
                         if (offline) {
-                            return offline;
+                            return navigable(offline);
                         }
                     }
-                    return (
+                    const held =
                         (await cache.match(request)) ??
                         (await cache.match(SPA_FALLBACK)) ??
-                        (await cache.match("/")) ??
-                        Response.error()
-                    );
+                        (await cache.match("/"));
+                    return held ? navigable(held) : Response.error();
                 }
             })(),
         );
