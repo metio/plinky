@@ -15,7 +15,7 @@ import {
 import { beamsVisible } from "../../../core/beams";
 import type { PlayOptions } from "../../../core/playOptions";
 import { gradedTally } from "../../../core/matcher";
-import { runSettled } from "../../../core/runEnd";
+import { runSettled, settleFinishedRun } from "../../../core/runEnd";
 import { tempoScale } from "../../../core/runOutcome";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
@@ -1012,11 +1012,12 @@ function usePlaySessionValue({
     // opened would close again, stopping a play-along in its count-in or a sight-read in
     // its study, and the grading latch the new run clears would face a finished run whose
     // capture has already been replaced.
-    const endFinishedRun = () => {
-        grading.gradeIfOwed();
-        takes.saveIfOwed();
-        matcher.reset();
-    };
+    const endFinishedRun = () =>
+        settleFinishedRun({
+            grade: grading.gradeIfOwed,
+            save: takes.saveIfOwed,
+            forget: matcher.reset,
+        });
 
     // Start Listen: the play surface goes full screen, any self-paced run stops, and the
     // transport walks the cursor from wherever it sits — the note Practice was on when

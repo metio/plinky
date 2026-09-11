@@ -25,6 +25,20 @@ export function runSettled({ complete, holdingNote }: RunEnding): boolean {
     return complete && !holdingNote;
 }
 
+// Ending a finished run because something else is taking the stage. Its grade and its
+// take both wait on the keys coming up and both read the completion, so they are settled
+// while it still stands; only then is it forgotten. The other order grades nothing and
+// saves nothing, since a run no longer complete owes neither.
+export function settleFinishedRun(run: {
+    grade: () => void;
+    save: () => void;
+    forget: () => void;
+}): void {
+    run.grade();
+    run.save();
+    run.forget();
+}
+
 export type GradeClaim = {
     // The matcher cleared the run's last position.
     complete: boolean;

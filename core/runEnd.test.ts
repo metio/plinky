@@ -2,7 +2,25 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { owesGrade, runSettled } from "./runEnd";
+import { owesGrade, runSettled, settleFinishedRun } from "./runEnd";
+
+describe("settleFinishedRun", () => {
+    it("grades and keeps the take while the completion stands, then forgets it", () => {
+        // A finished run whose last key is still down: the grade and the take are both
+        // owed, and each is only owed while the run still reads as complete.
+        let complete = true;
+        const seen: string[] = [];
+        settleFinishedRun({
+            grade: () => seen.push(`grade:${complete}`),
+            save: () => seen.push(`save:${complete}`),
+            forget: () => {
+                seen.push("forget");
+                complete = false;
+            },
+        });
+        expect(seen).toEqual(["grade:true", "save:true", "forget"]);
+    });
+});
 
 describe("runSettled", () => {
     it("settles a finished run once every key is up", () => {
