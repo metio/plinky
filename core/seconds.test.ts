@@ -38,16 +38,40 @@ describe("secondsFigure", () => {
         );
     });
 
-    it("says the same number as toFixed, in whatever the locale writes digits with", () => {
+    it("says a whole number of tenths exactly, in whatever the locale writes digits with", () => {
+        // A duration of whole tenths has one right figure and no rounding in it, so the digits
+        // written are the tenths themselves, whichever separator stands between them.
+        fc.assert(
+            fc.property(
+                fc.integer({ min: 0, max: 1_000_000 }),
+                fc.constantFrom(...LOCALES),
+                (tenths, locale) => {
+                    const digits = secondsFigure(tenths * 100, locale).replace(/\D/g, "");
+                    expect(digits).toBe(String(tenths).padStart(2, "0"));
+                },
+            ),
+        );
+    });
+
+    it("never writes a figure more than half a tenth from the duration", () => {
+        // Holds whichever way a duration ending in exactly half a tenth is rounded, so it pins
+        // the figure's nearness without pinning how an engine breaks a tie.
         fc.assert(
             fc.property(
                 fc.integer({ min: 0, max: 100_000_000 }),
                 fc.constantFrom(...LOCALES),
                 (ms, locale) => {
-                    const digits = (text: string) => text.replace(/\D/g, "");
-                    expect(digits(secondsFigure(ms, locale))).toBe(digits((ms / 1000).toFixed(1)));
+                    const tenths = Number(secondsFigure(ms, locale).replace(/\D/g, ""));
+                    expect(Math.abs(tenths * 100 - ms)).toBeLessThanOrEqual(50);
                 },
             ),
         );
+    });
+
+    it("rounds a duration ending in half a tenth up, as the decimal it is", () => {
+        // 1608.35 s is held as the binary double 1608.3499…, which toFixed rounds down to
+        // 1608.3. The figure rounds the decimal the duration actually is.
+        expect(secondsFigure(1_608_350, "en")).toBe("1608.4");
+        expect(secondsFigure(1_608_350, "de")).toBe("1608,4");
     });
 });
