@@ -278,7 +278,6 @@
     "hand_size_instruction": "親指のキーをタップし、次に小指を — またはMIDIピアノで弾いてください",
     "hand_size_tap_thumb": "親指のキーをタップ…",
     "hand_size_tap_pinky": "次に小指を",
-    "hand_size_semitones": "{count} 半音",
     "action_save": "保存",
     "home_eyebrow": "無料 · ブラウザで · インストール不要",
     "home_keyboard_hint": "キーをタップ — それがプリンクです。",
@@ -574,7 +573,7 @@
     "drill_leap": "最大の跳躍",
     "drill_leap_help": "続く2音がどこまで離れてよいか。自由なら音域内のどこへでも跳びます。",
     "drill_leap_free": "自由",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -584,7 +583,7 @@
                 "countPlural"
             ],
             "match": {
-                "countPlural=other": "{count}半音"
+                "countPlural=other": "{count} 半音"
             }
         }
     ],
@@ -844,8 +843,20 @@
     "midi_debug_reconnect": "再接続",
     "midi_debug_checking": "ブラウザ対応を確認中…",
     "midi_debug_requesting": "アクセスを要求中…",
-    "midi_debug_inputs_connected_one": "{count} 入力が接続されました",
-    "midi_debug_inputs_connected_other": "{count} 入力が接続されました",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 入力が接続されました"
+            }
+        }
+    ],
     "midi_debug_denied": "アクセスが拒否されました。",
     "midi_debug_error": "問題が発生しました。",
     "midi_debug_inputs": "入力",
@@ -1477,7 +1488,20 @@
     "settings_instrument_range": "鍵盤の大きさ",
     "settings_instrument_range_hint": "鍵盤からはみ出す曲は、オクターブ単位で中に収まります。持っていない鍵を求められることはありません。",
     "instrument_range_all_keys": "88鍵すべて",
-    "instrument_range_keys": "{count} 鍵",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 鍵"
+            }
+        }
+    ],
     "instrument_range_from_name": "キーボードの名前から",
     "instrument_range_measure": "測る",
     "instrument_range_reset": "88鍵すべてを使う",
@@ -1486,9 +1510,35 @@
     "instrument_range_too_close": "その2つは1オクターブ未満です。両端の鍵を押してみてください。",
     "instrument_range_no_device": "キーボードをつなぐと、Plinky が測れます。",
     "play_fit_down_one": "鍵盤に収まるよう1オクターブ下げました",
-    "play_fit_down_other": "鍵盤に収まるよう{count}オクターブ下げました",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "鍵盤に収まるよう{count}オクターブ下げました"
+            }
+        }
+    ],
     "play_fit_up_one": "鍵盤に収まるよう1オクターブ上げました",
-    "play_fit_up_other": "鍵盤に収まるよう{count}オクターブ上げました",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "鍵盤に収まるよう{count}オクターブ上げました"
+            }
+        }
+    ],
     "play_fit_beyond": "この曲は両端とも鍵盤からはみ出すので、楽譜どおりに鳴ります",
     "run_group_pace_title": "手とテンポ",
     "step_entry": "一音ずつ書く",

@@ -278,7 +278,6 @@
     "hand_size_instruction": "엄지 건반을 누른 다음 새끼손가락을 누르세요 — 또는 MIDI 피아노로 연주하세요",
     "hand_size_tap_thumb": "엄지 건반을 누르세요…",
     "hand_size_tap_pinky": "이제 새끼손가락",
-    "hand_size_semitones": "{count} 반음",
     "action_save": "저장",
     "home_eyebrow": "무료 · 브라우저에서 · 설치 필요 없음",
     "home_keyboard_hint": "건반을 눌러보세요 — 그게 플링크예요.",
@@ -574,7 +573,7 @@
     "drill_leap": "가장 큰 도약",
     "drill_leap_help": "이어지는 두 음이 얼마나 떨어질 수 있는지. 자유면 음역 안 어디로든 뛰어요.",
     "drill_leap_free": "자유",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -584,7 +583,7 @@
                 "countPlural"
             ],
             "match": {
-                "countPlural=other": "{count}반음"
+                "countPlural=other": "{count} 반음"
             }
         }
     ],
@@ -844,8 +843,20 @@
     "midi_debug_reconnect": "다시 연결",
     "midi_debug_checking": "브라우저 지원 확인 중…",
     "midi_debug_requesting": "접근 요청 중…",
-    "midi_debug_inputs_connected_one": "입력 {count}개 연결됨",
-    "midi_debug_inputs_connected_other": "입력 {count}개 연결됨",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "입력 {count}개 연결됨"
+            }
+        }
+    ],
     "midi_debug_denied": "접근이 거부됐어요.",
     "midi_debug_error": "문제가 발생했어요.",
     "midi_debug_inputs": "입력",
@@ -1477,7 +1488,20 @@
     "settings_instrument_range": "건반 크기",
     "settings_instrument_range_hint": "건반을 벗어나는 곡은 옥타브 단위로 안쪽으로 옮겨져요. 없는 건반을 누르라고 하지 않아요.",
     "instrument_range_all_keys": "88건반 전체",
-    "instrument_range_keys": "{count}건반",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}건반"
+            }
+        }
+    ],
     "instrument_range_from_name": "건반 이름에서",
     "instrument_range_measure": "재기",
     "instrument_range_reset": "88건반 모두 쓰기",
@@ -1486,9 +1510,35 @@
     "instrument_range_too_close": "두 건반이 한 옥타브도 떨어져 있지 않아요 — 양쪽 끝 건반을 눌러 보세요.",
     "instrument_range_no_device": "건반을 연결하면 Plinky가 재어 볼 수 있어요.",
     "play_fit_down_one": "건반에 맞도록 한 옥타브 내렸어요",
-    "play_fit_down_other": "건반에 맞도록 {count}옥타브 내렸어요",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "건반에 맞도록 {count}옥타브 내렸어요"
+            }
+        }
+    ],
     "play_fit_up_one": "건반에 맞도록 한 옥타브 올렸어요",
-    "play_fit_up_other": "건반에 맞도록 {count}옥타브 올렸어요",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "건반에 맞도록 {count}옥타브 올렸어요"
+            }
+        }
+    ],
     "play_fit_beyond": "이 곡은 건반 양쪽을 모두 벗어나서 악보 그대로 울려요",
     "run_group_pace_title": "손과 템포",
     "step_entry": "한 음씩 적기",

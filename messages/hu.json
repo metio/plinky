@@ -280,7 +280,6 @@
     "hand_size_instruction": "koppints a hüvelykujjad billentyűjére, majd a kisujjadéra — vagy játszd le őket egy MIDI-zongorán",
     "hand_size_tap_thumb": "Koppints a hüvelykujjad billentyűjére…",
     "hand_size_tap_pinky": "most a kisujjadéra",
-    "hand_size_semitones": "{count} félhang",
     "action_save": "Mentés",
     "home_eyebrow": "Ingyenes · a böngésződben · nincs mit telepíteni",
     "home_keyboard_hint": "Koppints egy billentyűre — ez egy plink.",
@@ -583,7 +582,7 @@
     "drill_leap": "Legnagyobb ugrás",
     "drill_leap_help": "Milyen messze lehet egymástól két egymást követő hang. A szabad bárhová engedi ugrani.",
     "drill_leap_free": "Szabad",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -856,8 +855,21 @@
     "midi_debug_reconnect": "Újracsatlakozás",
     "midi_debug_checking": "Böngészőtámogatás ellenőrzése…",
     "midi_debug_requesting": "Hozzáférés kérése…",
-    "midi_debug_inputs_connected_one": "{count} bemenet csatlakoztatva",
-    "midi_debug_inputs_connected_other": "{count} bemenet csatlakoztatva",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} bemenet csatlakoztatva",
+                "countPlural=other": "{count} bemenet csatlakoztatva"
+            }
+        }
+    ],
     "midi_debug_denied": "Hozzáférés megtagadva.",
     "midi_debug_error": "Valami hiba történt.",
     "midi_debug_inputs": "Bemenetek",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Billentyűzet mérete",
     "settings_instrument_range_hint": "Az a darab, amelyik túlnyúlik a billentyűidön, egész oktávokkal beljebb kerül — semmi nem kér olyan billentyűt, amid nincs.",
     "instrument_range_all_keys": "Mind a 88 billentyű",
-    "instrument_range_keys": "{count} billentyű",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} billentyű",
+                "countPlural=other": "{count} billentyű"
+            }
+        }
+    ],
     "instrument_range_from_name": "a billentyűzeted nevéből",
     "instrument_range_measure": "Mérés",
     "instrument_range_reset": "Mind a 88 használata",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "Ez a két billentyű kevesebb mint egy oktávra van — próbáld a két szélső billentyűt.",
     "instrument_range_no_device": "Csatlakoztass egy billentyűzetet, és Plinky megméri.",
     "play_fit_down_one": "Egy oktávval lejjebb, hogy elférjen a billentyűzeteden",
-    "play_fit_down_other": "{count} oktávval lejjebb, hogy elférjen a billentyűzeteden",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} oktávval lejjebb, hogy elférjen a billentyűzeteden",
+                "countPlural=other": "{count} oktávval lejjebb, hogy elférjen a billentyűzeteden"
+            }
+        }
+    ],
     "play_fit_up_one": "Egy oktávval feljebb, hogy elférjen a billentyűzeteden",
-    "play_fit_up_other": "{count} oktávval feljebb, hogy elférjen a billentyűzeteden",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} oktávval feljebb, hogy elférjen a billentyűzeteden",
+                "countPlural=other": "{count} oktávval feljebb, hogy elférjen a billentyűzeteden"
+            }
+        }
+    ],
     "play_fit_beyond": "Ez a darab mindkét végén túlnyúlik a billentyűzeteden, ezért úgy szól, ahogy le van írva",
     "run_group_pace_title": "Kezek és tempó",
     "step_entry": "Írd le hangról hangra",

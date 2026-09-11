@@ -282,7 +282,6 @@
     "hand_size_instruction": "apasă clapa degetului mare, apoi degetul mic — sau cântă-le pe un pian MIDI",
     "hand_size_tap_thumb": "Apasă clapa degetului mare…",
     "hand_size_tap_pinky": "acum degetul mic",
-    "hand_size_semitones": "{count} semitonuri",
     "action_save": "Salvează",
     "home_eyebrow": "Gratuit · în browser · nimic de instalat",
     "home_keyboard_hint": "Apasă o clapă — asta e un plink.",
@@ -592,7 +591,7 @@
     "drill_leap": "Cel mai mare salt",
     "drill_leap_help": "Cât de departe pot sta două note la rând. Liber lasă exercițiul să sară oriunde.",
     "drill_leap_free": "Liber",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -868,8 +867,22 @@
     "midi_debug_reconnect": "Reconectează",
     "midi_debug_checking": "Se verifică suportul browserului…",
     "midi_debug_requesting": "Se cere acces…",
-    "midi_debug_inputs_connected_one": "{count} intrare conectată",
-    "midi_debug_inputs_connected_other": "{count} intrări conectate",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} intrare conectată",
+                "countPlural=few": "{count} intrări conectate",
+                "countPlural=other": "{count} de intrări conectate"
+            }
+        }
+    ],
     "midi_debug_denied": "Acces refuzat.",
     "midi_debug_error": "Ceva nu a mers bine.",
     "midi_debug_inputs": "Intrări",
@@ -1511,7 +1524,22 @@
     "settings_instrument_range": "Dimensiunea claviaturii",
     "settings_instrument_range_hint": "O piesă care depășește clapele tale intră în ele cu octave întregi — nimic nu cere o clapă pe care nu o ai.",
     "instrument_range_all_keys": "Toate cele 88 de clape",
-    "instrument_range_keys": "{count} clape",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} clapă",
+                "countPlural=few": "{count} clape",
+                "countPlural=other": "{count} de clape"
+            }
+        }
+    ],
     "instrument_range_from_name": "din numele claviaturii tale",
     "instrument_range_measure": "Măsoară",
     "instrument_range_reset": "Folosește toate cele 88",
@@ -1520,9 +1548,39 @@
     "instrument_range_too_close": "Cele două clape sunt la mai puțin de o octavă — încearcă clapele de la fiecare capăt.",
     "instrument_range_no_device": "Conectează o claviatură și Plinky o poate măsura.",
     "play_fit_down_one": "Coborâtă cu o octavă ca să încapă pe claviatura ta",
-    "play_fit_down_other": "Coborâtă cu {count} octave ca să încapă pe claviatura ta",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Coborâtă cu {count} octavă ca să încapă pe claviatura ta",
+                "countPlural=few": "Coborâtă cu {count} octave ca să încapă pe claviatura ta",
+                "countPlural=other": "Coborâtă cu {count} de octave ca să încapă pe claviatura ta"
+            }
+        }
+    ],
     "play_fit_up_one": "Urcată cu o octavă ca să încapă pe claviatura ta",
-    "play_fit_up_other": "Urcată cu {count} octave ca să încapă pe claviatura ta",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Urcată cu {count} octavă ca să încapă pe claviatura ta",
+                "countPlural=few": "Urcată cu {count} octave ca să încapă pe claviatura ta",
+                "countPlural=other": "Urcată cu {count} de octave ca să încapă pe claviatura ta"
+            }
+        }
+    ],
     "play_fit_beyond": "Piesa aceasta depășește claviatura ta la ambele capete, așa că sună așa cum e scrisă",
     "run_group_pace_title": "Mâini și ritm",
     "step_entry": "Scrie-o notă cu notă",

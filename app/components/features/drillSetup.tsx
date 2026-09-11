@@ -52,7 +52,7 @@ function readNumber(id: DrillField["id"], value: number): string {
         return keyName(value);
     }
     if (id === "maxLeap") {
-        return value === 0 ? m.drill_leap_free() : m.drill_leap_semitones({ count: value });
+        return value === 0 ? m.drill_leap_free() : m.semitones_count({ count: value });
     }
     return String(value);
 }

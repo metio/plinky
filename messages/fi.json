@@ -280,7 +280,6 @@
     "hand_size_instruction": "napauta peukalon kosketinta, sitten pikkusormen — tai soita ne MIDI-pianolla",
     "hand_size_tap_thumb": "Napauta peukalon kosketinta…",
     "hand_size_tap_pinky": "nyt pikkusormi",
-    "hand_size_semitones": "{count} puolisävelaskelta",
     "action_save": "Tallenna",
     "home_eyebrow": "Ilmainen · selaimessasi · ei asennettavaa",
     "home_keyboard_hint": "Napauta kosketinta — se on plink.",
@@ -583,7 +582,7 @@
     "drill_leap": "Suurin hyppy",
     "drill_leap_help": "Kuinka kaukana kaksi peräkkäistä säveltä voi olla. Vapaa antaa harjoituksen hypätä minne vain.",
     "drill_leap_free": "Vapaa",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -856,8 +855,21 @@
     "midi_debug_reconnect": "Yhdistä uudelleen",
     "midi_debug_checking": "Tarkistetaan selaintukea…",
     "midi_debug_requesting": "Pyydetään käyttöoikeutta…",
-    "midi_debug_inputs_connected_one": "{count} tulo yhdistetty",
-    "midi_debug_inputs_connected_other": "{count} tuloa yhdistetty",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tulo yhdistetty",
+                "countPlural=other": "{count} tuloa yhdistetty"
+            }
+        }
+    ],
     "midi_debug_denied": "Käyttöoikeus evätty.",
     "midi_debug_error": "Jokin meni pieleen.",
     "midi_debug_inputs": "Tulot",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Koskettimiston koko",
     "settings_instrument_range_hint": "Kappale, joka ylittää koskettimesi, siirtyy niiden sisään kokonaisin oktaavein — mikään ei pyydä kosketinta, jota sinulla ei ole.",
     "instrument_range_all_keys": "Kaikki 88 kosketinta",
-    "instrument_range_keys": "{count} kosketinta",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kosketin",
+                "countPlural=other": "{count} kosketinta"
+            }
+        }
+    ],
     "instrument_range_from_name": "koskettimiston nimestä",
     "instrument_range_measure": "Mittaa",
     "instrument_range_reset": "Käytä kaikkia 88:aa",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "Nuo kaksi kosketinta ovat alle oktaavin päässä toisistaan — kokeile kummankin pään koskettimia.",
     "instrument_range_no_device": "Kytke koskettimisto, niin Plinky voi mitata sen.",
     "play_fit_down_one": "Siirretty oktaavi alaspäin, jotta se mahtuu koskettimistollesi",
-    "play_fit_down_other": "Siirretty {count} oktaavia alaspäin, jotta se mahtuu koskettimistollesi",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Siirretty {count} oktaavi alaspäin, jotta se mahtuu koskettimistollesi",
+                "countPlural=other": "Siirretty {count} oktaavia alaspäin, jotta se mahtuu koskettimistollesi"
+            }
+        }
+    ],
     "play_fit_up_one": "Siirretty oktaavi ylöspäin, jotta se mahtuu koskettimistollesi",
-    "play_fit_up_other": "Siirretty {count} oktaavia ylöspäin, jotta se mahtuu koskettimistollesi",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Siirretty {count} oktaavi ylöspäin, jotta se mahtuu koskettimistollesi",
+                "countPlural=other": "Siirretty {count} oktaavia ylöspäin, jotta se mahtuu koskettimistollesi"
+            }
+        }
+    ],
     "play_fit_beyond": "Tämä kappale ylittää koskettimistosi molemmista päistä, joten se soi kuten se on kirjoitettu",
     "run_group_pace_title": "Kädet ja tempo",
     "step_entry": "Kirjoita se nuotti kerrallaan",

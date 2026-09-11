@@ -284,7 +284,6 @@
     "hand_size_instruction": "klepněte na klávesu palce, pak malíčku — nebo je zahrajte na MIDI klavíru",
     "hand_size_tap_thumb": "Klepněte na klávesu palce…",
     "hand_size_tap_pinky": "teď malíček",
-    "hand_size_semitones": "{count} půltónů",
     "action_save": "Uložit",
     "home_eyebrow": "Zdarma · ve vašem prohlížeči · nic k instalaci",
     "home_keyboard_hint": "Klepněte na klávesu — a máte plink.",
@@ -601,7 +600,7 @@
     "drill_leap": "Největší skok",
     "drill_leap_help": "Jak daleko od sebe můžou být dva tóny po sobě. Volně nechá cvičení skákat kamkoli.",
     "drill_leap_free": "Volně",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -880,8 +879,23 @@
     "midi_debug_reconnect": "Znovu připojit",
     "midi_debug_checking": "Kontrola podpory prohlížeče…",
     "midi_debug_requesting": "Vyžádání přístupu…",
-    "midi_debug_inputs_connected_one": "{count} vstup připojen",
-    "midi_debug_inputs_connected_other": "{count} vstupů připojeno",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} vstup připojen",
+                "countPlural=few": "{count} vstupy připojeny",
+                "countPlural=many": "{count} vstupy připojeny",
+                "countPlural=other": "{count} vstupů připojeno"
+            }
+        }
+    ],
     "midi_debug_denied": "Přístup odepřen.",
     "midi_debug_error": "Něco se pokazilo.",
     "midi_debug_inputs": "Vstupy",
@@ -1528,7 +1542,23 @@
     "settings_instrument_range": "Velikost klaviatury",
     "settings_instrument_range_hint": "Skladba, která přesahuje tvé klávesy, se do nich posune o celé oktávy — nic si neřekne o klávesu, kterou nemáš.",
     "instrument_range_all_keys": "Všech 88 kláves",
-    "instrument_range_keys": "{count} kláves",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} klávesa",
+                "countPlural=few": "{count} klávesy",
+                "countPlural=many": "{count} klávesy",
+                "countPlural=other": "{count} kláves"
+            }
+        }
+    ],
     "instrument_range_from_name": "podle názvu tvé klaviatury",
     "instrument_range_measure": "Změřit",
     "instrument_range_reset": "Použít všech 88",
@@ -1537,9 +1567,41 @@
     "instrument_range_too_close": "Ty dvě klávesy dělí méně než oktáva — zkus klávesy na obou koncích.",
     "instrument_range_no_device": "Připoj klaviaturu a Plinky ji změří.",
     "play_fit_down_one": "Posunuto o oktávu níž, aby se to vešlo na tvou klaviaturu",
-    "play_fit_down_other": "Posunuto o {count} oktávy níž, aby se to vešlo na tvou klaviaturu",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Posunuto o {count} oktávu níž, aby se to vešlo na tvou klaviaturu",
+                "countPlural=few": "Posunuto o {count} oktávy níž, aby se to vešlo na tvou klaviaturu",
+                "countPlural=many": "Posunuto o {count} oktávy níž, aby se to vešlo na tvou klaviaturu",
+                "countPlural=other": "Posunuto o {count} oktáv níž, aby se to vešlo na tvou klaviaturu"
+            }
+        }
+    ],
     "play_fit_up_one": "Posunuto o oktávu výš, aby se to vešlo na tvou klaviaturu",
-    "play_fit_up_other": "Posunuto o {count} oktávy výš, aby se to vešlo na tvou klaviaturu",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Posunuto o {count} oktávu výš, aby se to vešlo na tvou klaviaturu",
+                "countPlural=few": "Posunuto o {count} oktávy výš, aby se to vešlo na tvou klaviaturu",
+                "countPlural=many": "Posunuto o {count} oktávy výš, aby se to vešlo na tvou klaviaturu",
+                "countPlural=other": "Posunuto o {count} oktáv výš, aby se to vešlo na tvou klaviaturu"
+            }
+        }
+    ],
     "play_fit_beyond": "Tahle skladba přesahuje tvou klaviaturu na obou koncích, takže zní tak, jak je zapsaná",
     "run_group_pace_title": "Ruce a tempo",
     "step_entry": "Zapsat ji nota po notě",

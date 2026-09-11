@@ -282,7 +282,6 @@
     "hand_size_instruction": "toca la tecla de tu pulgar y luego la del meñique, o tócalas en un piano MIDI",
     "hand_size_tap_thumb": "Toca la tecla de tu pulgar…",
     "hand_size_tap_pinky": "ahora tu meñique",
-    "hand_size_semitones": "{count} semitonos",
     "action_save": "Guardar",
     "home_eyebrow": "Gratis · en tu navegador · nada que instalar",
     "home_keyboard_hint": "Toca una tecla: eso es un plink.",
@@ -592,7 +591,7 @@
     "drill_leap": "Salto mayor",
     "drill_leap_help": "Cuánto pueden distanciarse dos notas seguidas. Libre deja que el ejercicio salte a cualquier parte.",
     "drill_leap_free": "Libre",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -868,8 +867,22 @@
     "midi_debug_reconnect": "Reconectar",
     "midi_debug_checking": "Comprobando compatibilidad del navegador…",
     "midi_debug_requesting": "Solicitando acceso…",
-    "midi_debug_inputs_connected_one": "{count} entrada conectada",
-    "midi_debug_inputs_connected_other": "{count} entradas conectadas",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} entrada conectada",
+                "countPlural=many": "{count} entradas conectadas",
+                "countPlural=other": "{count} entradas conectadas"
+            }
+        }
+    ],
     "midi_debug_denied": "Acceso denegado.",
     "midi_debug_error": "Algo salió mal.",
     "midi_debug_inputs": "Entradas",
@@ -1511,7 +1524,22 @@
     "settings_instrument_range": "Tamaño del teclado",
     "settings_instrument_range_hint": "Una pieza que se sale de tus teclas entra en ellas por octavas enteras, así nada te pide una tecla que no tienes.",
     "instrument_range_all_keys": "Las 88 teclas",
-    "instrument_range_keys": "{count} teclas",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tecla",
+                "countPlural=many": "{count} teclas",
+                "countPlural=other": "{count} teclas"
+            }
+        }
+    ],
     "instrument_range_from_name": "según el nombre de tu teclado",
     "instrument_range_measure": "Medir",
     "instrument_range_reset": "Usar las 88",
@@ -1520,9 +1548,39 @@
     "instrument_range_too_close": "Esas dos teclas están a menos de una octava — prueba con las de cada extremo.",
     "instrument_range_no_device": "Conecta un teclado y Plinky puede medirlo.",
     "play_fit_down_one": "Bajada una octava para caber en tu teclado",
-    "play_fit_down_other": "Bajada {count} octavas para caber en tu teclado",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Bajada {count} octava para caber en tu teclado",
+                "countPlural=many": "Bajada {count} octavas para caber en tu teclado",
+                "countPlural=other": "Bajada {count} octavas para caber en tu teclado"
+            }
+        }
+    ],
     "play_fit_up_one": "Subida una octava para caber en tu teclado",
-    "play_fit_up_other": "Subida {count} octavas para caber en tu teclado",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Subida {count} octava para caber en tu teclado",
+                "countPlural=many": "Subida {count} octavas para caber en tu teclado",
+                "countPlural=other": "Subida {count} octavas para caber en tu teclado"
+            }
+        }
+    ],
     "play_fit_beyond": "Esta pieza se sale de tu teclado por los dos lados, así que suena tal como está escrita",
     "run_group_pace_title": "Manos y ritmo",
     "step_entry": "Escribirla nota a nota",

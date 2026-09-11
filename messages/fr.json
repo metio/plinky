@@ -282,7 +282,6 @@
     "hand_size_instruction": "touchez la touche de votre pouce, puis votre auriculaire — ou jouez-les sur un piano MIDI",
     "hand_size_tap_thumb": "Touchez la touche de votre pouce…",
     "hand_size_tap_pinky": "maintenant votre auriculaire",
-    "hand_size_semitones": "{count} demi-tons",
     "action_save": "Enregistrer",
     "home_eyebrow": "Gratuit · dans votre navigateur · rien à installer",
     "home_keyboard_hint": "Touchez une touche — voilà un plink.",
@@ -592,7 +591,7 @@
     "drill_leap": "Plus grand saut",
     "drill_leap_help": "À quelle distance deux notes qui se suivent peuvent se trouver. Libre laisse l'exercice sauter partout.",
     "drill_leap_free": "Libre",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -868,8 +867,22 @@
     "midi_debug_reconnect": "Reconnecter",
     "midi_debug_checking": "Vérification de la prise en charge du navigateur…",
     "midi_debug_requesting": "Demande d'accès…",
-    "midi_debug_inputs_connected_one": "{count} entrée connectée",
-    "midi_debug_inputs_connected_other": "{count} entrées connectées",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} entrée connectée",
+                "countPlural=many": "{count} entrées connectées",
+                "countPlural=other": "{count} entrées connectées"
+            }
+        }
+    ],
     "midi_debug_denied": "Accès refusé.",
     "midi_debug_error": "Une erreur s'est produite.",
     "midi_debug_inputs": "Entrées",
@@ -1511,7 +1524,22 @@
     "settings_instrument_range": "Taille du clavier",
     "settings_instrument_range_hint": "Un morceau qui dépasse tes touches y rentre par octaves entières – rien ne te demande une touche que tu n'as pas.",
     "instrument_range_all_keys": "Les 88 touches",
-    "instrument_range_keys": "{count} touches",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} touche",
+                "countPlural=many": "{count} touches",
+                "countPlural=other": "{count} touches"
+            }
+        }
+    ],
     "instrument_range_from_name": "d'après le nom de ton clavier",
     "instrument_range_measure": "Mesurer",
     "instrument_range_reset": "Utiliser les 88",
@@ -1520,9 +1548,39 @@
     "instrument_range_too_close": "Ces deux touches sont à moins d'une octave – prends les touches de chaque extrémité.",
     "instrument_range_no_device": "Branche un clavier et Plinky peut le mesurer.",
     "play_fit_down_one": "Descendu d'une octave pour tenir sur ton clavier",
-    "play_fit_down_other": "Descendu de {count} octaves pour tenir sur ton clavier",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Descendu de {count} octave pour tenir sur ton clavier",
+                "countPlural=many": "Descendu de {count} octaves pour tenir sur ton clavier",
+                "countPlural=other": "Descendu de {count} octaves pour tenir sur ton clavier"
+            }
+        }
+    ],
     "play_fit_up_one": "Monté d'une octave pour tenir sur ton clavier",
-    "play_fit_up_other": "Monté de {count} octaves pour tenir sur ton clavier",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Monté de {count} octave pour tenir sur ton clavier",
+                "countPlural=many": "Monté de {count} octaves pour tenir sur ton clavier",
+                "countPlural=other": "Monté de {count} octaves pour tenir sur ton clavier"
+            }
+        }
+    ],
     "play_fit_beyond": "Ce morceau dépasse ton clavier des deux côtés, il est donc joué tel qu'il est écrit",
     "run_group_pace_title": "Mains et allure",
     "step_entry": "L'écrire note à note",

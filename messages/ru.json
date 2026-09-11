@@ -284,7 +284,6 @@
     "hand_size_instruction": "нажмите клавишу большого пальца, затем мизинца — или сыграйте их на MIDI-пианино",
     "hand_size_tap_thumb": "Нажмите клавишу большого пальца…",
     "hand_size_tap_pinky": "теперь мизинца",
-    "hand_size_semitones": "{count} полутонов",
     "action_save": "Сохранить",
     "home_eyebrow": "Бесплатно · в браузере · ничего устанавливать не нужно",
     "home_keyboard_hint": "Нажмите клавишу — вот и плинк.",
@@ -601,7 +600,7 @@
     "drill_leap": "Самый большой скачок",
     "drill_leap_help": "Как далеко могут стоять два звука подряд. Свободно позволяет упражнению прыгать куда угодно.",
     "drill_leap_free": "Свободно",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -880,8 +879,23 @@
     "midi_debug_reconnect": "Переподключить",
     "midi_debug_checking": "Проверка поддержки браузера…",
     "midi_debug_requesting": "Запрос доступа…",
-    "midi_debug_inputs_connected_one": "Подключён {count} вход",
-    "midi_debug_inputs_connected_other": "Подключено входов: {count}",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Подключён {count} вход",
+                "countPlural=few": "Подключено {count} входа",
+                "countPlural=many": "Подключено {count} входов",
+                "countPlural=other": "Подключено {count} входов"
+            }
+        }
+    ],
     "midi_debug_denied": "Доступ запрещён.",
     "midi_debug_error": "Что-то пошло не так.",
     "midi_debug_inputs": "Входы",
@@ -1528,7 +1542,23 @@
     "settings_instrument_range": "Размер клавиатуры",
     "settings_instrument_range_hint": "Пьеса, выходящая за твои клавиши, сдвигается на целые октавы внутрь — и ничто не просит клавишу, которой у тебя нет.",
     "instrument_range_all_keys": "Все 88 клавиш",
-    "instrument_range_keys": "{count} клавиш",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} клавиша",
+                "countPlural=few": "{count} клавиши",
+                "countPlural=many": "{count} клавиш",
+                "countPlural=other": "{count} клавиш"
+            }
+        }
+    ],
     "instrument_range_from_name": "из названия твоей клавиатуры",
     "instrument_range_measure": "Измерить",
     "instrument_range_reset": "Взять все 88",
@@ -1537,9 +1567,41 @@
     "instrument_range_too_close": "Эти две клавиши ближе октавы — возьми клавиши по краям.",
     "instrument_range_no_device": "Подключи клавиатуру, и Plinky её измерит.",
     "play_fit_down_one": "Опущено на октаву, чтобы поместилось на твоей клавиатуре",
-    "play_fit_down_other": "Опущено на {count} октавы, чтобы поместилось на твоей клавиатуре",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Опущено на {count} октаву, чтобы поместилось на твоей клавиатуре",
+                "countPlural=few": "Опущено на {count} октавы, чтобы поместилось на твоей клавиатуре",
+                "countPlural=many": "Опущено на {count} октав, чтобы поместилось на твоей клавиатуре",
+                "countPlural=other": "Опущено на {count} октав, чтобы поместилось на твоей клавиатуре"
+            }
+        }
+    ],
     "play_fit_up_one": "Поднято на октаву, чтобы поместилось на твоей клавиатуре",
-    "play_fit_up_other": "Поднято на {count} октавы, чтобы поместилось на твоей клавиатуре",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Поднято на {count} октаву, чтобы поместилось на твоей клавиатуре",
+                "countPlural=few": "Поднято на {count} октавы, чтобы поместилось на твоей клавиатуре",
+                "countPlural=many": "Поднято на {count} октав, чтобы поместилось на твоей клавиатуре",
+                "countPlural=other": "Поднято на {count} октав, чтобы поместилось на твоей клавиатуре"
+            }
+        }
+    ],
     "play_fit_beyond": "Эта пьеса выходит за твою клавиатуру с обеих сторон, поэтому звучит как записана",
     "run_group_pace_title": "Руки и темп",
     "step_entry": "Записать по нотам",

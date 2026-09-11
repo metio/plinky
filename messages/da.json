@@ -280,7 +280,6 @@
     "hand_size_instruction": "tryk på din tommelfinger-tangent, så din lillefinger — eller spil dem på et MIDI-klaver",
     "hand_size_tap_thumb": "Tryk på din tommelfinger-tangent…",
     "hand_size_tap_pinky": "nu din lillefinger",
-    "hand_size_semitones": "{count} halvtoner",
     "action_save": "Gem",
     "home_eyebrow": "Gratis · i din browser · intet at installere",
     "home_keyboard_hint": "Tryk på en tangent — det er et plink.",
@@ -583,7 +582,7 @@
     "drill_leap": "Største spring",
     "drill_leap_help": "Hvor langt fra hinanden to toner i træk må ligge. Frit lader øvelsen springe hvor som helst.",
     "drill_leap_free": "Frit",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -856,8 +855,21 @@
     "midi_debug_reconnect": "Tilslut igen",
     "midi_debug_checking": "Tjekker browserunderstøttelse…",
     "midi_debug_requesting": "Anmoder om adgang…",
-    "midi_debug_inputs_connected_one": "{count} indgang tilsluttet",
-    "midi_debug_inputs_connected_other": "{count} indgange tilsluttet",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} indgang tilsluttet",
+                "countPlural=other": "{count} indgange tilsluttet"
+            }
+        }
+    ],
     "midi_debug_denied": "Adgang nægtet.",
     "midi_debug_error": "Noget gik galt.",
     "midi_debug_inputs": "Indgange",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Klaviaturets størrelse",
     "settings_instrument_range_hint": "Et stykke, der rækker ud over dine tangenter, flytter ind i hele oktaver — så beder intet om en tangent, du ikke har.",
     "instrument_range_all_keys": "Alle 88 tangenter",
-    "instrument_range_keys": "{count} tangenter",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tangent",
+                "countPlural=other": "{count} tangenter"
+            }
+        }
+    ],
     "instrument_range_from_name": "fra klaviaturets navn",
     "instrument_range_measure": "Mål",
     "instrument_range_reset": "Brug alle 88",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "De to tangenter ligger mindre end en oktav fra hinanden — prøv tangenterne i hver ende.",
     "instrument_range_no_device": "Tilslut et klaviatur, så kan Plinky måle det.",
     "play_fit_down_one": "Sænket en oktav, så det passer på dit klaviatur",
-    "play_fit_down_other": "Sænket {count} oktaver, så det passer på dit klaviatur",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Sænket {count} oktav, så det passer på dit klaviatur",
+                "countPlural=other": "Sænket {count} oktaver, så det passer på dit klaviatur"
+            }
+        }
+    ],
     "play_fit_up_one": "Hævet en oktav, så det passer på dit klaviatur",
-    "play_fit_up_other": "Hævet {count} oktaver, så det passer på dit klaviatur",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Hævet {count} oktav, så det passer på dit klaviatur",
+                "countPlural=other": "Hævet {count} oktaver, så det passer på dit klaviatur"
+            }
+        }
+    ],
     "play_fit_beyond": "Dette stykke rækker ud over dit klaviatur i begge ender, så det lyder, som det er skrevet",
     "run_group_pace_title": "Hænder og tempo",
     "step_entry": "Skriv den node for node",

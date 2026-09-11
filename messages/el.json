@@ -280,7 +280,6 @@
     "hand_size_instruction": "πάτα το πλήκτρο του αντίχειρά σου, μετά του μικρού σου δαχτύλου — ή παίξε τα σε ένα πιάνο MIDI",
     "hand_size_tap_thumb": "Πάτα το πλήκτρο του αντίχειρά σου…",
     "hand_size_tap_pinky": "τώρα το μικρό σου δάχτυλο",
-    "hand_size_semitones": "{count} ημιτόνια",
     "action_save": "Αποθήκευση",
     "home_eyebrow": "Δωρεάν · μέσα στον browser σου · χωρίς εγκατάσταση",
     "home_keyboard_hint": "Πάτα ένα πλήκτρο — αυτό είναι ένα πλινκ.",
@@ -583,7 +582,7 @@
     "drill_leap": "Μεγαλύτερο πήδημα",
     "drill_leap_help": "Πόσο μακριά μπορούν να είναι δύο συνεχόμενες νότες. Ελεύθερο αφήνει την άσκηση να πηδά παντού.",
     "drill_leap_free": "Ελεύθερο",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -856,8 +855,21 @@
     "midi_debug_reconnect": "Επανασύνδεση",
     "midi_debug_checking": "Έλεγχος υποστήριξης browser…",
     "midi_debug_requesting": "Αίτημα πρόσβασης…",
-    "midi_debug_inputs_connected_one": "{count} είσοδος συνδεδεμένη",
-    "midi_debug_inputs_connected_other": "{count} είσοδοι συνδεδεμένες",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} είσοδος συνδεδεμένη",
+                "countPlural=other": "{count} είσοδοι συνδεδεμένες"
+            }
+        }
+    ],
     "midi_debug_denied": "Η πρόσβαση απορρίφθηκε.",
     "midi_debug_error": "Κάτι πήγε στραβά.",
     "midi_debug_inputs": "Είσοδοι",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Μέγεθος κλαβιέ",
     "settings_instrument_range_hint": "Ένα κομμάτι που ξεπερνά τα πλήκτρα σου μετακινείται μέσα τους κατά ολόκληρες οκτάβες — τίποτα δεν ζητά πλήκτρο που δεν έχεις.",
     "instrument_range_all_keys": "Και τα 88 πλήκτρα",
-    "instrument_range_keys": "{count} πλήκτρα",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} πλήκτρο",
+                "countPlural=other": "{count} πλήκτρα"
+            }
+        }
+    ],
     "instrument_range_from_name": "από το όνομα του κλαβιέ σου",
     "instrument_range_measure": "Μέτρησε",
     "instrument_range_reset": "Χρήση και των 88",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "Αυτά τα δύο πλήκτρα απέχουν λιγότερο από μία οκτάβα — δοκίμασε τα πλήκτρα στις δύο άκρες.",
     "instrument_range_no_device": "Σύνδεσε ένα κλαβιέ και ο Plinky μπορεί να το μετρήσει.",
     "play_fit_down_one": "Κατέβηκε μία οκτάβα για να χωρέσει στο κλαβιέ σου",
-    "play_fit_down_other": "Κατέβηκε {count} οκτάβες για να χωρέσει στο κλαβιέ σου",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Κατέβηκε {count} οκτάβα για να χωρέσει στο κλαβιέ σου",
+                "countPlural=other": "Κατέβηκε {count} οκτάβες για να χωρέσει στο κλαβιέ σου"
+            }
+        }
+    ],
     "play_fit_up_one": "Ανέβηκε μία οκτάβα για να χωρέσει στο κλαβιέ σου",
-    "play_fit_up_other": "Ανέβηκε {count} οκτάβες για να χωρέσει στο κλαβιέ σου",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Ανέβηκε {count} οκτάβα για να χωρέσει στο κλαβιέ σου",
+                "countPlural=other": "Ανέβηκε {count} οκτάβες για να χωρέσει στο κλαβιέ σου"
+            }
+        }
+    ],
     "play_fit_beyond": "Αυτό το κομμάτι ξεπερνά το κλαβιέ σου και από τις δύο άκρες, οπότε παίζεται όπως είναι γραμμένο",
     "run_group_pace_title": "Χέρια και ρυθμός",
     "step_entry": "Γράψ' το νότα-νότα",

@@ -284,7 +284,6 @@
     "hand_size_instruction": "dotknij klawisza kciuka, potem małego palca — lub zagraj je na pianinie MIDI",
     "hand_size_tap_thumb": "Dotknij klawisza kciuka…",
     "hand_size_tap_pinky": "teraz mały palec",
-    "hand_size_semitones": "{count} półtonów",
     "action_save": "Zapisz",
     "home_eyebrow": "Za darmo · w przeglądarce · nic do zainstalowania",
     "home_keyboard_hint": "Dotknij klawisza — to plink.",
@@ -601,7 +600,7 @@
     "drill_leap": "Największy skok",
     "drill_leap_help": "Jak daleko mogą leżeć dwa kolejne dźwięki. Swobodnie pozwala skakać w całym zakresie.",
     "drill_leap_free": "Swobodnie",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -880,8 +879,23 @@
     "midi_debug_reconnect": "Połącz ponownie",
     "midi_debug_checking": "Sprawdzanie obsługi przeglądarki…",
     "midi_debug_requesting": "Żądanie dostępu…",
-    "midi_debug_inputs_connected_one": "{count} wejście podłączone",
-    "midi_debug_inputs_connected_other": "{count} wejść podłączonych",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} wejście podłączone",
+                "countPlural=few": "{count} wejścia podłączone",
+                "countPlural=many": "{count} wejść podłączonych",
+                "countPlural=other": "{count} wejść podłączonych"
+            }
+        }
+    ],
     "midi_debug_denied": "Odmówiono dostępu.",
     "midi_debug_error": "Coś poszło nie tak.",
     "midi_debug_inputs": "Wejścia",
@@ -1528,7 +1542,23 @@
     "settings_instrument_range": "Rozmiar klawiatury",
     "settings_instrument_range_hint": "Utwór, który wychodzi poza twoje klawisze, wraca na nie o całe oktawy — nic nie poprosi o klawisz, którego nie masz.",
     "instrument_range_all_keys": "Wszystkie 88 klawiszy",
-    "instrument_range_keys": "{count} klawiszy",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} klawisz",
+                "countPlural=few": "{count} klawisze",
+                "countPlural=many": "{count} klawiszy",
+                "countPlural=other": "{count} klawiszy"
+            }
+        }
+    ],
     "instrument_range_from_name": "z nazwy twojej klawiatury",
     "instrument_range_measure": "Zmierz",
     "instrument_range_reset": "Użyj wszystkich 88",
@@ -1537,9 +1567,41 @@
     "instrument_range_too_close": "Te dwa klawisze dzieli mniej niż oktawa — spróbuj klawiszy na obu końcach.",
     "instrument_range_no_device": "Podłącz klawiaturę, a Plinky ją zmierzy.",
     "play_fit_down_one": "Obniżony o oktawę, żeby zmieścił się na twojej klawiaturze",
-    "play_fit_down_other": "Obniżony o {count} oktawy, żeby zmieścił się na twojej klawiaturze",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Obniżony o {count} oktawę, żeby zmieścił się na twojej klawiaturze",
+                "countPlural=few": "Obniżony o {count} oktawy, żeby zmieścił się na twojej klawiaturze",
+                "countPlural=many": "Obniżony o {count} oktaw, żeby zmieścił się na twojej klawiaturze",
+                "countPlural=other": "Obniżony o {count} oktaw, żeby zmieścił się na twojej klawiaturze"
+            }
+        }
+    ],
     "play_fit_up_one": "Podniesiony o oktawę, żeby zmieścił się na twojej klawiaturze",
-    "play_fit_up_other": "Podniesiony o {count} oktawy, żeby zmieścił się na twojej klawiaturze",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Podniesiony o {count} oktawę, żeby zmieścił się na twojej klawiaturze",
+                "countPlural=few": "Podniesiony o {count} oktawy, żeby zmieścił się na twojej klawiaturze",
+                "countPlural=many": "Podniesiony o {count} oktaw, żeby zmieścił się na twojej klawiaturze",
+                "countPlural=other": "Podniesiony o {count} oktaw, żeby zmieścił się na twojej klawiaturze"
+            }
+        }
+    ],
     "play_fit_beyond": "Ten utwór wychodzi poza twoją klawiaturę z obu stron, więc brzmi tak, jak został zapisany",
     "run_group_pace_title": "Ręce i tempo",
     "step_entry": "Zapisz ją nuta po nucie",

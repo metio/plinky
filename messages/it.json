@@ -282,7 +282,6 @@
     "hand_size_instruction": "tocca il tasto del pollice, poi del mignolo — o suonali su un piano MIDI",
     "hand_size_tap_thumb": "Tocca il tasto del pollice…",
     "hand_size_tap_pinky": "ora il mignolo",
-    "hand_size_semitones": "{count} semitoni",
     "action_save": "Salva",
     "home_eyebrow": "Gratis · nel browser · niente da installare",
     "home_keyboard_hint": "Tocca un tasto — ecco un plink.",
@@ -592,7 +591,7 @@
     "drill_leap": "Salto massimo",
     "drill_leap_help": "Quanto possono distare due note di seguito. Libero lascia saltare l'esercizio ovunque.",
     "drill_leap_free": "Libero",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -868,8 +867,22 @@
     "midi_debug_reconnect": "Riconnetti",
     "midi_debug_checking": "Verifica del supporto del browser…",
     "midi_debug_requesting": "Richiesta di accesso…",
-    "midi_debug_inputs_connected_one": "{count} ingresso collegato",
-    "midi_debug_inputs_connected_other": "{count} ingressi collegati",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ingresso collegato",
+                "countPlural=many": "{count} ingressi collegati",
+                "countPlural=other": "{count} ingressi collegati"
+            }
+        }
+    ],
     "midi_debug_denied": "Accesso negato.",
     "midi_debug_error": "Qualcosa è andato storto.",
     "midi_debug_inputs": "Ingressi",
@@ -1511,7 +1524,22 @@
     "settings_instrument_range": "Dimensione della tastiera",
     "settings_instrument_range_hint": "Un brano che va oltre i tuoi tasti rientra per ottave intere, così niente ti chiede un tasto che non hai.",
     "instrument_range_all_keys": "Tutti gli 88 tasti",
-    "instrument_range_keys": "{count} tasti",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tasto",
+                "countPlural=many": "{count} tasti",
+                "countPlural=other": "{count} tasti"
+            }
+        }
+    ],
     "instrument_range_from_name": "dal nome della tua tastiera",
     "instrument_range_measure": "Misura",
     "instrument_range_reset": "Usa tutti gli 88",
@@ -1520,9 +1548,39 @@
     "instrument_range_too_close": "Questi due tasti distano meno di un'ottava — prova quelli alle due estremità.",
     "instrument_range_no_device": "Collega una tastiera e Plinky può misurarla.",
     "play_fit_down_one": "Abbassato di un'ottava per stare sulla tua tastiera",
-    "play_fit_down_other": "Abbassato di {count} ottave per stare sulla tua tastiera",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Abbassato di {count} ottava per stare sulla tua tastiera",
+                "countPlural=many": "Abbassato di {count} ottave per stare sulla tua tastiera",
+                "countPlural=other": "Abbassato di {count} ottave per stare sulla tua tastiera"
+            }
+        }
+    ],
     "play_fit_up_one": "Alzato di un'ottava per stare sulla tua tastiera",
-    "play_fit_up_other": "Alzato di {count} ottave per stare sulla tua tastiera",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Alzato di {count} ottava per stare sulla tua tastiera",
+                "countPlural=many": "Alzato di {count} ottave per stare sulla tua tastiera",
+                "countPlural=other": "Alzato di {count} ottave per stare sulla tua tastiera"
+            }
+        }
+    ],
     "play_fit_beyond": "Questo brano esce dalla tua tastiera da entrambi i lati, quindi suona com'è scritto",
     "run_group_pace_title": "Mani e andatura",
     "step_entry": "Scriverla nota per nota",

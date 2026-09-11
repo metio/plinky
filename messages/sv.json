@@ -280,7 +280,6 @@
     "hand_size_instruction": "tryck på din tumtangent, sedan lillfingret — eller spela dem på ett MIDI-piano",
     "hand_size_tap_thumb": "Tryck på din tumtangent…",
     "hand_size_tap_pinky": "nu lillfingret",
-    "hand_size_semitones": "{count} halvtoner",
     "action_save": "Spara",
     "home_eyebrow": "Gratis · i webbläsaren · inget att installera",
     "home_keyboard_hint": "Tryck på en tangent — det är ett plink.",
@@ -583,7 +582,7 @@
     "drill_leap": "Största språng",
     "drill_leap_help": "Hur långt isär två toner i rad får ligga. Fritt låter övningen hoppa var som helst.",
     "drill_leap_free": "Fritt",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -856,8 +855,21 @@
     "midi_debug_reconnect": "Återanslut",
     "midi_debug_checking": "Kontrollerar webbläsarstöd…",
     "midi_debug_requesting": "Begär åtkomst…",
-    "midi_debug_inputs_connected_one": "{count} ingång ansluten",
-    "midi_debug_inputs_connected_other": "{count} ingångar anslutna",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ingång ansluten",
+                "countPlural=other": "{count} ingångar anslutna"
+            }
+        }
+    ],
     "midi_debug_denied": "Åtkomst nekad.",
     "midi_debug_error": "Något gick fel.",
     "midi_debug_inputs": "Ingångar",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Klaviaturens storlek",
     "settings_instrument_range_hint": "Ett stycke som går utanför dina tangenter flyttas in i hela oktaver — inget ber om en tangent du inte har.",
     "instrument_range_all_keys": "Alla 88 tangenter",
-    "instrument_range_keys": "{count} tangenter",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tangent",
+                "countPlural=other": "{count} tangenter"
+            }
+        }
+    ],
     "instrument_range_from_name": "från klaviaturens namn",
     "instrument_range_measure": "Mät",
     "instrument_range_reset": "Använd alla 88",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "De två tangenterna ligger mindre än en oktav isär — ta tangenterna längst ut i varje ände.",
     "instrument_range_no_device": "Anslut en klaviatur, så kan Plinky mäta den.",
     "play_fit_down_one": "Sänkt en oktav för att få plats på din klaviatur",
-    "play_fit_down_other": "Sänkt {count} oktaver för att få plats på din klaviatur",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Sänkt {count} oktav för att få plats på din klaviatur",
+                "countPlural=other": "Sänkt {count} oktaver för att få plats på din klaviatur"
+            }
+        }
+    ],
     "play_fit_up_one": "Höjd en oktav för att få plats på din klaviatur",
-    "play_fit_up_other": "Höjd {count} oktaver för att få plats på din klaviatur",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Höjd {count} oktav för att få plats på din klaviatur",
+                "countPlural=other": "Höjd {count} oktaver för att få plats på din klaviatur"
+            }
+        }
+    ],
     "play_fit_beyond": "Det här stycket går utanför din klaviatur i båda ändar, så det spelas som det är skrivet",
     "run_group_pace_title": "Händer och tempo",
     "step_entry": "Skriv den not för not",

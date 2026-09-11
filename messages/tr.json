@@ -280,7 +280,6 @@
     "hand_size_instruction": "başparmak tuşuna, sonra serçe parmağına dokun — ya da onları bir MIDI piyanoda çal",
     "hand_size_tap_thumb": "Başparmak tuşuna dokun…",
     "hand_size_tap_pinky": "şimdi serçe parmağın",
-    "hand_size_semitones": "{count} yarım ses",
     "action_save": "Kaydet",
     "home_eyebrow": "Ücretsiz · tarayıcında · kurulum yok",
     "home_keyboard_hint": "Bir tuşa dokun — işte bir plink.",
@@ -583,7 +582,7 @@
     "drill_leap": "En büyük atlama",
     "drill_leap_help": "Peş peşe iki ses ne kadar uzak olabilir. Serbest, alıştırmanın her yere atlamasına izin verir.",
     "drill_leap_free": "Serbest",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -856,8 +855,21 @@
     "midi_debug_reconnect": "Yeniden bağlan",
     "midi_debug_checking": "Tarayıcı desteği denetleniyor…",
     "midi_debug_requesting": "Erişim isteniyor…",
-    "midi_debug_inputs_connected_one": "{count} giriş bağlı",
-    "midi_debug_inputs_connected_other": "{count} giriş bağlı",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} giriş bağlı",
+                "countPlural=other": "{count} giriş bağlı"
+            }
+        }
+    ],
     "midi_debug_denied": "Erişim reddedildi.",
     "midi_debug_error": "Bir şeyler ters gitti.",
     "midi_debug_inputs": "Girişler",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Klavye boyutu",
     "settings_instrument_range_hint": "Tuşlarını aşan bir parça, tam oktavlarla içeri kayar — hiçbir şey sende olmayan bir tuşu istemez.",
     "instrument_range_all_keys": "88 tuşun hepsi",
-    "instrument_range_keys": "{count} tuş",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tuş",
+                "countPlural=other": "{count} tuş"
+            }
+        }
+    ],
     "instrument_range_from_name": "klavyenin adından",
     "instrument_range_measure": "Ölç",
     "instrument_range_reset": "88'in hepsini kullan",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "Bu iki tuş bir oktavdan yakın — iki uçtaki tuşları dene.",
     "instrument_range_no_device": "Bir klavye bağla, Plinky ölçebilsin.",
     "play_fit_down_one": "Klavyene sığsın diye bir oktav aşağı alındı",
-    "play_fit_down_other": "Klavyene sığsın diye {count} oktav aşağı alındı",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Klavyene sığsın diye {count} oktav aşağı alındı",
+                "countPlural=other": "Klavyene sığsın diye {count} oktav aşağı alındı"
+            }
+        }
+    ],
     "play_fit_up_one": "Klavyene sığsın diye bir oktav yukarı alındı",
-    "play_fit_up_other": "Klavyene sığsın diye {count} oktav yukarı alındı",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Klavyene sığsın diye {count} oktav yukarı alındı",
+                "countPlural=other": "Klavyene sığsın diye {count} oktav yukarı alındı"
+            }
+        }
+    ],
     "play_fit_beyond": "Bu parça klavyeni iki uçtan da aşıyor, bu yüzden yazıldığı gibi çalıyor",
     "run_group_pace_title": "Eller ve tempo",
     "step_entry": "Nota nota yaz",

@@ -284,7 +284,6 @@
     "hand_size_instruction": "торкніться клавіші великого пальця, потім мізинця — або зіграйте їх на MIDI-піаніно",
     "hand_size_tap_thumb": "Торкніться клавіші великого пальця…",
     "hand_size_tap_pinky": "тепер мізинця",
-    "hand_size_semitones": "{count} півтонів",
     "action_save": "Зберегти",
     "home_eyebrow": "Безкоштовно · у браузері · без встановлення",
     "home_keyboard_hint": "Торкніться клавіші — це і є плінк.",
@@ -601,7 +600,7 @@
     "drill_leap": "Найбільший стрибок",
     "drill_leap_help": "Як далеко можуть стояти два звуки поспіль. Вільно дозволяє вправі стрибати будь-куди.",
     "drill_leap_free": "Вільно",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -880,8 +879,23 @@
     "midi_debug_reconnect": "Перепідключити",
     "midi_debug_checking": "Перевірка підтримки браузером…",
     "midi_debug_requesting": "Запит доступу…",
-    "midi_debug_inputs_connected_one": "{count} вхід підключено",
-    "midi_debug_inputs_connected_other": "{count} входів підключено",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} вхід підключено",
+                "countPlural=few": "{count} входи підключено",
+                "countPlural=many": "{count} входів підключено",
+                "countPlural=other": "{count} входів підключено"
+            }
+        }
+    ],
     "midi_debug_denied": "Доступ відхилено.",
     "midi_debug_error": "Щось пішло не так.",
     "midi_debug_inputs": "Входи",
@@ -1528,7 +1542,23 @@
     "settings_instrument_range": "Розмір клавіатури",
     "settings_instrument_range_hint": "П'єса, що виходить за твої клавіші, зсувається всередину на цілі октави — ніщо не просить клавіші, якої в тебе немає.",
     "instrument_range_all_keys": "Усі 88 клавіш",
-    "instrument_range_keys": "{count} клавіш",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} клавіша",
+                "countPlural=few": "{count} клавіші",
+                "countPlural=many": "{count} клавіш",
+                "countPlural=other": "{count} клавіш"
+            }
+        }
+    ],
     "instrument_range_from_name": "з назви твоєї клавіатури",
     "instrument_range_measure": "Виміряти",
     "instrument_range_reset": "Узяти всі 88",
@@ -1537,9 +1567,41 @@
     "instrument_range_too_close": "Ці дві клавіші ближче за октаву — візьми клавіші на обох кінцях.",
     "instrument_range_no_device": "Підключи клавіатуру, і Plinky її виміряє.",
     "play_fit_down_one": "Опущено на октаву, щоб умістилося на твоїй клавіатурі",
-    "play_fit_down_other": "Опущено на {count} октави, щоб умістилося на твоїй клавіатурі",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Опущено на {count} октаву, щоб умістилося на твоїй клавіатурі",
+                "countPlural=few": "Опущено на {count} октави, щоб умістилося на твоїй клавіатурі",
+                "countPlural=many": "Опущено на {count} октав, щоб умістилося на твоїй клавіатурі",
+                "countPlural=other": "Опущено на {count} октав, щоб умістилося на твоїй клавіатурі"
+            }
+        }
+    ],
     "play_fit_up_one": "Піднято на октаву, щоб умістилося на твоїй клавіатурі",
-    "play_fit_up_other": "Піднято на {count} октави, щоб умістилося на твоїй клавіатурі",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Піднято на {count} октаву, щоб умістилося на твоїй клавіатурі",
+                "countPlural=few": "Піднято на {count} октави, щоб умістилося на твоїй клавіатурі",
+                "countPlural=many": "Піднято на {count} октав, щоб умістилося на твоїй клавіатурі",
+                "countPlural=other": "Піднято на {count} октав, щоб умістилося на твоїй клавіатурі"
+            }
+        }
+    ],
     "play_fit_beyond": "Ця п'єса виходить за твою клавіатуру з обох боків, тож звучить так, як записана",
     "run_group_pace_title": "Руки й темп",
     "step_entry": "Записати по нотах",

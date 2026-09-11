@@ -35,7 +35,7 @@ describe("a counted message in English", () => {
             m.repertoire_days_left({ date: "2026-09-12", count: 1 }),
             "2026-09-12 — 1 day away",
         ],
-        ["drill_leap_semitones", m.drill_leap_semitones({ count: 1 }), "1 semitone"],
+        ["semitones_count", m.semitones_count({ count: 1 }), "1 semitone"],
         ["recap_best_day", m.recap_best_day({ count: 1 }), "Best day: 1 note"],
         ["recap_best_day", m.recap_best_day({ count: 640 }), "Best day: 640 notes"],
     ])("%s reads %s", (_key, rendered, expected) => {
@@ -51,9 +51,9 @@ describe("a counted message in a language with more than two forms", () => {
     });
 
     it("takes the Russian form for twenty-one, which counts as one", () => {
-        expect(m.drill_leap_semitones({ count: 21 }, { locale: "ru" })).toBe("21 полутон");
-        expect(m.drill_leap_semitones({ count: 22 }, { locale: "ru" })).toBe("22 полутона");
-        expect(m.drill_leap_semitones({ count: 25 }, { locale: "ru" })).toBe("25 полутонов");
+        expect(m.semitones_count({ count: 21 }, { locale: "ru" })).toBe("21 полутон");
+        expect(m.semitones_count({ count: 22 }, { locale: "ru" })).toBe("22 полутона");
+        expect(m.semitones_count({ count: 25 }, { locale: "ru" })).toBe("25 полутонов");
     });
 });
 
@@ -123,6 +123,19 @@ describe("every plural message in every locale", () => {
         expect(m.balance_last({ days: 5 }, { locale: "ru" })).toBe("В последний раз 5 дней назад");
         expect(m.balance_last({ days: 1 }, { locale: "cs" })).toBe("Naposledy hráno před 1 dnem");
         expect(m.balance_last({ days: 5 }, { locale: "cs" })).toBe("Naposledy hráno před 5 dny");
+    });
+
+    it("counts MIDI inputs and keyboard keys with the Polish form for two to four", () => {
+        expect(m.midi_debug_inputs_connected({ count: 1 })).toBe("1 input connected");
+        expect(m.midi_debug_inputs_connected({ count: 3 }, { locale: "pl" })).toBe(
+            "3 wejścia podłączone",
+        );
+        expect(m.midi_debug_inputs_connected({ count: 5 }, { locale: "pl" })).toBe(
+            "5 wejść podłączonych",
+        );
+        expect(m.instrument_range_keys({ count: 61 })).toBe("61 keys");
+        expect(m.instrument_range_keys({ count: 24 }, { locale: "pl" })).toBe("24 klawisze");
+        expect(m.instrument_range_keys({ count: 61 }, { locale: "ru" })).toBe("61 клавиша");
     });
 
     it("tells Czech two from five", () => {

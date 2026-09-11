@@ -413,7 +413,6 @@
     "hand_size_instruction": "tap your thumb key, then your pinky — or play them on a MIDI piano",
     "hand_size_tap_thumb": "Tap your thumb key…",
     "hand_size_tap_pinky": "now your pinky",
-    "hand_size_semitones": "{count} semitones",
     "action_save": "Save",
     "home_eyebrow": "Free · in your browser · nothing to install",
     "home_keyboard_hint": "Tap a key — that's a plink.",
@@ -716,7 +715,7 @@
     "drill_leap": "Biggest jump",
     "drill_leap_help": "How far apart two notes in a row can sit. Free lets the drill leap anywhere in range.",
     "drill_leap_free": "Free",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -990,8 +989,21 @@
     "midi_debug_reconnect": "Reconnect",
     "midi_debug_checking": "Checking browser support…",
     "midi_debug_requesting": "Requesting access…",
-    "midi_debug_inputs_connected_one": "{count} input connected",
-    "midi_debug_inputs_connected_other": "{count} inputs connected",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} input connected",
+                "countPlural=other": "{count} inputs connected"
+            }
+        }
+    ],
     "midi_debug_denied": "Access denied.",
     "midi_debug_error": "Something went wrong.",
     "midi_debug_inputs": "Inputs",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Keyboard size",
     "settings_instrument_range_hint": "A piece that reaches past your keys moves into them by whole octaves, so nothing asks for a key you haven't got.",
     "instrument_range_all_keys": "All 88 keys",
-    "instrument_range_keys": "{count} keys",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} key",
+                "countPlural=other": "{count} keys"
+            }
+        }
+    ],
     "instrument_range_from_name": "from your keyboard's name",
     "instrument_range_measure": "Measure",
     "instrument_range_reset": "Use all 88",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "Those two keys are less than an octave apart — try the keys at each end.",
     "instrument_range_no_device": "Connect a keyboard and Plinky can measure it.",
     "play_fit_down_one": "Moved down an octave to fit your keyboard",
-    "play_fit_down_other": "Moved down {count} octaves to fit your keyboard",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Moved down {count} octave to fit your keyboard",
+                "countPlural=other": "Moved down {count} octaves to fit your keyboard"
+            }
+        }
+    ],
     "play_fit_up_one": "Moved up an octave to fit your keyboard",
-    "play_fit_up_other": "Moved up {count} octaves to fit your keyboard",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Moved up {count} octave to fit your keyboard",
+                "countPlural=other": "Moved up {count} octaves to fit your keyboard"
+            }
+        }
+    ],
     "play_fit_beyond": "This piece reaches past your keyboard at both ends, so it plays as written",
     "run_group_pace_title": "Hands and pace",
     "step_entry": "Write it note by note",

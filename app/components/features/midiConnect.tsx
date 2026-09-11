@@ -30,10 +30,7 @@ export function MidiConnect() {
                 <span className="text-sm text-muted">
                     {support === "unknown" && m.midi_debug_checking()}
                     {status === "requesting" && m.midi_debug_requesting()}
-                    {status === "ready" &&
-                        (devices.length === 1
-                            ? m.midi_debug_inputs_connected_one({ count: devices.length })
-                            : m.midi_debug_inputs_connected_other({ count: devices.length }))}
+                    {status === "ready" && m.midi_debug_inputs_connected({ count: devices.length })}
                     {status === "denied" && m.midi_debug_denied()}
                     {status === "error" && (error ?? m.midi_debug_error())}
                 </span>

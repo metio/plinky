@@ -68,7 +68,7 @@ export function HandSize() {
         // The semitone count always shows; the interval name is an extra gloss that a
         // very wide reach (a stray MIDI value) drops, so the count stands alone.
         const name = spanName(span);
-        const glossed = `${noteName(thumb)} → ${noteName(pinky)} · ${m.hand_size_semitones({ count: span })}`;
+        const glossed = `${noteName(thumb)} → ${noteName(pinky)} · ${m.semitones_count({ count: span })}`;
         readout = name ? `${glossed} · ${name}` : glossed;
     }
 
@@ -90,7 +90,7 @@ export function HandSize() {
                                 <span className="font-medium">{sideLabel[side]}</span>{" "}
                                 {span !== null ? (
                                     <span className="text-muted">
-                                        {m.hand_size_semitones({ count: span })}
+                                        {m.semitones_count({ count: span })}
                                         {spanName(span) ? ` · ${spanName(span)}` : ""}
                                     </span>
                                 ) : (

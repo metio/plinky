@@ -280,7 +280,6 @@
     "hand_size_instruction": "tik op je duimtoets, dan je pink — of speel ze op een MIDI-piano",
     "hand_size_tap_thumb": "Tik op je duimtoets…",
     "hand_size_tap_pinky": "nu je pink",
-    "hand_size_semitones": "{count} halve tonen",
     "action_save": "Opslaan",
     "home_eyebrow": "Gratis · in je browser · niets te installeren",
     "home_keyboard_hint": "Tik op een toets — dat is een plink.",
@@ -583,7 +582,7 @@
     "drill_leap": "Grootste sprong",
     "drill_leap_help": "Hoe ver twee opeenvolgende noten uit elkaar mogen liggen. Vrij laat de oefening overal heen springen.",
     "drill_leap_free": "Vrij",
-    "drill_leap_semitones": [
+    "semitones_count": [
         {
             "declarations": [
                 "input count",
@@ -856,8 +855,21 @@
     "midi_debug_reconnect": "Opnieuw verbinden",
     "midi_debug_checking": "Browserondersteuning controleren…",
     "midi_debug_requesting": "Toegang aanvragen…",
-    "midi_debug_inputs_connected_one": "{count} ingang verbonden",
-    "midi_debug_inputs_connected_other": "{count} ingangen verbonden",
+    "midi_debug_inputs_connected": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ingang verbonden",
+                "countPlural=other": "{count} ingangen verbonden"
+            }
+        }
+    ],
     "midi_debug_denied": "Toegang geweigerd.",
     "midi_debug_error": "Er ging iets mis.",
     "midi_debug_inputs": "Ingangen",
@@ -1494,7 +1506,21 @@
     "settings_instrument_range": "Klaviergrootte",
     "settings_instrument_range_hint": "Een stuk dat buiten je toetsen valt, schuift er in hele octaven in — zo vraagt niets om een toets die je niet hebt.",
     "instrument_range_all_keys": "Alle 88 toetsen",
-    "instrument_range_keys": "{count} toetsen",
+    "instrument_range_keys": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} toets",
+                "countPlural=other": "{count} toetsen"
+            }
+        }
+    ],
     "instrument_range_from_name": "uit de naam van je klavier",
     "instrument_range_measure": "Meten",
     "instrument_range_reset": "Alle 88 gebruiken",
@@ -1503,9 +1529,37 @@
     "instrument_range_too_close": "Die twee toetsen liggen minder dan een octaaf uit elkaar — neem de toetsen aan beide uiteinden.",
     "instrument_range_no_device": "Sluit een klavier aan, dan kan Plinky het meten.",
     "play_fit_down_one": "Een octaaf omlaag gezet zodat het op je klavier past",
-    "play_fit_down_other": "{count} octaven omlaag gezet zodat het op je klavier past",
+    "play_fit_down": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} octaaf omlaag gezet zodat het op je klavier past",
+                "countPlural=other": "{count} octaven omlaag gezet zodat het op je klavier past"
+            }
+        }
+    ],
     "play_fit_up_one": "Een octaaf omhoog gezet zodat het op je klavier past",
-    "play_fit_up_other": "{count} octaven omhoog gezet zodat het op je klavier past",
+    "play_fit_up": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} octaaf omhoog gezet zodat het op je klavier past",
+                "countPlural=other": "{count} octaven omhoog gezet zodat het op je klavier past"
+            }
+        }
+    ],
     "play_fit_beyond": "Dit stuk valt aan beide kanten buiten je klavier en klinkt daarom zoals het genoteerd staat",
     "run_group_pace_title": "Handen en tempo",
     "step_entry": "Noot voor noot opschrijven",

@@ -478,8 +478,10 @@ export function RunSetup() {
 }
 
 // The octave move that fitted the piece to the player's keyboard, in the words a player
-// would use for it. A shift is always whole octaves, so it divides exactly.
-function fitLine(fit: RangeFit): string | null {
+// would use for it. A shift is always whole octaves, so it divides exactly. A single octave
+// is "an octave", with no number; the plural message takes every count from two, including
+// the twenty-one that some languages count as one.
+export function fitLine(fit: RangeFit): string | null {
     if (fit.kind === "beyond") {
         return m.play_fit_beyond();
     }
@@ -488,9 +490,9 @@ function fitLine(fit: RangeFit): string | null {
     }
     const octaves = Math.abs(fit.shift) / 12;
     if (fit.shift < 0) {
-        return octaves === 1 ? m.play_fit_down_one() : m.play_fit_down_other({ count: octaves });
+        return octaves === 1 ? m.play_fit_down_one() : m.play_fit_down({ count: octaves });
     }
-    return octaves === 1 ? m.play_fit_up_one() : m.play_fit_up_other({ count: octaves });
+    return octaves === 1 ? m.play_fit_up_one() : m.play_fit_up({ count: octaves });
 }
 
 // Transposition shifts the whole piece into a friendlier key before the run. It is also
