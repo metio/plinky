@@ -221,7 +221,14 @@ export default function TheoryRoute() {
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
                 <TheoryIndex titles={LESSON_TITLE} numbers={LESSON_NUMBER} selected={lesson.id} />
                 <ul className="space-y-4">
-                    <LessonCard lesson={lesson} index={LESSON_NUMBER.get(lesson.id) ?? 1} />
+                    {/* A fresh card per lesson. Every lesson's address is this one route,
+                        so moving between two keeps the page mounted, and an unkeyed card
+                        would hand the next lesson the last one's engraver and demo. */}
+                    <LessonCard
+                        key={lesson.id}
+                        lesson={lesson}
+                        index={LESSON_NUMBER.get(lesson.id) ?? 1}
+                    />
                 </ul>
             </div>
 

@@ -7,7 +7,10 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { LESSONS } from "../../core/theoryCourse";
 import { demoMoments } from "../../core/theoryDemo";
+import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { m } from "../paraglide/messages.js";
+import { advanceScheduler } from "../testing/advanceScheduler";
+import { fakeScheduler } from "../testing/fakeScheduler";
 import { renderWithServices } from "../testing/renderWithServices";
 import TheoryRoute from "./theory";
 
@@ -108,6 +111,37 @@ describe("TheoryRoute", () => {
             fireEvent.click(button);
         }
         expect(screen.getByRole("heading", { level: 1 })).toBeTruthy();
+    });
+
+    it("stops the lesson it leaves, and draws only the lesson it opens", async () => {
+        // One route answers every lesson's address, so moving between two keeps the page
+        // mounted: whatever the first lesson left running must not carry over to the next.
+        const audio = fakeAudioEngine();
+        const scheduler = fakeScheduler();
+        renderWithServices(page("/en/theory/major"), { audio, scheduler });
+        fireEvent.click(screen.getByRole("button", { name: m.theory_hear_them() }));
+        await advanceScheduler(scheduler, 700);
+        audio.strikes.length = 0;
+
+        const index = screen.getByRole("navigation", { name: m.theory_index_label() });
+        fireEvent.click(
+            within(index).getByRole("link", { name: new RegExp(m.theory_minor_title()) }),
+        );
+        expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(m.theory_minor_title());
+        await advanceScheduler(scheduler, 60_000);
+
+        // The C major scale climbs to B and C above middle C; A minor stops short of both,
+        // so either one sounding or lit here can only be the lesson left behind.
+        expect(audio.strikes).toHaveLength(0);
+        for (const note of [71, 72]) {
+            expect(
+                document.querySelector(`[data-note="${note}"]`)?.getAttribute("aria-pressed"),
+            ).toBe("false");
+        }
+        expect(scheduler.pending().timers).toBe(0);
+        // One example on the page. Whether the engraver leaves the last drawing behind can
+        // only be seen where it really draws: theory.browser.test.tsx.
+        expect(document.querySelectorAll("figure")).toHaveLength(1);
     });
 
     it("closes with the two pages it points at", () => {

@@ -109,6 +109,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A backup of your progress restores on a nearly full device.** Restoring made room\nfor the backup's recordings only after writing them, so a phone holding plenty of\nits own takes could refuse a backup that would have fitted easily once they were\nreplaced, and say its storage was full. The device's own values now make way\nfirst, and a backup that still cannot fit leaves everything exactly as it was.",
                 twip: true,
             },
+            {
+                body: "**A theory lesson stops playing when you move to the next one.** Press Hear them on\none lesson, pick another from the list before it finished, and the rest of the first\nlesson went on sounding and lighting its keys on the new lesson's keyboard. Each\nmove between lessons also left an empty space above the example. The old lesson now\nfalls silent as you leave it, and each lesson draws its example once.",
+                twip: true,
+            },
         ],
     },
     {

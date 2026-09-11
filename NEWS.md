@@ -155,6 +155,12 @@ its own takes could refuse a backup that would have fitted easily once they were
 replaced, and say its storage was full. The device's own values now make way
 first, and a backup that still cannot fit leaves everything exactly as it was.
 
+**A theory lesson stops playing when you move to the next one.** Press Hear them on
+one lesson, pick another from the list before it finished, and the rest of the first
+lesson went on sounding and lighting its keys on the new lesson's keyboard. Each
+move between lessons also left an empty space above the example. The old lesson now
+falls silent as you leave it, and each lesson draws its example once.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

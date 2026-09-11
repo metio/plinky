@@ -70,6 +70,16 @@ export function SoundingKeyboard({
             stop();
         };
     }, [stop]);
+    // A different score is a different idea, and what is left of the last one belongs to a
+    // page the reader has moved on from: its strikes would sound over the new one and light
+    // its keys on the new one's keyboard. Compared by what it says rather than by identity,
+    // because a caller building the score inline hands over a new object every render.
+    const scoreKey = JSON.stringify(score);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: scoreKey is the trigger, not a value read inside
+    useEffect(() => {
+        stop();
+        setSounding(null);
+    }, [scoreKey, stop]);
 
     // The shape of the idea, which is what the keyboard is for when nobody has pressed
     // anything: a scale you can see the run of, a chord you can see the gaps in.
