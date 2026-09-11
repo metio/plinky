@@ -87,6 +87,9 @@ const EARLY_REVIEW_FRACTION = 0.1;
 // later review grows the interval when it passes or resets it when it fails. A
 // pass made before the review has come due keeps the schedule it had: what the
 // interval measures is retention across the gap, and a replay has not crossed one.
+// A fail resets it whenever it lands, early included. The two are not symmetric on
+// purpose: falling short after less time than the schedule allowed says the gap was
+// already too long, while clearing a shorter gap says nothing about the longer one.
 export function applyRun(
     current: Mastery | null,
     score: number,
