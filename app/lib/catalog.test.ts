@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
+// @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
 import {
     buildScore,
@@ -71,6 +72,22 @@ describe("subscribeUserScores", () => {
         });
         expect(saveUserScore(refusing, score("a"))).toBe(false);
         expect(heard).toBe(0);
+    });
+
+    it("hears another tab's library write, and not its other keys", () => {
+        // Another tab's write reaches this one only as the browser's storage event, and the
+        // live count beside the score backup relies on it.
+        let heard = 0;
+        const off = subscribeUserScores(kv, () => {
+            heard += 1;
+        });
+        window.dispatchEvent(new StorageEvent("storage", { key: "plinky:scores" }));
+        expect(heard).toBe(1);
+        window.dispatchEvent(new StorageEvent("storage", { key: "plinky:other" }));
+        expect(heard).toBe(1);
+        off();
+        window.dispatchEvent(new StorageEvent("storage", { key: "plinky:scores" }));
+        expect(heard).toBe(1);
     });
 
     it("keeps one store's library news to that store", () => {
