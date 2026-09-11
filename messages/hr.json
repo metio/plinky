@@ -1461,6 +1461,7 @@
     "ear_md_level_medium": "Četiri note",
     "ear_md_level_long": "Pet nota",
     "ear_digit_hint": "Možeš odgovoriti i tipkanjem broja.",
+    "ear_sequence_entered": "{item}, {position} od {total}",
     "legal_mt_notice_body": "Ova stranica napisana je na njemačkom jeziku. Mjerodavna je isključivo njemačka verzija; maßgeblich ist die deutsche Fassung, a ovaj strojni prijevod pruža se samo radi bolje razumljivosti za čitatelje koji ne govore njemački.",
     "legal_mt_view_original": "Na njemački izvornik",
     "legal_country": "Njemačka",

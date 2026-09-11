@@ -1435,6 +1435,7 @@
     "ear_md_level_medium": "Neljä säveltä",
     "ear_md_level_long": "Viisi säveltä",
     "ear_digit_hint": "Voit vastata myös näppäilemällä numeron.",
+    "ear_sequence_entered": "{item}, {position}/{total}",
     "legal_mt_notice_body": "Tämä sivu on laadittu saksaksi. Yksinomaan saksankielinen versio on oikeudellisesti sitova; maßgeblich ist die deutsche Fassung. Tämä konekäännös tarjotaan ainoastaan helpottamaan sivun ymmärtämistä lukijoille, jotka eivät osaa saksaa.",
     "legal_mt_view_original": "Saksankieliseen alkuperäistekstiin",
     "legal_country": "Saksa",

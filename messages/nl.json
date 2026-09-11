@@ -1435,6 +1435,7 @@
     "ear_md_level_medium": "Vier noten",
     "ear_md_level_long": "Vijf noten",
     "ear_digit_hint": "Je kunt ook antwoorden door het cijfer te typen.",
+    "ear_sequence_entered": "{item}, {position} van {total}",
     "legal_mt_notice_body": "Deze pagina is in het Duits opgesteld. Uitsluitend de Duitse versie is bindend; maßgeblich ist die deutsche Fassung. Deze machinevertaling wordt enkel ter betere begrijpelijkheid voor niet-Duitstalige lezers aangeboden. Wijkt hier iets af van het Duitse origineel, dan geldt de Duitse tekst.",
     "legal_mt_view_original": "Naar het Duitse origineel",
     "legal_country": "Duitsland",

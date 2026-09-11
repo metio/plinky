@@ -1460,6 +1460,7 @@
     "ear_md_level_medium": "Четири ноте",
     "ear_md_level_long": "Пет нота",
     "ear_digit_hint": "Можеш да одговориш и куцањем броја.",
+    "ear_sequence_entered": "{item}, {position} од {total}",
     "legal_mt_notice_body": "Ова страница је написана на немачком језику. Меродавна је искључиво немачка верзија — maßgeblich ist die deutsche Fassung; овај машински превод пружа се само ради боље разумљивости за читаоце који не говоре немачки.",
     "legal_mt_view_original": "Ка немачком оригиналу",
     "legal_country": "Немачка",

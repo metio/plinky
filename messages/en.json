@@ -1445,6 +1445,7 @@
     "ear_md_level_medium": "Four notes",
     "ear_md_level_long": "Five notes",
     "ear_digit_hint": "Typing the number answers too.",
+    "ear_sequence_entered": "{item}, {position} of {total}",
     "legal_mt_notice_body": "This page was written in German. Only the German version is legally binding — maßgeblich ist die deutsche Fassung. This machine translation is provided purely as a convenience for readers who do not speak German. If anything here differs from the German original, the German text applies.",
     "legal_mt_view_original": "Read the German original",
     "legal_country": "Germany",

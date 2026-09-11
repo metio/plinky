@@ -1435,6 +1435,7 @@
     "ear_md_level_medium": "Fire toner",
     "ear_md_level_long": "Fem toner",
     "ear_digit_hint": "Du kan også svare ved å taste tallet.",
+    "ear_sequence_entered": "{item}, {position} av {total}",
     "legal_mt_notice_body": "Denne siden ble skrevet på tysk. Kun den tyske versjonen er juridisk bindende — maßgeblich ist die deutsche Fassung; denne maskinoversettelsen stilles kun til rådighet for å gjøre innholdet lettere å forstå for lesere som ikke snakker tysk.",
     "legal_mt_view_original": "Til den tyske originalen",
     "legal_country": "Tyskland",

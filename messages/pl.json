@@ -1487,6 +1487,7 @@
     "ear_md_level_medium": "Cztery dźwięki",
     "ear_md_level_long": "Pięć dźwięków",
     "ear_digit_hint": "Możesz też odpowiedzieć, wpisując cyfrę.",
+    "ear_sequence_entered": "{item}, {position} z {total}",
     "legal_mt_notice_body": "Ta strona została sporządzona w języku niemieckim. Wyłącznie miarodajna jest wersja niemiecka — maßgeblich ist die deutsche Fassung; niniejsze tłumaczenie maszynowe jest udostępniane jedynie w celu ułatwienia zrozumienia czytelnikom nieznającym języka niemieckiego.",
     "legal_mt_view_original": "Do niemieckiego oryginału",
     "legal_country": "Niemcy",

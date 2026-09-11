@@ -1435,6 +1435,7 @@
     "ear_md_level_medium": "Vier Töne",
     "ear_md_level_long": "Fünf Töne",
     "ear_digit_hint": "Du kannst auch die Zahl tippen.",
+    "ear_sequence_entered": "{item}, {position} von {total}",
     "legal_mt_notice_body": "Diese Seite wurde auf Deutsch verfasst. Maßgeblich ist ausschließlich die deutsche Fassung; diese maschinelle Übersetzung wird nur zur besseren Verständlichkeit für nicht deutschsprachige Leser bereitgestellt.",
     "legal_mt_view_original": "Zum deutschen Original",
     "legal_country": "Deutschland",

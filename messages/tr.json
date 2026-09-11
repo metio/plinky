@@ -1434,6 +1434,7 @@
     "ear_md_level_medium": "Dört nota",
     "ear_md_level_long": "Beş nota",
     "ear_digit_hint": "Rakamı yazarak da cevap verebilirsin.",
+    "ear_sequence_entered": "{item}, {position}/{total}",
     "legal_mt_notice_body": "Bu sayfa Almanca yazılmıştır. Yalnızca Almanca sürüm bağlayıcıdır (maßgeblich ist die deutsche Fassung); bu makine çevirisi, Almanca bilmeyen okuyucular için yalnızca daha iyi anlaşılırlık sağlamak amacıyla sunulmaktadır.",
     "legal_mt_view_original": "Almanca orijinaline git",
     "legal_country": "Almanya",

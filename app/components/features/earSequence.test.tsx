@@ -15,6 +15,43 @@ const VOCAB: ChordDegree[] = ["I", "IV", "V"];
 
 const press = (name: string) => fireEvent.click(screen.getByRole("button", { name }));
 
+describe("EarSequence announcements", () => {
+    const mount = () =>
+        render(
+            <EarSequence
+                sequence={SEQUENCE}
+                choices={VOCAB}
+                settled={false}
+                onComplete={() => {}}
+                label="progression"
+            />,
+        );
+
+    it("announces each entry and where it landed in a live region", () => {
+        mount();
+        press("I");
+        press("IV");
+        const said = screen.getByText(
+            m.ear_sequence_entered({ item: "IV", position: 2, total: 4 }),
+        );
+        expect(said.closest("[aria-live]")?.getAttribute("aria-live")).toBe("polite");
+    });
+
+    it("says nothing before the first entry", () => {
+        mount();
+        const region = screen.getByRole("status");
+        expect(region.textContent).toBe("");
+    });
+
+    it("stops announcing an entry once it is undone", () => {
+        mount();
+        press("I");
+        press("IV");
+        fireEvent.click(screen.getByRole("button", { name: m.ear_progression_undo() }));
+        expect(screen.getByRole("status").textContent).toBe("");
+    });
+});
+
 describe("EarSequence", () => {
     it("offers a keypad of the level's chords", () => {
         render(

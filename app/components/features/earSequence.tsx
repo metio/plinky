@@ -53,6 +53,10 @@ export function EarSequence<T extends string>({
     label: string;
 }) {
     const [entered, setEntered] = useState<T[]>([]);
+    // What a screen reader is told after each entry. A number key moves no focus, so
+    // without it a player typing 1 4 5 hears nothing between presses and cannot tell
+    // which slot they are on or whether a key registered.
+    const [said, setSaid] = useState("");
 
     const choose = (degree: T) => {
         if (settled || entered.length >= sequence.length) {
@@ -60,6 +64,13 @@ export function EarSequence<T extends string>({
         }
         const next = [...entered, degree];
         setEntered(next);
+        setSaid(
+            m.ear_sequence_entered({
+                item: degree,
+                position: next.length,
+                total: sequence.length,
+            }),
+        );
         if (next.length === sequence.length) {
             onComplete(next.join("-"));
         }
@@ -72,11 +83,17 @@ export function EarSequence<T extends string>({
     const undo = () => {
         if (!settled) {
             setEntered((current) => current.slice(0, -1));
+            setSaid("");
         }
     };
 
     return (
         <div className="space-y-4">
+            {/* First in the column, so the spacing between the rows below stays as it
+                was: it is taken out of the flow and takes no room. */}
+            <p role="status" aria-live="polite" className="sr-only">
+                {said}
+            </p>
             {/* The sequence being built (or graded): one slot per chord. */}
             <fieldset className="flex items-center justify-center gap-2" aria-label={label}>
                 {sequence.map((answer, index) => {

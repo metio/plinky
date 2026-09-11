@@ -1408,6 +1408,7 @@
     "ear_md_level_medium": "네 음",
     "ear_md_level_long": "다섯 음",
     "ear_digit_hint": "숫자를 입력해도 답할 수 있어요.",
+    "ear_sequence_entered": "{item}, {total}개 중 {position}번째",
     "legal_mt_notice_body": "이 페이지는 독일어로 작성되었습니다. 오직 독일어 판본만이 법적 효력을 가지며(maßgeblich ist die deutsche Fassung), 이 기계 번역은 독일어를 사용하지 않는 독자의 이해를 돕기 위해서만 제공됩니다.",
     "legal_mt_view_original": "독일어 원문 보기",
     "legal_country": "독일",

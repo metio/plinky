@@ -1409,6 +1409,7 @@
     "ear_md_level_medium": "四个音",
     "ear_md_level_long": "五个音",
     "ear_digit_hint": "输入数字也可以作答。",
+    "ear_sequence_entered": "{item}，第 {position} / {total} 个",
     "legal_mt_notice_body": "本页面以德语撰写。仅德语版本具有法律约束力（maßgeblich ist die deutsche Fassung）；本机器翻译仅为方便不懂德语的读者理解而提供。如本页内容与德语原文有任何出入，以德语文本为准。",
     "legal_mt_view_original": "查看德语原文",
     "legal_country": "德国",

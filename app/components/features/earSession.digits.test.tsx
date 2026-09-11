@@ -156,6 +156,25 @@ describe("EarSession number keys", () => {
         unanswered();
     });
 
+    it("announces each note a digit writes down, and where it landed", () => {
+        // A digit moves no focus, so without this a screen reader hears nothing between
+        // presses and cannot tell whether a key registered.
+        mount("melodic-dictation");
+        press("1");
+        press("2");
+        expect(
+            screen.getByText(m.ear_sequence_entered({ item: "2", position: 2, total: 3 })),
+        ).toBeTruthy();
+    });
+
+    it("announces a progression's chord by its numeral", () => {
+        mount("progressions");
+        press("4");
+        expect(
+            screen.getByText(m.ear_sequence_entered({ item: "IV", position: 1, total: 4 })),
+        ).toBeTruthy();
+    });
+
     it("answers from the number row on a layout that types a symbol there", () => {
         // French AZERTY without Shift: the key printed 3 types ".
         mount("scale-degrees");

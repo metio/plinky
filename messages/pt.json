@@ -1461,6 +1461,7 @@
     "ear_md_level_medium": "Quatro notas",
     "ear_md_level_long": "Cinco notas",
     "ear_digit_hint": "Também podes responder escrevendo o número.",
+    "ear_sequence_entered": "{item}, {position} de {total}",
     "legal_mt_notice_body": "Esta página foi redigida em alemão. Só a versão alemã é juridicamente vinculativa — maßgeblich ist die deutsche Fassung; esta tradução automática é disponibilizada apenas para facilitar a compreensão a leitores que não falam alemão. Se algo aqui divergir do original alemão, prevalece o texto alemão.",
     "legal_mt_view_original": "Ver o original em alemão",
     "legal_country": "Alemanha",

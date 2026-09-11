@@ -1434,6 +1434,7 @@
     "ear_md_level_medium": "Katër nota",
     "ear_md_level_long": "Pesë nota",
     "ear_digit_hint": "Mund të përgjigjesh edhe duke shtypur numrin.",
+    "ear_sequence_entered": "{item}, {position} nga {total}",
     "legal_mt_notice_body": "Kjo faqe u shkrua në gjermanisht. Vetëm versioni gjerman është ligjërisht i detyrueshëm — maßgeblich ist die deutsche Fassung; ky përkthim automatik ofrohet vetëm për ta bërë më të kuptueshme për lexuesit që nuk flasin gjermanisht.",
     "legal_mt_view_original": "Te origjinali gjerman",
     "legal_country": "Gjermania",

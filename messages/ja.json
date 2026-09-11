@@ -1408,6 +1408,7 @@
     "ear_md_level_medium": "4つの音",
     "ear_md_level_long": "5つの音",
     "ear_digit_hint": "数字を入力しても答えられます。",
+    "ear_sequence_entered": "{item}、{total}中{position}番目",
     "legal_mt_notice_body": "本ページはドイツ語で作成されています。法的に効力を有するのはドイツ語版のみであり（maßgeblich ist die deutsche Fassung）、この機械翻訳はドイツ語を解さない読者の理解を助けるためだけに提供されています。",
     "legal_mt_view_original": "ドイツ語の原文へ",
     "legal_country": "ドイツ",

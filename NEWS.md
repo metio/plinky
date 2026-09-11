@@ -15,7 +15,8 @@ answers "3" just as clicking it does, and in melodic dictation each number you t
 fills the next note. Chord progressions take the number of the chord's degree, so 4
 is IV and 5 is V; each chord button now shows its number in the corner. A number the
 question doesn't offer is left alone. The number pad works too, and so does the
-number row on a French keyboard, with or without Shift.
+number row on a French keyboard, with or without Shift. With a screen reader, you
+hear each note or chord as you fill it in, and which of the slots it went into.
 
 ## 11 September 2026 — evening
 
