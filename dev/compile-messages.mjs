@@ -150,6 +150,28 @@ if (staticLocale) {
     writeFileSync(runtimePath, unwrapped);
 }
 
+// The catalogue's Portuguese is European, but a bare "pt" asks Intl for the Brazilian
+// plural rules, under which 0 is singular too: "0 partitura". Paraglide keys the rules on
+// the locale tag, and the tag is also the URL prefix, so the rules are pointed at "pt-PT"
+// here instead, where only 1 is singular. The two share their categories, so every arm a
+// translation carries still has a count that reaches it.
+const registryPath = "./app/paraglide/registry.js";
+const registry = readFileSync(registryPath, "utf8");
+const pluralRules = "new Intl.PluralRules(locale, options)";
+if (!registry.includes(pluralRules)) {
+    throw new Error(
+        `Could not find ${pluralRules} in registry.js — the Paraglide output shape changed; ` +
+            `Portuguese would read a count of zero as singular.`,
+    );
+}
+writeFileSync(
+    registryPath,
+    registry.replace(
+        pluralRules,
+        'new Intl.PluralRules(locale === "pt" ? "pt-PT" : locale, options)',
+    ),
+);
+
 // Last, so a failure anywhere above leaves no stamp and the next run recompiles rather
 // than trusting a tree that was never finished.
 writeFileSync(STAMP, key);

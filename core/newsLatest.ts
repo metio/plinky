@@ -158,6 +158,10 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
+                body: '**Every count in Plinky agrees with its number.** In Portuguese, a search with no\nmatches found "0 partitura", as though nothing were one score. Zero now takes the\nplural there, as it does in the Portuguese of Portugal.',
+                twip: true,
+            },
+            {
                 body: '**Seconds are written with your own decimal comma.** The notes you are slowest to\nread on the Stats page, and the margin you beat or lost to a ghost by, always used a\nfull stop: a German reader saw "1.4s" beside figures that elsewhere read "1,4". Both\nnow follow the language Plinky speaks to you.',
                 twip: true,
             },

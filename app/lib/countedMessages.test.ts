@@ -55,3 +55,17 @@ describe("a counted message in a language with more than two forms", () => {
         expect(m.drill_leap_semitones({ count: 25 }, { locale: "ru" })).toBe("25 полутонов");
     });
 });
+
+describe("a count of zero", () => {
+    // The catalogue is European Portuguese, where only 1 is singular; Brazilian Portuguese,
+    // which a bare "pt" selects in CLDR, reads 0 as singular too.
+    it("reads plural in European Portuguese", () => {
+        expect(m.scores_count({ count: 0 }, { locale: "pt" })).toBe("0 partituras");
+        expect(m.progress_notes({ count: 0 }, { locale: "pt" })).toMatch(/^0 notas$/);
+        expect(m.scores_count({ count: 1 }, { locale: "pt" })).toBe("1 partitura");
+    });
+
+    it("stays singular in French, where zero takes the singular", () => {
+        expect(m.scores_count({ count: 0 }, { locale: "fr" })).toBe("0 partition");
+    });
+});
