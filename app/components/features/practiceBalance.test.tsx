@@ -52,12 +52,12 @@ describe("PracticeBalance", () => {
         // nobody deciding anything, and the gap is what makes that visible.
         mount([session(0, 10, ["bach"]), session(19, 10, ["clementi"])]);
         expect(screen.getByText(m.balance_last_today())).toBeTruthy();
-        expect(screen.getByText(m.balance_last_other({ days: 19 }))).toBeTruthy();
+        expect(screen.getByText(m.balance_last({ days: 19 }))).toBeTruthy();
     });
 
     it("says one day in the singular", () => {
         mount([session(1, 10, ["bach"])]);
-        expect(screen.getByText(m.balance_last_one({ days: 1 }))).toBeTruthy();
+        expect(screen.getByText("Last played 1 day ago")).toBeTruthy();
     });
 
     it("shows nothing at all when no session named a piece", () => {

@@ -1250,8 +1250,20 @@
     "balance_title": "시간은 어디로 갔을까",
     "balance_intro": "곡별로, 그리고 마지막으로 친 지 얼마나 지났는지. 오래 쉬고 있는 곡은 그저 쉬고 있을 뿐입니다 — 다시 넣어도, 그대로 두어도 좋습니다.",
     "balance_last_today": "오늘 연주함",
-    "balance_last_one": "마지막 연주는 {days}일 전",
-    "balance_last_other": "마지막 연주는 {days}일 전",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "마지막 연주는 {days}일 전"
+            }
+        }
+    ],
     "repertoire_title": "보면대 위에",
     "repertoire_intro": "지금 붙잡고 있는 곡들, 각 곡이 어디까지 왔는지, 그리고 준비하고 있는 일까지.",
     "practice_range_label": "기간",

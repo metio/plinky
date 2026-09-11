@@ -1263,8 +1263,21 @@
     "balance_title": "Ku shkoi koha jote",
     "balance_intro": "Pjesë pas pjese, dhe sa kohë ka që nuk e ke luajtur secilën. Një pjesë e lënë mënjanë është thjesht kaq — ktheje në rotacion ose lëre të pushojë.",
     "balance_last_today": "Luajtur sot",
-    "balance_last_one": "Luajtur për herë të fundit {days} ditë më parë",
-    "balance_last_other": "Luajtur për herë të fundit {days} ditë më parë",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Luajtur për herë të fundit {days} ditë më parë",
+                "daysPlural=other": "Luajtur për herë të fundit {days} ditë më parë"
+            }
+        }
+    ],
     "repertoire_title": "Te mbajtësja e notave",
     "repertoire_intro": "Me çfarë po punon, ku ka arritur secila pjesë, dhe çdo gjë drejt së cilës po ecën.",
     "practice_range_label": "Periudha",

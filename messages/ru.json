@@ -1289,8 +1289,23 @@
     "balance_title": "Куда ушло твоё время",
     "balance_intro": "Пьеса за пьесой и сколько времени прошло с последнего раза. Отложенная пьеса — просто отложенная пьеса: верни её в работу или оставь в покое.",
     "balance_last_today": "Играл сегодня",
-    "balance_last_one": "В последний раз {days} день назад",
-    "balance_last_other": "В последний раз {days} дней назад",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "В последний раз {days} день назад",
+                "daysPlural=few": "В последний раз {days} дня назад",
+                "daysPlural=many": "В последний раз {days} дней назад",
+                "daysPlural=other": "В последний раз {days} дней назад"
+            }
+        }
+    ],
     "repertoire_title": "На пюпитре",
     "repertoire_intro": "Над чем вы работаете, до чего дошла каждая пьеса и к чему вы идёте.",
     "practice_range_label": "Период",

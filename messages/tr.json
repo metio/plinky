@@ -1263,8 +1263,21 @@
     "balance_title": "Zamanın nereye gitti",
     "balance_intro": "Parça parça, ve her birini en son ne zaman çaldığın. Bir kenara bırakılmış bir parça yalnızca odur — yeniden sıraya al ya da dinlenmeye bırak.",
     "balance_last_today": "Bugün çalındı",
-    "balance_last_one": "Son çalınışı {days} gün önce",
-    "balance_last_other": "Son çalınışı {days} gün önce",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Son çalınışı {days} gün önce",
+                "daysPlural=other": "Son çalınışı {days} gün önce"
+            }
+        }
+    ],
     "repertoire_title": "Nota sehpasında",
     "repertoire_intro": "Üzerinde çalıştıkların, her parçanın nereye geldiği ve hazırlandığın ne varsa.",
     "practice_range_label": "Dönem",

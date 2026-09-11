@@ -1264,8 +1264,21 @@
     "balance_title": "Vart din tid tog vägen",
     "balance_intro": "Stycke för stycke, och hur länge sedan du spelade vart och ett. Ett stycke som ligger stilla är bara det — ta upp det igen, eller låt det vila.",
     "balance_last_today": "Spelat i dag",
-    "balance_last_one": "Senast spelat för {days} dag sedan",
-    "balance_last_other": "Senast spelat för {days} dagar sedan",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Senast spelat för {days} dag sedan",
+                "daysPlural=other": "Senast spelat för {days} dagar sedan"
+            }
+        }
+    ],
     "repertoire_title": "På notstället",
     "repertoire_intro": "Vad du håller på med, hur långt varje stycke har kommit, och allt du siktar mot.",
     "practice_range_label": "Period",

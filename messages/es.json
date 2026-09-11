@@ -1277,8 +1277,22 @@
     "balance_title": "Adónde fue tu tiempo",
     "balance_intro": "Pieza por pieza, y cuánto hace que no tocas cada una. Una pieza tranquila no es más que eso — vuelve a incluirla o déjala descansar.",
     "balance_last_today": "Tocada hoy",
-    "balance_last_one": "Tocada por última vez hace {days} día",
-    "balance_last_other": "Tocada por última vez hace {days} días",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Tocada por última vez hace {days} día",
+                "daysPlural=many": "Tocada por última vez hace {days} días",
+                "daysPlural=other": "Tocada por última vez hace {days} días"
+            }
+        }
+    ],
     "repertoire_title": "En el atril",
     "repertoire_intro": "Lo que estás trabajando, por dónde va cada pieza, y aquello a lo que apuntas.",
     "practice_range_label": "Periodo",

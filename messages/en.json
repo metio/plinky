@@ -1274,8 +1274,21 @@
     "balance_title": "Where your time went",
     "balance_intro": "Piece by piece, and how long since you last touched each one. A quiet piece is just a quiet piece — put it back in the rotation, or let it go.",
     "balance_last_today": "Played today",
-    "balance_last_one": "Last played {days} day ago",
-    "balance_last_other": "Last played {days} days ago",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Last played {days} day ago",
+                "daysPlural=other": "Last played {days} days ago"
+            }
+        }
+    ],
     "repertoire_title": "On the music stand",
     "repertoire_intro": "What you are working on, where each piece has got to, and anything you are working toward.",
     "practice_range_label": "Period",

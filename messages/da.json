@@ -1264,8 +1264,21 @@
     "balance_title": "Hvor din tid gik hen",
     "balance_intro": "Stykke for stykke, og hvor længe siden du sidst spillede hvert af dem. Et stykke, der ligger stille, er bare det — tag det op igen, eller lad det hvile.",
     "balance_last_today": "Spillet i dag",
-    "balance_last_one": "Sidst spillet for {days} dag siden",
-    "balance_last_other": "Sidst spillet for {days} dage siden",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Sidst spillet for {days} dag siden",
+                "daysPlural=other": "Sidst spillet for {days} dage siden"
+            }
+        }
+    ],
     "repertoire_title": "På nodestativet",
     "repertoire_intro": "Det, du arbejder med, hvor langt hvert stykke er nået, og hvad du arbejder frem mod.",
     "practice_range_label": "Periode",

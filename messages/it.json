@@ -1277,8 +1277,22 @@
     "balance_title": "Dove è finito il tuo tempo",
     "balance_intro": "Brano per brano, e da quanto non ne suoni ciascuno. Un brano lasciato da parte è solo questo — rimettilo in rotazione o lascialo riposare.",
     "balance_last_today": "Suonato oggi",
-    "balance_last_one": "Suonato l’ultima volta {days} giorno fa",
-    "balance_last_other": "Suonato l’ultima volta {days} giorni fa",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Suonato l’ultima volta {days} giorno fa",
+                "daysPlural=many": "Suonato l’ultima volta {days} giorni fa",
+                "daysPlural=other": "Suonato l’ultima volta {days} giorni fa"
+            }
+        }
+    ],
     "repertoire_title": "Sul leggio",
     "repertoire_intro": "Quello su cui stai lavorando, a che punto è ogni brano, e ciò verso cui stai andando.",
     "practice_range_label": "Periodo",

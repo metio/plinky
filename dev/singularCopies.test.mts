@@ -47,13 +47,17 @@ describe("singularCopies", () => {
     it("accepts a message whose forms part only after one", () => {
         // Croatian: 1 nota, 2 note, 5 nota. The singular matches the plural and is right.
         expect(
-            singularCopies("hr", {
-                progress_notes: plural({
-                    "countPlural=one": "{count} nota",
-                    "countPlural=few": "{count} note",
-                    "countPlural=other": "{count} nota",
-                }),
-            }),
+            singularCopies(
+                "hr",
+                {
+                    progress_notes: plural({
+                        "countPlural=one": "{count} nota",
+                        "countPlural=few": "{count} note",
+                        "countPlural=other": "{count} nota",
+                    }),
+                },
+                {},
+            ),
         ).toEqual([]);
     });
 

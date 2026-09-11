@@ -81,11 +81,7 @@ export function PracticeBalance({
                                 />
                             </div>
                             <p className="text-xs text-muted">
-                                {days === 0
-                                    ? m.balance_last_today()
-                                    : days === 1
-                                      ? m.balance_last_one({ days })
-                                      : m.balance_last_other({ days })}
+                                {days === 0 ? m.balance_last_today() : m.balance_last({ days })}
                             </p>
                         </li>
                     );

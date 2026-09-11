@@ -1290,8 +1290,23 @@
     "balance_title": "Dokąd poszedł twój czas",
     "balance_intro": "Utwór po utworze i od kiedy nie grasz każdego z nich. Odłożony utwór to po prostu odłożony utwór — wróć do niego albo zostaw go w spokoju.",
     "balance_last_today": "Grany dzisiaj",
-    "balance_last_one": "Ostatnio grany {days} dzień temu",
-    "balance_last_other": "Ostatnio grany {days} dni temu",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Ostatnio grany {days} dzień temu",
+                "daysPlural=few": "Ostatnio grany {days} dni temu",
+                "daysPlural=many": "Ostatnio grany {days} dni temu",
+                "daysPlural=other": "Ostatnio grany {days} dni temu"
+            }
+        }
+    ],
     "repertoire_title": "Na pulpicie",
     "repertoire_intro": "Nad czym pracujesz, dokąd doszedł każdy utwór i to, do czego zmierzasz.",
     "practice_range_label": "Okres",

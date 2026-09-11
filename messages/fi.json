@@ -1264,8 +1264,21 @@
     "balance_title": "Minne aikasi meni",
     "balance_intro": "Kappale kerrallaan, ja kuinka kauan kustakin on. Hiljainen kappale on vain hiljainen kappale — ota se takaisin kiertoon tai anna sen levätä.",
     "balance_last_today": "Soitettu tänään",
-    "balance_last_one": "Soitettu viimeksi {days} päivä sitten",
-    "balance_last_other": "Soitettu viimeksi {days} päivää sitten",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Soitettu viimeksi {days} päivä sitten",
+                "daysPlural=other": "Soitettu viimeksi {days} päivää sitten"
+            }
+        }
+    ],
     "repertoire_title": "Nuottitelineellä",
     "repertoire_intro": "Mitä työstät, mihin kukin kappale on ehtinyt, ja mitä kohti olet menossa.",
     "practice_range_label": "Jakso",

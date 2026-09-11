@@ -1277,8 +1277,22 @@
     "balance_title": "Para onde foi o teu tempo",
     "balance_intro": "Peça a peça, e há quanto tempo não tocas cada uma. Uma peça esquecida é apenas isso — volta a incluí-la ou deixa-a descansar.",
     "balance_last_today": "Tocada hoje",
-    "balance_last_one": "Tocada pela última vez há {days} dia",
-    "balance_last_other": "Tocada pela última vez há {days} dias",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Tocada pela última vez há {days} dia",
+                "daysPlural=many": "Tocada pela última vez há {days} dias",
+                "daysPlural=other": "Tocada pela última vez há {days} dias"
+            }
+        }
+    ],
     "repertoire_title": "Na estante",
     "repertoire_intro": "O que estás a trabalhar, onde chegou cada peça, e aquilo para que estás a caminhar.",
     "practice_range_label": "Período",

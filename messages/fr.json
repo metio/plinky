@@ -1277,8 +1277,22 @@
     "balance_title": "Où est passé ton temps",
     "balance_intro": "Morceau par morceau, et depuis combien de temps tu n’as pas touché à chacun. Un morceau délaissé n’est qu’un morceau délaissé — remets-le au programme, ou laisse-le de côté.",
     "balance_last_today": "Joué aujourd’hui",
-    "balance_last_one": "Joué il y a {days} jour",
-    "balance_last_other": "Joué il y a {days} jours",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Joué il y a {days} jour",
+                "daysPlural=many": "Joué il y a {days} jours",
+                "daysPlural=other": "Joué il y a {days} jours"
+            }
+        }
+    ],
     "repertoire_title": "Sur le pupitre",
     "repertoire_intro": "Ce que tu travailles, où en est chaque morceau, et ce que tu prépares.",
     "practice_range_label": "Période",

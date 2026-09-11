@@ -1264,8 +1264,21 @@
     "balance_title": "Wohin deine Zeit ging",
     "balance_intro": "Stück für Stück, und wie lange jedes schon ruht. Ein stilles Stück ist einfach ein stilles Stück — nimm es wieder auf oder lass es ruhen.",
     "balance_last_today": "Heute gespielt",
-    "balance_last_one": "Zuletzt vor {days} Tag gespielt",
-    "balance_last_other": "Zuletzt vor {days} Tagen gespielt",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Zuletzt vor {days} Tag gespielt",
+                "daysPlural=other": "Zuletzt vor {days} Tagen gespielt"
+            }
+        }
+    ],
     "repertoire_title": "Auf dem Notenpult",
     "repertoire_intro": "Woran du gerade arbeitest, wie weit jedes Stück ist, und alles, worauf du hinarbeitest.",
     "practice_range_label": "Zeitraum",

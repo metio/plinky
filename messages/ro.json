@@ -1276,8 +1276,22 @@
     "balance_title": "Unde s-a dus timpul tău",
     "balance_intro": "Piesă cu piesă și de cât timp nu ai mai cântat fiecare. O piesă lăsată deoparte este doar atât — readu-o în rotație sau las-o să se odihnească.",
     "balance_last_today": "Cântată azi",
-    "balance_last_one": "Cântată ultima dată acum {days} zi",
-    "balance_last_other": "Cântată ultima dată acum {days} zile",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Cântată ultima dată acum {days} zi",
+                "daysPlural=few": "Cântată ultima dată acum {days} zile",
+                "daysPlural=other": "Cântată ultima dată acum {days} de zile"
+            }
+        }
+    ],
     "repertoire_title": "Pe pupitru",
     "repertoire_intro": "La ce lucrezi, unde a ajuns fiecare piesă și orice îți propui.",
     "practice_range_label": "Perioadă",

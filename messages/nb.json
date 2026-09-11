@@ -1264,8 +1264,21 @@
     "balance_title": "Hvor tiden din tok veien",
     "balance_intro": "Stykke for stykke, og hvor lenge siden du sist spilte hvert av dem. Et stykke som ligger stille, er bare det — ta det opp igjen, eller la det hvile.",
     "balance_last_today": "Spilt i dag",
-    "balance_last_one": "Sist spilt for {days} dag siden",
-    "balance_last_other": "Sist spilt for {days} dager siden",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Sist spilt for {days} dag siden",
+                "daysPlural=other": "Sist spilt for {days} dager siden"
+            }
+        }
+    ],
     "repertoire_title": "På notestativet",
     "repertoire_intro": "Det du jobber med, hvor langt hvert stykke er kommet, og alt du jobber frem mot.",
     "practice_range_label": "Periode",

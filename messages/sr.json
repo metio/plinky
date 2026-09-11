@@ -1276,8 +1276,22 @@
     "balance_title": "Где је отишло твоје време",
     "balance_intro": "Композицију по композицију и колико дуго ниси свирао сваку. Одложена композиција је само то — врати је у игру или је пусти да мирује.",
     "balance_last_today": "Свирано данас",
-    "balance_last_one": "Последњи пут свирано пре {days} дан",
-    "balance_last_other": "Последњи пут свирано пре {days} дана",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Последњи пут свирано пре {days} дана",
+                "daysPlural=few": "Последњи пут свирано пре {days} дана",
+                "daysPlural=other": "Последњи пут свирано пре {days} дана"
+            }
+        }
+    ],
     "repertoire_title": "На нотном пулту",
     "repertoire_intro": "Оно на чему радиш, докле је сваки комад стигао, и све чему тежиш.",
     "practice_range_label": "Период",

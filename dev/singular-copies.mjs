@@ -48,6 +48,12 @@ const SAME_FOR_ONE_AND_MANY = {
     cs: {
         music_remove_used: "zadání reads the same for one and five, and so does the verb",
     },
+    hr: {
+        balance_last: "prije takes the genitive, and dana serves one, two and five: prije 1 dana",
+    },
+    sr: {
+        balance_last: "пре takes the genitive, and дана serves one, two and five: пре 1 дана",
+    },
     fi: {
         music_remove_used: FINNISH_CASE,
         repertoire_days_left: FINNISH_CASE,

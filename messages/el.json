@@ -1264,8 +1264,21 @@
     "balance_title": "Πού πήγε ο χρόνος σου",
     "balance_intro": "Κομμάτι το κομμάτι, και πόσος καιρός πέρασε από την τελευταία φορά. Ένα κομμάτι που έμεινε στην άκρη είναι απλώς αυτό — βάλ’ το ξανά στη σειρά ή άφησέ το να ξεκουραστεί.",
     "balance_last_today": "Παίχτηκε σήμερα",
-    "balance_last_one": "Παίχτηκε τελευταία φορά πριν από {days} ημέρα",
-    "balance_last_other": "Παίχτηκε τελευταία φορά πριν από {days} ημέρες",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Παίχτηκε τελευταία φορά πριν από {days} ημέρα",
+                "daysPlural=other": "Παίχτηκε τελευταία φορά πριν από {days} ημέρες"
+            }
+        }
+    ],
     "repertoire_title": "Στο αναλόγιο",
     "repertoire_intro": "Τι δουλεύεις αυτή τη στιγμή, πού έχει φτάσει το κάθε κομμάτι, και ό,τι ετοιμάζεις.",
     "practice_range_label": "Περίοδος",

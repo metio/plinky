@@ -1289,8 +1289,23 @@
     "balance_title": "Kam šel tvůj čas",
     "balance_intro": "Skladbu po skladbě a jak dlouho jsi každou nehrál. Odložená skladba je prostě odložená skladba — vrať ji do hry, nebo ji nech odpočívat.",
     "balance_last_today": "Hráno dnes",
-    "balance_last_one": "Naposledy hráno před {days} dnem",
-    "balance_last_other": "Naposledy hráno před {days} dny",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Naposledy hráno před {days} dnem",
+                "daysPlural=few": "Naposledy hráno před {days} dny",
+                "daysPlural=many": "Naposledy hráno před {days} dne",
+                "daysPlural=other": "Naposledy hráno před {days} dny"
+            }
+        }
+    ],
     "repertoire_title": "Na pultu",
     "repertoire_intro": "Na čem právě pracuješ, kam se každá skladba dostala, a k čemu si to míříš.",
     "practice_range_label": "Období",

@@ -1250,8 +1250,20 @@
     "balance_title": "時間はどこへ行ったか",
     "balance_intro": "曲ごとに、そして最後に弾いてからどれくらい経ったか。しばらく弾いていない曲は、ただそれだけのこと。また戻すのも、そのままにするのも自由です。",
     "balance_last_today": "今日弾きました",
-    "balance_last_one": "最後に弾いたのは{days}日前",
-    "balance_last_other": "最後に弾いたのは{days}日前",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "最後に弾いたのは{days}日前"
+            }
+        }
+    ],
     "repertoire_title": "譜面台の上に",
     "repertoire_intro": "いま取り組んでいる曲と、それぞれがどこまで来たか、そして目指していること。",
     "practice_range_label": "期間",

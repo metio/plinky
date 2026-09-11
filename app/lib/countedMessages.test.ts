@@ -115,6 +115,16 @@ describe("every plural message in every locale", () => {
         expect(m.achievement_days({ count: 10 }, { locale: "ro" })).toBe("10 zile de cântat");
     });
 
+    it("counts days ago in Russian and Czech with their own forms", () => {
+        expect(m.balance_last({ days: 21 }, { locale: "ru" })).toBe(
+            "В последний раз 21 день назад",
+        );
+        expect(m.balance_last({ days: 3 }, { locale: "ru" })).toBe("В последний раз 3 дня назад");
+        expect(m.balance_last({ days: 5 }, { locale: "ru" })).toBe("В последний раз 5 дней назад");
+        expect(m.balance_last({ days: 1 }, { locale: "cs" })).toBe("Naposledy hráno před 1 dnem");
+        expect(m.balance_last({ days: 5 }, { locale: "cs" })).toBe("Naposledy hráno před 5 dny");
+    });
+
     it("tells Czech two from five", () => {
         expect(m.scores_count({ count: 2 }, { locale: "cs" })).toBe("2 skladby");
         expect(m.scores_count({ count: 5 }, { locale: "cs" })).toBe("5 skladeb");

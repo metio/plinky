@@ -1290,8 +1290,23 @@
     "balance_title": "Куди пішов твій час",
     "balance_intro": "П’єса за п’єсою і скільки часу минуло з останнього разу. Відкладена п’єса — просто відкладена п’єса: поверни її в роботу або залиш у спокої.",
     "balance_last_today": "Грав сьогодні",
-    "balance_last_one": "Востаннє {days} день тому",
-    "balance_last_other": "Востаннє {days} днів тому",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Востаннє {days} день тому",
+                "daysPlural=few": "Востаннє {days} дні тому",
+                "daysPlural=many": "Востаннє {days} днів тому",
+                "daysPlural=other": "Востаннє {days} днів тому"
+            }
+        }
+    ],
     "repertoire_title": "На пюпітрі",
     "repertoire_intro": "Над чим ви працюєте, як далеко просунулася кожна п’єса і до чого ви йдете.",
     "practice_range_label": "Період",

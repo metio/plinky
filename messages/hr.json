@@ -1277,8 +1277,22 @@
     "balance_title": "Kamo je otišlo tvoje vrijeme",
     "balance_intro": "Skladbu po skladbu i koliko dugo nisi svirao svaku. Odložena skladba je samo to — vrati je u igru ili je pusti da miruje.",
     "balance_last_today": "Svirano danas",
-    "balance_last_one": "Zadnji put svirano prije {days} dan",
-    "balance_last_other": "Zadnji put svirano prije {days} dana",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Zadnji put svirano prije {days} dana",
+                "daysPlural=few": "Zadnji put svirano prije {days} dana",
+                "daysPlural=other": "Zadnji put svirano prije {days} dana"
+            }
+        }
+    ],
     "repertoire_title": "Na notnom pultu",
     "repertoire_intro": "Na čemu radiš, dokle je svaka skladba stigla i čemu god težiš.",
     "practice_range_label": "Razdoblje",

@@ -1251,8 +1251,20 @@
     "balance_title": "你的时间去了哪里",
     "balance_intro": "一首一首看，以及每首多久没弹了。久未弹的曲子只是久未弹而已——重新排进来，或者就让它歇着。",
     "balance_last_today": "今天弹过",
-    "balance_last_one": "上次弹奏是 {days} 天前",
-    "balance_last_other": "上次弹奏是 {days} 天前",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "上次弹奏是 {days} 天前"
+            }
+        }
+    ],
     "repertoire_title": "谱架上",
     "repertoire_intro": "你正在练的曲子、每一首走到了哪一步，还有你心里那些目标。",
     "practice_range_label": "时段",

@@ -1264,8 +1264,21 @@
     "balance_title": "Waar je tijd heen ging",
     "balance_intro": "Stuk voor stuk, en hoelang je elk niet meer hebt gespeeld. Een stil stuk is gewoon een stil stuk — neem het weer op of laat het rusten.",
     "balance_last_today": "Vandaag gespeeld",
-    "balance_last_one": "Voor het laatst {days} dag geleden gespeeld",
-    "balance_last_other": "Voor het laatst {days} dagen geleden gespeeld",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Voor het laatst {days} dag geleden gespeeld",
+                "daysPlural=other": "Voor het laatst {days} dagen geleden gespeeld"
+            }
+        }
+    ],
     "repertoire_title": "Op de lessenaar",
     "repertoire_intro": "Waar je aan werkt, hoe ver elk stuk is, en alles waar je naartoe speelt.",
     "practice_range_label": "Periode",

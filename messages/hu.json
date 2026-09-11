@@ -1263,8 +1263,21 @@
     "balance_title": "Hová ment az időd",
     "balance_intro": "Darabról darabra, és hogy melyiket mikor játszottad utoljára. Egy félretett darab csak egy félretett darab — vedd elő újra, vagy hagyd pihenni.",
     "balance_last_today": "Ma játszottad",
-    "balance_last_one": "Utoljára {days} napja játszottad",
-    "balance_last_other": "Utoljára {days} napja játszottad",
+    "balance_last": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Utoljára {days} napja játszottad",
+                "daysPlural=other": "Utoljára {days} napja játszottad"
+            }
+        }
+    ],
     "repertoire_title": "A kottatartón",
     "repertoire_intro": "Amin éppen dolgozol, hol tart mindegyik darab, és amire készülsz.",
     "practice_range_label": "Időszak",
