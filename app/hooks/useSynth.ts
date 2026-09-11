@@ -148,8 +148,8 @@ export function useSynth(): UseSynthResult {
         (pedal: PedalKind, down: boolean) => audio.setPedal(pedal, down),
         [audio],
     );
-    // Reaches the engine regardless of the volume preference — it clears voices and
-    // pedal state, which must happen even for a muted session that opened none.
+    // Reaches the engine regardless of the volume preference — it clears the voices and
+    // held keys, which must happen even for a muted session that opened none.
     const silenceAll = useCallback(() => audio.allNotesOff(), [audio]);
 
     // A stable result so callers can list the synth in an effect's dependencies without the
