@@ -152,14 +152,31 @@ function drop(chord: Chord, keep: Set<Element>): void {
     silence(chord.head.note);
 }
 
-// Turns a note into a rest of exactly its own length, in place.
+// What a rest keeps of the note it replaces: the duration, the voice and the staff, the three
+// things the bar is counted in, and the type, dots and time modification the rest is printed
+// at. An engraver takes the time from the duration but draws the value from the type and its
+// dots, and reads a tuplet only from its time modification, so a dotted crotchet stripped of
+// its dot is drawn as a plain crotchet rest and the printed bar stops adding up.
+const KEPT = new Set(["duration", "voice", "staff", "type", "dot", "time-modification"]);
+
+// Turns a note into a rest of exactly its own length, printed at its own value, in place.
 //
 // Everything that described a sound is removed — the pitch, the tie it was part of, the beam
-// it was drawn in, how it was to be played, whose finger was on it. What stays is the
-// duration, the voice and the staff: the three things the bar is counted in.
+// it was drawn in, how it was to be played, whose finger was on it. Of its notations only a
+// tuplet bracket's start or stop stays, so a silenced triplet is still inside its bracket; a
+// notations element left with nothing in it goes too.
 function silence(note: Element): void {
     for (const child of Array.from(note.children)) {
-        if (!["duration", "voice", "staff", "type"].includes(child.tagName)) {
+        if (child.tagName === "notations") {
+            for (const mark of Array.from(child.children)) {
+                if (mark.tagName !== "tuplet") {
+                    mark.remove();
+                }
+            }
+            if (child.children.length === 0) {
+                child.remove();
+            }
+        } else if (!KEPT.has(child.tagName)) {
             child.remove();
         }
     }

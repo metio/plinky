@@ -89,6 +89,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A take you carry over as a MIDI file comes back at the tempo you set.** Download a\ntake composed at 90 beats a minute, open it in Compose, and the tempo box read\n89.9999550000225, a number that then travelled on in every link you shared. It now\nreads 90. A file or a shared link with a tempo the box cannot hold, faster than 240 or\nslower than 40, opens at the nearest one it can, where it used to drive the\nmetronome at whatever the file said.",
                 twip: true,
             },
+            {
+                body: "**A thinned piece prints its rests at the right length.** With Thin the texture set to\nMelody alone or Melody and bass, a dotted note taken out of the other hand became a\nplain rest without its dot, and a triplet taken out lost its bracket and was drawn as\nordinary quavers, so the bar on the page no longer added up. The rest now prints at\nexactly the value the note had, dot and triplet bracket included.",
+                twip: true,
+            },
         ],
     },
     {

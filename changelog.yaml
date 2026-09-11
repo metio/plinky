@@ -120,6 +120,12 @@
       reads 90. A file or a shared link with a tempo the box cannot hold, faster than 240 or
       slower than 40, opens at the nearest one it can, where it used to drive the
       metronome at whatever the file said.
+    - |-
+      **A thinned piece prints its rests at the right length.** With Thin the texture set to
+      Melody alone or Melody and bass, a dotted note taken out of the other hand became a
+      plain rest without its dot, and a triplet taken out lost its bracket and was drawn as
+      ordinary quavers, so the bar on the page no longer added up. The rest now prints at
+      exactly the value the note had, dot and triplet bracket included.
 
 - date: 2026-09-09
   label: night

@@ -46,6 +46,70 @@ const durations = (xml: string): number[] => {
         .map((n) => Number(n.querySelector("duration")?.textContent ?? "0"));
 };
 
+// The rests a reduction wrote, each with the value it will be printed at.
+function printedRests(xml: string) {
+    const doc = new DOMParser().parseFromString(xml, "application/xml");
+    return [...doc.querySelectorAll("note")]
+        .filter((n) => n.querySelector("rest") !== null)
+        .map((n) => ({
+            duration: n.querySelector("duration")?.textContent,
+            type: n.querySelector("type")?.textContent,
+            dots: n.querySelectorAll("dot").length,
+            actual: n.querySelector("time-modification > actual-notes")?.textContent,
+            normal: n.querySelector("time-modification > normal-notes")?.textContent,
+            tuplets: [...n.querySelectorAll("notations > tuplet")].map((t) =>
+                t.getAttribute("type"),
+            ),
+            notations: [...(n.querySelector("notations")?.children ?? [])].map((c) => c.tagName),
+            order: [...n.children].map((c) => c.tagName),
+        }));
+}
+
+describe("simplify: a silenced note keeps its printed value", () => {
+    const lower = (inner: string) =>
+        `<note><pitch><step>C</step><octave>3</octave></pitch>${inner}</note>`;
+
+    it("keeps the dot on a dotted note it turns into a rest", () => {
+        const xml = score(
+            note("E", 5, { duration: 6 }) +
+                lower(
+                    "<duration>6</duration><voice>2</voice><type>quarter</type><dot/><staff>2</staff>",
+                ) +
+                `<note><chord/><pitch><step>G</step><octave>3</octave></pitch><duration>6</duration><voice>2</voice><type>quarter</type><dot/><staff>2</staff></note>`,
+        );
+        const [rest] = printedRests(simplify(codec, xml, "melody"));
+        expect(rest).toMatchObject({ duration: "6", type: "quarter", dots: 1 });
+        expect(rest?.order).toEqual(["rest", "duration", "voice", "type", "dot", "staff"]);
+    });
+
+    it("keeps a triplet's time modification and bracket on the rest", () => {
+        const triplet = (step: string, bracket: string) =>
+            lower(
+                `<duration>2</duration><voice>2</voice><type>eighth</type>` +
+                    `<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>` +
+                    `<staff>2</staff><beam number="1">begin</beam>` +
+                    `<notations>${bracket}<slur type="start"/><fingering>1</fingering></notations>`,
+            ).replace("<step>C</step>", `<step>${step}</step>`);
+        const xml = score(
+            note("E", 5, { duration: 6 }) +
+                triplet("C", `<tuplet type="start" bracket="yes"/>`) +
+                triplet("D", "") +
+                triplet("E", `<tuplet type="stop"/>`),
+        );
+        const rests = printedRests(simplify(codec, xml, "melody"));
+        expect(rests).toHaveLength(3);
+        for (const rest of rests) {
+            expect(rest).toMatchObject({ type: "eighth", actual: "3", normal: "2" });
+        }
+        expect(rests.map((rest) => rest.tuplets)).toEqual([["start"], [], ["stop"]]);
+        // Only the bracket survives: a slur or a fingering on silence means nothing, and a
+        // notations element left with nothing in it is dropped altogether.
+        expect(rests.map((rest) => rest.notations)).toEqual([["tuplet"], [], ["tuplet"]]);
+        expect(rests[1]?.order).not.toContain("notations");
+        expect(rests[0]?.order).not.toContain("beam");
+    });
+});
+
 describe("simplify", () => {
     // A four-note chord in the right hand over a two-note chord in the left.
     const chordy = score(

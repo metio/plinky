@@ -163,3 +163,72 @@ describe("simplify", () => {
         );
     });
 });
+
+// A bar whose groups carry a printed value — a type, dots, and sometimes a triplet — shared
+// by every member of the group, as a chord's members must share it.
+type Valued = Event & { type: string; dots: number; triplet: boolean };
+
+const valuedEvents: fc.Arbitrary<Valued[]> = fc.array(
+    fc.record({
+        pitches: fc.array(
+            fc.record({
+                step: fc.constantFrom(...STEPS),
+                octave: fc.integer({ min: 2, max: 6 }),
+            }),
+            { minLength: 1, maxLength: 4 },
+        ),
+        duration: fc.integer({ min: 1, max: 8 }),
+        staff: fc.integer({ min: 1, max: 2 }),
+        type: fc.constantFrom("whole", "half", "quarter", "eighth", "16th"),
+        dots: fc.integer({ min: 0, max: 2 }),
+        triplet: fc.boolean(),
+    }),
+    { minLength: 1, maxLength: 12 },
+);
+
+function valuedScoreOf(list: Valued[]): string {
+    const body = list
+        .map(({ pitches, duration, staff, type, dots, triplet }) =>
+            pitches
+                .map(
+                    ({ step, octave }, index) =>
+                        `<note>${index > 0 ? "<chord/>" : ""}` +
+                        `<pitch><step>${step}</step><octave>${octave}</octave></pitch>` +
+                        `<duration>${duration}</duration><voice>${staff}</voice><type>${type}</type>` +
+                        "<dot/>".repeat(dots) +
+                        (triplet
+                            ? "<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>"
+                            : "") +
+                        `<staff>${staff}</staff></note>`,
+                )
+                .join(""),
+        )
+        .join("");
+    return `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">${body}</measure></part></score-partwise>`;
+}
+
+// The value each group is printed at, in bar order: one entry per note that is not a chord
+// member, whether it still sounds or has become a rest.
+function printedValues(xml: string): string[] {
+    const doc = new DOMParser().parseFromString(xml, "application/xml");
+    return [...doc.querySelectorAll("note")]
+        .filter((note) => note.querySelector("chord") === null)
+        .map((note) => {
+            const type = note.querySelector("type")?.textContent ?? "";
+            const dots = note.querySelectorAll("dot").length;
+            const actual = note.querySelector("time-modification > actual-notes")?.textContent;
+            const normal = note.querySelector("time-modification > normal-notes")?.textContent;
+            return `${type}+${dots}${actual ? ` ${actual}:${normal}` : ""}`;
+        });
+}
+
+describe("simplify: printed values", () => {
+    it("prints every group at the value it was written at, sounding or silenced", () => {
+        fc.assert(
+            fc.property(valuedEvents, fc.constantFrom(...REDUCTIONS), (list, level) => {
+                const xml = valuedScoreOf(list);
+                expect(printedValues(simplify(codec, xml, level))).toEqual(printedValues(xml));
+            }),
+        );
+    });
+});
