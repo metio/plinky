@@ -11,6 +11,12 @@
       tempo until it fits, so the notes stay on the beat, written at half or twice their
       value, and the take sounds exactly as the file did.
     - |-
+      **A transposed piece stays in a key you can read.** Moving a piece in F♯ major down a
+      semitone printed E♯ major, with eleven sharps, and a few other moves from a sharp or
+      flat key went past seven. The transposition now always lands on the nearer name of the
+      new key, F major there, the way it already did for the moves that had two names to
+      choose from.
+    - |-
       **Plinky opens without a connection, from its icon too.** With no network, opening
       Plinky from its icon on your home screen, or opening a page you had never visited on
       that device, showed your browser's own error page in place of Plinky. Both now open

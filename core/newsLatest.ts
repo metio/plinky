@@ -18,6 +18,10 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
+                body: "**A transposed piece stays in a key you can read.** Moving a piece in F♯ major down a\nsemitone printed E♯ major, with eleven sharps, and a few other moves from a sharp or\nflat key went past seven. The transposition now always lands on the nearer name of the\nnew key, F major there, the way it already did for the moves that had two names to\nchoose from.",
+                twip: true,
+            },
+            {
                 body: "**Plinky opens without a connection, from its icon too.** With no network, opening\nPlinky from its icon on your home screen, or opening a page you had never visited on\nthat device, showed your browser's own error page in place of Plinky. Both now open\nPlinky, and the pages you have visited open as they always did.",
                 twip: true,
             },

@@ -12,41 +12,42 @@ import { LETTERS } from "./notes";
 
 const LETTER_INDEX: Record<string, number> = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
 
-// For each chromatic step within an octave, the candidate spellings as
-// [letterSteps, fifthsDelta]: how far the note's letter name moves and how the key
-// signature shifts on the circle of fifths. The ambiguous (chromatic) steps carry a
-// second, enharmonic candidate — a tritone up is an augmented 4th (G→C♯, +6 fifths)
-// or a diminished 5th (G→D♭, −6) — and the one that keeps the resulting key nearer C
-// is chosen per piece, so transposing a sharp key doesn't land on a 10-sharp signature.
-const SPELLINGS: Array<Array<[number, number]>> = [
-    [[0, 0]], // unison
-    [
-        [1, -5], // minor 2nd
-        [0, 7], // augmented unison
-    ],
-    [[1, 2]], // major 2nd
-    [
-        [2, -3], // minor 3rd
-        [1, 9], // augmented 2nd
-    ],
-    [[2, 4]], // major 3rd
-    [[3, -1]], // perfect 4th
-    [
-        [3, 6], // augmented 4th
-        [4, -6], // diminished 5th
-    ],
-    [[4, 1]], // perfect 5th
-    [
-        [5, -4], // minor 6th
-        [4, 8], // augmented 5th
-    ],
-    [[5, 3]], // major 6th
-    [
-        [6, -2], // minor 7th
-        [5, 10], // augmented 6th
-    ],
-    [[6, 5]], // major 7th
-];
+// How a transposition is written: how many letters every note moves up within the octave,
+// and how far the key signature moves round the circle of fifths.
+export type KeyShift = { letterSteps: number; fifthsDelta: number };
+
+// The spelling of a transposition, chosen once for the whole piece from the key it opens in.
+// The engraver moves every note and every signature by it, and the marks read off the file
+// move their keys by it, so the key a surface names is the one the page prints.
+//
+// Each interval has one signature move per enharmonic name, twelve fifths apart: up a
+// semitone is a minor second (C to D♭, five flats) or an augmented unison (C to C♯, seven
+// sharps). The one that leaves the opening key nearest C is taken, so a sharp key moved up
+// does not land on a ten-sharp signature; between two equally near, the smaller move, which
+// is the plainer interval. The letters follow from the move, four to each fifth, counted the
+// way whose natural span is nearest the interval: B♯ is one letter below C, not six above.
+// A whole number of octaves keeps the spelling the piece had.
+export function keyShift(openingFifths: number, semitones: number): KeyShift {
+    const base = ((semitones % 12) + 12) % 12;
+    if (base === 0) {
+        return { letterSteps: 0, fifthsDelta: 0 };
+    }
+    const move = (base * 7) % 12;
+    const fifthsDelta = [move - 12, move, move + 12].reduce((best, candidate) => {
+        const nearer = Math.abs(openingFifths + candidate) - Math.abs(openingFifths + best);
+        if (nearer !== 0) {
+            return nearer < 0 ? candidate : best;
+        }
+        // Six sharps against six flats: the tritone as the augmented fourth.
+        const smaller = Math.abs(candidate) - Math.abs(best);
+        return smaller < 0 || (smaller === 0 && candidate > best) ? candidate : best;
+    });
+    const letters = (((fifthsDelta * 4) % 7) + 7) % 7;
+    const letterSteps = [letters - 7, letters, letters + 7].reduce((best, candidate) =>
+        Math.abs(base - (candidate * 12) / 7) < Math.abs(base - (best * 12) / 7) ? candidate : best,
+    );
+    return { letterSteps, fifthsDelta };
+}
 
 // The signed key signature of the first key change, or 0 (C major / A minor) when a
 // score carries none — the reference for choosing the spelling that stays in range.
@@ -129,15 +130,11 @@ export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: numbe
         return xml;
     }
 
-    // Split the shift into a letter-name move within the octave plus whole octaves,
-    // then pick the spelling whose key signature lands closest to C for this piece.
+    // Split the shift into a letter-name move within the octave plus whole octaves, spelled
+    // the way that lands this piece's key closest to C.
     const base = ((semitones % 12) + 12) % 12;
     const octaveShift = (semitones - base) / 12;
-    const fifths = initialFifths(doc);
-    const candidates = SPELLINGS[base] ?? [[0, 0]];
-    const [letterSteps, fifthsDelta] = candidates.reduce((best, candidate) =>
-        Math.abs(fifths + candidate[1]) < Math.abs(fifths + best[1]) ? candidate : best,
-    );
+    const { letterSteps, fifthsDelta } = keyShift(initialFifths(doc), semitones);
     const stepShift = letterSteps + 7 * octaveShift;
 
     for (const pitch of doc.querySelectorAll("note > pitch")) {

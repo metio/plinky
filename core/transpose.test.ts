@@ -104,6 +104,30 @@ describe("transposeMusicXml", () => {
         expect(pitches(result)[0]?.name).toBe("Bb");
     });
 
+    it("keeps a key an interval with one plain name would push past seven near C", () => {
+        // F♯ major down a semitone is F major, not E♯ major with eleven sharps.
+        const down = transposeMusicXml(domXmlCodec, score(note("F", 4, 1), 6), -1);
+        expect(fifthsOf(down)).toBe(-1);
+        expect(pitches(down)[0]?.name).toBe("F");
+        // B major up a tone is D♭ major, not C♯ major's seven sharps.
+        const up = transposeMusicXml(domXmlCodec, score(note("B", 4), 5), 2);
+        expect(fifthsOf(up)).toBe(-5);
+        expect(pitches(up)[0]).toMatchObject({ name: "Db", midi: 73, octave: 5 });
+        // D major up a major seventh lands on D♭ major too, an octave up.
+        const seventh = transposeMusicXml(domXmlCodec, score(note("D", 4), 2), 11);
+        expect(fifthsOf(seventh)).toBe(-5);
+        expect(pitches(seventh)[0]).toMatchObject({ name: "Db", midi: 73, octave: 5 });
+    });
+
+    it("keeps the spelling a piece had when it moves by whole octaves", () => {
+        const sharp = score(note("C", 4, 1), 7);
+        expect(fifthsOf(transposeMusicXml(domXmlCodec, sharp, 12))).toBe(7);
+        expect(pitches(transposeMusicXml(domXmlCodec, sharp, -12))[0]).toMatchObject({
+            name: "C#",
+            octave: 3,
+        });
+    });
+
     it("updates an existing alter element in place when the accidental survives", () => {
         // C♯4 up a major 2nd is D♯4: the note already carries <alter>, so the
         // element is rewritten rather than removed or duplicated.
