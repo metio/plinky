@@ -173,7 +173,9 @@ describe("the instrument a run commits to", () => {
         fireEvent.click(listenButton());
         await expect.poll(() => audio.committed, { timeout: 30000 }).toBe(1);
         await expect.poll(listening, { timeout: 30000 }).toBe("false");
-        expect(audio.holdingVoice).toBe(false);
+        // The release is an effect of the render that ends Listen, so it can land a frame after
+        // the attribute does.
+        await expect.poll(() => audio.holdingVoice, { timeout: 30000 }).toBe(false);
     });
 
     it("lets it go when a replayed take ends", async () => {
