@@ -210,17 +210,18 @@ describe("transposeMusicXml chord symbols", () => {
             ["B", -1],
             ["B", undefined],
         ];
+        // Every spelling rides in one document per key and interval, each symbol beside
+        // its note, so the whole grid is one transposition per pair rather than one per
+        // spelling: the i-th symbol and the i-th note were written as the same pitch.
+        const pairs = spellings
+            .map(([step, alter]) => harmony(step, alter, step, alter) + note(step, 4, alter))
+            .join("");
         for (const fifths of [-4, -1, 0, 2, 5]) {
             for (let semitones = -12; semitones <= 12; semitones++) {
-                for (const [step, alter] of spellings) {
-                    const xml = score(
-                        harmony(step, alter, step, alter) + note(step, 4, alter),
-                        fifths,
-                    );
-                    const moved = transposeMusicXml(domXmlCodec, xml, semitones);
-                    const written = pitches(moved)[0]?.name;
-                    expect(symbols(moved)).toEqual([{ root: written, bass: written }]);
-                }
+                const moved = transposeMusicXml(domXmlCodec, score(pairs, fifths), semitones);
+                const written = pitches(moved).map(({ name }) => name);
+                expect(written).toHaveLength(spellings.length);
+                expect(symbols(moved)).toEqual(written.map((name) => ({ root: name, bass: name })));
             }
         }
     });
