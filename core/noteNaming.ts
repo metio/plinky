@@ -127,9 +127,10 @@ const LOCALE_NAMING: Record<string, LocaleNaming> = {
     // Swedish is the split case: H with ciss/ess for a century, and B for B natural in the
     // schools since the 1990s. The default follows the schools; H stays one choice away.
     sv: { names: "letters", b: "b", h: "swedish", lowerMinor: true },
-    // Norwegian spells like Swedish and has moved the same way, H in the older books and B
-    // in today's school music, led by the chord symbols it is taught through.
-    nb: { names: "letters", b: "b", h: "swedish", lowerMinor: true },
+    // Norwegian spells like Swedish (ciss, ess) but has kept H: Norway's music dictionaries
+    // and encyclopaedia (Musikkordboken, Store norske leksikon) call B natural H and B
+    // flat B, with lower-case minor keys (h-moll).
+    nb: { names: "letters", b: "h", h: "swedish", lowerMinor: true },
     // Dutch calls B natural b and B flat bes, so B is right; the -is spelling it says a
     // sharp with is already its word for the sharp.
     nl: LETTERS_B,

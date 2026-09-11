@@ -54,9 +54,9 @@ describe("each language's default", () => {
         ["hr", "all", "german", true],
         ["sr", "all", "german", true],
         ["hu", "all", "hungarian", true],
-        // The split languages follow today's schools: B, with lower-case minor keys.
+        // Swedish follows today's schools: B, with lower-case minor keys.
         ["sv", "all", "letters", true],
-        ["nb", "all", "letters", true],
+        ["nb", "all", "swedish", true],
         ["fr", "solfege", "solfege", false],
         ["it", "solfege", "solfege", false],
         ["es", "solfege", "solfege", false],
@@ -94,7 +94,7 @@ describe("spelling in each language's letters", () => {
         ["hu", "auto", "H", "B", "Cisz", "Esz", "Asz", "h"],
         ["sv", "auto", "B", "B♭", "C♯", "E♭", "A♭", "b"],
         ["sv", "h", "H", "B", "Ciss", "Ess", "Ass", "h"],
-        ["nb", "auto", "B", "B♭", "C♯", "E♭", "A♭", "b"],
+        ["nb", "auto", "H", "B", "Ciss", "Ess", "Ass", "h"],
         ["nb", "h", "H", "B", "Ciss", "Ess", "Ass", "h"],
         ["de", "b", "B", "B♭", "C♯", "E♭", "A♭", "b"],
         ["en", "h", "H", "B", "Cis", "Es", "As", "H"],
