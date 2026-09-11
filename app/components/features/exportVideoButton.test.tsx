@@ -89,6 +89,24 @@ describe("ExportVideoButton", () => {
         expect(services.activity.active()).toBe(false);
     });
 
+    it("keeps holding after the panel closes, until the encode it started is done", async () => {
+        // Closing the drawer does not stop the encode, and its file still downloads — so
+        // the reload waits for the work, not for the button.
+        let finish: (blob: Blob) => void = () => {};
+        const { services, unmount } = mount({
+            supported: async () => true,
+            export: () => new Promise((resolve) => (finish = resolve)),
+        });
+        fireEvent.click(await screen.findByRole("button", { name: m.video_export() }));
+        fireEvent.click(screen.getByRole("button", { name: m.takes_download_video() }));
+        await waitFor(() => expect(services.activity.active()).toBe(true));
+        unmount();
+        expect(services.activity.active()).toBe(true);
+        finish(new Blob(["mp4"], { type: "video/mp4" }));
+        await waitFor(() => expect(services.activity.active()).toBe(false));
+        expect(downloadName).toBe(`${takeFileStem("Menuet", take)}.mp4`);
+    });
+
     it("lets the update through again when the encoder gives up", async () => {
         const { services } = mount({
             supported: async () => true,
