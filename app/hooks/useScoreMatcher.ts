@@ -598,12 +598,14 @@ export function useScoreMatcher(
             const hand = optionsRef.current.hand ?? "both";
             const all = collectMatchSteps(osmd, hand, optionsRef.current.marks);
             // The first position at or after the resume point; -1 when none remains
-            // (the cursor sits past the last note), which leaves nothing to play.
+            // (the cursor sits past the last note), which leaves nothing to play. The
+            // cursor position is asked first: a repeat that opens at bar one prints its
+            // second pass at onset 0, where the onset alone reads as the top of the piece.
             const startIndex =
-                fromWhole <= 0
-                    ? 0
-                    : fromOrdinal !== null && fromOrdinal >= 0
-                      ? resumeIndex(all, fromOrdinal)
+                fromOrdinal !== null && fromOrdinal >= 0
+                    ? resumeIndex(all, fromOrdinal)
+                    : fromWhole <= 0
+                      ? 0
                       : previewIndex(all, fromWhole);
             // Which of the whole piece's steps the run is over, by index into `all`: a
             // section loop over repeated bars keeps both passes, which is not one

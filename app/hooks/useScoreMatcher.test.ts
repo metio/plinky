@@ -292,7 +292,11 @@ describe("useScoreMatcher", () => {
                 { midi: 50, staff: 1 },
             ],
         ];
-        const { result } = render(positions, { forgiving: true });
+        const cleared: CorrectInfo[] = [];
+        const { result } = render(positions, {
+            forgiving: true,
+            onCorrect: (info) => cleared.push(info),
+        });
         act(() => result.current.start());
         expect(result.current.expected).toEqual([60, 48]);
 
@@ -313,10 +317,36 @@ describe("useScoreMatcher", () => {
         expect(result.current.complete).toBe(true);
         expect(result.current.done).toBe(2);
         expect(result.current.missed).toBe(1);
+        // The surface reads the skip as a stumble at that position, which is what its
+        // colour, a hidden note's reveal and Flow all take from here; the chord played in
+        // full is a clean first try.
+        expect(cleared.map((info) => info.wrongBefore)).toEqual([1, 0]);
 
         // A new run starts with nothing missed.
         act(() => result.current.start());
         expect(result.current.missed).toBe(0);
+    });
+
+    it("forgets a finished run's completion on reset, keeping its counts", () => {
+        const { result } = render([[60], [62]]);
+        act(() => result.current.start());
+        act(() => result.current.registerNote(60));
+        act(() => result.current.registerNote(62));
+        expect(result.current.complete).toBe(true);
+
+        act(() => result.current.reset());
+        // The completion goes, so nothing reads the finished run as the one on the
+        // surface; what it scored stays for the result panel describing it.
+        expect(result.current.complete).toBe(false);
+        expect(result.current.done).toBe(2);
+        expect(result.current.total).toBe(2);
+        expect(result.current.practicing).toBe(false);
+
+        // And the next run starts as any other does.
+        act(() => result.current.start());
+        expect(result.current.practicing).toBe(true);
+        expect(result.current.done).toBe(0);
+        expect(result.current.expected).toEqual([60]);
     });
 
     it("strict mode does not advance on the next note, so a slip blocks", () => {
@@ -515,6 +545,36 @@ describe("a run over a repeat", () => {
         act(() => result.current.start(0.125, null, 5));
         expect(handle.at()).toBe(5);
         expect(result.current.total).toBe(5);
+    });
+
+    it("resumes on the second pass when it opens at the top of the piece", () => {
+        // A repeat that opens at bar one prints its second pass at onset 0, the same place
+        // as the top of the piece. The cursor position is what tells them apart, so a
+        // handoff from Listen standing on step 4 carries on from there.
+        const handle = fakeOsmd(PASSES, WHOLES, BARS);
+        const { result } = renderHook(() => useScoreMatcher(() => handle.osmd));
+        act(() => result.current.start(0, null, 4));
+        expect(handle.at()).toBe(4);
+        expect(result.current.total).toBe(6);
+        expect(result.current.expected).toEqual([60]);
+    });
+
+    it("starts at the top when the cursor position given is the top", () => {
+        const handle = fakeOsmd(PASSES, WHOLES, BARS);
+        const { result } = renderHook(() => useScoreMatcher(() => handle.osmd));
+        act(() => result.current.start(0, null, 0));
+        expect(handle.at()).toBe(0);
+        expect(result.current.total).toBe(10);
+    });
+
+    it("starts at the top when the cursor stood past the end", () => {
+        // A finished run leaves the cursor past the last note, which reads as no cursor
+        // position at all and onset 0: Practice again plays the piece from the top.
+        const handle = fakeOsmd(PASSES, WHOLES, BARS);
+        const { result } = renderHook(() => useScoreMatcher(() => handle.osmd));
+        act(() => result.current.start(0, null, -1));
+        expect(handle.at()).toBe(0);
+        expect(result.current.total).toBe(10);
     });
 
     it("resumes on the first pass printed at an onset when no cursor position is given", () => {

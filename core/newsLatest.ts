@@ -34,7 +34,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**Taking over from Listen on a repeat carries on where it was playing.** Press\nPractice while Listen is on the second time through a repeated passage, and the run\nused to send you back to the first time through, so you played bars you had just\nheard all over again. It now picks up on the same pass, at the next note.",
+                body: "**Taking over from Listen on a repeat carries on where it was playing.** Press\nPractice while Listen is on the second time through a repeated passage, and the run\nused to send you back to the first time through, so you played bars you had just\nheard all over again. It now picks up on the same pass, at the next note, and that\nholds for a repeat that starts at the very top of the piece too.",
                 twip: true,
             },
             {

@@ -1134,9 +1134,11 @@ function usePlaySessionValue({
         // begin at the top. The top of a fresh piece reads as 0 either way.
         const from = resume ? resumePoint() : 0;
         // Which pass through a repeat that onset is on, read off the same cursor before
-        // anything below walks it back to the top.
-        const fromOrdinal = from > 0 ? resumeOrdinal() : null;
-        const partial = from > 0;
+        // anything below walks it back to the top. Read at onset 0 too: a repeat that
+        // opens at bar one prints its second pass there, and only the cursor position
+        // tells it from the top of the piece.
+        const fromOrdinal = resume ? resumeOrdinal() : null;
+        const partial = fromOrdinal !== null && fromOrdinal > 0;
         enterPlayFullscreen();
         listenPlayback.stop();
         clearSelfPacedResult();

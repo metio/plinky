@@ -46,7 +46,8 @@ you race; that has gone too.
 **Taking over from Listen on a repeat carries on where it was playing.** Press
 Practice while Listen is on the second time through a repeated passage, and the run
 used to send you back to the first time through, so you played bars you had just
-heard all over again. It now picks up on the same pass, at the next note.
+heard all over again. It now picks up on the same pass, at the next note, and that
+holds for a repeat that starts at the very top of the piece too.
 
 **Bars that vanish behind a sight-read come back when the music goes round again.**
 With bars vanishing on, a repeat sign or a section loop sends you back to bars that
