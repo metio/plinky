@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { secondsFigure } from "./seconds";
-
 import { packToCode, unpackFromCode } from "./shareCode";
 
 // A "ghost": the note onset times of a completed run on a score, each in ms from
