@@ -127,6 +127,21 @@ describe("progress backup", () => {
         expect(snapshotOf(target)).toEqual(before);
     });
 
+    it("frees the room an empty value took before putting back one it cleared", () => {
+        // An empty value still costs its key. The device's own empty value is cleared, the
+        // bundle's empty one is written into the room it left, and a larger value is then
+        // refused: putting the device's back needs that room again, so the bundle's must go
+        // first, although both values are the same length.
+        const before = { "plinky:s": "" };
+        const bundle = { "plinky:t": "", "plinky:u": x(10) };
+        const target = quotaStore(before, sizeOf(memoryStore(before)));
+
+        const result = importProgress(target, exportProgress(memoryStore(bundle), ""));
+
+        expect(result).toEqual({ ok: false, problem: "storage", undone: true });
+        expect(snapshotOf(target)).toEqual(before);
+    });
+
     it("clears nothing on a device that refuses every write", () => {
         // Such a device could not take back a value once cleared, whatever its size, so
         // it is found out before anything is removed and keeps all it held.

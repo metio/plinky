@@ -9,7 +9,7 @@ import { exportProgress, importProgress } from "./progressBackup";
 import { PREFIX } from "./resetDevice";
 
 const key = fc.constantFrom("a", "b", "c", "d", "takes:x", "takes:y");
-const value = fc.string({ minLength: 1, maxLength: 60 });
+const value = fc.string({ maxLength: 60 });
 const prefixed = (entries: Record<string, string>) =>
     Object.fromEntries(Object.entries(entries).map(([k, v]) => [PREFIX + k, v]));
 

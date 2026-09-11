@@ -125,8 +125,13 @@ type Change = { key: string; before: string | null; after: string | null };
 // room. Applied smallest growth first, the device only shrinks from where the refusal
 // left it and then grows back to exactly what it held before the restore began — both
 // of which fit — so a quota that admitted the device once admits every step back.
+//
+// Growth is measured the way a quota counts, key included: an empty value is not free,
+// so removing one frees its key's room and putting one back needs it.
 function rollBack(kv: KeyValueStore, changes: Change[]): boolean {
-    const growth = ({ before, after }: Change) => (before?.length ?? 0) - (after?.length ?? 0);
+    const stored = (key: string, value: string | null) =>
+        value === null ? 0 : key.length + value.length;
+    const growth = ({ key, before, after }: Change) => stored(key, before) - stored(key, after);
     let undone = true;
     for (const { key, before } of [...changes].sort((a, b) => growth(a) - growth(b))) {
         if (before === null) {
