@@ -87,8 +87,7 @@ jobs:
             | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' \
             | cut -c1-28 \
             | sed -E 's/-+$//')
-          domain="${PREVIEW_DOMAIN}"
-          [ -n "$domain" ] || domain="plinky-preview.pages.dev"
+          domain="${PREVIEW_DOMAIN:-plinky-preview.pages.dev}"
           {
             echo "slug=$slug"
             echo "url=https://$slug.$domain"
