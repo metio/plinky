@@ -668,29 +668,16 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // is refreshed when Settings saves a remap, so a new layout takes effect at once.
     const octaveRef = useRef(0);
     const keyMapRef = useRef<KeyMap>(DEFAULT_KEY_MAP);
-    // Keys a mounted surface has claimed for itself, counted per claim so two surfaces
-    // claiming the same key each hold it until both let go.
-    const claimedKeysRef = useRef(new Map<string, number>());
+    // The claims mounted surfaces hold, one entry each. A key stays claimed while any claim
+    // names it, so two surfaces claiming the same key each hold it until both let go, and a
+    // claim lets go by leaving the set, which it can only do once however often it asks.
+    const claimsRef = useRef(new Set<readonly string[]>());
     const claimKeys = useCallback((keys: readonly string[]) => {
-        const claimed = claimedKeysRef.current;
-        const mine = keys.map((key) => key.toLowerCase());
-        for (const key of mine) {
-            claimed.set(key, (claimed.get(key) ?? 0) + 1);
-        }
-        let released = false;
+        const claims = claimsRef.current;
+        const claim = keys.map((key) => key.toLowerCase());
+        claims.add(claim);
         return () => {
-            if (released) {
-                return;
-            }
-            released = true;
-            for (const key of mine) {
-                const count = (claimed.get(key) ?? 1) - 1;
-                if (count > 0) {
-                    claimed.set(key, count);
-                } else {
-                    claimed.delete(key);
-                }
-            }
+            claims.delete(claim);
         };
     }, []);
     useEffect(() => {
@@ -737,9 +724,13 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         // answering digits reads the press through digitOfKey, so on AZERTY the key printed
         // 3 answers 3 while typing ", and must not also play whatever " is bound to.
         const claimed = (event: KeyboardEvent, key: string): boolean => {
-            const claims = claimedKeysRef.current;
             const digit = digitOfKey(event.key, event.code);
-            return claims.has(key) || (digit !== null && claims.has(digit));
+            for (const claim of claimsRef.current) {
+                if (claim.includes(key) || (digit !== null && claim.includes(digit))) {
+                    return true;
+                }
+            }
+            return false;
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
