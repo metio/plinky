@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { cookieValue } from "../core/localeCarry";
+
 // Answer a real page with a real document.
 //
 // Cloudflare Pages has one response for a path it holds no document for: it serves
@@ -62,21 +64,17 @@ export function pickLocale(acceptLanguage, locales) {
 }
 
 // The cookie the app's language switcher writes (paraglide's `cookie` strategy, set up in
-// dev/compile-messages.mjs). The edge runs with no build step, so the name is repeated
-// here; a test reads it off the compiled runtime.
+// dev/compile-messages.mjs). The name lives in the compiled runtime, which the edge does not
+// bundle, so it is repeated here; a test reads it off the runtime.
 export const LOCALE_COOKIE = "PARAGLIDE_LOCALE";
 
 // The language the player last picked, from the Cookie header, when it is one the site
-// speaks. Null for no cookie, or one naming a language the site no longer has.
+// speaks. Null for no cookie, or one naming a language the site no longer has. Read with the
+// app's own parser, so the edge and the app that carries the choice into the cookie agree on
+// which cookie is the choice.
 export function chosenLocale(cookieHeader, locales) {
-    for (const part of (cookieHeader ?? "").split(";")) {
-        const [name, ...value] = part.trim().split("=");
-        if (name === LOCALE_COOKIE) {
-            const locale = value.join("=").trim();
-            return locales.includes(locale) ? locale : null;
-        }
-    }
-    return null;
+    const locale = cookieValue(cookieHeader ?? "", LOCALE_COOKIE);
+    return locale !== null && locales.includes(locale) ? locale : null;
 }
 
 async function known(context) {
@@ -124,8 +122,8 @@ async function described(context, locale) {
 }
 
 // The shelves the catalogue can be browsed by, kept here rather than imported from
-// core/musicHubs: the middleware is plain JavaScript the edge runs with no build step, so
-// it carries its own copy of the two lists. They are short and they are pinned by a test
+// core/musicHubs, which would bring the person module it is written against into the edge's
+// bundle for the sake of two short lists. They are pinned by a test
 // that reads the core module, so a shelf added there without being added here fails
 // rather than answering 404 at the edge while the app renders it.
 const HUB_GRADES = ["1", "2", "3", "4", "5", "6", "7", "8"];
