@@ -79,6 +79,7 @@ function harness(overrides: Partial<RunGradingOptions> = {}, services?: Partial<
     const options: RunGradingOptions = {
         complete: false,
         holdingNote: false,
+        cleared: 8,
         correct: 8,
         wrong: 0,
         capture: { current: playedRun(8) },
@@ -241,9 +242,30 @@ describe("useRunGrading", () => {
         expect(calls.recordResult).toHaveBeenCalledTimes(1);
     });
 
+    it("refuses an empty capture even where every cleared position was a skip", () => {
+        // A skip clears a position without it counting as right, so the graded tally can
+        // read zero right notes for a run that cleared eight. The guard asks what the
+        // matcher cleared, not what it graded, or those counters would pass it paired
+        // with the next run's empty capture.
+        const { finish, calls, services } = harness({
+            capture: { current: startCapture() },
+            cleared: 8,
+            correct: 0,
+            wrong: 8,
+        });
+        services.ghosts.save(SONG, [0, 500, 1000]);
+
+        finish();
+
+        expect(calls.recordResult).not.toHaveBeenCalled();
+        expect(calls.adoptOwnRun).not.toHaveBeenCalled();
+        expect(services.ghosts.load(SONG)).toEqual([0, 500, 1000]);
+    });
+
     it("survives a run that cleared nothing", () => {
         const { finish, calls, result } = harness({
             capture: { current: startCapture() },
+            cleared: 0,
             correct: 0,
         });
         expect(() => finish()).not.toThrow();

@@ -29,6 +29,10 @@ import type { Milestone } from "../../core/milestones";
 export type RunGradingOptions = {
     // The matcher's finished-run counters. `complete` turning true is what fires this.
     complete: boolean;
+    // Positions the matcher cleared, skipped ones included: what tells a finished run's
+    // counters from a capture that already belongs to the next run.
+    cleared: number;
+    // The graded tally, where a skipped position counts as a miss.
     correct: number;
     wrong: number;
     // The run's captured notes, read at completion. A ref because the capture is
@@ -108,7 +112,7 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
             !owesGrade({
                 complete: o.complete,
                 graded: gradedRef.current,
-                correct: o.correct,
+                cleared: o.cleared,
                 captured: o.capture.current.notes.length,
             })
         ) {

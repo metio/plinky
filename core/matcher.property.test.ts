@@ -261,3 +261,30 @@ describe("resumeIndex properties", () => {
         );
     });
 });
+
+describe("a finished run", () => {
+    // A skip needs a next position to move on to, so the last one is always played in
+    // full: however much was skipped, a run that completes has cleared at least one
+    // position outright, and its graded tally never reads zero right notes.
+    it("clears its last position in full, however much it skipped", () => {
+        fc.assert(
+            fc.property(stepsArb, fc.array(pitch, { maxLength: 40 }), (steps, noise) => {
+                // Arbitrary playing, then every remaining position's notes in order,
+                // so each run ends complete.
+                const { state } = play(
+                    steps,
+                    [...noise, ...steps.flatMap((step) => step.pitches)],
+                    true,
+                );
+                expect(state.complete).toBe(true);
+                expect(state.missed).toBeLessThan(steps.length);
+                const tally = gradedTally({
+                    positions: steps.length,
+                    wrong: state.wrong,
+                    missed: state.missed,
+                });
+                expect(tally.correct).toBeGreaterThan(0);
+            }),
+        );
+    });
+});

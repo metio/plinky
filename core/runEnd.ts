@@ -30,8 +30,10 @@ export type GradeClaim = {
     complete: boolean;
     // This run has already been graded.
     graded: boolean;
-    // Positions the matcher cleared, and notes the capture holds.
-    correct: number;
+    // Positions the matcher cleared, the ones the forgiving advance moved past included,
+    // and notes the capture holds. Cleared rather than graded right: a skipped position is
+    // a miss in the tally, yet the capture still holds whatever was played there.
+    cleared: number;
     captured: number;
 };
 
@@ -43,6 +45,6 @@ export type GradeClaim = {
 // would be written to history and mastery a second time, and its empty onset list would
 // replace the ghost the player races. A run that cleared nothing has nothing to capture,
 // and is still graded.
-export function owesGrade({ complete, graded, correct, captured }: GradeClaim): boolean {
-    return complete && !graded && (correct === 0 || captured > 0);
+export function owesGrade({ complete, graded, cleared, captured }: GradeClaim): boolean {
+    return complete && !graded && (cleared === 0 || captured > 0);
 }

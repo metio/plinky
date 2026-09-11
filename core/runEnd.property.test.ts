@@ -8,7 +8,7 @@ import { owesGrade } from "./runEnd";
 const claims = fc.record({
     complete: fc.boolean(),
     graded: fc.boolean(),
-    correct: fc.nat({ max: 400 }),
+    cleared: fc.nat({ max: 400 }),
     captured: fc.nat({ max: 400 }),
 });
 
@@ -26,8 +26,8 @@ describe("owesGrade", () => {
 
     it("never grades cleared positions from an empty capture", () => {
         fc.assert(
-            fc.property(claims, fc.integer({ min: 1, max: 400 }), (claim, correct) => {
-                expect(owesGrade({ ...claim, correct, captured: 0 })).toBe(false);
+            fc.property(claims, fc.integer({ min: 1, max: 400 }), (claim, cleared) => {
+                expect(owesGrade({ ...claim, cleared, captured: 0 })).toBe(false);
             }),
         );
     });
@@ -37,8 +37,8 @@ describe("owesGrade", () => {
             fc.property(
                 fc.nat({ max: 400 }),
                 fc.integer({ min: 1, max: 400 }),
-                (correct, captured) => {
-                    expect(owesGrade({ complete: true, graded: false, correct, captured })).toBe(
+                (cleared, captured) => {
+                    expect(owesGrade({ complete: true, graded: false, cleared, captured })).toBe(
                         true,
                     );
                 },

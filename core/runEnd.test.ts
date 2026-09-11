@@ -20,7 +20,7 @@ describe("runSettled", () => {
 });
 
 describe("owesGrade", () => {
-    const finished = { complete: true, graded: false, correct: 8, captured: 8 };
+    const finished = { complete: true, graded: false, cleared: 8, captured: 8 };
 
     it("owes a finished, ungraded run its grade", () => {
         expect(owesGrade(finished)).toBe(true);
@@ -39,6 +39,6 @@ describe("owesGrade", () => {
     });
 
     it("still grades a run that cleared nothing", () => {
-        expect(owesGrade({ ...finished, correct: 0, captured: 0 })).toBe(true);
+        expect(owesGrade({ ...finished, cleared: 0, captured: 0 })).toBe(true);
     });
 });

@@ -853,6 +853,7 @@ function usePlaySessionValue({
     const grading = useRunGrading({
         complete: matcher.complete,
         holdingNote,
+        cleared: matcher.done,
         ...gradedTally({
             positions: matcher.total,
             wrong: matcher.wrong,
