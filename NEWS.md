@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
-## 10 September 2026
+## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played
 faster than 240 or slower than 40 beats a minute set the tempo to the nearest end of
