@@ -93,8 +93,40 @@
     "meta_home_description": "Oefen piano in je browser met een MIDI-toetsenbord of je computertoetsenbord — bladlezen, ritme, tempo, gehoortraining en lusoefeningen, met je stukken bewaard op je apparaat.",
     "meta_play_description": "Speel \"{title}\" in je browser — lees het van blad op je MIDI- of computertoetsenbord.",
     "meta_play_description_by": "Speel \"{title}\" van {composer} in je browser — lees het van blad op je MIDI- of computertoetsenbord.",
-    "play_facts": "{bars} maten · {beats} per maat · {tempo} bpm",
-    "meta_play_facts": "Niveau {grade}, {bars} maten, {tempo} slagen per minuut.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} maat · {beats} per maat · {tempo} bpm",
+                "barsPlural=other": "{bars} maten · {beats} per maat · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Niveau {grade}, {bars} maat, {tempo} slagen per minuut.",
+                "barsPlural=other": "Niveau {grade}, {bars} maten, {tempo} slagen per minuut."
+            }
+        }
+    ],
     "meta_daily_title": "Dagelijkse uitdaging",
     "meta_daily_description": "Het stuk van vandaag — voor iedereen hetzelfde — beoordeeld en deelbaar",
     "meta_settings_description": "Maak Plinky helemaal van jou",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Elke noot klinkt terwijl hij voorbijkomt, zodat je kunt meevolgen. Zet het uit om ze zelf op tempo te lezen.",
     "duet_toggle": "Speel de andere hand",
     "duet_hint": "De app speelt de hand die je niet oefent, in de maat – zo speel je een duet met de app.",
-    "keep_up_result": "Je bleef bij {inTime} van {total} noten op tijd.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Je bleef bij {inTime} van {total} noot op tijd.",
+                "totalPlural=other": "Je bleef bij {inTime} van {total} noten op tijd."
+            }
+        }
+    ],
     "race_ghost_toggle": "Race tegen je schaduw",
     "race_ghost_hint": "Een doorschijnende herhaling van je beste run op dit stuk speelt naast je mee.",
     "action_exit_fullscreen": "Volledig scherm sluiten",
@@ -1563,7 +1610,21 @@
     "tools_metro_start": "Starten",
     "tools_metro_stop": "Stoppen",
     "theory_title": "Hoe muziek in elkaar zit",
-    "theory_intro": "{count} korte lessen over wat een notenbalk je eigenlijk vertelt. Bij elke les hoort iets om te spelen — lees de alinea en luister dan.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} korte les over wat een notenbalk je eigenlijk vertelt. Bij elke les hoort iets om te spelen — lees de alinea en luister dan.",
+                "countPlural=other": "{count} korte lessen over wat een notenbalk je eigenlijk vertelt. Bij elke les hoort iets om te spelen — lees de alinea en luister dan."
+            }
+        }
+    ],
     "meta_theory_description": "Gratis cursus pianotheorie in acht lessen: de notenbalk, kruisen en mollen, toonsoorten en toonladders, en de kleur van akkoorden. Speel elk idee in je browser.",
     "theory_unit_reading": "De bladzijde lezen",
     "theory_unit_keys": "Toonsoorten en toonladders",

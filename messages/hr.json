@@ -94,8 +94,42 @@
     "meta_home_description": "Vježbaj klavir u pregledniku s MIDI klavijaturom ili tipkovnicom računala — čitanje s lista, ritam, tempo, trening sluha i vježbe s petljom, uz note pohranjene na tvom uređaju.",
     "meta_play_description": "Sviraj \"{title}\" u pregledniku — čitaj s lista na MIDI-ju ili tipkovnici računala.",
     "meta_play_description_by": "Sviraj \"{title}\" skladatelja {composer} u pregledniku — čitaj s lista na MIDI-ju ili tipkovnici računala.",
-    "play_facts": "{bars} taktova · {beats} po taktu · {tempo} bpm",
-    "meta_play_facts": "Stupanj {grade}, {bars} taktova, {tempo} otkucaja u minuti.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} takt · {beats} po taktu · {tempo} bpm",
+                "barsPlural=few": "{bars} takta · {beats} po taktu · {tempo} bpm",
+                "barsPlural=other": "{bars} taktova · {beats} po taktu · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Stupanj {grade}, {bars} takt, {tempo} otkucaja u minuti.",
+                "barsPlural=few": "Stupanj {grade}, {bars} takta, {tempo} otkucaja u minuti.",
+                "barsPlural=other": "Stupanj {grade}, {bars} taktova, {tempo} otkucaja u minuti."
+            }
+        }
+    ],
     "meta_daily_title": "Dnevni izazov",
     "meta_daily_description": "Današnja skladba — ista za sve — ocijenjena i za dijeljenje",
     "meta_settings_description": "Učini Plinky svojim",
@@ -199,7 +233,23 @@
     "guide_notes_hint": "Svaka nota zasvira dok prolazi, tako da je možeš pratiti. Isključi da ih sam čitaš u tempu.",
     "duet_toggle": "Sviraj drugu ruku",
     "duet_hint": "Aplikacija svira ruku koju ne vježbaš, u ritmu – tako sviraš duet s njom.",
-    "keep_up_result": "Držao si korak s {inTime} od {total} nota na vrijeme.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Držao si korak s {inTime} od {total} note na vrijeme.",
+                "totalPlural=few": "Držao si korak s {inTime} od {total} note na vrijeme.",
+                "totalPlural=other": "Držao si korak s {inTime} od {total} nota na vrijeme."
+            }
+        }
+    ],
     "race_ghost_toggle": "Utrkuj se sa svojim duhom",
     "race_ghost_hint": "Prozirna snimka tvog najboljeg pokušaja ove skladbe svira uz tebe.",
     "action_exit_fullscreen": "Izađi iz cijelog zaslona",
@@ -1589,7 +1639,22 @@
     "tools_metro_start": "Pokreni",
     "tools_metro_stop": "Zaustavi",
     "theory_title": "Kako glazba radi",
-    "theory_intro": "{count} kratkih lekcija o tome što ti crtovlje zapravo govori. Svaka ima nešto za odsvirati — pročitaj odlomak, pa poslušaj.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kratka lekcija o tome što ti crtovlje zapravo govori. Svaka ima nešto za odsvirati — pročitaj odlomak, pa poslušaj.",
+                "countPlural=few": "{count} kratke lekcije o tome što ti crtovlje zapravo govori. Svaka ima nešto za odsvirati — pročitaj odlomak, pa poslušaj.",
+                "countPlural=other": "{count} kratkih lekcija o tome što ti crtovlje zapravo govori. Svaka ima nešto za odsvirati — pročitaj odlomak, pa poslušaj."
+            }
+        }
+    ],
     "meta_theory_description": "Besplatan tečaj glazbene teorije u osam lekcija: čitanje crtovlja, povisilice i snizilice, ljestvice i predznaci, i odakle akordima boja.",
     "theory_unit_reading": "Čitanje nota",
     "theory_unit_keys": "Tonaliteti i ljestvice",

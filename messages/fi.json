@@ -93,8 +93,40 @@
     "meta_home_description": "Harjoittele pianoa selaimessa MIDI-koskettimistolla tai tietokoneen näppäimistöllä — nuotinlukua, rytmiä, tempoa, kuuloharjoittelua ja silmukkaharjoituksia, nuottisi säilyvät laitteellasi.",
     "meta_play_description": "Soita \"{title}\" selaimessasi — lue nuoteista ja soita se MIDI- tai tietokoneen näppäimistöllä.",
     "meta_play_description_by": "Soita \"{title}\", säveltäjänä {composer}, selaimessasi — lue nuoteista ja soita se MIDI- tai tietokoneen näppäimistöllä.",
-    "play_facts": "{bars} tahtia · {beats} per tahti · {tempo} bpm",
-    "meta_play_facts": "Taso {grade}, {bars} tahtia, {tempo} iskua minuutissa.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} tahti · {beats} per tahti · {tempo} bpm",
+                "barsPlural=other": "{bars} tahtia · {beats} per tahti · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Taso {grade}, {bars} tahti, {tempo} iskua minuutissa.",
+                "barsPlural=other": "Taso {grade}, {bars} tahtia, {tempo} iskua minuutissa."
+            }
+        }
+    ],
     "meta_daily_title": "Päivän haaste",
     "meta_daily_description": "Tämän päivän kappale — sama kaikille — arvosteltu ja jaettavissa",
     "meta_settings_description": "Tee Plinkystä omanlaisesi",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Jokainen nuotti soi ohittaessaan, jotta pysyt mukana. Sammuta se, jos haluat lukea nuotit itse tempossa.",
     "duet_toggle": "Soita toinen käsi",
     "duet_hint": "Sovellus soittaa käden, jota et harjoittele, tahdissa – soitat sen kanssa duetin.",
-    "keep_up_result": "Pysyit mukana {inTime}/{total} nuotissa ajallaan.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Pysyit mukana {inTime}/{total} nuotissa ajallaan.",
+                "totalPlural=other": "Pysyit mukana {inTime}/{total} nuotissa ajallaan."
+            }
+        }
+    ],
     "race_ghost_toggle": "Kilpaile haamuasi vastaan",
     "race_ghost_hint": "Läpikuultava toisto parhaasta suorituksestasi tässä kappaleessa soi rinnallasi.",
     "action_exit_fullscreen": "Poistu koko näytöstä",
@@ -1563,7 +1610,21 @@
     "tools_metro_start": "Käynnistä",
     "tools_metro_stop": "Pysäytä",
     "theory_title": "Miten musiikki toimii",
-    "theory_intro": "{count} lyhyttä oppituntia siitä, mitä nuottiviivasto oikeastaan kertoo. Jokaisessa on jotain soitettavaa — lue kappale ja kuuntele sitten.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} lyhyt oppitunti siitä, mitä nuottiviivasto oikeastaan kertoo. Jokaisessa on jotain soitettavaa — lue kappale ja kuuntele sitten.",
+                "countPlural=other": "{count} lyhyttä oppituntia siitä, mitä nuottiviivasto oikeastaan kertoo. Jokaisessa on jotain soitettavaa — lue kappale ja kuuntele sitten."
+            }
+        }
+    ],
     "meta_theory_description": "Ilmainen kahdeksan oppitunnin pianoteorian kurssi: nuottiviivasto, korotukset ja alennukset, sävellajit ja asteikot sekä sointujen väri. Kuuntele selaimessa.",
     "theory_unit_reading": "Nuottikuvan lukeminen",
     "theory_unit_keys": "Sävellajit ja asteikot",

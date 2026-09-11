@@ -94,8 +94,42 @@
     "meta_home_description": "Jouez du piano dans votre navigateur avec un clavier MIDI ou celui de votre ordinateur — déchiffrage, rythme, tempo, travail de l'oreille et exercices en boucle, avec vos partitions gardées sur votre appareil.",
     "meta_play_description": "Jouez « {title} » dans votre navigateur — déchiffrez-le avec votre clavier MIDI ou celui de votre ordinateur.",
     "meta_play_description_by": "Jouez « {title} » de {composer} dans votre navigateur — déchiffrez-le avec votre clavier MIDI ou celui de votre ordinateur.",
-    "play_facts": "{bars} mesures · {beats} par mesure · {tempo} bpm",
-    "meta_play_facts": "Niveau {grade}, {bars} mesures, {tempo} battements par minute.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} mesure · {beats} par mesure · {tempo} bpm",
+                "barsPlural=many": "{bars} mesures · {beats} par mesure · {tempo} bpm",
+                "barsPlural=other": "{bars} mesures · {beats} par mesure · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Niveau {grade}, {bars} mesure, {tempo} battements par minute.",
+                "barsPlural=many": "Niveau {grade}, {bars} mesures, {tempo} battements par minute.",
+                "barsPlural=other": "Niveau {grade}, {bars} mesures, {tempo} battements par minute."
+            }
+        }
+    ],
     "meta_daily_title": "Défi du jour",
     "meta_daily_description": "Le morceau du jour — le même pour tout le monde — noté et partageable",
     "meta_settings_description": "Faites de Plinky le vôtre",
@@ -199,7 +233,23 @@
     "guide_notes_hint": "Chaque note sonne à son passage, pour vous aider à suivre. Désactivez pour les lire vous-même à tempo.",
     "duet_toggle": "Jouer l'autre main",
     "duet_hint": "L'appli joue la main que tu ne travailles pas, en rythme – tu joues un duo avec elle.",
-    "keep_up_result": "Vous avez suivi {inTime} des {total} notes à temps.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Vous avez suivi {inTime} note sur {total} à temps.",
+                "totalPlural=many": "Vous avez suivi {inTime} des {total} notes à temps.",
+                "totalPlural=other": "Vous avez suivi {inTime} des {total} notes à temps."
+            }
+        }
+    ],
     "race_ghost_toggle": "Courez contre votre fantôme",
     "race_ghost_hint": "Un rejeu translucide de votre meilleure partie sur ce morceau joue à vos côtés.",
     "action_exit_fullscreen": "Quitter le plein écran",
@@ -1589,7 +1639,22 @@
     "tools_metro_start": "Démarrer",
     "tools_metro_stop": "Arrêter",
     "theory_title": "Comment la musique fonctionne",
-    "theory_intro": "{count} courtes leçons sur ce qu'une portée vous dit vraiment. Chacune a quelque chose à jouer : lisez le paragraphe, puis écoutez.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} courte leçon sur ce qu'une portée vous dit vraiment. Chacune a quelque chose à jouer : lisez le paragraphe, puis écoutez.",
+                "countPlural=many": "{count} courtes leçons sur ce qu'une portée vous dit vraiment. Chacune a quelque chose à jouer : lisez le paragraphe, puis écoutez.",
+                "countPlural=other": "{count} courtes leçons sur ce qu'une portée vous dit vraiment. Chacune a quelque chose à jouer : lisez le paragraphe, puis écoutez."
+            }
+        }
+    ],
     "meta_theory_description": "Un cours gratuit de théorie du piano en huit leçons : lire la portée, dièses et bémols, gammes et armures, et d'où vient la couleur des accords.",
     "theory_unit_reading": "Lire la partition",
     "theory_unit_keys": "Tonalités et gammes",

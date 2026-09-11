@@ -94,8 +94,42 @@
     "meta_home_description": "Pratica piano no navegador com um teclado MIDI ou o teclado do computador — leitura à primeira vista, ritmo, andamento, treino auditivo e exercícios em loop, com as tuas partituras guardadas no teu dispositivo.",
     "meta_play_description": "Toca \"{title}\" no teu navegador — lê à primeira vista no teu teclado MIDI ou do computador.",
     "meta_play_description_by": "Toca \"{title}\" de {composer} no teu navegador — lê à primeira vista no teu teclado MIDI ou do computador.",
-    "play_facts": "{bars} compassos · {beats} por compasso · {tempo} bpm",
-    "meta_play_facts": "Nível {grade}, {bars} compassos, {tempo} batidas por minuto.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} compasso · {beats} por compasso · {tempo} bpm",
+                "barsPlural=many": "{bars} compassos · {beats} por compasso · {tempo} bpm",
+                "barsPlural=other": "{bars} compassos · {beats} por compasso · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Nível {grade}, {bars} compasso, {tempo} batidas por minuto.",
+                "barsPlural=many": "Nível {grade}, {bars} compassos, {tempo} batidas por minuto.",
+                "barsPlural=other": "Nível {grade}, {bars} compassos, {tempo} batidas por minuto."
+            }
+        }
+    ],
     "meta_daily_title": "Desafio diário",
     "meta_daily_description": "A peça de hoje — a mesma para todos — avaliada e pronta para partilhar",
     "meta_settings_description": "Deixa o Plinky à tua maneira",
@@ -199,7 +233,23 @@
     "guide_notes_hint": "Cada nota soa ao passar, para acompanhar facilmente. Desliga para as leres no andamento por conta própria.",
     "duet_toggle": "Tocar a outra mão",
     "duet_hint": "A app toca a mão que não estás a praticar, a tempo — assim tocas um dueto com ela.",
-    "keep_up_result": "Acompanhaste {inTime} de {total} notas no tempo.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Acompanhaste {inTime} de {total} nota no tempo.",
+                "totalPlural=many": "Acompanhaste {inTime} de {total} notas no tempo.",
+                "totalPlural=other": "Acompanhaste {inTime} de {total} notas no tempo."
+            }
+        }
+    ],
     "race_ghost_toggle": "Corre contra o teu fantasma",
     "race_ghost_hint": "Uma repetição translúcida da tua melhor execução nesta peça toca ao teu lado.",
     "action_exit_fullscreen": "Sair do ecrã inteiro",
@@ -1589,7 +1639,22 @@
     "tools_metro_start": "Começar",
     "tools_metro_stop": "Parar",
     "theory_title": "Como a música funciona",
-    "theory_intro": "{count} lições curtas sobre o que uma pauta te está mesmo a dizer. Cada uma tem algo para tocar — lê o parágrafo e depois ouve.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} lição curta sobre o que uma pauta te está mesmo a dizer. Cada uma tem algo para tocar — lê o parágrafo e depois ouve.",
+                "countPlural=many": "{count} lições curtas sobre o que uma pauta te está mesmo a dizer. Cada uma tem algo para tocar — lê o parágrafo e depois ouve.",
+                "countPlural=other": "{count} lições curtas sobre o que uma pauta te está mesmo a dizer. Cada uma tem algo para tocar — lê o parágrafo e depois ouve."
+            }
+        }
+    ],
     "meta_theory_description": "Curso gratuito de teoria em oito lições: ler a pauta, sustenidos e bemóis, tonalidades e escalas e a cor dos acordes. Toca cada ideia no navegador.",
     "theory_unit_reading": "Ler a página",
     "theory_unit_keys": "Tonalidades e escalas",

@@ -92,8 +92,38 @@
     "meta_home_description": "MIDI キーボードやパソコンのキーボードで、ブラウザでピアノを練習 — 初見、リズム、テンポ、聴音、ループ練習まで。楽譜は端末に保存されます。",
     "meta_play_description": "ブラウザで「{title}」を弾いてみましょう — MIDI かパソコンのキーボードで初見演奏。",
     "meta_play_description_by": "ブラウザで {composer} の「{title}」を弾いてみましょう — MIDI かパソコンのキーボードで初見演奏。",
-    "play_facts": "{bars} 小節 · 1小節 {beats} 拍 · {tempo} bpm",
-    "meta_play_facts": "グレード {grade}、{bars} 小節、1分あたり {tempo} 拍。",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=other": "{bars} 小節 · 1小節 {beats} 拍 · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=other": "グレード {grade}、{bars} 小節、1分あたり {tempo} 拍。"
+            }
+        }
+    ],
     "meta_daily_title": "デイリーチャレンジ",
     "meta_daily_description": "今日の一曲 — みんな同じ曲です — 採点されて、シェアもできます",
     "meta_settings_description": "Plinky を自分好みに",
@@ -195,7 +225,21 @@
     "guide_notes_hint": "各音が通過するときに鳴るので、それを頼りに追っていけます。オフにすれば、自分のテンポで読む練習になります。",
     "duet_toggle": "もう片方の手を演奏",
     "duet_hint": "練習していない方の手をアプリがテンポに合わせて演奏し、二重奏になります。",
-    "keep_up_result": "{total} 音のうち {inTime} 音に間に合いました。",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=other": "{total} 音のうち {inTime} 音に間に合いました。"
+            }
+        }
+    ],
     "race_ghost_toggle": "ゴーストと競争",
     "race_ghost_hint": "この曲でのベストプレイの半透明のリプレイが、隣で一緒に流れます。",
     "action_exit_fullscreen": "全画面を終了",
@@ -1535,7 +1579,20 @@
     "tools_metro_start": "開始",
     "tools_metro_stop": "停止",
     "theory_title": "音楽のしくみ",
-    "theory_intro": "五線譜が実際に何を伝えているのかについての短いレッスンが{count}本。どれにも鳴らせるものがあります——段落を読んで、それから聴いてみてください。",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "五線譜が実際に何を伝えているのかについての短いレッスンが{count}本。どれにも鳴らせるものがあります——段落を読んで、それから聴いてみてください。"
+            }
+        }
+    ],
     "meta_theory_description": "ピアノの音楽理論、無料の8レッスン。五線の読み方、シャープとフラット、調と音階、そして和音の色。どのアイデアもブラウザで鳴らせます。",
     "theory_unit_reading": "楽譜を読む",
     "theory_unit_keys": "調と音階",

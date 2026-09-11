@@ -93,8 +93,40 @@
     "meta_home_description": "Öva piano i webbläsaren med ett MIDI-piano eller datorns tangentbord — notläsning, rytm, tempo, gehörsträning och loopövningar, med dina stycken sparade på din egen enhet.",
     "meta_play_description": "Spela \"{title}\" i webbläsaren — läs det direkt från bladet på ditt MIDI-piano eller datorns tangentbord.",
     "meta_play_description_by": "Spela \"{title}\" av {composer} i webbläsaren — läs det direkt från bladet på ditt MIDI-piano eller datorns tangentbord.",
-    "play_facts": "{bars} takter · {beats} per takt · {tempo} bpm",
-    "meta_play_facts": "Nivå {grade}, {bars} takter, {tempo} slag per minut.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} takt · {beats} per takt · {tempo} bpm",
+                "barsPlural=other": "{bars} takter · {beats} per takt · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Nivå {grade}, {bars} takt, {tempo} slag per minut.",
+                "barsPlural=other": "Nivå {grade}, {bars} takter, {tempo} slag per minut."
+            }
+        }
+    ],
     "meta_daily_title": "Daglig utmaning",
     "meta_daily_description": "Dagens stycke — samma för alla — betygsatt och delbart",
     "meta_settings_description": "Gör Plinky till din egen",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Varje ton ljuder när den passerar, så att du kan följa med. Stäng av för att läsa dem i tempo på egen hand.",
     "duet_toggle": "Spela den andra handen",
     "duet_hint": "Appen spelar handen du inte övar på, i takt – så att du spelar en duett med den.",
-    "keep_up_result": "Du hängde med på {inTime} av {total} toner i tid.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Du hängde med på {inTime} av {total} ton i tid.",
+                "totalPlural=other": "Du hängde med på {inTime} av {total} toner i tid."
+            }
+        }
+    ],
     "race_ghost_toggle": "Kör mot ditt spöke",
     "race_ghost_hint": "En genomskinlig repris av din bästa genomspelning av stycket spelar med dig.",
     "action_exit_fullscreen": "Lämna helskärm",
@@ -1563,7 +1610,21 @@
     "tools_metro_start": "Starta",
     "tools_metro_stop": "Stoppa",
     "theory_title": "Så fungerar musiken",
-    "theory_intro": "{count} korta lektioner om vad ett notsystem egentligen berättar. Varje har något att spela — läs stycket och lyssna sedan.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kort lektion om vad ett notsystem egentligen berättar. Varje har något att spela — läs stycket och lyssna sedan.",
+                "countPlural=other": "{count} korta lektioner om vad ett notsystem egentligen berättar. Varje har något att spela — läs stycket och lyssna sedan."
+            }
+        }
+    ],
     "meta_theory_description": "En gratis kurs i pianoteori i åtta lektioner: att läsa notsystemet, kors och b, tonarter och skalor, och var ackordens färg kommer ifrån.",
     "theory_unit_reading": "Att läsa bladet",
     "theory_unit_keys": "Tonarter och skalor",

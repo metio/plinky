@@ -93,8 +93,40 @@
     "meta_home_description": "MIDI klavyeyle ya da bilgisayar klavyenle tarayıcında piyano çal — deşifre, ritim, tempo, kulak eğitimi ve döngü alıştırmaları; notaların cihazında kalır.",
     "meta_play_description": "\"{title}\" parçasını tarayıcında çal — MIDI'de ya da bilgisayar klavyende deşifre et.",
     "meta_play_description_by": "{composer} bestesi \"{title}\" parçasını tarayıcında çal — MIDI'de ya da bilgisayar klavyende deşifre et.",
-    "play_facts": "{bars} ölçü · ölçü başına {beats} · {tempo} bpm",
-    "meta_play_facts": "{grade}. seviye, {bars} ölçü, dakikada {tempo} vuruş.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} ölçü · ölçü başına {beats} · {tempo} bpm",
+                "barsPlural=other": "{bars} ölçü · ölçü başına {beats} · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{grade}. seviye, {bars} ölçü, dakikada {tempo} vuruş.",
+                "barsPlural=other": "{grade}. seviye, {bars} ölçü, dakikada {tempo} vuruş."
+            }
+        }
+    ],
     "meta_daily_title": "Günlük meydan okuma",
     "meta_daily_description": "Bugünün parçası — herkese aynı — notlanır ve paylaşılabilir",
     "meta_settings_description": "Plinky'yi kendine göre yap",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Takip edebilesin diye her nota geçerken çalar. Tempoda kendin okumak istersen kapat.",
     "duet_toggle": "Diğer eli çal",
     "duet_hint": "Uygulama çalışmadığın eli tempoda çalar; onunla düet yaparsın.",
-    "keep_up_result": "{total} notanın {inTime} tanesine zamanında ayak uydurdun.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{total} notanın {inTime} tanesine zamanında ayak uydurdun.",
+                "totalPlural=other": "{total} notanın {inTime} tanesine zamanında ayak uydurdun."
+            }
+        }
+    ],
     "race_ghost_toggle": "Hayaletinle yarış",
     "race_ghost_hint": "Bu parçadaki en iyi turunun yarı saydam bir tekrarı, yanı başında çalar.",
     "action_exit_fullscreen": "Tam ekrandan çık",
@@ -1561,7 +1608,21 @@
     "tools_metro_start": "Başlat",
     "tools_metro_stop": "Durdur",
     "theory_title": "Müzik nasıl işler",
-    "theory_intro": "Bir porte sana aslında ne söylüyor: {count} kısa ders. Her birinde çalınacak bir şey var — paragrafı oku, sonra dinle.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Bir porte sana aslında ne söylüyor: {count} kısa ders. Her birinde çalınacak bir şey var — paragrafı oku, sonra dinle.",
+                "countPlural=other": "Bir porte sana aslında ne söylüyor: {count} kısa ders. Her birinde çalınacak bir şey var — paragrafı oku, sonra dinle."
+            }
+        }
+    ],
     "meta_theory_description": "Sekiz derslik ücretsiz piyano teorisi: porteyi okumak, diyezler ve bemoller, tonlar ve diziler, akorların rengi nereden gelir. Hepsini tarayıcında çal.",
     "theory_unit_reading": "Sayfayı okumak",
     "theory_unit_keys": "Tonlar ve diziler",

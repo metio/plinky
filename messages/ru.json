@@ -95,8 +95,44 @@
     "meta_home_description": "Занимайтесь на пианино в браузере с MIDI-клавиатурой или клавиатурой компьютера — чтение с листа, ритм, темп, развитие слуха и повторы фрагментов, а ваши партитуры хранятся на устройстве.",
     "meta_play_description": "Играйте «{title}» в браузере — читайте с листа на MIDI- или компьютерной клавиатуре.",
     "meta_play_description_by": "Играйте «{title}» ({composer}) в браузере — читайте с листа на MIDI- или компьютерной клавиатуре.",
-    "play_facts": "{bars} тактов · {beats} на такт · {tempo} bpm",
-    "meta_play_facts": "Уровень {grade}, {bars} тактов, {tempo} ударов в минуту.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} такт · {beats} на такт · {tempo} bpm",
+                "barsPlural=few": "{bars} такта · {beats} на такт · {tempo} bpm",
+                "barsPlural=many": "{bars} тактов · {beats} на такт · {tempo} bpm",
+                "barsPlural=other": "{bars} тактов · {beats} на такт · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Уровень {grade}, {bars} такт, {tempo} ударов в минуту.",
+                "barsPlural=few": "Уровень {grade}, {bars} такта, {tempo} ударов в минуту.",
+                "barsPlural=many": "Уровень {grade}, {bars} тактов, {tempo} ударов в минуту.",
+                "barsPlural=other": "Уровень {grade}, {bars} тактов, {tempo} ударов в минуту."
+            }
+        }
+    ],
     "meta_daily_title": "Задание дня",
     "meta_daily_description": "Сегодняшняя пьеса — одна для всех — с оценкой и возможностью поделиться",
     "meta_settings_description": "Сделайте Plinky своим",
@@ -201,7 +237,24 @@
     "guide_notes_hint": "Каждая нота звучит, пока проходит, — так легче следить. Отключите, чтобы читать ноты в темпе самостоятельно.",
     "duet_toggle": "Играть другой рукой",
     "duet_hint": "Приложение играет руку, которую ты не отрабатываешь, в такт — ты играешь с ним дуэтом.",
-    "keep_up_result": "Вы успели вовремя с {inTime} из {total} нот.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Вы успели вовремя с {inTime} из {total} ноты.",
+                "totalPlural=few": "Вы успели вовремя с {inTime} из {total} нот.",
+                "totalPlural=many": "Вы успели вовремя с {inTime} из {total} нот.",
+                "totalPlural=other": "Вы успели вовремя с {inTime} из {total} нот."
+            }
+        }
+    ],
     "race_ghost_toggle": "Гонка с призраком",
     "race_ghost_hint": "Полупрозрачный повтор вашего лучшего прохождения этой пьесы играет рядом с вами.",
     "action_exit_fullscreen": "Выйти из полноэкранного режима",
@@ -1613,7 +1666,23 @@
     "tools_metro_start": "Пуск",
     "tools_metro_stop": "Стоп",
     "theory_title": "Как устроена музыка",
-    "theory_intro": "{count} коротких уроков о том, что на самом деле говорит нотный стан. В каждом есть что послушать — прочитай абзац, а потом послушай.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} короткий урок о том, что на самом деле говорит нотный стан. В каждом есть что послушать — прочитай абзац, а потом послушай.",
+                "countPlural=few": "{count} коротких урока о том, что на самом деле говорит нотный стан. В каждом есть что послушать — прочитай абзац, а потом послушай.",
+                "countPlural=many": "{count} коротких уроков о том, что на самом деле говорит нотный стан. В каждом есть что послушать — прочитай абзац, а потом послушай.",
+                "countPlural=other": "{count} коротких уроков о том, что на самом деле говорит нотный стан. В каждом есть что послушать — прочитай абзац, а потом послушай."
+            }
+        }
+    ],
     "meta_theory_description": "Бесплатный курс теории из восьми уроков: нотный стан, диезы и бемоли, тональности и гаммы, откуда у аккордов цвет. Каждую идею можно сыграть в браузере.",
     "theory_unit_reading": "Чтение нот",
     "theory_unit_keys": "Тональности и гаммы",

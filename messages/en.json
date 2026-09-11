@@ -93,8 +93,40 @@
     "meta_home_description": "Practise piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear training, and loop drills, with your scores kept on your device.",
     "meta_play_description": "Play \"{title}\" in your browser — sight-read it on your MIDI or computer keyboard.",
     "meta_play_description_by": "Play \"{title}\" by {composer} in your browser — sight-read it on your MIDI or computer keyboard.",
-    "play_facts": "{bars} bars · {beats} to the bar · {tempo} bpm",
-    "meta_play_facts": "Grade {grade}, {bars} bars, {tempo} beats per minute.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} bar · {beats} to the bar · {tempo} bpm",
+                "barsPlural=other": "{bars} bars · {beats} to the bar · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Grade {grade}, {bars} bar, {tempo} beats per minute.",
+                "barsPlural=other": "Grade {grade}, {bars} bars, {tempo} beats per minute."
+            }
+        }
+    ],
     "meta_daily_title": "Daily challenge",
     "meta_daily_description": "Today's piece — the same one for everyone — graded and shareable",
     "meta_settings_description": "Make Plinky yours",
@@ -330,7 +362,22 @@
     "guide_notes_hint": "Each note sounds as it passes, so you can follow along. Turn it off to read them at tempo yourself.",
     "duet_toggle": "Play the other hand",
     "duet_hint": "The app plays the hand you're not practising, in time — so you play a duet with it.",
-    "keep_up_result": "You kept up with {inTime} of {total} notes in time.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "You kept up with {inTime} of {total} note in time.",
+                "totalPlural=other": "You kept up with {inTime} of {total} notes in time."
+            }
+        }
+    ],
     "race_ghost_toggle": "Race your ghost",
     "race_ghost_hint": "A translucent replay of your best run on this piece plays alongside you.",
     "action_exit_fullscreen": "Exit full screen",
@@ -1573,7 +1620,21 @@
     "tools_metro_start": "Start",
     "tools_metro_stop": "Stop",
     "theory_title": "How the music works",
-    "theory_intro": "{count} short lessons on what a stave is actually telling you. Each one has something to play — read the paragraph, then hear it.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} short lesson on what a stave is actually telling you. Each one has something to play — read the paragraph, then hear it.",
+                "countPlural=other": "{count} short lessons on what a stave is actually telling you. Each one has something to play — read the paragraph, then hear it."
+            }
+        }
+    ],
     "meta_theory_description": "A free eight-lesson course in piano theory: reading the stave, sharps and flats, keys and scales, and how chords get their colour. Play each idea in your browser.",
     "theory_unit_reading": "Reading the page",
     "theory_unit_keys": "Keys and scales",

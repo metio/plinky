@@ -95,8 +95,44 @@
     "meta_home_description": "Практикуйте фортепіано у браузері з MIDI-клавіатурою чи клавіатурою комп’ютера — читання з аркуша, ритм, темп, тренування слуху та вправи на повтори, а ваші партитури лишаються на пристрої.",
     "meta_play_description": "Грайте «{title}» у браузері — читайте з аркуша на MIDI чи клавіатурі комп’ютера.",
     "meta_play_description_by": "Грайте «{title}» ({composer}) у браузері — читайте з аркуша на MIDI чи клавіатурі комп’ютера.",
-    "play_facts": "{bars} тактів · {beats} на такт · {tempo} bpm",
-    "meta_play_facts": "Рівень {grade}, {bars} тактів, {tempo} ударів на хвилину.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} такт · {beats} на такт · {tempo} bpm",
+                "barsPlural=few": "{bars} такти · {beats} на такт · {tempo} bpm",
+                "barsPlural=many": "{bars} тактів · {beats} на такт · {tempo} bpm",
+                "barsPlural=other": "{bars} тактів · {beats} на такт · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Рівень {grade}, {bars} такт, {tempo} ударів на хвилину.",
+                "barsPlural=few": "Рівень {grade}, {bars} такти, {tempo} ударів на хвилину.",
+                "barsPlural=many": "Рівень {grade}, {bars} тактів, {tempo} ударів на хвилину.",
+                "barsPlural=other": "Рівень {grade}, {bars} тактів, {tempo} ударів на хвилину."
+            }
+        }
+    ],
     "meta_daily_title": "Щоденний виклик",
     "meta_daily_description": "Сьогоднішня п’єса — однакова для всіх — з оцінкою, якою можна поділитися",
     "meta_settings_description": "Зробіть Plinky своїм",
@@ -201,7 +237,24 @@
     "guide_notes_hint": "Кожна нота звучить, коли проходить повз, щоб ви могли стежити. Вимкніть, щоб читати їх у темпі самостійно.",
     "duet_toggle": "Грати іншою рукою",
     "duet_hint": "Застосунок грає руку, яку ти не тренуєш, у такт — ти граєш із ним дует.",
-    "keep_up_result": "Ви встигли з {inTime} із {total} нот вчасно.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Ви встигли з {inTime} із {total} ноти вчасно.",
+                "totalPlural=few": "Ви встигли з {inTime} із {total} нот вчасно.",
+                "totalPlural=many": "Ви встигли з {inTime} із {total} нот вчасно.",
+                "totalPlural=other": "Ви встигли з {inTime} із {total} нот вчасно."
+            }
+        }
+    ],
     "race_ghost_toggle": "Змагайтеся з тінню",
     "race_ghost_hint": "Напівпрозорий повтор вашого найкращого проходження цієї п’єси грає поруч із вами.",
     "action_exit_fullscreen": "Вийти з повноекранного режиму",
@@ -1615,7 +1668,23 @@
     "tools_metro_start": "Пуск",
     "tools_metro_stop": "Стоп",
     "theory_title": "Як влаштована музика",
-    "theory_intro": "{count} коротких уроків про те, що насправді каже нотний стан. У кожному є що зіграти — прочитай абзац, а потім послухай.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} короткий урок про те, що насправді каже нотний стан. У кожному є що зіграти — прочитай абзац, а потім послухай.",
+                "countPlural=few": "{count} короткі уроки про те, що насправді каже нотний стан. У кожному є що зіграти — прочитай абзац, а потім послухай.",
+                "countPlural=many": "{count} коротких уроків про те, що насправді каже нотний стан. У кожному є що зіграти — прочитай абзац, а потім послухай.",
+                "countPlural=other": "{count} коротких уроків про те, що насправді каже нотний стан. У кожному є що зіграти — прочитай абзац, а потім послухай."
+            }
+        }
+    ],
     "meta_theory_description": "Безкоштовний курс фортепіанної теорії з восьми уроків: нотний стан, дієзи й бемолі, тональності та гами, звідки в акордів колір.",
     "theory_unit_reading": "Читання нот",
     "theory_unit_keys": "Тональності та гами",

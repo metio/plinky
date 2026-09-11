@@ -95,8 +95,44 @@
     "meta_home_description": "Cvičte klavír v prehliadači s MIDI klávesnicou alebo klávesnicou počítača — čítanie z listu, rytmus, tempo, tréning sluchu a cvičenia v slučke; vaše skladby zostávajú na vašom zariadení.",
     "meta_play_description": "Zahrajte si „{title}“ v prehliadači — čítajte z listu na MIDI klavíri alebo klávesnici počítača.",
     "meta_play_description_by": "Zahrajte si „{title}“ od {composer} v prehliadači — čítajte z listu na MIDI klavíri alebo klávesnici počítača.",
-    "play_facts": "{bars} taktov · {beats} na takt · {tempo} bpm",
-    "meta_play_facts": "Stupeň {grade}, {bars} taktov, {tempo} dôb za minútu.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} takt · {beats} na takt · {tempo} bpm",
+                "barsPlural=few": "{bars} takty · {beats} na takt · {tempo} bpm",
+                "barsPlural=many": "{bars} takty · {beats} na takt · {tempo} bpm",
+                "barsPlural=other": "{bars} taktov · {beats} na takt · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Stupeň {grade}, {bars} takt, {tempo} dôb za minútu.",
+                "barsPlural=few": "Stupeň {grade}, {bars} takty, {tempo} dôb za minútu.",
+                "barsPlural=many": "Stupeň {grade}, {bars} takty, {tempo} dôb za minútu.",
+                "barsPlural=other": "Stupeň {grade}, {bars} taktov, {tempo} dôb za minútu."
+            }
+        }
+    ],
     "meta_daily_title": "Denná výzva",
     "meta_daily_description": "Dnešná skladba — rovnaká pre všetkých — s hodnotením a možnosťou zdieľania",
     "meta_settings_description": "Nech je Plinky presne podľa vás",
@@ -201,7 +237,24 @@
     "guide_notes_hint": "Každá nota zaznie, keď prechádza, aby ste ju mohli sledovať. Vypnite to a čítajte ich v tempe sami.",
     "duet_toggle": "Zahrať druhú ruku",
     "duet_hint": "Aplikácia hrá ruku, ktorú necvičíš, v rytme – zahráš si s ňou duet.",
-    "keep_up_result": "Stihli ste {inTime} z {total} nôt načas.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Stihli ste {inTime} z {total} noty načas.",
+                "totalPlural=few": "Stihli ste {inTime} z {total} nôt načas.",
+                "totalPlural=many": "Stihli ste {inTime} z {total} noty načas.",
+                "totalPlural=other": "Stihli ste {inTime} z {total} nôt načas."
+            }
+        }
+    ],
     "race_ghost_toggle": "Pretekajte s duchom",
     "race_ghost_hint": "Priehľadný záznam vášho najlepšieho pokusu na tejto skladbe hrá popri vás.",
     "action_exit_fullscreen": "Ukončiť celú obrazovku",
@@ -1613,7 +1666,23 @@
     "tools_metro_start": "Spustiť",
     "tools_metro_stop": "Zastaviť",
     "theory_title": "Ako hudba funguje",
-    "theory_intro": "{count} krátkych lekcií o tom, čo ti notová osnova vlastne hovorí. Ku každej je niečo na prehratie — prečítaj si odsek a potom si to vypočuj.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} krátka lekcia o tom, čo ti notová osnova vlastne hovorí. Ku každej je niečo na prehratie — prečítaj si odsek a potom si to vypočuj.",
+                "countPlural=few": "{count} krátke lekcie o tom, čo ti notová osnova vlastne hovorí. Ku každej je niečo na prehratie — prečítaj si odsek a potom si to vypočuj.",
+                "countPlural=many": "{count} krátke lekcie o tom, čo ti notová osnova vlastne hovorí. Ku každej je niečo na prehratie — prečítaj si odsek a potom si to vypočuj.",
+                "countPlural=other": "{count} krátkych lekcií o tom, čo ti notová osnova vlastne hovorí. Ku každej je niečo na prehratie — prečítaj si odsek a potom si to vypočuj."
+            }
+        }
+    ],
     "meta_theory_description": "Osem lekcií klavírnej teórie zadarmo: notová osnova, krížiky a béčka, tóniny a stupnice aj farba akordov. Každý nápad si zahráš priamo v prehliadači.",
     "theory_unit_reading": "Čítanie nôt",
     "theory_unit_keys": "Tóniny a stupnice",

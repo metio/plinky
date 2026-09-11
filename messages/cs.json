@@ -95,8 +95,44 @@
     "meta_home_description": "Cvičte klavír ve svém prohlížeči s MIDI klávesnicí nebo klávesnicí počítače — čtení z listu, rytmus, tempo, trénink sluchu a cvičení ve smyčkách, vaše noty přitom zůstávají na vašem zařízení.",
     "meta_play_description": "Zahrajte si \"{title}\" ve svém prohlížeči — čtěte ji z listu na MIDI nebo klávesnici počítače.",
     "meta_play_description_by": "Zahrajte si \"{title}\" od {composer} ve svém prohlížeči — čtěte ji z listu na MIDI nebo klávesnici počítače.",
-    "play_facts": "{bars} taktů · {beats} na takt · {tempo} bpm",
-    "meta_play_facts": "Stupeň {grade}, {bars} taktů, {tempo} dob za minutu.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} takt · {beats} na takt · {tempo} bpm",
+                "barsPlural=few": "{bars} takty · {beats} na takt · {tempo} bpm",
+                "barsPlural=many": "{bars} takty · {beats} na takt · {tempo} bpm",
+                "barsPlural=other": "{bars} taktů · {beats} na takt · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Stupeň {grade}, {bars} takt, {tempo} dob za minutu.",
+                "barsPlural=few": "Stupeň {grade}, {bars} takty, {tempo} dob za minutu.",
+                "barsPlural=many": "Stupeň {grade}, {bars} takty, {tempo} dob za minutu.",
+                "barsPlural=other": "Stupeň {grade}, {bars} taktů, {tempo} dob za minutu."
+            }
+        }
+    ],
     "meta_daily_title": "Denní výzva",
     "meta_daily_description": "Dnešní skladba — pro všechny stejná — ohodnocená a připravená ke sdílení",
     "meta_settings_description": "Udělejte si Plinky po svém",
@@ -201,7 +237,24 @@
     "guide_notes_hint": "Každá nota se ozve, jak přichází, abyste ji mohli sledovat. Vypněte to a zkuste je číst v tempu sami.",
     "duet_toggle": "Zahrát druhou ruku",
     "duet_hint": "Aplikace hraje ruku, kterou necvičíš, v rytmu – zahraješ si s ní duet.",
-    "keep_up_result": "Stihli jste včas {inTime} z {total} not.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Stihli jste včas {inTime} z {total} noty.",
+                "totalPlural=few": "Stihli jste včas {inTime} z {total} not.",
+                "totalPlural=many": "Stihli jste včas {inTime} z {total} noty.",
+                "totalPlural=other": "Stihli jste včas {inTime} z {total} not."
+            }
+        }
+    ],
     "race_ghost_toggle": "Závoďte se svým duchem",
     "race_ghost_hint": "Průsvitné přehrání vašeho nejlepšího pokusu o tuto skladbu poběží vedle vás.",
     "action_exit_fullscreen": "Ukončit celou obrazovku",
@@ -1613,7 +1666,23 @@
     "tools_metro_start": "Spustit",
     "tools_metro_stop": "Zastavit",
     "theory_title": "Jak hudba funguje",
-    "theory_intro": "{count} krátkých lekcí o tom, co ti notová osnova vlastně říká. Ke každé je něco k přehrání — přečti si odstavec a pak si to poslechni.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} krátká lekce o tom, co ti notová osnova vlastně říká. Ke každé je něco k přehrání — přečti si odstavec a pak si to poslechni.",
+                "countPlural=few": "{count} krátké lekce o tom, co ti notová osnova vlastně říká. Ke každé je něco k přehrání — přečti si odstavec a pak si to poslechni.",
+                "countPlural=many": "{count} krátké lekce o tom, co ti notová osnova vlastně říká. Ke každé je něco k přehrání — přečti si odstavec a pak si to poslechni.",
+                "countPlural=other": "{count} krátkých lekcí o tom, co ti notová osnova vlastně říká. Ke každé je něco k přehrání — přečti si odstavec a pak si to poslechni."
+            }
+        }
+    ],
     "meta_theory_description": "Kurz hudební nauky v osmi lekcích zdarma: čtení notové osnovy, křížky a béčka, tóniny a stupnice a odkud mají akordy svou barvu. Vše si můžeš poslechnout.",
     "theory_unit_reading": "Čtení notového zápisu",
     "theory_unit_keys": "Tóniny a stupnice",

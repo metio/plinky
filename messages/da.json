@@ -93,8 +93,40 @@
     "meta_home_description": "Øv klaver i din browser med et MIDI-klaver eller dit computertastatur — nodelæsning, rytme, tempo, høretræning og loop-øvelser, mens dine stykker bliver på din enhed.",
     "meta_play_description": "Spil \"{title}\" i din browser — nodelæs det på dit MIDI- eller computertastatur.",
     "meta_play_description_by": "Spil \"{title}\" af {composer} i din browser — nodelæs det på dit MIDI- eller computertastatur.",
-    "play_facts": "{bars} takter · {beats} pr. takt · {tempo} bpm",
-    "meta_play_facts": "Niveau {grade}, {bars} takter, {tempo} slag i minuttet.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} takt · {beats} pr. takt · {tempo} bpm",
+                "barsPlural=other": "{bars} takter · {beats} pr. takt · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Niveau {grade}, {bars} takt, {tempo} slag i minuttet.",
+                "barsPlural=other": "Niveau {grade}, {bars} takter, {tempo} slag i minuttet."
+            }
+        }
+    ],
     "meta_daily_title": "Daglig udfordring",
     "meta_daily_description": "Dagens stykke — det samme for alle — bedømt og til at dele",
     "meta_settings_description": "Gør Plinky til din",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Hver node lyder, når den passerer, så du kan følge med. Slå den fra for selv at læse dem i tempo.",
     "duet_toggle": "Spil den anden hånd",
     "duet_hint": "Appen spiller den hånd, du ikke øver, i takt – så du spiller en duet med den.",
-    "keep_up_result": "Du fulgte med på {inTime} af {total} noder i tide.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Du fulgte med på {inTime} af {total} node i tide.",
+                "totalPlural=other": "Du fulgte med på {inTime} af {total} noder i tide."
+            }
+        }
+    ],
     "race_ghost_toggle": "Kapløb mod dit spøgelse",
     "race_ghost_hint": "Et gennemsigtigt gensyn af dit bedste gennemløb af dette stykke spiller med ved siden af dig.",
     "action_exit_fullscreen": "Forlad fuld skærm",
@@ -1563,7 +1610,21 @@
     "tools_metro_start": "Start",
     "tools_metro_stop": "Stop",
     "theory_title": "Sådan virker musikken",
-    "theory_intro": "{count} korte lektioner om, hvad et nodesystem egentlig fortæller dig. Hver har noget at spille — læs afsnittet, og hør det så.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kort lektion om, hvad et nodesystem egentlig fortæller dig. Hver har noget at spille — læs afsnittet, og hør det så.",
+                "countPlural=other": "{count} korte lektioner om, hvad et nodesystem egentlig fortæller dig. Hver har noget at spille — læs afsnittet, og hør det så."
+            }
+        }
+    ],
     "meta_theory_description": "Et gratis kursus i otte lektioner: at læse nodesystemet, kryds og b'er, tonearter og skalaer, og hvor akkorder får deres farve fra. Alt kan du høre.",
     "theory_unit_reading": "At læse siden",
     "theory_unit_keys": "Tonearter og skalaer",

@@ -94,8 +94,42 @@
     "meta_home_description": "Вежбај клавир у прегледачу помоћу MIDI клавира или тастатуре рачунара — читање с листа, ритам, темпо, обука слуха и вежбе понављања, уз нумере сачуване на твом уређају.",
     "meta_play_description": "Одсвирај „{title}” у прегледачу — читај с листа и свирај помоћу MIDI или рачунарске тастатуре.",
     "meta_play_description_by": "Одсвирај „{title}” аутора {composer} у прегледачу — читај с листа и свирај помоћу MIDI или рачунарске тастатуре.",
-    "play_facts": "{bars} тактова · {beats} по такту · {tempo} bpm",
-    "meta_play_facts": "Степен {grade}, {bars} тактова, {tempo} откуцаја у минути.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} такт · {beats} по такту · {tempo} bpm",
+                "barsPlural=few": "{bars} такта · {beats} по такту · {tempo} bpm",
+                "barsPlural=other": "{bars} тактова · {beats} по такту · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Степен {grade}, {bars} такт, {tempo} откуцаја у минути.",
+                "barsPlural=few": "Степен {grade}, {bars} такта, {tempo} откуцаја у минути.",
+                "barsPlural=other": "Степен {grade}, {bars} тактова, {tempo} откуцаја у минути."
+            }
+        }
+    ],
     "meta_daily_title": "Дневни изазов",
     "meta_daily_description": "Данашњи комад — исти за све — оцењен и спреман за дељење",
     "meta_settings_description": "Учини Plinky својим",
@@ -199,7 +233,23 @@
     "guide_notes_hint": "Свака нота се огласи док пролази, да можеш да пратиш. Искључи да их сам читаш у темпу.",
     "duet_toggle": "Свирај другу руку",
     "duet_hint": "Апликација свира руку коју не вежбаш, у ритму — тако свираш дует са њом.",
-    "keep_up_result": "Испратио си {inTime} од {total} нота на време.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Испратио си {inTime} од {total} ноте на време.",
+                "totalPlural=few": "Испратио си {inTime} од {total} ноте на време.",
+                "totalPlural=other": "Испратио си {inTime} од {total} нота на време."
+            }
+        }
+    ],
     "race_ghost_toggle": "Тркај се са својим духом",
     "race_ghost_hint": "Провидни снимак твог најбољег покушаја на овом комаду свира уз тебе.",
     "action_exit_fullscreen": "Изађи из целог екрана",
@@ -1587,7 +1637,22 @@
     "tools_metro_start": "Покрени",
     "tools_metro_stop": "Заустави",
     "theory_title": "Како музика функционише",
-    "theory_intro": "{count} кратких лекција о томе шта ти нотни систем заправо говори. Уз сваку иде нешто за слушање — прочитај пасус, па послушај.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} кратка лекција о томе шта ти нотни систем заправо говори. Уз сваку иде нешто за слушање — прочитај пасус, па послушај.",
+                "countPlural=few": "{count} кратке лекције о томе шта ти нотни систем заправо говори. Уз сваку иде нешто за слушање — прочитај пасус, па послушај.",
+                "countPlural=other": "{count} кратких лекција о томе шта ти нотни систем заправо говори. Уз сваку иде нешто за слушање — прочитај пасус, па послушај."
+            }
+        }
+    ],
     "meta_theory_description": "Осам бесплатних лекција клавирске теорије: линијски систем, повисилице и снизилице, тоналитети и скале, боја акорда. Сваку идеју одсвираш у прегледачу.",
     "theory_unit_reading": "Читање нота",
     "theory_unit_keys": "Тоналитети и скале",

@@ -93,8 +93,40 @@
     "meta_home_description": "Praktiko pianon në shfletues me një tastierë MIDI ose me atë të kompjuterit — lexim nga partitura, ritëm, tempo, stërvitje veshi dhe ushtrime me përsëritje, me partiturat e tua të ruajtura në pajisje.",
     "meta_play_description": "Luaj \"{title}\" në shfletuesin tënd — lexoje nga partitura në pianon tënde MIDI ose në tastierën e kompjuterit.",
     "meta_play_description_by": "Luaj \"{title}\" nga {composer} në shfletuesin tënd — lexoje nga partitura në pianon tënde MIDI ose në tastierën e kompjuterit.",
-    "play_facts": "{bars} masa · {beats} për masë · {tempo} bpm",
-    "meta_play_facts": "Niveli {grade}, {bars} masa, {tempo} rrahje në minutë.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} masë · {beats} për masë · {tempo} bpm",
+                "barsPlural=other": "{bars} masa · {beats} për masë · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Niveli {grade}, {bars} masë, {tempo} rrahje në minutë.",
+                "barsPlural=other": "Niveli {grade}, {bars} masa, {tempo} rrahje në minutë."
+            }
+        }
+    ],
     "meta_daily_title": "Sfida ditore",
     "meta_daily_description": "Pjesa e sotme — e njëjta për të gjithë — e vlerësuar dhe gati për t'u ndarë",
     "meta_settings_description": "Bëje Plinky-n tënd",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Çdo notë tingëllon ndërsa kalon, që të mund ta ndjekësh. Fike për t'i lexuar vetë në tempo.",
     "duet_toggle": "Luaj dorën tjetër",
     "duet_hint": "Aplikacioni luan dorën që nuk po ushtron, në ritëm — kështu luan një duet me të.",
-    "keep_up_result": "Mbajte hapin me {inTime} nga {total} nota në kohë.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Mbajte hapin me {inTime} nga {total} notë në kohë.",
+                "totalPlural=other": "Mbajte hapin me {inTime} nga {total} nota në kohë."
+            }
+        }
+    ],
     "race_ghost_toggle": "Garo me hijen tënde",
     "race_ghost_hint": "Një ripërsëritje e tejdukshme e provës tënde më të mirë në këtë pjesë luan pranë teje.",
     "action_exit_fullscreen": "Dil nga ekrani i plotë",
@@ -1561,7 +1608,21 @@
     "tools_metro_start": "Nis",
     "tools_metro_stop": "Ndal",
     "theory_title": "Si funksionon muzika",
-    "theory_intro": "{count} mësime të shkurtra për atë që të thotë vërtet një pentagram. Secili ka diçka për t'u luajtur — lexo paragrafin, pastaj dëgjoje.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} mësim i shkurtër për atë që të thotë vërtet një pentagram. Secili ka diçka për t'u luajtur — lexo paragrafin, pastaj dëgjoje.",
+                "countPlural=other": "{count} mësime të shkurtra për atë që të thotë vërtet një pentagram. Secili ka diçka për t'u luajtur — lexo paragrafin, pastaj dëgjoje."
+            }
+        }
+    ],
     "meta_theory_description": "Tetë mësime falas teorie pianoje: leximi i pentagramit, diezët e bemolët, tonalitetet e shkallët dhe ngjyra e akordeve. Luaj çdo ide në shfletues.",
     "theory_unit_reading": "Leximi i faqes",
     "theory_unit_keys": "Tonalitetet dhe shkallët",

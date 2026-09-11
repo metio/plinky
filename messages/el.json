@@ -93,8 +93,40 @@
     "meta_home_description": "Παίξε πιάνο μέσα στον browser σου με ένα πληκτρολόγιο MIDI ή το πληκτρολόγιο του υπολογιστή σου — ανάγνωση παρτιτούρας, ρυθμός, τέμπο, εξάσκηση ακοής και ασκήσεις επανάληψης, με τις παρτιτούρες σου να μένουν στη συσκευή σου.",
     "meta_play_description": "Παίξε το \"{title}\" μέσα στον browser σου — διάβασέ το με την πρώτη στο MIDI ή στο πληκτρολόγιο του υπολογιστή σου.",
     "meta_play_description_by": "Παίξε το \"{title}\" του {composer} μέσα στον browser σου — διάβασέ το με την πρώτη στο MIDI ή στο πληκτρολόγιο του υπολογιστή σου.",
-    "play_facts": "{bars} μέτρα · {beats} ανά μέτρο · {tempo} bpm",
-    "meta_play_facts": "Επίπεδο {grade}, {bars} μέτρα, {tempo} παλμοί το λεπτό.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} μέτρο · {beats} ανά μέτρο · {tempo} bpm",
+                "barsPlural=other": "{bars} μέτρα · {beats} ανά μέτρο · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Επίπεδο {grade}, {bars} μέτρο, {tempo} παλμοί το λεπτό.",
+                "barsPlural=other": "Επίπεδο {grade}, {bars} μέτρα, {tempo} παλμοί το λεπτό."
+            }
+        }
+    ],
     "meta_daily_title": "Ημερήσια πρόκληση",
     "meta_daily_description": "Το σημερινό κομμάτι — το ίδιο για όλους — βαθμολογημένο και έτοιμο να το μοιραστείς",
     "meta_settings_description": "Κάνε το Plinky δικό σου",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Κάθε νότα ηχεί καθώς περνάει, ώστε να μπορείς να ακολουθείς. Απενεργοποίησέ το για να τις διαβάζεις μόνος σου στο τέμπο.",
     "duet_toggle": "Παίξε το άλλο χέρι",
     "duet_hint": "Η εφαρμογή παίζει το χέρι που δεν εξασκείς, στον ρυθμό — παίζεις ντουέτο μαζί της.",
-    "keep_up_result": "Ακολούθησες στον χρόνο {inTime} από {total} νότες.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Ακολούθησες στον χρόνο {inTime} από {total} νότα.",
+                "totalPlural=other": "Ακολούθησες στον χρόνο {inTime} από {total} νότες."
+            }
+        }
+    ],
     "race_ghost_toggle": "Κόντρα με το φάντασμά σου",
     "race_ghost_hint": "Μια ημιδιάφανη αναπαραγωγή της καλύτερης προσπάθειάς σου σε αυτό το κομμάτι παίζει δίπλα σου.",
     "action_exit_fullscreen": "Έξοδος από πλήρη οθόνη",
@@ -1563,7 +1610,21 @@
     "tools_metro_start": "Ξεκίνα",
     "tools_metro_stop": "Σταμάτα",
     "theory_title": "Πώς λειτουργεί η μουσική",
-    "theory_intro": "{count} σύντομα μαθήματα για το τι σου λέει πραγματικά ένα πεντάγραμμο. Καθένα έχει κάτι να παίξεις — διάβασε την παράγραφο και μετά άκουσέ το.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} σύντομο μάθημα για το τι σου λέει πραγματικά ένα πεντάγραμμο. Καθένα έχει κάτι να παίξεις — διάβασε την παράγραφο και μετά άκουσέ το.",
+                "countPlural=other": "{count} σύντομα μαθήματα για το τι σου λέει πραγματικά ένα πεντάγραμμο. Καθένα έχει κάτι να παίξεις — διάβασε την παράγραφο και μετά άκουσέ το."
+            }
+        }
+    ],
     "meta_theory_description": "Ένα δωρεάν μάθημα θεωρίας για πιάνο σε οκτώ βήματα: πεντάγραμμο, διέσεις και υφέσεις, τονικότητες, κλίμακες και συγχορδίες — με ήχο στον browser σου.",
     "theory_unit_reading": "Να διαβάζεις τη σελίδα",
     "theory_unit_keys": "Τονικότητες και κλίμακες",

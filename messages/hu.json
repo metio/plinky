@@ -93,8 +93,40 @@
     "meta_home_description": "Gyakorolj zongorázni a böngésződben MIDI-billentyűzettel vagy a számítógéped billentyűivel — lapról olvasás, ritmus, tempó, hallásfejlesztés és ismétlőgyakorlatok, a kottáid pedig az eszközödön maradnak.",
     "meta_play_description": "Játszd le a(z) \"{title}\" darabot a böngésződben — olvasd lapról a MIDI- vagy számítógép-billentyűzeteden.",
     "meta_play_description_by": "Játszd le {composer} \"{title}\" darabját a böngésződben — olvasd lapról a MIDI- vagy számítógép-billentyűzeteden.",
-    "play_facts": "{bars} ütem · ütemenként {beats} · {tempo} bpm",
-    "meta_play_facts": "{grade}. szint, {bars} ütem, percenként {tempo} ütés.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} ütem · ütemenként {beats} · {tempo} bpm",
+                "barsPlural=other": "{bars} ütem · ütemenként {beats} · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{grade}. szint, {bars} ütem, percenként {tempo} ütés.",
+                "barsPlural=other": "{grade}. szint, {bars} ütem, percenként {tempo} ütés."
+            }
+        }
+    ],
     "meta_daily_title": "Napi kihívás",
     "meta_daily_description": "A mai darab — mindenkinek ugyanaz — értékelve és megosztható",
     "meta_settings_description": "Szabd magadra a Plinkyt",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Minden hang megszólal, ahogy elhalad, hogy tudj követni. Kapcsold ki, hogy magad olvasd őket a saját tempódban.",
     "duet_toggle": "A másik kéz lejátszása",
     "duet_hint": "Az app lejátssza a kezet, amelyet nem gyakorolsz, ütemre – így duettet játszol vele.",
-    "keep_up_result": "Időben lépést tartottál {total} hangból {inTime}-tal.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Időben lépést tartottál {total} hangból {inTime}-tal.",
+                "totalPlural=other": "Időben lépést tartottál {total} hangból {inTime}-tal."
+            }
+        }
+    ],
     "race_ghost_toggle": "Versenyezz a szellemeddel",
     "race_ghost_hint": "A legjobb futásod áttetsző visszajátszása veled együtt játszik ezen a darabon.",
     "action_exit_fullscreen": "Kilépés a teljes képernyőből",
@@ -1561,7 +1608,21 @@
     "tools_metro_start": "Indítás",
     "tools_metro_stop": "Leállítás",
     "theory_title": "Hogyan működik a zene",
-    "theory_intro": "{count} rövid lecke arról, mit mond neked valójában a kotta. Mindegyikhez tartozik valami lejátszható — olvasd el a bekezdést, aztán hallgasd meg.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} rövid lecke arról, mit mond neked valójában a kotta. Mindegyikhez tartozik valami lejátszható — olvasd el a bekezdést, aztán hallgasd meg.",
+                "countPlural=other": "{count} rövid lecke arról, mit mond neked valójában a kotta. Mindegyikhez tartozik valami lejátszható — olvasd el a bekezdést, aztán hallgasd meg."
+            }
+        }
+    ],
     "meta_theory_description": "Ingyenes, nyolcleckés zeneelmélet zongorásoknak: a vonalrendszer olvasása, keresztek és bék, hangnemek és skálák, és honnan van az akkordok színe.",
     "theory_unit_reading": "A kotta olvasása",
     "theory_unit_keys": "Hangnemek és skálák",

@@ -93,8 +93,40 @@
     "meta_home_description": "Übe Klavier im Browser mit einem MIDI-Keyboard oder deiner Computertastatur – Blattlesen, Rhythmus, Tempo, Gehörbildung und Loop-Übungen, deine Noten bleiben auf deinem Gerät.",
     "meta_play_description": "Spiele „{title}“ in deinem Browser – lies es vom Blatt auf deinem MIDI- oder Computer-Keyboard.",
     "meta_play_description_by": "Spiele „{title}“ von {composer} in deinem Browser – lies es vom Blatt auf deinem MIDI- oder Computer-Keyboard.",
-    "play_facts": "{bars} Takte · {beats} pro Takt · {tempo} bpm",
-    "meta_play_facts": "Stufe {grade}, {bars} Takte, {tempo} Schläge pro Minute.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} Takt · {beats} pro Takt · {tempo} bpm",
+                "barsPlural=other": "{bars} Takte · {beats} pro Takt · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Stufe {grade}, {bars} Takt, {tempo} Schläge pro Minute.",
+                "barsPlural=other": "Stufe {grade}, {bars} Takte, {tempo} Schläge pro Minute."
+            }
+        }
+    ],
     "meta_daily_title": "Tägliche Herausforderung",
     "meta_daily_description": "Das heutige Stück – für alle dasselbe – bewertet und zum Teilen",
     "meta_settings_description": "Mach Plinky zu deinem eigenen",
@@ -197,7 +229,22 @@
     "guide_notes_hint": "Jede Note erklingt, während sie vorbeizieht, damit du mitkommst. Schalte es aus, um sie im Tempo selbst zu lesen.",
     "duet_toggle": "Die andere Hand spielen",
     "duet_hint": "Die App spielt die Hand, die du nicht übst, im Takt – so spielst du ein Duett mit ihr.",
-    "keep_up_result": "Du hast bei {inTime} von {total} Noten rechtzeitig mitgehalten.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Du hast bei {inTime} von {total} Note rechtzeitig mitgehalten.",
+                "totalPlural=other": "Du hast bei {inTime} von {total} Noten rechtzeitig mitgehalten."
+            }
+        }
+    ],
     "race_ghost_toggle": "Gegen deinen Geist antreten",
     "race_ghost_hint": "Eine durchscheinende Wiederholung deines besten Durchlaufs dieses Stücks spielt neben dir mit.",
     "action_exit_fullscreen": "Vollbild verlassen",
@@ -1563,7 +1610,21 @@
     "tools_metro_start": "Start",
     "tools_metro_stop": "Stopp",
     "theory_title": "Wie Musik funktioniert",
-    "theory_intro": "{count} kurze Lektionen darüber, was ein Notensystem dir eigentlich sagt. Zu jeder gibt es etwas zum Abspielen — lies den Absatz, dann hör es dir an.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kurze Lektion darüber, was ein Notensystem dir eigentlich sagt. Zu jeder gibt es etwas zum Abspielen — lies den Absatz, dann hör es dir an.",
+                "countPlural=other": "{count} kurze Lektionen darüber, was ein Notensystem dir eigentlich sagt. Zu jeder gibt es etwas zum Abspielen — lies den Absatz, dann hör es dir an."
+            }
+        }
+    ],
     "meta_theory_description": "Ein freier Kurs in acht Lektionen: das Notensystem lesen, Kreuze und Bes, Tonarten und Tonleitern, und woher Akkorde ihre Farbe haben. Alles zum Anhören.",
     "theory_unit_reading": "Die Seite lesen",
     "theory_unit_keys": "Tonarten und Tonleitern",

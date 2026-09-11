@@ -94,8 +94,42 @@
     "meta_home_description": "Esercitati al pianoforte nel browser con una tastiera MIDI o la tastiera del computer — lettura a prima vista, ritmo, tempo, allenamento dell'orecchio ed esercizi in loop, con i tuoi spartiti conservati sul tuo dispositivo.",
     "meta_play_description": "Suona \"{title}\" nel browser — leggilo a prima vista con il tuo MIDI o la tastiera del computer.",
     "meta_play_description_by": "Suona \"{title}\" di {composer} nel browser — leggilo a prima vista con il tuo MIDI o la tastiera del computer.",
-    "play_facts": "{bars} battute · {beats} per battuta · {tempo} bpm",
-    "meta_play_facts": "Livello {grade}, {bars} battute, {tempo} battiti al minuto.",
+    "play_facts": [
+        {
+            "declarations": [
+                "input bars",
+                "input beats",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "{bars} battuta · {beats} per battuta · {tempo} bpm",
+                "barsPlural=many": "{bars} battute · {beats} per battuta · {tempo} bpm",
+                "barsPlural=other": "{bars} battute · {beats} per battuta · {tempo} bpm"
+            }
+        }
+    ],
+    "meta_play_facts": [
+        {
+            "declarations": [
+                "input grade",
+                "input bars",
+                "input tempo",
+                "local barsPlural = bars: plural"
+            ],
+            "selectors": [
+                "barsPlural"
+            ],
+            "match": {
+                "barsPlural=one": "Livello {grade}, {bars} battuta, {tempo} battiti al minuto.",
+                "barsPlural=many": "Livello {grade}, {bars} battute, {tempo} battiti al minuto.",
+                "barsPlural=other": "Livello {grade}, {bars} battute, {tempo} battiti al minuto."
+            }
+        }
+    ],
     "meta_daily_title": "Sfida del giorno",
     "meta_daily_description": "Il brano di oggi — lo stesso per tutti — valutato e condivisibile",
     "meta_settings_description": "Rendi Plinky tuo.",
@@ -199,7 +233,23 @@
     "guide_notes_hint": "Ogni nota suona mentre passa, così puoi seguirla. Disattiva per leggerle tu a tempo.",
     "duet_toggle": "Suona l'altra mano",
     "duet_hint": "L'app suona la mano che non stai esercitando, a tempo: suoni un duetto con lei.",
-    "keep_up_result": "Hai tenuto il passo con {inTime} di {total} note a tempo.",
+    "keep_up_result": [
+        {
+            "declarations": [
+                "input inTime",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Hai tenuto il passo con {inTime} di {total} nota a tempo.",
+                "totalPlural=many": "Hai tenuto il passo con {inTime} di {total} note a tempo.",
+                "totalPlural=other": "Hai tenuto il passo con {inTime} di {total} note a tempo."
+            }
+        }
+    ],
     "race_ghost_toggle": "Corri contro il tuo fantasma",
     "race_ghost_hint": "Una riproduzione traslucida della tua esecuzione migliore su questo brano ti accompagna mentre suoni.",
     "action_exit_fullscreen": "Esci da schermo intero",
@@ -1589,7 +1639,22 @@
     "tools_metro_start": "Avvia",
     "tools_metro_stop": "Ferma",
     "theory_title": "Come funziona la musica",
-    "theory_intro": "{count} brevi lezioni su ciò che un pentagramma ti sta davvero dicendo. Ognuna ha qualcosa da suonare: leggi il paragrafo, poi ascolta.",
+    "theory_intro": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} breve lezione su ciò che un pentagramma ti sta davvero dicendo. Ognuna ha qualcosa da suonare: leggi il paragrafo, poi ascolta.",
+                "countPlural=many": "{count} brevi lezioni su ciò che un pentagramma ti sta davvero dicendo. Ognuna ha qualcosa da suonare: leggi il paragrafo, poi ascolta.",
+                "countPlural=other": "{count} brevi lezioni su ciò che un pentagramma ti sta davvero dicendo. Ognuna ha qualcosa da suonare: leggi il paragrafo, poi ascolta."
+            }
+        }
+    ],
     "meta_theory_description": "Otto lezioni gratuite di teoria del pianoforte: il pentagramma, diesis e bemolli, tonalità e scale, il colore degli accordi. Suona ogni idea nel browser.",
     "theory_unit_reading": "Leggere la pagina",
     "theory_unit_keys": "Tonalità e scale",

@@ -53,6 +53,7 @@ const SAME_FOR_ONE_AND_MANY = {
     hr: {
         balance_last: "prije takes the genitive, and dana serves one, two and five: prije 1 dana",
         rhythm_staff_label: "od takes the genitive, and note serves one and two: od 1 note",
+        keep_up_result: "od takes the genitive, and note serves one and two: od 1 note",
         assignments_available_count:
             "od takes the genitive, and skladbe serves one and two: od 1 skladbe",
         assignments_imported_partial:
@@ -61,6 +62,7 @@ const SAME_FOR_ONE_AND_MANY = {
     sr: {
         balance_last: "пре takes the genitive, and дана serves one, two and five: пре 1 дана",
         rhythm_staff_label: "од takes the genitive, and ноте serves one and two: од 1 ноте",
+        keep_up_result: "од takes the genitive, and ноте serves one and two: од 1 ноте",
         assignments_available_count:
             "од takes the genitive, and композиције serves one and two: од 1 композиције",
         assignments_imported_partial:
@@ -71,6 +73,7 @@ const SAME_FOR_ONE_AND_MANY = {
             "the noun stays in the genitive singular after any numeral: yhden sävelen, kolmen sävelen",
         music_remove_used: FINNISH_CASE,
         recap_boast: FINNISH_CASE,
+        keep_up_result: "the noun stays singular after any numeral: 1/3 nuotissa, 3/5 nuotissa",
         repertoire_days_left: FINNISH_CASE,
         stats_opening_days: FINNISH_CASE,
         stats_opening_days_more: FINNISH_CASE,

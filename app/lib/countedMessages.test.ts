@@ -192,6 +192,23 @@ describe("every plural message in every locale", () => {
         expect(m.recap_card_detail({ month: "May", days: 1 })).toBe("May · 1 day");
     });
 
+    it("counts bars, lessons and the notes you kept up with by their own number", () => {
+        expect(m.keep_up_result({ inTime: 0, total: 1 })).toBe(
+            "You kept up with 0 of 1 note in time.",
+        );
+        expect(m.keep_up_result({ inTime: 20, total: 21 }, { locale: "ru" })).toBe(
+            "Вы успели вовремя с 20 из 21 ноты.",
+        );
+        expect(m.play_facts({ bars: 1, beats: 4, tempo: 90 })).toBe(
+            "1 bar · 4 to the bar · 90 bpm",
+        );
+        expect(m.meta_play_facts({ grade: 1, bars: 22, tempo: 90 }, { locale: "ru" })).toBe(
+            "Уровень 1, 22 такта, 90 ударов в минуту.",
+        );
+        expect(m.theory_intro({ count: 22 }, { locale: "ru" })).toMatch(/^22 коротких урока о том/);
+        expect(m.theory_intro({ count: 13 })).toMatch(/^13 short lessons on/);
+    });
+
     it("tells Czech two from five", () => {
         expect(m.scores_count({ count: 2 }, { locale: "cs" })).toBe("2 skladby");
         expect(m.scores_count({ count: 5 }, { locale: "cs" })).toBe("5 skladeb");
