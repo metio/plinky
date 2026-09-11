@@ -5,23 +5,8 @@ import { useEffect } from "react";
 import { digitFor, optionForDigit } from "../../core/earAnswer";
 import { digitOfKey } from "../../core/keyMap";
 import { useClaimedKeys } from "../contexts/midi";
+import { typingInto } from "../lib/typingInto";
 import { useLatest } from "./useLatest";
-
-// Input types a digit means nothing to: pressing 3 on a focused radio or button changes
-// nothing, so the answer surface may take it.
-const NOT_TYPED_INTO = new Set(["button", "checkbox", "radio", "range", "reset", "submit"]);
-
-// Whether the focused element is somewhere the player is typing, where a digit is theirs.
-function typingInto(target: EventTarget | null): boolean {
-    const el = target as HTMLElement | null;
-    if (!el) {
-        return false;
-    }
-    if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "SELECT") {
-        return true;
-    }
-    return el.tagName === "INPUT" && !NOT_TYPED_INTO.has((el as HTMLInputElement).type);
-}
 
 // The number keys answer an ear question while it is `active`: each digit that names one
 // of `options` (core/earAnswer decides which) picks it, and is claimed from the computer

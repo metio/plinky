@@ -7,6 +7,7 @@ import { memoryStore } from "../adapters/memoryStore";
 import { fakeSampleSource } from "../adapters/fakeSampleSource";
 import { type AppServices, createServices, ServicesProvider } from "../contexts/services";
 import { createActivitySignal } from "../lib/activity";
+import { createKeyboardEvidence } from "../lib/keyboardEvidence";
 
 // Render UI inside a ServicesProvider over a fresh in-memory world: no shared
 // localStorage, no cross-test leakage, no clearing between tests. The returned
@@ -23,6 +24,8 @@ export function renderWithServices(ui: ReactElement, overrides: Partial<AppServi
         // shared singleton, and a leaked begin() from one test must not read as
         // "active" in the next.
         activity: overrides.activity ?? createActivitySignal(),
+        // Fresh too, so a key one test pressed does not show the next test's legends.
+        keyboardEvidence: overrides.keyboardEvidence ?? createKeyboardEvidence(),
         // Recordings a test hands over itself, never a cache and never a fetch: the real
         // source would reach for an origin that does not exist here, and a test that
         // wants the recorded piano says which recordings it has.

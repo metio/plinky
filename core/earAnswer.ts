@@ -46,6 +46,21 @@ export function digitFor(option: string): string | null {
     return degree < 0 ? null : String(degree + 1);
 }
 
+// Whether the number keys' legends show — the hint that they answer, and a button's
+// corner digit. A fine pointer anywhere on the device makes a keyboard likely; a key
+// pressed outside a text field proves one, which is the only evidence a tablet in a
+// keyboard case gives. With neither, the device is taken for a phone, whose player has no
+// number keys and for whom a legend about them is only noise.
+export function showsDigitLegends({
+    finePointer,
+    keyPressed,
+}: {
+    finePointer: boolean;
+    keyPressed: boolean;
+}): boolean {
+    return finePointer || keyPressed;
+}
+
 // The option a pressed key answers with, or null when that key answers with nothing here —
 // an 8, a letter, or a degree this question does not offer.
 export function optionForDigit<T extends string>(key: string, options: readonly T[]): T | null {

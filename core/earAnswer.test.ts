@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { digitFor, optionForDigit, optionVerdict } from "./earAnswer";
+import { digitFor, optionForDigit, optionVerdict, showsDigitLegends } from "./earAnswer";
 
 describe("optionVerdict", () => {
     it("marks nothing at all while the round is unanswered", () => {
@@ -101,5 +101,22 @@ describe("optionForDigit", () => {
         expect(optionForDigit("2", ["1", "3", "5"])).toBeNull();
         expect(optionForDigit("q", ["1", "3", "5"])).toBeNull();
         expect(optionForDigit("1", ["major", "minor"])).toBeNull();
+    });
+});
+
+describe("showsDigitLegends", () => {
+    it("shows them where a fine pointer makes a keyboard likely", () => {
+        // A desktop, a laptop's touchpad, a tablet with a trackpad.
+        expect(showsDigitLegends({ finePointer: true, keyPressed: false })).toBe(true);
+    });
+
+    it("shows them once a key has been pressed, whatever the pointer", () => {
+        // A tablet or phone in a keyboard case, with no trackpad.
+        expect(showsDigitLegends({ finePointer: false, keyPressed: true })).toBe(true);
+        expect(showsDigitLegends({ finePointer: true, keyPressed: true })).toBe(true);
+    });
+
+    it("hides them on a touch-only device no key has been pressed on", () => {
+        expect(showsDigitLegends({ finePointer: false, keyPressed: false })).toBe(false);
     });
 });

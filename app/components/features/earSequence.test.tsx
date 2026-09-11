@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ChordDegree } from "../../../core/theory";
 import { m } from "../../paraglide/messages.js";
-import { DIGIT_LEGEND } from "./earDigitHint";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { EarSequence } from "./earSequence";
 
 afterEach(cleanup);
@@ -54,8 +54,19 @@ describe("EarSequence announcements", () => {
 });
 
 describe("EarSequence digit legends", () => {
-    it("shows a numeral's corner digit under the same rule as the hint explaining it", () => {
-        render(
+    afterEach(() => vi.unstubAllGlobals());
+
+    // Which pointers the device has, as `(any-pointer: fine)` reports it.
+    const pointer = (fine: boolean) =>
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: fine && query === "(any-pointer: fine)",
+            addEventListener() {},
+            removeEventListener() {},
+        }));
+
+    // Through the services world, so the evidence of a keyboard starts fresh per test.
+    const mount = () =>
+        renderWithServices(
             <EarSequence
                 sequence={SEQUENCE}
                 choices={VOCAB}
@@ -64,10 +75,50 @@ describe("EarSequence digit legends", () => {
                 label="progression"
             />,
         );
-        const badge = screen.getByRole("button", { name: "IV" }).querySelector("[aria-hidden]");
-        expect(badge?.textContent).toBe("4");
-        expect(badge?.className).toContain(DIGIT_LEGEND);
-        expect(screen.getByText(m.ear_digit_hint()).className).toContain(DIGIT_LEGEND);
+
+    const badge = () => screen.getByRole("button", { name: "IV" }).querySelector("[aria-hidden]");
+    const hint = () => screen.queryByText(m.ear_digit_hint());
+
+    it("shows the corner digits and the hint where a fine pointer makes a keyboard likely", () => {
+        pointer(true);
+        mount();
+        expect(badge()?.textContent).toBe("4");
+        expect(hint()).toBeTruthy();
+    });
+
+    it("shows neither on a touch-only device", () => {
+        pointer(false);
+        mount();
+        expect(badge()).toBeNull();
+        expect(hint()).toBeNull();
+    });
+
+    it("shows both once a key press proves a keyboard, whatever the pointer", () => {
+        // A tablet in a keyboard case: its main pointer is a finger, and it has keys.
+        pointer(false);
+        mount();
+        act(() => {
+            window.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", code: "ShiftLeft" }));
+        });
+        expect(badge()?.textContent).toBe("4");
+        expect(hint()).toBeTruthy();
+    });
+
+    it("takes nothing typed into a text field as proof", () => {
+        // A phone's own on-screen keyboard only ever types into a field, so a key pressed
+        // there says nothing about a keyboard the player could answer with.
+        pointer(false);
+        mount();
+        const field = document.createElement("input");
+        document.body.append(field);
+        act(() => {
+            field.dispatchEvent(
+                new KeyboardEvent("keydown", { key: "a", code: "KeyA", bubbles: true }),
+            );
+        });
+        field.remove();
+        expect(badge()).toBeNull();
+        expect(hint()).toBeNull();
     });
 });
 

@@ -89,11 +89,22 @@ describe("EarSession number keys", () => {
         expect(heard).toHaveLength(1);
     });
 
-    it("names each digit's button as its shortcut and says the keys answer", () => {
+    it("names each digit's button as its shortcut, and hints only once a key is pressed", () => {
+        // jsdom reports no fine pointer, so until a key is pressed this is a phone.
         mount("scale-degrees");
         expect(screen.getByRole("button", { name: "3" }).getAttribute("aria-keyshortcuts")).toBe(
             "3",
         );
+        expect(screen.queryByText(m.ear_digit_hint())).toBeNull();
+        press("8");
+        expect(screen.getByText(m.ear_digit_hint())).toBeTruthy();
+    });
+
+    it("keeps the hint on the next question once a key has been pressed", () => {
+        mount("scale-degrees");
+        press("1");
+        fireEvent.click(screen.getByRole("button", { name: m.ear_next() }));
+        unanswered();
         expect(screen.getByText(m.ear_digit_hint())).toBeTruthy();
     });
 

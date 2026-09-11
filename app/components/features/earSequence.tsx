@@ -4,7 +4,8 @@
 import { useState } from "react";
 import { digitFor } from "../../../core/earAnswer";
 import { useDigitAnswers } from "../../hooks/useDigitAnswers";
-import { DIGIT_LEGEND, EarDigitHint } from "./earDigitHint";
+import { useDigitLegends } from "../../hooks/useDigitLegends";
+import { EarDigitHint } from "./earDigitHint";
 import { UndoIcon } from "../ui/icons";
 import { IconButton } from "../ui/button";
 import { VERDICT_BOX } from "./earVerdict";
@@ -79,6 +80,7 @@ export function EarSequence<T extends string>({
     // The number keys fill the next slot: a degree by its own number, a chord by the degree
     // its numeral stands on.
     const digits = useDigitAnswers(choices, !settled && entered.length < sequence.length, choose);
+    const legends = useDigitLegends();
 
     const undo = () => {
         if (!settled) {
@@ -150,13 +152,14 @@ export function EarSequence<T extends string>({
                         >
                             {degree}
                             {/* A numeral's number key, printed small in the corner the way
-                                a keycap carries a second legend. A degree's label is
-                                already its number and needs none. The name stays the
-                                numeral alone; the shortcut is announced separately. */}
-                            {digit !== null && digit !== degree ? (
+                                a keycap carries a second legend, where the hint below
+                                shows too. A degree's label is already its number and
+                                needs none. The name stays the numeral alone; the
+                                shortcut is announced separately. */}
+                            {legends && digit !== null && digit !== degree ? (
                                 <span
                                     aria-hidden="true"
-                                    className={`absolute top-1 right-1.5 text-[10px] leading-none font-normal text-muted tabular-nums ${DIGIT_LEGEND}`}
+                                    className="absolute top-1 right-1.5 text-[10px] leading-none font-normal text-muted tabular-nums"
                                 >
                                     {digit}
                                 </span>

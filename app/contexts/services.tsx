@@ -56,6 +56,7 @@ import { createPeopleSource, type PeopleSource } from "../stores/peopleSource";
 import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
 import { type ActivitySignal, runActivity } from "../lib/activity";
+import { type KeyboardEvidence, sessionKeyboard } from "../lib/keyboardEvidence";
 
 // The app's injected integration points, gathered in one place. Every external
 // capability the UI depends on — persistence, the state stores over it, audio,
@@ -131,6 +132,9 @@ export type AppServices = {
     // file rather than for the sound, since `audio` above is the instrument itself.
     audioFile: AudioExporter;
     activity: ActivitySignal;
+    // Whether a key has been pressed on a keyboard of the player's own this session — what
+    // decides, with the pointer, whether the number keys' legends show.
+    keyboardEvidence: KeyboardEvidence;
 };
 
 // Where the recordings are published. A version sits in the path because a pack is
@@ -223,6 +227,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.
         activity: overrides.activity ?? runActivity,
+        keyboardEvidence: overrides.keyboardEvidence ?? sessionKeyboard,
     };
 }
 
@@ -269,6 +274,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     video: true,
     audioFile: true,
     activity: true,
+    keyboardEvidence: true,
 };
 const SERVICE_KEYS = Object.keys(SERVICE_KEY_SET) as readonly (keyof AppServices)[];
 
