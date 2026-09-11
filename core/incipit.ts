@@ -16,19 +16,15 @@
 // in the Node tooling that bakes the catalogue, and in tests.
 
 import { textOf } from "./musicxmlDom";
+import { LETTERS } from "./notes";
 import type { XmlCodec } from "./xml";
 
-// A letter's index within its octave, C through B — the diatonic ladder a staff draws.
-const LETTERS = ["C", "D", "E", "F", "G", "A", "B"] as const;
-const LETTER_INDEX: Record<string, number> = Object.fromEntries(
-    LETTERS.map((letter, index) => [letter, index]),
-);
-
-// The lowest line of each clef's staff, as a diatonic index (octave × 7 + letter):
-// E4 for the treble, G2 for the bass. Every vertical position is measured from it.
+// The lowest line of each clef's staff, as a diatonic index (octave × 7 + letter, a
+// letter's index within its octave being its place in LETTERS, C through B): E4 for the
+// treble, G2 for the bass. Every vertical position is measured from it.
 const BOTTOM_LINE: Record<Clef, number> = {
-    treble: 4 * 7 + LETTER_INDEX.E!,
-    bass: 2 * 7 + LETTER_INDEX.G!,
+    treble: 4 * 7 + LETTERS.indexOf("E"),
+    bass: 2 * 7 + LETTERS.indexOf("G"),
 };
 
 export type Clef = "treble" | "bass";
@@ -78,8 +74,8 @@ function noteOf(note: Element, divisions: number): IncipitNote | null {
     }
     const step = textOf(pitch, "step").toUpperCase();
     const octaveText = textOf(pitch, "octave");
-    const letter = LETTER_INDEX[step];
-    if (letter === undefined || octaveText === "") {
+    const letter = LETTERS.indexOf(step);
+    if (letter < 0 || octaveText === "") {
         return null;
     }
     const octave = Number(octaveText);

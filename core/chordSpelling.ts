@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ChordSpan } from "./harmony";
-import { alterFor, LETTERS, SEMITONE, spellMidi } from "./notes";
+import { alterOnto, LETTERS, octaveOf, spellInKey } from "./notes";
 import {
     type ChordQuality,
     chordLetterSteps,
@@ -39,19 +39,9 @@ function tonicLetter(key: SpelledKey): number {
     return key.mode === "major" ? major : (major + 5) % 7;
 }
 
-// The accidental that puts a letter on a pitch class: -6 to 5, and within a double sharp
-// or flat for any chord a key signature can hold.
-function alterOnto(pitchClass: number, letter: number): number {
-    const natural = SEMITONE[LETTERS[letter] ?? "C"] ?? 0;
-    return ((((pitchClass - natural) % 12) + 18) % 12) - 6;
-}
-
-// A pitch class on the signature's own side of the keyboard: sharps under sharps, flats
-// under flats.
-function signatureSide(pitchClass: number, fifths: number): Spelling {
-    const { step, alter } = spellMidi(60 + pitchClass, fifths < 0);
-    return { step, alter };
-}
+// The accidental that puts the letter at an index into LETTERS on a pitch class.
+const alterOntoLetter = (pitchClass: number, letter: number): number =>
+    alterOnto(pitchClass, LETTERS[letter] ?? "C");
 
 function rootLetter(chord: Chord): number {
     const step = pitchClassOf(chord.root - chord.key.tonic);
@@ -63,7 +53,10 @@ function onLetter(chord: Chord, root: number): Spelling[] {
     const letters = chordLetterSteps(chord.quality);
     return chordPitches(chord.root, chord.quality).map((pitch, index) => {
         const letter = (root + (letters[index] ?? 0)) % 7;
-        return { step: LETTERS[letter] ?? "C", alter: alterOnto(pitchClassOf(pitch), letter) };
+        return {
+            step: LETTERS[letter] ?? "C",
+            alter: alterOntoLetter(pitchClassOf(pitch), letter),
+        };
     });
 }
 
@@ -78,7 +71,7 @@ export function spellChord(chord: Chord): Spelling[] {
     const root = pitchClassOf(chord.root);
     const others = [0, 1, 2, 3, 4, 5, 6]
         .filter((letter) => letter !== degree)
-        .sort((a, b) => Math.abs(alterOnto(root, a)) - Math.abs(alterOnto(root, b)));
+        .sort((a, b) => Math.abs(alterOntoLetter(root, a)) - Math.abs(alterOntoLetter(root, b)));
     for (const letter of [degree, ...others]) {
         const spelled = onLetter(chord, letter);
         if (spelled.every((tone) => Math.abs(tone.alter) <= 2)) {
@@ -86,38 +79,30 @@ export function spellChord(chord: Chord): Spelling[] {
         }
     }
     // No stack in CHORD_STACKS gets here: every root has a name within one accidental, and
-    // every tone above it is then within two.
-    return chordPitches(chord.root, chord.quality).map((pitch) =>
-        signatureSide(pitchClassOf(pitch), chord.key.fifths),
-    );
-}
-
-// One pitch class as the chord writes it. A tone of the chord takes the chord's spelling; a
-// note outside it takes the letter the signature gives it where it has one, and the
-// signature's side of the keyboard where it does not.
-export function spellChordTone(chord: Chord, pitchClass: number): Spelling {
-    const wanted = pitchClassOf(pitchClass);
-    const tones = chordPitches(chord.root, chord.quality).map(pitchClassOf);
-    const at = tones.indexOf(wanted);
-    const spelled = at >= 0 ? spellChord(chord)[at] : undefined;
-    if (spelled) {
-        return spelled;
-    }
-    for (const step of LETTERS) {
-        const alter = alterFor(step, chord.key.fifths);
-        if (pitchClassOf((SEMITONE[step] ?? 0) + alter) === wanted) {
-            return { step, alter };
-        }
-    }
-    return signatureSide(wanted, chord.key.fifths);
+    // every tone above it is then within two. The degree's own stack keeps the return total.
+    return onLetter(chord, degree);
 }
 
 // A sounding pitch as the chord writes it, with the octave its letter is in: B♯3 sounds
-// as middle C and C♭4 as the B below it, so the octave follows the letter, not the key.
+// as middle C and C♭4 as the B below it, so the octave follows the letter, not the key. A
+// tone of the chord takes the chord's spelling; a note outside it, the key's.
 export function spellChordPitch(
     chord: Chord,
     midi: number,
 ): { step: string; alter: number; octave: number } {
-    const { step, alter } = spellChordTone(chord, midi);
-    return { step, alter, octave: Math.floor((Math.round(midi) - alter) / 12) - 1 };
+    const sounding = Math.round(midi);
+    const at = chordPitches(chord.root, chord.quality)
+        .map(pitchClassOf)
+        .indexOf(pitchClassOf(sounding));
+    const spelled = at >= 0 ? spellChord(chord)[at] : undefined;
+    if (!spelled) {
+        return spellInKey(sounding, chord.key.fifths);
+    }
+    return { ...spelled, octave: octaveOf(sounding, spelled.step, spelled.alter) };
+}
+
+// One pitch class as the chord writes it, without an octave.
+export function spellChordTone(chord: Chord, pitchClass: number): Spelling {
+    const { step, alter } = spellChordPitch(chord, pitchClass);
+    return { step, alter };
 }

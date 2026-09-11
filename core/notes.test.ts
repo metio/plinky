@@ -3,7 +3,45 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from "vitest";
-import { alterFor, keyLabelOf, LETTERS, pitchMidiOf, SEMITONE, solfegeOf } from "./notes";
+import {
+    alterFor,
+    alterOnto,
+    keyLabelOf,
+    LETTERS,
+    octaveOf,
+    pitchMidiOf,
+    SEMITONE,
+    solfegeOf,
+} from "./notes";
+
+describe("alterOnto", () => {
+    it("reaches a pitch class from a letter the shorter way round", () => {
+        expect(alterOnto(1, "C")).toBe(1);
+        expect(alterOnto(1, "D")).toBe(-1);
+        expect(alterOnto(2, "C")).toBe(2);
+        expect(alterOnto(4, "E")).toBe(0);
+    });
+
+    it("crosses the octave line to reach a letter's neighbour", () => {
+        // B♯ is C, and C♭ is B.
+        expect(alterOnto(0, "B")).toBe(1);
+        expect(alterOnto(11, "C")).toBe(-1);
+    });
+
+    it("reads any whole number as its pitch class", () => {
+        expect(alterOnto(13, "C")).toBe(1);
+        expect(alterOnto(-1, "C")).toBe(-1);
+    });
+});
+
+describe("octaveOf", () => {
+    it("puts a letter spelled across the octave line in its own octave", () => {
+        expect(octaveOf(60, "C", 0)).toBe(4);
+        // B♯3 sounds as middle C, and C♭4 as the B below it.
+        expect(octaveOf(60, "B", 1)).toBe(3);
+        expect(octaveOf(59, "C", -1)).toBe(4);
+    });
+});
 
 describe("the note facts", () => {
     it("names the seven letters in scale order", () => {

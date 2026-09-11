@@ -164,3 +164,52 @@ export function spellMidi(
     const { step, alter } = (flats ? FLAT_SPELL : SHARP_SPELL)[pitchClass]!;
     return { step, alter, octave: Math.floor(semitone / 12) - 1 };
 }
+
+// The accidental that puts a letter on a pitch class: the smaller way round, -6 to 5, so a
+// letter a step or two from the pitch reaches it with a sharp or flat, or a double.
+export function alterOnto(pitchClass: number, step: string): number {
+    return ((((pitchClass - (SEMITONE[step] ?? 0)) % 12) + 18) % 12) - 6;
+}
+
+// A MIDI note spelled for a key signature: the letter whose signature alteration
+// already lands on this pitch when there is one, so a scale tone is written plain
+// and the signature does the work. A note outside the key takes an accidental,
+// leaning the way the key does — sharps in sharp keys, flats in flat keys.
+export function spellInKey(
+    midi: number,
+    fifths: number,
+): { step: string; octave: number; alter: number } {
+    const pc = ((midi % 12) + 12) % 12;
+    for (const letter of LETTERS) {
+        const alter = alterFor(letter, fifths);
+        if (((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
+            return { step: letter, octave: octaveOf(midi, letter, alter), alter };
+        }
+    }
+    // Not in the key. A natural first: the letter the signature alters, written with a
+    // natural sign, is how a reader expects to see it — F natural in G major is F♮, not
+    // E♯, and D natural in D♭ major is D♮, not E𝄫.
+    for (const letter of LETTERS) {
+        if ((SEMITONE[letter] ?? 0) === pc) {
+            return { step: letter, octave: octaveOf(midi, letter, 0), alter: 0 };
+        }
+    }
+    // Otherwise borrow the neighbouring letter and lean it one step the way the key does:
+    // sharps in sharp keys, flats in flat keys. Never a double accidental.
+    const alter = fifths < 0 ? -1 : 1;
+    for (const letter of LETTERS) {
+        if (((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
+            return { step: letter, octave: octaveOf(midi, letter, alter), alter };
+        }
+    }
+    // Every pitch class is reachable above; this keeps the return total.
+    return { step: "C", octave: Math.floor(midi / 12) - 1, alter: 0 };
+}
+
+// MIDI numbers name C-1 as 0, so the octave is the note's own C. A B# or Cb
+// belongs to the octave of its letter, not of its sounding pitch, which is why the
+// alteration comes back out here.
+export function octaveOf(midi: number, letter: string, alter: number): number {
+    const natural = midi - alter;
+    return Math.floor(natural / 12) - 1 + (natural % 12 < (SEMITONE[letter] ?? 0) ? 1 : 0);
+}

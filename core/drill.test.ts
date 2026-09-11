@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { DEFAULT_DRILL, type DrillOptions, generateDrill, pitchPool, spell } from "./drill";
+import { DEFAULT_DRILL, type DrillOptions, generateDrill, pitchPool } from "./drill";
+import { spellInKey as spell } from "./notes";
 import { seededRandom } from "./random";
 
 // A deterministic rng: cycles the given values, so a test picks exactly which

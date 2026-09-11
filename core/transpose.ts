@@ -1,16 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { midiOf } from "./notes";
-import { SEMITONE } from "./notes";
+import { alterOnto, LETTERS, midiOf, SEMITONE } from "./notes";
 import type { XmlCodec } from "./xml";
-import { LETTERS } from "./notes";
+
 // Transposes a score's MusicXML up or down by a number of semitones, client-side,
 // so a piece can be practised in a more comfortable key. Every <pitch> is respelled
 // and every key signature shifts with it, the way a transposing edition is printed —
 // not just nudged chromatically. OSMD then renders, plays and matches the new key.
-
-const LETTER_INDEX: Record<string, number> = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
 
 // How a transposition is written: how many letters every note moves up within the octave,
 // and how far the key signature moves round the circle of fifths.
@@ -95,18 +92,17 @@ function moveHarmonyPitch(
 ): void {
     const stepNode = holder.querySelector(stepTag);
     const step = stepNode?.textContent?.trim() ?? "";
-    const letter = LETTER_INDEX[step];
+    const letter = LETTERS.indexOf(step);
     const semitone = SEMITONE[step];
     const alterNode = holder.querySelector(alterTag);
     const alter = Number(alterNode?.textContent ?? "0");
-    if (!stepNode || letter === undefined || semitone === undefined || !Number.isFinite(alter)) {
+    if (!stepNode || letter < 0 || semitone === undefined || !Number.isFinite(alter)) {
         return;
     }
     const newLetter = LETTERS[(((letter + letterSteps) % 7) + 7) % 7] ?? "C";
     // With no octave to carry, the accidental is the smallest one that reaches the moved
-    // pitch class from the new letter: -6 to 5, and in practice within a double either way.
-    const gap = semitone + alter + semitones - (SEMITONE[newLetter] ?? 0);
-    const newAlter = (((gap % 12) + 18) % 12) - 6;
+    // pitch class from the new letter, in practice within a double either way.
+    const newAlter = alterOnto(semitone + alter + semitones, newLetter);
     stepNode.textContent = newLetter;
     // A `text` attribute prints a name in place of the step (H for B); it named the old one.
     stepNode.removeAttribute("text");
@@ -139,9 +135,9 @@ export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: numbe
 
     for (const pitch of doc.querySelectorAll("note > pitch")) {
         const step = pitch.querySelector("step")?.textContent?.trim() ?? "";
-        const letter = LETTER_INDEX[step];
+        const letter = LETTERS.indexOf(step);
         const semitone = SEMITONE[step];
-        if (letter === undefined || semitone === undefined) {
+        if (letter < 0 || semitone === undefined) {
             continue;
         }
         const octave = Number(pitch.querySelector("octave")?.textContent ?? "4");
