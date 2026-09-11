@@ -101,6 +101,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A score you just added can be backed up straight away.** Add a score on the\nManage tab of Music and the backup section right below it still said you had none,\nwith its download button greyed out until you left the tab and came back. It now\ncounts the new score the moment it is added, and one you remove just as quickly.",
                 twip: true,
             },
+            {
+                body: "**A take saved as MusicXML carries the piece's name.** The file was named after the\npiece, but opened in MuseScore or another notation program every take was headed\n\"Improvisation\". It now shows the piece's title, and your computer recognises the\nfile as sheet music rather than plain XML.",
+                twip: true,
+            },
         ],
     },
     {

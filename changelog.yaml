@@ -137,6 +137,11 @@
       Manage tab of Music and the backup section right below it still said you had none,
       with its download button greyed out until you left the tab and came back. It now
       counts the new score the moment it is added, and one you remove just as quickly.
+    - |-
+      **A take saved as MusicXML carries the piece's name.** The file was named after the
+      piece, but opened in MuseScore or another notation program every take was headed
+      "Improvisation". It now shows the piece's title, and your computer recognises the
+      file as sheet music rather than plain XML.
 
 - date: 2026-09-09
   label: night

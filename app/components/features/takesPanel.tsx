@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { toMidiNotes, toMusicXml } from "../../../core/composition";
-import { downloadBlob } from "../../lib/download";
+import { downloadMidi, downloadMusicXml } from "../../lib/download";
 import { buildMidiFile } from "../../../core/midiFile";
 import { takeFileStem } from "../../lib/takeFile";
 import { scoreReadings } from "../../../core/grade";
@@ -119,13 +119,12 @@ export function TakesPanel({
                                     <Button
                                         variant="ghost"
                                         onClick={() =>
-                                            downloadBlob(
+                                            downloadMidi(
                                                 buildMidiFile(toMidiNotes(take.composition), {
                                                     tempo: take.composition.tempo,
                                                     beatsPerBar: take.composition.beatsPerBar,
                                                 }),
-                                                "audio/midi",
-                                                `${takeFileStem(title, take)}.mid`,
+                                                takeFileStem(title, take),
                                             )
                                         }
                                     >
@@ -134,10 +133,12 @@ export function TakesPanel({
                                     <Button
                                         variant="ghost"
                                         onClick={() =>
-                                            downloadBlob(
-                                                toMusicXml(take.composition),
-                                                "application/xml",
-                                                `${takeFileStem(title, take)}.musicxml`,
+                                            // The piece's title goes in the document too, so a
+                                            // notation program heads the take with the name the
+                                            // file already carries.
+                                            downloadMusicXml(
+                                                toMusicXml(take.composition, { title }),
+                                                takeFileStem(title, take),
                                             )
                                         }
                                     >

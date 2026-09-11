@@ -8,6 +8,8 @@ import type React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Composition } from "../../../core/composition";
 import type { Take } from "../../../core/takes";
+import { takeFileStem } from "../../lib/takeFile";
+import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { TakesPanel } from "./takesPanel";
 
@@ -81,6 +83,40 @@ describe("TakesPanel", () => {
         expect(screen.getByText(/Accuracy 91%/)).toBeTruthy();
         expect(screen.getByText(/Timing 73%/)).toBeTruthy();
         expect(screen.getByText(/Flow 88%/)).toBeTruthy();
+    });
+
+    it("downloads a take's MusicXML under the piece's own title and media type", async () => {
+        // The file is named after the piece, so its header must say the same thing when it
+        // opens in a notation program — every take read "Improvisation" there.
+        let exported: Blob | null = null;
+        let downloadName = "";
+        URL.createObjectURL = vi.fn((blob: Blob) => {
+            exported = blob;
+            return "blob:take";
+        });
+        URL.revokeObjectURL = vi.fn();
+        const realCreate = document.createElement.bind(document);
+        const spy = vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+            const el = realCreate(tag);
+            if (tag === "a") {
+                vi.spyOn(el as HTMLAnchorElement, "click").mockImplementation(() => {
+                    downloadName = (el as HTMLAnchorElement).download;
+                });
+            }
+            return el;
+        });
+        try {
+            render(<TakesPanel {...base} title="Für Elise" takes={[mk("1")]} />);
+            fireEvent.click(screen.getByRole("button", { name: m.takes_download_musicxml() }));
+            const blob = exported as Blob | null;
+            expect(blob?.type).toBe("application/vnd.recordare.musicxml+xml");
+            expect(downloadName).toBe(`${takeFileStem("Für Elise", mk("1"))}.musicxml`);
+            const text = (await blob?.text()) ?? "";
+            expect(text).toContain("<work-title>Für Elise</work-title>");
+            expect(text).not.toContain("Improvisation");
+        } finally {
+            spy.mockRestore();
+        }
     });
 
     it("omits the metrics line for a take with no stored grade", () => {
