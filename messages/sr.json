@@ -429,7 +429,22 @@
     "compose_staff_label": "Скица твоје импровизације на нотном систему",
     "compose_staff_empty": "Одсвирај неколико нота и појавиће се овде.",
     "compose_recording_idle": "Снимање — свирај било шта и свака нота се бележи",
-    "compose_recording_count": "Снимање · {count} нота забележено",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Снимање · {count} нота забележена",
+                "countPlural=few": "Снимање · {count} ноте забележене",
+                "countPlural=other": "Снимање · {count} нота забележено"
+            }
+        }
+    ],
     "compose_sketch_note": "Звук је тачно оно што си одсвирао; нотни систем је оквирна скица, поравната на мрежу да се чита као нотација.",
     "compose_title_label": "Наслов",
     "compose_tempo_label": "Темпо",
@@ -453,7 +468,22 @@
     "compose_copied": "Копирано!",
     "compose_download_midi": "Преузми MIDI",
     "compose_download_musicxml": "Преузми MusicXML",
-    "compose_note_count": "{count} нота",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} нота",
+                "countPlural=few": "{count} ноте",
+                "countPlural=other": "{count} нота"
+            }
+        }
+    ],
     "daily_intro": "Нова нумера сваки дан — иста за све, клавирска верзија дневне загонетке. Пробај, погледај како ти иде, и подели своју мрежу ако желиш.",
     "daily_mode_label": "Данашњи изазов или загревање",
     "daily_tab_challenge": "Данашњи изазов",

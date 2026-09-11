@@ -423,7 +423,21 @@
     "compose_staff_label": "En notskiss av din improvisation",
     "compose_staff_empty": "Spela några toner så dyker de upp här.",
     "compose_recording_idle": "Spelar in — spela vad du vill, varje ton fångas",
-    "compose_recording_count": "Spelar in · {count} toner fångade",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Spelar in · {count} ton fångad",
+                "countPlural=other": "Spelar in · {count} toner fångade"
+            }
+        }
+    ],
     "compose_sketch_note": "Ljudet är exakt vad du spelade; notsystemet är en ungefärlig skiss, fäst mot ett rutnät så att det läses som notation.",
     "compose_title_label": "Titel",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "Kopierat!",
     "compose_download_midi": "Ladda ner MIDI",
     "compose_download_musicxml": "Ladda ner MusicXML",
-    "compose_note_count": "{count} toner",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ton",
+                "countPlural=other": "{count} toner"
+            }
+        }
+    ],
     "daily_intro": "Ett nytt stycke varje dag — samma för alla, en pianoversion av dagens pussel. Ge det ett försök, se hur det går, och dela ditt rutnät om du vill.",
     "daily_mode_label": "Dagens utmaning eller uppvärmning",
     "daily_tab_challenge": "Dagens utmaning",

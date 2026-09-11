@@ -423,7 +423,21 @@
     "compose_staff_label": "Eine Notenskizze deiner Improvisation",
     "compose_staff_empty": "Spiele ein paar Noten, und sie erscheinen hier.",
     "compose_recording_idle": "Aufnahme läuft – spiel irgendetwas, jede Note wird erfasst",
-    "compose_recording_count": "Aufnahme läuft · {count} Noten erfasst",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Aufnahme läuft · {count} Note erfasst",
+                "countPlural=other": "Aufnahme läuft · {count} Noten erfasst"
+            }
+        }
+    ],
     "compose_sketch_note": "Der Klang ist genau das, was du gespielt hast; die Notenzeile ist eine ungefähre Skizze, an ein Raster ausgerichtet, damit sie als Notation lesbar ist.",
     "compose_title_label": "Titel",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "Kopiert!",
     "compose_download_midi": "MIDI herunterladen",
     "compose_download_musicxml": "MusicXML herunterladen",
-    "compose_note_count": "{count} Noten",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Note",
+                "countPlural=other": "{count} Noten"
+            }
+        }
+    ],
     "daily_intro": "Ein neues Stück jeden Tag – für alle dasselbe, eine Klavierversion des Tagesrätsels. Probier es aus, sieh, wie es läuft, und teile dein Raster, wenn du magst.",
     "daily_mode_label": "Heutige Herausforderung oder Aufwärmen",
     "daily_tab_challenge": "Heutige Herausforderung",

@@ -429,7 +429,22 @@
     "compose_staff_label": "Un boceto en pentagrama de tu improvisación",
     "compose_staff_empty": "Toca unas notas y aparecerán aquí.",
     "compose_recording_idle": "Grabando: toca lo que sea, y cada nota queda capturada",
-    "compose_recording_count": "Grabando · {count} notas capturadas",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Grabando · {count} nota capturada",
+                "countPlural=many": "Grabando · {count} notas capturadas",
+                "countPlural=other": "Grabando · {count} notas capturadas"
+            }
+        }
+    ],
     "compose_sketch_note": "El audio es exactamente lo que tocaste; el pentagrama es un boceto aproximado, ajustado a una cuadrícula para que se lea como notación.",
     "compose_title_label": "Título",
     "compose_tempo_label": "Tempo",
@@ -453,7 +468,22 @@
     "compose_copied": "¡Copiado!",
     "compose_download_midi": "Descargar MIDI",
     "compose_download_musicxml": "Descargar MusicXML",
-    "compose_note_count": "{count} notas",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=many": "{count} notas",
+                "countPlural=other": "{count} notas"
+            }
+        }
+    ],
     "daily_intro": "Una pieza nueva cada día, la misma para todos: una versión pianística del reto diario. Pruébala, mira cómo te va y comparte tu cuadrícula si quieres.",
     "daily_mode_label": "El reto de hoy o calentamiento",
     "daily_tab_challenge": "El reto de hoy",

@@ -423,7 +423,21 @@
     "compose_staff_label": "Az improvizációd kottavázlata",
     "compose_staff_empty": "Játssz le néhány hangot, és itt megjelennek.",
     "compose_recording_idle": "Felvétel — játssz bármit, és minden hang rögzül",
-    "compose_recording_count": "Felvétel · {count} hang rögzítve",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Felvétel · {count} hang rögzítve",
+                "countPlural=other": "Felvétel · {count} hang rögzítve"
+            }
+        }
+    ],
     "compose_sketch_note": "A hang pontosan az, amit játszottál; a kotta hozzávetőleges vázlat, rácsra illesztve, hogy kottaként olvasható legyen.",
     "compose_title_label": "Cím",
     "compose_tempo_label": "Tempó",
@@ -447,7 +461,21 @@
     "compose_copied": "Másolva!",
     "compose_download_midi": "MIDI letöltése",
     "compose_download_musicxml": "MusicXML letöltése",
-    "compose_note_count": "{count} hang",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} hang",
+                "countPlural=other": "{count} hang"
+            }
+        }
+    ],
     "daily_intro": "Minden nap egy új darab — ugyanaz mindenkinek, a napi fejtörő zongorás változata. Próbáld ki, lásd, hogyan alakul, és oszd meg a rácsodat, ha szeretnéd.",
     "daily_mode_label": "Mai kihívás vagy bemelegítés",
     "daily_tab_challenge": "Mai kihívás",

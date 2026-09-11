@@ -429,7 +429,22 @@
     "compose_staff_label": "Une esquisse sur portée de votre improvisation",
     "compose_staff_empty": "Jouez quelques notes et elles apparaîtront ici.",
     "compose_recording_idle": "Enregistrement — jouez ce que vous voulez, chaque note est capturée",
-    "compose_recording_count": "Enregistrement · {count} notes capturées",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Enregistrement · {count} note capturée",
+                "countPlural=many": "Enregistrement · {count} notes capturées",
+                "countPlural=other": "Enregistrement · {count} notes capturées"
+            }
+        }
+    ],
     "compose_sketch_note": "L'audio est exactement ce que vous avez joué ; la portée est une esquisse approximative, calée sur une grille pour se lire comme une notation.",
     "compose_title_label": "Titre",
     "compose_tempo_label": "Tempo",
@@ -453,7 +468,22 @@
     "compose_copied": "Copié !",
     "compose_download_midi": "Télécharger le MIDI",
     "compose_download_musicxml": "Télécharger le MusicXML",
-    "compose_note_count": "{count} notes",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} note",
+                "countPlural=many": "{count} notes",
+                "countPlural=other": "{count} notes"
+            }
+        }
+    ],
     "daily_intro": "Un nouveau morceau chaque jour — le même pour tout le monde, une version pianistique du défi quotidien. Essayez-le, voyez comment ça se passe, et partagez votre grille si le cœur vous en dit.",
     "daily_mode_label": "Défi du jour ou échauffement",
     "daily_tab_challenge": "Défi du jour",

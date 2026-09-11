@@ -417,7 +417,20 @@
     "compose_staff_label": "즉흥 연주의 오선보 스케치",
     "compose_staff_empty": "몇 음 연주하면 여기에 나타나요.",
     "compose_recording_idle": "녹음 중 — 무엇이든 연주하면 모든 음이 담겨요",
-    "compose_recording_count": "녹음 중 · 음 {count}개 담김",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "녹음 중 · 음 {count}개 담김"
+            }
+        }
+    ],
     "compose_sketch_note": "소리는 연주한 그대로예요; 오선보는 악보처럼 읽히도록 격자에 맞춘 대략적인 스케치예요.",
     "compose_title_label": "제목",
     "compose_tempo_label": "템포",
@@ -441,7 +454,20 @@
     "compose_copied": "복사됨!",
     "compose_download_midi": "MIDI 내려받기",
     "compose_download_musicxml": "MusicXML 내려받기",
-    "compose_note_count": "음 {count}개",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "음 {count}개"
+            }
+        }
+    ],
     "daily_intro": "매일 새로운 한 곡 — 모두에게 똑같이 주어지는, 피아노로 즐기는 하루의 퍼즐이에요. 한번 도전해 보고, 어떻게 되는지 지켜보고, 원한다면 그리드를 공유해 보세요.",
     "daily_mode_label": "오늘의 도전 또는 준비 운동",
     "daily_tab_challenge": "오늘의 도전",

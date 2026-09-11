@@ -423,7 +423,21 @@
     "compose_staff_label": "En nodeskitse af din improvisation",
     "compose_staff_empty": "Spil et par noder, så dukker de op her.",
     "compose_recording_idle": "Optager — spil hvad som helst, og hver node fanges",
-    "compose_recording_count": "Optager · {count} noder fanget",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Optager · {count} node fanget",
+                "countPlural=other": "Optager · {count} noder fanget"
+            }
+        }
+    ],
     "compose_sketch_note": "Lyden er præcis, hvad du spillede; nodesystemet er en omtrentlig skitse, snappet til et gitter, så det læses som noder.",
     "compose_title_label": "Titel",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "Kopieret!",
     "compose_download_midi": "Download MIDI",
     "compose_download_musicxml": "Download MusicXML",
-    "compose_note_count": "{count} noder",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} node",
+                "countPlural=other": "{count} noder"
+            }
+        }
+    ],
     "daily_intro": "Et nyt stykke hver dag — det samme for alle, en klaverudgave af den daglige gåde. Prøv det, se hvordan det går, og del dit gitter, hvis du har lyst.",
     "daily_mode_label": "Dagens udfordring eller opvarmning",
     "daily_tab_challenge": "Dagens udfordring",

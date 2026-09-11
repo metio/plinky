@@ -150,7 +150,7 @@ describe("Compose", () => {
             { container },
         );
 
-        expect(await screen.findByText("1 notes")).toBeTruthy();
+        expect(await screen.findByText("1 note")).toBeTruthy();
         const field = screen.getByLabelText(m.compose_tempo_label()) as HTMLInputElement;
         // 300 is past the field's 240, and half of it keeps every note on the beat grid.
         expect(field.value).toBe("150");
@@ -230,7 +230,7 @@ describe("Compose", () => {
         );
         const container = mount();
         await strike(60);
-        expect(await screen.findByText("1 notes")).toBeTruthy();
+        expect(await screen.findByText("1 note")).toBeTruthy();
         const file = new File([bytes], "take.mid", { type: "audio/midi" });
         const input = container.querySelector('input[type="file"]') as HTMLInputElement;
         await act(async () => {
@@ -238,7 +238,7 @@ describe("Compose", () => {
         });
         // The in-progress take is held, not silently overwritten…
         expect(await screen.findByText(/Replace your current recording/)).toBeTruthy();
-        expect(screen.getByText("1 notes")).toBeTruthy();
+        expect(screen.getByText("1 note")).toBeTruthy();
         // …until the player confirms the replace.
         fireEvent.click(screen.getByRole("button", { name: "Replace" }));
         expect(await screen.findByText("2 notes")).toBeTruthy();

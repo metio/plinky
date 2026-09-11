@@ -429,7 +429,22 @@
     "compose_staff_label": "Um esboço em pauta da tua improvisação",
     "compose_staff_empty": "Toque algumas notas e elas aparecerão aqui.",
     "compose_recording_idle": "A gravar — toca o que quiseres, e cada nota é capturada",
-    "compose_recording_count": "A gravar · {count} notas capturadas",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "A gravar · {count} nota capturada",
+                "countPlural=many": "A gravar · {count} notas capturadas",
+                "countPlural=other": "A gravar · {count} notas capturadas"
+            }
+        }
+    ],
     "compose_sketch_note": "O áudio é exatamente o que tocaste; a pauta é um esboço aproximado, ajustado a uma grelha para se ler como notação.",
     "compose_title_label": "Título",
     "compose_tempo_label": "Andamento",
@@ -453,7 +468,22 @@
     "compose_copied": "Copiado!",
     "compose_download_midi": "Descarregar MIDI",
     "compose_download_musicxml": "Descarregar MusicXML",
-    "compose_note_count": "{count} notas",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=many": "{count} notas",
+                "countPlural=other": "{count} notas"
+            }
+        }
+    ],
     "daily_intro": "Uma peça nova todos os dias — a mesma para todos, uma versão em piano do puzzle diário. Dá-lhe uma oportunidade, vê como corre, e partilha a tua grelha se quiseres.",
     "daily_mode_label": "Desafio de hoje ou aquecimento",
     "daily_tab_challenge": "Desafio de hoje",

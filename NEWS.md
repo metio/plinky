@@ -231,8 +231,9 @@ one score as several. Both now use the singular, and Polish, Czech, Russian and 
 other languages with more than two forms get the right one for every count.
 
 **Every count in Plinky agrees with its number.** With one learned piece, the home
-page said "1 pieces on the stand", your very first note was "1 notes played", and a
-composer with a single piece in the catalogue had "1 pieces to play".
+page said "1 pieces on the stand", your very first note was "1 notes played", a
+composer with a single piece in the catalogue had "1 pieces to play", and Compose
+counted the first note of a take as "1 notes".
 Each now reads the way you would say it, in every language Plinky speaks, with the
 third and fourth forms Polish, Czech, Russian and their neighbours use for two, five
 or twenty-one. In Portuguese, a search with no matches found "0 partitura", as though

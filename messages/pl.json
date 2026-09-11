@@ -435,7 +435,23 @@
     "compose_staff_label": "Szkic twojej improwizacji na pięciolinii",
     "compose_staff_empty": "Zagraj kilka nut, a pojawią się tutaj.",
     "compose_recording_idle": "Nagrywanie — zagraj cokolwiek, a każda nuta zostanie uchwycona",
-    "compose_recording_count": "Nagrywanie · uchwycono {count} nut",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Nagrywanie · uchwycono {count} nutę",
+                "countPlural=few": "Nagrywanie · uchwycono {count} nuty",
+                "countPlural=many": "Nagrywanie · uchwycono {count} nut",
+                "countPlural=other": "Nagrywanie · uchwycono {count} nut"
+            }
+        }
+    ],
     "compose_sketch_note": "Dźwięk to dokładnie to, co zagrałeś; pięciolinia to przybliżony szkic, przyciągnięty do siatki, by czytał się jak notacja.",
     "compose_title_label": "Tytuł",
     "compose_tempo_label": "Tempo",
@@ -459,7 +475,23 @@
     "compose_copied": "Skopiowano!",
     "compose_download_midi": "Pobierz MIDI",
     "compose_download_musicxml": "Pobierz MusicXML",
-    "compose_note_count": "{count} nut",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nuta",
+                "countPlural=few": "{count} nuty",
+                "countPlural=many": "{count} nut",
+                "countPlural=other": "{count} nut"
+            }
+        }
+    ],
     "daily_intro": "Nowy utwór każdego dnia — ten sam dla wszystkich, pianistyczna odsłona codziennej łamigłówki. Spróbuj, zobacz, jak poszło, i udostępnij swoją siatkę, jeśli masz ochotę.",
     "daily_mode_label": "Dzisiejsze wyzwanie lub rozgrzewka",
     "daily_tab_challenge": "Dzisiejsze wyzwanie",

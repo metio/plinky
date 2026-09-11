@@ -417,7 +417,20 @@
     "compose_staff_label": "你即兴演奏的谱表草图",
     "compose_staff_empty": "弹几个音，它们就会出现在这里。",
     "compose_recording_idle": "录制中——随便弹，每个音都会被接住",
-    "compose_recording_count": "录制中 · 已接住 {count} 个音",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "录制中 · 已接住 {count} 个音"
+            }
+        }
+    ],
     "compose_sketch_note": "音频与你实际弹奏的完全一致；谱表是大致的草图，被吸附到网格上以便当作记谱阅读。",
     "compose_title_label": "标题",
     "compose_tempo_label": "速度",
@@ -441,7 +454,20 @@
     "compose_copied": "已复制！",
     "compose_download_midi": "下载 MIDI",
     "compose_download_musicxml": "下载 MusicXML",
-    "compose_note_count": "{count} 个音",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 个音"
+            }
+        }
+    ],
     "daily_intro": "每天一首新曲子——所有人都一样，是每日益智游戏的钢琴版。弹一弹，看看手感如何，想分享就分享你的成绩网格。",
     "daily_mode_label": "今日挑战或热身",
     "daily_tab_challenge": "今日挑战",

@@ -435,7 +435,23 @@
     "compose_staff_label": "Набросок вашей импровизации на нотном стане",
     "compose_staff_empty": "Сыграйте несколько нот, и они появятся здесь.",
     "compose_recording_idle": "Запись — играйте что угодно, каждая нота фиксируется",
-    "compose_recording_count": "Запись · зафиксировано нот: {count}",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Запись · зафиксирована {count} нота",
+                "countPlural=few": "Запись · зафиксированы {count} ноты",
+                "countPlural=many": "Запись · зафиксировано {count} нот",
+                "countPlural=other": "Запись · зафиксировано {count} нот"
+            }
+        }
+    ],
     "compose_sketch_note": "Звук — в точности то, что вы сыграли; нотный стан — приблизительный набросок, привязанный к сетке, чтобы читаться как нотация.",
     "compose_title_label": "Название",
     "compose_tempo_label": "Темп",
@@ -459,7 +475,23 @@
     "compose_copied": "Скопировано!",
     "compose_download_midi": "Скачать MIDI",
     "compose_download_musicxml": "Скачать MusicXML",
-    "compose_note_count": "{count} нот",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} нота",
+                "countPlural=few": "{count} ноты",
+                "countPlural=many": "{count} нот",
+                "countPlural=other": "{count} нот"
+            }
+        }
+    ],
     "daily_intro": "Каждый день новая пьеса — одна и та же для всех, фортепианный вариант ежедневной головоломки. Попробуйте, посмотрите, как получится, и поделитесь своей сеткой, если захотите.",
     "daily_mode_label": "Задание дня или разминка",
     "daily_tab_challenge": "Задание дня",

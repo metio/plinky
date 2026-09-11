@@ -423,7 +423,21 @@
     "compose_staff_label": "Një skicë në pentagram e improvizimit tënd",
     "compose_staff_empty": "Luaj disa nota dhe do të shfaqen këtu.",
     "compose_recording_idle": "Po regjistron — luaj çfarëdo, dhe çdo notë kapet",
-    "compose_recording_count": "Po regjistron · {count} nota të kapura",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Po regjistron · {count} notë e kapur",
+                "countPlural=other": "Po regjistron · {count} nota të kapura"
+            }
+        }
+    ],
     "compose_sketch_note": "Audioja është saktësisht ç'ke luajtur; pentagrami është një skicë e përafërt, e ngjeshur në një rrjetë që të lexohet si notacion.",
     "compose_title_label": "Titulli",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "U kopjua!",
     "compose_download_midi": "Shkarko MIDI",
     "compose_download_musicxml": "Shkarko MusicXML",
-    "compose_note_count": "{count} nota",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} notë",
+                "countPlural=other": "{count} nota"
+            }
+        }
+    ],
     "daily_intro": "Një pjesë e re çdo ditë — e njëjta për të gjithë, një version pianistik i sfidës së përditshme. Provoje, shiko si të shkon, dhe ndaje rrjetën tënde nëse do.",
     "daily_mode_label": "Sfida e sotme ose ngrohja",
     "daily_tab_challenge": "Sfida e sotme",

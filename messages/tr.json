@@ -423,7 +423,21 @@
     "compose_staff_label": "Doğaçlamanın porte üzerindeki taslağı",
     "compose_staff_empty": "Birkaç nota çal, burada belirsinler.",
     "compose_recording_idle": "Kaydediliyor — ne çalarsan çal, her nota yakalanır",
-    "compose_recording_count": "Kaydediliyor · {count} nota yakalandı",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Kaydediliyor · {count} nota yakalandı",
+                "countPlural=other": "Kaydediliyor · {count} nota yakalandı"
+            }
+        }
+    ],
     "compose_sketch_note": "Ses tam olarak çaldığındır; porte ise nota gibi okunsun diye bir ızgaraya oturtulmuş yaklaşık bir taslaktır.",
     "compose_title_label": "Başlık",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "Kopyalandı!",
     "compose_download_midi": "MIDI indir",
     "compose_download_musicxml": "MusicXML indir",
-    "compose_note_count": "{count} nota",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=other": "{count} nota"
+            }
+        }
+    ],
     "daily_intro": "Her gün yeni bir parça — herkese aynı, günlük bulmacanın piyano hali. Bir dene, nasıl gittiğine bak, istersen ızgaranı paylaş.",
     "daily_mode_label": "Bugünün meydan okuması ya da ısınma",
     "daily_tab_challenge": "Bugünün meydan okuması",

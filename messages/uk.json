@@ -435,7 +435,23 @@
     "compose_staff_label": "Начерк вашої імпровізації на нотному стані",
     "compose_staff_empty": "Зіграйте кілька нот, і вони з’являться тут.",
     "compose_recording_idle": "Запис — грайте будь-що, і кожна нота ловиться",
-    "compose_recording_count": "Запис · {count} нот зловлено",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Запис · {count} ноту зловлено",
+                "countPlural=few": "Запис · {count} ноти зловлено",
+                "countPlural=many": "Запис · {count} нот зловлено",
+                "countPlural=other": "Запис · {count} нот зловлено"
+            }
+        }
+    ],
     "compose_sketch_note": "Звук — це точно те, що ви зіграли; нотний стан — приблизний начерк, вирівняний по сітці, щоб читатися як нотація.",
     "compose_title_label": "Назва",
     "compose_tempo_label": "Темп",
@@ -459,7 +475,23 @@
     "compose_copied": "Скопійовано!",
     "compose_download_midi": "Завантажити MIDI",
     "compose_download_musicxml": "Завантажити MusicXML",
-    "compose_note_count": "{count} нот",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} нота",
+                "countPlural=few": "{count} ноти",
+                "countPlural=many": "{count} нот",
+                "countPlural=other": "{count} нот"
+            }
+        }
+    ],
     "daily_intro": "Нова п’єса щодня — однакова для всіх, фортепіанна версія щоденної головоломки. Спробуйте, подивіться, як вийде, і поділіться своєю сіткою, якщо захочете.",
     "daily_mode_label": "Сьогоднішній виклик чи розминка",
     "daily_tab_challenge": "Сьогоднішній виклик",

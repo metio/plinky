@@ -423,7 +423,21 @@
     "compose_staff_label": "Ένα σκίτσο του αυτοσχεδιασμού σου στο πεντάγραμμο",
     "compose_staff_empty": "Παίξε μερικές νότες και θα εμφανιστούν εδώ.",
     "compose_recording_idle": "Ηχογραφεί — παίξε οτιδήποτε, κάθε νότα πιάνεται",
-    "compose_recording_count": "Ηχογραφεί · {count} νότες πιάστηκαν",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Ηχογραφεί · {count} νότα πιάστηκε",
+                "countPlural=other": "Ηχογραφεί · {count} νότες πιάστηκαν"
+            }
+        }
+    ],
     "compose_sketch_note": "Ο ήχος είναι ακριβώς αυτό που έπαιξες· το πεντάγραμμο είναι ένα κατά προσέγγιση σκίτσο, ευθυγραμμισμένο σε πλέγμα ώστε να διαβάζεται ως σημειογραφία.",
     "compose_title_label": "Τίτλος",
     "compose_tempo_label": "Τέμπο",
@@ -447,7 +461,21 @@
     "compose_copied": "Αντιγράφηκε!",
     "compose_download_midi": "Λήψη MIDI",
     "compose_download_musicxml": "Λήψη MusicXML",
-    "compose_note_count": "{count} νότες",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} νότα",
+                "countPlural=other": "{count} νότες"
+            }
+        }
+    ],
     "daily_intro": "Ένα καινούριο κομμάτι κάθε μέρα — το ίδιο για όλους, μια πιανιστική εκδοχή του καθημερινού παζλ. Δοκίμασέ το, δες πώς πάει, και μοιράσου το πλέγμα σου αν θες.",
     "daily_mode_label": "Σημερινή πρόκληση ή προθέρμανση",
     "daily_tab_challenge": "Σημερινή πρόκληση",

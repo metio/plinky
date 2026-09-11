@@ -54,6 +54,11 @@ describe("ComposeExportBar", () => {
         expect(screen.getByText("0 notes")).toBeTruthy();
     });
 
+    it("counts a single note as one note", () => {
+        mount({ noteCount: 1 });
+        expect(screen.getByText("1 note")).toBeTruthy();
+    });
+
     it("hands a chosen file over and resets the input so the same file reopens", () => {
         const onOpenFile = vi.fn();
         const { container } = mount({ onOpenFile });

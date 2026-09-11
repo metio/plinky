@@ -423,7 +423,21 @@
     "compose_staff_label": "Een notenbalkschets van je improvisatie",
     "compose_staff_empty": "Speel een paar noten en ze verschijnen hier.",
     "compose_recording_idle": "Opnemen — speel wat je wilt, en elke noot wordt opgevangen",
-    "compose_recording_count": "Opnemen · {count} noten opgevangen",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Opnemen · {count} noot opgevangen",
+                "countPlural=other": "Opnemen · {count} noten opgevangen"
+            }
+        }
+    ],
     "compose_sketch_note": "De audio is precies wat je speelde; de notenbalk is een benaderende schets, uitgelijnd op een raster zodat het als notatie leest.",
     "compose_title_label": "Titel",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "Gekopieerd!",
     "compose_download_midi": "MIDI downloaden",
     "compose_download_musicxml": "MusicXML downloaden",
-    "compose_note_count": "{count} noten",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} noot",
+                "countPlural=other": "{count} noten"
+            }
+        }
+    ],
     "daily_intro": "Elke dag een nieuw stuk — voor iedereen hetzelfde, een pianoversie van de dagelijkse puzzel. Probeer het, kijk hoe het gaat, en deel je raster als je wilt.",
     "daily_mode_label": "Uitdaging van vandaag of warming-up",
     "daily_tab_challenge": "Uitdaging van vandaag",

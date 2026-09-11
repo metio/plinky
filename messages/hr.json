@@ -429,7 +429,22 @@
     "compose_staff_label": "Skica tvoje improvizacije na crtovlju",
     "compose_staff_empty": "Odsviraj nekoliko nota i pojavit će se ovdje.",
     "compose_recording_idle": "Snimanje — sviraj bilo što i svaka nota se bilježi",
-    "compose_recording_count": "Snimanje · {count} nota zabilježeno",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Snimanje · {count} nota zabilježena",
+                "countPlural=few": "Snimanje · {count} note zabilježene",
+                "countPlural=other": "Snimanje · {count} nota zabilježeno"
+            }
+        }
+    ],
     "compose_sketch_note": "Zvuk je točno ono što si odsvirao; crtovlje je približna skica, poravnata na rešetku da se čita kao notacija.",
     "compose_title_label": "Naslov",
     "compose_tempo_label": "Tempo",
@@ -453,7 +468,22 @@
     "compose_copied": "Kopirano!",
     "compose_download_midi": "Preuzmi MIDI",
     "compose_download_musicxml": "Preuzmi MusicXML",
-    "compose_note_count": "{count} nota",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=few": "{count} note",
+                "countPlural=other": "{count} nota"
+            }
+        }
+    ],
     "daily_intro": "Nova skladba svaki dan — ista za sve, klavirska verzija dnevne zagonetke. Okušaj se, vidi kako ti je ispala, pa podijeli svoju mrežu ako želiš.",
     "daily_mode_label": "Današnji izazov ili zagrijavanje",
     "daily_tab_challenge": "Današnji izazov",

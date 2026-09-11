@@ -423,7 +423,21 @@
     "compose_staff_label": "Luonnos improvisaatiostasi nuottiviivastolla",
     "compose_staff_empty": "Soita muutama nuotti, niin ne ilmestyvät tähän.",
     "compose_recording_idle": "Äänitys käynnissä — soita mitä tahansa, ja jokainen nuotti tallentuu",
-    "compose_recording_count": "Äänitys käynnissä · {count} nuottia tallennettu",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Äänitys käynnissä · {count} nuotti tallennettu",
+                "countPlural=other": "Äänitys käynnissä · {count} nuottia tallennettu"
+            }
+        }
+    ],
     "compose_sketch_note": "Ääni on täsmälleen se, mitä soitit; nuottiviivasto on likimääräinen luonnos, joka on kohdistettu ruudukkoon, jotta se luetaan notaationa.",
     "compose_title_label": "Nimi",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "Kopioitu!",
     "compose_download_midi": "Lataa MIDI",
     "compose_download_musicxml": "Lataa MusicXML",
-    "compose_note_count": "{count} nuottia",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nuotti",
+                "countPlural=other": "{count} nuottia"
+            }
+        }
+    ],
     "daily_intro": "Uusi kappale joka päivä — sama kaikille, pianoversio päivän palapelistä. Kokeile, katso miten se sujuu, ja jaa ruudukkosi jos haluat.",
     "daily_mode_label": "Tämän päivän haaste tai lämmittely",
     "daily_tab_challenge": "Tämän päivän haaste",

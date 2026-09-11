@@ -417,7 +417,20 @@
     "compose_staff_label": "あなたの即興演奏の譜面スケッチ",
     "compose_staff_empty": "いくつか音を弾くと、ここに表示されます。",
     "compose_recording_idle": "録音中 — 何でも弾いてみてください、すべての音を拾います",
-    "compose_recording_count": "録音中 ・ {count} 音を拾いました",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "録音中 ・ {count} 音を拾いました"
+            }
+        }
+    ],
     "compose_sketch_note": "音声はあなたが弾いたそのままです。譜面は記譜として読めるようグリッドに合わせた、おおよそのスケッチです。",
     "compose_title_label": "タイトル",
     "compose_tempo_label": "テンポ",
@@ -441,7 +454,20 @@
     "compose_copied": "コピーしました！",
     "compose_download_midi": "MIDIをダウンロード",
     "compose_download_musicxml": "MusicXMLをダウンロード",
-    "compose_note_count": "{count} 音",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 音"
+            }
+        }
+    ],
     "daily_intro": "毎日届く新しい一曲 — みんな同じ曲で、ピアノ版の毎日パズルです。まずは試してみて、どんな手応えか感じて、よければグリッドをシェアしてください。",
     "daily_mode_label": "今日のチャレンジまたはウォームアップ",
     "daily_tab_challenge": "今日のチャレンジ",

@@ -435,7 +435,23 @@
     "compose_staff_label": "Náčrt vašej improvizácie v notovej osnove",
     "compose_staff_empty": "Zahrajte pár nôt a objavia sa tu.",
     "compose_recording_idle": "Nahráva sa — hrajte čokoľvek, každá nota sa zachytí",
-    "compose_recording_count": "Nahráva sa · zachytených {count} nôt",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Nahráva sa · zachytená {count} nota",
+                "countPlural=few": "Nahráva sa · zachytené {count} noty",
+                "countPlural=many": "Nahráva sa · zachytené {count} noty",
+                "countPlural=other": "Nahráva sa · zachytených {count} nôt"
+            }
+        }
+    ],
     "compose_sketch_note": "Zvuk je presne to, čo ste zahrali; notová osnova je približný náčrt prichytený k mriežke, aby sa dal čítať ako notácia.",
     "compose_title_label": "Názov",
     "compose_tempo_label": "Tempo",
@@ -459,7 +475,23 @@
     "compose_copied": "Skopírované!",
     "compose_download_midi": "Stiahnuť MIDI",
     "compose_download_musicxml": "Stiahnuť MusicXML",
-    "compose_note_count": "{count} nôt",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=few": "{count} noty",
+                "countPlural=many": "{count} noty",
+                "countPlural=other": "{count} nôt"
+            }
+        }
+    ],
     "daily_intro": "Nová skladba každý deň — rovnaká pre všetkých, klavírna verzia dennej hádanky. Skúste to, pozrite, ako to dopadne, a podeľte sa o svoju mriežku, ak chcete.",
     "daily_mode_label": "Dnešná výzva alebo rozcvička",
     "daily_tab_challenge": "Dnešná výzva",

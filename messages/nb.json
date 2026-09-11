@@ -423,7 +423,21 @@
     "compose_staff_label": "En noteskisse av improvisasjonen din",
     "compose_staff_empty": "Spill noen få toner, så dukker de opp her.",
     "compose_recording_idle": "Spiller inn — spill hva som helst, og hver tone fanges",
-    "compose_recording_count": "Spiller inn · {count} toner fanget",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Spiller inn · {count} tone fanget",
+                "countPlural=other": "Spiller inn · {count} toner fanget"
+            }
+        }
+    ],
     "compose_sketch_note": "Lyden er nøyaktig det du spilte; notesystemet er en omtrentlig skisse, festet til et rutenett så det leses som notasjon.",
     "compose_title_label": "Tittel",
     "compose_tempo_label": "Tempo",
@@ -447,7 +461,21 @@
     "compose_copied": "Kopiert!",
     "compose_download_midi": "Last ned MIDI",
     "compose_download_musicxml": "Last ned MusicXML",
-    "compose_note_count": "{count} toner",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tone",
+                "countPlural=other": "{count} toner"
+            }
+        }
+    ],
     "daily_intro": "Et nytt stykke hver dag — det samme for alle, en pianoversjon av dagens puslespill. Prøv deg, se hvordan det går, og del gjerne rutenettet ditt.",
     "daily_mode_label": "Dagens utfordring eller oppvarming",
     "daily_tab_challenge": "Dagens utfordring",

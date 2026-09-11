@@ -429,7 +429,22 @@
     "compose_staff_label": "Un abbozzo su pentagramma della tua improvvisazione",
     "compose_staff_empty": "Suona qualche nota e appariranno qui.",
     "compose_recording_idle": "Registrazione — suona qualsiasi cosa e ogni nota viene catturata",
-    "compose_recording_count": "Registrazione · {count} note catturate",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Registrazione · {count} nota catturata",
+                "countPlural=many": "Registrazione · {count} note catturate",
+                "countPlural=other": "Registrazione · {count} note catturate"
+            }
+        }
+    ],
     "compose_sketch_note": "L'audio è esattamente ciò che hai suonato; il pentagramma è un abbozzo approssimativo, allineato a una griglia così si legge come notazione.",
     "compose_title_label": "Titolo",
     "compose_tempo_label": "Tempo",
@@ -453,7 +468,22 @@
     "compose_copied": "Copiato!",
     "compose_download_midi": "Scarica MIDI",
     "compose_download_musicxml": "Scarica MusicXML",
-    "compose_note_count": "{count} note",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=many": "{count} note",
+                "countPlural=other": "{count} note"
+            }
+        }
+    ],
     "daily_intro": "Un brano nuovo ogni giorno — lo stesso per tutti, la versione pianistica del puzzle quotidiano. Provaci, guarda come va, e condividi la tua griglia se ti va.",
     "daily_mode_label": "Sfida del giorno o riscaldamento",
     "daily_tab_challenge": "Sfida del giorno",

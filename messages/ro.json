@@ -429,7 +429,22 @@
     "compose_staff_label": "O schiță pe portativ a improvizației tale",
     "compose_staff_empty": "Cântă câteva note și vor apărea aici.",
     "compose_recording_idle": "Se înregistrează — cântă orice, fiecare notă e prinsă",
-    "compose_recording_count": "Se înregistrează · {count} note prinse",
+    "compose_recording_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Se înregistrează · {count} notă prinsă",
+                "countPlural=few": "Se înregistrează · {count} note prinse",
+                "countPlural=other": "Se înregistrează · {count} de note prinse"
+            }
+        }
+    ],
     "compose_sketch_note": "Sunetul e exact ce ai cântat; portativul e o schiță aproximativă, aliniată la o grilă ca să se citească drept notație.",
     "compose_title_label": "Titlu",
     "compose_tempo_label": "Tempo",
@@ -453,7 +468,22 @@
     "compose_copied": "Copiat!",
     "compose_download_midi": "Descarcă MIDI",
     "compose_download_musicxml": "Descarcă MusicXML",
-    "compose_note_count": "{count} note",
+    "compose_note_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} notă",
+                "countPlural=few": "{count} note",
+                "countPlural=other": "{count} de note"
+            }
+        }
+    ],
     "daily_intro": "O piesă nouă în fiecare zi — aceeași pentru toată lumea, o variantă la pian a puzzle-ului zilnic. Încearcă, vezi cum îți iese și distribuie-ți grila, dacă vrei.",
     "daily_mode_label": "Provocarea de azi sau încălzire",
     "daily_tab_challenge": "Provocarea de azi",
