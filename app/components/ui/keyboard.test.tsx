@@ -43,8 +43,8 @@ describe("Keyboard's spoken key names", () => {
     });
 
     it("says a Danish key with H for B natural, beside the Danish sharp of the key below", () => {
-        // Danish reads B as B flat; "Ais" beside a key called "B" named two neighbours
-        // alike and B natural not at all.
+        // Danish reads B as B flat, so B natural is H and the key below it is Ais; a key
+        // called "B" would name B flat.
         overwriteGetLocale(() => "da");
         render(<Keyboard from={69} to={71} />);
         expect(screen.getByLabelText("H 4")).toBeTruthy();

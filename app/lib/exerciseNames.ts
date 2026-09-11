@@ -56,9 +56,9 @@ const MINOR: ReadonlySet<ExerciseType> = new Set([
 
 export function exerciseName(config: ExerciseConfig, naming: Naming): string {
     const { type, forms } = exerciseTitleParts(config);
-    // The key named the way the player's keys name notes, not the way English does. German
-    // reads the letter B as B flat and calls B natural H, so "B-Dur-Tonleiter" told a
-    // German student to play the wrong scale; French names it "si bémol".
+    // The key named the way the player's keys name notes. German reads the letter B as B
+    // flat and calls B natural H, so the scale of B natural is "H-Dur-Tonleiter"; French
+    // names B flat "si bémol".
     const key = MINOR.has(type) ? minorKeyText(config.key, naming) : noteText(config.key, naming);
     const title = opening(TITLES[type]({ key }), naming);
     if (forms.length === 0) {
