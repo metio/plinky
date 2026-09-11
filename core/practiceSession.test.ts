@@ -209,6 +209,17 @@ describe("summarizeRange", () => {
         expect(report.moods.rough).toBe(1);
     });
 
+    it("gives a tie for the longest day to the earlier day, even one the grid cannot draw", () => {
+        // 2006 is older than the grid's reach, so it is counted after every drawn day.
+        const tied = [
+            ...addManualSession([], { date: "2006-01-02", minutes: 30 }),
+            ...addManualSession([], { date: "2026-06-21", minutes: 30 }),
+        ];
+        expect(summarizeRange(tied, "1926-06-23", "2026-06-23").longestDay?.date).toBe(
+            "2006-01-02",
+        );
+    });
+
     it("is empty over a range with no practice", () => {
         const report = summarizeRange(log, "2026-07-01", "2026-07-07");
         expect(report.activeDays).toBe(0);

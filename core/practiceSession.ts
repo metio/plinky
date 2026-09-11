@@ -340,12 +340,13 @@ export function reportStart(log: PracticeLog, days: number | null, to: string): 
     return earliest;
 }
 
-// The days the consistency grid draws: the whole range, or its last MAX_RANGE_DAYS
-// days when the range is longer. daysInRange refuses a longer span outright, and a
-// report must still count every session in it, so only the grid is shortened.
+// The days the consistency grid draws: the whole range, or `to` and the MAX_RANGE_DAYS
+// days before it when the range is longer. daysInRange refuses a longer span outright,
+// and a report must still count every session in it, so only the grid is shortened.
+// Date keys sort as strings, so the later start is the greater one.
 function gridDays(from: string, to: string): string[] {
     const earliest = shiftDay(to, -MAX_RANGE_DAYS);
-    return daysInRange(daysBetween(earliest, from) > 0 ? from : earliest, to);
+    return daysInRange(from > earliest ? from : earliest, to);
 }
 
 export function summarizeRange(log: PracticeLog, from: string, to: string): PracticeReport {
@@ -387,13 +388,15 @@ export function summarizeRange(log: PracticeLog, from: string, to: string): Prac
     }
 
     const ordered = days.map((date) => byDate.get(date) as PracticeDay);
-    // Oldest first, so a tie for the longest day goes to the earlier one, as it does in
-    // the grid.
-    const practised = [...byDate.values()]
-        .filter((day) => day.activeMs > 0 || day.sessions > 0)
-        .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    const practised = [...byDate.values()].filter((day) => day.activeMs > 0 || day.sessions > 0);
+    // A tie for the longest day goes to the earlier one, as it does in the grid.
     const longestDay = practised.reduce<PracticeDay | null>(
-        (best, day) => (!best || day.activeMs > best.activeMs ? day : best),
+        (best, day) =>
+            !best ||
+            day.activeMs > best.activeMs ||
+            (day.activeMs === best.activeMs && day.date < best.date)
+                ? day
+                : best,
         null,
     );
 
