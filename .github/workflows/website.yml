@@ -166,11 +166,13 @@ jobs:
           nix develop --command npx --yes wrangler@4 pages deploy build/client
           --project-name=plinky
           --branch=main
-          --commit-hash=${{ github.sha }}
+          --commit-hash="$GITHUB_SHA"
           --commit-dirty=true
       - name: Tell the search engines
         # After the deploy, never before: the addresses submitted have to be live when an
         # engine fetches them. Only the pages this push actually rewrote, and never a
         # failure that goes red — the site is already up. See dev/submit-indexnow.mjs.
         if: ${{ github.event_name == 'push' }}
-        run: nix develop --command node dev/submit-indexnow.mjs ${{ github.event.before }} ${{ github.sha }}
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: nix develop --command node dev/submit-indexnow.mjs "$BEFORE" "$GITHUB_SHA"

@@ -5,32 +5,28 @@
 // renders it with the same OpenSheetMusicDisplay the app uses (in headless
 // Chromium), confirming it loads and produces playable notes — i.e. that Plinky
 // can actually use it. Writes `valid` and a markdown `report` to GITHUB_OUTPUT.
+//
+// The body is untrusted; dev/submission.mjs keeps every word of it out of the outputs.
+import { randomUUID } from "node:crypto";
 import { appendFileSync } from "node:fs";
 import { chromium } from "playwright";
+import {
+    checkLicense,
+    formatFileCommand,
+    licenseProblem,
+    readSubmission,
+    renderReport,
+    submissionOutputs,
+    xmlProblem,
+} from "../../dev/submission.mjs";
 
-const body = process.env.ISSUE_BODY || "";
-
-// Read a field from the issue form's rendered body.
-const section = (label) => {
-    const re = new RegExp(`###\\s*${label}\\s*\\r?\\n([\\s\\S]*?)(?=\\r?\\n###\\s|$)`, "i");
-    const match = body.match(re);
-    return match ? match[1].trim() : "";
-};
-
-// The MusicXML field uses render:xml, so it arrives wrapped in a fenced block.
-let xml = section("MusicXML");
-const fenced = xml.match(/^```[a-z]*\r?\n([\s\S]*?)\r?\n```$/);
-if (fenced) {
-    xml = fenced[1].trim();
-}
-const license = section("License");
+const { xml, license } = readSubmission(process.env.ISSUE_BODY || "");
 
 const problems = [];
 let notes = 0;
-if (!xml || xml === "_No response_") {
-    problems.push("No MusicXML was provided.");
-} else if (!/<score-partwise|<score-timewise/i.test(xml)) {
-    problems.push("That doesn't look like MusicXML — it should be a `<score-partwise>` document.");
+const unreadable = xmlProblem(xml);
+if (unreadable !== null) {
+    problems.push(unreadable);
 } else {
     const browser = await chromium.launch();
     try {
@@ -80,20 +76,19 @@ if (!xml || xml === "_No response_") {
         await browser.close();
     }
 }
+const unlicensed = licenseProblem(license);
+if (unlicensed !== null) {
+    problems.push(unlicensed);
+}
 
 const valid = problems.length === 0;
-const lines = [
-    valid
-        ? `✅ **Looks good!** This renders and plays ${notes} note${notes === 1 ? "" : "s"} in Plinky. A maintainer will review it and add it to the catalog.`
-        : `⚠️ **This needs a change before it can be added:**\n${problems.map((problem) => `- ${problem}`).join("\n")}`,
-];
-if (license) {
-    lines.push(`\nLicense: \`${license}\``);
-}
+const outputs = submissionOutputs({
+    valid,
+    report: renderReport({ problems, notes, license: checkLicense(license) }),
+});
 
 const output = process.env.GITHUB_OUTPUT;
 if (output) {
-    appendFileSync(output, `valid=${valid}\n`);
-    appendFileSync(output, `report<<PLINKY_EOF\n${lines.join("\n")}\nPLINKY_EOF\n`);
+    appendFileSync(output, formatFileCommand(outputs, `PLINKY_${randomUUID()}`));
 }
-console.log(`valid=${valid} notes=${notes}`);
+console.log(`valid=${outputs.valid} notes=${notes}`);

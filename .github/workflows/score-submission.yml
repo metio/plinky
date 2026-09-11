@@ -4,21 +4,34 @@ name: Score submission
 on:
   issues:
     types: [opened, edited]
-permissions:
-  issues: write
+# The issue body is untrusted: anyone can open an issue, and one opened through the API
+# or edited afterwards can hold anything in any section. So the job that reads and
+# renders it holds a read-only token and leaves none in the checkout, and only the job
+# that comments can write to issues — it runs no code from the body, and reads the
+# verdict and report from its environment rather than having them pasted into its
+# script by a `${{ }}` expansion.
+permissions: {}
 jobs:
   check:
     name: check
     # Only act on score submissions; the issue form prefixes the title.
     if: startsWith(github.event.issue.title, '[Score] ')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      valid: ${{ steps.validate.outputs.valid }}
+      report: ${{ steps.validate.outputs.report }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Setup Node.js
+        # No dependency cache: this job runs for anyone's issue, and a cache saved from
+        # it would be restorable by the default branch's other workflows.
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 24
-          cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Validate the submitted MusicXML
@@ -26,14 +39,22 @@ jobs:
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: node .github/scripts/validate-submission.mjs
+  comment:
+    name: comment
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
       - name: Comment and label
         # Renovate pins this to a commit digest.
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
-          REPORT: ${{ steps.validate.outputs.report }}
+          VALID: ${{ needs.check.outputs.valid }}
+          REPORT: ${{ needs.check.outputs.report }}
         with:
           script: |
-            const valid = "${{ steps.validate.outputs.valid }}" === "true";
+            const valid = process.env.VALID === "true";
             const marker = "<!-- plinky-score-check -->";
             const message = [
               marker,

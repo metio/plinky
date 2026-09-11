@@ -79,13 +79,15 @@ jobs:
         # lower-case, non-alphanumerics to hyphens, trimmed, capped at Cloudflare's 28-char
         # alias limit. Readable and predictable; the immutable per-deploy *.pages.dev URL
         # is the collision-proof backstop if two branches ever slug the same.
+        env:
+          PREVIEW_DOMAIN: ${{ vars.PREVIEW_DOMAIN }}
         run: |
           slug=$(printf '%s' "${GITHUB_REF_NAME}" \
             | tr '[:upper:]' '[:lower:]' \
             | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' \
             | cut -c1-28 \
             | sed -E 's/-+$//')
-          domain="${{ vars.PREVIEW_DOMAIN }}"
+          domain="${PREVIEW_DOMAIN}"
           [ -n "$domain" ] || domain="plinky-preview.pages.dev"
           {
             echo "slug=$slug"
@@ -95,10 +97,11 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SLUG: ${{ steps.slug.outputs.slug }}
         run: >-
           nix develop --command npx --yes wrangler@4 pages deploy build/client
           --project-name=plinky-preview
-          --branch="${{ steps.slug.outputs.slug }}"
+          --branch="$SLUG"
           --commit-dirty=true
       - name: Record the preview deployment
         env:
