@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**The microphone hears every note you play, the same one twice included.** With the\nmicrophone listening on the Piano page, in Compose, on the home page's keyboard or in\nKeep up, Plinky played each note back over your piano, and a note you repeated soon\nafter was taken for that echo and never heard, so it went missing from a sketch or a\nrun. Plinky now leaves a piano it hears through the microphone to make its own sound.",
+                twip: true,
+            },
+            {
                 body: "**Keep up keeps time through grace notes.** In Keep up, a grace note held on for\nits whole written length before the note it decorates, and a very quick one a little\nlonger still, so every ornament pushed the beat later and the notes you were chasing\ndrifted away from the metronome. Grace notes now take their time from the note they\nlean on, the way Listen plays them, and the beat stays where the score puts it.",
                 twip: true,
             },

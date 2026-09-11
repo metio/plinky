@@ -3,7 +3,7 @@
 
 import { useCallback, useMemo } from "react";
 import { noteGain } from "../../core/loudness";
-import { isInstrumentInput } from "../../core/midi";
+import { soundsOnItsOwn } from "../../core/midi";
 import { wetFor } from "../../core/room";
 import type { PedalKind } from "../../core/pedals";
 import { useAudioEngine, usePrefsStore } from "../contexts/services";
@@ -83,12 +83,11 @@ export function useSynth(): UseSynthResult {
     );
 
     // Whether the player's own instrument is already making this sound, so Plinky must not
-    // make it again. Only a note from a real instrument: a drawn key and a computer key
-    // have no voice of their own and would go silent. A caller that names no device is not
-    // an instrument path and always sounds.
+    // make it again; see soundsOnItsOwn. A caller that names no device is not an instrument
+    // path and always sounds.
     const ownVoice = useCallback(
         (device: string | undefined) =>
-            prefsStore.load().instrumentSounds && device !== undefined && isInstrumentInput(device),
+            device !== undefined && soundsOnItsOwn(device, prefsStore.load().instrumentSounds),
         [prefsStore],
     );
 

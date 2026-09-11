@@ -146,6 +146,18 @@ export function isInstrumentInput(device: string): boolean {
     return !STAND_INS.includes(device);
 }
 
+// Whether a note from this source is already sounding without Plinky, so Plinky must not
+// voice it a second time. An instrument is, when the player says it has speakers of its own
+// (`instrumentSounds`); a drawn key and a computer key never are.
+//
+// The microphone always is, whatever the setting: it can only hear a note that is already
+// in the room. Voicing it would double every note, and worse, the copy from the speaker
+// marks that pitch as recently struck, so the echo guard in front of the microphone takes
+// the player's next strike of it — or of its octave — for Plinky's own sound and drops it.
+export function soundsOnItsOwn(device: string, instrumentSounds: boolean): boolean {
+    return device === MIC_DEVICE || (instrumentSounds && isInstrumentInput(device));
+}
+
 // Whether an input's key presses are delivered only while the window holds focus.
 // The computer keyboard (keyup) and the on-screen keyboard (pointerup) both lose their
 // release event once focus leaves — Alt-Tab, clicking away — so a note held then must be

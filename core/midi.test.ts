@@ -16,6 +16,7 @@ import {
     ON_SCREEN_DEVICE,
     parseMidiMessage,
     pitchClass,
+    soundsOnItsOwn,
     spokenPitch,
 } from "./midi";
 
@@ -264,11 +265,31 @@ describe("spokenPitch", () => {
 
 describe("isInstrumentInput", () => {
     it("is true only for a device somebody is actually playing", () => {
-        // It decides whether Plinky voices the note. A real instrument may be sounding it
-        // already; a drawn key, a typed key and a microphone make no sound of their own.
+        // A real instrument may be sounding the note already; a drawn key and a typed key
+        // make no sound of their own. The microphone is a stand-in too, since it only
+        // hears an instrument — soundsOnItsOwn is what keeps its notes unvoiced.
         expect(isInstrumentInput("Yamaha P-125")).toBe(true);
         expect(isInstrumentInput(ON_SCREEN_DEVICE)).toBe(false);
         expect(isInstrumentInput(KEYBOARD_DEVICE)).toBe(false);
         expect(isInstrumentInput(MIC_DEVICE)).toBe(false);
+    });
+});
+
+describe("soundsOnItsOwn", () => {
+    it("leaves the microphone's notes to the room, whatever the setting", () => {
+        expect(soundsOnItsOwn(MIC_DEVICE, false)).toBe(true);
+        expect(soundsOnItsOwn(MIC_DEVICE, true)).toBe(true);
+    });
+
+    it("leaves an instrument's notes to it only when it has speakers of its own", () => {
+        expect(soundsOnItsOwn("Yamaha P-125", true)).toBe(true);
+        expect(soundsOnItsOwn("Yamaha P-125", false)).toBe(false);
+    });
+
+    it("never leaves a drawn key or a computer key to itself", () => {
+        for (const instrumentSounds of [false, true]) {
+            expect(soundsOnItsOwn(ON_SCREEN_DEVICE, instrumentSounds)).toBe(false);
+            expect(soundsOnItsOwn(KEYBOARD_DEVICE, instrumentSounds)).toBe(false);
+        }
     });
 });

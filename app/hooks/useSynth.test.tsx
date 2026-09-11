@@ -5,7 +5,7 @@
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import { KEYBOARD_DEVICE, ON_SCREEN_DEVICE } from "../../core/midi";
+import { KEYBOARD_DEVICE, MIC_DEVICE, ON_SCREEN_DEVICE } from "../../core/midi";
 import type { Prefs } from "../../core/prefs";
 import { ROOM_WET } from "../../core/room";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
@@ -200,6 +200,18 @@ describe("when the player's own instrument makes the sound", () => {
         synth.playNote(60);
 
         expect(audio.strikes).toHaveLength(1);
+    });
+
+    it("never answers the microphone, which only hears a piano already sounding", () => {
+        for (const instrumentSounds of [false, true]) {
+            const { audio, synth } = harness({ instrumentSounds });
+
+            synth.pressNote(60, { velocity: 100, device: MIC_DEVICE });
+            synth.playNote(62, { device: MIC_DEVICE });
+
+            expect(audio.voices).toEqual([]);
+            expect(audio.strikes).toEqual([]);
+        }
     });
 
     it("answers the instrument when the setting is off", () => {
