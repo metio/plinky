@@ -6,6 +6,8 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { type Composition, decodeComposition } from "../../core/composition";
 import { parseMidiFile } from "../../core/midiParse";
+import { m } from "../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../paraglide/runtime.js";
 import { useCompositionExport } from "./useCompositionExport";
 
 const downloads: { mime: string; filename: string; data: Uint8Array | string }[] = [];
@@ -66,6 +68,26 @@ describe("useCompositionExport", () => {
         const parsed = parseMidiFile(file?.data as Uint8Array);
         expect(parsed?.notes.map((note) => note.pitch)).toEqual([60, 64]);
         expect(parsed?.tempo).toBe(120);
+    });
+
+    it("names and heads a fresh take's files in the reader's language", () => {
+        // The title a fresh take starts with, as Compose seeds it: in Spanish the word
+        // differs from English, so an English literal cannot pass for it.
+        overwriteGetLocale(() => "es");
+        try {
+            const title = m.compose_default_title();
+            expect(title).toBe("Improvisación");
+            const { result } = renderHook(() => useCompositionExport(COMPOSITION, title));
+            act(() => result.current.downloadMidi());
+            act(() => result.current.downloadMusicXml());
+            expect(downloads.map((file) => file.filename)).toEqual([
+                "improvisacion.mid",
+                "improvisacion.musicxml",
+            ]);
+            expect(String(downloads[1]?.data)).toContain("<work-title>Improvisación</work-title>");
+        } finally {
+            overwriteGetLocale(() => baseLocale);
+        }
     });
 
     it("downloads MusicXML carrying the title", () => {

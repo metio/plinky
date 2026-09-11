@@ -546,6 +546,7 @@
     ],
     "compose_sketch_note": "L'audio è esattamente ciò che hai suonato; il pentagramma è un abbozzo approssimativo, allineato a una griglia così si legge come notazione.",
     "compose_title_label": "Titolo",
+    "compose_default_title": "Improvvisazione",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Metro",
     "compose_quantize_label": "Sistema il ritmo",

@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 11 September 2026 — evening
 
+**A new take in Compose is named in your language.** Its title started as the
+English word "Improvisation" in every language, and that word went on to name the
+MIDI and MusicXML files you download and head the score they open as. It now starts
+in your own language — "Improvisación", "Improvvisazione", "即興演奏" — and you can
+still rename it.
+
 **A screen reader names the piano's keys in your language.** Every key on the
 on-screen keyboard, and the wrong-note announcement, was read out in English
 whatever language Plinky was in, so a German page said "Falsche Note: F sharp 4".

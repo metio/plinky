@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Ljudet är exakt vad du spelade; notsystemet är en ungefärlig skiss, fäst mot ett rutnät så att det läses som notation.",
     "compose_title_label": "Titel",
+    "compose_default_title": "Improvisation",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Taktart",
     "compose_quantize_label": "Städa upp rytmen",

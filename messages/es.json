@@ -546,6 +546,7 @@
     ],
     "compose_sketch_note": "El audio es exactamente lo que tocaste; el pentagrama es un boceto aproximado, ajustado a una cuadrícula para que se lea como notación.",
     "compose_title_label": "Título",
+    "compose_default_title": "Improvisación",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Compás",
     "compose_quantize_label": "Ordenar el ritmo",

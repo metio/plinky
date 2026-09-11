@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Audioja është saktësisht ç'ke luajtur; pentagrami është një skicë e përafërt, e ngjeshur në një rrjetë që të lexohet si notacion.",
     "compose_title_label": "Titulli",
+    "compose_default_title": "Improvizim",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Masa",
     "compose_quantize_label": "Rregullo ritmin",

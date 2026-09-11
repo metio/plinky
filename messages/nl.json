@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "De audio is precies wat je speelde; de notenbalk is een benaderende schets, uitgelijnd op een raster zodat het als notatie leest.",
     "compose_title_label": "Titel",
+    "compose_default_title": "Improvisatie",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Maatsoort",
     "compose_quantize_label": "Ritme opschonen",

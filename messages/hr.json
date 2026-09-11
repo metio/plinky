@@ -546,6 +546,7 @@
     ],
     "compose_sketch_note": "Zvuk je točno ono što si odsvirao; crtovlje je približna skica, poravnata na rešetku da se čita kao notacija.",
     "compose_title_label": "Naslov",
+    "compose_default_title": "Improvizacija",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Mjera",
     "compose_quantize_label": "Posloži ritam",

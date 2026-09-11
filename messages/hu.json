@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "A hang pontosan az, amit játszottál; a kotta hozzávetőleges vázlat, rácsra illesztve, hogy kottaként olvasható legyen.",
     "compose_title_label": "Cím",
+    "compose_default_title": "Improvizáció",
     "compose_tempo_label": "Tempó",
     "compose_beats_label": "Ütemmutató",
     "compose_quantize_label": "Ritmus rendezése",

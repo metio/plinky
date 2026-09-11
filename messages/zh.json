@@ -520,6 +520,7 @@
     ],
     "compose_sketch_note": "音频与你实际弹奏的完全一致；谱表是大致的草图，被吸附到网格上以便当作记谱阅读。",
     "compose_title_label": "标题",
+    "compose_default_title": "即兴演奏",
     "compose_tempo_label": "速度",
     "compose_beats_label": "拍号",
     "compose_quantize_label": "整理节奏",

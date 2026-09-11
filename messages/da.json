@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Lyden er præcis, hvad du spillede; nodesystemet er en omtrentlig skitse, snappet til et gitter, så det læses som noder.",
     "compose_title_label": "Titel",
+    "compose_default_title": "Improvisation",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Taktart",
     "compose_quantize_label": "Ryd op i rytmen",

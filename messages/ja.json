@@ -520,6 +520,7 @@
     ],
     "compose_sketch_note": "音声はあなたが弾いたそのままです。譜面は記譜として読めるようグリッドに合わせた、おおよそのスケッチです。",
     "compose_title_label": "タイトル",
+    "compose_default_title": "即興演奏",
     "compose_tempo_label": "テンポ",
     "compose_beats_label": "拍子",
     "compose_quantize_label": "リズムを整える",

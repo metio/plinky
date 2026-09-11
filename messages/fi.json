@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Ääni on täsmälleen se, mitä soitit; nuottiviivasto on likimääräinen luonnos, joka on kohdistettu ruudukkoon, jotta se luetaan notaationa.",
     "compose_title_label": "Nimi",
+    "compose_default_title": "Improvisaatio",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Tahtilaji",
     "compose_quantize_label": "Siisti rytmi",

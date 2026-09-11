@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Der Klang ist genau das, was du gespielt hast; die Notenzeile ist eine ungefähre Skizze, an ein Raster ausgerichtet, damit sie als Notation lesbar ist.",
     "compose_title_label": "Titel",
+    "compose_default_title": "Improvisation",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Takt",
     "compose_quantize_label": "Rhythmus aufräumen",

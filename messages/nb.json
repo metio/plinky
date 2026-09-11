@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Lyden er nøyaktig det du spilte; notesystemet er en omtrentlig skisse, festet til et rutenett så det leses som notasjon.",
     "compose_title_label": "Tittel",
+    "compose_default_title": "Improvisasjon",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Takt",
     "compose_quantize_label": "Rydd opp rytmen",

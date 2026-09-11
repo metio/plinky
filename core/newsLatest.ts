@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: '**A new take in Compose is named in your language.** Its title started as the\nEnglish word "Improvisation" in every language, and that word went on to name the\nMIDI and MusicXML files you download and head the score they open as. It now starts\nin your own language — "Improvisación", "Improvvisazione", "即興演奏" — and you can\nstill rename it.',
+                twip: true,
+            },
+            {
                 body: '**A screen reader names the piano\'s keys in your language.** Every key on the\non-screen keyboard, and the wrong-note announcement, was read out in English\nwhatever language Plinky was in, so a German page said "Falsche Note: F sharp 4".\nKeys are now named the way your language names them, "Falsche Note: Fis 4" and H for\nB natural in German, and with your language\'s own word for a sharp everywhere else.',
                 twip: true,
             },

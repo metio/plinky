@@ -44,7 +44,9 @@ const KEYBOARD_SPAN = 24;
 export default function Compose() {
     const _onboarding = useOnboardingStore();
     const [searchParams] = useSearchParams();
-    const [title, setTitle] = useState("Improvisation");
+    // A fresh take is named in the reader's language: the name heads the staff and the
+    // exported score, and becomes the downloaded file's name.
+    const [title, setTitle] = useState<string>(() => m.compose_default_title());
     const [tempo, setTempo] = useState(COMPOSE_DEFAULT_TEMPO);
     const [beatsPerBar, setBeatsPerBar] = useState(4);
     const [quantizeOn, setQuantizeOn] = useState(true);

@@ -666,6 +666,7 @@
     ],
     "compose_sketch_note": "The audio is exactly what you played; the staff is an approximate sketch, snapped to a grid so it reads as notation.",
     "compose_title_label": "Title",
+    "compose_default_title": "Improvisation",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Time",
     "compose_quantize_label": "Tidy the rhythm",

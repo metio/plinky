@@ -546,6 +546,7 @@
     ],
     "compose_sketch_note": "L'audio est exactement ce que vous avez joué ; la portée est une esquisse approximative, calée sur une grille pour se lire comme une notation.",
     "compose_title_label": "Titre",
+    "compose_default_title": "Improvisation",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Mesure",
     "compose_quantize_label": "Nettoyer le rythme",

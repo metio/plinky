@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Ses tam olarak çaldığındır; porte ise nota gibi okunsun diye bir ızgaraya oturtulmuş yaklaşık bir taslaktır.",
     "compose_title_label": "Başlık",
+    "compose_default_title": "Doğaçlama",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Ölçü",
     "compose_quantize_label": "Ritmi düzelt",

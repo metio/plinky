@@ -546,6 +546,7 @@
     ],
     "compose_sketch_note": "Sunetul e exact ce ai cântat; portativul e o schiță aproximativă, aliniată la o grilă ca să se citească drept notație.",
     "compose_title_label": "Titlu",
+    "compose_default_title": "Improvizație",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Măsură",
     "compose_quantize_label": "Aranjează ritmul",

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, useSearchParams } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -9,6 +9,7 @@ import { fakeMidi } from "../adapters/fakeMidi";
 import { type AppServices, ServicesProvider } from "../contexts/services";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { m } from "../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../paraglide/runtime.js";
 import { switchOn } from "../testing/controls";
 import Compose from "./compose";
 
@@ -75,6 +76,25 @@ describe("Compose", () => {
             window.__plinky?.release(64);
         });
         expect(audio.voices.at(-1)).toMatchObject({ kind: "release", note: 64 });
+    });
+
+    it("names a fresh take in the reader's language", async () => {
+        // German and English share the word, so Spanish is the language that shows the
+        // name is translated rather than hard-coded.
+        try {
+            overwriteGetLocale(() => "es");
+            const spanish = mount();
+            const field = await within(spanish).findByLabelText(m.compose_title_label());
+            expect((field as HTMLInputElement).value).toBe("Improvisación");
+            expect((field as HTMLInputElement).value).toBe(m.compose_default_title());
+
+            overwriteGetLocale(() => "de");
+            const german = mount();
+            const deField = await within(german).findByLabelText(m.compose_title_label());
+            expect((deField as HTMLInputElement).value).toBe(m.compose_default_title());
+        } finally {
+            overwriteGetLocale(() => baseLocale);
+        }
     });
 
     it("captures played notes, sketches a staff and checkpoints", async () => {

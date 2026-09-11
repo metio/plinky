@@ -546,6 +546,7 @@
     ],
     "compose_sketch_note": "O áudio é exatamente o que tocaste; a pauta é um esboço aproximado, ajustado a uma grelha para se ler como notação.",
     "compose_title_label": "Título",
+    "compose_default_title": "Improvisação",
     "compose_tempo_label": "Andamento",
     "compose_beats_label": "Compasso",
     "compose_quantize_label": "Organizar o ritmo",

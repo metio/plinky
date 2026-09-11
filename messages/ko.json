@@ -520,6 +520,7 @@
     ],
     "compose_sketch_note": "소리는 연주한 그대로예요; 오선보는 악보처럼 읽히도록 격자에 맞춘 대략적인 스케치예요.",
     "compose_title_label": "제목",
+    "compose_default_title": "즉흥 연주",
     "compose_tempo_label": "템포",
     "compose_beats_label": "박자",
     "compose_quantize_label": "리듬 정리",

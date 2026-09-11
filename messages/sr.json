@@ -546,6 +546,7 @@
     ],
     "compose_sketch_note": "Звук је тачно оно што си одсвирао; нотни систем је оквирна скица, поравната на мрежу да се чита као нотација.",
     "compose_title_label": "Наслов",
+    "compose_default_title": "Импровизација",
     "compose_tempo_label": "Темпо",
     "compose_beats_label": "Мера",
     "compose_quantize_label": "Уреди ритам",

@@ -559,6 +559,7 @@
     ],
     "compose_sketch_note": "Zvuk je presne to, čo ste zahrali; notová osnova je približný náčrt prichytený k mriežke, aby sa dal čítať ako notácia.",
     "compose_title_label": "Názov",
+    "compose_default_title": "Improvizácia",
     "compose_tempo_label": "Tempo",
     "compose_beats_label": "Metrum",
     "compose_quantize_label": "Upraviť rytmus",

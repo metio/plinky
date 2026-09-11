@@ -533,6 +533,7 @@
     ],
     "compose_sketch_note": "Ο ήχος είναι ακριβώς αυτό που έπαιξες· το πεντάγραμμο είναι ένα κατά προσέγγιση σκίτσο, ευθυγραμμισμένο σε πλέγμα ώστε να διαβάζεται ως σημειογραφία.",
     "compose_title_label": "Τίτλος",
+    "compose_default_title": "Αυτοσχεδιασμός",
     "compose_tempo_label": "Τέμπο",
     "compose_beats_label": "Μέτρο",
     "compose_quantize_label": "Τακτοποίησε τον ρυθμό",
