@@ -3,16 +3,10 @@
 
 import { useState } from "react";
 import { smoothestMotion } from "../../../core/chordMotion";
-import {
-    type ChordQuality,
-    CHORD_QUALITIES,
-    chordPitches,
-    noteNameOf,
-    type PitchClass,
-} from "../../../core/theory";
+import { type ChordQuality, CHORD_QUALITIES, chordPitches } from "../../../core/theory";
 import type { Naming } from "../../../core/noteNaming";
 import { useNoteNaming } from "../../hooks/useNoteNaming";
-import { noteSymbol } from "../../lib/noteNames";
+import { pitchSymbol } from "../../lib/noteNames";
 import { chordName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 import { SegmentedControl } from "../ui/segmentedControl";
@@ -41,10 +35,9 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
 
     // Named as the player's keys name them.
     const naming = useNoteNaming();
-    const nameOf = (pitchClass: PitchClass) => noteSymbol(noteNameOf(pitchClass), naming);
     const label = (root: string, quality: ChordQuality) =>
         m.chord_named({
-            root: nameOf(((rootNote + Number(root)) % 12) as PitchClass),
+            root: pitchSymbol(rootNote + Number(root), naming),
             quality: chordName(quality),
         });
 
@@ -91,7 +84,9 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
                     dash rather than a sentence where a change shares nothing, because
                     "none" is the answer least worth a word. */}
                 <dd className="tabular-nums">
-                    {motion.common.length === 0 ? "—" : motion.common.map(nameOf).join(" · ")}
+                    {motion.common.length === 0
+                        ? "—"
+                        : motion.common.map((pitch) => pitchSymbol(pitch, naming)).join(" · ")}
                 </dd>
                 <dt className="text-muted">{m.tools_changes_travel()}</dt>
                 <dd className="tabular-nums">{motion.distance}</dd>
@@ -113,6 +108,6 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
 function tonics(root: number, naming: Naming): { id: string; label: string }[] {
     return Array.from({ length: 12 }, (_, step) => ({
         id: String(step),
-        label: noteSymbol(noteNameOf(((root + step) % 12) as PitchClass), naming),
+        label: pitchSymbol(root + step, naming),
     }));
 }

@@ -3,8 +3,7 @@
 
 import { type HeldSound, nameHeldNotes } from "../../../core/chordNaming";
 import type { Naming } from "../../../core/noteNaming";
-import { noteNameOf, type PitchClass } from "../../../core/theory";
-import { localNaming, noteText, opening } from "../../lib/noteNames";
+import { localNaming, opening, pitchText } from "../../lib/noteNames";
 import { chordName, intervalName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 
@@ -22,7 +21,7 @@ import { m } from "../../paraglide/messages.js";
 // the language's own.
 
 function say(sound: HeldSound, naming: Naming): string {
-    const note = (pitchClass: PitchClass) => noteText(noteNameOf(pitchClass), naming);
+    const note = (pitch: number) => pitchText(pitch, naming);
     switch (sound.kind) {
         case "note":
             return note(sound.pitchClass);

@@ -11,7 +11,7 @@ import {
     openingIn,
 } from "../../core/noteNaming";
 import type { Prefs } from "../../core/prefs";
-import type { NoteNameId } from "../../core/theory";
+import { type NoteNameId, noteNameOf, type Spelling } from "../../core/theory";
 import { noteWords } from "../components/ui/noteWords";
 import { getLocale } from "../paraglide/runtime.js";
 
@@ -38,6 +38,16 @@ export function noteText(name: NoteNameId | string, naming: Naming): string {
 // A note as a label or a chord symbol writes it: C♯, Cis, ré♯.
 export function noteSymbol(name: NoteNameId | string, naming: Naming): string {
     return noteSymbolIn(name, naming.system, noteWords());
+}
+
+// A pitch, any octave, named in a sentence or as a label. Spelled on sharps unless a key
+// signature asks for flats: the key of D flat contains no C sharp.
+export function pitchText(pitch: number, naming: Naming, spelling: Spelling = "sharp"): string {
+    return noteText(noteNameOf(pitch, spelling), naming);
+}
+
+export function pitchSymbol(pitch: number, naming: Naming, spelling: Spelling = "sharp"): string {
+    return noteSymbol(noteNameOf(pitch, spelling), naming);
 }
 
 // The tonic of a minor key, lower case where the language writes it so.
