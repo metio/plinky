@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { pianoParts, stavesPerPart } from "./accompaniment";
+import { pianoParts, stavesOf, stavesPerPart } from "./accompaniment";
 import { spellChordPitch } from "./chordSpelling";
 import { type ChordSpan, readHarmony } from "./harmony";
 import { readTimeline } from "./musicxmlTimeline";
@@ -40,13 +40,11 @@ export function blockChords(codec: XmlCodec, xml: string): string {
     const counts = stavesPerPart(doc);
     const { left, right } = partsOf(counts);
     // The left hand is its own part, or the second staff of a two-staff part. A piano
-    // written on one staff has no left hand to block.
+    // written on one staff has no left hand to block. The piano is asked for its own staff
+    // count: on an art song it is not the score's first part.
     const ownPart = parts.length === 2;
     const leftPart = ownPart ? parts[1] : parts[0];
-    if (
-        !leftPart ||
-        (!ownPart && left === right + 1 && (counts[parts.indexOf(leftPart)] ?? 1) < 2)
-    ) {
+    if (!leftPart || (!ownPart && left === right + 1 && stavesOf(leftPart) < 2)) {
         return xml;
     }
     const staffNumber = ownPart ? null : 2;

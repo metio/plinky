@@ -5,6 +5,12 @@
   label: evening
   entries:
     - |-
+      **Left hand as chords works on songs with a singer.** With Other parts showing, a
+      song whose singer is written above the piano kept the composer's full left hand when
+      you chose Left hand as chords, and the run still counted as a practice version. The
+      piano's left hand now turns into chords under the singer's line, as it does on a
+      piece for piano alone.
+    - |-
       **Stopping Listen stops the sound.** Press Listen again to stop it, restart it, or
       stop a run you are replaying, and the cursor stopped while the notes already played
       rang on, a pedalled bass for a bar or more, and under the next pass if you started

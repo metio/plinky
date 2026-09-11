@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**Left hand as chords works on songs with a singer.** With Other parts showing, a\nsong whose singer is written above the piano kept the composer's full left hand when\nyou chose Left hand as chords, and the run still counted as a practice version. The\npiano's left hand now turns into chords under the singer's line, as it does on a\npiece for piano alone.",
+                twip: true,
+            },
+            {
                 body: "**Stopping Listen stops the sound.** Press Listen again to stop it, restart it, or\nstop a run you are replaying, and the cursor stopped while the notes already played\nrang on, a pedalled bass for a bar or more, and under the next pass if you started\nagain. Playing a sketch back in Compose did the same after Stop. The notes now fade\nthe moment you stop, and anything you are holding on your own keys keeps sounding. A\npiece that plays to its end still lets its last chord ring.",
                 twip: true,
             },

@@ -225,4 +225,55 @@ describe("blockChords", () => {
         const melody = `<?xml version="1.0"?><score-partwise><part-list><score-part id="P1"/></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>${note("C", 4, 1, 1)}</measure></part></score-partwise>`;
         expect(blockChords(domXmlCodec, melody)).toBe(melody);
     });
+
+    // A song: one-staff parts written above the piano, each singing a whole note a bar.
+    const song = (singers: number) => {
+        const sung = `<measure number="1"><attributes><divisions>4</divisions></attributes><note><pitch><step>C</step><octave>5</octave></pitch><duration>16</duration><voice>1</voice><type>whole</type></note></measure><measure number="2"><note><pitch><step>B</step><octave>4</octave></pitch><duration>16</duration><voice>1</voice><type>whole</type></note></measure>`;
+        const ids = Array.from({ length: singers }, (_, index) => `V${index + 1}`);
+        const list = [...ids, "P1"].map((id) => `<score-part id="${id}"/>`).join("");
+        const voices = ids.map((id) => `<part id="${id}">${sung}</part>`).join("");
+        return ALBERTI.replace(
+            /<part-list>.*<\/part-list>/,
+            `<part-list>${list}</part-list>`,
+        ).replace('<part id="P1">', `${voices}<part id="P1">`);
+    };
+    const pianoOf = (xml: string) => {
+        const doc = domXmlCodec.parse(xml);
+        const piano = doc?.querySelector('part[id="P1"]');
+        return piano
+            ? `<score-partwise><part id="P1">${piano.innerHTML}</part></score-partwise>`
+            : "";
+    };
+    const singersOf = (xml: string) =>
+        Array.from(domXmlCodec.parse(xml)?.querySelectorAll('part[id^="V"]') ?? []).map(
+            (part) => part.innerHTML,
+        );
+
+    it("blocks the piano's left hand when a singer is written above it", () => {
+        const art = song(1);
+        const blocked = blockChords(domXmlCodec, art);
+        expect(leftHand(pianoOf(blocked))).toEqual([[[48, 52, 55]], [[43, 47, 53]]]);
+        // The singer is nobody's left hand.
+        expect(singersOf(blocked)).toEqual(singersOf(art));
+    });
+
+    it("blocks the piano's left hand under two one-staff parts", () => {
+        const blocked = blockChords(domXmlCodec, song(2));
+        expect(leftHand(pianoOf(blocked))).toEqual([[[48, 52, 55]], [[43, 47, 53]]]);
+    });
+
+    it("leaves a score with no two-staff part alone", () => {
+        // Three one-staff parts: the last is the played one, and it has no left hand.
+        const trio = `<?xml version="1.0"?><score-partwise><part-list><score-part id="P1"/><score-part id="P2"/><score-part id="P3"/></part-list>${[
+            "P1",
+            "P2",
+            "P3",
+        ]
+            .map(
+                (id) =>
+                    `<part id="${id}"><measure number="1"><attributes><divisions>1</divisions></attributes>${note("C", 4, 1, 1)}</measure></part>`,
+            )
+            .join("")}</score-partwise>`;
+        expect(blockChords(domXmlCodec, trio)).toBe(trio);
+    });
 });

@@ -17,13 +17,14 @@ import type { XmlCodec } from "./xml";
 // How many staves each <part> is written on, in score order. A part that states no
 // <staves> is on one, which is what the format means by leaving it out.
 export function stavesPerPart(doc: Document): number[] {
-    return Array.from(doc.querySelectorAll("score-partwise > part, score-timewise > part")).map(
-        (part) => {
-            const stated = part.querySelector("attributes > staves")?.textContent?.trim();
-            const count = stated === undefined ? Number.NaN : Number.parseInt(stated, 10);
-            return Number.isInteger(count) && count > 0 ? count : 1;
-        },
-    );
+    return partElements(doc).map(stavesOf);
+}
+
+// How many staves one <part> is written on: its declared count, or one.
+export function stavesOf(part: Element): number {
+    const stated = part.querySelector("attributes > staves")?.textContent?.trim();
+    const count = stated === undefined ? Number.NaN : Number.parseInt(stated, 10);
+    return Number.isInteger(count) && count > 0 ? count : 1;
 }
 
 function partElements(doc: Document): Element[] {
