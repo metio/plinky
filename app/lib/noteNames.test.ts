@@ -37,24 +37,6 @@ describe.each(locales.map((locale) => [locale]))("note names in %s", (locale) =>
         });
     });
 
-    it("speaks an H language's black key exactly as its key prints it", () => {
-        // The German sharp word is a suffix, and so is the spelling core prints on the key;
-        // a message that drifted from the table would say one name and print another. Only
-        // the languages whose own names are H letters: Russian letters are H letters too,
-        // but its sharp is the word диез, which says the same note another way.
-        inLocale(locale, () => {
-            const naming = localNaming();
-            if (naming.system === "letters" || naming.system === "solfege") {
-                return;
-            }
-            for (const black of [61, 63, 66, 68, 70]) {
-                expect(spokenNoteIn(black, naming, noteWords())).toBe(
-                    pitchLabelIn(black, naming.system, noteWords()),
-                );
-            }
-        });
-    });
-
     it.each(["auto", "b", "h"] as NoteLetters[])(
         "never calls B natural B beside the language's B-flat-side sharp (%s letters)",
         (letters) => {

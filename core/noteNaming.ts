@@ -60,11 +60,12 @@ export type Naming = {
     // Whether this language writes a minor key's tonic in lower case — h-Moll, a-mol,
     // fiss-moll — which is how its reader tells a minor key from its major at a glance.
     lowerMinor: boolean;
-    // How a black key's sharp is said aloud: the language's own way (a suffix in the H
-    // languages — Cis, Ciss, Cisz — "C sharp" in English), or as a plain word after the
-    // letter ("A mit Kreuz"). Decided here with the letters, because the two must agree:
-    // a German reader hears "Ais" as the key below B, so a German keyboard that says
-    // "Ais" beside a key called "B" names two neighbours alike and B natural not at all.
+    // How a letter system says a black key's sharp aloud: the language's own way ("C
+    // sharp", "C dièse"), or as a plain word after the letter ("A mit Kreuz"). Decided
+    // here with the letters, because the two must agree: a German reader hears "Ais" as
+    // the key below B, so a German keyboard that says "Ais" beside a key called "B" names
+    // two neighbours alike and B natural not at all. The H systems say a key as they
+    // print it, and do re mi always says the word.
     spokenSharp: "language" | "word";
 };
 
@@ -368,11 +369,12 @@ export function keyLabelIn(
 }
 
 // A key as a screen reader should say it, without its octave: "C sharp", "Cis",
-// "do dièse". One rule for every system: a white key is its name, and a black key is the
-// white key below it with the sharp said as the naming decided — never a glyph.
+// "do dièse". A white key is its name, and so is any key of an H system, whose printed
+// name (Cis, Ciss, Cisz) is already how it is said. A black key otherwise is the white
+// key below it with the sharp said as the naming decided — never a glyph.
 export function spokenNoteIn(midi: number, naming: Naming, words: NoteWords): string {
     const slug = slugOf(midi);
-    if (!slug.endsWith("sharp")) {
+    if (!slug.endsWith("sharp") || (naming.system !== "letters" && naming.system !== "solfege")) {
         return noteTextIn(slug, naming.system, words);
     }
     const below = noteSymbolIn(slug.slice(0, 1), naming.system, words);

@@ -330,3 +330,25 @@ describe("openingIn", () => {
         expect(openingIn("", "solfege", "fr")).toBe("");
     });
 });
+
+describe("an H system's black key said aloud", () => {
+    it("is said as it is printed, whatever the page's language", () => {
+        for (const [labels, locale, letters] of [
+            ["all", "en", "h"],
+            ["all", "fr", "h"],
+            ["all", "ru", "auto"],
+            ["all", "de", "auto"],
+        ] as const) {
+            const naming = namingFor(labels, locale, letters);
+            expect(spokenNoteIn(61, naming, WORDS)).toBe("Cis");
+            expect(spokenNoteIn(61, naming, WORDS)).toBe(pitchLabelIn(61, naming.system, WORDS));
+        }
+        expect(spokenNoteIn(70, namingFor("all", "hu"), WORDS)).toBe("Aisz");
+        expect(spokenNoteIn(70, namingFor("all", "nb"), WORDS)).toBe("Aiss");
+    });
+
+    it("leaves a letter system saying its sharp in the language's own word", () => {
+        expect(spokenNoteIn(61, namingFor("all", "en"), WORDS)).toBe("C sharp");
+        expect(spokenNoteIn(61, namingFor("solfege", "en"), WORDS)).toBe("do sharp");
+    });
+});
