@@ -9,6 +9,9 @@
 // The verdict comes from `earVerdict`, so a right or wrong answer reads the same here as
 // on the ladder, the keyboard and the sequence.
 
+import { digitFor } from "../../../core/earAnswer";
+import { useDigitAnswers } from "../../hooks/useDigitAnswers";
+import { EarDigitHint } from "./earDigitHint";
 import { answerClasses, type Verdict } from "./earVerdict";
 
 export function EarChoices<T extends string>({
@@ -28,36 +31,43 @@ export function EarChoices<T extends string>({
     label: string;
 }) {
     const settled = answer !== null;
+    // Scale degrees answer from the number keys too; a chord's or a scale's name has no
+    // digit, so on those grids this claims and hints at nothing.
+    const digits = useDigitAnswers(choices, !settled, onChoose);
     // Wrapping rather than a fixed grid: the drill can be set to as few as two answers, and
     // three columns then stretched each one across a third of the width with the row half
     // empty — a lot of space between two things that belong together. They keep a common
     // minimum so a short name and a long one still make a tidy row, and the group stays
     // centred however many there are.
     return (
-        <fieldset
-            className="mx-auto flex w-full min-w-0 max-w-md flex-wrap justify-center gap-2"
-            aria-label={label}
-        >
-            {choices.map((choice) => {
-                const verdict: Verdict = !settled
-                    ? null
-                    : choice === answer
-                      ? "correct"
-                      : choice === given
-                        ? "wrong"
-                        : null;
-                return (
-                    <button
-                        type="button"
-                        key={choice}
-                        disabled={settled}
-                        onClick={() => onChoose(choice)}
-                        className={`flex min-h-11 min-w-28 flex-auto items-center justify-center rounded-md border px-3 text-center text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, settled)}`}
-                    >
-                        {nameOf(choice)}
-                    </button>
-                );
-            })}
-        </fieldset>
+        <div className="space-y-3">
+            <fieldset
+                className="mx-auto flex w-full min-w-0 max-w-md flex-wrap justify-center gap-2"
+                aria-label={label}
+            >
+                {choices.map((choice) => {
+                    const verdict: Verdict = !settled
+                        ? null
+                        : choice === answer
+                          ? "correct"
+                          : choice === given
+                            ? "wrong"
+                            : null;
+                    return (
+                        <button
+                            type="button"
+                            key={choice}
+                            disabled={settled}
+                            onClick={() => onChoose(choice)}
+                            aria-keyshortcuts={digitFor(choice) ?? undefined}
+                            className={`flex min-h-11 min-w-28 flex-auto items-center justify-center rounded-md border px-3 text-center text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, settled)}`}
+                        >
+                            {nameOf(choice)}
+                        </button>
+                    );
+                })}
+            </fieldset>
+            <EarDigitHint shown={digits.length > 0} />
+        </div>
     );
 }

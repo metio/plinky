@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
+import { digitFor } from "../../../core/earAnswer";
+import { useDigitAnswers } from "../../hooks/useDigitAnswers";
+import { EarDigitHint } from "./earDigitHint";
 import { UndoIcon } from "../ui/icons";
 import { IconButton } from "../ui/button";
 import { VERDICT_BOX } from "./earVerdict";
@@ -62,6 +65,10 @@ export function EarSequence<T extends string>({
         }
     };
 
+    // The number keys fill the next slot: a degree by its own number, a chord by the degree
+    // its numeral stands on.
+    const digits = useDigitAnswers(choices, !settled && entered.length < sequence.length, choose);
+
     const undo = () => {
         if (!settled) {
             setEntered((current) => current.slice(0, -1));
@@ -113,18 +120,35 @@ export function EarSequence<T extends string>({
 
             {/* The keypad: the chords this level can hold. */}
             <div className="mx-auto grid w-full min-w-0 max-w-md grid-cols-4 gap-2 sm:grid-cols-7">
-                {choices.map((degree) => (
-                    <button
-                        type="button"
-                        key={degree}
-                        disabled={settled}
-                        onClick={() => choose(degree)}
-                        className="flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-raised text-sm font-semibold text-ink transition-colors hover:border-accent-solid hover:text-accent-strong disabled:cursor-default disabled:opacity-50"
-                    >
-                        {degree}
-                    </button>
-                ))}
+                {choices.map((degree) => {
+                    const digit = digitFor(degree);
+                    return (
+                        <button
+                            type="button"
+                            key={degree}
+                            disabled={settled}
+                            onClick={() => choose(degree)}
+                            aria-keyshortcuts={digit ?? undefined}
+                            className="relative flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-raised text-sm font-semibold text-ink transition-colors hover:border-accent-solid hover:text-accent-strong disabled:cursor-default disabled:opacity-50"
+                        >
+                            {degree}
+                            {/* A numeral's number key, printed small in the corner the way
+                                a keycap carries a second legend. A degree's label is
+                                already its number and needs none. The name stays the
+                                numeral alone; the shortcut is announced separately. */}
+                            {digit !== null && digit !== degree ? (
+                                <span
+                                    aria-hidden="true"
+                                    className="absolute top-1 right-1.5 text-[10px] leading-none font-normal text-muted tabular-nums"
+                                >
+                                    {digit}
+                                </span>
+                            ) : null}
+                        </button>
+                    );
+                })}
             </div>
+            <EarDigitHint shown={digits.length > 0} />
         </div>
     );
 }
