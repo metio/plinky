@@ -692,7 +692,23 @@
     "meta_assignments_description": "Sastavi zadatak za vježbanje — uređeni popis skladbi i vježbi — i podijeli ga kao datoteku ili poveznicu",
     "assignments_intro": "Zadatak je uređeni popis skladbi i vježbi, svaka s neobaveznim ciljanim tempom i napomenom ako je želiš. Sastavi ga i podijeli kao datoteku ili poveznicu — tko god ga otvori, dobije ga kao stazu, a njegov napredak ostaje na njegovom uređaju.",
     "assignments_received_heading": "S tobom je podijeljen zadatak",
-    "assignments_received_detail": "\"{name}\" — {count} stavki. Uvezi ga da ga dodaš u svoje staze.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} stavka. Uvezi ga da ga dodaš u svoje staze.",
+                "countPlural=few": "\"{name}\" — {count} stavke. Uvezi ga da ga dodaš u svoje staze.",
+                "countPlural=other": "\"{name}\" — {count} stavki. Uvezi ga da ga dodaš u svoje staze."
+            }
+        }
+    ],
     "assignments_import_received": "Uvezi ovaj zadatak",
     "assignments_build_heading": "Sastavi zadatak",
     "assignments_name_placeholder": "Naziv zadatka",
@@ -736,8 +752,41 @@
     "assignments_remove_missing": "Ukloni skladbe koje nedostaju",
     "assignments_remove_missing_label": "Ukloni skladbe koje nedostaju iz {name}",
     "assignments_missing_removed": "Skladbe koje nedostaju uklonjene su iz \"{name}\".",
-    "assignments_available_count": "{available} od {total} skladbi dostupno je na ovom uređaju.",
-    "assignments_imported_partial": "Uvezeno \"{name}\" — {available} od {total} skladbi dostupno je na ovom uređaju.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} od {total} skladbe dostupno je na ovom uređaju.",
+                "totalPlural=few": "{available} od {total} skladbe dostupno je na ovom uređaju.",
+                "totalPlural=other": "{available} od {total} skladbi dostupno je na ovom uređaju."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Uvezeno \"{name}\" — {available} od {total} skladbe dostupno je na ovom uređaju.",
+                "totalPlural=few": "Uvezeno \"{name}\" — {available} od {total} skladbe dostupno je na ovom uređaju.",
+                "totalPlural=other": "Uvezeno \"{name}\" — {available} od {total} skladbi dostupno je na ovom uređaju."
+            }
+        }
+    ],
     "home_assignments": "Zadaci",
     "home_assignments_blurb": "Niz skladbi — učiteljev ili onaj koji sam sastaviš — kao vođena staza vježbanja, uz ocjenu svakog koraka koji svladaš.",
     "progress_days_practiced": "Dana vježbanja",
@@ -1440,7 +1489,22 @@
     "scores_expression": "Izražajnost",
     "assignments_due_label": "Ciljni datum",
     "assignments_due_hint": "Sat, ispit, koncert — neobavezno.",
-    "assignments_left": "Još {count} za naučiti",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Još {count} za naučiti",
+                "countPlural=few": "Još {count} za naučiti",
+                "countPlural=other": "Još {count} za naučiti"
+            }
+        }
+    ],
     "tools_title": "Mali alati",
     "tools_intro": "Stvari koje provjeriš usred vježbanja. Bez računa i bez instrumenta — samo one za kojima stalno posežeš.",
     "learn_intro": "Sve što te Plinky može naučiti izvan skladbi — kako je glazba složena, što znače njezine oznake i sitnice koje provjeriš usred vježbanja.",
@@ -1770,7 +1834,22 @@
     "warmup_card_white": "Samo bijele tipke. Odsviraj ljestvicu da ruka sjedne pa se vrati.",
     "warmup_back": "Natrag na {title}",
     "settings_grand_piano_ready_hint": "Snimke se učitavaju kad ih skladba zatraži, pa broj svaki put kreće od nule i raste dok sviraš. Važno je ono što je na uređaju — to se učita odmah.",
-    "assignments_show_steps": "Prikaži {count} skladbi",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Prikaži {count} skladbu",
+                "countPlural=few": "Prikaži {count} skladbe",
+                "countPlural=other": "Prikaži {count} skladbi"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Izgled tipki",
     "finish_joyful": "Razigrano",
     "finish_glossy": "Sjajno",

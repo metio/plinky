@@ -681,7 +681,22 @@
     "meta_assignments_description": "Építs egy gyakorlófeladatot — egy rendezett listát darabokból és gyakorlatokból — és oszd meg fájlként vagy linkként",
     "assignments_intro": "A feladat darabok és gyakorlatok rendezett listája, mindegyikhez opcionális céltempóval és megjegyzéssel. Állíts össze egyet, és oszd meg fájlként vagy linkként — aki megnyitja, útvonalként kapja meg, és a haladása a saját eszközén marad.",
     "assignments_received_heading": "Megosztottak veled egy feladatot",
-    "assignments_received_detail": "„{name}” — {count} elem. Importáld, hogy hozzáadd az útvonalaidhoz.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "„{name}” — {count} elem. Importáld, hogy hozzáadd az útvonalaidhoz.",
+                "countPlural=other": "„{name}” — {count} elem. Importáld, hogy hozzáadd az útvonalaidhoz."
+            }
+        }
+    ],
     "assignments_import_received": "Feladat importálása",
     "assignments_build_heading": "Feladat összeállítása",
     "assignments_name_placeholder": "Feladat neve",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Hiányzó darabok eltávolítása",
     "assignments_remove_missing_label": "Hiányzó darabok eltávolítása innen: {name}",
     "assignments_missing_removed": "A hiányzó darabok eltávolítva innen: „{name}”.",
-    "assignments_available_count": "{total} darabból {available} érhető el ezen az eszközön.",
-    "assignments_imported_partial": "„{name}” importálva — {total} darabból {available} érhető el ezen az eszközön.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{total} darabból {available} érhető el ezen az eszközön.",
+                "totalPlural=other": "{total} darabból {available} érhető el ezen az eszközön."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "„{name}” importálva — {total} darabból {available} érhető el ezen az eszközön.",
+                "totalPlural=other": "„{name}” importálva — {total} darabból {available} érhető el ezen az eszközön."
+            }
+        }
+    ],
     "home_assignments": "Feladatok",
     "home_assignments_blurb": "Darabok sorozata — egy tanáré, vagy amit magad állítasz össze — vezetett gyakorlóútként, ahol minden lépés értékelést kap, ahogy teljesíted.",
     "progress_days_practiced": "Gyakorolt napok",
@@ -1420,7 +1466,21 @@
     "scores_expression": "Kifejezés",
     "assignments_due_label": "Céldátum",
     "assignments_due_hint": "Egy óra, egy vizsga, egy koncert — opcionális.",
-    "assignments_left": "Még {count} megtanulásra vár",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Még {count} megtanulásra vár",
+                "countPlural=other": "Még {count} megtanulásra vár"
+            }
+        }
+    ],
     "tools_title": "Kis eszközök",
     "tools_intro": "Amiknek gyakorlás közben utánanéznél. Nincs fiók, hangszer sem kell — csak azok, amikhez újra meg újra visszanyúlsz.",
     "meta_tools_description": "Ingyenes zongorás eszközök a böngésződben: hallható kvintkör, skála- és akkordböngésző a billentyűkön, és koppintós tempómérő. Fiók nem kell.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Csak fehér billentyűk. Játszd le a skálát, hogy a kéz elhelyezkedjen, aztán gyere vissza.",
     "warmup_back": "Vissza: {title}",
     "settings_grand_piano_ready_hint": "A felvételek akkor töltődnek be, amikor egy darab kéri őket, így ez minden látogatáskor nulláról indul és játék közben nő. Az számít, ami az eszközön van — az azonnal betöltődik.",
-    "assignments_show_steps": "A {count} darab megjelenítése",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "A {count} darab megjelenítése",
+                "countPlural=other": "A {count} darab megjelenítése"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Billentyűk stílusa",
     "finish_joyful": "Játékos",
     "finish_glossy": "Fényes",

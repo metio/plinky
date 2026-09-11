@@ -681,7 +681,22 @@
     "meta_assignments_description": "Ndërto një detyrë praktike — një listë të renditur pjesësh e ushtrimesh — dhe ndaje si skedar ose lidhje",
     "assignments_intro": "Një detyrë është një listë e renditur pjesësh e ushtrimesh, secila me një tempo objektiv dhe një shënim nëse do. Ndërtoje dhe ndaje si skedar ose lidhje — kushdo që e hap e merr si një shteg, dhe progresi i tij mbetet në pajisjen e vet.",
     "assignments_received_heading": "Një detyrë u nda me ty",
-    "assignments_received_detail": "\"{name}\" — {count} elemente. Importoje për ta shtuar te shtigjet e tua.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} element. Importoje për ta shtuar te shtigjet e tua.",
+                "countPlural=other": "\"{name}\" — {count} elemente. Importoje për ta shtuar te shtigjet e tua."
+            }
+        }
+    ],
     "assignments_import_received": "Importo këtë detyrë",
     "assignments_build_heading": "Ndërto një detyrë",
     "assignments_name_placeholder": "Emri i detyrës",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Hiq pjesët që mungojnë",
     "assignments_remove_missing_label": "Hiq pjesët që mungojnë nga {name}",
     "assignments_missing_removed": "Pjesët që mungojnë u hoqën nga \"{name}\".",
-    "assignments_available_count": "{available} nga {total} pjesë janë të disponueshme në këtë pajisje.",
-    "assignments_imported_partial": "U importua \"{name}\" — {available} nga {total} pjesë janë të disponueshme në këtë pajisje.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} nga {total} pjesë janë të disponueshme në këtë pajisje.",
+                "totalPlural=other": "{available} nga {total} pjesë janë të disponueshme në këtë pajisje."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "U importua \"{name}\" — {available} nga {total} pjesë janë të disponueshme në këtë pajisje.",
+                "totalPlural=other": "U importua \"{name}\" — {available} nga {total} pjesë janë të disponueshme në këtë pajisje."
+            }
+        }
+    ],
     "home_assignments": "Detyrat",
     "home_assignments_blurb": "Një varg pjesësh — i një mësuesi, ose një që ndërton vetë — si një shteg i udhëhequr, ku çdo hap vlerësohet ndërsa e kalon.",
     "progress_days_practiced": "Ditë praktike",
@@ -1420,7 +1466,21 @@
     "scores_expression": "Shprehësia",
     "assignments_due_label": "Data e synuar",
     "assignments_due_hint": "Një mësim, një provim, një koncert — opsionale.",
-    "assignments_left": "Edhe {count} për të mësuar",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Edhe {count} për të mësuar",
+                "countPlural=other": "Edhe {count} për të mësuar"
+            }
+        }
+    ],
     "tools_title": "Vegla të vogla",
     "tools_intro": "Gjëra për t'i parë shpejt mes praktikës. Pa llogari, pa instrument — vetëm ato që të duhen përherë.",
     "meta_tools_description": "Vegla falas pianoje në shfletues: një rreth kuintash që dëgjohet, shkallë e akorde të ndezura mbi taste, dhe një lexues tempoje me trokitje.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Vetëm taste të bardha. Luaj shkallën që dora të vendoset, pastaj kthehu.",
     "warmup_back": "Kthehu te {title}",
     "settings_grand_piano_ready_hint": "Regjistrimet ngarkohen kur një pjesë i kërkon, prandaj numri nis nga zeroja çdo herë dhe rritet ndërsa luan. Rëndësi ka çfarë ndodhet në pajisje — ato ngarkohen menjëherë.",
-    "assignments_show_steps": "Shfaq {count} pjesët",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Shfaq {count} pjesën",
+                "countPlural=other": "Shfaq {count} pjesët"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Pamja e tastave",
     "finish_joyful": "Gazmore",
     "finish_glossy": "Me shkëlqim",

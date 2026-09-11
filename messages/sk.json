@@ -703,7 +703,24 @@
     "meta_assignments_description": "Vytvorte cvičebné zadanie — usporiadaný zoznam skladieb a cvičení — a zdieľajte ho ako súbor alebo odkaz",
     "assignments_intro": "Zadanie je usporiadaný zoznam skladieb a cvičení, každé s voliteľným cieľovým tempom a poznámkou. Zostavte si ho a zdieľajte ako súbor alebo odkaz — kto ho otvorí, dostane ho ako cestu, a jeho pokrok zostane na jeho vlastnom zariadení.",
     "assignments_received_heading": "Bolo s vami zdieľané zadanie",
-    "assignments_received_detail": "„{name}“ — {count} položiek. Importujte ho a pridajte k svojim cestám.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "„{name}“ — {count} položka. Importujte ho a pridajte k svojim cestám.",
+                "countPlural=few": "„{name}“ — {count} položky. Importujte ho a pridajte k svojim cestám.",
+                "countPlural=many": "„{name}“ — {count} položky. Importujte ho a pridajte k svojim cestám.",
+                "countPlural=other": "„{name}“ — {count} položiek. Importujte ho a pridajte k svojim cestám."
+            }
+        }
+    ],
     "assignments_import_received": "Importovať toto zadanie",
     "assignments_build_heading": "Vytvoriť zadanie",
     "assignments_name_placeholder": "Názov zadania",
@@ -747,8 +764,43 @@
     "assignments_remove_missing": "Odstrániť chýbajúce skladby",
     "assignments_remove_missing_label": "Odstrániť chýbajúce skladby zo zadania {name}",
     "assignments_missing_removed": "Chýbajúce skladby boli odstránené zo „{name}“.",
-    "assignments_available_count": "{available} z {total} skladieb je dostupných na tomto zariadení.",
-    "assignments_imported_partial": "Importované „{name}“ — {available} z {total} skladieb je dostupných na tomto zariadení.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} z {total} skladby je dostupných na tomto zariadení.",
+                "totalPlural=few": "{available} z {total} skladieb je dostupných na tomto zariadení.",
+                "totalPlural=many": "{available} z {total} skladby je dostupných na tomto zariadení.",
+                "totalPlural=other": "{available} z {total} skladieb je dostupných na tomto zariadení."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Importované „{name}“ — {available} z {total} skladby je dostupných na tomto zariadení.",
+                "totalPlural=few": "Importované „{name}“ — {available} z {total} skladieb je dostupných na tomto zariadení.",
+                "totalPlural=many": "Importované „{name}“ — {available} z {total} skladby je dostupných na tomto zariadení.",
+                "totalPlural=other": "Importované „{name}“ — {available} z {total} skladieb je dostupných na tomto zariadení."
+            }
+        }
+    ],
     "home_assignments": "Zadania",
     "home_assignments_blurb": "Postupnosť skladieb — od učiteľa, alebo taká, ktorú si zostavíte sami — ako vedená cesta, kde každý krok dostane známku, keď ho zvládnete.",
     "progress_days_practiced": "Precvičené dni",
@@ -1458,7 +1510,23 @@
     "scores_expression": "Výraz",
     "assignments_due_label": "Cieľový dátum",
     "assignments_due_hint": "Hodina, skúška, koncert — nepovinné.",
-    "assignments_left": "Zostáva naučiť: {count}",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Zostáva naučiť: {count}",
+                "countPlural=few": "Zostáva naučiť: {count}",
+                "countPlural=many": "Zostáva naučiť: {count}",
+                "countPlural=other": "Zostáva naučiť: {count}"
+            }
+        }
+    ],
     "tools_title": "Malé pomôcky",
     "tools_intro": "Veci, ktoré si človek počas cvičenia rád overí. Bez registrácie, bez klavíra — len tie, po ktorých stále siahaš.",
     "meta_tools_description": "Klavírne pomôcky v prehliadači zadarmo: kvintový kruh, ktorý si vypočuješ, stupnice a akordy priamo na klávesoch a meranie tempa ťukaním.",
@@ -1797,7 +1865,23 @@
     "warmup_card_white": "Len biele klávesy. Zahraj stupnicu, nech ruka sadne, a vráť sa.",
     "warmup_back": "Späť na {title}",
     "settings_grand_piano_ready_hint": "Nahrávky sa načítajú, keď si ich skladba vyžiada, takže číslo začína pri každej návšteve na nule a rastie počas hrania. Dôležité je, čo je v zariadení — to sa načíta okamžite.",
-    "assignments_show_steps": "Zobraziť {count} skladieb",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Zobraziť {count} skladbu",
+                "countPlural=few": "Zobraziť {count} skladby",
+                "countPlural=many": "Zobraziť {count} skladby",
+                "countPlural=other": "Zobraziť {count} skladieb"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Vzhľad klávesov",
     "finish_joyful": "Hravý",
     "finish_glossy": "Lesklý",

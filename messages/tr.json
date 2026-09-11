@@ -681,7 +681,22 @@
     "meta_assignments_description": "Bir çalışma ödevi oluştur — parçalar ve alıştırmalardan oluşan sıralı bir liste — ve dosya veya bağlantı olarak paylaş",
     "assignments_intro": "Bir ödev; her biri isteğe bağlı bir hedef tempo ve notla, parçalar ve alıştırmalardan oluşan sıralı bir listedir. Bir tane oluştur ve dosya ya da bağlantı olarak paylaş — açan kişi onu bir patika olarak alır, ilerlemesi kendi cihazında kalır.",
     "assignments_received_heading": "Seninle bir ödev paylaşıldı",
-    "assignments_received_detail": "\"{name}\" — {count} öğe. Patikalarına eklemek için içe aktar.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} öğe. Patikalarına eklemek için içe aktar.",
+                "countPlural=other": "\"{name}\" — {count} öğe. Patikalarına eklemek için içe aktar."
+            }
+        }
+    ],
     "assignments_import_received": "Bu ödevi içe aktar",
     "assignments_build_heading": "Bir ödev oluştur",
     "assignments_name_placeholder": "Ödev adı",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Eksik parçaları kaldır",
     "assignments_remove_missing_label": "{name} ödevindeki eksik parçaları kaldır",
     "assignments_missing_removed": "\"{name}\" ödevindeki eksik parçalar kaldırıldı.",
-    "assignments_available_count": "{total} parçadan {available} tanesi bu cihazda mevcut.",
-    "assignments_imported_partial": "\"{name}\" içe aktarıldı — {total} parçadan {available} tanesi bu cihazda mevcut.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{total} parçadan {available} tanesi bu cihazda mevcut.",
+                "totalPlural=other": "{total} parçadan {available} tanesi bu cihazda mevcut."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "\"{name}\" içe aktarıldı — {total} parçadan {available} tanesi bu cihazda mevcut.",
+                "totalPlural=other": "\"{name}\" içe aktarıldı — {total} parçadan {available} tanesi bu cihazda mevcut."
+            }
+        }
+    ],
     "home_assignments": "Ödevler",
     "home_assignments_blurb": "Bir parça dizisi — bir öğretmeninkini ya da kendi oluşturduğunu — rehberli bir patika olarak, her adımı geçtikçe notlanır.",
     "progress_days_practiced": "Çalışılan gün",
@@ -1420,7 +1466,21 @@
     "scores_expression": "İfade",
     "assignments_due_label": "Hedef tarih",
     "assignments_due_hint": "Bir ders, bir sınav, bir dinleti — isteğe bağlı.",
-    "assignments_left": "Öğrenilecek {count} parça kaldı",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Öğrenilecek {count} parça kaldı",
+                "countPlural=other": "Öğrenilecek {count} parça kaldı"
+            }
+        }
+    ],
     "tools_title": "Küçük araçlar",
     "tools_intro": "Çalışmanın ortasında bakıvereceğin şeyler. Hesap yok, çalgı gerekmez — yalnızca sık sık aradıkların.",
     "meta_tools_description": "Tarayıcında ücretsiz piyano araçları: duyabildiğin bir beşliler çemberi, tuşlarda ışıyan dizi ve akorlar, bir de vuruşla tempo ölçer. Hesap gerekmez.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Yalnızca beyaz tuşlar. Elin yerleşsin diye diziyi çal, sonra geri dön.",
     "warmup_back": "{title} parçasına dön",
     "settings_grand_piano_ready_hint": "Kayıtlar bir parça istediğinde yüklenir, bu yüzden sayı her ziyarette sıfırdan başlar ve sen çaldıkça artar. Önemli olan cihazda ne olduğudur — onlar anında yüklenir.",
-    "assignments_show_steps": "{count} parçayı göster",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} parçayı göster",
+                "countPlural=other": "{count} parçayı göster"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Tuşların görünümü",
     "finish_joyful": "Neşeli",
     "finish_glossy": "Parlak",

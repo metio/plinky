@@ -692,7 +692,23 @@
     "meta_assignments_description": "Crea un compito di esercizio — un elenco ordinato di brani ed esercizi — e condividilo come file o link",
     "assignments_intro": "Un compito è un elenco ordinato di brani ed esercizi, ciascuno con un tempo obiettivo e una nota se vuoi. Costruiscine uno e condividilo come file o link — chi lo apre lo riceve come percorso, e i suoi progressi restano sul suo dispositivo.",
     "assignments_received_heading": "Ti è stato condiviso un compito",
-    "assignments_received_detail": "\"{name}\" — {count} elementi. Importalo per aggiungerlo ai tuoi percorsi.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} elemento. Importalo per aggiungerlo ai tuoi percorsi.",
+                "countPlural=many": "\"{name}\" — {count} elementi. Importalo per aggiungerlo ai tuoi percorsi.",
+                "countPlural=other": "\"{name}\" — {count} elementi. Importalo per aggiungerlo ai tuoi percorsi."
+            }
+        }
+    ],
     "assignments_import_received": "Importa questo compito",
     "assignments_build_heading": "Crea un compito",
     "assignments_name_placeholder": "Nome del compito",
@@ -736,8 +752,41 @@
     "assignments_remove_missing": "Rimuovi i brani mancanti",
     "assignments_remove_missing_label": "Rimuovi i brani mancanti da {name}",
     "assignments_missing_removed": "Brani mancanti rimossi da \"{name}\".",
-    "assignments_available_count": "{available} brani su {total} sono disponibili su questo dispositivo.",
-    "assignments_imported_partial": "\"{name}\" importato — {available} brani su {total} sono disponibili su questo dispositivo.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} brano su {total} è disponibile su questo dispositivo.",
+                "totalPlural=many": "{available} brani su {total} sono disponibili su questo dispositivo.",
+                "totalPlural=other": "{available} brani su {total} sono disponibili su questo dispositivo."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "\"{name}\" importato — {available} brano su {total} è disponibile su questo dispositivo.",
+                "totalPlural=many": "\"{name}\" importato — {available} brani su {total} sono disponibili su questo dispositivo.",
+                "totalPlural=other": "\"{name}\" importato — {available} brani su {total} sono disponibili su questo dispositivo."
+            }
+        }
+    ],
     "home_assignments": "Compiti",
     "home_assignments_blurb": "Una sequenza di brani — di un insegnante, o una che crei tu — come percorso guidato, con ogni passo valutato man mano che lo superi.",
     "progress_days_practiced": "Giorni di esercizio",
@@ -1440,7 +1489,22 @@
     "scores_expression": "Espressione",
     "assignments_due_label": "Data obiettivo",
     "assignments_due_hint": "Una lezione, un esame, un saggio — facoltativa.",
-    "assignments_left": "Ancora {count} da imparare",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Ancora {count} da imparare",
+                "countPlural=many": "Ancora {count} da imparare",
+                "countPlural=other": "Ancora {count} da imparare"
+            }
+        }
+    ],
     "tools_title": "Piccoli strumenti",
     "tools_intro": "Cose da controllare al volo mentre suoni. Niente account, niente strumento — solo quelle a cui torni sempre.",
     "learn_intro": "Tutto quello che Plinky può insegnarti fuori da un brano — com'è fatta la musica, cosa vogliono dire i suoi segni, e le piccole cose che controlli al volo mentre suoni.",
@@ -1770,7 +1834,22 @@
     "warmup_card_white": "Solo tasti bianchi. Suona la scala per assestare la mano, poi torna qui.",
     "warmup_back": "Torna a {title}",
     "settings_grand_piano_ready_hint": "Le registrazioni si caricano quando un brano le chiede, quindi il numero riparte da zero a ogni visita e sale mentre suoni. Conta quello che è sul dispositivo: quello si carica subito.",
-    "assignments_show_steps": "Mostra i {count} brani",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Mostra {count} brano",
+                "countPlural=many": "Mostra i {count} brani",
+                "countPlural=other": "Mostra i {count} brani"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Aspetto dei tasti",
     "finish_joyful": "Giocoso",
     "finish_glossy": "Lucido",

@@ -815,7 +815,22 @@
     "meta_assignments_description": "Build a practice assignment — an ordered list of pieces and exercises — and share it as a file or a link",
     "assignments_intro": "An assignment is an ordered list of pieces and exercises, each with a target tempo and note if you want one. Build one and share it as a file or a link — whoever opens it gets it as a track, and their progress stays on their own device.",
     "assignments_received_heading": "An assignment was shared with you",
-    "assignments_received_detail": "\"{name}\" — {count} items. Import it to add it to your tracks.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} item. Import it to add it to your tracks.",
+                "countPlural=other": "\"{name}\" — {count} items. Import it to add it to your tracks."
+            }
+        }
+    ],
     "assignments_import_received": "Import this assignment",
     "assignments_build_heading": "Build an assignment",
     "assignments_name_placeholder": "Assignment name",
@@ -859,8 +874,39 @@
     "assignments_remove_missing": "Remove missing pieces",
     "assignments_remove_missing_label": "Remove missing pieces from {name}",
     "assignments_missing_removed": "Removed the missing pieces from \"{name}\".",
-    "assignments_available_count": "{available} of {total} pieces are available on this device.",
-    "assignments_imported_partial": "Imported \"{name}\" — {available} of {total} pieces are available on this device.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} of {total} piece is available on this device.",
+                "totalPlural=other": "{available} of {total} pieces are available on this device."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Imported \"{name}\" — {available} of {total} piece is available on this device.",
+                "totalPlural=other": "Imported \"{name}\" — {available} of {total} pieces are available on this device."
+            }
+        }
+    ],
     "home_assignments": "Assignments",
     "home_assignments_blurb": "A sequence of pieces — a teacher's, or one you build yourself — as a guided path, with each step graded as you clear it.",
     "progress_days_practiced": "Days practised",
@@ -1431,7 +1477,21 @@
     "scores_expression": "Expression",
     "assignments_due_label": "Working toward",
     "assignments_due_hint": "A lesson, an exam, a recital — optional.",
-    "assignments_left": "{count} still to learn",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} still to learn",
+                "countPlural=other": "{count} still to learn"
+            }
+        }
+    ],
     "tools_title": "Little tools",
     "tools_intro": "Things to look up mid-practice. No account, no instrument needed — just the ones you keep reaching for.",
     "learn_intro": "Everything Plinky can teach you away from a piece — how the music is built, what its marks mean, and the little things you look up mid-practice.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Nothing but white keys. Play the scale to settle your hand, then come back.",
     "warmup_back": "Back to {title}",
     "settings_grand_piano_ready_hint": "Recordings are decoded as a piece asks for them, so this starts at nothing each visit and climbs while you play. What is on the device is what matters — those load instantly.",
-    "assignments_show_steps": "Show the {count} pieces",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Show the {count} piece",
+                "countPlural=other": "Show the {count} pieces"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Keyboard feel",
     "finish_joyful": "Joyful",
     "finish_glossy": "Glossy",

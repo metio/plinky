@@ -150,6 +150,27 @@ describe("every plural message in every locale", () => {
         );
     });
 
+    it("counts an assignment's pieces and items, and what is left of it", () => {
+        expect(m.assignments_show_steps({ count: 1 })).toBe("Show the 1 piece");
+        expect(m.assignments_received_detail({ name: "Set", count: 1 })).toBe(
+            '"Set" — 1 item. Import it to add it to your tracks.',
+        );
+        expect(m.assignments_left({ count: 1 }, { locale: "es" })).toBe("Queda 1 por aprender");
+        expect(m.assignments_left({ count: 3 }, { locale: "es" })).toBe("Quedan 3 por aprender");
+    });
+
+    it("chooses the noun of 'of N pieces' by the total", () => {
+        expect(m.assignments_available_count({ available: 1, total: 2 })).toBe(
+            "1 of 2 pieces are available on this device.",
+        );
+        expect(m.assignments_available_count({ available: 20, total: 21 }, { locale: "ru" })).toBe(
+            "На этом устройстве доступно 20 из 21 пьесы.",
+        );
+        expect(m.assignments_available_count({ available: 0, total: 1 }, { locale: "pl" })).toBe(
+            "Na tym urządzeniu dostępnych jest 0 z 1 utworu.",
+        );
+    });
+
     it("tells Czech two from five", () => {
         expect(m.scores_count({ count: 2 }, { locale: "cs" })).toBe("2 skladby");
         expect(m.scores_count({ count: 5 }, { locale: "cs" })).toBe("5 skladeb");

@@ -39,6 +39,7 @@ const SINGULAR_DIFFERS_FROM = {
 
 const INVARIANT_PJESE = "pjesë is one word for one piece and several";
 const INVARIANT_DITE = "ditë is one word for one day and several";
+const INVARIANT_OBJEKT = "objekt is one word for one item and several";
 const FINNISH_CASE =
     "the noun takes the numeral's case in the singular: yhtenä päivänä, kolmena päivänä";
 
@@ -52,10 +53,18 @@ const SAME_FOR_ONE_AND_MANY = {
     hr: {
         balance_last: "prije takes the genitive, and dana serves one, two and five: prije 1 dana",
         rhythm_staff_label: "od takes the genitive, and note serves one and two: od 1 note",
+        assignments_available_count:
+            "od takes the genitive, and skladbe serves one and two: od 1 skladbe",
+        assignments_imported_partial:
+            "od takes the genitive, and skladbe serves one and two: od 1 skladbe",
     },
     sr: {
         balance_last: "пре takes the genitive, and дана serves one, two and five: пре 1 дана",
         rhythm_staff_label: "од takes the genitive, and ноте serves one and two: од 1 ноте",
+        assignments_available_count:
+            "од takes the genitive, and композиције serves one and two: од 1 композиције",
+        assignments_imported_partial:
+            "од takes the genitive, and композиције serves one and two: од 1 композиције",
     },
     fi: {
         rhythm_staff_label:
@@ -70,6 +79,8 @@ const SAME_FOR_ONE_AND_MANY = {
         today_review: INVARIANT_PJESE,
         today_stand: INVARIANT_PJESE,
         person_pieces: INVARIANT_PJESE,
+        assignments_available_count: INVARIANT_PJESE,
+        assignments_imported_partial: INVARIANT_PJESE,
         achievement_days: INVARIANT_DITE,
         balance_last: INVARIANT_DITE,
         repertoire_days_left: INVARIANT_DITE,
@@ -77,7 +88,8 @@ const SAME_FOR_ONE_AND_MANY = {
         stats_opening_days_more: INVARIANT_DITE,
     },
     sv: {
-        progress_backup_items: "objekt is one word for one item and several",
+        progress_backup_items: INVARIANT_OBJEKT,
+        assignments_received_detail: INVARIANT_OBJEKT,
     },
 };
 

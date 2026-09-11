@@ -670,7 +670,21 @@
     "meta_assignments_description": "创建一份练习作业——一份有序的曲目和练习清单——并以文件或链接分享",
     "assignments_intro": "一份作业，是一串有序的曲目与练习，每项都可以附上目标速度和备注（如果你想的话）。做好一份，以文件或链接分享——打开它的人会得到一条学习路线，进度保存在各自的设备上。",
     "assignments_received_heading": "有人给你分享了一份作业",
-    "assignments_received_detail": "《{name}》——{count} 项。导入后即可加入你的学习路线。",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "《{name}》——{count} 项。导入后即可加入你的学习路线。"
+            }
+        }
+    ],
     "assignments_import_received": "导入这份作业",
     "assignments_build_heading": "创建作业",
     "assignments_name_placeholder": "作业名称",
@@ -714,8 +728,37 @@
     "assignments_remove_missing": "移除缺失的曲目",
     "assignments_remove_missing_label": "从《{name}》中移除缺失的曲目",
     "assignments_missing_removed": "已从《{name}》中移除缺失的曲目。",
-    "assignments_available_count": "{total} 首曲目中有 {available} 首可在此设备上使用。",
-    "assignments_imported_partial": "已导入《{name}》——{total} 首曲目中有 {available} 首可在此设备上使用。",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=other": "{total} 首曲目中有 {available} 首可在此设备上使用。"
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=other": "已导入《{name}》——{total} 首曲目中有 {available} 首可在此设备上使用。"
+            }
+        }
+    ],
     "home_assignments": "作业",
     "home_assignments_blurb": "一串曲目——老师留的，或你自己编排的——组成一条引导式练习路线，每闯过一步都会评级。",
     "progress_days_practiced": "练习天数",
@@ -1402,7 +1445,20 @@
     "scores_expression": "表现力",
     "assignments_due_label": "目标日期",
     "assignments_due_hint": "一节课、一场考试、一次演出——可选。",
-    "assignments_left": "还有 {count} 首要学",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "还有 {count} 首要学"
+            }
+        }
+    ],
     "tools_title": "小工具",
     "tools_intro": "练琴中途想查一下的东西。不用账号，也不用琴——都是你最常翻的那几样。",
     "learn_intro": "曲子之外，Plinky 还能教你的一切——音乐是怎么搭起来的、谱上的记号是什么意思，以及练琴中途想查一下的小东西。",
@@ -1716,7 +1772,20 @@
     "warmup_card_white": "全是白键。弹一遍音阶让手安定下来，然后回来。",
     "warmup_back": "返回《{title}》",
     "settings_grand_piano_ready_hint": "录音在乐曲需要时才载入，所以每次访问都从零开始，随着弹奏增加。真正重要的是设备上的数量 —— 那些会立即载入。",
-    "assignments_show_steps": "显示这 {count} 首",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "显示这 {count} 首"
+            }
+        }
+    ],
     "settings_keyboard_finish": "琴键质感",
     "finish_joyful": "活泼",
     "finish_glossy": "光泽",

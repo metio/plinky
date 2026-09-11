@@ -365,6 +365,12 @@ describe("AssignmentsRoute named works", () => {
         expect(screen.getByText(m.assignments_show_steps({ count: 3 }))).toBeTruthy();
     });
 
+    it("counts a named work of one piece as one piece", async () => {
+        mount(sources([{ id: "one-piece", name: "A single study", items: ["a"] }]));
+        await screen.findByText("A single study");
+        expect(screen.getByText("Show the 1 piece")).toBeTruthy();
+    });
+
     it("shows only the starter when the named works cannot be fetched", async () => {
         mount(emptySources());
         await screen.findByText(m.assignments_builtin_heading());

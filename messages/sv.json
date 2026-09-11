@@ -681,7 +681,22 @@
     "meta_assignments_description": "Bygg en övningsuppgift — en ordnad lista med stycken och övningar — och dela den som en fil eller länk",
     "assignments_intro": "En övningsuppgift är en ordnad lista med stycken och övningar, var och en med ett måltempo och en anteckning om du vill. Bygg en och dela den som en fil eller länk — den som öppnar den får den som ett spår, och deras framsteg stannar på deras egen enhet.",
     "assignments_received_heading": "En uppgift har delats med dig",
-    "assignments_received_detail": "\"{name}\" — {count} objekt. Importera den för att lägga till den bland dina spår.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} objekt. Importera den för att lägga till den bland dina spår.",
+                "countPlural=other": "\"{name}\" — {count} objekt. Importera den för att lägga till den bland dina spår."
+            }
+        }
+    ],
     "assignments_import_received": "Importera den här uppgiften",
     "assignments_build_heading": "Bygg en uppgift",
     "assignments_name_placeholder": "Uppgiftens namn",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Ta bort saknade stycken",
     "assignments_remove_missing_label": "Ta bort saknade stycken från {name}",
     "assignments_missing_removed": "Tog bort de saknade styckena från \"{name}\".",
-    "assignments_available_count": "{available} av {total} stycken är tillgängliga på den här enheten.",
-    "assignments_imported_partial": "Importerade \"{name}\" — {available} av {total} stycken är tillgängliga på den här enheten.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} av {total} stycke är tillgängligt på den här enheten.",
+                "totalPlural=other": "{available} av {total} stycken är tillgängliga på den här enheten."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Importerade \"{name}\" — {available} av {total} stycke är tillgängligt på den här enheten.",
+                "totalPlural=other": "Importerade \"{name}\" — {available} av {total} stycken är tillgängliga på den här enheten."
+            }
+        }
+    ],
     "home_assignments": "Uppgifter",
     "home_assignments_blurb": "En följd av stycken — en lärares, eller en du bygger själv — som en guidad övningsstig, där varje steg betygsätts när du klarar det.",
     "progress_days_practiced": "Dagar övade",
@@ -1421,7 +1467,21 @@
     "scores_expression": "Uttryck",
     "assignments_due_label": "Måldatum",
     "assignments_due_hint": "En lektion, ett prov, en konsert — valfritt.",
-    "assignments_left": "{count} kvar att lära",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kvar att lära",
+                "countPlural=other": "{count} kvar att lära"
+            }
+        }
+    ],
     "tools_title": "Små verktyg",
     "tools_intro": "Sådant du slår upp mitt i övningen. Inget konto, inget instrument — bara det du gång på gång behöver.",
     "learn_intro": "Allt Plinky kan lära dig vid sidan av ett stycke — hur musiken är byggd, vad tecknen betyder och det du slår upp mitt i övningen.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Bara vita tangenter. Spela skalan så handen sätter sig, och kom sedan tillbaka.",
     "warmup_back": "Tillbaka till {title}",
     "settings_grand_piano_ready_hint": "Inspelningar laddas när ett stycke ber om dem, så siffran börjar på noll varje besök och växer medan du spelar. Det som finns på enheten är det som räknas — det laddas direkt.",
-    "assignments_show_steps": "Visa de {count} styckena",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Visa {count} stycke",
+                "countPlural=other": "Visa de {count} styckena"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Tangenternas känsla",
     "finish_joyful": "Lekfull",
     "finish_glossy": "Blank",

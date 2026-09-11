@@ -692,7 +692,23 @@
     "meta_assignments_description": "Направи задатак за вежбање — уређену листу комада и вежби — и подели га као фајл или везу",
     "assignments_intro": "Задатак је уређена листа комада и вежби, свака са циљним темпом и белешком ако желиш. Направи га и подели као фајл или везу — ко га отвори добија га као стазу, а напредак му остаје на сопственом уређају.",
     "assignments_received_heading": "Задатак је подељен с тобом",
-    "assignments_received_detail": "\"{name}\" — {count} ставки. Увези га да га додаш у своје стазе.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} ставка. Увези га да га додаш у своје стазе.",
+                "countPlural=few": "\"{name}\" — {count} ставке. Увези га да га додаш у своје стазе.",
+                "countPlural=other": "\"{name}\" — {count} ставки. Увези га да га додаш у своје стазе."
+            }
+        }
+    ],
     "assignments_import_received": "Увези овај задатак",
     "assignments_build_heading": "Направи задатак",
     "assignments_name_placeholder": "Назив задатка",
@@ -736,8 +752,41 @@
     "assignments_remove_missing": "Уклони композиције које недостају",
     "assignments_remove_missing_label": "Уклони композиције које недостају из {name}",
     "assignments_missing_removed": "Композиције које недостају су уклоњене из \"{name}\".",
-    "assignments_available_count": "{available} од {total} композиција је доступно на овом уређају.",
-    "assignments_imported_partial": "Увезено \"{name}\" — {available} од {total} композиција је доступно на овом уређају.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} од {total} композиције је доступно на овом уређају.",
+                "totalPlural=few": "{available} од {total} композиције је доступно на овом уређају.",
+                "totalPlural=other": "{available} од {total} композиција је доступно на овом уређају."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Увезено \"{name}\" — {available} од {total} композиције је доступно на овом уређају.",
+                "totalPlural=few": "Увезено \"{name}\" — {available} од {total} композиције је доступно на овом уређају.",
+                "totalPlural=other": "Увезено \"{name}\" — {available} од {total} композиција је доступно на овом уређају."
+            }
+        }
+    ],
     "home_assignments": "Задаци",
     "home_assignments_blurb": "Низ комада — наставников, или онај који сам направиш — као вођена стаза вежбања, где се сваки корак оцењује када га пређеш.",
     "progress_days_practiced": "Дана вежбања",
@@ -1439,7 +1488,22 @@
     "scores_expression": "Изражајност",
     "assignments_due_label": "Циљни датум",
     "assignments_due_hint": "Час, испит, концерт — изборно.",
-    "assignments_left": "Још {count} за учење",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Још {count} за учење",
+                "countPlural=few": "Још {count} за учење",
+                "countPlural=other": "Још {count} за учење"
+            }
+        }
+    ],
     "tools_title": "Ситне алатке",
     "tools_intro": "Ствари које провериш усред вежбања. Без налога, без инструмента — само оне за којима стално посежеш.",
     "meta_tools_description": "Бесплатне клавирске алатке у прегледачу: квинтни круг који можеш да чујеш, скале и акорди осветљени на диркама и темпо по куцању. Без налога.",
@@ -1770,7 +1834,22 @@
     "warmup_card_white": "Само беле дирке. Одсвирај лествицу да рука седне па се врати.",
     "warmup_back": "Назад на {title}",
     "settings_grand_piano_ready_hint": "Снимци се учитавају када их комад затражи, па број сваки пут креће од нуле и расте док свираш. Важно је оно што је на уређају — то се учитава одмах.",
-    "assignments_show_steps": "Прикажи {count} комада",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Прикажи {count} комад",
+                "countPlural=few": "Прикажи {count} комада",
+                "countPlural=other": "Прикажи {count} комада"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Изглед дирки",
     "finish_joyful": "Разиграно",
     "finish_glossy": "Сјајно",

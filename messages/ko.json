@@ -670,7 +670,21 @@
     "meta_assignments_description": "연습 과제 — 순서가 있는 곡과 연습 목록 — 을 만들어 파일이나 링크로 공유하세요",
     "assignments_intro": "과제는 곡과 연습을 순서대로 담은 목록이에요, 원한다면 각각에 목표 템포와 메모도 붙일 수 있어요. 하나 만들어서 파일이나 링크로 공유해 보세요 — 여는 사람은 트랙으로 받고, 진행 상황은 각자의 기기에 남아요.",
     "assignments_received_heading": "과제가 공유됐어요",
-    "assignments_received_detail": "\"{name}\" — 항목 {count}개. 가져오면 트랙에 추가돼요.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "\"{name}\" — 항목 {count}개. 가져오면 트랙에 추가돼요."
+            }
+        }
+    ],
     "assignments_import_received": "이 과제 가져오기",
     "assignments_build_heading": "과제 만들기",
     "assignments_name_placeholder": "과제 이름",
@@ -714,8 +728,37 @@
     "assignments_remove_missing": "찾을 수 없는 곡 제거",
     "assignments_remove_missing_label": "{name}에서 찾을 수 없는 곡 제거",
     "assignments_missing_removed": "\"{name}\"에서 찾을 수 없는 곡을 제거했어요.",
-    "assignments_available_count": "{total}곡 중 {available}곡을 이 기기에서 사용할 수 있어요.",
-    "assignments_imported_partial": "\"{name}\"을(를) 가져왔어요 — {total}곡 중 {available}곡을 이 기기에서 사용할 수 있어요.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=other": "{total}곡 중 {available}곡을 이 기기에서 사용할 수 있어요."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=other": "\"{name}\"을(를) 가져왔어요 — {total}곡 중 {available}곡을 이 기기에서 사용할 수 있어요."
+            }
+        }
+    ],
     "home_assignments": "과제",
     "home_assignments_blurb": "곡들을 순서대로 이어놓은 안내 경로예요 — 선생님이 만든 것이든 직접 만든 것이든, 단계를 통과할 때마다 채점돼요.",
     "progress_days_practiced": "연습한 날",
@@ -1401,7 +1444,20 @@
     "scores_expression": "표현",
     "assignments_due_label": "목표 날짜",
     "assignments_due_hint": "레슨, 시험, 발표회 — 선택이에요.",
-    "assignments_left": "{count}곡 더 익히면 돼요",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}곡 더 익히면 돼요"
+            }
+        }
+    ],
     "tools_title": "작은 도구들",
     "tools_intro": "연습하다 잠깐 찾아볼 것들. 계정도, 악기도 필요 없어요 — 자주 손이 가는 것만 모았어요.",
     "meta_tools_description": "브라우저에서 쓰는 무료 피아노 도구: 소리 나는 5도권, 건반에 켜지는 음계와 화음, 탭 템포 측정기. 계정은 필요 없어요.",
@@ -1716,7 +1772,20 @@
     "warmup_card_white": "흰건반뿐입니다. 손이 자리 잡도록 음계를 치고 돌아오세요.",
     "warmup_back": "{title}(으)로 돌아가기",
     "settings_grand_piano_ready_hint": "녹음은 곡이 필요로 할 때 불러옵니다. 방문할 때마다 0에서 시작해 연주하는 동안 늘어납니다. 중요한 것은 기기에 있는 수이고, 그것들은 즉시 불러옵니다.",
-    "assignments_show_steps": "{count}곡 보기",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}곡 보기"
+            }
+        }
+    ],
     "settings_keyboard_finish": "건반 느낌",
     "finish_joyful": "경쾌하게",
     "finish_glossy": "광택",

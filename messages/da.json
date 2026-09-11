@@ -681,7 +681,22 @@
     "meta_assignments_description": "Byg en øveopgave — en ordnet liste af stykker og øvelser — og del den som en fil eller et link",
     "assignments_intro": "En øveopgave er en ordnet liste af stykker og øvelser, hver med et måltempo og en note, hvis du vil. Byg en, og del den som en fil eller et link — den, der åbner den, får den som et spor, og deres fremskridt bliver på deres egen enhed.",
     "assignments_received_heading": "En opgave er blevet delt med dig",
-    "assignments_received_detail": "\"{name}\" — {count} punkter. Importér den for at føje den til dine spor.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} punkt. Importér den for at føje den til dine spor.",
+                "countPlural=other": "\"{name}\" — {count} punkter. Importér den for at føje den til dine spor."
+            }
+        }
+    ],
     "assignments_import_received": "Importér denne opgave",
     "assignments_build_heading": "Byg en opgave",
     "assignments_name_placeholder": "Opgavenavn",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Fjern manglende stykker",
     "assignments_remove_missing_label": "Fjern manglende stykker fra {name}",
     "assignments_missing_removed": "Fjernede de manglende stykker fra \"{name}\".",
-    "assignments_available_count": "{available} af {total} stykker er tilgængelige på denne enhed.",
-    "assignments_imported_partial": "Importerede \"{name}\" — {available} af {total} stykker er tilgængelige på denne enhed.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} af {total} stykke er tilgængeligt på denne enhed.",
+                "totalPlural=other": "{available} af {total} stykker er tilgængelige på denne enhed."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Importerede \"{name}\" — {available} af {total} stykke er tilgængeligt på denne enhed.",
+                "totalPlural=other": "Importerede \"{name}\" — {available} af {total} stykker er tilgængelige på denne enhed."
+            }
+        }
+    ],
     "home_assignments": "Opgaver",
     "home_assignments_blurb": "En række af stykker — en lærers, eller en du selv bygger — som en guidet vej, hvor hvert trin bedømmes, når du klarer det.",
     "progress_days_practiced": "Dage øvet",
@@ -1421,7 +1467,21 @@
     "scores_expression": "Udtryk",
     "assignments_due_label": "Måldato",
     "assignments_due_hint": "En time, en eksamen, en koncert — valgfrit.",
-    "assignments_left": "{count} tilbage at lære",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tilbage at lære",
+                "countPlural=other": "{count} tilbage at lære"
+            }
+        }
+    ],
     "tools_title": "Små værktøjer",
     "tools_intro": "Ting at slå op midt i øvningen. Ingen konto, intet instrument nødvendigt — kun dem, du bliver ved med at bruge.",
     "learn_intro": "Alt det, Plinky kan lære dig ved siden af stykkerne — hvordan musikken virker, hvad tegnene betyder, og de små ting, du slår op midt i øvningen.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Kun hvide tangenter. Spil skalaen, så hånden falder på plads, og kom så tilbage.",
     "warmup_back": "Tilbage til {title}",
     "settings_grand_piano_ready_hint": "Optagelser indlæses, når et stykke beder om dem, så tallet starter på nul hvert besøg og vokser, mens du spiller. Det, der ligger på enheden, er det afgørende — det indlæses straks.",
-    "assignments_show_steps": "Vis de {count} stykker",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Vis {count} stykke",
+                "countPlural=other": "Vis de {count} stykker"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Tangenternes look",
     "finish_joyful": "Legende",
     "finish_glossy": "Blank",

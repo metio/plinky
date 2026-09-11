@@ -681,7 +681,22 @@
     "meta_assignments_description": "Erstelle eine Übungsaufgabe – eine geordnete Liste von Stücken und Übungen – und teile sie als Datei oder Link",
     "assignments_intro": "Eine Aufgabe ist eine geordnete Liste von Stücken und Übungen, jeweils mit einem Zieltempo und einer Notiz, wenn du magst. Erstelle eine und teile sie als Datei oder Link – wer sie öffnet, bekommt sie als Lernpfad, und der Fortschritt bleibt auf dem eigenen Gerät.",
     "assignments_received_heading": "Eine Aufgabe wurde mit dir geteilt",
-    "assignments_received_detail": "\"{name}\" – {count} Einträge. Importiere sie, um sie zu deinen Lernpfaden hinzuzufügen.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" – {count} Eintrag. Importiere sie, um sie zu deinen Lernpfaden hinzuzufügen.",
+                "countPlural=other": "\"{name}\" – {count} Einträge. Importiere sie, um sie zu deinen Lernpfaden hinzuzufügen."
+            }
+        }
+    ],
     "assignments_import_received": "Diese Aufgabe importieren",
     "assignments_build_heading": "Eine Aufgabe erstellen",
     "assignments_name_placeholder": "Aufgabenname",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Fehlende Stücke entfernen",
     "assignments_remove_missing_label": "Fehlende Stücke aus {name} entfernen",
     "assignments_missing_removed": "Fehlende Stücke aus \"{name}\" entfernt.",
-    "assignments_available_count": "{available} von {total} Stücken sind auf diesem Gerät verfügbar.",
-    "assignments_imported_partial": "\"{name}\" importiert — {available} von {total} Stücken sind auf diesem Gerät verfügbar.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} von {total} Stück ist auf diesem Gerät verfügbar.",
+                "totalPlural=other": "{available} von {total} Stücken sind auf diesem Gerät verfügbar."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "\"{name}\" importiert — {available} von {total} Stück ist auf diesem Gerät verfügbar.",
+                "totalPlural=other": "\"{name}\" importiert — {available} von {total} Stücken sind auf diesem Gerät verfügbar."
+            }
+        }
+    ],
     "home_assignments": "Aufgaben",
     "home_assignments_blurb": "Eine Folge von Stücken – von einer Lehrkraft oder von dir selbst zusammengestellt – als geführter Pfad, jeder Schritt bewertet, sobald du ihn schaffst.",
     "progress_days_practiced": "Tage geübt",
@@ -1421,7 +1467,21 @@
     "scores_expression": "Ausdruck",
     "assignments_due_label": "Zieldatum",
     "assignments_due_hint": "Eine Stunde, eine Prüfung, ein Vorspiel — optional.",
-    "assignments_left": "Noch {count} zu lernen",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Noch {count} zu lernen",
+                "countPlural=other": "Noch {count} zu lernen"
+            }
+        }
+    ],
     "tools_title": "Kleine Helfer",
     "tools_intro": "Zum Nachschlagen mitten im Üben. Kein Konto, kein Instrument nötig — nur die, nach denen du immer wieder greifst.",
     "learn_intro": "Alles, was Plinky dir abseits eines Stücks beibringen kann — wie Musik aufgebaut ist, was ihre Zeichen bedeuten, und die Kleinigkeiten, die du mitten im Üben nachschlägst.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Nur weiße Tasten. Spiel die Tonleiter, damit die Hand sitzt, und komm dann zurück.",
     "warmup_back": "Zurück zu {title}",
     "settings_grand_piano_ready_hint": "Aufnahmen werden erst geladen, wenn ein Stück sie braucht. Die Zahl beginnt bei jedem Besuch bei null und wächst beim Spielen. Entscheidend ist, was auf dem Gerät liegt – das lädt sofort.",
-    "assignments_show_steps": "Die {count} Stücke zeigen",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Stück zeigen",
+                "countPlural=other": "Die {count} Stücke zeigen"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Anmutung der Tasten",
     "finish_joyful": "Verspielt",
     "finish_glossy": "Glänzend",

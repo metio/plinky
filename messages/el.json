@@ -681,7 +681,22 @@
     "meta_assignments_description": "Φτιάξε μια εργασία εξάσκησης — μια οργανωμένη λίστα κομματιών και ασκήσεων — και μοιράσου την ως αρχείο ή σύνδεσμο",
     "assignments_intro": "Μια εργασία είναι μια σειρά κομματιών και ασκήσεων, καθεμία με στόχο τέμπο και σημείωση αν θέλεις. Φτιάξε μία και μοιράσου την ως αρχείο ή σύνδεσμο — όποιος την ανοίξει την παίρνει ως διαδρομή, και η πρόοδός του μένει στη δική του συσκευή.",
     "assignments_received_heading": "Μοιράστηκε μαζί σου μια εργασία",
-    "assignments_received_detail": "«{name}» — {count} στοιχεία. Εισήγαγέ την για να την προσθέσεις στις διαδρομές σου.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "«{name}» — {count} στοιχείο. Εισήγαγέ την για να την προσθέσεις στις διαδρομές σου.",
+                "countPlural=other": "«{name}» — {count} στοιχεία. Εισήγαγέ την για να την προσθέσεις στις διαδρομές σου."
+            }
+        }
+    ],
     "assignments_import_received": "Εισαγωγή αυτής της εργασίας",
     "assignments_build_heading": "Φτιάξε μια εργασία",
     "assignments_name_placeholder": "Όνομα εργασίας",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Αφαίρεση κομματιών που λείπουν",
     "assignments_remove_missing_label": "Αφαίρεση των κομματιών που λείπουν από το {name}",
     "assignments_missing_removed": "Τα κομμάτια που λείπουν αφαιρέθηκαν από το «{name}».",
-    "assignments_available_count": "{available} από {total} κομμάτια είναι διαθέσιμα σε αυτή τη συσκευή.",
-    "assignments_imported_partial": "Εισήχθη «{name}» — {available} από {total} κομμάτια είναι διαθέσιμα σε αυτή τη συσκευή.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} από {total} κομμάτι είναι διαθέσιμο σε αυτή τη συσκευή.",
+                "totalPlural=other": "{available} από {total} κομμάτια είναι διαθέσιμα σε αυτή τη συσκευή."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Εισήχθη «{name}» — {available} από {total} κομμάτι είναι διαθέσιμο σε αυτή τη συσκευή.",
+                "totalPlural=other": "Εισήχθη «{name}» — {available} από {total} κομμάτια είναι διαθέσιμα σε αυτή τη συσκευή."
+            }
+        }
+    ],
     "home_assignments": "Εργασίες",
     "home_assignments_blurb": "Μια σειρά κομματιών — ενός δασκάλου, ή μια που φτιάχνεις μόνος σου — σαν καθοδηγούμενη διαδρομή, με κάθε βήμα να βαθμολογείται καθώς το ολοκληρώνεις.",
     "progress_days_practiced": "Μέρες που έπαιξες",
@@ -1421,7 +1467,21 @@
     "scores_expression": "Έκφραση",
     "assignments_due_label": "Ημερομηνία-στόχος",
     "assignments_due_hint": "Ένα μάθημα, μια εξέταση, μια συναυλία — προαιρετικά.",
-    "assignments_left": "Μένουν {count} να μάθεις",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Μένει {count} να μάθεις",
+                "countPlural=other": "Μένουν {count} να μάθεις"
+            }
+        }
+    ],
     "tools_title": "Μικρά εργαλεία",
     "tools_intro": "Πράγματα να κοιτάξεις στα γρήγορα μέσα στην εξάσκηση. Χωρίς λογαριασμό, χωρίς όργανο — μόνο αυτά που πιάνεις ξανά και ξανά.",
     "learn_intro": "Ό,τι μπορεί να σου μάθει το Plinky μακριά από τα κομμάτια — πώς λειτουργεί η μουσική, τι σημαίνουν τα σύμβολά της, και τα μικρά πράγματα που κοιτάς στα γρήγορα μέσα στην εξάσκηση.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Μόνο άσπρα πλήκτρα. Παίξε την κλίμακα για να στρώσει το χέρι και γύρνα πίσω.",
     "warmup_back": "Πίσω στο {title}",
     "settings_grand_piano_ready_hint": "Οι ηχογραφήσεις φορτώνονται όταν τις ζητήσει ένα κομμάτι, οπότε ο αριθμός ξεκινά από το μηδέν κάθε φορά και ανεβαίνει καθώς παίζεις. Σημασία έχει τι υπάρχει στη συσκευή — αυτά φορτώνουν αμέσως.",
-    "assignments_show_steps": "Εμφάνιση των {count} κομματιών",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Εμφάνιση {count} κομματιού",
+                "countPlural=other": "Εμφάνιση των {count} κομματιών"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Αίσθηση πλήκτρων",
     "finish_joyful": "Παιχνιδιάρικο",
     "finish_glossy": "Γυαλιστερό",

@@ -692,7 +692,23 @@
     "meta_assignments_description": "Créez un devoir d'entraînement — une liste ordonnée de morceaux et d'exercices — et partagez-le sous forme de fichier ou de lien",
     "assignments_intro": "Un devoir est une liste ordonnée de morceaux et d'exercices, chacun avec un tempo cible et une note si vous le souhaitez. Créez-en un et partagez-le sous forme de fichier ou de lien — la personne qui l'ouvre le reçoit comme un parcours, et sa progression reste sur son propre appareil.",
     "assignments_received_heading": "Un devoir a été partagé avec vous",
-    "assignments_received_detail": "« {name} » — {count} éléments. Importez-le pour l'ajouter à vos parcours.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "« {name} » — {count} élément. Importez-le pour l'ajouter à vos parcours.",
+                "countPlural=many": "« {name} » — {count} éléments. Importez-le pour l'ajouter à vos parcours.",
+                "countPlural=other": "« {name} » — {count} éléments. Importez-le pour l'ajouter à vos parcours."
+            }
+        }
+    ],
     "assignments_import_received": "Importer ce devoir",
     "assignments_build_heading": "Créer un devoir",
     "assignments_name_placeholder": "Nom du devoir",
@@ -736,8 +752,41 @@
     "assignments_remove_missing": "Retirer les morceaux manquants",
     "assignments_remove_missing_label": "Retirer les morceaux manquants de {name}",
     "assignments_missing_removed": "Morceaux manquants retirés de « {name} ».",
-    "assignments_available_count": "{available} morceaux sur {total} sont disponibles sur cet appareil.",
-    "assignments_imported_partial": "« {name} » importé — {available} morceaux sur {total} sont disponibles sur cet appareil.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} morceau sur {total} est disponible sur cet appareil.",
+                "totalPlural=many": "{available} morceaux sur {total} sont disponibles sur cet appareil.",
+                "totalPlural=other": "{available} morceaux sur {total} sont disponibles sur cet appareil."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "« {name} » importé — {available} morceau sur {total} est disponible sur cet appareil.",
+                "totalPlural=many": "« {name} » importé — {available} morceaux sur {total} sont disponibles sur cet appareil.",
+                "totalPlural=other": "« {name} » importé — {available} morceaux sur {total} sont disponibles sur cet appareil."
+            }
+        }
+    ],
     "home_assignments": "Devoirs",
     "home_assignments_blurb": "Une suite de morceaux — celle d'un professeur, ou la vôtre — comme un parcours guidé, chaque étape étant notée à mesure que vous la franchissez.",
     "progress_days_practiced": "Jours d'entraînement",
@@ -1440,7 +1489,22 @@
     "scores_expression": "Expression",
     "assignments_due_label": "Date visée",
     "assignments_due_hint": "Un cours, un examen, une audition — facultatif.",
-    "assignments_left": "Encore {count} à apprendre",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Encore {count} à apprendre",
+                "countPlural=many": "Encore {count} à apprendre",
+                "countPlural=other": "Encore {count} à apprendre"
+            }
+        }
+    ],
     "tools_title": "Petits outils",
     "tools_intro": "De quoi vérifier une chose au milieu d'une séance. Sans compte, sans instrument — juste ceux que tu ressors tout le temps.",
     "learn_intro": "Tout ce que Plinky peut t'apprendre en dehors d'un morceau — comment la musique est construite, ce que veulent dire ses signes, et les petites choses qu'on vérifie au milieu d'une séance.",
@@ -1770,7 +1834,22 @@
     "warmup_card_white": "Rien que des touches blanches. Jouez la gamme pour poser la main, puis revenez.",
     "warmup_back": "Retour à {title}",
     "settings_grand_piano_ready_hint": "Les enregistrements sont chargés quand un morceau les demande : le compte repart de zéro à chaque visite et monte pendant que vous jouez. Ce qui compte, c'est ce qui est sur l'appareil — cela se charge aussitôt.",
-    "assignments_show_steps": "Voir les {count} morceaux",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Voir {count} morceau",
+                "countPlural=many": "Voir les {count} morceaux",
+                "countPlural=other": "Voir les {count} morceaux"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Aspect des touches",
     "finish_joyful": "Joyeux",
     "finish_glossy": "Brillant",

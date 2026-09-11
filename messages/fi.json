@@ -681,7 +681,22 @@
     "meta_assignments_description": "Luo harjoitustehtävä — järjestetty lista kappaleita ja harjoituksia — ja jaa se tiedostona tai linkkinä",
     "assignments_intro": "Tehtävä on järjestetty lista kappaleita ja harjoituksia, kullakin oma tavoitetempo ja huomautus, jos haluat sellaisen. Rakenna yksi ja jaa se tiedostona tai linkkinä — kuka tahansa sen avaa, saa sen polkuna, ja hänen edistymisensä pysyy hänen omalla laitteellaan.",
     "assignments_received_heading": "Sinulle jaettiin tehtävä",
-    "assignments_received_detail": "\"{name}\" — {count} kohdetta. Tuo se lisätäksesi sen polkuihisi.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} kohde. Tuo se lisätäksesi sen polkuihisi.",
+                "countPlural=other": "\"{name}\" — {count} kohdetta. Tuo se lisätäksesi sen polkuihisi."
+            }
+        }
+    ],
     "assignments_import_received": "Tuo tämä tehtävä",
     "assignments_build_heading": "Luo tehtävä",
     "assignments_name_placeholder": "Tehtävän nimi",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Poista puuttuvat kappaleet",
     "assignments_remove_missing_label": "Poista puuttuvat kappaleet tehtävästä {name}",
     "assignments_missing_removed": "Puuttuvat kappaleet poistettu tehtävästä \"{name}\".",
-    "assignments_available_count": "{available}/{total} kappaletta on saatavilla tällä laitteella.",
-    "assignments_imported_partial": "Tuotu \"{name}\" — {available}/{total} kappaletta on saatavilla tällä laitteella.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available}/{total} kappale on saatavilla tällä laitteella.",
+                "totalPlural=other": "{available}/{total} kappaletta on saatavilla tällä laitteella."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Tuotu \"{name}\" — {available}/{total} kappale on saatavilla tällä laitteella.",
+                "totalPlural=other": "Tuotu \"{name}\" — {available}/{total} kappaletta on saatavilla tällä laitteella."
+            }
+        }
+    ],
     "home_assignments": "Tehtävät",
     "home_assignments_blurb": "Kappalesarja — opettajan tai itse rakentamasi — ohjattuna polkuna, jossa jokainen askel arvostellaan, kun suoritat sen.",
     "progress_days_practiced": "Harjoituspäiviä",
@@ -1421,7 +1467,21 @@
     "scores_expression": "Ilmaisu",
     "assignments_due_label": "Tavoitepäivä",
     "assignments_due_hint": "Tunti, tutkinto, konsertti — valinnainen.",
-    "assignments_left": "{count} vielä opittavana",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} vielä opittavana",
+                "countPlural=other": "{count} vielä opittavana"
+            }
+        }
+    ],
     "tools_title": "Pienet työkalut",
     "tools_intro": "Asioita, joita tarkistat kesken harjoittelun. Ei tiliä, ei soitinta — vain ne, joihin tulee tartuttua yhä uudelleen.",
     "learn_intro": "Kaikki, mitä Plinky voi opettaa kappaleiden ulkopuolella — miten musiikki rakentuu, mitä sen merkit tarkoittavat ja pienet asiat, joita tarkistat kesken harjoittelun.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Pelkkiä valkoisia koskettimia. Soita asteikko, niin käsi asettuu, ja palaa sitten.",
     "warmup_back": "Takaisin: {title}",
     "settings_grand_piano_ready_hint": "Äänitteet ladataan vasta kun kappale pyytää niitä, joten luku alkaa joka kerta nollasta ja kasvaa soittaessasi. Merkitystä on sillä, mitä laitteella on — se latautuu heti.",
-    "assignments_show_steps": "Näytä {count} kappaletta",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Näytä {count} kappale",
+                "countPlural=other": "Näytä {count} kappaletta"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Koskettimien tuntu",
     "finish_joyful": "Leikkisä",
     "finish_glossy": "Kiiltävä",

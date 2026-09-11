@@ -692,7 +692,23 @@
     "meta_assignments_description": "Crea una tarea de práctica —una lista ordenada de piezas y ejercicios— y compártela como archivo o enlace",
     "assignments_intro": "Una asignación es una lista ordenada de piezas y ejercicios, cada uno con un tempo objetivo y una nota si quieres. Crea una y compártela como archivo o enlace: quien la abra la recibe como un itinerario, y su progreso se queda en su propio dispositivo.",
     "assignments_received_heading": "Se ha compartido una tarea contigo",
-    "assignments_received_detail": "«{name}»: {count} elementos. Impórtala para añadirla a tus rutas.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "«{name}»: {count} elemento. Impórtala para añadirla a tus rutas.",
+                "countPlural=many": "«{name}»: {count} elementos. Impórtala para añadirla a tus rutas.",
+                "countPlural=other": "«{name}»: {count} elementos. Impórtala para añadirla a tus rutas."
+            }
+        }
+    ],
     "assignments_import_received": "Importar esta tarea",
     "assignments_build_heading": "Crear una tarea",
     "assignments_name_placeholder": "Nombre de la tarea",
@@ -736,8 +752,41 @@
     "assignments_remove_missing": "Quitar piezas faltantes",
     "assignments_remove_missing_label": "Quitar las piezas faltantes de {name}",
     "assignments_missing_removed": "Se quitaron las piezas faltantes de «{name}».",
-    "assignments_available_count": "{available} de {total} piezas están disponibles en este dispositivo.",
-    "assignments_imported_partial": "Se importó «{name}»: {available} de {total} piezas están disponibles en este dispositivo.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} de {total} pieza está disponible en este dispositivo.",
+                "totalPlural=many": "{available} de {total} piezas están disponibles en este dispositivo.",
+                "totalPlural=other": "{available} de {total} piezas están disponibles en este dispositivo."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Se importó «{name}»: {available} de {total} pieza está disponible en este dispositivo.",
+                "totalPlural=many": "Se importó «{name}»: {available} de {total} piezas están disponibles en este dispositivo.",
+                "totalPlural=other": "Se importó «{name}»: {available} de {total} piezas están disponibles en este dispositivo."
+            }
+        }
+    ],
     "home_assignments": "Tareas",
     "home_assignments_blurb": "Una secuencia de piezas, de un profesor o creada por ti mismo, como un camino guiado, con cada paso calificado al superarlo.",
     "progress_days_practiced": "Días practicados",
@@ -1440,7 +1489,22 @@
     "scores_expression": "Expresión",
     "assignments_due_label": "Fecha objetivo",
     "assignments_due_hint": "Una clase, un examen, una audición — opcional.",
-    "assignments_left": "Quedan {count} por aprender",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Queda {count} por aprender",
+                "countPlural=many": "Quedan {count} por aprender",
+                "countPlural=other": "Quedan {count} por aprender"
+            }
+        }
+    ],
     "tools_title": "Herramientas sueltas",
     "tools_intro": "Cosas que consultar a mitad de práctica. Sin cuenta y sin instrumento — solo las que acabas buscando una y otra vez.",
     "learn_intro": "Todo lo que Plinky puede enseñarte fuera de una pieza: cómo está hecha la música, qué significan sus signos y las cosillas que consultas a mitad de práctica.",
@@ -1770,7 +1834,22 @@
     "warmup_card_white": "Solo teclas blancas. Toca la escala para asentar la mano y vuelve.",
     "warmup_back": "Volver a {title}",
     "settings_grand_piano_ready_hint": "Las grabaciones se cargan cuando una pieza las pide, así que esto empieza en cero cada visita y sube mientras tocas. Lo que importa es lo que hay en el dispositivo: eso se carga al instante.",
-    "assignments_show_steps": "Ver las {count} piezas",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Ver {count} pieza",
+                "countPlural=many": "Ver las {count} piezas",
+                "countPlural=other": "Ver las {count} piezas"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Aspecto de las teclas",
     "finish_joyful": "Alegre",
     "finish_glossy": "Brillante",

@@ -692,7 +692,23 @@
     "meta_assignments_description": "Creează o temă de exersare — o listă ordonată de piese și exerciții — și distribuie-o ca fișier sau link",
     "assignments_intro": "O temă e o listă ordonată de piese și exerciții, fiecare cu un tempo țintă și, dacă vrei, o notă. Construiește una și distribuie-o ca fișier sau link — oricine o deschide o primește ca traseu, iar progresul rămâne pe dispozitivul propriu.",
     "assignments_received_heading": "Ți-a fost distribuită o temă",
-    "assignments_received_detail": "„{name}” — {count} elemente. Importă-o ca să o adaugi la traseele tale.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "„{name}” — {count} element. Importă-o ca să o adaugi la traseele tale.",
+                "countPlural=few": "„{name}” — {count} elemente. Importă-o ca să o adaugi la traseele tale.",
+                "countPlural=other": "„{name}” — {count} de elemente. Importă-o ca să o adaugi la traseele tale."
+            }
+        }
+    ],
     "assignments_import_received": "Importă această temă",
     "assignments_build_heading": "Creează o temă",
     "assignments_name_placeholder": "Numele temei",
@@ -736,8 +752,41 @@
     "assignments_remove_missing": "Elimină piesele lipsă",
     "assignments_remove_missing_label": "Elimină piesele lipsă din {name}",
     "assignments_missing_removed": "Piesele lipsă au fost eliminate din „{name}”.",
-    "assignments_available_count": "{available} din {total} piese sunt disponibile pe acest dispozitiv.",
-    "assignments_imported_partial": "„{name}” importată — {available} din {total} piese sunt disponibile pe acest dispozitiv.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} din {total} piesă sunt disponibile pe acest dispozitiv.",
+                "totalPlural=few": "{available} din {total} piese sunt disponibile pe acest dispozitiv.",
+                "totalPlural=other": "{available} din {total} de piese sunt disponibile pe acest dispozitiv."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "„{name}” importată — {available} din {total} piesă sunt disponibile pe acest dispozitiv.",
+                "totalPlural=few": "„{name}” importată — {available} din {total} piese sunt disponibile pe acest dispozitiv.",
+                "totalPlural=other": "„{name}” importată — {available} din {total} de piese sunt disponibile pe acest dispozitiv."
+            }
+        }
+    ],
     "home_assignments": "Teme",
     "home_assignments_blurb": "O succesiune de piese — a unui profesor, sau una construită de tine — ca un traseu ghidat, cu fiecare pas notat pe măsură ce-l parcurgi.",
     "progress_days_practiced": "Zile de exersare",
@@ -1439,7 +1488,22 @@
     "scores_expression": "Expresivitate",
     "assignments_due_label": "Data țintă",
     "assignments_due_hint": "O lecție, un examen, un recital — opțional.",
-    "assignments_left": "Mai sunt {count} de învățat",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Mai este {count} de învățat",
+                "countPlural=few": "Mai sunt {count} de învățat",
+                "countPlural=other": "Mai sunt {count} de învățat"
+            }
+        }
+    ],
     "tools_title": "Unelte mici",
     "tools_intro": "Lucruri de căutat în mijlocul exersatului. Fără cont, fără instrument — doar cele la care ajungi mereu.",
     "meta_tools_description": "Unelte gratuite de pian în browser: un cerc al cvintelor care se aude, game și acorduri arătate pe clape și un tempo bătut cu degetul. Fără cont.",
@@ -1770,7 +1834,22 @@
     "warmup_card_white": "Numai clape albe. Cântă gama ca să-ți așezi mâna, apoi întoarce-te.",
     "warmup_back": "Înapoi la {title}",
     "settings_grand_piano_ready_hint": "Înregistrările se încarcă atunci când o piesă le cere, așa că numărul pornește de la zero la fiecare vizită și crește în timp ce cânți. Contează ce se află pe dispozitiv — acelea se încarcă imediat.",
-    "assignments_show_steps": "Arată cele {count} piese",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Arată {count} piesă",
+                "countPlural=few": "Arată cele {count} piese",
+                "countPlural=other": "Arată cele {count} de piese"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Aspectul clapelor",
     "finish_joyful": "Jucăuș",
     "finish_glossy": "Lucios",

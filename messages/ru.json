@@ -703,7 +703,24 @@
     "meta_assignments_description": "Составьте задание для занятий — упорядоченный список пьес и упражнений — и поделитесь им как файлом или ссылкой",
     "assignments_intro": "Задание — это упорядоченный список пьес и упражнений, у каждого свой целевой темп и заметка, если захотите. Составьте его и поделитесь файлом или ссылкой — тот, кто откроет, получит его как курс, а прогресс останется на его собственном устройстве.",
     "assignments_received_heading": "Вам поделились заданием",
-    "assignments_received_detail": "«{name}» — элементов: {count}. Импортируйте, чтобы добавить его в свои курсы.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "«{name}» — {count} элемент. Импортируйте, чтобы добавить его в свои курсы.",
+                "countPlural=few": "«{name}» — {count} элемента. Импортируйте, чтобы добавить его в свои курсы.",
+                "countPlural=many": "«{name}» — {count} элементов. Импортируйте, чтобы добавить его в свои курсы.",
+                "countPlural=other": "«{name}» — {count} элементов. Импортируйте, чтобы добавить его в свои курсы."
+            }
+        }
+    ],
     "assignments_import_received": "Импортировать это задание",
     "assignments_build_heading": "Составить задание",
     "assignments_name_placeholder": "Название задания",
@@ -747,8 +764,43 @@
     "assignments_remove_missing": "Убрать отсутствующие пьесы",
     "assignments_remove_missing_label": "Убрать отсутствующие пьесы из {name}",
     "assignments_missing_removed": "Отсутствующие пьесы убраны из «{name}».",
-    "assignments_available_count": "На этом устройстве доступно {available} из {total} пьес.",
-    "assignments_imported_partial": "Импортировано «{name}» — на этом устройстве доступно {available} из {total} пьес.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "На этом устройстве доступно {available} из {total} пьесы.",
+                "totalPlural=few": "На этом устройстве доступно {available} из {total} пьес.",
+                "totalPlural=many": "На этом устройстве доступно {available} из {total} пьес.",
+                "totalPlural=other": "На этом устройстве доступно {available} из {total} пьес."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Импортировано «{name}» — на этом устройстве доступно {available} из {total} пьесы.",
+                "totalPlural=few": "Импортировано «{name}» — на этом устройстве доступно {available} из {total} пьес.",
+                "totalPlural=many": "Импортировано «{name}» — на этом устройстве доступно {available} из {total} пьес.",
+                "totalPlural=other": "Импортировано «{name}» — на этом устройстве доступно {available} из {total} пьес."
+            }
+        }
+    ],
     "home_assignments": "Задания",
     "home_assignments_blurb": "Последовательность пьес — учительская или составленная вами — как путь с указателями, где каждый шаг получает оценку по мере прохождения.",
     "progress_days_practiced": "Дней занятий",
@@ -1458,7 +1510,23 @@
     "scores_expression": "Выразительность",
     "assignments_due_label": "Целевая дата",
     "assignments_due_hint": "Урок, экзамен, концерт — по желанию.",
-    "assignments_left": "Осталось выучить: {count}",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Осталось выучить: {count}",
+                "countPlural=few": "Осталось выучить: {count}",
+                "countPlural=many": "Осталось выучить: {count}",
+                "countPlural=other": "Осталось выучить: {count}"
+            }
+        }
+    ],
     "tools_title": "Полезные мелочи",
     "tools_intro": "То, что бывает нужно посмотреть посреди занятия. Без регистрации и без инструмента — только то, к чему возвращаешься чаще всего.",
     "meta_tools_description": "Бесплатные фортепианные мелочи в браузере: звучащий квинтовый круг, гаммы и аккорды прямо на клавишах и определитель темпа. Без регистрации.",
@@ -1797,7 +1865,23 @@
     "warmup_card_white": "Только белые клавиши. Сыграйте гамму, чтобы рука легла, и возвращайтесь.",
     "warmup_back": "Назад к «{title}»",
     "settings_grand_piano_ready_hint": "Записи загружаются, когда их запрашивает пьеса, поэтому счёт начинается с нуля при каждом визите и растёт по мере игры. Важно то, что есть на устройстве, — оно загружается мгновенно.",
-    "assignments_show_steps": "Показать {count} пьес",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Показать {count} пьесу",
+                "countPlural=few": "Показать {count} пьесы",
+                "countPlural=many": "Показать {count} пьес",
+                "countPlural=other": "Показать {count} пьес"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Вид клавиш",
     "finish_joyful": "Весёлый",
     "finish_glossy": "Глянцевый",

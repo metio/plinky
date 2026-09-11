@@ -681,7 +681,22 @@
     "meta_assignments_description": "Stel een oefenopdracht samen — een geordende lijst van stukken en oefeningen — en deel die als bestand of link",
     "assignments_intro": "Een opdracht is een geordende lijst van stukken en oefeningen, elk met een doeltempo en notitie als je dat wilt. Stel er een samen en deel hem als bestand of link — wie hem opent, krijgt hem als traject, en hun voortgang blijft op hun eigen apparaat.",
     "assignments_received_heading": "Er is een opdracht met je gedeeld",
-    "assignments_received_detail": "\"{name}\" — {count} onderdelen. Importeer hem om hem aan je trajecten toe te voegen.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} onderdeel. Importeer hem om hem aan je trajecten toe te voegen.",
+                "countPlural=other": "\"{name}\" — {count} onderdelen. Importeer hem om hem aan je trajecten toe te voegen."
+            }
+        }
+    ],
     "assignments_import_received": "Deze opdracht importeren",
     "assignments_build_heading": "Een opdracht samenstellen",
     "assignments_name_placeholder": "Naam van opdracht",
@@ -725,8 +740,39 @@
     "assignments_remove_missing": "Ontbrekende stukken verwijderen",
     "assignments_remove_missing_label": "Ontbrekende stukken verwijderen uit {name}",
     "assignments_missing_removed": "Ontbrekende stukken verwijderd uit \"{name}\".",
-    "assignments_available_count": "{available} van de {total} stukken zijn beschikbaar op dit apparaat.",
-    "assignments_imported_partial": "\"{name}\" geïmporteerd — {available} van de {total} stukken zijn beschikbaar op dit apparaat.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} van het {total} stuk is beschikbaar op dit apparaat.",
+                "totalPlural=other": "{available} van de {total} stukken zijn beschikbaar op dit apparaat."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "\"{name}\" geïmporteerd — {available} van het {total} stuk is beschikbaar op dit apparaat.",
+                "totalPlural=other": "\"{name}\" geïmporteerd — {available} van de {total} stukken zijn beschikbaar op dit apparaat."
+            }
+        }
+    ],
     "home_assignments": "Opdrachten",
     "home_assignments_blurb": "Een reeks stukken — van een docent, of zelf samengesteld — als begeleid pad, waarbij elke stap een cijfer krijgt zodra je hem afrondt.",
     "progress_days_practiced": "Geoefende dagen",
@@ -1421,7 +1467,21 @@
     "scores_expression": "Expressie",
     "assignments_due_label": "Streefdatum",
     "assignments_due_hint": "Een les, een examen, een uitvoering — optioneel.",
-    "assignments_left": "Nog {count} te leren",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Nog {count} te leren",
+                "countPlural=other": "Nog {count} te leren"
+            }
+        }
+    ],
     "tools_title": "Kleine hulpjes",
     "tools_intro": "Dingen om even op te zoeken tijdens het spelen. Geen account, geen instrument nodig — alleen die je steeds weer gebruikt.",
     "learn_intro": "Alles wat Plinky je kan leren buiten een stuk om — hoe muziek in elkaar zit, wat de tekens betekenen, en de kleine dingen die je tijdens het oefenen even opzoekt.",
@@ -1743,7 +1803,21 @@
     "warmup_card_white": "Alleen witte toetsen. Speel de toonladder om je hand te laten wennen en kom dan terug.",
     "warmup_back": "Terug naar {title}",
     "settings_grand_piano_ready_hint": "Opnamen worden pas geladen als een stuk erom vraagt, dus dit begint elk bezoek op nul en loopt op terwijl je speelt. Wat op het apparaat staat telt — dat laadt meteen.",
-    "assignments_show_steps": "Toon de {count} stukken",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Toon {count} stuk",
+                "countPlural=other": "Toon de {count} stukken"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Uitstraling van de toetsen",
     "finish_joyful": "Speels",
     "finish_glossy": "Glanzend",

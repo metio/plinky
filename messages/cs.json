@@ -703,7 +703,24 @@
     "meta_assignments_description": "Sestavte cvičební úkol — uspořádaný seznam skladeb a cvičení — a sdílejte ho jako soubor nebo odkaz",
     "assignments_intro": "Zadání je uspořádaný seznam skladeb a cvičení, každé s volitelným cílovým tempem a poznámkou. Sestavte si ho a sdílejte jako soubor nebo odkaz — kdo ho otevře, dostane ho jako cestu, a jeho pokrok zůstává na jeho vlastním zařízení.",
     "assignments_received_heading": "Byl s vámi sdílen úkol",
-    "assignments_received_detail": "\"{name}\" — {count} položek. Naimportujte ho a přidejte do svých cest.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} položka. Naimportujte ho a přidejte do svých cest.",
+                "countPlural=few": "\"{name}\" — {count} položky. Naimportujte ho a přidejte do svých cest.",
+                "countPlural=many": "\"{name}\" — {count} položky. Naimportujte ho a přidejte do svých cest.",
+                "countPlural=other": "\"{name}\" — {count} položek. Naimportujte ho a přidejte do svých cest."
+            }
+        }
+    ],
     "assignments_import_received": "Importovat tento úkol",
     "assignments_build_heading": "Sestavit úkol",
     "assignments_name_placeholder": "Název úkolu",
@@ -747,8 +764,43 @@
     "assignments_remove_missing": "Odebrat chybějící skladby",
     "assignments_remove_missing_label": "Odebrat chybějící skladby z {name}",
     "assignments_missing_removed": "Chybějící skladby byly z \"{name}\" odebrány.",
-    "assignments_available_count": "{available} z {total} skladeb je na tomto zařízení k dispozici.",
-    "assignments_imported_partial": "Naimportováno \"{name}\" — {available} z {total} skladeb je na tomto zařízení k dispozici.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "{available} z {total} skladby je na tomto zařízení k dispozici.",
+                "totalPlural=few": "{available} z {total} skladeb je na tomto zařízení k dispozici.",
+                "totalPlural=many": "{available} z {total} skladby je na tomto zařízení k dispozici.",
+                "totalPlural=other": "{available} z {total} skladeb je na tomto zařízení k dispozici."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Naimportováno \"{name}\" — {available} z {total} skladby je na tomto zařízení k dispozici.",
+                "totalPlural=few": "Naimportováno \"{name}\" — {available} z {total} skladeb je na tomto zařízení k dispozici.",
+                "totalPlural=many": "Naimportováno \"{name}\" — {available} z {total} skladby je na tomto zařízení k dispozici.",
+                "totalPlural=other": "Naimportováno \"{name}\" — {available} z {total} skladeb je na tomto zařízení k dispozici."
+            }
+        }
+    ],
     "home_assignments": "Úkoly",
     "home_assignments_blurb": "Řada skladeb — od učitele, nebo vlastní sestavená — jako vedená cesta, kde každý zvládnutý krok dostane známku.",
     "progress_days_practiced": "Procvičené dny",
@@ -1458,7 +1510,23 @@
     "scores_expression": "Výraz",
     "assignments_due_label": "Cílové datum",
     "assignments_due_hint": "Hodina, zkouška, koncert — nepovinné.",
-    "assignments_left": "Zbývá naučit: {count}",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Zbývá naučit: {count}",
+                "countPlural=few": "Zbývá naučit: {count}",
+                "countPlural=many": "Zbývá naučit: {count}",
+                "countPlural=other": "Zbývá naučit: {count}"
+            }
+        }
+    ],
     "tools_title": "Malé pomůcky",
     "tools_intro": "Věci, které si během cvičení potřebuješ ověřit. Bez účtu, bez nástroje — jen ty, po kterých pořád saháš.",
     "meta_tools_description": "Klavírní pomůcky zdarma v prohlížeči: kvintový kruh, který si můžete poslechnout, stupnice a akordy na klávesách a ťukané tempo. Bez registrace.",
@@ -1797,7 +1865,23 @@
     "warmup_card_white": "Jen bílé klávesy. Zahraj stupnici, ať ruka sedne, a vrať se.",
     "warmup_back": "Zpět na {title}",
     "settings_grand_piano_ready_hint": "Nahrávky se načtou, až si o ně skladba řekne, takže číslo začíná při každé návštěvě na nule a roste během hraní. Důležité je, co je v zařízení — to se načte okamžitě.",
-    "assignments_show_steps": "Zobrazit {count} skladeb",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Zobrazit {count} skladbu",
+                "countPlural=few": "Zobrazit {count} skladby",
+                "countPlural=many": "Zobrazit {count} skladby",
+                "countPlural=other": "Zobrazit {count} skladeb"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Vzhled kláves",
     "finish_joyful": "Hravý",
     "finish_glossy": "Lesklý",

@@ -703,7 +703,24 @@
     "meta_assignments_description": "Zbuduj zadanie ćwiczeniowe — uporządkowaną listę utworów i ćwiczeń — i udostępnij je jako plik lub link",
     "assignments_intro": "Zadanie to uporządkowana lista utworów i ćwiczeń, z opcjonalnym docelowym tempem i notatką przy każdym. Zbuduj je i udostępnij jako plik albo link — każdy, kto je otworzy, dostanie je jako ścieżkę, a jego postępy zostaną na jego własnym urządzeniu.",
     "assignments_received_heading": "Udostępniono ci zadanie",
-    "assignments_received_detail": "\"{name}\" — {count} pozycji. Zaimportuj je, aby dodać do swoich ścieżek.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "\"{name}\" — {count} pozycja. Zaimportuj je, aby dodać do swoich ścieżek.",
+                "countPlural=few": "\"{name}\" — {count} pozycje. Zaimportuj je, aby dodać do swoich ścieżek.",
+                "countPlural=many": "\"{name}\" — {count} pozycji. Zaimportuj je, aby dodać do swoich ścieżek.",
+                "countPlural=other": "\"{name}\" — {count} pozycji. Zaimportuj je, aby dodać do swoich ścieżek."
+            }
+        }
+    ],
     "assignments_import_received": "Zaimportuj to zadanie",
     "assignments_build_heading": "Zbuduj zadanie",
     "assignments_name_placeholder": "Nazwa zadania",
@@ -747,8 +764,43 @@
     "assignments_remove_missing": "Usuń brakujące utwory",
     "assignments_remove_missing_label": "Usuń brakujące utwory z {name}",
     "assignments_missing_removed": "Usunięto brakujące utwory z \"{name}\".",
-    "assignments_available_count": "Na tym urządzeniu dostępnych jest {available} z {total} utworów.",
-    "assignments_imported_partial": "Zaimportowano \"{name}\" — na tym urządzeniu dostępnych jest {available} z {total} utworów.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Na tym urządzeniu dostępnych jest {available} z {total} utworu.",
+                "totalPlural=few": "Na tym urządzeniu dostępnych jest {available} z {total} utworów.",
+                "totalPlural=many": "Na tym urządzeniu dostępnych jest {available} z {total} utworów.",
+                "totalPlural=other": "Na tym urządzeniu dostępnych jest {available} z {total} utworów."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Zaimportowano \"{name}\" — na tym urządzeniu dostępnych jest {available} z {total} utworu.",
+                "totalPlural=few": "Zaimportowano \"{name}\" — na tym urządzeniu dostępnych jest {available} z {total} utworów.",
+                "totalPlural=many": "Zaimportowano \"{name}\" — na tym urządzeniu dostępnych jest {available} z {total} utworów.",
+                "totalPlural=other": "Zaimportowano \"{name}\" — na tym urządzeniu dostępnych jest {available} z {total} utworów."
+            }
+        }
+    ],
     "home_assignments": "Zadania",
     "home_assignments_blurb": "Sekwencja utworów — od nauczyciela albo zbudowana przez ciebie — jako prowadzona ścieżka, w której każdy krok dostaje ocenę, gdy go pokonasz.",
     "progress_days_practiced": "Dni ćwiczeń",
@@ -1459,7 +1511,23 @@
     "scores_expression": "Wyraz",
     "assignments_due_label": "Data docelowa",
     "assignments_due_hint": "Lekcja, egzamin, koncert — opcjonalnie.",
-    "assignments_left": "Jeszcze {count} do opanowania",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Jeszcze {count} do opanowania",
+                "countPlural=few": "Jeszcze {count} do opanowania",
+                "countPlural=many": "Jeszcze {count} do opanowania",
+                "countPlural=other": "Jeszcze {count} do opanowania"
+            }
+        }
+    ],
     "tools_title": "Małe narzędzia",
     "tools_intro": "Rzeczy do sprawdzenia w trakcie ćwiczenia. Bez konta, bez instrumentu — tylko te, po które sięgasz najczęściej.",
     "learn_intro": "Wszystko, czego Plinky może cię nauczyć poza utworami — jak działa muzyka, co oznaczają jej znaki i drobiazgi, które sprawdzasz w trakcie ćwiczenia.",
@@ -1797,7 +1865,23 @@
     "warmup_card_white": "Same białe klawisze. Zagraj gamę, żeby ręka się ułożyła, i wróć.",
     "warmup_back": "Powrót do {title}",
     "settings_grand_piano_ready_hint": "Nagrania wczytują się, gdy utwór ich potrzebuje, więc liczba zaczyna się od zera przy każdej wizycie i rośnie w trakcie grania. Liczy się to, co jest na urządzeniu — to wczytuje się natychmiast.",
-    "assignments_show_steps": "Pokaż {count} utworów",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Pokaż {count} utwór",
+                "countPlural=few": "Pokaż {count} utwory",
+                "countPlural=many": "Pokaż {count} utworów",
+                "countPlural=other": "Pokaż {count} utworów"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Wygląd klawiszy",
     "finish_joyful": "Wesoły",
     "finish_glossy": "Błyszczący",

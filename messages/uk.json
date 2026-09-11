@@ -703,7 +703,24 @@
     "meta_assignments_description": "Створіть завдання для практики — упорядкований список п’єс і вправ — і поділіться ним як файлом чи посиланням",
     "assignments_intro": "Завдання — це впорядкований список п’єс і вправ, кожна з цільовим темпом і приміткою, якщо забажаєте. Складіть його та поділіться як файлом чи посиланням — хто відкриє, отримає його як курс, і його прогрес лишиться на його ж пристрої.",
     "assignments_received_heading": "Вам надіслали завдання",
-    "assignments_received_detail": "«{name}» — {count} елементів. Імпортуйте, щоб додати до своїх курсів.",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "«{name}» — {count} елемент. Імпортуйте, щоб додати до своїх курсів.",
+                "countPlural=few": "«{name}» — {count} елементи. Імпортуйте, щоб додати до своїх курсів.",
+                "countPlural=many": "«{name}» — {count} елементів. Імпортуйте, щоб додати до своїх курсів.",
+                "countPlural=other": "«{name}» — {count} елементів. Імпортуйте, щоб додати до своїх курсів."
+            }
+        }
+    ],
     "assignments_import_received": "Імпортувати це завдання",
     "assignments_build_heading": "Створити завдання",
     "assignments_name_placeholder": "Назва завдання",
@@ -747,8 +764,43 @@
     "assignments_remove_missing": "Прибрати відсутні твори",
     "assignments_remove_missing_label": "Прибрати відсутні твори із {name}",
     "assignments_missing_removed": "Відсутні твори прибрано з «{name}».",
-    "assignments_available_count": "На цьому пристрої доступно {available} з {total} творів.",
-    "assignments_imported_partial": "Імпортовано «{name}» — на цьому пристрої доступно {available} з {total} творів.",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "На цьому пристрої доступно {available} з {total} твору.",
+                "totalPlural=few": "На цьому пристрої доступно {available} з {total} творів.",
+                "totalPlural=many": "На цьому пристрої доступно {available} з {total} творів.",
+                "totalPlural=other": "На цьому пристрої доступно {available} з {total} творів."
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=one": "Імпортовано «{name}» — на цьому пристрої доступно {available} з {total} твору.",
+                "totalPlural=few": "Імпортовано «{name}» — на цьому пристрої доступно {available} з {total} творів.",
+                "totalPlural=many": "Імпортовано «{name}» — на цьому пристрої доступно {available} з {total} творів.",
+                "totalPlural=other": "Імпортовано «{name}» — на цьому пристрої доступно {available} з {total} творів."
+            }
+        }
+    ],
     "home_assignments": "Завдання",
     "home_assignments_blurb": "Послідовність п’єс — вчительська або складена вами самими — як напрямний шлях, де кожен крок отримує оцінку, щойно ви його долаєте.",
     "progress_days_practiced": "Днів практики",
@@ -1459,7 +1511,23 @@
     "scores_expression": "Виразність",
     "assignments_due_label": "Цільова дата",
     "assignments_due_hint": "Урок, іспит, концерт — необов’язково.",
-    "assignments_left": "Лишилося вивчити: {count}",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Лишилося вивчити: {count}",
+                "countPlural=few": "Лишилося вивчити: {count}",
+                "countPlural=many": "Лишилося вивчити: {count}",
+                "countPlural=other": "Лишилося вивчити: {count}"
+            }
+        }
+    ],
     "tools_title": "Маленькі помічники",
     "tools_intro": "Те, що зручно підглянути посеред заняття. Без облікового запису, без піаніно — лише те, до чого повертаєшся найчастіше.",
     "learn_intro": "Усе, чого Plinky може навчити поза п’єсою — як влаштована музика, що означають її знаки і дрібниці, які зручно підглянути посеред заняття.",
@@ -1797,7 +1865,23 @@
     "warmup_card_white": "Лише білі клавіші. Зіграйте гаму, щоб рука лягла, і повертайтеся.",
     "warmup_back": "Назад до «{title}»",
     "settings_grand_piano_ready_hint": "Записи завантажуються, коли їх просить п'єса, тож лік починається з нуля щовізиту й зростає, поки ви граєте. Важливо те, що є на пристрої, — воно завантажується миттєво.",
-    "assignments_show_steps": "Показати {count} п'єс",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Показати {count} п'єсу",
+                "countPlural=few": "Показати {count} п'єси",
+                "countPlural=many": "Показати {count} п'єс",
+                "countPlural=other": "Показати {count} п'єс"
+            }
+        }
+    ],
     "settings_keyboard_finish": "Вигляд клавіш",
     "finish_joyful": "Веселий",
     "finish_glossy": "Глянцевий",

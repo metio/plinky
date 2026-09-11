@@ -670,7 +670,21 @@
     "meta_assignments_description": "練習課題 — 曲と練習の順序付きリスト — を作成し、ファイルやリンクで共有しましょう",
     "assignments_intro": "課題は曲や練習の順序リストで、それぞれに目標テンポとメモを付けられます。作ったらファイルかリンクとしてシェアでき、開いた人はそれをトラックとして受け取り、進捗は各自の端末に保存されます。",
     "assignments_received_heading": "課題が共有されました",
-    "assignments_received_detail": "「{name}」 — {count} 項目。取り込んでトラックに追加しましょう。",
+    "assignments_received_detail": [
+        {
+            "declarations": [
+                "input name",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "「{name}」 — {count} 項目。取り込んでトラックに追加しましょう。"
+            }
+        }
+    ],
     "assignments_import_received": "この課題を取り込む",
     "assignments_build_heading": "課題を作成",
     "assignments_name_placeholder": "課題名",
@@ -714,8 +728,37 @@
     "assignments_remove_missing": "見つからない曲を削除",
     "assignments_remove_missing_label": "「{name}」から見つからない曲を削除",
     "assignments_missing_removed": "「{name}」から見つからない曲を削除しました。",
-    "assignments_available_count": "{total} 曲中 {available} 曲がこの端末で利用できます。",
-    "assignments_imported_partial": "「{name}」を取り込みました — {total} 曲中 {available} 曲がこの端末で利用できます。",
+    "assignments_available_count": [
+        {
+            "declarations": [
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=other": "{total} 曲中 {available} 曲がこの端末で利用できます。"
+            }
+        }
+    ],
+    "assignments_imported_partial": [
+        {
+            "declarations": [
+                "input name",
+                "input available",
+                "input total",
+                "local totalPlural = total: plural"
+            ],
+            "selectors": [
+                "totalPlural"
+            ],
+            "match": {
+                "totalPlural=other": "「{name}」を取り込みました — {total} 曲中 {available} 曲がこの端末で利用できます。"
+            }
+        }
+    ],
     "home_assignments": "課題",
     "home_assignments_blurb": "曲を並べた一連の流れ — 先生が作ったものでも、自分で組んだものでも、道しるべのように進めます。クリアするたびに各ステップが採点されます。",
     "progress_days_practiced": "練習した日数",
@@ -1401,7 +1444,20 @@
     "scores_expression": "表現",
     "assignments_due_label": "目標の日",
     "assignments_due_hint": "レッスン、試験、発表会 — 任意です。",
-    "assignments_left": "あと {count} 曲",
+    "assignments_left": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "あと {count} 曲"
+            }
+        }
+    ],
     "tools_title": "小さな道具",
     "tools_intro": "練習の合間に調べたいこと。アカウントも楽器もいりません — よく手が伸びるものだけを集めました。",
     "meta_tools_description": "ブラウザで使える無料のピアノ道具：音の出る五度圏、鍵盤で光る音階と和音、タップで測るテンポ。アカウントは不要です。",
@@ -1716,7 +1772,20 @@
     "warmup_card_white": "白鍵だけです。手をなじませる音階を弾いてから戻ってきてください。",
     "warmup_back": "{title} に戻る",
     "settings_grand_piano_ready_hint": "録音は曲が必要としたときに読み込まれます。訪れるたびにゼロから始まり、弾くうちに増えます。大事なのは端末にある数で、そちらはすぐ読み込まれます。",
-    "assignments_show_steps": "{count}曲を表示",
+    "assignments_show_steps": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}曲を表示"
+            }
+        }
+    ],
     "settings_keyboard_finish": "鍵盤の質感",
     "finish_joyful": "たのしい",
     "finish_glossy": "つやあり",
