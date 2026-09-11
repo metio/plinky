@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { isComplex } from "./plural-messages.mjs";
+
 // Finds counted messages whose singular reads exactly like the plural, in a language that
 // tells the two apart. A translation that copies the plural into the singular arm compiles,
 // interpolates the right placeholders and covers every plural category, so each of the
@@ -65,9 +67,6 @@ const SAME_FOR_ONE_AND_MANY = {
         progress_backup_items: "objekt is one word for one item and several",
     },
 };
-
-const isComplex = (value) =>
-    Array.isArray(value) && typeof value[0]?.match === "object" && value[0].match !== null;
 
 // A plural message's arms by category: "countPlural=few" is the `few` arm.
 function armsByCategory(value) {

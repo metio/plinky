@@ -19,6 +19,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { armsOf, isComplex, pluralProblems } from "./plural-messages.mjs";
 import { singularCopies } from "./singular-copies.mjs";
 import { OFFLINE_MESSAGES } from "./stamp-sw.mjs";
 
@@ -44,12 +45,6 @@ function messagesOf(locale) {
         ),
     );
 }
-
-const isComplex = (value) =>
-    Array.isArray(value) && typeof value[0]?.match === "object" && value[0].match !== null;
-
-// The text of every arm, for a check that only wants to read the words.
-const armsOf = (value) => (isComplex(value) ? Object.values(value[0].match) : [value]);
 
 // The {placeholders} a message interpolates. A translation carries the same set as the
 // contract does, in any order and any number of times: a name the caller never passes
@@ -109,9 +104,12 @@ for (const locale of locales) {
     // A singular copied from the plural passes every check below, so it is looked for on
     // its own — in the contract too, which a later edit could break the same way.
     const copies = singularCopies(locale, messages);
+    // Every plural message answers for every count its language can produce — the
+    // contract's own included, whose arms a typo breaks for English readers alike.
+    const plurals = pluralProblems(locale, messages, baseMessages);
     if (locale === baseLocale) {
-        if (copies.length > 0) {
-            problems.push({ locale, missing: [], orphan: [], mismatched: [], copies });
+        if (copies.length > 0 || plurals.length > 0) {
+            problems.push({ locale, missing: [], orphan: [], mismatched: plurals, copies });
         }
         continue;
     }
@@ -138,24 +136,7 @@ for (const locale of locales) {
         }
     }
 
-    // A plural message must answer for every category its OWN language can produce.
-    // Paraglide compiles the variants into a chain of comparisons and, when none matches,
-    // returns the message key — so a Polish count of five in a message carrying only `one`
-    // and `other` does not read a little oddly, it prints "progress_backup_items" on the
-    // page. The categories are not a matter of taste, so they are asked of Intl rather than
-    // listed here, and they differ per language: Polish needs four, Croatian three, Japanese
-    // one.
-    const needed = new Intl.PluralRules(locale).resolvedOptions().pluralCategories;
-    for (const [key, value] of Object.entries(messages)) {
-        if (!isComplex(value)) {
-            continue;
-        }
-        const arms = new Set(Object.keys(value[0].match).map((arm) => arm.split("=").at(-1)));
-        const absent = needed.filter((category) => !arms.has(category));
-        if (absent.length > 0) {
-            mismatched.push(`${key}: no arm for ${absent.join(", ")} — that count prints the key`);
-        }
-    }
+    mismatched.push(...plurals);
 
     if (missing.length > 0 || orphan.length > 0 || mismatched.length > 0 || copies.length > 0) {
         problems.push({ locale, missing, orphan, mismatched, copies });
