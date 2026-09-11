@@ -47,7 +47,11 @@ const browser = await chromium.launch({
 let total = 0;
 console.log(`axe (${MODE} mode):`);
 for (const path of PAGES) {
-    const ctx = await browser.newContext({ colorScheme: MODE });
+    // Reduced motion, so axe measures each page at rest. The landing keyboard fades its keys
+    // in one after another over most of a second, and a key caught half-faded fails contrast
+    // or passes it depending on how fast the page loaded — a sweep that measures a frame
+    // rather than the page. Every animation here already stands down under this preference.
+    const ctx = await browser.newContext({ colorScheme: MODE, reducedMotion: "reduce" });
     const page = await ctx.newPage();
     await page.addInitScript((mode) => {
         try {
