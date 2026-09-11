@@ -51,6 +51,9 @@ fransisco = "fransisco"
 # natural "B" rather than "H" told a German reader to play the wrong scale.
 ges = "ges"
 fes = "fes"
+# "Eis" is E sharp in the same system — the -is suffix German spells a sharp with (Cis,
+# Fis, Eis), which a key signature at the circle's cut needs.
+eis = "eis"
 # "ist" is German ("is"), kept verbatim in the machine-translation notice's prevail
 # clause "maßgeblich ist die deutsche Fassung", which every translated legal page —
 # including the checked English base — carries word for word.

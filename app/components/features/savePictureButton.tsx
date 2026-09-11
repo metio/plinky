@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { type DiagramKey, svgKeyboardDiagram } from "../../../core/keyboardDiagram";
 import { downloadBlob } from "../../lib/download";
+import { localNoteSystem } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
 import { svgToPng } from "../../lib/rasterize";
 import { Button } from "../ui/button";
@@ -108,7 +109,16 @@ export function SavePictureButton({
 }) {
     return (
         <SaveDiagram
-            svg={() => svgKeyboardDiagram({ from, to, keys, caption, noteNames: true })}
+            svg={() =>
+                svgKeyboardDiagram({
+                    from,
+                    to,
+                    keys,
+                    caption,
+                    noteNames: true,
+                    system: localNoteSystem(),
+                })
+            }
             filename={filename}
         />
     );

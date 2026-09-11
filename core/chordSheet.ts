@@ -12,11 +12,11 @@
 
 import { isWhite } from "./keyboardGeometry";
 import type { DiagramOptions } from "./keyboardDiagram";
+import { type NoteSystem, noteTextIn } from "./noteNaming";
 import {
     CHORD_DEGREES,
     type ChordDegree,
     degreePitches,
-    NOTE_TEXT,
     noteNameOf,
     type Spelling,
 } from "./theory";
@@ -50,16 +50,18 @@ function whiteWindow(tonic: number): { from: number; to: number } {
     return { from, to };
 }
 
-// One diagram per degree, in the order the key builds them.
+// One diagram per degree, in the order the key builds them. The letters in each symbol and
+// on the keys are the reader's: a German sheet names B natural H.
 export function diatonicSheetDiagrams(
     tonic: number,
     spelling: Spelling = "sharp",
+    system: NoteSystem = "letters",
 ): DiagramOptions[] {
     const { from, to } = whiteWindow(tonic);
     return CHORD_DEGREES.map((degree) => {
         const pitches = degreePitches(tonic, degree);
         const root = pitches[0] ?? tonic;
-        const symbol = `${NOTE_TEXT[noteNameOf(root, spelling)]}${symbolSuffix(degree)}`;
+        const symbol = `${noteTextIn(noteNameOf(root, spelling), system)}${symbolSuffix(degree)}`;
         return {
             from,
             to,
@@ -67,6 +69,7 @@ export function diatonicSheetDiagrams(
             caption: `${degree} · ${symbol}`,
             noteNames: true,
             spelling,
+            system,
         };
     });
 }

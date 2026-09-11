@@ -19,7 +19,8 @@
 
 import { escapeXml } from "./xmlText";
 import { isWhite, keyLane, whiteKeys } from "./keyboardGeometry";
-import { NOTE_TEXT, noteNameOf, pitchClassOf, type Spelling } from "./theory";
+import { type NoteSystem, noteTextIn } from "./noteNaming";
+import { noteNameOf, pitchClassOf, type Spelling } from "./theory";
 
 // A marked key, and optionally the finger that plays it.
 export type DiagramKey = { note: number; finger?: number };
@@ -34,6 +35,8 @@ export type DiagramOptions = {
     // Note names on every white key, for a reader who does not yet know them by position.
     noteNames?: boolean;
     spelling?: Spelling;
+    // How the reader's language writes those names: B natural is H in German.
+    system?: NoteSystem;
 };
 
 const WIDTH = 1200;
@@ -88,6 +91,7 @@ function diagramBody({
     caption,
     noteNames = false,
     spelling = "sharp",
+    system = "letters",
 }: DiagramOptions): { markup: string; height: number } {
     const height = KEYBED_TOP * 2 + KEYBED_HEIGHT + (caption ? CAPTION_HEIGHT : 0);
     const marked = new Map(keys.map((key) => [key.note, key.finger]));
@@ -136,7 +140,7 @@ function diagramBody({
         if (noteNames && white) {
             parts.push(
                 `<text x="${round(left + width / 2)}" y="${KEYBED_TOP + KEYBED_HEIGHT - 12}" fill="${LABEL}" font-family="system-ui,sans-serif" font-size="26" text-anchor="middle">${escapeXml(
-                    NOTE_TEXT[noteNameOf(pitchClassOf(note), spelling)],
+                    noteTextIn(noteNameOf(pitchClassOf(note), spelling), system),
                 )}</text>`,
             );
         }

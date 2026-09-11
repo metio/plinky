@@ -24,6 +24,25 @@ describe("the diatonic chord sheet", () => {
         ]);
     });
 
+    it("names the chords and the keys the way a German reader does", () => {
+        // B natural is H and B means B flat, so a German sheet in C ends on H°, and the
+        // key of B flat starts on B.
+        const inC = diatonicSheetDiagrams(C4, "sharp", "german");
+        expect(inC[6]?.caption).toBe("vii° · H°");
+        expect(diatonicSheetDiagrams(C4 + 10, "flat", "german")[0]?.caption).toBe("I · B");
+        expect(diatonicSheetDiagrams(C4 + 6, "sharp", "german")[0]?.caption).toBe("I · Fis");
+        // The white keys under the chords are named in the same system.
+        const svg = svgDiagramSheet({ title: "Akkorde in C", diagrams: inC });
+        expect(svg).toContain(">H</text>");
+        expect(svg).not.toContain(">B</text>");
+    });
+
+    it("keeps the letter names where the reader reads letters", () => {
+        const svg = svgDiagramSheet({ title: "C", diagrams: diatonicSheetDiagrams(C4) });
+        expect(svg).toContain(">B</text>");
+        expect(svg).not.toContain(">H</text>");
+    });
+
     it("spells the key it is in", () => {
         // In a flat key the sixth degree is B flat minor, never A sharp minor — the
         // picture has to agree with the signature a reader is holding it against.

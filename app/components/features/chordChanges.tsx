@@ -7,10 +7,10 @@ import {
     type ChordQuality,
     CHORD_QUALITIES,
     chordPitches,
-    NOTE_TEXT,
     noteNameOf,
     type PitchClass,
 } from "../../../core/theory";
+import { noteText } from "../../lib/noteNames";
 import { chordName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 import { SegmentedControl } from "../ui/segmentedControl";
@@ -37,9 +37,9 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
     const top = Math.max(rootNote + 24, ...from, ...to);
     const motion = smoothestMotion(from, to);
 
-    const noteText = (pitchClass: PitchClass) => NOTE_TEXT[noteNameOf(pitchClass)];
+    const nameOf = (pitchClass: PitchClass) => noteText(noteNameOf(pitchClass));
     const label = (root: string, quality: ChordQuality) =>
-        `${noteText(((rootNote + Number(root)) % 12) as PitchClass)} ${chordName(quality)}`;
+        `${nameOf(((rootNote + Number(root)) % 12) as PitchClass)} ${chordName(quality)}`;
 
     // Each pair of pickers is headed by the chord it currently names. Four controls
     // labelled Root, Chord, Root, Chord tell a reader nothing about which half they are
@@ -84,7 +84,7 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
                     rather than a sentence where a change shares nothing, because "none"
                     is the answer least worth a word. */}
                 <dd className="tabular-nums">
-                    {motion.common.length === 0 ? "—" : motion.common.map(noteText).join(" · ")}
+                    {motion.common.length === 0 ? "—" : motion.common.map(nameOf).join(" · ")}
                 </dd>
                 <dt className="text-muted">{m.tools_changes_travel()}</dt>
                 <dd className="tabular-nums">{motion.distance}</dd>
@@ -106,6 +106,6 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
 function tonics(root: number): { id: string; label: string }[] {
     return Array.from({ length: 12 }, (_, step) => ({
         id: String(step),
-        label: NOTE_TEXT[noteNameOf(((root + step) % 12) as PitchClass)],
+        label: noteText(noteNameOf(((root + step) % 12) as PitchClass)),
     }));
 }

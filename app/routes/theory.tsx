@@ -5,7 +5,8 @@ import { TheoryIndex } from "../components/features/theoryIndex";
 
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
 import { breadcrumbData, routeMeta, webPageData } from "../../core/site";
-import { NOTE_TEXT, noteNameOf } from "../../core/theory";
+import { noteNameOf } from "../../core/theory";
+import { noteText } from "../lib/noteNames";
 import {
     type Demo,
     type Lesson,
@@ -137,9 +138,9 @@ function LessonDemo({ demo, onPlay }: { demo: Demo; onPlay: () => void }) {
             {key && (
                 <p className="text-sm text-muted">
                     {m.theory_signature_reads({
-                        key: NOTE_TEXT[noteNameOf(key.tonic, key.spelling)],
+                        key: noteText(noteNameOf(key.tonic, key.spelling)),
                         notes: signatureNotes(key)
-                            .map((name) => NOTE_TEXT[name])
+                            .map((name) => noteText(name))
                             .join(" · "),
                     })}
                 </p>

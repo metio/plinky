@@ -7,10 +7,67 @@ import { afterEach, describe, expect, it } from "vitest";
 import { CIRCLE } from "../../core/circleOfFifths";
 import { NOTE_TEXT, noteNameOf } from "../../core/theory";
 import { m } from "../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../paraglide/runtime.js";
 import { renderWithServices } from "../testing/renderWithServices";
 import ToolsRoute from "./tools";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    overwriteGetLocale(() => baseLocale);
+});
+
+// German calls B natural H and reserves B for B flat, so a letter table read in German
+// names the wrong note: D major's relative minor would read as B flat minor.
+describe("ToolsRoute in German", () => {
+    it("names D major's relative minor h-Moll, with its sharps as words", () => {
+        overwriteGetLocale(() => "de");
+        renderWithServices(<ToolsRoute />);
+        fireEvent.click(screen.getAllByRole("tab", { name: "D" })[0] as HTMLElement);
+        expect(screen.getByText("Fis · Cis")).toBeTruthy();
+        expect(screen.getByText("h-Moll")).toBeTruthy();
+        expect(screen.queryByText("B-Moll")).toBeNull();
+    });
+
+    it("calls the key of B natural H and the key of B flat B", () => {
+        overwriteGetLocale(() => "de");
+        renderWithServices(<ToolsRoute />);
+        const circle = screen.getByRole("tablist", { name: m.tools_circle_title() });
+        const names = Array.from(circle.querySelectorAll('[role="tab"]')).map(
+            (tab) => tab.textContent,
+        );
+        expect(names).toContain("H");
+        expect(names).toContain("B");
+        expect(names).not.toContain("B♭");
+        // Picking H shows B major's five sharps and its relative minor, gis-Moll.
+        fireEvent.click(screen.getAllByRole("tab", { name: "H" })[0] as HTMLElement);
+        expect(screen.getByText("Fis · Cis · Gis · Dis · Ais")).toBeTruthy();
+        expect(screen.getByText("gis-Moll")).toBeTruthy();
+    });
+
+    it("names the keys under the hand in German too", () => {
+        overwriteGetLocale(() => "de");
+        renderWithServices(<ToolsRoute />);
+        // The root choosers are on sharps, the eleventh semitone above C is H.
+        const [root] = screen.getAllByRole("tablist", { name: m.tools_root() });
+        const names = Array.from(root?.querySelectorAll('[role="tab"]') ?? []).map(
+            (tab) => tab.textContent,
+        );
+        expect(names).toEqual([
+            "C",
+            "Cis",
+            "D",
+            "Dis",
+            "E",
+            "F",
+            "Fis",
+            "G",
+            "Gis",
+            "A",
+            "Ais",
+            "H",
+        ]);
+    });
+});
 
 describe("ToolsRoute", () => {
     it("offers every key on the circle", () => {
@@ -36,6 +93,15 @@ describe("ToolsRoute", () => {
         fireEvent.click(screen.getAllByRole("tab", { name: "D" })[0] as HTMLElement);
         expect(screen.getByText("F♯ · C♯")).toBeTruthy();
         expect(screen.getByText(m.tools_circle_minor({ note: "B" }))).toBeTruthy();
+    });
+
+    it("names the root choosers by letter in English", () => {
+        renderWithServices(<ToolsRoute />);
+        const [root] = screen.getAllByRole("tablist", { name: m.tools_root() });
+        const names = Array.from(root?.querySelectorAll('[role="tab"]') ?? []).map(
+            (tab) => tab.textContent,
+        );
+        expect(names).toEqual(["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]);
     });
 
     it("offers a scale and a chord chooser, each with its own root", () => {

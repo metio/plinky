@@ -9,6 +9,7 @@ import { LESSONS } from "../../core/theoryCourse";
 import { demoMoments } from "../../core/theoryDemo";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { m } from "../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../paraglide/runtime.js";
 import { advanceScheduler } from "../testing/advanceScheduler";
 import { fakeScheduler } from "../testing/fakeScheduler";
 import { renderWithServices } from "../testing/renderWithServices";
@@ -103,6 +104,19 @@ describe("TheoryRoute", () => {
         renderWithServices(page("/en/theory/signature"));
         // G major: one sharp, F♯.
         expect(screen.getByText(m.theory_signature_reads({ key: "G", notes: "F♯" }))).toBeTruthy();
+    });
+
+    it("spells the signature the way a German reader names the notes", () => {
+        overwriteGetLocale(() => "de");
+        try {
+            renderWithServices(page("/de/theory/signature"));
+            // German writes F sharp as Fis, and would read a bare B as B flat.
+            expect(
+                screen.getByText(m.theory_signature_reads({ key: "G", notes: "Fis" })),
+            ).toBeTruthy();
+        } finally {
+            overwriteGetLocale(() => baseLocale);
+        }
     });
 
     it("plays without falling over when a lesson is asked to sound", () => {

@@ -15,6 +15,8 @@
 // name with another, so they stay on letters until somebody who reads them supplies the
 // spellings. The seam is here for when they do.
 
+import type { NoteNameId } from "./theory";
+
 export type NoteSystem =
     // C D E F G A B, with ♯ and ♭. What most of the world reads and what Plinky did
     // everywhere.
@@ -68,3 +70,17 @@ export function keyNameIn(slug: string, system: NoteSystem): string {
 // Ces Des Es Fes Ges As B — the flat of each degree, with the three the language
 // contracts. B is the flat of H, which is the whole reason this module exists.
 const GERMAN_FLAT = ["Ces", "Des", "Es", "Fes", "Ges", "As", "B"];
+
+// A spelled note — "d-flat", "b", "e-sharp" — as this system writes it: D♭ or Des, B or
+// H. A note id has the shape of a key slug, a letter and then sharp or flat, so it is
+// spelled by the same rules.
+export function noteTextIn(name: NoteNameId, system: NoteSystem): string {
+    return keyNameIn(name, system);
+}
+
+// The tonic of a minor key. German writes it in lower case — h-Moll, fis-Moll, es-Moll —
+// which is how a German reader tells the minor key from its major at a glance.
+export function minorKeyTextIn(name: NoteNameId, system: NoteSystem): string {
+    const text = noteTextIn(name, system);
+    return system === "german" ? text.toLowerCase() : text;
+}

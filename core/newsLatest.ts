@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**In German, the circle of fifths calls B natural H.** German reads the letter B as\nB flat, so the Tools page told a German reader that D major's relative minor was\nB-Moll, and named the key of five sharps B. The circle, its signatures, the chord\nsheet you can save, the scale, chord and interval pickers and the Theory lessons now\nuse the German names: h-Moll, Fis · Cis, H for B natural and B for B flat.",
+                twip: true,
+            },
+            {
                 body: "**Left hand as chords works on songs with a singer.** With Other parts showing, a\nsong whose singer is written above the piano kept the composer's full left hand when\nyou chose Left hand as chords, and the run still counted as a practice version. The\npiano's left hand now turns into chords under the singer's line, as it does on a\npiece for piano alone.",
                 twip: true,
             },

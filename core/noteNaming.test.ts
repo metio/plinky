@@ -2,7 +2,57 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { keyNameIn, noteSystemFor } from "./noteNaming";
+import { keyNameIn, minorKeyTextIn, noteSystemFor, noteTextIn } from "./noteNaming";
+import { NOTE_TEXT, type NoteNameId } from "./theory";
+
+const NOTE_IDS = Object.keys(NOTE_TEXT) as NoteNameId[];
+
+describe("noteTextIn", () => {
+    it("writes every spelled note exactly as the letter table does, in letters", () => {
+        for (const id of NOTE_IDS) {
+            expect(noteTextIn(id, "letters")).toBe(NOTE_TEXT[id]);
+        }
+    });
+
+    it("calls B natural H in German, B flat B, and spells the rest as words", () => {
+        expect(noteTextIn("b", "german")).toBe("H");
+        expect(noteTextIn("b-flat", "german")).toBe("B");
+        expect(noteTextIn("f-sharp", "german")).toBe("Fis");
+        expect(noteTextIn("c-sharp", "german")).toBe("Cis");
+        expect(noteTextIn("e-flat", "german")).toBe("Es");
+        expect(noteTextIn("a-flat", "german")).toBe("As");
+        expect(noteTextIn("d-flat", "german")).toBe("Des");
+    });
+
+    it("spells the signature-only names a key at the circle's cut needs", () => {
+        expect(noteTextIn("e-sharp", "german")).toBe("Eis");
+        expect(noteTextIn("b-sharp", "german")).toBe("His");
+        expect(noteTextIn("c-flat", "german")).toBe("Ces");
+        expect(noteTextIn("f-flat", "german")).toBe("Fes");
+    });
+
+    it("gives every spelled note its own German name, with no sign left in it", () => {
+        const names = NOTE_IDS.map((id) => noteTextIn(id, "german"));
+        expect(new Set(names).size).toBe(names.length);
+        for (const name of names) {
+            expect(name).not.toMatch(/[♯♭]/);
+        }
+    });
+});
+
+describe("minorKeyTextIn", () => {
+    it("writes a German minor key's tonic in lower case", () => {
+        expect(minorKeyTextIn("b", "german")).toBe("h");
+        expect(minorKeyTextIn("f-sharp", "german")).toBe("fis");
+        expect(minorKeyTextIn("e-flat", "german")).toBe("es");
+    });
+
+    it("leaves a letter name as it is", () => {
+        for (const id of NOTE_IDS) {
+            expect(minorKeyTextIn(id, "letters")).toBe(NOTE_TEXT[id]);
+        }
+    });
+});
 
 const SLUGS = [
     "c",

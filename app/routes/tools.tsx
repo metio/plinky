@@ -13,15 +13,14 @@ import {
     tap,
     tapCount,
 } from "../../core/tapTempo";
-import { NOTE_LABELS } from "../../core/keyMap";
 import {
     CHORD_QUALITIES,
     type ChordQuality,
     chordPitches,
     INTERVAL_IDS,
     type IntervalId,
-    NOTE_TEXT,
     noteNameOf,
+    type PitchClass,
     SCALE_IDS,
     type ScaleId,
     scalePitches,
@@ -37,6 +36,7 @@ import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
+import { localNoteSystem, minorKeyText, noteText } from "../lib/noteNames";
 import { chordName, intervalName, scaleName } from "../lib/theoryNames";
 import { diatonicSheetDiagrams } from "../../core/chordSheet";
 import { svgDiagramSheet } from "../../core/keyboardDiagram";
@@ -91,10 +91,16 @@ function Panel({
 // one sounds its tonic triad, so the diagram is something you can hear rather than
 // only read.
 // A key spells its own notes: the key of D flat contains no C sharp, so the diagram
-// must say D flat. The explorers below stay on the sharp-only keyboard table, because
-// there a root is a key on the instrument rather than a key signature.
-function spell(pitch: number, key: CircleKey): string {
-    return NOTE_TEXT[noteNameOf(pitch, key.spelling)];
+// must say D flat. The explorers below stay on sharps, because there a root is a key on
+// the instrument rather than a key signature. Every name is the reader's own: a German
+// page calls B natural H, and B means B flat there.
+function spell(pitch: PitchClass, key: CircleKey): string {
+    return noteText(noteNameOf(pitch, key.spelling));
+}
+
+// A key under the hand, named on sharps.
+function rootName(pitch: number): string {
+    return noteText(noteNameOf(pitchClassOf(pitch)));
 }
 
 function CircleOfFifths() {
@@ -132,10 +138,14 @@ function CircleOfFifths() {
                 <dd>
                     {notes.length === 0
                         ? m.tools_circle_none()
-                        : notes.map((name) => NOTE_TEXT[name]).join(" · ")}
+                        : notes.map((name) => noteText(name)).join(" · ")}
                 </dd>
                 <dt className="text-muted">{m.tools_circle_relative()}</dt>
-                <dd>{m.tools_circle_minor({ note: spell(selected.relativeMinor, selected) })}</dd>
+                <dd>
+                    {m.tools_circle_minor({
+                        note: minorKeyText(noteNameOf(selected.relativeMinor, selected.spelling)),
+                    })}
+                </dd>
             </dl>
             {/* The seven chords leave together or not at all. Saved one at a time they
                 arrive as seven files with no order and no title, and what they were
@@ -147,7 +157,11 @@ function CircleOfFifths() {
                         title: m.tools_circle_sheet_title({
                             key: spell(selected.tonic, selected),
                         }),
-                        diagrams: diatonicSheetDiagrams(ROOT + selected.tonic, selected.spelling),
+                        diagrams: diatonicSheetDiagrams(
+                            ROOT + selected.tonic,
+                            selected.spelling,
+                            localNoteSystem(),
+                        ),
                     })
                 }
                 filename={`plinky-chords-${spell(selected.tonic, selected)}`}
@@ -165,7 +179,7 @@ function CircleOfFifths() {
 function tonicOptions(): { id: string; label: string }[] {
     return Array.from({ length: 12 }, (_, pitch) => ({
         id: String(pitch),
-        label: NOTE_LABELS[pitch] ?? "",
+        label: rootName(pitch),
     }));
 }
 
@@ -199,7 +213,7 @@ function ScaleExplorer() {
                 from={ROOT}
                 to={ROOT + 24}
                 keys={pitches.map((note) => ({ note }))}
-                caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(tonic)))]} ${scaleName(scale)}`}
+                caption={`${rootName(ROOT + Number(tonic))} ${scaleName(scale)}`}
                 filename="plinky-scale"
             />
         </Panel>
@@ -232,7 +246,7 @@ function ChordExplorer() {
                 from={ROOT}
                 to={top}
                 keys={pitches.map((note) => ({ note }))}
-                caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(root)))]} ${chordName(quality)}`}
+                caption={`${rootName(ROOT + Number(root))} ${chordName(quality)}`}
                 filename="plinky-chord"
             />
         </Panel>
@@ -263,7 +277,7 @@ function IntervalFinder() {
             />
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-body">
                 <dt className="text-muted">{m.tools_interval_lands()}</dt>
-                <dd>{NOTE_LABELS[to % 12] ?? ""}</dd>
+                <dd>{rootName(to)}</dd>
             </dl>
             {/* Sounded together and then apart: an interval is a distance you can hear
                 either way round, and hearing both is how the name sticks. */}
