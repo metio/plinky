@@ -49,8 +49,10 @@ export function daysBetween(from: string, to: string): number {
 
 // Every key from `from` to `to` inclusive, oldest first. An inverted or unparsable
 // range yields nothing — a report over it is empty rather than unbounded. The cap
-// bounds what a stored (or hand-typed) range can ask the caller to allocate.
-const MAX_RANGE_DAYS = 3660;
+// bounds what a stored (or hand-typed) range can ask the caller to allocate. A
+// caller whose range may legitimately be longer (the practice report's "all time")
+// clamps its start to this span rather than asking for more.
+export const MAX_RANGE_DAYS = 3660;
 
 export function daysInRange(from: string, to: string): string[] {
     const span = daysBetween(from, to);

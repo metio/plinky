@@ -242,8 +242,9 @@ export function PracticeReport({
     // because two controls for one question is the mess the page had.
     //
     // Left off (a story, a teacher's page), the report keeps its own control and its own
-    // rolling ranges, so it still stands on its own anywhere else.
-    days?: number;
+    // rolling ranges, so it still stands on its own anywhere else. Null is all time: the
+    // report opens on the day of the earliest session.
+    days?: number | null;
     // Whether the panel draws its own heading. The Stats page heads each of its questions
     // once and gathers the answers beneath, so a panel answering one of them must not
     // restate its name — two headings for one thing is what made that page read as a stack

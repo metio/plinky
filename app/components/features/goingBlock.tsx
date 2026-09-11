@@ -70,14 +70,9 @@ export function GoingBlock({
             )}
 
             <FeatureBoundary feature="PracticeReport">
-                {/* days is null only for all time, where the report shows everything — a
-                    century of days is every day anybody has. */}
-                <PracticeReport
-                    pieceTitle={pieceTitle}
-                    now={now}
-                    days={days ?? 36_500}
-                    headed={false}
-                />
+                {/* days is null only for all time, where the report opens on the first
+                    session the player ever logged. */}
+                <PracticeReport pieceTitle={pieceTitle} now={now} days={days} headed={false} />
             </FeatureBoundary>
         </div>
     );

@@ -61,6 +61,11 @@ could not find those notes in the score and drew your playing out as new notatio
 instead. The run is now kept as the both-hands run it was, and its video shows the
 piece as written.
 
+**All time on the Stats page shows your practice.** With the period set to All
+time, the practice report said there was nothing here yet, however much you had
+logged, while the week, the month and the year showed it. It now adds up every
+sitting since your first, and its calendar starts on that day.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

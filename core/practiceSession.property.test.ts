@@ -3,7 +3,7 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { daysInRange } from "./dateKey";
+import { daysInRange, MAX_RANGE_DAYS, shiftDay } from "./dateKey";
 import {
     addManualSession,
     foldSession,
@@ -11,7 +11,9 @@ import {
     type PracticeLog,
     type PracticePing,
     parsePracticeLog,
+    reportStart,
     sessionDate,
+    sessionsInRange,
     summarizeRange,
 } from "./practiceSession";
 
@@ -131,6 +133,43 @@ describe("summarizeRange", () => {
                 expect(report.days.filter((day) => day.sessions > 0).length).toBe(
                     report.activeDays,
                 );
+            }),
+        );
+    });
+
+    it("never loses a session to a range longer than the grid can draw", () => {
+        // However far back the range reaches — all time is a span no calendar grid should
+        // enumerate — the totals match the log, and the grid ends on the range's last day.
+        fc.assert(
+            fc.property(
+                arbPings,
+                arbManual,
+                fc.integer({ min: 0, max: 100_000 }),
+                (pings, manual, reach) => {
+                    const log = manual.reduce(addManualSession, foldAll(pings));
+                    const to = "2026-06-30";
+                    const report = summarizeRange(log, shiftDay(to, -reach), to);
+                    const inRange = sessionsInRange(log, shiftDay(to, -reach), to);
+                    expect(report.sessions).toBe(inRange.length);
+                    expect(report.activeMs).toBe(
+                        inRange.reduce((total, session) => total + session.activeMs, 0),
+                    );
+                    expect(report.days.length).toBe(Math.min(reach, MAX_RANGE_DAYS) + 1);
+                    expect(report.days.at(-1)?.date).toBe(to);
+                },
+            ),
+        );
+    });
+
+    it("opens all time where the log begins, so it holds every session", () => {
+        fc.assert(
+            fc.property(arbPings, arbManual, (pings, manual) => {
+                const log = manual.reduce(addManualSession, foldAll(pings));
+                const to = "2026-06-30";
+                const report = summarizeRange(log, reportStart(log, null, to), to);
+                const upToToday = log.filter((session) => sessionDate(session) <= to);
+                expect(report.sessions).toBe(upToToday.length);
+                expect(report.sessions === 0).toBe(upToToday.length === 0);
             }),
         );
     });

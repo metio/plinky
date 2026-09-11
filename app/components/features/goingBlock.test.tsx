@@ -5,7 +5,9 @@
 import { cleanup, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { History } from "../../../core/history";
+import { memoryStore } from "../../adapters/memoryStore";
 import { m } from "../../paraglide/messages.js";
+import { createPracticeLogStore } from "../../stores/practiceLogStore";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { choose, chosen } from "../../testing/controls";
 import { GoingBlock } from "./goingBlock";
@@ -90,6 +92,26 @@ describe("the block behind the period dial", () => {
         mount({ "2025-06-02": 500 });
         choose(m.scope_label, m.scope_month);
         expect(screen.getAllByText("0").length).toBeGreaterThan(0);
+    });
+
+    it("reports every logged sitting under all time, the oldest included", () => {
+        // All time is longer than any calendar grid is drawn for; the report beneath the
+        // tile must still count the whole record rather than say nothing was practised.
+        const kv = memoryStore();
+        const practiceLog = createPracticeLogStore(kv);
+        practiceLog.addManual({ date: "2025-06-02", minutes: 30 });
+        practiceLog.addManual({ date: "2026-08-17", minutes: 10 });
+        renderWithServices(<GoingBlock history={HISTORY} pieceTitle={(id) => id} now={NOW} />, {
+            store: kv,
+            practiceLog,
+        });
+        choose(m.scope_label, m.scope_all);
+        expect(screen.queryByText(m.practice_empty())).toBeNull();
+        expect(screen.getAllByText(m.practice_m({ minutes: 40 })).length).toBeGreaterThan(0);
+        // The month holds only the later sitting.
+        choose(m.scope_label, m.scope_month);
+        expect(screen.getAllByText(m.practice_m({ minutes: 10 })).length).toBeGreaterThan(0);
+        expect(screen.queryAllByText(m.practice_m({ minutes: 40 }))).toHaveLength(0);
     });
 
     it("draws no heading of its own — the question above it is the heading", () => {

@@ -45,6 +45,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A run's video shows the piece's own notation after One hand at a time.** Trying\nOne hand at a time from Ways to practise can open a tune written on a single staff.\nYou play it with both hands, but the run was kept as a left-hand run, so its video\ncould not find those notes in the score and drew your playing out as new notation\ninstead. The run is now kept as the both-hands run it was, and its video shows the\npiece as written.",
                 twip: true,
             },
+            {
+                body: "**All time on the Stats page shows your practice.** With the period set to All\ntime, the practice report said there was nothing here yet, however much you had\nlogged, while the week, the month and the year showed it. It now adds up every\nsitting since your first, and its calendar starts on that day.",
+                twip: true,
+            },
         ],
     },
     {

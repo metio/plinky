@@ -4,7 +4,7 @@
 import { toCsv } from "./csv";
 import { parseJson } from "./json";
 import { todayKey } from "./daily";
-import { daysBetween, daysInRange, isDateKey } from "./dateKey";
+import { daysBetween, daysInRange, isDateKey, MAX_RANGE_DAYS, shiftDay } from "./dateKey";
 
 // A practice session: one stretch of sitting at the instrument.
 //
@@ -321,8 +321,37 @@ const NO_MOODS: Record<Mood, number> = {
     breakthrough: 0,
 };
 
+// The first day of a report `days` long ending on `to`, counting `to` itself. Null asks
+// for all time, which starts on the day of the earliest session — a report over the
+// player's whole record, and a grid that begins where the record does rather than a
+// century of blanks. An empty log (or one whose every session lies after `to`) starts
+// on `to`.
+export function reportStart(log: PracticeLog, days: number | null, to: string): string {
+    if (days !== null) {
+        return shiftDay(to, -(Math.max(1, days) - 1));
+    }
+    let earliest = to;
+    for (const session of log) {
+        const date = sessionDate(session);
+        if (date < earliest) {
+            earliest = date;
+        }
+    }
+    return earliest;
+}
+
+// The days the consistency grid draws: the whole range, or its last MAX_RANGE_DAYS
+// days when the range is longer. daysInRange refuses a longer span outright, and a
+// report must still count every session in it, so only the grid is shortened.
+function gridDays(from: string, to: string): string[] {
+    const earliest = shiftDay(to, -MAX_RANGE_DAYS);
+    return daysInRange(daysBetween(earliest, from) > 0 ? from : earliest, to);
+}
+
 export function summarizeRange(log: PracticeLog, from: string, to: string): PracticeReport {
-    const days = daysInRange(from, to);
+    const days = gridDays(from, to);
+    // Keyed by every day a session in the range fell on, not only the days the grid
+    // draws, so the totals, the active days and the longest day cover the whole range.
     const byDate = new Map<string, PracticeDay>(
         days.map((date) => [date, { date, activeMs: 0, notes: 0, sessions: 0 }]),
     );
@@ -335,9 +364,11 @@ export function summarizeRange(log: PracticeLog, from: string, to: string): Prac
     let notes = 0;
 
     for (const session of sessionsInRange(log, from, to)) {
-        const day = byDate.get(sessionDate(session));
+        const date = sessionDate(session);
+        let day = byDate.get(date);
         if (!day) {
-            continue;
+            day = { date, activeMs: 0, notes: 0, sessions: 0 };
+            byDate.set(date, day);
         }
         day.activeMs += session.activeMs;
         day.notes += session.notes;
@@ -356,7 +387,11 @@ export function summarizeRange(log: PracticeLog, from: string, to: string): Prac
     }
 
     const ordered = days.map((date) => byDate.get(date) as PracticeDay);
-    const practised = ordered.filter((day) => day.activeMs > 0 || day.sessions > 0);
+    // Oldest first, so a tie for the longest day goes to the earlier one, as it does in
+    // the grid.
+    const practised = [...byDate.values()]
+        .filter((day) => day.activeMs > 0 || day.sessions > 0)
+        .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     const longestDay = practised.reduce<PracticeDay | null>(
         (best, day) => (!best || day.activeMs > best.activeMs ? day : best),
         null,

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
+import { MAX_RANGE_DAYS } from "./dateKey";
 import {
     addManualSession,
     foldSession,
@@ -11,6 +12,7 @@ import {
     parsePracticeLog,
     practiceLogToCsv,
     removeSession,
+    reportStart,
     SESSION_GAP_MS,
     sessionDate,
     setSessionMood,
@@ -212,6 +214,52 @@ describe("summarizeRange", () => {
         expect(report.activeDays).toBe(0);
         expect(report.averageMs).toBe(0);
         expect(report.longestDay).toBeNull();
+    });
+
+    it("counts every session in a range longer than the grid can draw", () => {
+        // A century back from today: longer than daysInRange will enumerate. The totals
+        // still cover the whole range; only the grid is shortened to its last days.
+        const report = summarizeRange(log, "1926-06-23", "2026-06-23");
+        expect(report.sessions).toBe(2);
+        expect(report.activeMs).toBe(50 * MINUTE);
+        expect(report.activeDays).toBe(2);
+        expect(report.longestDay?.date).toBe("2026-06-21");
+        expect(report.days.length).toBe(MAX_RANGE_DAYS + 1);
+        expect(report.days.at(-1)?.date).toBe("2026-06-23");
+    });
+
+    it("counts a session older than the grid's reach without drawing it", () => {
+        const old = addManualSession(log, { date: "2006-01-02", minutes: 40 });
+        const report = summarizeRange(old, "1926-06-23", "2026-06-23");
+        expect(report.sessions).toBe(3);
+        expect(report.activeDays).toBe(3);
+        expect(report.longestDay?.date).toBe("2006-01-02");
+        expect(report.days.some((day) => day.date === "2006-01-02")).toBe(false);
+    });
+});
+
+describe("reportStart", () => {
+    const log = [
+        ...addManualSession([], { date: "2026-03-04", minutes: 30 }),
+        ...addManualSession([], { date: "2026-06-21", minutes: 10 }),
+    ];
+
+    it("counts back a window of days, today included", () => {
+        expect(reportStart(log, 7, "2026-06-23")).toBe("2026-06-17");
+        expect(reportStart(log, 1, "2026-06-23")).toBe("2026-06-23");
+        // A window of nothing is still today.
+        expect(reportStart(log, 0, "2026-06-23")).toBe("2026-06-23");
+    });
+
+    it("opens all time on the day of the earliest session", () => {
+        expect(reportStart(log, null, "2026-06-23")).toBe("2026-03-04");
+        // Order in the log does not matter.
+        expect(reportStart([...log].reverse(), null, "2026-06-23")).toBe("2026-03-04");
+    });
+
+    it("opens all time on today when nothing earlier is logged", () => {
+        expect(reportStart([], null, "2026-06-23")).toBe("2026-06-23");
+        expect(reportStart(log, null, "2026-01-01")).toBe("2026-01-01");
     });
 });
 
