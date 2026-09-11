@@ -7,7 +7,7 @@ import { isFirstS, isFlawless, type Milestone } from "../../core/milestones";
 import type { CapturedNote } from "../../core/runCapture";
 import type { Grid } from "../../core/shareCard";
 import type { AppServices } from "../contexts/services";
-import { currentGrade, loadGradedMastery, skillRating } from "./gradeProgress";
+import { currentGrade, type GradedMastery, loadGradedMastery, skillRating } from "./gradeProgress";
 import { seenBadgeMarks } from "./statsData";
 
 // A finished run, plus the context and derived outcome that decide where it's remembered.
@@ -40,6 +40,16 @@ export type RecordedRun = {
     grid: Grid;
     tolerance: number;
 };
+
+// Raises the kept badge marks to what the mastery shows now, and hands back the graded
+// mastery it read. Every run that changes mastery ends here — a played piece through
+// recordRun, an ear drill through its session — so a star or the ear set earned by a run
+// is kept from that run on, and shelving or un-marking a piece later cannot take it back.
+export async function keepBadgeMarks(services: AppServices, now: number): Promise<GradedMastery[]> {
+    const items = await loadGradedMastery(services.mastery, services);
+    services.milestones.recordBadgeMarks(seenBadgeMarks(items, now));
+    return items;
+}
 
 // Fold a finished run into every place that remembers it — the lifetime fingerprint, the
 // daily challenge, the practice history, this score's ghost, and its spaced-repetition
@@ -148,10 +158,7 @@ export function recordRun(
     const firstS = isFirstS(grade.score, before?.bestScore ?? 0);
     const flawlessNow = isFlawless(grade) && !services.milestones.flawlessDone();
     const decayMode = services.prefs.load().decayMode;
-    loadGradedMastery(services.mastery, services).then((items) => {
-        // A star or the ear set earned by this run is kept from here, so shelving a piece
-        // later cannot take it back.
-        services.milestones.recordBadgeMarks(seenBadgeMarks(items, now));
+    keepBadgeMarks(services, now).then((items) => {
         const reached = currentGrade(items);
         if (reached > services.milestones.reachedGrade()) {
             services.milestones.recordReachedGrade(reached);

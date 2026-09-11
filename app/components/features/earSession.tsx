@@ -20,7 +20,8 @@ import type {
     ScaleDegree,
     ScaleId,
 } from "../../../core/theory";
-import { useMasteryStore, usePrefsStore } from "../../contexts/services";
+import { useMasteryStore, usePrefsStore, useServices } from "../../contexts/services";
+import { keepBadgeMarks } from "../../lib/recordRun";
 import { chordName, scaleName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -78,6 +79,7 @@ export function EarSession({
     focus?: EarFocus;
 }) {
     const finish = useKeyboardFinish();
+    const services = useServices();
     const mastery = useMasteryStore();
     const prefs = usePrefsStore();
     const [question, setQuestion] = useState<EarQuestion | null>(null);
@@ -161,9 +163,12 @@ export function EarSession({
         }
         const runScore = Math.round(scoreRounds(rounds).accuracy * 100);
         const threshold = letterMin(prefs.load().masteryThreshold);
-        mastery.save(item.id, applyRun(mastery.load(item.id), runScore, threshold, Date.now()));
+        const now = Date.now();
+        mastery.save(item.id, applyRun(mastery.load(item.id), runScore, threshold, now));
+        // The run that learns the last ear item earns the ear badge, and keeps it.
+        keepBadgeMarks(services, now);
         onComplete?.(item.id);
-    }, [done, exercise, level, rounds, mastery, prefs, onComplete]);
+    }, [done, exercise, level, rounds, mastery, prefs, services, onComplete]);
 
     const settled = given !== null;
     const wasCorrect = question !== null && settled && isCorrect(question, given);

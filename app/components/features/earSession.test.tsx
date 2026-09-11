@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { EAR_SESSION_ROUNDS } from "../../../core/earCatalog";
+import { EAR_ITEMS, EAR_SESSION_ROUNDS } from "../../../core/earCatalog";
 import type { EarExerciseId } from "../../../core/earExercise";
+import { markLearned } from "../../../core/mastery";
 import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
+import type { AppServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { EarSession } from "./earSession";
@@ -26,13 +28,21 @@ function mount(
         autoStart?: boolean;
         onComplete?: (id: string) => void;
     } = {},
+    overrides: Partial<AppServices> = {},
 ) {
     vi.spyOn(Math, "random").mockReturnValue(0);
     return renderWithServices(
         <EarSession exercise={props.exercise ?? "intervals"} level={props.level ?? 0} {...props} />,
-        { audio: fakeAudioEngine() },
+        { audio: fakeAudioEngine(), ...overrides },
     );
 }
+
+// An empty catalogue: the graded mastery holds the ear items alone, with nothing fetched.
+const noManifest = { manifest: () => Promise.resolve([]) } as unknown;
+const emptyCatalogue: Partial<AppServices> = {
+    songs: noManifest as AppServices["songs"],
+    exercises: noManifest as AppServices["exercises"],
+};
 
 const press = (name: string) => fireEvent.click(screen.getByRole("button", { name }));
 
@@ -99,6 +109,28 @@ describe("EarSession", () => {
         const record = services.mastery.load("ear-intervals-0");
         expect(record?.bestScore).toBe(100);
         expect(record?.learned).toBe(true);
+    });
+
+    it("keeps the ear badge from the session that learns the last ear item", async () => {
+        // Kept here rather than on the next visit to Stats, so un-marking an ear item
+        // before then cannot lose a badge the player earned.
+        const { services } = mount({}, emptyCatalogue);
+        for (const item of EAR_ITEMS) {
+            if (item.id !== "ear-intervals-0") {
+                services.mastery.save(item.id, markLearned(null, Date.now()));
+            }
+        }
+        expect(services.milestones.badgeMarks().earMastered).toBe(false);
+        playSession(m.theory_interval_unison());
+        await waitFor(() => expect(services.milestones.badgeMarks().earMastered).toBe(true));
+    });
+
+    it("leaves the ear badge unearned while an ear item is still to learn", async () => {
+        const { services } = mount({}, emptyCatalogue);
+        const save = vi.spyOn(services.milestones, "recordBadgeMarks");
+        playSession(m.theory_interval_unison());
+        await waitFor(() => expect(save).toHaveBeenCalled());
+        expect(services.milestones.badgeMarks().earMastered).toBe(false);
     });
 
     it("records to the level being trained", () => {
