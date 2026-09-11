@@ -154,6 +154,12 @@
       lesson went on sounding and lighting its keys on the new lesson's keyboard. Each
       move between lessons also left an empty space above the example. The old lesson now
       falls silent as you leave it, and each lesson draws its example once.
+    - |-
+      **A book of studies keeps its name while its page loads.** Opening a collection's
+      page, such as Czerny's eight-bar exercises, blanked its heading and the name in your
+      browser tab until the list of books arrived, and left both blank for good if it never
+      did. The tab keeps the book's name throughout, and the heading shows the page's
+      address until the name is ready.
 
 - date: 2026-09-09
   label: night

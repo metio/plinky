@@ -40,8 +40,9 @@ type Shelf =
     | { facet: "grade"; grade: HubGrade }
     | { facet: "era"; era: Era }
     // A work carries its own name rather than a slug, because the name is a proper noun
-    // the catalogue owns and the page has nothing of its own to call it by.
-    | { facet: "collection"; collection: string; name: string };
+    // the catalogue owns and the page has nothing of its own to call it by. Null until the
+    // catalogue says what it is.
+    | { facet: "collection"; collection: string; name: string | null };
 
 // The shelf an address names, or nothing at all. An unknown grade or era is a real 404
 // rather than an empty page: a shelf that never existed should not answer, or a search
@@ -61,7 +62,7 @@ export function shelfFor(
     if (params.collection !== undefined) {
         // The set of works is catalogue data, so until it is fetched the page cannot say
         // whether an address names one. It shows the address's own slug meanwhile rather
-        // than an error, and the name arrives with the list.
+        // than an error (see shelfHeading), and the name arrives with the list.
         const found = works.find((work) => work.id === params.collection);
         const id = hubCollection(
             params.collection,
@@ -73,14 +74,19 @@ export function shelfFor(
         return {
             facet: "collection",
             collection: params.collection,
-            name: found?.name ?? "",
+            name: found?.name ?? null,
         };
     }
     return null;
 }
 
-// The shelf's own address, its heading, and the line under it.
-export function shelfTitle(shelf: Shelf): string {
+// The shelf's own address, its title, its heading, and the line under it.
+//
+// The title and the line are null while a work's name is unknown, and a null leaves the
+// head alone: the edge served this page's document already carrying the work's name, so
+// writing anything before the name arrives — or when the fetch for it fails — would only
+// replace the right title with a worse one.
+export function shelfTitle(shelf: Shelf): string | null {
     if (shelf.facet === "collection") {
         return shelf.name;
     }
@@ -95,9 +101,15 @@ export function shelfTitle(shelf: Shelf): string {
     }[shelf.era];
 }
 
-export function shelfIntro(shelf: Shelf): string {
+// What the page is headed with, which is never blank: a work whose name has not arrived
+// is headed with its address, the one thing the page knows it by.
+export function shelfHeading(shelf: Shelf): string {
+    return shelfTitle(shelf) ?? (shelf.facet === "collection" ? shelf.collection : "");
+}
+
+export function shelfIntro(shelf: Shelf): string | null {
     if (shelf.facet === "collection") {
-        return m.hub_collection_intro({ name: shelf.name });
+        return shelf.name === null ? null : m.hub_collection_intro({ name: shelf.name });
     }
     return shelf.facet === "grade" ? m.hub_grade_intro({ grade: shelf.grade }) : m.hub_era_intro();
 }
@@ -233,7 +245,11 @@ export default function MusicHubRoute() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <PageHeader eyebrow={m.hub_eyebrow()} title={title ?? ""} hint={intro ?? undefined} />
+            <PageHeader
+                eyebrow={m.hub_eyebrow()}
+                title={shelfHeading(shelf)}
+                hint={intro ?? undefined}
+            />
 
             {pieces && pieces.length > 0 ? (
                 <>

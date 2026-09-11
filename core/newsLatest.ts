@@ -113,6 +113,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A theory lesson stops playing when you move to the next one.** Press Hear them on\none lesson, pick another from the list before it finished, and the rest of the first\nlesson went on sounding and lighting its keys on the new lesson's keyboard. Each\nmove between lessons also left an empty space above the example. The old lesson now\nfalls silent as you leave it, and each lesson draws its example once.",
                 twip: true,
             },
+            {
+                body: "**A book of studies keeps its name while its page loads.** Opening a collection's\npage, such as Czerny's eight-bar exercises, blanked its heading and the name in your\nbrowser tab until the list of books arrived, and left both blank for good if it never\ndid. The tab keeps the book's name throughout, and the heading shows the page's\naddress until the name is ready.",
+                twip: true,
+            },
         ],
     },
     {
