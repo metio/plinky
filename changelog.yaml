@@ -5,6 +5,16 @@
   label: evening
   entries:
     - |-
+      **The last few English note names now use your keys' names too.** The notes held
+      in the MIDI settings, the note the microphone hears and the one its setup asks
+      for, your hand size, your piano's range, the drill's range and key, the key on the
+      home page's Arcade button, the fingering editor and the notes you take longest to
+      find on Stats all still printed English letters. A German player read B4 where the
+      keys said H, and a French player read A4 beside keys saying la. They now name every
+      note the way your keys do. Your note names also follow the page's language until
+      you choose them yourself in Settings: changing the volume no longer fixes them in
+      place.
+    - |-
       **Note names on the keys are easier to read.** The names printed on the on-screen
       keys were a pale grey that was hard to make out on a white key, and harder still on
       one lit green, red or blue. They are darker now, and on a lit key they change with

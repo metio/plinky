@@ -7,6 +7,7 @@ import {
     namingFor,
     noteSymbolIn,
     noteTextIn,
+    octaveOf,
     openingIn,
 } from "../../core/noteNaming";
 import type { Prefs } from "../../core/prefs";
@@ -46,6 +47,11 @@ export function pitchText(pitch: number, naming: Naming, spelling: Spelling = "s
 
 export function pitchSymbol(pitch: number, naming: Naming, spelling: Spelling = "sharp"): string {
     return noteSymbol(noteNameOf(pitch, spelling), naming);
+}
+
+// A key with its octave, as a readout prints it: C4, Ais4, la♯4.
+export function pitchName(pitch: number, naming: Naming): string {
+    return `${pitchSymbol(pitch, naming)}${octaveOf(pitch)}`;
 }
 
 // The tonic of a minor key, lower case where the language writes it so.

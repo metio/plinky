@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { nextIn } from "../../../core/cycle";
-import { labelsIn, pickedLabels } from "../../../core/noteNaming";
+import { labelsIn, namingFor, pickedLabels } from "../../../core/noteNaming";
 import {
     NOTE_HINT_CYCLE,
     NOTE_LABEL_CYCLE,
     type NoteHints,
     type NoteLabels,
 } from "../../../core/prefs";
+import { noteSymbol } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { KeysIcon, SpeakerOffIcon, SpeakerIcon } from "../ui/icons";
@@ -27,14 +28,17 @@ const hintGlyph: Record<NoteHints, string> = { always: "◉", miss: "◐", never
 const CYCLE_BUTTON =
     "min-w-9 rounded-md px-2 py-1 text-xs font-medium tabular-nums text-muted hover:bg-subtle hover:text-ink";
 
-// The glyph stands for the naming itself: letters, the one landmark letter, the
-// first solfège syllable, or nothing.
-const labelGlyph: Record<Exclude<NoteLabels, "auto">, string> = {
-    all: "ABC",
-    c: "C",
-    solfege: "do",
-    off: "–",
-};
+// The glyph stands for the naming itself: letters, the one landmark named as the C keys
+// then print it, the first solfège syllable, or nothing.
+function labelGlyph(labels: Exclude<NoteLabels, "auto">, locale: string): string {
+    if (labels === "all") {
+        return "ABC";
+    }
+    if (labels === "off") {
+        return "–";
+    }
+    return noteSymbol("c", namingFor(labels, locale));
+}
 
 export function KeyboardQuickControls({
     hidden,
@@ -92,7 +96,7 @@ export function KeyboardQuickControls({
                         }`}
                         className={CYCLE_BUTTON}
                     >
-                        {labelGlyph[labels]}
+                        {labelGlyph(labels, locale)}
                     </button>
                     {noteHints !== undefined && onNoteHints !== undefined && (
                         <button

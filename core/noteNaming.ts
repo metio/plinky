@@ -378,10 +378,15 @@ export function spokenNoteIn(midi: number, naming: Naming, words: NoteWords): st
     return naming.spokenSharp === "word" ? words.sharp(below) : words.spokenSharp(below);
 }
 
-// The same with its octave, middle C in the fourth — an octave digit run onto the name is
-// spoken as one word, so it stands apart.
+// The octave a key sits in, counted so that middle C (MIDI 60) is C4.
+export function octaveOf(midi: number): number {
+    return Math.floor(midi / 12) - 1;
+}
+
+// The same with its octave — an octave digit run onto the name is spoken as one word,
+// so it stands apart.
 export function spokenKeyIn(midi: number, naming: Naming, words: NoteWords): string {
-    return `${spokenNoteIn(midi, naming, words)} ${Math.floor(midi / 12) - 1}`;
+    return `${spokenNoteIn(midi, naming, words)} ${octaveOf(midi)}`;
 }
 
 // The natural names of the letter systems, in scale order: the two choices a player is

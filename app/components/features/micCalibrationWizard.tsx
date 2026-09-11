@@ -13,7 +13,8 @@ import {
     stepProgress,
     stepReady,
 } from "../../../core/micCalibration";
-import { noteName } from "../../../core/midi";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { pitchName } from "../../lib/noteNames";
 import { useMidiConnection } from "../../contexts/midi";
 import { useScheduler } from "../../contexts/services";
 import { usePrefs } from "../../hooks/usePrefs";
@@ -50,6 +51,7 @@ export function MicCalibrationWizard() {
     const { micStatus, startCalibration, stopMic } = useMidiConnection();
     const { prefs, update } = usePrefs();
     const scheduler = useScheduler();
+    const naming = useNoteNaming();
     const [open, setOpen] = useState(false);
     const [state, setState] = useState(() => beginCalibration(TARGET_NOTE));
     const [saved, setSaved] = useState(false);
@@ -159,7 +161,7 @@ export function MicCalibrationWizard() {
                     {state.step === "note" && (
                         <div className="flex items-center gap-3">
                             <span className="rounded-md bg-raised px-3 py-1.5 font-mono text-lg font-semibold text-accent-deep shadow-sm">
-                                {noteName(TARGET_NOTE)}
+                                {pitchName(TARGET_NOTE, naming)}
                             </span>
                             {heard !== null && (
                                 <span className="text-sm font-medium text-success">

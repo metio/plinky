@@ -3,21 +3,26 @@
 
 import { describe, expect, it } from "vitest";
 import { DEFAULT_DRILL, type DrillOptions, generateDrill, MAX_FIFTHS, MIN_FIFTHS } from "./drill";
-import { clampDrill, DRILL_FIELDS, keyName } from "./drillSpec";
+import { clampDrill, DRILL_FIELDS, majorTonicOf } from "./drillSpec";
+import { NOTE_TEXT } from "./theory";
 
-describe("keyName", () => {
-    it("names the signature the way a reader would", () => {
-        expect(keyName(0)).toBe("C");
-        expect(keyName(1)).toBe("G");
-        expect(keyName(-1)).toBe("F");
-        expect(keyName(MAX_FIFTHS)).toBe("C#");
-        expect(keyName(MIN_FIFTHS)).toBe("Cb");
+describe("majorTonicOf", () => {
+    it("spells the tonic of the major key a signature reads as", () => {
+        expect(majorTonicOf(0)).toBe("c");
+        expect(majorTonicOf(1)).toBe("g");
+        expect(majorTonicOf(-1)).toBe("f");
+        expect(majorTonicOf(-2)).toBe("b-flat");
+        expect(majorTonicOf(MAX_FIFTHS)).toBe("c-sharp");
+        expect(majorTonicOf(MIN_FIFTHS)).toBe("c-flat");
     });
 
-    it("names something for every signature the fields offer", () => {
+    it("spells a real note for every signature the fields offer, each once", () => {
+        const tonics = new Set<string>();
         for (let fifths = MIN_FIFTHS; fifths <= MAX_FIFTHS; fifths++) {
-            expect(keyName(fifths)).toMatch(/^[A-G][b#]?$/);
+            expect(NOTE_TEXT).toHaveProperty(majorTonicOf(fifths));
+            tonics.add(majorTonicOf(fifths));
         }
+        expect(tonics.size).toBe(MAX_FIFTHS - MIN_FIFTHS + 1);
     });
 });
 

@@ -12,25 +12,10 @@ import {
     KEYBOARD_DEVICE,
     keyToNote,
     MIC_DEVICE,
-    noteName,
     ON_SCREEN_DEVICE,
     parseMidiMessage,
     soundsOnItsOwn,
 } from "./midi";
-
-describe("noteName", () => {
-    it("names middle C and its neighbours", () => {
-        expect(noteName(60)).toBe("C4");
-        expect(noteName(69)).toBe("A4");
-        expect(noteName(61)).toBe("C#4");
-        expect(noteName(72)).toBe("C5");
-    });
-
-    it("names a note below MIDI 0 with a floor-mod instead of indexing off the array", () => {
-        expect(noteName(-1)).toBe("B-2");
-        expect(noteName(-12)).toBe("C-2");
-    });
-});
 
 describe("keyToNote", () => {
     it("maps the left hand to a full octave on the bottom row from C4", () => {

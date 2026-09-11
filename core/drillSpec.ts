@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type { NoteNameId } from "./theory";
 import {
     DRILL_RHYTHMS,
     type DrillOptions,
@@ -39,28 +40,29 @@ export const DRILL_FIELDS: readonly DrillField[] = [
     { id: "smoothness", kind: "number", min: 0, max: 6 },
 ];
 
-// The major key a signature spells, for naming a choice the reader recognises —
-// nobody picks "three sharps", they pick A major.
-const MAJOR_KEYS = [
-    "Cb",
-    "Gb",
-    "Db",
-    "Ab",
-    "Eb",
-    "Bb",
-    "F",
-    "C",
-    "G",
-    "D",
-    "A",
-    "E",
-    "B",
-    "F#",
-    "C#",
+// The tonic of the major key a signature spells, for naming a choice the reader
+// recognises — nobody picks "three sharps", they pick A major. The app names it in the
+// reader's own note names.
+const MAJOR_TONICS: NoteNameId[] = [
+    "c-flat",
+    "g-flat",
+    "d-flat",
+    "a-flat",
+    "e-flat",
+    "b-flat",
+    "f",
+    "c",
+    "g",
+    "d",
+    "a",
+    "e",
+    "b",
+    "f-sharp",
+    "c-sharp",
 ];
 
-export function keyName(fifths: number): string {
-    return MAJOR_KEYS[fifths - MIN_FIFTHS] ?? "C";
+export function majorTonicOf(fifths: number): NoteNameId {
+    return MAJOR_TONICS[fifths - MIN_FIFTHS] ?? "c";
 }
 
 // A drill with every value forced back inside what the generator can use: the

@@ -24,21 +24,11 @@ export type MidiNoteEvent = {
     id: number;
     kind: "noteon" | "noteoff";
     note: number;
-    noteName: string;
     velocity: number;
     channel: number;
     device: string;
     timestamp: number;
 };
-
-const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-// MIDI note 60 is middle C (C4), so the octave is offset by one below the raw
-// division by twelve. The pitch class is taken with a floor-mod so a note below
-// MIDI 0 still names a real letter rather than indexing off the end of the array.
-export function noteName(note: number): string {
-    return `${NOTE_NAMES[((note % 12) + 12) % 12]!}${Math.floor(note / 12) - 1}`;
-}
 
 // The MIDI control-change number each pedal speaks on: sustain 64, sostenuto 66, soft 67.
 const PEDAL_CC: Record<number, PedalKind> = { 64: "sustain", 66: "sostenuto", 67: "soft" };

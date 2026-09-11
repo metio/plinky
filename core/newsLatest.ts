@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**The last few English note names now use your keys' names too.** The notes held\nin the MIDI settings, the note the microphone hears and the one its setup asks\nfor, your hand size, your piano's range, the drill's range and key, the key on the\nhome page's Arcade button, the fingering editor and the notes you take longest to\nfind on Stats all still printed English letters. A German player read B4 where the\nkeys said H, and a French player read A4 beside keys saying la. They now name every\nnote the way your keys do. Your note names also follow the page's language until\nyou choose them yourself in Settings: changing the volume no longer fixes them in\nplace.",
+                twip: true,
+            },
+            {
                 body: "**Note names on the keys are easier to read.** The names printed on the on-screen\nkeys were a pale grey that was hard to make out on a white key, and harder still on\none lit green, red or blue. They are darker now, and on a lit key they change with\nits colour, so a name stays readable whichever state the key is in, on every\nkeyboard look, in light and dark mode.",
                 twip: true,
             },

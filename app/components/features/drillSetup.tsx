@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { DrillOptions } from "../../../core/drill";
-import { clampDrill, DRILL_FIELDS, type DrillField, keyName } from "../../../core/drillSpec";
+import { clampDrill, DRILL_FIELDS, type DrillField, majorTonicOf } from "../../../core/drillSpec";
+import type { Naming } from "../../../core/noteNaming";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { noteSymbol, pitchName } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
 import { ChoiceField, SwitchField } from "../ui/fields";
 import { SlidersIcon } from "../ui/icons";
@@ -38,18 +41,11 @@ const RHYTHM_LABEL: Record<string, () => string> = {
     varied: m.drill_rhythm_varied,
 };
 
-// Middle C is MIDI 60, and the octave numbering names it C4.
-const LETTERS = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
-
-export function noteName(midi: number): string {
-    return `${LETTERS[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`;
-}
-
 // How a numeric field's current value reads: most are plain counts, but a key is a
-// key's name, and a leap of nothing is no limit at all.
-function readNumber(id: DrillField["id"], value: number): string {
+// key's name, named as the keys name it, and a leap of nothing is no limit at all.
+function readNumber(id: DrillField["id"], value: number, naming: Naming): string {
     if (id === "fifths") {
-        return keyName(value);
+        return noteSymbol(majorTonicOf(value), naming);
     }
     if (id === "maxLeap") {
         return value === 0 ? m.drill_leap_free() : m.semitones_count({ count: value });
@@ -66,6 +62,7 @@ export function DrillSetup({
     value: DrillOptions;
     onChange: (next: DrillOptions) => void;
 }) {
+    const naming = useNoteNaming();
     const update = (patch: Partial<DrillOptions>) => onChange(clampDrill({ ...value, ...patch }));
 
     return (
@@ -126,7 +123,7 @@ export function DrillSetup({
                             <span className="block text-sm font-medium text-body">{label}</span>
                             <div className="flex flex-wrap items-center gap-4">
                                 <Stepper
-                                    value={noteName(value.low)}
+                                    value={pitchName(value.low, naming)}
                                     decrementLabel={m.drill_range_lower_down()}
                                     incrementLabel={m.drill_range_lower_up()}
                                     canDecrement={value.low > field.min}
@@ -135,7 +132,7 @@ export function DrillSetup({
                                     onIncrement={() => update({ low: value.low + 1 })}
                                 />
                                 <Stepper
-                                    value={noteName(value.high)}
+                                    value={pitchName(value.high, naming)}
                                     decrementLabel={m.drill_range_upper_down()}
                                     incrementLabel={m.drill_range_upper_up()}
                                     canDecrement={value.high > value.low}
@@ -153,7 +150,7 @@ export function DrillSetup({
                     <div key={field.id} className="space-y-1">
                         <span className="block text-sm font-medium text-body">{label}</span>
                         <Stepper
-                            value={readNumber(field.id, current)}
+                            value={readNumber(field.id, current, naming)}
                             decrementLabel={m.drill_less({ field: label })}
                             incrementLabel={m.drill_more({ field: label })}
                             canDecrement={current > field.min}

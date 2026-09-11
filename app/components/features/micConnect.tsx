@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { MIC_DEVICE } from "../../../core/midi";
-import { noteName } from "../../../core/midi";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { pitchName } from "../../lib/noteNames";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { useState } from "react";
 import { m } from "../../paraglide/messages.js";
@@ -15,6 +16,7 @@ import { MicCalibrationWizard } from "./micCalibrationWizard";
 // Settings hides this whole block where no microphone API exists.
 export function MicConnect() {
     const { micStatus, startMic, stopMic } = useMidiConnection();
+    const naming = useNoteNaming();
     const [heard, setHeard] = useState<number | null>(null);
 
     useMidiInput({
@@ -52,7 +54,7 @@ export function MicConnect() {
                         <>
                             {m.mic_heard()}{" "}
                             <span className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-accent-deep">
-                                {noteName(heard)}
+                                {pitchName(heard, naming)}
                             </span>
                         </>
                     )}

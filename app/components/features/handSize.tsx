@@ -3,7 +3,8 @@
 
 import { useState } from "react";
 import { useMidiInput } from "../../contexts/midi";
-import { noteName } from "../../../core/midi";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { pitchName } from "../../lib/noteNames";
 import { spanName } from "../../lib/theoryNames";
 import type { HandSpan } from "../../../core/prefs";
 import { usePrefs } from "../../hooks/usePrefs";
@@ -22,6 +23,7 @@ const SIDES: Side[] = ["left", "right"];
 // as note events — so the two furthest keys the player reaches give the span.
 export function HandSize() {
     const { prefs, update } = usePrefs();
+    const naming = useNoteNaming();
     const spans = prefs.handSpan;
     const [active, setActive] = useState<Side | null>(null);
     const [captured, setCaptured] = useState<number[]>([]);
@@ -62,13 +64,13 @@ export function HandSize() {
     if (thumb === undefined) {
         readout = m.hand_size_tap_thumb();
     } else if (pinky === undefined) {
-        readout = `${noteName(thumb)} — ${m.hand_size_tap_pinky()}`;
+        readout = `${pitchName(thumb, naming)} — ${m.hand_size_tap_pinky()}`;
     } else {
         const span = Math.abs(pinky - thumb);
         // The semitone count always shows; the interval name is an extra gloss that a
         // very wide reach (a stray MIDI value) drops, so the count stands alone.
         const name = spanName(span);
-        const glossed = `${noteName(thumb)} → ${noteName(pinky)} · ${m.semitones_count({ count: span })}`;
+        const glossed = `${pitchName(thumb, naming)} → ${pitchName(pinky, naming)} · ${m.semitones_count({ count: span })}`;
         readout = name ? `${glossed} · ${name}` : glossed;
     }
 

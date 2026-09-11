@@ -5,12 +5,19 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { m } from "../../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../../paraglide/runtime.js";
 import { pressed } from "../../testing/controls";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    overwriteGetLocale(() => baseLocale);
+});
 
 const noop = () => {};
+
+// The label cycle as the page names it, read in whatever language the test set.
+const labelsButton = () => `${m.settings_note_labels()}: ${m.note_labels_c()}`;
 
 function renderControls(overrides: Partial<Parameters<typeof KeyboardQuickControls>[0]> = {}) {
     return render(
@@ -32,6 +39,32 @@ describe("KeyboardQuickControls", () => {
         renderControls({ noteLabels: "all", onNoteLabels });
         fireEvent.click(screen.getByRole("button", { name: "Note names on the keys: Every key" }));
         expect(onNoteLabels).toHaveBeenCalledWith("c");
+    });
+
+    it("shows a device that has picked nothing as the language's own naming", () => {
+        overwriteGetLocale(() => "fr");
+        renderControls({ noteLabels: "auto" });
+        expect(
+            screen.getByRole("button", {
+                name: `${m.settings_note_labels()}: ${m.note_labels_solfege()}`,
+            }),
+        ).toBeTruthy();
+    });
+
+    it("stores the language's own naming as auto when the cycle comes back to it", () => {
+        overwriteGetLocale(() => "fr");
+        const onNoteLabels = vi.fn();
+        renderControls({ noteLabels: "c", onNoteLabels });
+        fireEvent.click(screen.getByRole("button", { name: labelsButton() }));
+        expect(onNoteLabels).toHaveBeenCalledWith("auto");
+    });
+
+    it("prints the C landmark the way the C keys print it", () => {
+        overwriteGetLocale(() => "ru");
+        renderControls({ noteLabels: "c" });
+        expect(screen.getByRole("button", { name: labelsButton() }).textContent).toBe(
+            m.solfege_do(),
+        );
     });
 
     it("names the solfège labels for what they are, not as off", () => {

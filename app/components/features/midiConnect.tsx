@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
-import { noteName } from "../../../core/midi";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { pitchName } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { usePrefs } from "../../hooks/usePrefs";
@@ -15,6 +16,7 @@ import { sectionLabelClasses } from "../ui/classes";
 export function MidiConnect() {
     const heldNotes = useHeldNotes();
     const { prefs } = usePrefs();
+    const naming = useNoteNaming();
     const { support, status, error, devices, octaveOffset, requestAccess } = useMidiConnection();
 
     return (
@@ -76,7 +78,7 @@ export function MidiConnect() {
                                 key={note}
                                 className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-accent-deep"
                             >
-                                {noteName(note)} ({note})
+                                {pitchName(note, naming)} ({note})
                             </span>
                         ))}
                     </div>

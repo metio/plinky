@@ -3,7 +3,9 @@
 
 import { useState } from "react";
 import { keysIn, sizeFromName } from "../../../core/instrumentRange";
-import { isPreciseInput, noteName } from "../../../core/midi";
+import { isPreciseInput } from "../../../core/midi";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { pitchName } from "../../lib/noteNames";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { useInstrumentRange } from "../../hooks/useInstrumentRange";
 import { usePrefs } from "../../hooks/usePrefs";
@@ -24,6 +26,7 @@ import { SettingsSection } from "../ui/settingsSection";
 export function InstrumentRangeSetting() {
     const { prefs, update } = usePrefs();
     const { devices } = useMidiConnection();
+    const naming = useNoteNaming();
     const range = useInstrumentRange();
     const [measuring, setMeasuring] = useState(false);
     const [pressed, setPressed] = useState<number[]>([]);
@@ -69,8 +72,8 @@ export function InstrumentRangeSetting() {
         pressed.length === 0
             ? m.instrument_range_awaiting_lowest()
             : low === undefined
-              ? `${noteName(pressed[0]!)} · ${m.instrument_range_awaiting_highest()}`
-              : `${noteName(low)} → ${noteName(high!)}`;
+              ? `${pitchName(pressed[0]!, naming)} · ${m.instrument_range_awaiting_highest()}`
+              : `${pitchName(low, naming)} → ${pitchName(high!, naming)}`;
 
     return (
         <SettingsSection

@@ -35,6 +35,19 @@ describe("SlowNotes", () => {
         expect(container.firstChild).toBeNull();
     });
 
+    it("names a slow note as a German reader's keys name it", () => {
+        overwriteGetLocale(() => "de");
+        mount({
+            "71": { plays: 10, wrongs: 0, totalMs: 12000, timed: 10 },
+            "70": { plays: 10, wrongs: 0, totalMs: 8000, timed: 10 },
+        });
+
+        const rows = screen.getAllByRole("listitem").map((li) => li.textContent);
+        expect(rows[0]).toContain("H4");
+        expect(rows[1]).toContain("Ais4");
+        expect(rows.join(" ")).not.toContain("B4");
+    });
+
     it("lists the slowest notes by name, longest first", () => {
         mount({
             "60": { plays: 10, wrongs: 0, totalMs: 3000, timed: 10 },

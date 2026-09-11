@@ -7,7 +7,9 @@ import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
 import { msUntilPartOfDayChanges, partOfDay } from "../../../core/greeting";
 import { GreetingScene } from "./greetingScene";
-import { buildExerciseId, keyName } from "../../../core/exerciseGen";
+import { buildExerciseId } from "../../../core/exerciseGen";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { noteSymbol } from "../../lib/noteNames";
 import { type Letter, letterFor } from "../../../core/grade";
 import { summarizePractice } from "../../../core/history";
 import { type Standing, type StandingPart, standingParts } from "../../../core/standing";
@@ -311,6 +313,7 @@ type Session = {
 // appears once the client resolves it.
 export function HomeToday() {
     const prefsStore = usePrefsStore();
+    const naming = useNoteNaming();
     // The two things the day's practice can offer to set up, read live: an instrument to
     // play on, and the hand the finger positions are fitted to.
     const midiReady = useMidiConnected();
@@ -550,7 +553,7 @@ export function HomeToday() {
                         }
                     }
                     arcadeTo={`/play/${arcadeId}`}
-                    arcadeKey={keyName(arcadeConfig(session.arcadeLevel).key)}
+                    arcadeKey={noteSymbol(arcadeConfig(session.arcadeLevel).key, naming)}
                 />
                 {/* Somewhere to put your hands before anything is asked of them. It is
                     the same instrument the practice surfaces use, so a warm-up here and

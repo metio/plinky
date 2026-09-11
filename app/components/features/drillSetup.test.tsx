@@ -7,9 +7,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_DRILL, type DrillOptions } from "../../../core/drill";
 import { DRILL_FIELDS } from "../../../core/drillSpec";
 import { m } from "../../paraglide/messages.js";
-import { DrillSetup, noteName } from "./drillSetup";
+import { baseLocale, overwriteGetLocale } from "../../paraglide/runtime.js";
+import { DrillSetup } from "./drillSetup";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    overwriteGetLocale(() => baseLocale);
+});
 
 function mount(over: Partial<DrillOptions> = {}) {
     const onChange = vi.fn();
@@ -18,12 +22,20 @@ function mount(over: Partial<DrillOptions> = {}) {
     return { onChange, value };
 }
 
-describe("noteName", () => {
-    it("names a MIDI note the way a keyboard does", () => {
-        expect(noteName(60)).toBe("C4");
-        expect(noteName(21)).toBe("A0");
-        expect(noteName(108)).toBe("C8");
-        expect(noteName(61)).toBe("C♯4");
+describe("the range and key readouts", () => {
+    it("name the ends of the range and the key as the keys name them", () => {
+        mount({ low: 59, high: 70, fifths: -2 });
+        expect(screen.getByText("B3")).toBeTruthy();
+        expect(screen.getByText("A♯4")).toBeTruthy();
+        expect(screen.getByText("B♭")).toBeTruthy();
+    });
+
+    it("say H for B natural and B for B flat to a German reader", () => {
+        overwriteGetLocale(() => "de");
+        mount({ low: 59, high: 70, fifths: -2 });
+        expect(screen.getByText("H3")).toBeTruthy();
+        expect(screen.getByText("Ais4")).toBeTruthy();
+        expect(screen.getByText("B")).toBeTruthy();
     });
 });
 

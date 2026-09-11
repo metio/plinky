@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { fingerPositions } from "../../../core/fingering";
 import { barHeat } from "../../../core/fingerHeat";
 import { fingerQualities } from "../../../core/fingeringScore";
-import { noteName } from "../../../core/midi";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { pitchName } from "../../lib/noteNames";
 import type { MeasureBox } from "../../../core/scoreCanvas";
 import { scoreToTimedBars, staffFor } from "../../../core/scoreToBars";
 import { useFingeringStore, usePrefsStore, useXmlCodec } from "../../contexts/services";
@@ -73,6 +74,7 @@ export function FingeringStrip({
     renderVersion: number;
 }) {
     const prefsStore = usePrefsStore();
+    const naming = useNoteNaming();
     const xmlCodec = useXmlCodec();
     const fingering = useFingeringStore();
     const [hand, setHand] = useState<Hand>("right");
@@ -296,7 +298,7 @@ export function FingeringStrip({
                                             }`}
                                         >
                                             <span className="font-mono text-xs text-body">
-                                                {noteName(pitch)}
+                                                {pitchName(pitch, naming)}
                                             </span>
                                             <span className="text-base font-semibold tabular-nums">
                                                 {fingers[p]?.[note] ?? "·"}

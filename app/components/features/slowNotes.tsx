@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useSyncExternalStore } from "react";
-import { noteName } from "../../../core/midi";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { pitchName } from "../../lib/noteNames";
 import { type NoteStats, slowestNotes, typicalMs } from "../../../core/noteStats";
 import { secondsFigure } from "../../../core/seconds";
 import { useNoteStatsStore } from "../../contexts/services";
@@ -31,6 +32,7 @@ export function SlowNotes({
     headed?: boolean;
 }) {
     const store = useNoteStatsStore();
+    const naming = useNoteNaming();
     const stats = useSyncExternalStore(store.subscribe, store.load, () => NOTHING_YET);
     const slow = slowestNotes(stats);
     const typical = typicalMs(stats);
@@ -54,7 +56,7 @@ export function SlowNotes({
                 {slow.map((row) => (
                     <li key={row.note} className="flex items-center gap-3 text-sm">
                         <span className="w-14 shrink-0 font-medium tabular-nums">
-                            {noteName(row.note)}
+                            {pitchName(row.note, naming)}
                         </span>
                         <span
                             className="h-2 rounded-full bg-accent-soft"

@@ -20,7 +20,6 @@ function note(device: string, pitch = 60, at = 1_000): MidiNoteEvent {
         id: 1,
         kind: "noteon",
         note: pitch,
-        noteName: "C4",
         velocity: 90,
         channel: 1,
         device,
