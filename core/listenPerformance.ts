@@ -370,6 +370,10 @@ export type PlayedNote = {
 };
 
 // How far through the piece's last bar a step is, 0 to 1, or null anywhere before it.
+//
+// Counted in positions rather than steps. A position spelled out into sub-steps — a rolled
+// chord, an ornament's figure — is one place in the bar, so each of its steps takes that
+// place and broadens exactly as the same position struck plainly would.
 export function finalBarProgress(steps: readonly ListenStep[], index: number): number | null {
     const last = steps[steps.length - 1]?.measureIndex;
     const step = steps[index];
@@ -380,11 +384,17 @@ export function finalBarProgress(steps: readonly ListenStep[], index: number): n
     while (first > 0 && steps[first - 1]?.measureIndex === last) {
         first -= 1;
     }
-    let count = 0;
-    for (let at = first; at < steps.length && steps[at]?.measureIndex === last; at++) {
-        count += 1;
+    let places = 0;
+    let place = 0;
+    for (let at = first; at < steps.length && steps[at]?.measureIndex === last; ) {
+        const { to } = subStepsOf(steps, at);
+        if (index >= at && index <= to) {
+            place = places;
+        }
+        places += 1;
+        at = to + 1;
     }
-    return count <= 1 ? 1 : (index - first) / (count - 1);
+    return places <= 1 ? 1 : place / (places - 1);
 }
 
 // The steps one position was spelled out into — a rolled chord's notes, an ornament's or a

@@ -251,6 +251,21 @@ describe("a position spelled out into sub-steps", () => {
         expect(sum(held)).toBeCloseTo(listenStepMs([1], 180), 9);
     });
 
+    it("holds graces and a principal on different stretches for their written time", () => {
+        // A fermata stretches the principal and not the graces leaning on it. At 60 bpm
+        // the first grace is 20 ms, under the floor, and the position still ends where
+        // each sub-step's written length at its own stretch puts it.
+        const split = [
+            step([62], { lengths: [0.02], position: 4, advancesCursor: false, stretch: 1 }),
+            step([64], { lengths: [0.25], position: 4, advancesCursor: false, stretch: 1 }),
+            step([60], { lengths: [0.75], position: 4, stretch: 2 }),
+        ];
+        const held = advances(split, 60);
+        expect(sum(held)).toBeCloseTo(20 + 250 + 1500, 9);
+        expect(held[0]).toBe(MIN_STEP_MS);
+        expect(held[1]).toBeCloseTo(250, 9);
+    });
+
     it("shares a position too short for every floor out in its written proportions", () => {
         // A semiquaver at 180 bpm is 83 ms, too short for three 40 ms floors and a last note.
         const rolled = rollChord(step([60, 64, 67, 72], { lengths: [0.25], bpm: 180 }));
@@ -406,6 +421,14 @@ describe("finalBarProgress", () => {
         expect(finalBarProgress(steps, 2)).toBe(0.5);
         expect(finalBarProgress(steps, 3)).toBe(1);
         expect(finalBarProgress([step([60])], 0)).toBe(1);
+    });
+
+    it("gives every sub-step of a position the place of that position", () => {
+        // A rolled chord then a plain note in the last bar: two places in it, however many
+        // steps the chord was spelled out into.
+        const rolled = rollChord(step([60, 64, 67], { measureIndex: 1, position: 1 }));
+        const steps = [step([55]), ...rolled, step([72], { measureIndex: 1, position: 2 })];
+        expect(steps.map((_, index) => finalBarProgress(steps, index))).toEqual([null, 0, 0, 0, 1]);
     });
 });
 

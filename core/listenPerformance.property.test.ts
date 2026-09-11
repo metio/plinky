@@ -211,6 +211,32 @@ describe("the listening performance, whatever the page says", () => {
         );
     });
 
+    it("holds a rolled chord in the last bar exactly as long as the same chord struck", () => {
+        // The last bar broadens as it goes, and a position spelled out into sub-steps is
+        // still one place in that bar: every sub-step takes the broadening of the chord.
+        fc.assert(
+            fc.property(
+                listenStep.filter((step) => step.notes.length > 1),
+                fc.integer({ min: 20, max: 400 }),
+                (plain, tempo) => {
+                    const rolled = rollChord({ ...plain, advancesCursor: true });
+                    const held = rolled.reduce(
+                        (sum, _, index) =>
+                            sum + performListenStep(rolled, index, tempo, true).advanceMs,
+                        0,
+                    );
+                    const struck = performListenStep(
+                        [{ ...plain, advancesCursor: true }],
+                        0,
+                        tempo,
+                        true,
+                    ).advanceMs;
+                    expect(held).toBeCloseTo(struck, 6);
+                },
+            ),
+        );
+    });
+
     it("holds any position's sub-steps for their written time together, never less than zero", () => {
         fc.assert(
             fc.property(
