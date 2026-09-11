@@ -31,6 +31,8 @@ import type { AudioExporter } from "../ports/audioExporter";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { exerciseName } from "../lib/exerciseNames";
+import { namingOf } from "../lib/noteNames";
+import { getLocale } from "../paraglide/runtime.js";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
 import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
@@ -176,12 +178,14 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     // rest of the app is given — a test that injects a fake clock drives the
     // mic's loop with it too, rather than the mic quietly keeping its own.
     const scheduler = overrides.scheduler ?? browserScheduler;
+    // A device that has chosen nothing names notes the way its page's language does.
+    const prefs = overrides.prefs ?? createPrefsStore(store, getLocale());
     return {
         store,
         persistence: overrides.persistence ?? webStoragePersistence,
         errors: overrides.errors ?? createErrorLogStore(store),
         errorFeed: overrides.errorFeed ?? windowErrors,
-        prefs: overrides.prefs ?? createPrefsStore(store),
+        prefs,
         mastery: overrides.mastery ?? createMasteryStore(store),
         history: overrides.history ?? createHistoryStore(store),
         practiceLog: overrides.practiceLog ?? createPracticeLogStore(store),
@@ -211,7 +215,11 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         songs: overrides.songs ?? createSongSource(fetcher),
         people: overrides.people ?? createPeopleSource(fetcher),
         news: overrides.news ?? createNewsSource(fetcher),
-        exercises: overrides.exercises ?? createExerciseSource(fetcher, exerciseName),
+        // A scale's title names its key the way the player's keys name it, read when the
+        // title is made so a changed choice reaches the next list drawn.
+        exercises:
+            overrides.exercises ??
+            createExerciseSource(fetcher, (config) => exerciseName(config, namingOf(prefs.load()))),
         video: overrides.video ?? lazyVideoExporter,
         audioFile: overrides.audioFile ?? lazyAudioExporter,
         // The shared app-wide instance by default — the composition root watches

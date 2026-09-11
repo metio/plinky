@@ -49,7 +49,10 @@ import { type Groove, GROOVES } from "../../core/groove";
 import { BARS_PER_ROW, METRONOME_SUBDIVISIONS, NOTE_SCALES, REVEAL_TRIES } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, type Prefs, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
+import { lettersIn, naturalsIn } from "../../core/noteNaming";
+import { namingOf } from "../lib/noteNames";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/settings";
 import { PageHeader } from "../components/ui/pageHeader";
 import { useScrollToHash } from "../hooks/useScrollToHash";
@@ -83,6 +86,8 @@ export default function Settings() {
     useScrollToHash();
 
     const { prefs, update } = usePrefs();
+    // What the keys call a note, which decides whether a letter choice means anything.
+    const naming = namingOf(prefs);
     const synth = useSynth();
     const { support: midiSupport, micStatus, keyLights, devices } = useMidiConnection();
     const { hash } = useLocation();
@@ -409,6 +414,21 @@ export default function Settings() {
                             ]}
                             help={m.settings_note_labels_help()}
                         />
+                        {/* B or H only means something while letters name the notes; with
+                        do re mi on the keys there is no letter to choose. The options are
+                        the names themselves, which no translation should touch. */}
+                        {naming.system !== "solfege" && (
+                            <ChoiceField
+                                label={m.settings_note_letters()}
+                                value={lettersIn(prefs.noteLetters, getLocale())}
+                                onChange={(noteLetters: "b" | "h") => update({ noteLetters })}
+                                options={[
+                                    { id: "b", label: naturalsIn("b").join(" ") },
+                                    { id: "h", label: naturalsIn("h").join(" ") },
+                                ]}
+                                help={m.settings_note_letters_help()}
+                            />
+                        )}
                         {/* The choice, demonstrated: a real octave that re-labels itself as the
                     pick above changes, and plays when tapped — the same keyboard the
                     practice modes render. */}
@@ -417,6 +437,7 @@ export default function Settings() {
                                 from={60}
                                 to={72}
                                 labels={prefs.noteLabels}
+                                naming={naming}
                                 well="w-full max-w-sm"
                                 onPress={(note) => synth.playNote(note)}
                             />

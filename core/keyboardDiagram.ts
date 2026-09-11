@@ -19,8 +19,7 @@
 
 import { escapeXml } from "./xmlText";
 import { isWhite, keyLane, whiteKeys } from "./keyboardGeometry";
-import { type NoteSystem, noteTextIn } from "./noteNaming";
-import { noteNameOf, pitchClassOf, type Spelling } from "./theory";
+import { NOTE_TEXT, type NoteNameId, noteNameOf, pitchClassOf, type Spelling } from "./theory";
 
 // A marked key, and optionally the finger that plays it.
 export type DiagramKey = { note: number; finger?: number };
@@ -35,9 +34,17 @@ export type DiagramOptions = {
     // Note names on every white key, for a reader who does not yet know them by position.
     noteNames?: boolean;
     spelling?: Spelling;
-    // How the reader's language writes those names: B natural is H in German.
-    system?: NoteSystem;
+    // How the reader writes those names — H for B natural in German, ré in French. A
+    // function rather than a system, because the solfège syllables are translated copy
+    // this module has no business reading.
+    spell?: NoteSpeller;
 };
+
+// A spelled note as a label writes it.
+export type NoteSpeller = (name: NoteNameId) => string;
+
+// The letter names, for a picture drawn with no reader in mind.
+export const letterSpeller: NoteSpeller = (name) => NOTE_TEXT[name];
 
 const WIDTH = 1200;
 const KEYBED_TOP = 40;
@@ -91,7 +98,7 @@ function diagramBody({
     caption,
     noteNames = false,
     spelling = "sharp",
-    system = "letters",
+    spell = letterSpeller,
 }: DiagramOptions): { markup: string; height: number } {
     const height = KEYBED_TOP * 2 + KEYBED_HEIGHT + (caption ? CAPTION_HEIGHT : 0);
     const marked = new Map(keys.map((key) => [key.note, key.finger]));
@@ -140,7 +147,7 @@ function diagramBody({
         if (noteNames && white) {
             parts.push(
                 `<text x="${round(left + width / 2)}" y="${KEYBED_TOP + KEYBED_HEIGHT - 12}" fill="${LABEL}" font-family="system-ui,sans-serif" font-size="26" text-anchor="middle">${escapeXml(
-                    noteTextIn(noteNameOf(pitchClassOf(note), spelling), system),
+                    spell(noteNameOf(pitchClassOf(note), spelling)),
                 )}</text>`,
             );
         }

@@ -7,6 +7,7 @@ import { readHarmony } from "../../../core/harmony";
 import { readTimeline } from "../../../core/musicxmlTimeline";
 import { type PieceChords as Summary, summarizeChords } from "../../../core/pieceChords";
 import { useXmlCodec } from "../../contexts/services";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { exerciseName } from "../../lib/exerciseNames";
 import { m } from "../../paraglide/messages.js";
 import { linkClasses } from "../ui/classes";
@@ -23,6 +24,7 @@ import { SettingsSection } from "../ui/settingsSection";
 // when the reading finds no chords at all, which a bare melody line is.
 export function PieceChords({ xml }: { xml: string }) {
     const codec = useXmlCodec();
+    const naming = useNoteNaming();
     const summary = useMemo<Summary | null>(() => {
         const doc = codec.parse(xml);
         return doc ? summarizeChords(readHarmony(readTimeline(doc))) : null;
@@ -58,7 +60,7 @@ export function PieceChords({ xml }: { xml: string }) {
                 {summary.chordSet !== null && set !== null && (
                     <li>
                         <Link to={`/play/${summary.chordSet}`} className={linkClasses}>
-                            {exerciseName(set)}
+                            {exerciseName(set, naming)}
                         </Link>
                     </li>
                 )}

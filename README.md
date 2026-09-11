@@ -726,9 +726,15 @@ Still learning where the notes are? The keys can carry their **note names** — 
 or just the C keys as orientation landmarks (the white key left of each pair of black
 keys), or none once the map is second nature — set under **Settings**. They can also
 read as **do re mi** rather than letters: in French, Italian, Spanish, Portuguese,
-Romanian, Russian, Greek and much of Asia those *are* the note names, not a beginner's
-crutch, and the syllables follow the language you're reading Plinky in. Every key is
-labelled by default, so a first-timer can find any note straight away.
+Romanian, Greek, Turkish, Albanian, Russian and Ukrainian those *are* the note names, not
+a beginner's crutch, so that is how the keys start out there, and the syllables follow
+the language you're reading Plinky in. Letters come in two traditions: most of the world
+calls the last white key of the octave B, while German and much of northern and central
+Europe call it H and keep B for B flat. Plinky starts with the one your language uses, and
+**Settings** lets you pick the other. Whatever the keys say, everything else says too — the
+chord readout, the ear-training keys, the key-mapping caps, the tools and theory pages,
+a scale's title and what a screen reader hears. Every key is labelled by default, so a
+first-timer can find any note straight away.
 
 If your piano has lights, Plinky can use them, two different ways. **Settings → Follow
 along on my keyboard** mirrors each note as Plinky plays it, so Listen shows the music

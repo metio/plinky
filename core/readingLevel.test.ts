@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PREFS } from "./prefs";
+import { DEFAULT_PREFS, defaultPrefsFor } from "./prefs";
 import { type AidPrefs, READING_LEVELS, levelAids, levelOf } from "./readingLevel";
 
 describe("levelAids", () => {
@@ -65,6 +65,23 @@ describe("levelOf", () => {
         // Extra fields on the object (as a full Prefs would carry) don't matter.
         const withExtras = { ...levelAids("confident"), sound: false, volume: 10 } as AidPrefs;
         expect(levelOf(withExtras)).toBe("confident");
+    });
+
+    it("reads every key in do re mi as the same rung as every key in letters", () => {
+        expect(levelOf({ ...levelAids("starter"), noteLabels: "solfege" })).toBe("starter");
+        expect(levelOf({ ...levelAids("learning"), noteLabels: "solfege" })).toBe("learning");
+        expect(levelOf({ ...levelAids("confident"), noteLabels: "solfege" })).toBe("custom");
+    });
+
+    it("keeps the player's naming when a level names every key, and never adds one", () => {
+        expect(levelAids("starter", "solfege").noteLabels).toBe("solfege");
+        expect(levelAids("learning", "solfege").noteLabels).toBe("solfege");
+        expect(levelAids("confident", "solfege").noteLabels).toBe("c");
+        expect(levelAids("sightReader", "solfege").noteLabels).toBe("off");
+    });
+
+    it("is the level a fresh device reads as in a do-re-mi language too", () => {
+        expect(levelOf(defaultPrefsFor("fr"))).toBe("starter");
     });
 
     it("is the level a fresh device reads as", () => {

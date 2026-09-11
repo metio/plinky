@@ -87,11 +87,12 @@ const FLAT_NAMES: NoteNameId[] = [
     "b",
 ];
 
-// How each note name is written. Deliberately NOT translated: letter names are not
-// translated anywhere else in Plinky, and one surface reading "Do" beside another
-// reading "C" would be worse than either alone. The keyboard's own labels come from
-// core/keyMap's sharp-only table; this one exists because a key signature has to be
-// able to say D flat rather than C sharp — the key of D flat contains no C sharp.
+// How each note name is written in English letters — one of the naming systems
+// core/noteNaming chooses between, and the one a chord symbol or a picture drawn with no
+// reader in mind falls back on. What a player reads is named by core/noteNaming, which
+// may say H or ré instead. Both spellings of a black key are here because a key
+// signature has to be able to say D flat rather than C sharp — the key of D flat
+// contains no C sharp.
 export const NOTE_TEXT: Record<NoteNameId, string> = {
     c: "C",
     "c-sharp": "C♯",

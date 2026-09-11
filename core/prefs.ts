@@ -13,6 +13,7 @@ import {
     type LightProfileId,
 } from "./lightProfile";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+import { defaultNoteLabels, type NoteLabels, type NoteLetters } from "./noteNaming";
 import type { InstrumentRange } from "./instrumentRange";
 import type { MicCalibration } from "./pitch";
 import { type DecayMode, REVIEW_CAP } from "./review";
@@ -27,11 +28,9 @@ export type HandSpan = { left: number | null; right: number | null };
 // or never (pure sight-reading). A wrong key still flashes red regardless.
 export type NoteHints = "always" | "miss" | "never";
 
-// Whether the keys carry their note name, for a player still learning where the notes
-// are: every key labelled (all), only the C keys as orientation landmarks (c — the
-// white key left of each two-black-key group), or bare (off) once the map is second
-// nature.
-export type NoteLabels = "all" | "c" | "solfege" | "off";
+// How the keys are named and what the rest of the app calls a note live with the naming
+// decision they feed (core/noteNaming); a preference only stores the player's choice.
+export type { NoteLabels, NoteLetters };
 
 export type Prefs = {
     sound: boolean;
@@ -84,6 +83,9 @@ export type Prefs = {
     keepOffline: boolean;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
+    // B or H for the last white key of the octave, wherever a letter names a note. Auto
+    // follows the page's language, so it is only ever set by the player choosing.
+    noteLetters: NoteLetters;
     // Your own instrument makes the sound, so Plinky does not play your notes a second
     // time. A digital piano with speakers, or an acoustic one with MIDI fitted, is already
     // sounding every key you press — answering it adds a second voice a few milliseconds
@@ -218,6 +220,7 @@ const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 // validation list and a cycle that can disagree about what exists.
 export const NOTE_HINT_CYCLE: NoteHints[] = ["always", "miss", "never"];
 export const NOTE_LABEL_CYCLE: NoteLabels[] = ["all", "c", "solfege", "off"];
+const NOTE_LETTERS: NoteLetters[] = ["auto", "b", "h"];
 const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
 // Shared by volume and reverb: both are a whole percentage a slider produces, and both have
@@ -259,7 +262,7 @@ function cleanHandSpan(value: unknown): HandSpan {
     return { left: cleanSpan(span.left), right: cleanSpan(span.right) };
 }
 
-function defaults(): Prefs {
+function defaults(locale: string): Prefs {
     return {
         sound: true,
         volume: 80,
@@ -282,7 +285,10 @@ function defaults(): Prefs {
         chordSymbols: false,
         keepOffline: false,
         noteHints: "always",
-        noteLabels: "all",
+        // Every key named, in the way the reader's language names a note: do re mi in
+        // French or Italian, letters in English or German.
+        noteLabels: defaultNoteLabels(locale),
+        noteLetters: "auto",
         instrumentSounds: false,
         midiEcho: false,
         listenShaping: true,
@@ -365,17 +371,35 @@ function cleanCalibration(value: unknown): MicCalibration | null {
 // A stable defaults object for render snapshots (server render, first hydration):
 // the same reference every time, so a subscription snapshot never loops. Frozen —
 // callers copy before changing, as they do with any loaded prefs.
-export const DEFAULT_PREFS: Readonly<Prefs> = Object.freeze({
-    ...defaults(),
-    handSpan: Object.freeze({ left: null, right: null }),
-    keyMap: Object.freeze(DEFAULT_KEY_MAP) as KeyMap,
-});
+function frozenDefaults(locale: string): Readonly<Prefs> {
+    return Object.freeze({
+        ...defaults(locale),
+        handSpan: Object.freeze({ left: null, right: null }),
+        keyMap: Object.freeze(DEFAULT_KEY_MAP) as KeyMap,
+    });
+}
+
+export const DEFAULT_PREFS: Readonly<Prefs> = frozenDefaults("en");
+
+// The same for a page in another language, whose defaults name notes its own way — so a
+// French page prerenders do re mi on its keys rather than letters it swaps out on load.
+// One object per language, for the same reason as above.
+const LOCALE_DEFAULTS = new Map<string, Readonly<Prefs>>([["en", DEFAULT_PREFS]]);
+export function defaultPrefsFor(locale: string): Readonly<Prefs> {
+    let prefs = LOCALE_DEFAULTS.get(locale);
+    if (prefs === undefined) {
+        prefs = frozenDefaults(locale);
+        LOCALE_DEFAULTS.set(locale, prefs);
+    }
+    return prefs;
+}
 
 // Parses a raw stored string (or null for nothing stored) into full, valid Prefs.
 // Every field is coerced or dropped to its default, so a corrupt or stale store can
-// never leak an out-of-range value into the app.
-export function parsePrefs(raw: string | null): Prefs {
-    const base = defaults();
+// never leak an out-of-range value into the app. What a field defaults to can depend on
+// the page's language: nothing stored names notes the way that language does.
+export function parsePrefs(raw: string | null, locale = "en"): Prefs {
+    const base = defaults(locale);
     return parseJson(raw, base, (value) => {
         // A stored value of the wrong kind — null, a number — throws on the first read
         // below and lands on the defaults, as a corrupt one does.
@@ -405,6 +429,7 @@ export function parsePrefs(raw: string | null): Prefs {
             keepOffline: bool(parsed.keepOffline, base.keepOffline),
             noteHints: oneOf(parsed.noteHints, NOTE_HINT_CYCLE, base.noteHints),
             noteLabels: oneOf(parsed.noteLabels, NOTE_LABEL_CYCLE, base.noteLabels),
+            noteLetters: oneOf(parsed.noteLetters, NOTE_LETTERS, base.noteLetters),
             forgiving: bool(parsed.forgiving, base.forgiving),
             keepUp: bool(parsed.keepUp, base.keepUp),
             guideNotes: bool(parsed.guideNotes, base.guideNotes),

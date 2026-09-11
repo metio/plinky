@@ -36,7 +36,9 @@ import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
-import { localNoteSystem, minorKeyText, noteText } from "../lib/noteNames";
+import type { Naming } from "../../core/noteNaming";
+import { useNoteNaming } from "../hooks/useNoteNaming";
+import { minorKeyText, noteSymbol } from "../lib/noteNames";
 import { chordName, intervalName, scaleName } from "../lib/theoryNames";
 import { diatonicSheetDiagrams } from "../../core/chordSheet";
 import { svgDiagramSheet } from "../../core/keyboardDiagram";
@@ -92,20 +94,21 @@ function Panel({
 // only read.
 // A key spells its own notes: the key of D flat contains no C sharp, so the diagram
 // must say D flat. The explorers below stay on sharps, because there a root is a key on
-// the instrument rather than a key signature. Every name is the reader's own: a German
-// page calls B natural H, and B means B flat there.
-function spell(pitch: PitchClass, key: CircleKey): string {
-    return noteText(noteNameOf(pitch, key.spelling));
+// the instrument rather than a key signature. Every name is the one the player's keys
+// print: a German page calls B natural H and means B flat by B, a French one says ré.
+function spell(pitch: PitchClass, key: CircleKey, naming: Naming): string {
+    return noteSymbol(noteNameOf(pitch, key.spelling), naming);
 }
 
 // A key under the hand, named on sharps.
-function rootName(pitch: number): string {
-    return noteText(noteNameOf(pitchClassOf(pitch)));
+function rootName(pitch: number, naming: Naming): string {
+    return noteSymbol(noteNameOf(pitchClassOf(pitch)), naming);
 }
 
 function CircleOfFifths() {
     const [selected, setSelected] = useState<CircleKey>(CIRCLE[0] as CircleKey);
     const synth = useSynth();
+    const naming = useNoteNaming();
     const notes = signatureNotes(selected);
     const pick = (key: CircleKey) => {
         setSelected(key);
@@ -122,7 +125,7 @@ function CircleOfFifths() {
             <SegmentedControl
                 options={CIRCLE.map((key) => ({
                     id: String(key.tonic),
-                    label: spell(key.tonic, key),
+                    label: spell(key.tonic, key, naming),
                 }))}
                 value={String(selected.tonic)}
                 onChange={(tonic) => {
@@ -138,12 +141,15 @@ function CircleOfFifths() {
                 <dd>
                     {notes.length === 0
                         ? m.tools_circle_none()
-                        : notes.map((name) => noteText(name)).join(" · ")}
+                        : notes.map((name) => noteSymbol(name, naming)).join(" · ")}
                 </dd>
                 <dt className="text-muted">{m.tools_circle_relative()}</dt>
                 <dd>
                     {m.tools_circle_minor({
-                        note: minorKeyText(noteNameOf(selected.relativeMinor, selected.spelling)),
+                        note: minorKeyText(
+                            noteNameOf(selected.relativeMinor, selected.spelling),
+                            naming,
+                        ),
                     })}
                 </dd>
             </dl>
@@ -155,16 +161,16 @@ function CircleOfFifths() {
                 svg={() =>
                     svgDiagramSheet({
                         title: m.tools_circle_sheet_title({
-                            key: spell(selected.tonic, selected),
+                            key: spell(selected.tonic, selected, naming),
                         }),
                         diagrams: diatonicSheetDiagrams(
                             ROOT + selected.tonic,
                             selected.spelling,
-                            localNoteSystem(),
+                            (name) => noteSymbol(name, naming),
                         ),
                     })
                 }
-                filename={`plinky-chords-${spell(selected.tonic, selected)}`}
+                filename={`plinky-chords-${spell(selected.tonic, selected, naming)}`}
                 pictureLabel={m.tools_circle_save_chords()}
             />
         </Panel>
@@ -176,16 +182,17 @@ function CircleOfFifths() {
 // browser's — the architecture confines them and a test needs to advance them.
 // The twelve roots, labelled the way the keyboard is: a root here is a key under the
 // hand rather than a key signature.
-function tonicOptions(): { id: string; label: string }[] {
+function tonicOptions(naming: Naming): { id: string; label: string }[] {
     return Array.from({ length: 12 }, (_, pitch) => ({
         id: String(pitch),
-        label: rootName(pitch),
+        label: rootName(pitch, naming),
     }));
 }
 
 function ScaleExplorer() {
     const [tonic, setTonic] = useState("0");
     const [scale, setScale] = useState<ScaleId>("major");
+    const naming = useNoteNaming();
     const pitches = scalePitches(ROOT + Number(tonic), scale);
     return (
         <Panel title={m.tools_scales_title()} hint={m.tools_scales_hint()}>
@@ -193,7 +200,7 @@ function ScaleExplorer() {
                 label={m.tools_root()}
                 value={tonic}
                 onChange={setTonic}
-                options={tonicOptions()}
+                options={tonicOptions(naming)}
             />
             <SegmentedControl
                 label={m.tools_scale()}
@@ -213,7 +220,7 @@ function ScaleExplorer() {
                 from={ROOT}
                 to={ROOT + 24}
                 keys={pitches.map((note) => ({ note }))}
-                caption={`${rootName(ROOT + Number(tonic))} ${scaleName(scale)}`}
+                caption={`${rootName(ROOT + Number(tonic), naming)} ${scaleName(scale)}`}
                 filename="plinky-scale"
             />
         </Panel>
@@ -223,6 +230,7 @@ function ScaleExplorer() {
 function ChordExplorer() {
     const [root, setRoot] = useState("0");
     const [quality, setQuality] = useState<ChordQuality>("major");
+    const naming = useNoteNaming();
     const pitches = chordPitches(ROOT + Number(root), quality);
     // Two octaves from the root, or as far as the chord reaches: a ninth on B climbs past
     // the top of two octaves and would lose its top note off the keyboard and the picture.
@@ -233,7 +241,7 @@ function ChordExplorer() {
                 label={m.tools_root()}
                 value={root}
                 onChange={setRoot}
-                options={tonicOptions()}
+                options={tonicOptions(naming)}
             />
             <SegmentedControl
                 label={m.tools_chord()}
@@ -246,7 +254,10 @@ function ChordExplorer() {
                 from={ROOT}
                 to={top}
                 keys={pitches.map((note) => ({ note }))}
-                caption={`${rootName(ROOT + Number(root))} ${chordName(quality)}`}
+                caption={m.chord_named({
+                    root: rootName(ROOT + Number(root), naming),
+                    quality: chordName(quality),
+                })}
                 filename="plinky-chord"
             />
         </Panel>
@@ -259,6 +270,7 @@ function ChordExplorer() {
 function IntervalFinder() {
     const [root, setRoot] = useState("0");
     const [interval, pickInterval] = useState<IntervalId>("perfect-fifth");
+    const naming = useNoteNaming();
     const from = ROOT + Number(root);
     const to = from + semitonesOf(interval);
     return (
@@ -267,7 +279,7 @@ function IntervalFinder() {
                 label={m.tools_root()}
                 value={root}
                 onChange={setRoot}
-                options={tonicOptions()}
+                options={tonicOptions(naming)}
             />
             <SegmentedControl
                 label={m.tools_interval_label()}
@@ -277,7 +289,7 @@ function IntervalFinder() {
             />
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-body">
                 <dt className="text-muted">{m.tools_interval_lands()}</dt>
-                <dd>{rootName(to)}</dd>
+                <dd>{rootName(to, naming)}</dd>
             </dl>
             {/* Sounded together and then apart: an interval is a distance you can hear
                 either way round, and hearing both is how the name sticks. */}

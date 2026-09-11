@@ -3,7 +3,9 @@
 
 import { buildExerciseId, parseExerciseId } from "../../../core/exerciseGen";
 import { warmUpFor } from "../../../core/warmUp";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { exerciseName } from "../../lib/exerciseNames";
+import { noteSymbol } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
 import { SettingsSection } from "../ui/settingsSection";
 import { NotesIcon } from "../ui/icons";
@@ -12,6 +14,7 @@ import { usePlayPiece } from "./playSession";
 
 export function WarmUpCard() {
     const { fifths, id, title } = usePlayPiece();
+    const naming = useNoteNaming();
     const warmUp = warmUpFor({
         fifths,
         // Not read from the score: see above. The scale is right either way.
@@ -34,14 +37,18 @@ export function WarmUpCard() {
             <div className="space-y-2">
                 <p className="text-sm text-body">
                     {warmUp.accidentals.length > 0
-                        ? m.warmup_card_notes({ notes: warmUp.accidentals.join(", ") })
+                        ? m.warmup_card_notes({
+                              notes: warmUp.accidentals
+                                  .map((name) => noteSymbol(name, naming))
+                                  .join(", "),
+                          })
                         : m.warmup_card_white()}
                 </p>
                 <Link
                     to={to}
                     className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-accent-strong hover:underline"
                 >
-                    {exerciseName(warmUp.exercise)} →
+                    {exerciseName(warmUp.exercise, naming)} →
                 </Link>
             </div>
         </SettingsSection>

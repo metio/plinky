@@ -4,6 +4,8 @@
 
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import { m } from "../../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../../paraglide/runtime.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 
 import { KeyMapping } from "./keyMapping";
@@ -47,9 +49,9 @@ describe("KeyMapping", () => {
             "J",
         );
         // The slot it came from reads as unbound, not as the default layout returning.
-        expect(screen.getByRole("button", { name: /Rebind A♯, Left hand/i }).textContent).toContain(
-            "—",
-        );
+        expect(
+            screen.getByRole("button", { name: /Rebind A sharp, Left hand/i }).textContent,
+        ).toContain("—");
     });
 
     it("cancels an armed rebind on Escape without changing the binding", () => {
@@ -72,5 +74,33 @@ describe("KeyMapping", () => {
         fireEvent.click(screen.getByRole("button", { name: "Reset to default" }));
         expect(services.prefs.load().keyMap.left.z).toBe(0);
         expect("a" in services.prefs.load().keyMap.left).toBe(false);
+    });
+});
+
+describe("KeyMapping in the reader's naming", () => {
+    afterEach(() => overwriteGetLocale(() => baseLocale));
+    const left = () => m.keyboard_hint_left();
+
+    it("names a German cap as the German keys do, B natural as H", () => {
+        overwriteGetLocale(() => "de");
+        renderWithServices(<KeyMapping />);
+        const cis = screen.getByRole("button", {
+            name: m.keymap_rebind({ note: "Cis", hand: left() }),
+        });
+        expect(cis.textContent).toContain("Cis");
+        const h = screen.getByRole("button", {
+            name: m.keymap_rebind({ note: "H", hand: left() }),
+        });
+        expect(h.querySelector("span")?.textContent).toBe("H");
+    });
+
+    it("names a French cap in do re mi, the sharp said in words", () => {
+        overwriteGetLocale(() => "fr");
+        renderWithServices(<KeyMapping />);
+        const doSharp = m.note_sharp_word({ note: m.solfege_do() });
+        const cap = screen.getByRole("button", {
+            name: m.keymap_rebind({ note: doSharp, hand: left() }),
+        });
+        expect(cap.querySelector("span")?.textContent).toBe(`${m.solfege_do()}♯`);
     });
 });

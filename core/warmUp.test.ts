@@ -32,7 +32,7 @@ describe("warmUpFor", () => {
         const warm = warmUpFor({ fifths: -3, minor: false, isExercise: false });
         expect(warm).not.toBeNull();
         expect(warm?.key).toBe("eflat");
-        expect(warm?.accidentals).toEqual(["B♭", "E♭", "A♭"]);
+        expect(warm?.accidentals).toEqual(["b-flat", "e-flat", "a-flat"]);
         expect(warm?.exercise.type).toBe("major-scale");
     });
 
@@ -40,13 +40,13 @@ describe("warmUpFor", () => {
         // Two flats is always B♭ then E♭ and never another pair, so the offer can say which
         // notes to go and find rather than only how many there are.
         expect(warmUpFor({ fifths: -2, minor: false, isExercise: false })?.accidentals).toEqual([
-            "B♭",
-            "E♭",
+            "b-flat",
+            "e-flat",
         ]);
         expect(warmUpFor({ fifths: 3, minor: false, isExercise: false })?.accidentals).toEqual([
-            "F♯",
-            "C♯",
-            "G♯",
+            "f-sharp",
+            "c-sharp",
+            "g-sharp",
         ]);
         // C major asks for none, and an offer with nothing to place still teaches the
         // shape of the scale.

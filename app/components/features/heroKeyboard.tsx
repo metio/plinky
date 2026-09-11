@@ -4,6 +4,7 @@
 import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { useVoicedInput } from "../../hooks/useVoicedInput";
 import { Keyboard } from "../ui/keyboard";
 import { ChordReadout } from "./chordReadout";
@@ -23,6 +24,7 @@ const TO = 72;
 // ripple on load; that and the press are the only motion, both dropped for reduce-motion.
 export function HeroKeyboard() {
     const labels = useNoteLabels();
+    const naming = useNoteNaming();
     const theme = useKeyboardTheme();
     const finish = useKeyboardFinish();
     // The shared input funnel: touch taps and a connected MIDI keyboard both flow through
@@ -45,6 +47,7 @@ export function HeroKeyboard() {
                 lit={new Set(heldNotes)}
                 rise
                 labels={labels}
+                naming={naming}
                 well="mx-auto w-full max-w-md"
                 theme={theme}
                 badge={<MidiBadge />}
@@ -55,7 +58,7 @@ export function HeroKeyboard() {
                 here to be pressed for its own sake; saying what came out turns idle
                 noodling into the one lesson nobody can look up — you cannot search for a
                 sound you have no name for. */}
-            <ChordReadout notes={heldNotes} />
+            <ChordReadout notes={heldNotes} naming={naming} />
         </>
     );
 }

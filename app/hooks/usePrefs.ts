@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useMemo, useSyncExternalStore } from "react";
-import { DEFAULT_PREFS, type Prefs } from "../../core/prefs";
+import { defaultPrefsFor, type Prefs } from "../../core/prefs";
 import { usePrefsStore } from "../contexts/services";
+import { getLocale } from "../paraglide/runtime.js";
 
 export type UsePrefsResult = {
     prefs: Prefs;
@@ -21,7 +22,9 @@ export type UsePrefsResult = {
 // re-render like the rest of the stored state.
 export function usePrefs(): UsePrefsResult {
     const store = usePrefsStore();
-    const prefs = useSyncExternalStore(store.subscribe, store.load, () => DEFAULT_PREFS);
+    const prefs = useSyncExternalStore(store.subscribe, store.load, () =>
+        defaultPrefsFor(getLocale()),
+    );
     const update = useCallback(
         (change: Partial<Prefs>) => store.save({ ...store.load(), ...change }),
         [store],

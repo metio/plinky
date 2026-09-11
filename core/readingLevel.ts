@@ -63,19 +63,30 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
 
 // The aid settings a level applies — merge into the prefs store so only the aid
 // fields change and every personal/physical pref is left as it was.
-export function levelAids(level: ReadingLevel): AidPrefs {
-    return AIDS[level];
+//
+// A level decides HOW MANY keys are named, never what a note is called: letters and do
+// re mi are two ways of naming every key, and a French player on do re mi who picks
+// "starter" keeps do re mi. `every` is the naming a level that names every key uses.
+export function levelAids(level: ReadingLevel, every: "all" | "solfege" = "all"): AidPrefs {
+    const aids = AIDS[level];
+    return aids.noteLabels === "all" ? { ...aids, noteLabels: every } : aids;
 }
+
+// Two label settings that name every key, differing only in the names.
+const rungOf = (labels: AidPrefs["noteLabels"]) => (labels === "solfege" ? "all" : labels);
 
 // The level whose aids exactly match the current prefs, or "custom" when the mix
 // matches none — what the level control highlights, and the marker of a hand-tuned
-// setup. Compares only the aid fields, so unrelated prefs never affect the result.
+// setup. Compares only the aid fields, so unrelated prefs never affect the result, and
+// reads every key named in do re mi as the same rung as every key named in letters.
 export function levelOf(prefs: AidPrefs): ReadingLevel | "custom" {
     return (
         READING_LEVELS.find((level) => {
             const aids = AIDS[level];
-            return (Object.keys(aids) as (keyof AidPrefs)[]).every(
-                (key) => aids[key] === prefs[key],
+            return (Object.keys(aids) as (keyof AidPrefs)[]).every((key) =>
+                key === "noteLabels"
+                    ? rungOf(aids.noteLabels) === rungOf(prefs.noteLabels)
+                    : aids[key] === prefs[key],
             );
         }) ?? "custom"
     );

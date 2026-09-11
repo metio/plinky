@@ -5,9 +5,19 @@ import { describe, expect, it } from "vitest";
 import { diatonicSheetDiagrams } from "./chordSheet";
 import { isWhite } from "./keyboardGeometry";
 import { svgDiagramSheet } from "./keyboardDiagram";
-import { CHORD_DEGREES } from "./theory";
+import { type NoteWords, noteSymbolIn } from "./noteNaming";
+import { CHORD_DEGREES, type NoteNameId } from "./theory";
 
 const C4 = 60;
+
+const WORDS: NoteWords = {
+    syllables: ["do", "ré", "mi", "fa", "sol", "la", "si"],
+    sharp: (note) => `${note} dièse`,
+    flat: (note) => `${note} bémol`,
+    spokenSharp: (note) => `${note} dièse`,
+};
+const german = (name: NoteNameId) => noteSymbolIn(name, "german", WORDS);
+const solfege = (name: NoteNameId) => noteSymbolIn(name, "solfege", WORDS);
 
 describe("the diatonic chord sheet", () => {
     it("draws one diagram per degree, in the order the key builds them", () => {
@@ -27,14 +37,24 @@ describe("the diatonic chord sheet", () => {
     it("names the chords and the keys the way a German reader does", () => {
         // B natural is H and B means B flat, so a German sheet in C ends on H°, and the
         // key of B flat starts on B.
-        const inC = diatonicSheetDiagrams(C4, "sharp", "german");
+        const inC = diatonicSheetDiagrams(C4, "sharp", german);
         expect(inC[6]?.caption).toBe("vii° · H°");
-        expect(diatonicSheetDiagrams(C4 + 10, "flat", "german")[0]?.caption).toBe("I · B");
-        expect(diatonicSheetDiagrams(C4 + 6, "sharp", "german")[0]?.caption).toBe("I · Fis");
+        expect(diatonicSheetDiagrams(C4 + 10, "flat", german)[0]?.caption).toBe("I · B");
+        expect(diatonicSheetDiagrams(C4 + 6, "sharp", german)[0]?.caption).toBe("I · Fis");
         // The white keys under the chords are named in the same system.
         const svg = svgDiagramSheet({ title: "Akkorde in C", diagrams: inC });
         expect(svg).toContain(">H</text>");
         expect(svg).not.toContain(">B</text>");
+    });
+
+    it("writes a do-re-mi sheet's symbols with signs, never the flat as a word", () => {
+        // "si bémolm" is not a chord symbol; "si♭m" is.
+        const inBflat = diatonicSheetDiagrams(C4 + 10, "flat", solfege);
+        expect(inBflat[0]?.caption).toBe("I · si♭");
+        expect(inBflat[1]?.caption).toBe("ii · dom");
+        const svg = svgDiagramSheet({ title: "si♭", diagrams: inBflat });
+        expect(svg).toContain(">do</text>");
+        expect(svg).not.toContain(">C</text>");
     });
 
     it("keeps the letter names where the reader reads letters", () => {

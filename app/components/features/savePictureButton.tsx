@@ -4,7 +4,8 @@
 import { useState } from "react";
 import { type DiagramKey, svgKeyboardDiagram } from "../../../core/keyboardDiagram";
 import { downloadBlob } from "../../lib/download";
-import { localNoteSystem } from "../../lib/noteNames";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { noteSymbol } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
 import { svgToPng } from "../../lib/rasterize";
 import { Button } from "../ui/button";
@@ -107,6 +108,7 @@ export function SavePictureButton({
     caption: string;
     filename: string;
 }) {
+    const naming = useNoteNaming();
     return (
         <SaveDiagram
             svg={() =>
@@ -116,7 +118,7 @@ export function SavePictureButton({
                     keys,
                     caption,
                     noteNames: true,
-                    system: localNoteSystem(),
+                    spell: (name) => noteSymbol(name, naming),
                 })
             }
             filename={filename}

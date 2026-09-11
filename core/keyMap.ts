@@ -27,22 +27,6 @@ export type KeyMap = {
 // Index is the semitone offset stored in the map.
 export const SEMITONES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
 
-// Display labels for each semitone slot, sharps spelled with ♯.
-export const NOTE_LABELS: Record<number, string> = {
-    0: "C",
-    1: "C♯",
-    2: "D",
-    3: "D♯",
-    4: "E",
-    5: "F",
-    6: "F♯",
-    7: "G",
-    8: "G♯",
-    9: "A",
-    10: "A♯",
-    11: "B",
-};
-
 export const HANDS: Hand[] = ["left", "right"];
 
 export const DEFAULT_KEY_MAP: KeyMap = {

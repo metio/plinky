@@ -4,9 +4,14 @@
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
-import { type NoteSystem, noteSystemFor, spokenKeyIn } from "../../../core/noteNaming";
-import { keyLabelOf } from "../../../core/notes";
-import type { NoteLabels } from "../../../core/prefs";
+import {
+    keyLabelIn,
+    type Naming,
+    type NoteLabels,
+    namingFor,
+    spokenKeyIn,
+} from "../../../core/noteNaming";
+import { noteWords } from "./noteWords";
 import { isWhite, keybedMaxWidthPx, whiteKeys } from "../../../core/keyboardGeometry";
 import { type KeyState, keyState } from "../../../core/keyState";
 import { m } from "../../paraglide/messages.js";
@@ -37,22 +42,6 @@ const NAVIGATION: Record<string, (note: number, from: number, to: number) => num
 const MIN_TAP_VELOCITY = 45;
 const MAX_TAP_VELOCITY = 120;
 
-// The seven solfège syllables, in scale order from do. Translated, because they are
-// spelled differently from one language to the next — and in the traditions that use
-// them they are not a teaching aid, they are the note's name.
-const SYLLABLES: Array<() => string> = [
-    m.solfege_do,
-    m.solfege_re,
-    m.solfege_mi,
-    m.solfege_fa,
-    m.solfege_sol,
-    m.solfege_la,
-    m.solfege_si,
-];
-
-// The typographic sharp a solfège syllable takes when it names a raised note.
-const SHARP_GLYPH = "♯";
-
 // What a key wears in each state that does not depend on the chosen skin. Held at module
 // scope because these are constants: building them per key per render allocated fifty
 // objects a frame on the one render path that runs at sixty frames a second.
@@ -72,27 +61,6 @@ const BLACK_STATE = {
     left: "bg-hand-left",
     right: "bg-hand-right",
 } as const;
-
-// Which label the setting calls for, said in the reader's own language: the syllables
-// are translated copy, so core decides what to print and this spells it.
-function keyLabel(note: number, labels: NoteLabels): string | null {
-    const label = keyLabelOf(note, labels);
-    if (label === null) {
-        return null;
-    }
-    if (label.kind === "letter") {
-        return label.letter;
-    }
-    return `${SYLLABLES[label.degree]?.() ?? ""}${label.sharp ? SHARP_GLYPH : ""}`;
-}
-
-// A key as a screen reader says it, in the reader's language: "C sharp 4", "C dièse 4",
-// "Cis 4". core names the key in the locale's note system; the sharp word is translated
-// copy, so this spells it.
-function spokenName(note: number, system: NoteSystem): string {
-    const { name, sharp, octave } = spokenKeyIn(note, system);
-    return `${sharp ? m.keyboard_key_sharp({ note: name }) : name} ${octave}`;
-}
 
 const NONE: ReadonlySet<number> = new Set();
 const NO_SOUNDING: ReadonlyMap<number, "left" | "right"> = new Map();
@@ -128,6 +96,7 @@ export function Keyboard({
     wrong = null,
     rise = false,
     labels = "off",
+    naming,
     well = "mx-auto w-full max-w-xl",
     sustained = false,
     holds = NO_HOLDS,
@@ -155,6 +124,11 @@ export function Keyboard({
     holds?: ReadonlyMap<number, number>;
     // Print note names on the keys for a player still learning where the notes are.
     labels?: NoteLabels;
+    // What the names are: the player's own naming (core/noteNaming), so a key says what
+    // the chord readout and the theory pages say. Separate from `labels` because a
+    // sight-read hides the names without changing what a note is called — the wrong-note
+    // announcement still speaks the player's names.
+    naming?: Naming;
     // The last wrong note plus a bump counter, so a repeated miss re-flashes.
     wrong?: { note: number; seq: number } | null;
     // The landing hero's one-time key-rise on load; off everywhere else.
@@ -209,18 +183,23 @@ export function Keyboard({
     // container (rather than the white keys alone) keeps white and black keys aligned.
     const maxWidth = whites.length ? keybedMaxWidthPx(from, to) : undefined;
 
-    // Every key's spoken name, worked out once per range and language rather than for
-    // each key on every frame a hold fill redraws.
+    // What a note is called here: the system the caller hands in — the player's own
+    // naming, which every other surface also reads — or, for a keyboard shown with no
+    // player behind it, what these labels mean in this language.
     const locale = getLocale();
+    const named = naming ?? namingFor(labels, locale);
+    const words = useMemo(() => noteWords(locale), [locale]);
+    // Every key's spoken name, worked out once per range and naming rather than for
+    // each key on every frame a hold fill redraws. A wrong note outside the drawn range
+    // (a MIDI key beyond the window) is named on demand by the same rule.
     const spoken = useMemo(() => {
-        const system = noteSystemFor(locale);
         const names = new Map<number, string>();
         for (let note = from; note <= to; note++) {
-            names.set(note, spokenName(note, system));
+            names.set(note, spokenKeyIn(note, named, words));
         }
         return names;
-    }, [from, to, locale]);
-    const sayKey = (note: number) => spoken.get(note) ?? spokenName(note, noteSystemFor(locale));
+    }, [from, to, named, words]);
+    const sayKey = (note: number) => spoken.get(note) ?? spokenKeyIn(note, named, words);
 
     const keysRef = useRef<HTMLDivElement>(null);
     // The one key in the tab order (roving tabindex): Tab reaches the keybed once, then
@@ -557,7 +536,7 @@ export function Keyboard({
     // The label is read ONCE — it was computed twice per key, once to decide whether to draw
     // the span and once to fill it.
     const keyFace = (note: number, labelClass: string) => {
-        const label = keyLabel(note, labels);
+        const label = keyLabelIn(note, labels, named.system, words);
         return (
             <>
                 {holds.has(note) && <HoldFill fraction={holds.get(note)!} />}

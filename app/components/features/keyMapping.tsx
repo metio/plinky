@@ -10,15 +10,17 @@ import {
     keyCapOf,
     keyForSlot,
     keyPlaysNote,
-    NOTE_LABELS,
     rebind,
     rebindPedal,
     SEMITONES,
 } from "../../../core/keyMap";
+import { pitchLabelIn, spokenNoteIn } from "../../../core/noteNaming";
 import { type PedalKind, PEDAL_KINDS } from "../../../core/pedals";
 import { usePrefs } from "../../hooks/usePrefs";
+import { namingOf } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { noteWords } from "../ui/noteWords";
 
 const HAND_LABEL: Record<Hand, () => string> = {
     left: m.keyboard_hint_left,
@@ -43,6 +45,9 @@ type Arming = { kind: "note"; hand: Hand; semitone: number } | { kind: "pedal"; 
 export function KeyMapping() {
     const { prefs, update } = usePrefs();
     const map = prefs.keyMap;
+    // Each cap names its note the way the player's keys do, and says it aloud by name.
+    const naming = namingOf(prefs);
+    const words = noteWords();
     // The slot or pedal currently listening for a key, or null when idle.
     const [arming, setArming] = useState<Arming | null>(null);
     // Set when a pedal bind is refused because the pressed key already plays a note, so the
@@ -124,7 +129,7 @@ export function KeyMapping() {
                                         setArming(armed ? null : { kind: "note", hand, semitone });
                                     }}
                                     aria-label={m.keymap_rebind({
-                                        note: NOTE_LABELS[semitone]!,
+                                        note: spokenNoteIn(semitone, naming, words),
                                         hand: HAND_LABEL[hand](),
                                     })}
                                     aria-pressed={armed}
@@ -135,7 +140,7 @@ export function KeyMapping() {
                                     }`}
                                 >
                                     <span className="text-[10px] text-muted">
-                                        {NOTE_LABELS[semitone]}
+                                        {pitchLabelIn(semitone, naming.system, words)}
                                     </span>
                                     <span className="font-mono text-sm font-semibold">
                                         {armed ? "…" : keyCapOf(keyForSlot(map, hand, semitone))}

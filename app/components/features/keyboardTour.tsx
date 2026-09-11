@@ -20,6 +20,7 @@ import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../../core/glossa
 import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { useVoicedInput } from "../../hooks/useVoicedInput";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -75,6 +76,7 @@ function staffXml(step: TourStep): string | null {
 export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     const [state, setState] = useState(beginTour);
     const labels = useNoteLabels();
+    const naming = useNoteNaming();
     const theme = useKeyboardTheme();
     const finish = useKeyboardFinish();
     const { pressKey, releaseKey } = useMidiConnection();
@@ -144,6 +146,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
                 // whole group when any of them will do (press any black key).
                 expected={prompt.length > 0 ? prompt : step.highlight}
                 labels={labels}
+                naming={naming}
                 theme={theme}
                 well="mx-auto w-full max-w-lg"
                 onPress={(note, velocity) => {

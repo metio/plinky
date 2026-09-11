@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: '**Every note is called what your keys call it.** The keys could say do re mi, but\nthe chord under your hands, the ear-training keys, the key mapping, the tools and\ntheory pages and a scale\'s name still said C, D and E. In Danish, Polish, Czech and\nthe other languages that call B natural H, the key above A sharp was still printed\nand read out as "B" — which there means B flat. Now whatever your keys say, every\nother screen says too: "Gamme de si bémol majeur", "Ré Majeur", H for B natural.\nFrench, Italian, Spanish, Portuguese and the other do-re-mi languages start on do re\nmi, and **Settings** lets you choose between B and H if you learned the other.',
+                twip: true,
+            },
+            {
                 body: '**A new take in Compose is named in your language.** Its title started as the\nEnglish word "Improvisation" in every language, and that word went on to name the\nMIDI and MusicXML files you download and head the score they open as. It now starts\nin your own language — "Improvisación", "Improvvisazione", "即興演奏" — and you can\nstill rename it.',
                 twip: true,
             },

@@ -4,6 +4,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { namingFor } from "../../../core/noteNaming";
 import { m } from "../../paraglide/messages.js";
 import { baseLocale, overwriteGetLocale } from "../../paraglide/runtime.js";
 import { Keyboard } from "./keyboard";
@@ -25,11 +26,64 @@ describe("Keyboard's spoken key names", () => {
         expect(screen.queryByLabelText(/sharp/)).toBeNull();
     });
 
-    it("says the sharp in the reader's own word", () => {
+    it("says the sharp in the reader's own word when the keys read letters", () => {
         overwriteGetLocale(() => "fr");
-        render(<Keyboard from={60} to={61} />);
+        render(<Keyboard from={60} to={61} naming={namingFor("all", "fr")} />);
         expect(screen.getByLabelText(`${m.keyboard_key_sharp({ note: "C" })} 4`)).toBeTruthy();
         expect(screen.queryByLabelText("C sharp 4")).toBeNull();
+    });
+
+    it("says a French key in do re mi, which is what a French reader calls it", () => {
+        overwriteGetLocale(() => "fr");
+        render(<Keyboard from={60} to={61} />);
+        expect(screen.getByLabelText(`${m.solfege_do()} 4`)).toBeTruthy();
+        expect(
+            screen.getByLabelText(`${m.note_sharp_word({ note: m.solfege_do() })} 4`),
+        ).toBeTruthy();
+    });
+
+    it("says a Danish key with H for B natural, beside the Danish sharp of the key below", () => {
+        // Danish reads B as B flat; "Ais" beside a key called "B" named two neighbours
+        // alike and B natural not at all.
+        overwriteGetLocale(() => "da");
+        render(<Keyboard from={69} to={71} />);
+        expect(screen.getByLabelText("H 4")).toBeTruthy();
+        expect(screen.getByLabelText(`${m.keyboard_key_sharp({ note: "A" })} 4`)).toBeTruthy();
+        expect(screen.queryByLabelText("B 4")).toBeNull();
+    });
+
+    it("says the sharp as a word when a German player chooses B for B natural", () => {
+        overwriteGetLocale(() => "de");
+        render(<Keyboard from={69} to={71} naming={namingFor("all", "de", "b")} />);
+        expect(screen.getByLabelText("B 4")).toBeTruthy();
+        expect(screen.getByLabelText(`${m.note_sharp_word({ note: "A" })} 4`)).toBeTruthy();
+        expect(screen.queryByLabelText("Ais 4")).toBeNull();
+    });
+
+    it("names a wrong note played outside the drawn keys by the same rule", async () => {
+        // A MIDI key beyond the window has no key on screen to borrow a name from.
+        overwriteGetLocale(() => "de");
+        render(<Keyboard from={60} to={64} wrong={{ note: 71, seq: 1 }} />);
+        await waitFor(() =>
+            expect(screen.getByRole("status").textContent).toBe(
+                m.keyboard_wrong_note({ note: "H 4" }),
+            ),
+        );
+    });
+
+    it("prints German names on the keys, B natural as H and the black keys spelled", () => {
+        overwriteGetLocale(() => "de");
+        render(<Keyboard from={59} to={61} labels="all" />);
+        expect(screen.getByText("H")).toBeTruthy();
+        expect(screen.getByText("Cis")).toBeTruthy();
+        expect(screen.queryByText("C♯")).toBeNull();
+    });
+
+    it("prints do re mi on the C keys of a French keyboard showing only C", () => {
+        overwriteGetLocale(() => "fr");
+        render(<Keyboard from={60} to={72} labels="c" />);
+        expect(screen.getAllByText(m.solfege_do())).toHaveLength(2);
+        expect(screen.queryByText("C")).toBeNull();
     });
 
     it("announces a wrong note in German", async () => {

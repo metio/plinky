@@ -37,7 +37,7 @@ describe("the warm-up offered before a piece", () => {
                 if (warm !== null) {
                     expect(warm.accidentals.length).toBe(Math.abs(fifths));
                     // Sharps or flats, never a mixture: no signature has both.
-                    const kind = fifths >= 0 ? "♯" : "♭";
+                    const kind = fifths >= 0 ? "-sharp" : "-flat";
                     for (const note of warm.accidentals) {
                         expect(note).toContain(kind);
                     }

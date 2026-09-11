@@ -4,10 +4,12 @@
 import { useNavigate } from "react-router";
 import { noindexMeta, routeMeta } from "../../core/site";
 import { levelAids } from "../../core/readingLevel";
+import { everyKeyLabels } from "../../core/noteNaming";
 import { KeyboardTour } from "../components/features/keyboardTour";
 import { ServicesProvider, useOnboardingStore, usePrefsStore } from "../contexts/services";
 import { localizedHref } from "../components/ui/href";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/basics";
 import { PageHeader } from "../components/ui/pageHeader";
 import { useUnaidedServices } from "../hooks/useUnaidedServices";
@@ -48,7 +50,11 @@ export default function Basics() {
                         // where they are, so the reading aids go all the way up and the run
                         // panel folds to its essentials. Only the five aid fields move; every
                         // personal and physical preference is left exactly as it was.
-                        prefsStore.save({ ...prefsStore.load(), ...levelAids("starter") });
+                        const prefs = prefsStore.load();
+                        prefsStore.save({
+                            ...prefs,
+                            ...levelAids("starter", everyKeyLabels(prefs.noteLabels, getLocale())),
+                        });
                         navigate(localizedHref("/"));
                     }}
                 />

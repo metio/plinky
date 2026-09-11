@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
-import { unaidedPrefs, DEFAULT_PREFS, parsePrefs, type Prefs } from "./prefs";
+import { unaidedPrefs, DEFAULT_PREFS, defaultPrefsFor, parsePrefs, type Prefs } from "./prefs";
 
 const BASE: Prefs = {
     sound: true,
@@ -20,6 +20,7 @@ const BASE: Prefs = {
     keepOffline: false,
     noteHints: "always",
     noteLabels: "all",
+    noteLetters: "auto",
     instrumentSounds: false,
     midiEcho: false,
     listenShaping: true,
@@ -129,6 +130,31 @@ describe("parsePrefs", () => {
         expect(parsePrefs(null).noteLabels).toBe("all");
         expect(parsePrefs(stored({ noteLabels: "off" })).noteLabels).toBe("off");
         expect(parsePrefs(JSON.stringify({ noteLabels: "bogus" })).noteLabels).toBe("all");
+    });
+
+    it("names every key in do re mi by default where the language does", () => {
+        expect(parsePrefs(null, "fr").noteLabels).toBe("solfege");
+        expect(parsePrefs(null, "it").noteLabels).toBe("solfege");
+        expect(parsePrefs(null, "de").noteLabels).toBe("all");
+        // A stored choice is the player's, whatever the language.
+        expect(parsePrefs(stored({ noteLabels: "all" }), "fr").noteLabels).toBe("all");
+        expect(parsePrefs(JSON.stringify({ noteLabels: "bogus" }), "fr").noteLabels).toBe(
+            "solfege",
+        );
+    });
+
+    it("leaves B or H to the language until the player picks, and rejects an unknown value", () => {
+        expect(parsePrefs(null).noteLetters).toBe("auto");
+        expect(parsePrefs(null, "de").noteLetters).toBe("auto");
+        expect(parsePrefs(stored({ noteLetters: "h" })).noteLetters).toBe("h");
+        expect(parsePrefs(JSON.stringify({ noteLetters: "x" })).noteLetters).toBe("auto");
+    });
+
+    it("hands a server render the page language's defaults, one object per language", () => {
+        expect(defaultPrefsFor("en")).toBe(DEFAULT_PREFS);
+        expect(defaultPrefsFor("fr").noteLabels).toBe("solfege");
+        expect(defaultPrefsFor("fr")).toBe(defaultPrefsFor("fr"));
+        expect(Object.isFrozen(defaultPrefsFor("fr"))).toBe(true);
     });
 
     it("defaults beams to auto and rejects an unknown value", () => {

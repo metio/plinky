@@ -4,10 +4,16 @@
 
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import { namingFor } from "../../../core/noteNaming";
 import { chordPitches } from "../../../core/theory";
+import { m } from "../../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../../paraglide/runtime.js";
 import { ChordReadout } from "./chordReadout";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    overwriteGetLocale(() => baseLocale);
+});
 
 const shown = () => screen.getByRole("status").textContent;
 
@@ -46,6 +52,27 @@ describe("ChordReadout", () => {
         render(<ChordReadout notes={[60, 67]} />);
         expect(shown()).toContain("C");
         expect(shown()).toContain("·");
+    });
+
+    it("names a German chord the way the German keys do, B natural as H", () => {
+        overwriteGetLocale(() => "de");
+        render(<ChordReadout notes={chordPitches(71, "major")} naming={namingFor("all", "de")} />);
+        expect(shown()).toBe(m.chord_named({ root: "H", quality: m.theory_chord_major() }));
+    });
+
+    it("names a French chord in do re mi, the sharp as a word, opening in capitals", () => {
+        overwriteGetLocale(() => "fr");
+        render(<ChordReadout notes={chordPitches(66, "minor")} />);
+        const root = m.note_sharp_word({ note: m.solfege_fa() });
+        const line = m.chord_named({ root, quality: m.theory_chord_minor() });
+        expect(shown()).toBe(`${line.charAt(0).toUpperCase()}${line.slice(1)}`);
+        expect(shown()).not.toContain("F♯");
+    });
+
+    it("follows the player's letters on a French page", () => {
+        overwriteGetLocale(() => "fr");
+        render(<ChordReadout notes={chordPitches(62, "major")} naming={namingFor("all", "fr")} />);
+        expect(shown()).toBe(m.chord_named({ root: "D", quality: m.theory_chord_major() }));
     });
 
     it("announces itself politely, so a screen reader is told without being interrupted", () => {

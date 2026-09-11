@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 11 September 2026 — evening
 
+**Every note is called what your keys call it.** The keys could say do re mi, but
+the chord under your hands, the ear-training keys, the key mapping, the tools and
+theory pages and a scale's name still said C, D and E. In Danish, Polish, Czech and
+the other languages that call B natural H, the key above A sharp was still printed
+and read out as "B" — which there means B flat. Now whatever your keys say, every
+other screen says too: "Gamme de si bémol majeur", "Ré Majeur", H for B natural.
+French, Italian, Spanish, Portuguese and the other do-re-mi languages start on do re
+mi, and **Settings** lets you choose between B and H if you learned the other.
+
 **A new take in Compose is named in your language.** Its title started as the
 English word "Improvisation" in every language, and that word went on to name the
 MIDI and MusicXML files you download and head the score they open as. It now starts

@@ -27,6 +27,7 @@ import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { EarChoices } from "./earChoices";
 import { useKeyboardFinish } from "../../hooks/useKeyboardTheme";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { EarKeyboard } from "./earKeyboard";
 import { EarLadder } from "./earLadder";
 import { EarSequence } from "./earSequence";
@@ -79,6 +80,7 @@ export function EarSession({
     focus?: EarFocus;
 }) {
     const finish = useKeyboardFinish();
+    const naming = useNoteNaming();
     const services = useServices();
     const mastery = useMasteryStore();
     const prefs = usePrefsStore();
@@ -241,6 +243,7 @@ export function EarSession({
             ) : question.kind === "perfect-pitch" ? (
                 <EarKeyboard
                     finish={finish}
+                    naming={naming}
                     choices={question.choices}
                     answer={settled ? question.answer : null}
                     given={settled ? (given as NoteNameId) : null}

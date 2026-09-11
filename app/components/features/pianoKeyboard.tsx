@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { NoteLabels } from "../../../core/prefs";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
 import type { HoldFeed } from "../../hooks/useHoldIndicator";
 import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
@@ -57,6 +58,9 @@ export function PianoKeyboard({
     const heldNotes = useHeldNotes();
     const savedLabels = useNoteLabels();
     const labels = labelsOverride ?? savedLabels;
+    // What a note is called follows the player's own choice even when a sight-read hides
+    // the names, so the wrong-note announcement still speaks the player's names.
+    const naming = useNoteNaming();
     const theme = useKeyboardTheme();
     const finish = useKeyboardFinish();
     // The held notes as a set, rebuilt only when they change. This component re-renders
@@ -99,6 +103,7 @@ export function PianoKeyboard({
             wrong={wrong}
             holds={holdFractions}
             labels={labels}
+            naming={naming}
             sustained={sustained}
             theme={theme}
             badge={<MidiBadge />}

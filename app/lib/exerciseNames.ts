@@ -3,8 +3,9 @@
 
 import type { ExerciseConfig, ExerciseForm, ExerciseType } from "../../core/exerciseGen";
 import { exerciseTitleParts } from "../../core/exerciseGen";
-import { keyNameIn, noteSystemFor } from "../../core/noteNaming";
+import type { Naming } from "../../core/noteNaming";
 import { m } from "../paraglide/messages.js";
+import { minorKeyText, noteText, opening } from "./noteNames";
 import { getLocale } from "../paraglide/runtime.js";
 
 // What a scale or arpeggio is called, in the reader's language. core works out which key
@@ -43,13 +44,23 @@ const FORMS: Record<ExerciseForm, () => string> = {
     broken: m.exercise_form_broken,
 };
 
-export function exerciseName(config: ExerciseConfig): string {
+// The kinds whose key is a minor one, and so written in lower case where the language
+// writes a minor tonic that way: a-Moll-Tonleiter, fiss-moll skala.
+const MINOR: ReadonlySet<ExerciseType> = new Set([
+    "natural-minor-scale",
+    "harmonic-minor-scale",
+    "melodic-minor-scale",
+    "minor-arpeggio",
+    "minor-chords",
+]);
+
+export function exerciseName(config: ExerciseConfig, naming: Naming): string {
     const { type, forms } = exerciseTitleParts(config);
-    // The key named the way this language names notes, not the way English does. German
+    // The key named the way the player's keys name notes, not the way English does. German
     // reads the letter B as B flat and calls B natural H, so "B-Dur-Tonleiter" told a
-    // German student to play the wrong scale.
-    const key = keyNameIn(config.key, noteSystemFor(getLocale()));
-    const title = TITLES[type]({ key });
+    // German student to play the wrong scale; French names it "si bémol".
+    const key = MINOR.has(type) ? minorKeyText(config.key, naming) : noteText(config.key, naming);
+    const title = opening(TITLES[type]({ key }), naming);
     if (forms.length === 0) {
         return title;
     }

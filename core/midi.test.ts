@@ -15,7 +15,6 @@ import {
     noteName,
     ON_SCREEN_DEVICE,
     parseMidiMessage,
-    pitchClass,
     soundsOnItsOwn,
 } from "./midi";
 
@@ -30,19 +29,6 @@ describe("noteName", () => {
     it("names a note below MIDI 0 with a floor-mod instead of indexing off the array", () => {
         expect(noteName(-1)).toBe("B-2");
         expect(noteName(-12)).toBe("C-2");
-    });
-});
-
-describe("pitchClass", () => {
-    it("gives the octave-free letter with a typographic sharp", () => {
-        expect(pitchClass(60)).toBe("C");
-        expect(pitchClass(72)).toBe("C");
-        expect(pitchClass(61)).toBe("C♯");
-    });
-
-    it("floor-mods so notes below MIDI 0 still map", () => {
-        expect(pitchClass(-12)).toBe("C");
-        expect(pitchClass(-1)).toBe("B");
     });
 });
 

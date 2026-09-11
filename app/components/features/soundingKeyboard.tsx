@@ -5,6 +5,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { type DemoScore, demoDurationMs, demoMoments, demoNotes } from "../../../core/theoryDemo";
 import { useScheduler } from "../../contexts/services";
 import type { SchedulerHandle } from "../../ports/scheduler";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { useSynth } from "../../hooks/useSynth";
 import { Button } from "../ui/button";
 import { Keyboard } from "../ui/keyboard";
@@ -51,6 +52,8 @@ export function SoundingKeyboard({
 }) {
     const synth = useSynth();
     const scheduler = useScheduler();
+    // The C keys are named as the player's keys name them: C, or do.
+    const naming = useNoteNaming();
     // Strikes still waiting to happen, so a phrase left half-played when the reader
     // moves on does not go on sounding, and a second press replaces the first.
     const pending = useRef<SchedulerHandle[]>([]);
@@ -114,7 +117,13 @@ export function SoundingKeyboard({
 
     return (
         <div className="space-y-3">
-            <Keyboard from={from} to={to} lit={new Set(sounding ?? shape)} labels="c" />
+            <Keyboard
+                from={from}
+                to={to}
+                lit={new Set(sounding ?? shape)}
+                labels="c"
+                naming={naming}
+            />
             {children}
             <Button variant="secondary" onClick={hear}>
                 {label}

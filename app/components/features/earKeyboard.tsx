@@ -3,9 +3,11 @@
 
 import { keyLane } from "../../../core/keyboardGeometry";
 import { finishFor, type KeyboardFinish } from "../../../core/keyboardFinish";
-import { NOTE_LABELS } from "../../../core/keyMap";
+import { type Naming, pitchLabelIn, spokenNoteIn } from "../../../core/noteNaming";
 import { noteNameOf, type NoteNameId, type PitchClass } from "../../../core/theory";
+import { localNaming } from "../../lib/noteNames";
 import { m } from "../../paraglide/messages.js";
+import { noteWords } from "../ui/noteWords";
 import { optionVerdict } from "../../../core/earAnswer";
 import { answerClasses, VERDICT_FILL, type Verdict } from "./earVerdict";
 
@@ -16,11 +18,10 @@ import { answerClasses, VERDICT_FILL, type Verdict } from "./earVerdict";
 //
 // One octave, no octave choice: the exercise asks for the note, not the register.
 //
-// The keys are labelled from core/keyMap's NOTE_LABELS — the same table the computer
-// keyboard is labelled from — so a note is spelled identically wherever it appears.
-// Letter names deliberately do NOT go through paraglide: they are not translated
-// anywhere else in Plinky, and a keyboard reading "Do" here beside one reading "C" on
-// the play page would be worse than either choice made consistently.
+// The keys are named exactly as the player's own keys are, from the same core function
+// the on-screen keyboard prints with: an answer key reading "Do" here beside a keyboard
+// reading "C" on the play page would ask the player to translate between them. Each is
+// spoken by its name rather than its glyph, which a screen reader reads as "number".
 
 // One octave from C, laid out by the same core/keyboardGeometry every other keyboard in
 // Plinky is laid out by. The white list, the black keys' boundaries and their widths were
@@ -59,6 +60,7 @@ export function EarKeyboard({
     given,
     onChoose,
     finish = finishFor(),
+    naming = localNaming(),
 }: {
     choices: NoteNameId[];
     // Set once the round is answered; until then the keyboard reveals nothing.
@@ -67,8 +69,14 @@ export function EarKeyboard({
     onChoose: (note: NoteNameId) => void;
     // The same shading the rest of the app's keyboards wear.
     finish?: KeyboardFinish;
+    // The player's naming, so the answer keys say what every other key says.
+    naming?: Naming;
 }) {
     const settled = answer !== null;
+    const words = noteWords();
+    const shown = (pitchClass: PitchClass) =>
+        pitchLabelIn(OCTAVE_FROM + pitchClass, naming.system, words);
+    const said = (pitchClass: PitchClass) => spokenNoteIn(OCTAVE_FROM + pitchClass, naming, words);
     const offered = (pitchClass: PitchClass) => choices.includes(noteNameOf(pitchClass));
 
     return (
@@ -86,9 +94,10 @@ export function EarKeyboard({
                             key={pitchClass}
                             disabled={settled || !offered(pitchClass)}
                             onClick={() => onChoose(name)}
+                            aria-label={said(pitchClass)}
                             className={`flex flex-1 items-end justify-center border pb-2 text-sm font-medium transition-colors disabled:cursor-default ${finish.whiteKey} ${whiteClasses(verdict, settled)}`}
                         >
-                            {NOTE_LABELS[pitchClass]}
+                            {shown(pitchClass)}
                         </button>
                     );
                 })}
@@ -102,10 +111,11 @@ export function EarKeyboard({
                         key={pitchClass}
                         disabled={settled}
                         onClick={() => onChoose(name)}
+                        aria-label={said(pitchClass)}
                         className={`flex h-[60%] items-end justify-center pb-1.5 text-xs font-medium transition-colors disabled:cursor-default ${finish.blackKey} ${blackClasses(verdict, settled)}`}
                         style={{ width: `${lane.widthPct}%`, left: `${lane.leftPct}%` }}
                     >
-                        {NOTE_LABELS[pitchClass]}
+                        {shown(pitchClass)}
                     </button>
                 );
             })}

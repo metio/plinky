@@ -18,15 +18,17 @@
 import { FLAT_ORDER as FLATS, SHARP_ORDER as SHARPS } from "./notes";
 import type { ExerciseConfig } from "./exerciseGen";
 import { keySlugFor } from "./exerciseGen";
+import type { NoteNameId } from "./theory";
 
 // The order sharps and flats appear in a key signature, which never varies: F C G D A E B
 // for sharps and its reverse for flats. Two flats is always B♭ and E♭, never any other
 // pair — which is what lets the offer name the actual notes rather than only counting them.
-const SHARP_ORDER = SHARPS.map((letter) => `${letter}♯`);
-const FLAT_ORDER = FLATS.map((letter) => `${letter}♭`);
+// Ids rather than text, so the card names them the way the player's keys do.
+const SHARP_ORDER = SHARPS.map((letter) => `${letter.toLowerCase()}-sharp` as NoteNameId);
+const FLAT_ORDER = FLATS.map((letter) => `${letter.toLowerCase()}-flat` as NoteNameId);
 
 // The black keys this signature asks for, in the order the signature writes them.
-export function accidentalsOf(fifths: number): string[] {
+export function accidentalsOf(fifths: number): NoteNameId[] {
     const order = fifths >= 0 ? SHARP_ORDER : FLAT_ORDER;
     return order.slice(0, Math.min(Math.abs(fifths), order.length));
 }
@@ -39,7 +41,7 @@ export type WarmUp = {
     // The black keys the hand has to place, named and in signature order. The whole reason
     // the offer is worth making: "B♭, E♭, A♭" is something to go and find, where "three
     // flats" is only something to be told.
-    accidentals: string[];
+    accidentals: NoteNameId[];
 };
 
 // Both hands, one octave: the shape a warm-up wants. Two octaves is a practice session

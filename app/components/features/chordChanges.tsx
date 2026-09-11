@@ -10,7 +10,9 @@ import {
     noteNameOf,
     type PitchClass,
 } from "../../../core/theory";
-import { noteText } from "../../lib/noteNames";
+import type { Naming } from "../../../core/noteNaming";
+import { useNoteNaming } from "../../hooks/useNoteNaming";
+import { noteSymbol } from "../../lib/noteNames";
 import { chordName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 import { SegmentedControl } from "../ui/segmentedControl";
@@ -37,9 +39,14 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
     const top = Math.max(rootNote + 24, ...from, ...to);
     const motion = smoothestMotion(from, to);
 
-    const nameOf = (pitchClass: PitchClass) => noteText(noteNameOf(pitchClass));
+    // Named as the player's keys name them.
+    const naming = useNoteNaming();
+    const nameOf = (pitchClass: PitchClass) => noteSymbol(noteNameOf(pitchClass), naming);
     const label = (root: string, quality: ChordQuality) =>
-        `${nameOf(((rootNote + Number(root)) % 12) as PitchClass)} ${chordName(quality)}`;
+        m.chord_named({
+            root: nameOf(((rootNote + Number(root)) % 12) as PitchClass),
+            quality: chordName(quality),
+        });
 
     // Each pair of pickers is headed by the chord it currently names. Four controls
     // labelled Root, Chord, Root, Chord tell a reader nothing about which half they are
@@ -62,7 +69,7 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
                 label={`${m.tools_root()} · ${name}`}
                 value={root}
                 onChange={onRoot}
-                options={tonics(rootNote)}
+                options={tonics(rootNote, naming)}
             />
             <SegmentedControl
                 label={`${m.tools_chord()} · ${name}`}
@@ -80,9 +87,9 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
 
             <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                 <dt className="text-muted">{m.tools_changes_shared()}</dt>
-                {/* Notation, so it reads the same in every language — and an em dash
-                    rather than a sentence where a change shares nothing, because "none"
-                    is the answer least worth a word. */}
+                {/* The shared notes, named as the player's keys name them — and an em
+                    dash rather than a sentence where a change shares nothing, because
+                    "none" is the answer least worth a word. */}
                 <dd className="tabular-nums">
                     {motion.common.length === 0 ? "—" : motion.common.map(nameOf).join(" · ")}
                 </dd>
@@ -103,9 +110,9 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
     );
 }
 
-function tonics(root: number): { id: string; label: string }[] {
+function tonics(root: number, naming: Naming): { id: string; label: string }[] {
     return Array.from({ length: 12 }, (_, step) => ({
         id: String(step),
-        label: noteText(noteNameOf(((root + step) % 12) as PitchClass)),
+        label: noteSymbol(noteNameOf(((root + step) % 12) as PitchClass), naming),
     }));
 }
