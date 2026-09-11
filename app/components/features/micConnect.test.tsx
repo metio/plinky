@@ -3,15 +3,20 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { fakePitch } from "../../adapters/fakePitch";
 import { memoryStore } from "../../adapters/memoryStore";
 import { MidiProvider, useMidiInput } from "../../contexts/midi";
 import { m } from "../../paraglide/messages.js";
+import { fakeAudioContext } from "../../testing/fakeAudioContext";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { MicConnect } from "./micConnect";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+});
 
 // A probe on the shared note funnel: mic notes must reach the same subscribers
 // a MIDI keyboard feeds, or practice would never hear the piano.
@@ -94,6 +99,43 @@ describe("MicConnect", () => {
         act(() => pitch.emit({ kind: "on", note: 64 }));
         act(() => pitch.emit({ kind: "off", note: 60 }));
         expect(heard).toEqual([{ note: 64, device: "Microphone" }]);
+    });
+
+    it("hears the player on a pitch a stopped playback had struck, once its sound is gone", async () => {
+        // The real engine behind the guard: Listen strikes C4 for four seconds and is
+        // stopped at once. While it rang the mic hearing C4 was our speaker; once the fade
+        // is over, C4 is the player starting the piece.
+        let wall = 1_000;
+        vi.spyOn(performance, "now").mockImplementation(() => wall);
+        const fake = fakeAudioContext();
+        vi.stubGlobal("AudioContext", function FakeContext() {
+            return fake.context;
+        });
+        vi.resetModules();
+        const { webAudioEngine: audio } = await import("../../adapters/webAudioEngine");
+        const pitch = fakePitch();
+        const heard: Array<{ note: number; device: string }> = [];
+        renderWithServices(
+            <MidiProvider>
+                <MicConnect />
+                <FunnelProbe heard={heard} />
+            </MidiProvider>,
+            { pitch, audio },
+        );
+        fireEvent.click(screen.getByRole("button", { name: m.mic_listen() }));
+        await waitFor(() => expect(pitch.listening()).toBe(true));
+
+        const listen = Symbol("listen");
+        audio.resume();
+        audio.strike({ note: 60, gain: 0.3, velocity: 90, duration: 4, delay: 0, owner: listen });
+        act(() => pitch.emit({ kind: "on", note: 60 }));
+        act(() => pitch.emit({ kind: "off", note: 60 }));
+        expect(heard).toEqual([]);
+
+        audio.silenceStrikes(listen);
+        wall += 500;
+        act(() => pitch.emit({ kind: "on", note: 60 }));
+        expect(heard).toEqual([{ note: 60, device: "Microphone" }]);
     });
 
     it("hands the saved calibration to the live detector when listening starts", async () => {

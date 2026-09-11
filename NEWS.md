@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 11 September 2026 — evening
 
+**With the microphone on, your first notes after stopping Listen are heard.** Plinky
+ignores what the microphone hears of its own speaker, and it kept ignoring a note
+Listen had played for as long as that note would have rung, even once Stop had
+silenced it. Start a piece straight after listening and its opening notes, the ones
+Listen had just played, could go unheard for a few seconds. A stopped note now stops
+counting as Plinky's own the moment it goes quiet.
+
 **Every note is called what your keys call it.** The keys could say do re mi, but
 the chord under your hands, the ear-training keys, the key mapping, the tools and
 theory pages and a scale's name still said C, D and E. In Danish, Polish, Czech and

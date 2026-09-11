@@ -710,10 +710,28 @@ function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): 
 const struckUntil = new Map<number, number>();
 
 // Fixed-length struck notes still ringing (or scheduled ahead by a delay) on the shared
-// live context, each with the owner it was struck under. Unlike a pressed voice they open no
-// entry in `voices`, so allNotesOff can only silence them by tracking them here; each
-// removes itself once its ring-out ends.
-const scheduledStrikes = new Map<StruckStrike, StrikeOwner | undefined>();
+// live context, each with the owner it was struck under, its pitch and when its echo window
+// closes. Unlike a pressed voice they open no entry in `voices`, so allNotesOff can only
+// silence them by tracking them here; each removes itself once its ring-out ends.
+type TrackedStrike = { owner: StrikeOwner | undefined; note: number; until: number };
+const scheduledStrikes = new Map<StruckStrike, TrackedStrike>();
+
+// How long a sound cut short takes to leave the speaker: the fast fade, and the stop just
+// after it.
+const CUT_STOP_S = 0.11;
+
+// A pitch that was cut short is on the speaker only until its fade ends, unless a strike
+// still tracked on it rings on longer. Left at the full ring, the mic's echo guard would
+// swallow the player's own notes on that pitch for seconds after the sound was gone.
+function closeEchoWindow(note: number): void {
+    let until = performance.now() + CUT_STOP_S * 1000;
+    for (const tracked of scheduledStrikes.values()) {
+        if (tracked.note === note) {
+            until = Math.max(until, tracked.until);
+        }
+    }
+    struckUntil.set(note, Math.min(struckUntil.get(note) ?? until, until));
+}
 
 // Ring out and stop the scheduled/ringing struck notes now — every one, or only those struck
 // under `owner` — the strike counterpart to fading the live voices. A strike still waiting
@@ -721,11 +739,13 @@ const scheduledStrikes = new Map<StruckStrike, StrikeOwner | undefined>();
 // oscillator before its start time simply keeps it from ever sounding.
 function silenceStrikes(ctx: AudioContext, owner?: StrikeOwner): void {
     const now = ctx.currentTime;
-    for (const [strike, struckBy] of scheduledStrikes) {
-        if (owner !== undefined && struckBy !== owner) {
+    const cut = new Set<number>();
+    for (const [strike, tracked] of scheduledStrikes) {
+        if (owner !== undefined && tracked.owner !== owner) {
             continue;
         }
         scheduledStrikes.delete(strike);
+        cut.add(tracked.note);
         const gain = strike.envelope.gain;
         const shelf = Math.max(0.0001, gain.value);
         gain.cancelScheduledValues(now);
@@ -733,11 +753,14 @@ function silenceStrikes(ctx: AudioContext, owner?: StrikeOwner): void {
         gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
         for (const oscillator of strike.oscillators) {
             try {
-                oscillator.stop(now + 0.11);
+                oscillator.stop(now + CUT_STOP_S);
             } catch {
                 // Already stopped — harmless.
             }
         }
+    }
+    for (const note of cut) {
+        closeEchoWindow(note);
     }
 }
 
@@ -830,16 +853,14 @@ export const webAudioEngine: AudioEngine = {
             // renderStrike alongside the note — one place, so an exported video carries
             // them exactly as the speakers just did.
             const strike = renderStrike(ctx, note, voiceFor(note.note, note.velocity));
-            scheduledStrikes.set(strike, note.owner);
+            const until = performance.now() + (Math.max(0, note.delay) + note.duration) * 1000;
+            scheduledStrikes.set(strike, { owner: note.owner, note: note.note, until });
             // Drop it from the tracked set once it has finished ringing, so the set holds
             // only strikes that are still (or not yet) sounding.
             strike.oscillators.at(-1)?.addEventListener("ended", () => {
                 scheduledStrikes.delete(strike);
             });
-            struckUntil.set(
-                note.note,
-                performance.now() + (Math.max(0, note.delay) + note.duration) * 1000,
-            );
+            struckUntil.set(note.note, until);
         }
     },
     press(note, gain, velocity) {
@@ -945,6 +966,9 @@ export const webAudioEngine: AudioEngine = {
             // A fixed-length strike opens no voice, so silence the scheduled/ringing ones
             // too — otherwise a note scheduled ahead would sound on past the panic.
             silenceStrikes(ctx);
+            for (const note of voices.keys()) {
+                closeEchoWindow(note);
+            }
         }
         // Clear the voices and keys regardless of context so a later press starts fresh and
         // no stale key keeps a future voice alive. The pedals stay: they are where the

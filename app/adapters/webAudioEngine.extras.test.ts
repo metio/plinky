@@ -9,6 +9,7 @@ import type { SampleVoice } from "../ports/sampleSource";
 
 afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
     vi.resetModules();
 });
 
@@ -175,6 +176,68 @@ describe("taking back one playback's strikes", () => {
         engine.strike({ note: 48, gain: 0.3, velocity: 90, duration: 5, delay: 0, owner: listen });
         engine.silenceStrikes(listen);
         expect(() => engine.silenceStrikes(listen)).not.toThrow();
+    });
+});
+
+// The microphone's echo guard asks recentlyStruck whether a pitch it heard is our own
+// speaker. A strike that has been cut short is no longer on the speaker, so it must stop
+// answering for that pitch once its fade is over — or the player's first notes after Stop,
+// which are the notes Listen just played, are thrown away as echo.
+describe("the echo window of a strike cut short", () => {
+    const clock = () => {
+        let wall = 1_000;
+        vi.spyOn(performance, "now").mockImplementation(() => wall);
+        return (ms: number) => {
+            wall += ms;
+        };
+    };
+
+    it("closes when the strike is silenced, not when it would have rung out", async () => {
+        const advance = clock();
+        const engine = await engineWith(fakeAudioContext(), silentPack);
+        const listen = Symbol("listen");
+        engine.strike({ note: 60, gain: 0.3, velocity: 90, duration: 4, delay: 0, owner: listen });
+        expect(engine.recentlyStruck?.(60, 300)).toBe(true);
+        engine.silenceStrikes(listen);
+        advance(500);
+        expect(engine.recentlyStruck?.(60, 300)).toBe(false);
+    });
+
+    it("stays open while another strike on the same pitch still rings", async () => {
+        const advance = clock();
+        const engine = await engineWith(fakeAudioContext(), silentPack);
+        const listen = Symbol("listen");
+        const other = Symbol("other");
+        engine.strike({ note: 60, gain: 0.3, velocity: 90, duration: 4, delay: 0, owner: listen });
+        engine.strike({ note: 60, gain: 0.3, velocity: 90, duration: 2, delay: 0, owner: other });
+        engine.silenceStrikes(listen);
+        advance(1_000);
+        expect(engine.recentlyStruck?.(60, 300)).toBe(true);
+        // The survivor's own ring is what the window follows now: two seconds, not four.
+        advance(1_400);
+        expect(engine.recentlyStruck?.(60, 300)).toBe(false);
+    });
+
+    it("leaves the window of a pitch nobody silenced", async () => {
+        const advance = clock();
+        const engine = await engineWith(fakeAudioContext(), silentPack);
+        const listen = Symbol("listen");
+        engine.strike({ note: 60, gain: 0.3, velocity: 90, duration: 4, delay: 0, owner: listen });
+        engine.strike({ note: 64, gain: 0.3, velocity: 90, duration: 4, delay: 0 });
+        engine.silenceStrikes(listen);
+        advance(2_000);
+        expect(engine.recentlyStruck?.(64, 300)).toBe(true);
+    });
+
+    it("closes for everything a panic silences", async () => {
+        const advance = clock();
+        const engine = await engineWith(fakeAudioContext(), silentPack);
+        engine.strike({ note: 60, gain: 0.3, velocity: 90, duration: 4, delay: 0 });
+        engine.strike({ note: 67, gain: 0.3, velocity: 90, duration: 3, delay: 0.5 });
+        engine.allNotesOff();
+        advance(500);
+        expect(engine.recentlyStruck?.(60, 300)).toBe(false);
+        expect(engine.recentlyStruck?.(67, 300)).toBe(false);
     });
 });
 

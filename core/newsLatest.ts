@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**With the microphone on, your first notes after stopping Listen are heard.** Plinky\nignores what the microphone hears of its own speaker, and it kept ignoring a note\nListen had played for as long as that note would have rung, even once Stop had\nsilenced it. Start a piece straight after listening and its opening notes, the ones\nListen had just played, could go unheard for a few seconds. A stopped note now stops\ncounting as Plinky's own the moment it goes quiet.",
+                twip: true,
+            },
+            {
                 body: '**Every note is called what your keys call it.** The keys could say do re mi, but\nthe chord under your hands, the ear-training keys, the key mapping, the tools and\ntheory pages and a scale\'s name still said C, D and E. In Danish, Polish, Czech and\nthe other languages that call B natural H, the key above A sharp was still printed\nand read out as "B" — which there means B flat. Now whatever your keys say, every\nother screen says too: "Gamme de si bémol majeur", "Ré Majeur", H for B natural.\nFrench, Italian, Spanish, Portuguese and the other do-re-mi languages start on do re\nmi, and **Settings** lets you choose between B and H if you learned the other.',
                 twip: true,
             },
