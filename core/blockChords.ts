@@ -38,13 +38,13 @@ export function blockChords(codec: XmlCodec, xml: string): string {
     }
     const parts = pianoParts(doc);
     const counts = stavesPerPart(doc);
-    const { left, right } = partsOf(counts);
+    const { left } = partsOf(counts);
     // The left hand is its own part, or the second staff of a two-staff part. A piano
     // written on one staff has no left hand to block. The piano is asked for its own staff
     // count: on an art song it is not the score's first part.
     const ownPart = parts.length === 2;
     const leftPart = ownPart ? parts[1] : parts[0];
-    if (!leftPart || (!ownPart && left === right + 1 && stavesOf(leftPart) < 2)) {
+    if (!leftPart || (!ownPart && stavesOf(leftPart) < 2)) {
         return xml;
     }
     const staffNumber = ownPart ? null : 2;
