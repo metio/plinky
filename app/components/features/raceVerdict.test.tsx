@@ -5,9 +5,13 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { m } from "../../paraglide/messages.js";
+import { overwriteGetLocale } from "../../paraglide/runtime.js";
 import { RaceVerdict } from "./raceVerdict";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    overwriteGetLocale(() => "en");
+});
 
 describe("RaceVerdict", () => {
     it("announces a win with the margin in seconds", () => {
@@ -18,6 +22,12 @@ describe("RaceVerdict", () => {
     it("announces a loss with the margin", () => {
         render(<RaceVerdict verdict={{ outcome: "lost", marginMs: 1100 }} />);
         expect(screen.getByText(m.ghost_verdict_lost({ margin: "1.1s" }))).toBeTruthy();
+    });
+
+    it("writes the margin the way the reader's language writes numbers", () => {
+        overwriteGetLocale(() => "de");
+        render(<RaceVerdict verdict={{ outcome: "won", marginMs: 2340 }} />);
+        expect(screen.getByText(m.ghost_verdict_won({ margin: "2,3s" }))).toBeTruthy();
     });
 
     it("calls a dead heat without a margin", () => {

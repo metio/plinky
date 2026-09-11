@@ -4,6 +4,7 @@
 import type { ReactNode } from "react";
 import { formatRaceMargin, type RaceVerdict as Verdict } from "../../../core/ghost";
 import { m } from "../../paraglide/messages.js";
+import { getLocale } from "../../paraglide/runtime.js";
 import { GhostIcon, KeysIcon } from "../ui/icons";
 
 // The head-to-head payoff shown with the grade when a raced run finishes: who crossed the
@@ -11,7 +12,7 @@ import { GhostIcon, KeysIcon } from "../ui/icons";
 // ghost's fuchsia; a dead heat stays neutral — the same colour language as the race strip
 // so the result reads as the end of that same duel.
 export function RaceVerdict({ verdict }: { verdict: Verdict }) {
-    const margin = formatRaceMargin(verdict.marginMs);
+    const margin = formatRaceMargin(verdict.marginMs, getLocale());
 
     if (verdict.outcome === "tie") {
         return (

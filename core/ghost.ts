@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { secondsFigure } from "./seconds";
+
 import { packToCode, unpackFromCode } from "./shareCode";
 
 // A "ghost": the note onset times of a completed run on a score, each in ms from
@@ -122,11 +124,11 @@ export function raceVerdict(ghostOnsets: number[], yourFinishMs: number): RaceVe
     return { outcome: diff < 0 ? "won" : "lost", marginMs };
 }
 
-// A race margin as a compact seconds reading — "2.3s" — for the verdict line. The
-// second's SI symbol reads the same in every locale, so the surrounding words are all
-// the copy that needs translating.
-export function formatRaceMargin(marginMs: number): string {
-    return `${(marginMs / 1000).toFixed(1)}s`;
+// A race margin as a compact seconds reading — "2.3s", or "2,3s" in German — for the
+// verdict line. The second's SI symbol reads the same in every locale, so the surrounding
+// words are all the copy that needs translating; the figure follows the locale.
+export function formatRaceMargin(marginMs: number, locale: string): string {
+    return `${secondsFigure(marginMs, locale)}s`;
 }
 
 // How many notes the ghost has reached by a given elapsed time. The onsets ascend,

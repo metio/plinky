@@ -186,6 +186,11 @@ showed "1 Noten", "1 notes" or "1 notas", and a Music search with one match coun
 one score as several. Both now use the singular, and Polish, Czech, Russian and the
 other languages with more than two forms get the right one for every count.
 
+**Seconds are written with your own decimal comma.** The notes you are slowest to
+read on the Stats page, and the margin you beat or lost to a ghost by, always used a
+full stop: a German reader saw "1.4s" beside figures that elsewhere read "1,4". Both
+now follow the language Plinky speaks to you.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

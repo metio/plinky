@@ -150,10 +150,16 @@ describe("ghost codec", () => {
     });
 
     describe("formatRaceMargin", () => {
+        it("writes the margin with the locale's decimal separator", () => {
+            expect(formatRaceMargin(2340, "de")).toBe("2,3s");
+            expect(formatRaceMargin(2340, "fr")).toBe("2,3s");
+            expect(formatRaceMargin(2340, "ja")).toBe("2.3s");
+        });
+
         it("reads the margin as compact seconds", () => {
-            expect(formatRaceMargin(2340)).toBe("2.3s");
-            expect(formatRaceMargin(0)).toBe("0.0s");
-            expect(formatRaceMargin(12040)).toBe("12.0s");
+            expect(formatRaceMargin(2340, "en")).toBe("2.3s");
+            expect(formatRaceMargin(0, "en")).toBe("0.0s");
+            expect(formatRaceMargin(12040, "en")).toBe("12.0s");
         });
     });
 });

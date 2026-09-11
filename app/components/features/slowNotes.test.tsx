@@ -7,10 +7,14 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { NoteStats } from "../../../core/noteStats";
 import { memoryStore } from "../../adapters/memoryStore";
 import { m } from "../../paraglide/messages.js";
+import { overwriteGetLocale } from "../../paraglide/runtime.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { SlowNotes } from "./slowNotes";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    overwriteGetLocale(() => "en");
+});
 
 const mount = (stats: NoteStats) =>
     renderWithServices(<SlowNotes />, {
@@ -65,6 +69,18 @@ describe("SlowNotes", () => {
 
         // The median of 0.3, 0.8 and 1.2 is 0.8.
         expect(screen.getByText(m.slow_notes_intro({ typical: "0.8" }))).toBeTruthy();
+    });
+
+    it("writes the seconds with the reader's own decimal separator", () => {
+        overwriteGetLocale(() => "de");
+        mount({
+            "60": { plays: 10, wrongs: 0, totalMs: 3000, timed: 10 },
+            "62": { plays: 10, wrongs: 0, totalMs: 12000, timed: 10 },
+            "64": { plays: 10, wrongs: 0, totalMs: 8000, timed: 10 },
+        });
+
+        expect(screen.getByText(m.slow_notes_intro({ typical: "0,8" }))).toBeTruthy();
+        expect(screen.getByText(m.slow_notes_seconds({ seconds: "1,2" }))).toBeTruthy();
     });
 
     it("reads a corrupt record as nothing rather than crashing the page", () => {

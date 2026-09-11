@@ -129,6 +129,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: '**A single note is one note in your language too.** In German, French, Spanish,\nPolish and most other languages, a day in this week\'s chart with one note played\nshowed "1 Noten", "1 notes" or "1 notas", and a Music search with one match counted\none score as several. Both now use the singular, and Polish, Czech, Russian and the\nother languages with more than two forms get the right one for every count.',
                 twip: true,
             },
+            {
+                body: '**Seconds are written with your own decimal comma.** The notes you are slowest to\nread on the Stats page, and the margin you beat or lost to a ghost by, always used a\nfull stop: a German reader saw "1.4s" beside figures that elsewhere read "1,4". Both\nnow follow the language Plinky speaks to you.',
+                twip: true,
+            },
         ],
     },
     {

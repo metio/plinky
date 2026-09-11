@@ -4,8 +4,10 @@
 import { useSyncExternalStore } from "react";
 import { noteName } from "../../../core/midi";
 import { type NoteStats, slowestNotes, typicalMs } from "../../../core/noteStats";
+import { secondsFigure } from "../../../core/seconds";
 import { useNoteStatsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
+import { getLocale } from "../../paraglide/runtime.js";
 import { sectionHeadingClasses } from "../ui/classes";
 
 // The notes you are slowest to find, longest first.
@@ -40,12 +42,13 @@ export function SlowNotes({
     }
 
     const slowest = slow[0]?.meanMs ?? 1;
+    const locale = getLocale();
 
     return (
         <section className="space-y-3">
             {headed && <h2 className={sectionHeadingClasses}>{m.slow_notes_heading()}</h2>}
             <p className="text-sm text-muted">
-                {m.slow_notes_intro({ typical: (typical / 1000).toFixed(1) })}
+                {m.slow_notes_intro({ typical: secondsFigure(typical, locale) })}
             </p>
             <ul className="space-y-1">
                 {slow.map((row) => (
@@ -61,7 +64,7 @@ export function SlowNotes({
                             style={{ width: `${Math.max(4, (row.meanMs / slowest) * 60)}%` }}
                         />
                         <span className="shrink-0 tabular-nums text-muted">
-                            {m.slow_notes_seconds({ seconds: (row.meanMs / 1000).toFixed(1) })}
+                            {m.slow_notes_seconds({ seconds: secondsFigure(row.meanMs, locale) })}
                         </span>
                     </li>
                 ))}
