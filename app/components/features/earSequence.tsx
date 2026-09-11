@@ -91,13 +91,18 @@ export function EarSequence<T extends string>({
 
     return (
         <div className="space-y-4">
-            {/* First in the column, so the spacing between the rows below stays as it
-                was: it is taken out of the flow and takes no room. */}
-            <p role="status" aria-live="polite" className="sr-only">
-                {said}
-            </p>
-            {/* The sequence being built (or graded): one slot per chord. */}
-            <fieldset className="flex items-center justify-center gap-2" aria-label={label}>
+            {/* The sequence being built (or graded): one slot per chord. Five slots and
+                the undo button are wider than a small phone, so the slots narrow to fit
+                (min-w-0 lifts a fieldset's min-content floor) while the undo button keeps
+                its full tap target. */}
+            <fieldset className="flex min-w-0 items-center justify-center gap-2" aria-label={label}>
+                {/* The row's announcement, heard as part of the row it describes. Out of
+                    the flow, so it takes no slot and no room. A visually hidden element is
+                    drawn a pixel outside where it would stand, and a centred row stands it
+                    in the middle, well inside every edge of the surface. */}
+                <p role="status" aria-live="polite" className="sr-only">
+                    {said}
+                </p>
                 {sequence.map((answer, index) => {
                     const pick = entered[index];
                     const state = settled
@@ -115,7 +120,7 @@ export function EarSequence<T extends string>({
                             // never reorders and its length is fixed per question.
                             // biome-ignore lint/suspicious/noArrayIndexKey: a slot's position is its identity here
                             key={index}
-                            className={`flex h-12 w-12 flex-col items-center justify-center rounded-md border text-sm font-semibold ${slotClasses(state)}`}
+                            className={`flex h-12 w-12 min-w-0 flex-col items-center justify-center rounded-md border text-sm font-semibold ${slotClasses(state)}`}
                         >
                             <span>{settled ? (pick ?? "·") : (pick ?? "")}</span>
                             {/* A wrong slot reveals the chord it should have been. */}
@@ -129,6 +134,7 @@ export function EarSequence<T extends string>({
                     <IconButton
                         label={m.ear_progression_undo()}
                         variant="ghost"
+                        className="shrink-0"
                         onClick={undo}
                         disabled={entered.length === 0}
                     >

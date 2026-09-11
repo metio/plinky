@@ -19,6 +19,11 @@ question doesn't offer is left alone. The number pad works too, and so does the
 number row on a French keyboard, with or without Shift. With a screen reader, you
 hear each note or chord as you fill it in, and which of the slots it went into.
 
+**Ear training fits a small phone again.** A long melody or a chord progression
+drew more listening dots than a narrow screen holds in a row, and five answer boxes
+were wider than it too, so the page zoomed out and the undo button was cut off at
+the edge. The dots now wrap onto a second row, and the boxes narrow to fit.
+
 ## 11 September 2026 — evening
 
 **The last few English note names now use your keys' names too.** The notes held

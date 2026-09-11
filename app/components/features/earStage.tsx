@@ -83,7 +83,10 @@ export function EarStage({
 
     return (
         <div className="flex flex-col items-center gap-4 rounded-xl bg-surface px-6 py-8">
-            <div className="flex h-16 items-center justify-center gap-4">
+            {/* A long question sounds a cadence and a melody, one dot per note — more
+                than a phone's width holds in a row — so the dots wrap. The gap between
+                rows leaves a lit dot room to grow without touching the next. */}
+            <div className="flex min-h-16 w-full flex-wrap items-center justify-center gap-x-4 gap-y-5">
                 {notes.map((_note, index) => {
                     const sounding = lit.includes(index);
                     return (
