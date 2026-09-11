@@ -37,6 +37,10 @@ export function useComposeFile({ hasWork, onLoad }: ComposeFileOptions) {
             if (!file) {
                 return;
             }
+            // A new pick supersedes a file still waiting on the replace question, whether
+            // or not the new one opens: confirming must never load a file the player has
+            // since moved on from.
+            setPendingReplace(null);
             const mine = ++openSeq.current;
             let loaded: Composition | null = null;
             try {

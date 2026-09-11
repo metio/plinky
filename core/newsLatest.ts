@@ -57,6 +57,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**The Due now filter keeps its button when nothing is due.** Filter Music to Due\nnow, play the piece that was due, come back, and the list was empty with no button\nleft to turn the filter off. The Due now button now stays while the filter is on,\nso one tap brings the whole shelf back.",
                 twip: true,
             },
+            {
+                body: "**Compose's replace question follows the last file you opened.** Asked whether to\nreplace your take with one file, you could open another instead; if that one would\nnot open, the question stayed up, and Replace loaded the first file after all.\nOpening a new file now withdraws the question about the earlier one.",
+                twip: true,
+            },
         ],
     },
     {

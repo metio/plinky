@@ -107,6 +107,63 @@ describe("useComposeFile", () => {
         expect(onLoad).not.toHaveBeenCalled();
     });
 
+    it("drops a parked file when a later pick fails", async () => {
+        // Asked whether to replace the take with A, the player opens B instead, and B is
+        // unreadable. The prompt must not survive to load A over the take on Replace.
+        const onLoad = vi.fn();
+        const { result } = renderHook(() => useComposeFile({ hasWork: () => true, onLoad }), {
+            wrapper,
+        });
+        await act(() => result.current.openFile(midiFile()));
+        expect(result.current.pendingReplace).toBe(true);
+        const garbage = new File(["not a score"], "junk.xml", { type: "text/xml" });
+        await act(() => result.current.openFile(garbage));
+        expect(result.current.error).toBeTruthy();
+        expect(result.current.pendingReplace).toBe(false);
+        act(() => result.current.confirmReplace());
+        expect(onLoad).not.toHaveBeenCalled();
+    });
+
+    it("parks the later file in place of the earlier one when both open", async () => {
+        const onLoad = vi.fn();
+        const { result } = renderHook(() => useComposeFile({ hasWork: () => true, onLoad }), {
+            wrapper,
+        });
+        await act(() => result.current.openFile(midiFile()));
+        const later = new File(
+            [
+                buildMidiFile(
+                    toMidiNotes({
+                        notes: [{ pitch: 70, startMs: 0, durationMs: 400, velocity: 90 }],
+                        tempo: 120,
+                        beatsPerBar: 4,
+                    }),
+                    { tempo: 120 },
+                ),
+            ],
+            "later.mid",
+            { type: "audio/midi" },
+        );
+        await act(() => result.current.openFile(later));
+        expect(result.current.pendingReplace).toBe(true);
+        act(() => result.current.confirmReplace());
+        expect(onLoad).toHaveBeenCalledTimes(1);
+        expect(onLoad.mock.calls[0]?.[0].notes.map((n: { pitch: number }) => n.pitch)).toEqual([
+            70,
+        ]);
+    });
+
+    it("keeps a parked file when the picker is dismissed without a choice", async () => {
+        // Dismissing the picker is not a new pick: the question about A still stands.
+        const onLoad = vi.fn();
+        const { result } = renderHook(() => useComposeFile({ hasWork: () => true, onLoad }), {
+            wrapper,
+        });
+        await act(() => result.current.openFile(midiFile()));
+        await act(() => result.current.openFile(undefined));
+        expect(result.current.pendingReplace).toBe(true);
+    });
+
     it("surfaces an unreadable file as an error, cleared on the next attempt", async () => {
         const onLoad = vi.fn();
         const { result } = renderHook(() => useComposeFile({ hasWork: () => false, onLoad }), {

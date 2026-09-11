@@ -76,6 +76,11 @@ now, play the piece that was due, come back, and the list was empty with no butt
 left to turn the filter off. The Due now button now stays while the filter is on,
 so one tap brings the whole shelf back.
 
+**Compose's replace question follows the last file you opened.** Asked whether to
+replace your take with one file, you could open another instead; if that one would
+not open, the question stayed up, and Replace loaded the first file after all.
+Opening a new file now withdraws the question about the earlier one.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played
