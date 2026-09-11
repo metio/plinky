@@ -81,9 +81,24 @@ describe("neverBuilt", () => {
     });
 
     it("matches a page whose path carries an escape", () => {
-        expect(neverBuilt(["/en/caf%C3%A9/"], new Set([requestPath("/en/caf%C3%A9/")]))).toEqual([
-            "/en/caf%C3%A9/",
-        ]);
+        expect(neverBuilt(["/en/caf%C3%A9/"], new Set(["/en/café/"]))).toEqual(["/en/caf%C3%A9/"]);
+    });
+
+    it("names an escaped page the served tree is missing, as the server reports it", async () => {
+        const fellBack = new Set<string>();
+        const served = await serveStatic(root, {
+            fallback: "spa",
+            onFallback: (p) => fellBack.add(p),
+        });
+        const pages = ["/en/", "/en/caf%C3%A9/"];
+        try {
+            for (const page of pages) {
+                expect((await fetch(`http://localhost:${served.port}${page}`)).status).toBe(200);
+            }
+        } finally {
+            await served.close();
+        }
+        expect(neverBuilt(pages, fellBack)).toEqual(["/en/caf%C3%A9/"]);
     });
 
     it("reports the audited page a served tree is missing", async () => {
