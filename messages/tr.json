@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Hazır olduğunda.",
     "rhythm_counting": "Giriş sayılıyor…",
     "rhythm_listening": "Dinliyorum.",
-    "rhythm_staff_label": "Vurulacak {notes} notalık bir ritim",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Vurulacak {notes} notalık bir ritim",
+                "notesPlural=other": "Vurulacak {notes} notalık bir ritim"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Tam yerinde.",
     "rhythm_verdict_good": "Hepsi var, biraz gevşek.",
     "rhythm_verdict_off": "Bir denemeye daha değer.",
     "rhythm_counts": "{total} notanın {onTime} tanesi zamanında",
-    "rhythm_missed": "{count} kaçtı",
-    "rhythm_extra": "{count} fazla",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kaçtı",
+                "countPlural=other": "{count} kaçtı"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} fazla",
+                "countPlural=other": "{count} fazla"
+            }
+        }
+    ],
     "meta_rhythm_title": "Ritim çalışması",
     "meta_rhythm_description": "Bir ritim oku ve geri vur. On üç seviye, sade dörtlüklerden triolelere ve bileşik ölçülere. Piyano gerekmez.",
     "scores_explain_toggle": "Bunlar ne demek",

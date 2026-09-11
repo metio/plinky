@@ -1587,13 +1587,52 @@
     "rhythm_ready": "准备好了就开始。",
     "rhythm_counting": "数拍中…",
     "rhythm_listening": "正在听。",
-    "rhythm_staff_label": "一段 {notes} 个音的节奏，等你敲",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=other": "一段 {notes} 个音的节奏，等你敲"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "分毫不差。",
     "rhythm_verdict_good": "都在，稍微松了点。",
     "rhythm_verdict_off": "值得再来一次。",
     "rhythm_counts": "{total} 个里有 {onTime} 个准时",
-    "rhythm_missed": "漏了 {count} 个",
-    "rhythm_extra": "多了 {count} 个",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "漏了 {count} 个"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "多了 {count} 个"
+            }
+        }
+    ],
     "meta_rhythm_title": "节奏训练",
     "meta_rhythm_description": "读一段节奏，把它敲回来。十三个级别，从简单的四分音符到三连音和复拍子。不需要钢琴。",
     "scores_explain_toggle": "这些是什么意思",

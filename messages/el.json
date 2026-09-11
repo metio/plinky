@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Όποτε θέλεις.",
     "rhythm_counting": "Μετράω για την είσοδο…",
     "rhythm_listening": "Ακούω.",
-    "rhythm_staff_label": "Ένας ρυθμός {notes} νότων για χτύπημα",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Ένας ρυθμός {notes} νότας για χτύπημα",
+                "notesPlural=other": "Ένας ρυθμός {notes} νότων για χτύπημα"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Ακριβώς.",
     "rhythm_verdict_good": "Είναι όλες εκεί, λίγο χαλαρά.",
     "rhythm_verdict_off": "Αξίζει άλλη μια προσπάθεια.",
     "rhythm_counts": "{onTime} από {total} στον χρόνο",
-    "rhythm_missed": "{count} χάθηκαν",
-    "rhythm_extra": "{count} παραπανίσια",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} χάθηκε",
+                "countPlural=other": "{count} χάθηκαν"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} παραπανίσιο",
+                "countPlural=other": "{count} παραπανίσια"
+            }
+        }
+    ],
     "meta_rhythm_title": "Εξάσκηση ρυθμού",
     "meta_rhythm_description": "Διάβασε έναν ρυθμό και χτύπα τον. Δεκατρία επίπεδα, από απλά τέταρτα ως τρίηχα και σύνθετα μέτρα. Χωρίς πιάνο.",
     "scores_explain_toggle": "Τι σημαίνουν αυτά",

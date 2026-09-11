@@ -1631,13 +1631,58 @@
     "rhythm_ready": "Când ești gata.",
     "rhythm_counting": "Număr intrarea…",
     "rhythm_listening": "Ascult.",
-    "rhythm_staff_label": "Un ritm de {notes} note de bătut",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Un ritm de {notes} notă de bătut",
+                "notesPlural=few": "Un ritm de {notes} note de bătut",
+                "notesPlural=other": "Un ritm de {notes} de note de bătut"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Exact.",
     "rhythm_verdict_good": "Sunt toate, puțin lejer.",
     "rhythm_verdict_off": "Merită încă o încercare.",
     "rhythm_counts": "{onTime} din {total} la timp",
-    "rhythm_missed": "{count} ratate",
-    "rhythm_extra": "{count} în plus",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ratată",
+                "countPlural=few": "{count} ratate",
+                "countPlural=other": "{count} de ratate"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} în plus",
+                "countPlural=few": "{count} în plus",
+                "countPlural=other": "{count} în plus"
+            }
+        }
+    ],
     "meta_rhythm_title": "Antrenor de ritm",
     "meta_rhythm_description": "Citește un ritm și bate-l. Treisprezece niveluri, de la pătrimi simple la triolete și măsuri compuse. Fără pian.",
     "scores_explain_toggle": "Ce înseamnă acestea",

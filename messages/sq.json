@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Kur të jesh gati.",
     "rhythm_counting": "Po numëroj hyrjen…",
     "rhythm_listening": "Po dëgjoj.",
-    "rhythm_staff_label": "Një ritëm me {notes} nota për t’u trokitur",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Një ritëm me {notes} notë për t’u trokitur",
+                "notesPlural=other": "Një ritëm me {notes} nota për t’u trokitur"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Pikërisht.",
     "rhythm_verdict_good": "Janë të gjitha, pak të lira.",
     "rhythm_verdict_off": "Ia vlen edhe një provë.",
     "rhythm_counts": "{onTime} nga {total} në kohë",
-    "rhythm_missed": "{count} të humbura",
-    "rhythm_extra": "{count} të tepërta",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} e humbur",
+                "countPlural=other": "{count} të humbura"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} e tepërt",
+                "countPlural=other": "{count} të tepërta"
+            }
+        }
+    ],
     "meta_rhythm_title": "Stërvitje ritmi",
     "meta_rhythm_description": "Lexo një ritëm dhe trokite. Trembëdhjetë nivele, nga çerekët e thjeshtë te triolat dhe masat e përbëra. Pa piano.",
     "scores_explain_toggle": "Çfarë do të thonë këto",

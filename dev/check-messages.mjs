@@ -103,7 +103,7 @@ for (const locale of locales) {
     const messages = messagesOf(locale);
     // A singular copied from the plural passes every check below, so it is looked for on
     // its own — in the contract too, which a later edit could break the same way.
-    const copies = singularCopies(locale, messages);
+    const copies = singularCopies(locale, messages, undefined, baseMessages);
     // Every plural message answers for every count its language can produce — the
     // contract's own included, whose arms a typo breaks for English readers alike.
     const plurals = pluralProblems(locale, messages, baseMessages);

@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Bereit, wenn du es bist.",
     "rhythm_counting": "Es wird eingezählt …",
     "rhythm_listening": "Ich höre zu.",
-    "rhythm_staff_label": "Ein Rhythmus aus {notes} Noten zum Klopfen",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Ein Rhythmus aus {notes} Note zum Klopfen",
+                "notesPlural=other": "Ein Rhythmus aus {notes} Noten zum Klopfen"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Genau richtig.",
     "rhythm_verdict_good": "Alles da, etwas locker.",
     "rhythm_verdict_off": "Einen weiteren Versuch wert.",
     "rhythm_counts": "{onTime} von {total} im Takt",
-    "rhythm_missed": "{count} fehlen",
-    "rhythm_extra": "{count} zu viel",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} fehlt",
+                "countPlural=other": "{count} fehlen"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} zu viel",
+                "countPlural=other": "{count} zu viel"
+            }
+        }
+    ],
     "meta_rhythm_title": "Rhythmustrainer",
     "meta_rhythm_description": "Lies einen Rhythmus und klopfe ihn zurück. Dreizehn Stufen, von einfachen Vierteln bis zu Triolen und zusammengesetzten Taktarten. Kein Klavier nötig.",
     "scores_explain_toggle": "Was das bedeutet",

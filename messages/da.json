@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Når du er klar.",
     "rhythm_counting": "Tæller dig ind …",
     "rhythm_listening": "Lytter.",
-    "rhythm_staff_label": "En rytme på {notes} toner at banke",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "En rytme på {notes} tone at banke",
+                "notesPlural=other": "En rytme på {notes} toner at banke"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Lige på.",
     "rhythm_verdict_good": "Det hele er der, lidt løst.",
     "rhythm_verdict_off": "Værd at prøve igen.",
     "rhythm_counts": "{onTime} af {total} i takt",
-    "rhythm_missed": "{count} manglede",
-    "rhythm_extra": "{count} for mange",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} manglede",
+                "countPlural=other": "{count} manglede"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} for meget",
+                "countPlural=other": "{count} for mange"
+            }
+        }
+    ],
     "meta_rhythm_title": "Rytmetræner",
     "meta_rhythm_description": "Læs en rytme, og bank den tilbage. Tretten niveauer, fra enkle fjerdedele til trioler og sammensatte taktarter. Uden klaver.",
     "scores_explain_toggle": "Hvad det betyder",

@@ -1631,13 +1631,58 @@
     "rhythm_ready": "Quando quiseres.",
     "rhythm_counting": "A contar a entrada…",
     "rhythm_listening": "A ouvir.",
-    "rhythm_staff_label": "Um ritmo de {notes} notas para bater",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Um ritmo de {notes} nota para bater",
+                "notesPlural=many": "Um ritmo de {notes} notas para bater",
+                "notesPlural=other": "Um ritmo de {notes} notas para bater"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Mesmo em cima.",
     "rhythm_verdict_good": "Está tudo lá, um pouco solto.",
     "rhythm_verdict_off": "Vale outra tentativa.",
     "rhythm_counts": "{onTime} de {total} a tempo",
-    "rhythm_missed": "{count} falhadas",
-    "rhythm_extra": "{count} a mais",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} falhada",
+                "countPlural=many": "{count} falhadas",
+                "countPlural=other": "{count} falhadas"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} a mais",
+                "countPlural=many": "{count} a mais",
+                "countPlural=other": "{count} a mais"
+            }
+        }
+    ],
     "meta_rhythm_title": "Treino de ritmo",
     "meta_rhythm_description": "Lê um ritmo e bate-o. Treze níveis, das semínimas simples às tercinas e aos compassos compostos. Sem piano.",
     "scores_explain_toggle": "O que isto significa",

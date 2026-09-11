@@ -1631,13 +1631,58 @@
     "rhythm_ready": "Cuando quieras.",
     "rhythm_counting": "Contando la entrada…",
     "rhythm_listening": "Escuchando.",
-    "rhythm_staff_label": "Un ritmo de {notes} notas para marcar",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Un ritmo de {notes} nota para marcar",
+                "notesPlural=many": "Un ritmo de {notes} notas para marcar",
+                "notesPlural=other": "Un ritmo de {notes} notas para marcar"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Justo ahí.",
     "rhythm_verdict_good": "Está todo, algo suelto.",
     "rhythm_verdict_off": "Merece otro intento.",
     "rhythm_counts": "{onTime} de {total} a tiempo",
-    "rhythm_missed": "{count} perdidas",
-    "rhythm_extra": "{count} de más",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} perdida",
+                "countPlural=many": "{count} perdidas",
+                "countPlural=other": "{count} perdidas"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} de más",
+                "countPlural=many": "{count} de más",
+                "countPlural=other": "{count} de más"
+            }
+        }
+    ],
     "meta_rhythm_title": "Entrenador de ritmo",
     "meta_rhythm_description": "Lee un ritmo y márcalo. Trece niveles, de negras simples a tresillos y compases compuestos. Sin piano.",
     "scores_explain_toggle": "Qué significa esto",

@@ -138,6 +138,18 @@ describe("every plural message in every locale", () => {
         expect(m.instrument_range_keys({ count: 61 }, { locale: "ru" })).toBe("61 клавиша");
     });
 
+    it("lets a verb or adjective agree where English has no noun to", () => {
+        expect(m.rhythm_missed({ count: 1 })).toBe("1 missed");
+        expect(m.rhythm_missed({ count: 1 }, { locale: "de" })).toBe("1 fehlt");
+        expect(m.rhythm_missed({ count: 3 }, { locale: "de" })).toBe("3 fehlen");
+        expect(m.rhythm_extra({ count: 3 }, { locale: "pl" })).toBe("3 nadmiarowe");
+        expect(m.rhythm_extra({ count: 5 }, { locale: "pl" })).toBe("5 nadmiarowych");
+        expect(m.rhythm_staff_label({ notes: 1 })).toBe("A rhythm of 1 note to tap");
+        expect(m.rhythm_staff_label({ notes: 4 }, { locale: "ru" })).toBe(
+            "Ритм из 4 нот для простукивания",
+        );
+    });
+
     it("tells Czech two from five", () => {
         expect(m.scores_count({ count: 2 }, { locale: "cs" })).toBe("2 skladby");
         expect(m.scores_count({ count: 5 }, { locale: "cs" })).toBe("5 skladeb");

@@ -1631,13 +1631,58 @@
     "rhythm_ready": "Quand tu veux.",
     "rhythm_counting": "Décompte…",
     "rhythm_listening": "J’écoute.",
-    "rhythm_staff_label": "Un rythme de {notes} notes à taper",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Un rythme de {notes} note à taper",
+                "notesPlural=many": "Un rythme de {notes} notes à taper",
+                "notesPlural=other": "Un rythme de {notes} notes à taper"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Pile dessus.",
     "rhythm_verdict_good": "Tout y est, un peu flottant.",
     "rhythm_verdict_off": "Ça vaut un autre essai.",
     "rhythm_counts": "{onTime} sur {total} dans le tempo",
-    "rhythm_missed": "{count} manquées",
-    "rhythm_extra": "{count} en trop",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} manquée",
+                "countPlural=many": "{count} manquées",
+                "countPlural=other": "{count} manquées"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} en trop",
+                "countPlural=many": "{count} en trop",
+                "countPlural=other": "{count} en trop"
+            }
+        }
+    ],
     "meta_rhythm_title": "Entraîneur de rythme",
     "meta_rhythm_description": "Lis un rythme et tape-le. Treize niveaux, des noires simples aux triolets et aux mesures composées. Sans piano.",
     "scores_explain_toggle": "Ce que cela signifie",

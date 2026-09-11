@@ -1653,13 +1653,61 @@
     "rhythm_ready": "Keď budeš chcieť.",
     "rhythm_counting": "Odpočítavam…",
     "rhythm_listening": "Počúvam.",
-    "rhythm_staff_label": "Rytmus z {notes} nôt na vyťukanie",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Rytmus z {notes} noty na vyťukanie",
+                "notesPlural=few": "Rytmus z {notes} nôt na vyťukanie",
+                "notesPlural=many": "Rytmus z {notes} noty na vyťukanie",
+                "notesPlural=other": "Rytmus z {notes} nôt na vyťukanie"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Presne.",
     "rhythm_verdict_good": "Všetko tam je, len trochu voľne.",
     "rhythm_verdict_off": "Stojí za ďalší pokus.",
     "rhythm_counts": "{onTime} z {total} v rytme",
-    "rhythm_missed": "{count} vynechané",
-    "rhythm_extra": "{count} navyše",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} vynechaná",
+                "countPlural=few": "{count} vynechané",
+                "countPlural=many": "{count} vynechaných",
+                "countPlural=other": "{count} vynechaných"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} navyše",
+                "countPlural=few": "{count} navyše",
+                "countPlural=many": "{count} navyše",
+                "countPlural=other": "{count} navyše"
+            }
+        }
+    ],
     "meta_rhythm_title": "Tréning rytmu",
     "meta_rhythm_description": "Prečítaj rytmus a vyťukaj ho. Trinásť úrovní, od jednoduchých štvrťových nôt po trioly a zložené takty. Bez klavíra.",
     "scores_explain_toggle": "Čo to znamená",

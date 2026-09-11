@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Ready when you are.",
     "rhythm_counting": "Counting you in…",
     "rhythm_listening": "Listening.",
-    "rhythm_staff_label": "A rhythm of {notes} notes to tap",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "A rhythm of {notes} note to tap",
+                "notesPlural=other": "A rhythm of {notes} notes to tap"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Bang on.",
     "rhythm_verdict_good": "All there, a little loose.",
     "rhythm_verdict_off": "Worth another go.",
     "rhythm_counts": "{onTime} of {total} in time",
-    "rhythm_missed": "{count} missed",
-    "rhythm_extra": "{count} extra",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} missed",
+                "countPlural=other": "{count} missed"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} extra",
+                "countPlural=other": "{count} extra"
+            }
+        }
+    ],
     "meta_rhythm_title": "Rhythm trainer",
     "meta_rhythm_description": "Read a rhythm and tap it back. Thirteen graded levels, from plain quarter notes to triplets and compound time. No piano needed.",
     "scores_explain_toggle": "What these mean",

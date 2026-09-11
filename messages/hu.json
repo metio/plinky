@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Amikor készen állsz.",
     "rhythm_counting": "Beszámolás…",
     "rhythm_listening": "Figyelek.",
-    "rhythm_staff_label": "Egy {notes} hangból álló ritmus kopogásra",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Egy {notes} hangból álló ritmus kopogásra",
+                "notesPlural=other": "Egy {notes} hangból álló ritmus kopogásra"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Pontosan.",
     "rhythm_verdict_good": "Minden megvan, kicsit lazán.",
     "rhythm_verdict_off": "Megér még egy próbát.",
     "rhythm_counts": "{onTime} / {total} időben",
-    "rhythm_missed": "{count} kimaradt",
-    "rhythm_extra": "{count} fölösleges",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kimaradt",
+                "countPlural=other": "{count} kimaradt"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} fölösleges",
+                "countPlural=other": "{count} fölösleges"
+            }
+        }
+    ],
     "meta_rhythm_title": "Ritmusgyakorló",
     "meta_rhythm_description": "Olvass el egy ritmust, és kopogd vissza. Tizenhárom szint, az egyszerű negyedektől a triolákig és az összetett ütemekig. Zongora nélkül.",
     "scores_explain_toggle": "Mit jelentenek ezek",

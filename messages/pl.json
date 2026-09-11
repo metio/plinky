@@ -1653,13 +1653,61 @@
     "rhythm_ready": "Kiedy chcesz.",
     "rhythm_counting": "Odliczanie…",
     "rhythm_listening": "Słucham.",
-    "rhythm_staff_label": "Rytm z {notes} nut do wystukania",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Rytm z {notes} nuty do wystukania",
+                "notesPlural=few": "Rytm z {notes} nut do wystukania",
+                "notesPlural=many": "Rytm z {notes} nut do wystukania",
+                "notesPlural=other": "Rytm z {notes} nut do wystukania"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Idealnie.",
     "rhythm_verdict_good": "Wszystko jest, trochę luźno.",
     "rhythm_verdict_off": "Warto spróbować jeszcze raz.",
     "rhythm_counts": "{onTime} z {total} w rytmie",
-    "rhythm_missed": "{count} pominięte",
-    "rhythm_extra": "{count} nadmiarowe",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} pominięta",
+                "countPlural=few": "{count} pominięte",
+                "countPlural=many": "{count} pominiętych",
+                "countPlural=other": "{count} pominiętych"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nadmiarowa",
+                "countPlural=few": "{count} nadmiarowe",
+                "countPlural=many": "{count} nadmiarowych",
+                "countPlural=other": "{count} nadmiarowych"
+            }
+        }
+    ],
     "meta_rhythm_title": "Trening rytmu",
     "meta_rhythm_description": "Przeczytaj rytm i wystukaj go. Trzynaście poziomów, od zwykłych ćwierćnut po triole i metrum złożone. Bez pianina.",
     "scores_explain_toggle": "Co to znaczy",

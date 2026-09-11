@@ -1609,13 +1609,55 @@
     "rhythm_ready": "När du är redo.",
     "rhythm_counting": "Räknar in dig …",
     "rhythm_listening": "Lyssnar.",
-    "rhythm_staff_label": "En rytm på {notes} toner att knacka",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "En rytm på {notes} ton att knacka",
+                "notesPlural=other": "En rytm på {notes} toner att knacka"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Mitt i prick.",
     "rhythm_verdict_good": "Allt finns där, lite löst.",
     "rhythm_verdict_off": "Värt ett försök till.",
     "rhythm_counts": "{onTime} av {total} i takt",
-    "rhythm_missed": "{count} missade",
-    "rhythm_extra": "{count} för många",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} missad",
+                "countPlural=other": "{count} missade"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} för mycket",
+                "countPlural=other": "{count} för många"
+            }
+        }
+    ],
     "meta_rhythm_title": "Rytmträning",
     "meta_rhythm_description": "Läs en rytm och knacka tillbaka den. Tretton nivåer, från enkla fjärdedelar till trioler och sammansatta taktarter. Utan piano.",
     "scores_explain_toggle": "Vad det här betyder",

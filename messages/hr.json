@@ -1631,13 +1631,58 @@
     "rhythm_ready": "Kad budeš spreman.",
     "rhythm_counting": "Odbrojavam…",
     "rhythm_listening": "Slušam.",
-    "rhythm_staff_label": "Ritam od {notes} nota za otkucati",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Ritam od {notes} note za otkucati",
+                "notesPlural=few": "Ritam od {notes} note za otkucati",
+                "notesPlural=other": "Ritam od {notes} nota za otkucati"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Točno.",
     "rhythm_verdict_good": "Sve je tu, malo raspušteno.",
     "rhythm_verdict_off": "Vrijedi još jednom.",
     "rhythm_counts": "{onTime} od {total} u ritmu",
-    "rhythm_missed": "{count} propušteno",
-    "rhythm_extra": "{count} viška",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} propuštena",
+                "countPlural=few": "{count} propuštene",
+                "countPlural=other": "{count} propušteno"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} viška",
+                "countPlural=few": "{count} viška",
+                "countPlural=other": "{count} viška"
+            }
+        }
+    ],
     "meta_rhythm_title": "Vježba ritma",
     "meta_rhythm_description": "Pročitaj ritam i otkucaj ga. Trinaest razina, od jednostavnih četvrtinki do triola i složenih mjera. Bez klavira.",
     "scores_explain_toggle": "Što ovo znači",

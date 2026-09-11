@@ -1653,13 +1653,61 @@
     "rhythm_ready": "Когда будешь готов.",
     "rhythm_counting": "Отсчёт…",
     "rhythm_listening": "Слушаю.",
-    "rhythm_staff_label": "Ритм из {notes} нот для простукивания",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Ритм из {notes} ноты для простукивания",
+                "notesPlural=few": "Ритм из {notes} нот для простукивания",
+                "notesPlural=many": "Ритм из {notes} нот для простукивания",
+                "notesPlural=other": "Ритм из {notes} нот для простукивания"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Точно в цель.",
     "rhythm_verdict_good": "Всё на месте, немного вольно.",
     "rhythm_verdict_off": "Стоит попробовать ещё раз.",
     "rhythm_counts": "{onTime} из {total} вовремя",
-    "rhythm_missed": "{count} пропущено",
-    "rhythm_extra": "{count} лишних",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} пропущена",
+                "countPlural=few": "{count} пропущены",
+                "countPlural=many": "{count} пропущено",
+                "countPlural=other": "{count} пропущено"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} лишняя",
+                "countPlural=few": "{count} лишние",
+                "countPlural=many": "{count} лишних",
+                "countPlural=other": "{count} лишних"
+            }
+        }
+    ],
     "meta_rhythm_title": "Тренажёр ритма",
     "meta_rhythm_description": "Прочитай ритм и простучи его. Тринадцать уровней — от простых четвертей до триолей и сложных размеров. Без пианино.",
     "scores_explain_toggle": "Что это значит",

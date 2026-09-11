@@ -174,12 +174,38 @@ describe("singularCopies", () => {
         expect(singularCopies("sq", {}, exemptions)[0]).toMatch(/no longer does/);
     });
 
+    it("asks nothing of a message the contract writes the same for one and many", () => {
+        const invariant = plural({
+            "countPlural=one": "{count} gemist",
+            "countPlural=other": "{count} gemist",
+        });
+        const contract = {
+            rhythm_missed: plural({
+                "countPlural=one": "{count} missed",
+                "countPlural=other": "{count} missed",
+            }),
+        };
+        expect(singularCopies("nl", { rhythm_missed: invariant }, {}, contract)).toEqual([]);
+        // The same translation under a contract that tells one from many is a copy.
+        const counted = {
+            rhythm_missed: plural({
+                "countPlural=one": "{count} note",
+                "countPlural=other": "{count} notes",
+            }),
+        };
+        expect(singularCopies("nl", { rhythm_missed: invariant }, {}, counted)).toHaveLength(1);
+    });
+
     it("finds no copied singular anywhere in the catalogue", () => {
         const { locales } = JSON.parse(readFileSync("project.inlang/settings.json", "utf8"));
+        const contract = JSON.parse(readFileSync("messages/en.json", "utf8"));
         const found = (locales as string[]).flatMap((locale) =>
-            singularCopies(locale, JSON.parse(readFileSync(`messages/${locale}.json`, "utf8"))).map(
-                (problem) => `${locale} ${problem}`,
-            ),
+            singularCopies(
+                locale,
+                JSON.parse(readFileSync(`messages/${locale}.json`, "utf8")),
+                undefined,
+                contract,
+            ).map((problem) => `${locale} ${problem}`),
         );
         expect(found).toEqual([]);
     });

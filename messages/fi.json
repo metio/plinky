@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Kun olet valmis.",
     "rhythm_counting": "Lasketaan sisään …",
     "rhythm_listening": "Kuuntelen.",
-    "rhythm_staff_label": "{notes} sävelen rytmi naputettavaksi",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "{notes} sävelen rytmi naputettavaksi",
+                "notesPlural=other": "{notes} sävelen rytmi naputettavaksi"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Juuri oikein.",
     "rhythm_verdict_good": "Kaikki on siellä, vähän löysästi.",
     "rhythm_verdict_off": "Kannattaa yrittää uudelleen.",
     "rhythm_counts": "{onTime} / {total} ajallaan",
-    "rhythm_missed": "{count} jäi väliin",
-    "rhythm_extra": "{count} liikaa",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} jäi väliin",
+                "countPlural=other": "{count} jäi väliin"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} liikaa",
+                "countPlural=other": "{count} liikaa"
+            }
+        }
+    ],
     "meta_rhythm_title": "Rytmiharjoittelu",
     "meta_rhythm_description": "Lue rytmi ja naputa se takaisin. Kolmetoista tasoa, yksinkertaisista neljäsosista trioleihin ja yhdistettyihin tahtilajeihin. Ilman pianoa.",
     "scores_explain_toggle": "Mitä nämä tarkoittavat",

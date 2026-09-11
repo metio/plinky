@@ -1631,13 +1631,58 @@
     "rhythm_ready": "Кад будеш спреман.",
     "rhythm_counting": "Одбројавам…",
     "rhythm_listening": "Слушам.",
-    "rhythm_staff_label": "Ритам од {notes} нота за откуцавање",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Ритам од {notes} ноте за откуцавање",
+                "notesPlural=few": "Ритам од {notes} ноте за откуцавање",
+                "notesPlural=other": "Ритам од {notes} нота за откуцавање"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Тачно.",
     "rhythm_verdict_good": "Све је ту, мало распуштено.",
     "rhythm_verdict_off": "Вреди још једном.",
     "rhythm_counts": "{onTime} од {total} у ритму",
-    "rhythm_missed": "{count} пропуштено",
-    "rhythm_extra": "{count} вишка",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} пропуштена",
+                "countPlural=few": "{count} пропуштене",
+                "countPlural=other": "{count} пропуштено"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} вишка",
+                "countPlural=few": "{count} вишка",
+                "countPlural=other": "{count} вишка"
+            }
+        }
+    ],
     "meta_rhythm_title": "Вежба ритма",
     "meta_rhythm_description": "Прочитај ритам и откуцај га. Тринаест нивоа, од једноставних четвртина до триола и сложених мера. Без клавира.",
     "scores_explain_toggle": "Шта ово значи",

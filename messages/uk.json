@@ -1653,13 +1653,61 @@
     "rhythm_ready": "Коли будеш готовий.",
     "rhythm_counting": "Відлік…",
     "rhythm_listening": "Слухаю.",
-    "rhythm_staff_label": "Ритм із {notes} нот для вистукування",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Ритм із {notes} ноти для вистукування",
+                "notesPlural=few": "Ритм із {notes} нот для вистукування",
+                "notesPlural=many": "Ритм із {notes} нот для вистукування",
+                "notesPlural=other": "Ритм із {notes} нот для вистукування"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Точно.",
     "rhythm_verdict_good": "Усе на місці, трохи вільно.",
     "rhythm_verdict_off": "Варто спробувати ще раз.",
     "rhythm_counts": "{onTime} з {total} вчасно",
-    "rhythm_missed": "{count} пропущено",
-    "rhythm_extra": "{count} зайвих",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} пропущена",
+                "countPlural=few": "{count} пропущені",
+                "countPlural=many": "{count} пропущено",
+                "countPlural=other": "{count} пропущено"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} зайва",
+                "countPlural=few": "{count} зайві",
+                "countPlural=many": "{count} зайвих",
+                "countPlural=other": "{count} зайвих"
+            }
+        }
+    ],
     "meta_rhythm_title": "Тренажер ритму",
     "meta_rhythm_description": "Прочитай ритм і вистукай його. Тринадцять рівнів — від простих четвертних до тріолей і складних розмірів. Без піаніно.",
     "scores_explain_toggle": "Що це означає",

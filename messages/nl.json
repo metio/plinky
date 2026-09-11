@@ -1609,13 +1609,55 @@
     "rhythm_ready": "Wanneer je wilt.",
     "rhythm_counting": "Aftellen…",
     "rhythm_listening": "Ik luister.",
-    "rhythm_staff_label": "Een ritme van {notes} noten om te tikken",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Een ritme van {notes} noot om te tikken",
+                "notesPlural=other": "Een ritme van {notes} noten om te tikken"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "Precies goed.",
     "rhythm_verdict_good": "Alles er, iets losjes.",
     "rhythm_verdict_off": "Nog een poging waard.",
     "rhythm_counts": "{onTime} van {total} op tijd",
-    "rhythm_missed": "{count} gemist",
-    "rhythm_extra": "{count} te veel",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} gemist",
+                "countPlural=other": "{count} gemist"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} te veel",
+                "countPlural=other": "{count} te veel"
+            }
+        }
+    ],
     "meta_rhythm_title": "Ritmetrainer",
     "meta_rhythm_description": "Lees een ritme en tik het terug. Dertien niveaus, van eenvoudige kwarten tot triolen en samengestelde maatsoorten. Zonder piano.",
     "scores_explain_toggle": "Wat dit betekent",

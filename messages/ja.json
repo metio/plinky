@@ -1587,13 +1587,52 @@
     "rhythm_ready": "いつでもどうぞ。",
     "rhythm_counting": "カウント中…",
     "rhythm_listening": "聞いています。",
-    "rhythm_staff_label": "{notes}個の音を叩くリズム",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=other": "{notes}個の音を叩くリズム"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "ぴったりです。",
     "rhythm_verdict_good": "全部そろっています。少しゆるめです。",
     "rhythm_verdict_off": "もう一度やってみる価値があります。",
     "rhythm_counts": "{total}個中{onTime}個が時間どおり",
-    "rhythm_missed": "{count}個抜け",
-    "rhythm_extra": "{count}個多い",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}個抜け"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}個多い"
+            }
+        }
+    ],
     "meta_rhythm_title": "リズム練習",
     "meta_rhythm_description": "リズムを読んで叩き返します。13段階、単純な四分音符から三連符・複合拍子まで。ピアノは要りません。",
     "scores_explain_toggle": "この数字の意味",

@@ -1587,13 +1587,52 @@
     "rhythm_ready": "준비되면 언제든지.",
     "rhythm_counting": "카운트 중…",
     "rhythm_listening": "듣고 있습니다.",
-    "rhythm_staff_label": "{notes}개의 음을 두드리는 리듬",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=other": "{notes}개의 음을 두드리는 리듬"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "정확합니다.",
     "rhythm_verdict_good": "다 있습니다. 조금 느슨해요.",
     "rhythm_verdict_off": "한 번 더 해볼 만합니다.",
     "rhythm_counts": "{total}개 중 {onTime}개가 제때",
-    "rhythm_missed": "{count}개 놓침",
-    "rhythm_extra": "{count}개 초과",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}개 놓침"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}개 초과"
+            }
+        }
+    ],
     "meta_rhythm_title": "리듬 연습",
     "meta_rhythm_description": "리듬을 읽고 두드려 보세요. 열세 단계, 단순한 4분음표부터 셋잇단음표와 겹박자까지. 피아노는 필요 없습니다.",
     "scores_explain_toggle": "이 숫자의 의미",

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { isComplex } from "./plural-messages.mjs";
+import { armsOf, isComplex } from "./plural-messages.mjs";
 
 // Finds counted messages whose singular reads exactly like the plural, in a language that
 // tells the two apart. A translation that copies the plural into the singular arm compiles,
@@ -51,11 +51,15 @@ const SAME_FOR_ONE_AND_MANY = {
     },
     hr: {
         balance_last: "prije takes the genitive, and dana serves one, two and five: prije 1 dana",
+        rhythm_staff_label: "od takes the genitive, and note serves one and two: od 1 note",
     },
     sr: {
         balance_last: "пре takes the genitive, and дана serves one, two and five: пре 1 дана",
+        rhythm_staff_label: "од takes the genitive, and ноте serves one and two: од 1 ноте",
     },
     fi: {
+        rhythm_staff_label:
+            "the noun stays in the genitive singular after any numeral: yhden sävelen, kolmen sävelen",
         music_remove_used: FINNISH_CASE,
         repertoire_days_left: FINNISH_CASE,
         stats_opening_days: FINNISH_CASE,
@@ -84,11 +88,20 @@ function armsByCategory(value) {
     );
 }
 
+// A message the contract itself writes the same for one and many — "{count} missed",
+// "{count} extra" — has no noun agreeing with the number, so a translation that does the
+// same is no evidence of a copy. Where a language's verb or adjective does agree (German
+// "1 fehlt", "2 fehlen"), the rendering tests hold it to that instead.
+const agreesWithNothing = (value) => isComplex(value) && new Set(armsOf(value)).size === 1;
+
 // Every counted message in one locale's catalogue, as its name and whether its singular
 // reads like a plural.
-function countedMessages(locale, messages) {
+function countedMessages(locale, messages, contract) {
     const counted = [];
     for (const [key, value] of Object.entries(messages)) {
+        if (agreesWithNothing(contract[key])) {
+            continue;
+        }
         if (key.endsWith("_one") && typeof value === "string") {
             const name = key.slice(0, -"_one".length);
             const other = messages[`${name}_other`];
@@ -115,7 +128,12 @@ function countedMessages(locale, messages) {
 // What is wrong with one locale's counted messages, one line per problem: a singular copied
 // from the plural, or an exemption that no longer describes any message. An exemption that
 // outlives its message would quietly excuse the next copy made under that name.
-export function singularCopies(locale, messages, exemptions = SAME_FOR_ONE_AND_MANY) {
+export function singularCopies(
+    locale,
+    messages,
+    exemptions = SAME_FOR_ONE_AND_MANY,
+    contract = {},
+) {
     const categories = new Intl.PluralRules(locale).resolvedOptions().pluralCategories;
     if (!categories.includes("one") || SINGULAR_AFTER_NUMERAL.has(locale)) {
         return [];
@@ -123,7 +141,7 @@ export function singularCopies(locale, messages, exemptions = SAME_FOR_ONE_AND_M
     const allowed = exemptions[locale] ?? {};
     const problems = [];
     const excused = new Set();
-    for (const { name, same } of countedMessages(locale, messages)) {
+    for (const { name, same } of countedMessages(locale, messages, contract)) {
         if (!same) {
             continue;
         }

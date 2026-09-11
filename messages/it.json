@@ -1631,13 +1631,58 @@
     "rhythm_ready": "Quando vuoi.",
     "rhythm_counting": "Conto l’entrata…",
     "rhythm_listening": "Ascolto.",
-    "rhythm_staff_label": "Un ritmo di {notes} note da battere",
+    "rhythm_staff_label": [
+        {
+            "declarations": [
+                "input notes",
+                "local notesPlural = notes: plural"
+            ],
+            "selectors": [
+                "notesPlural"
+            ],
+            "match": {
+                "notesPlural=one": "Un ritmo di {notes} nota da battere",
+                "notesPlural=many": "Un ritmo di {notes} note da battere",
+                "notesPlural=other": "Un ritmo di {notes} note da battere"
+            }
+        }
+    ],
     "rhythm_verdict_perfect": "In pieno.",
     "rhythm_verdict_good": "C’è tutto, un po’ libero.",
     "rhythm_verdict_off": "Vale un altro tentativo.",
     "rhythm_counts": "{onTime} su {total} a tempo",
-    "rhythm_missed": "{count} mancate",
-    "rhythm_extra": "{count} in più",
+    "rhythm_missed": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} mancata",
+                "countPlural=many": "{count} mancate",
+                "countPlural=other": "{count} mancate"
+            }
+        }
+    ],
+    "rhythm_extra": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} in più",
+                "countPlural=many": "{count} in più",
+                "countPlural=other": "{count} in più"
+            }
+        }
+    ],
     "meta_rhythm_title": "Allenatore di ritmo",
     "meta_rhythm_description": "Leggi un ritmo e battilo. Tredici livelli, dalle semplici semiminime alle terzine e ai tempi composti. Senza pianoforte.",
     "scores_explain_toggle": "Che cosa significano",
