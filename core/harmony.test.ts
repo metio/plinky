@@ -70,6 +70,29 @@ describe("readHarmony", () => {
         expect(span).toMatchObject({ root: 2, numeral: "V", key: { tonic: 7, mode: "major" } });
     });
 
+    it("reads a chord after a change of signature in the new key", () => {
+        // A bar of C major, then F♯ major under six sharps, or the same sounds as G♭ major
+        // under six flats: the signature is what tells the two keys apart.
+        const modulate = (fifths: number) =>
+            readHarmony({
+                notes: [...block([48, 52, 55], 0), ...block([54, 58, 61], 4)],
+                bars: FOUR_FOUR(2),
+                keys: [
+                    { whole: 0, fifths: 0 },
+                    { whole: 1, fifths },
+                ],
+                end: 2,
+            });
+        const [before, after] = modulate(6);
+        expect(before?.key).toEqual({ tonic: 0, mode: "major", fifths: 0 });
+        expect(after).toMatchObject({
+            root: 6,
+            numeral: "I",
+            key: { tonic: 6, mode: "major", fifths: 6 },
+        });
+        expect(modulate(-6)[1]?.key).toEqual({ tonic: 6, mode: "major", fifths: -6 });
+    });
+
     it("hears a minor piece as minor, with the harmonic-minor dominant", () => {
         // A minor, E major, A minor: no sharps in the signature, but the music says minor.
         const notes = [

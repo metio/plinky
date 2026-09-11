@@ -268,4 +268,18 @@ describe("transposeMusicXml chord symbols", () => {
         expect(moved).not.toContain('text="H"');
         expect(symbols(moved)).toEqual([{ root: "C#", bass: null }]);
     });
+
+    it("rewrites an explicit natural in place and forgets a printed bass name", () => {
+        // C over B, as MuseScore writes it with <root-alter>0</root-alter> and the bass
+        // printed as H. Up a semitone into D♭ major: D♭ over C.
+        const xml = score(
+            harmony("C", 0, "B").replace("<bass-step>B", '<bass-step text="H">B') + note("C", 4),
+            0,
+        );
+        const moved = transposeMusicXml(domXmlCodec, xml, 1);
+        expect(symbols(moved)).toEqual([{ root: "Db", bass: "C" }]);
+        expect(moved.match(/<root-alter>/g)).toHaveLength(1);
+        expect(moved).toContain("<root-step>D</root-step><root-alter>-1</root-alter>");
+        expect(moved).not.toContain("text=");
+    });
 });

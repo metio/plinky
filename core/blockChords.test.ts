@@ -190,6 +190,37 @@ describe("blockChords", () => {
         expect(leftSpelled(blockChords(domXmlCodec, dMinor)).slice(3)).toEqual(["A", "C#", "E"]);
     });
 
+    it("writes a seventh chord's shell with its sharp third and flat seventh", () => {
+        // G minor, then its leading-tone seventh F♯–A–C–E♭ held for the bar over F♯: the
+        // shell drops the fifth, so the block is F♯, A and E♭, a sharp and a flat in one
+        // chord. Held rather than broken, since an Alberti figure of it reads as two triads.
+        const held = (step: string, octave: number, alter = 0) =>
+            note(step, octave, 16, 2, alter).replace("<note>", "<note><chord/>");
+        const gMinor = score(
+            bar(
+                1,
+                note("B", 4, 8, 1, -1) + note("D", 5, 8, 1),
+                note("G", 2, 4, 2) +
+                    note("D", 3, 4, 2) +
+                    note("B", 2, 4, 2, -1) +
+                    note("D", 3, 4, 2),
+                -2,
+            ) +
+                bar(
+                    2,
+                    note("A", 4, 8, 1) + note("C", 5, 8, 1),
+                    note("F", 2, 16, 2, 1) + held("A", 2) + held("C", 3) + held("E", 3, -1),
+                ),
+        );
+        const blocked = blockChords(domXmlCodec, gMinor);
+        expect(leftSpelled(blocked).slice(3)).toEqual(["F#", "A", "Eb"]);
+        // Read back from letter, alter and octave, the block is F♯ with a minor third and a
+        // diminished seventh above it: every octave follows its letter.
+        const [bottom, third, seventh] = leftHand(blocked)[1]?.[0] ?? [];
+        expect((bottom ?? 0) % 12).toBe(6);
+        expect([(third ?? 0) - (bottom ?? 0), (seventh ?? 0) - (bottom ?? 0)]).toEqual([3, 9]);
+    });
+
     it("leaves a single-staff score alone", () => {
         const melody = `<?xml version="1.0"?><score-partwise><part-list><score-part id="P1"/></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>${note("C", 4, 1, 1)}</measure></part></score-partwise>`;
         expect(blockChords(domXmlCodec, melody)).toBe(melody);

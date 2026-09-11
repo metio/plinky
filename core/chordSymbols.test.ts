@@ -159,6 +159,38 @@ describe("withChordSymbols", () => {
         expect(rootOf(tonic(-6, ["G", -1], ["B", -1], ["D", -1]))).toBe("G-1");
     });
 
+    it("spells a chord after a change of signature by the new one", () => {
+        // C major for a bar, then the same F♯ major triad under six sharps or six flats: the
+        // second symbol is written F♯ under sharps and G♭ under flats.
+        const modulated = (fifths: number) => {
+            const [root, third, fifth]: Array<[string, number]> =
+                fifths > 0
+                    ? [
+                          ["F", 1],
+                          ["A", 1],
+                          ["C", 1],
+                      ]
+                    : [
+                          ["G", -1],
+                          ["B", -1],
+                          ["D", -1],
+                      ];
+            const second = `<measure number="2"><attributes><key><fifths>${fifths}</fifths></key></attributes>${
+                note(third[0], 5, 8, 1, third[1]) + note(fifth[0], 5, 8, 1, fifth[1])
+            }<backup><duration>16</duration></backup>${
+                note(root[0], 3, 4, 2, root[1]) +
+                note(fifth[0], 3, 4, 2, fifth[1]) +
+                note(third[0], 3, 4, 2, third[1]) +
+                note(fifth[0], 3, 4, 2, fifth[1])
+            }</measure>`;
+            return harmonies(withChordSymbols(domXmlCodec, score(cMajorBar + second))).map(
+                (one) => one.root,
+            );
+        };
+        expect(modulated(6)).toEqual(["C", "F1"]);
+        expect(modulated(-6)).toEqual(["C", "G-1"]);
+    });
+
     it("hands back what it was given when the file is not a score", () => {
         expect(withChordSymbols(domXmlCodec, "<not-xml")).toBe("<not-xml");
     });
