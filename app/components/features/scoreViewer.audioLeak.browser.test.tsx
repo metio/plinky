@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildScore } from "../../../core/musicxmlBuild";
@@ -9,6 +10,7 @@ import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
+import { m } from "../../paraglide/messages.js";
 import { ScoreViewer } from "./scoreViewer";
 
 // A guard for the "one note rings forever after finishing a song" leak. The guide
@@ -28,31 +30,58 @@ const CHORD_SCORE = buildScore({
     bass: [{ pitch: { step: "C", octave: 4, alter: 0 }, value: "half" }],
 });
 
-function mount() {
+// The Runs tab belongs to the route's mode bar; this stand-in button plays that part, so a
+// kept take can be replayed the way the page replays it.
+function Surface() {
+    const [runsView, setRunsView] = useState(false);
+    return (
+        <>
+            <button type="button" onClick={() => setRunsView(true)}>
+                Runs
+            </button>
+            <ScoreViewer
+                id="chord"
+                xml={CHORD_SCORE}
+                title="Chord"
+                runsView={runsView}
+                onShowScore={() => setRunsView(false)}
+            />
+        </>
+    );
+}
+
+function mount({ surface = true } = {}) {
     // Inject a fake MIDI seam (the browser grants real Web MIDI otherwise) and a
     // recording audio engine so the test can assert what would have sounded.
     const audio = fakeAudioEngine();
-    const view = render(
+    const tree = (shown: boolean) => (
         <MemoryRouter>
             <ServicesProvider services={{ midi: fakeMidi(), audio }}>
-                <MidiProvider>
-                    <ScoreViewer id="chord" xml={CHORD_SCORE} title="Chord" />
-                </MidiProvider>
+                <MidiProvider>{shown && <Surface />}</MidiProvider>
             </ServicesProvider>
-        </MemoryRouter>,
+        </MemoryRouter>
     );
-    return { audio, unmount: view.unmount };
+    const view = render(tree(surface));
+    return { audio, unmount: view.unmount, open: () => view.rerender(tree(true)) };
 }
 
-const startPractice = async () => {
-    vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+const listenButton = () => screen.getByRole("button", { name: m.action_listen() });
+const listening = () => listenButton().getAttribute("aria-pressed");
+
+// Practice is enabled once the score is interactive, so it is the readiness gate.
+const awaitReady = async () => {
     const practice = await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
     // OSMD can be slow to make the score interactive under full-suite load; give the
     // readiness poll the same generous window as the findBy above.
     await expect
         .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000 })
         .toBe(false);
-    fireEvent.click(practice);
+    return practice;
+};
+
+const startPractice = async () => {
+    vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+    fireEvent.click(await awaitReady());
 };
 
 afterEach(() => {
@@ -100,5 +129,78 @@ describe("play-surface audio cleanup", () => {
         // The engine's voices are a process-lifetime singleton, so unmount must panic
         // them — nothing can outlive the surface, whatever state it was left in.
         expect(audio.silenced).toBeGreaterThan(0);
+    });
+
+    it("starts under a pedal the player was already holding as the surface opened", async () => {
+        // The engine hears a pedal only when it moves on a sounding surface. Pressed while
+        // nothing was listening, it has to be handed over as the surface arrives.
+        const { audio, open } = mount({ surface: false });
+        act(() => window.__plinky?.pedal("sustain", true));
+        expect(audio.pedals).toEqual([]);
+        open();
+        await expect
+            .poll(() => audio.pedals, { timeout: 30000 })
+            .toContainEqual({ pedal: "sustain", down: true });
+    });
+});
+
+describe("the instrument a run commits to", () => {
+    it("keeps the next run's instrument when Practice takes over from Listen", async () => {
+        // The two runs hand over in one handler, so "performing" never reads false between
+        // them and nothing releases the commitment the new run has just made.
+        const { audio } = mount();
+        await startPractice();
+        fireEvent.click(listenButton());
+        await expect.poll(listening, { timeout: 30000 }).toBe("true");
+        const before = audio.committed;
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        await expect.poll(() => audio.committed, { timeout: 30000 }).toBe(before + 1);
+        expect(audio.holdingVoice).toBe(true);
+    });
+
+    it("lets it go when Listen is stopped", async () => {
+        const { audio } = mount();
+        await awaitReady();
+        fireEvent.click(listenButton());
+        await expect.poll(() => audio.holdingVoice, { timeout: 30000 }).toBe(true);
+        fireEvent.click(listenButton());
+        await expect.poll(() => audio.holdingVoice, { timeout: 30000 }).toBe(false);
+    });
+
+    it("lets it go when Listen plays to the end", async () => {
+        const { audio } = mount();
+        await awaitReady();
+        fireEvent.click(listenButton());
+        await expect.poll(() => audio.committed, { timeout: 30000 }).toBe(1);
+        await expect.poll(listening, { timeout: 30000 }).toBe("false");
+        expect(audio.holdingVoice).toBe(false);
+    });
+
+    it("lets it go when a replayed take ends", async () => {
+        const { audio } = mount();
+        await startPractice();
+        // One chord clears the one position and ends the run; letting go saves the take.
+        const e4 = await screen.findByLabelText("E 4");
+        const c4 = await screen.findByLabelText("C 4");
+        fireEvent.pointerDown(e4);
+        fireEvent.pointerDown(c4);
+        fireEvent.pointerUp(e4);
+        fireEvent.pointerUp(c4);
+        expect(await screen.findByText("Run saved", undefined, { timeout: 30000 })).toBeTruthy();
+        fireEvent.click(await screen.findByRole("button", { name: "Runs" }));
+        const before = audio.committed;
+        fireEvent.click(
+            (await screen.findAllByRole("button", { name: m.takes_replay() }))[0] as HTMLElement,
+        );
+        await expect.poll(() => audio.committed, { timeout: 30000 }).toBe(before + 1);
+        await expect.poll(() => audio.holdingVoice, { timeout: 30000 }).toBe(false);
+    });
+
+    it("lets it go when the page is left mid-run", async () => {
+        const { audio, unmount } = mount();
+        await startPractice();
+        await expect.poll(() => audio.holdingVoice, { timeout: 30000 }).toBe(true);
+        unmount();
+        expect(audio.holdingVoice).toBe(false);
     });
 });

@@ -45,23 +45,4 @@ describe("useVoiceCommitment", () => {
         unmount();
         expect(audio.holdingVoice).toBe(false);
     });
-
-    it("keeps the next run's instrument when one run hands straight to another", () => {
-        // Practice pressed during Listen: one stops and the other starts in the same
-        // moment, so "performing" never reads false and the new commitment stands.
-        const { audio, rerender } = harness(true);
-        audio.commitVoice();
-        rerender({ on: true });
-        expect(audio.holdingVoice).toBe(true);
-    });
-
-    it("leaves a commitment made while nothing had started yet until the run is under way", () => {
-        // A run commits in the same handler that starts it, so the render that follows reads
-        // "performing" — nothing in between may release what it has just chosen.
-        const { audio, rerender } = harness(false);
-        audio.commitVoice();
-        rerender({ on: true });
-        rerender({ on: true });
-        expect(audio.holdingVoice).toBe(true);
-    });
 });
