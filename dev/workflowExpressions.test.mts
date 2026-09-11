@@ -73,6 +73,16 @@ describe("the score-submission workflow", () => {
         });
     });
 
+    // The one job holding a write token runs nothing from the repository or the body.
+    it("gives the commenting job only issues:write and a single github-script step", () => {
+        const comment = workflow.jobs?.comment;
+        expect(comment?.permissions).toEqual({ issues: "write" });
+        expect(comment?.steps).toHaveLength(1);
+        const [step] = comment?.steps ?? [];
+        expect(step?.uses).toMatch(/^actions\/github-script@[0-9a-f]{40}$/);
+        expect(step?.run).toBeUndefined();
+    });
+
     it("saves no dependency cache from an issue anyone can open", () => {
         const setup = workflow.jobs?.check?.steps?.find((step) =>
             step.uses?.startsWith("actions/setup-node@"),
