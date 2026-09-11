@@ -3,6 +3,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_KEY_MAP, rebindPedal } from "../../core/keyMap";
 import type { PedalKind } from "../../core/pedals";
@@ -10,7 +11,13 @@ import { type FakeMidi, fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { memoryStore } from "../adapters/memoryStore";
 import { ON_SCREEN_DEVICE } from "../../core/midi";
 import { ServicesProvider } from "./services";
-import { MidiProvider, useMidiConnection, useMidiInput, useHeldNotes } from "./midi";
+import {
+    MidiProvider,
+    useClaimedKeys,
+    useMidiConnection,
+    useMidiInput,
+    useHeldNotes,
+} from "./midi";
 
 // The provider takes its MIDI seam injected, so the whole flow — support probe,
 // permission resume, request, hot-plug, messages — runs against the fake with
@@ -609,5 +616,114 @@ describe("a cable pulled out and put back", () => {
             expect(event.defaultPrevented).toBe(false);
             button.remove();
         });
+    });
+});
+
+describe("claimed keys", () => {
+    // Codes matter: the provider tracks a held key by its physical code, and two presses
+    // with no code would share one slot.
+    const down = (key: string, code: string) =>
+        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key, code })));
+    const up = (key: string, code: string) =>
+        act(() => window.dispatchEvent(new KeyboardEvent("keyup", { key, code })));
+
+    const useSurfaceClaiming = ({ keys, active }: { keys: string[]; active: boolean }) => {
+        useClaimedKeys(keys, active);
+        return usePlayingSurface();
+    };
+
+    it("plays nothing for a claimed key and still plays an unclaimed one", () => {
+        const { result } = renderHook(() => useSurfaceClaiming({ keys: ["3"], active: true }), {
+            wrapper: wrapperWith(fakeMidi()),
+        });
+        down("3", "Digit3");
+        expect(result.current.heldNotes).toEqual([]);
+        down("q", "KeyQ");
+        expect(result.current.heldNotes).toHaveLength(1);
+    });
+
+    it("gives the key back when the claim goes inactive", () => {
+        const { result, rerender } = renderHook(useSurfaceClaiming, {
+            wrapper: wrapperWith(fakeMidi()),
+            initialProps: { keys: ["3"], active: true },
+        });
+        rerender({ keys: ["3"], active: false });
+        down("3", "Digit3");
+        expect(result.current.heldNotes).toHaveLength(1);
+    });
+
+    it("gives the key back when the component claiming it unmounts", () => {
+        // A claiming component mounted beside the playing surface, then taken away.
+        const Claimer = () => {
+            useClaimedKeys(["5"]);
+            return null;
+        };
+        let setShown: (shown: boolean) => void = () => {};
+        const Host = ({ children }: { children: React.ReactNode }) => {
+            const [shown, set] = useState(true);
+            setShown = set;
+            return (
+                <>
+                    {children}
+                    {shown ? <Claimer /> : null}
+                </>
+            );
+        };
+        const Wrapper = wrapperWith(fakeMidi());
+        const { result } = renderHook(() => usePlayingSurface(), {
+            wrapper: ({ children }) => (
+                <Wrapper>
+                    <Host>{children}</Host>
+                </Wrapper>
+            ),
+        });
+        down("5", "Digit5");
+        expect(result.current.heldNotes).toEqual([]);
+        up("5", "Digit5");
+        act(() => setShown(false));
+        down("5", "Digit5");
+        expect(result.current.heldNotes).toHaveLength(1);
+    });
+
+    it("keeps a key claimed until every claim on it lets go", () => {
+        const wrapper = wrapperWith(fakeMidi());
+        const { result, rerender } = renderHook(
+            ({ first, second }: { first: boolean; second: boolean }) => {
+                useClaimedKeys(["3"], first);
+                useClaimedKeys(["3"], second);
+                return usePlayingSurface();
+            },
+            { wrapper, initialProps: { first: true, second: true } },
+        );
+        rerender({ first: false, second: true });
+        down("3", "Digit3");
+        expect(result.current.heldNotes).toEqual([]);
+        rerender({ first: false, second: false });
+        down("3", "Digit3");
+        expect(result.current.heldNotes).toHaveLength(1);
+    });
+
+    it("still releases a note held when the claim on its key began", () => {
+        const { result, rerender } = renderHook(useSurfaceClaiming, {
+            wrapper: wrapperWith(fakeMidi()),
+            initialProps: { keys: ["3"], active: false },
+        });
+        down("3", "Digit3");
+        expect(result.current.heldNotes).toHaveLength(1);
+        rerender({ keys: ["3"], active: true });
+        up("3", "Digit3");
+        expect(result.current.heldNotes).toEqual([]);
+    });
+
+    it("matches a claim whatever case the key arrives in", () => {
+        const { result } = renderHook(() => useSurfaceClaiming({ keys: ["Q"], active: true }), {
+            wrapper: wrapperWith(fakeMidi()),
+        });
+        down("q", "KeyQ");
+        expect(result.current.heldNotes).toEqual([]);
+    });
+
+    it("is nothing at all outside a provider", () => {
+        expect(() => renderHook(() => useClaimedKeys(["3"]))).not.toThrow();
     });
 });

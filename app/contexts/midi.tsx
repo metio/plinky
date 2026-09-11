@@ -130,6 +130,9 @@ type MidiContextValue = {
     // Listen raw for the calibration wizard: per-frame loudness and pitch, no
     // tuning applied and nothing fed to the note funnel.
     startCalibration: (onSample: (sample: CalibrationSample) => void) => void;
+    // Take these computer keys away from the instrument until the returned release runs —
+    // a surface that answers with them itself. See useClaimedKeys.
+    claimKeys: (keys: readonly string[]) => () => void;
 };
 
 const MidiContext = createContext<MidiContextValue | null>(null);
@@ -665,6 +668,31 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // is refreshed when Settings saves a remap, so a new layout takes effect at once.
     const octaveRef = useRef(0);
     const keyMapRef = useRef<KeyMap>(DEFAULT_KEY_MAP);
+    // Keys a mounted surface has claimed for itself, counted per claim so two surfaces
+    // claiming the same key each hold it until both let go.
+    const claimedKeysRef = useRef(new Map<string, number>());
+    const claimKeys = useCallback((keys: readonly string[]) => {
+        const claimed = claimedKeysRef.current;
+        const mine = keys.map((key) => key.toLowerCase());
+        for (const key of mine) {
+            claimed.set(key, (claimed.get(key) ?? 0) + 1);
+        }
+        let released = false;
+        return () => {
+            if (released) {
+                return;
+            }
+            released = true;
+            for (const key of mine) {
+                const count = (claimed.get(key) ?? 1) - 1;
+                if (count > 0) {
+                    claimed.set(key, count);
+                } else {
+                    claimed.delete(key);
+                }
+            }
+        };
+    }, []);
     useEffect(() => {
         if (typeof window === "undefined") {
             return;
@@ -713,7 +741,8 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 event.ctrlKey ||
                 event.altKey ||
                 !playingWithKeys() ||
-                wantsTheKey(event.target, key)
+                wantsTheKey(event.target, key) ||
+                claimedKeysRef.current.has(key)
             ) {
                 return;
             }
@@ -843,8 +872,10 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             startMic,
             stopMic,
             startCalibration,
+            claimKeys,
         }),
         [
+            claimKeys,
             lights,
             support,
             status,
@@ -906,4 +937,23 @@ export function useMidiInput(handlers: NoteListener): void {
                 handlersRef.current.onPedal?.(pedal, down, timestamp),
         });
     }, [subscribe, keys]);
+}
+
+// Claim computer keys for the calling component while `active`: the keyboard stops playing
+// them, so a surface that answers with a key does not also sound a note with it. Only the
+// press is withheld. A key already down when the claim starts still releases its note on
+// keyup, so a claim can never strand a note on.
+//
+// Outside a MidiProvider there is no instrument to take the keys from, and the claim is
+// nothing at all — a story or a bare render of the surface needs no provider for it.
+export function useClaimedKeys(keys: readonly string[], active = true): void {
+    const claimKeys = useContext(MidiContext)?.claimKeys;
+    // Keyed on the keys' contents rather than the array, which a caller rebuilds every render.
+    const signature = keys.join("\n");
+    useEffect(() => {
+        if (!claimKeys || !active || signature === "") {
+            return;
+        }
+        return claimKeys(signature.split("\n"));
+    }, [claimKeys, active, signature]);
 }
