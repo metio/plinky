@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { memoryStore } from "../adapters/memoryStore";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import { quotaStore, sizeOf, snapshotOf } from "../testing/quotaStore";
 import { countProgressEntries, exportProgress, importProgress } from "./progressBackup";
 import { PREFIX } from "./resetDevice";
 
@@ -21,17 +22,7 @@ function crowdedStore(seed: Record<string, string>, limit: number): KeyValueStor
     return { ...inner, set: (key, value) => writes++ < limit && inner.set(key, value) };
 }
 
-// A device out of room for anything NEW, which still has space to rewrite a value it is
-// already holding — the ordinary shape of a full quota, and the one where a rollback can
-// actually succeed.
-function noRoomForMore(seed: Record<string, string>, limit: number): KeyValueStore {
-    const inner = memoryStore(seed);
-    let fresh = 0;
-    return {
-        ...inner,
-        set: (key, value) => (inner.get(key) !== null || fresh++ < limit) && inner.set(key, value),
-    };
-}
+const x = (n: number) => "x".repeat(n);
 
 describe("progress backup", () => {
     it("carries every Plinky value and leaves other sites' keys behind", () => {
@@ -80,42 +71,83 @@ describe("progress backup", () => {
         expect(target.get("plinky:../other-app")).toBe("owned");
     });
 
-    it("keeps what the device had when storage refuses the restore", () => {
-        // Two of the four writes land, then the device is full. Pruning is what makes
-        // a restore destructive, so a failed one must not reach it.
-        const target = crowdedStore({ "plinky:mastery:keep-me": "{}" }, 2);
+    it("restores a bundle that fits only once the device's own values are gone", () => {
+        // The device's takes and the bundle's takes are different keys. Holding both at
+        // once would need room for the two together, although the device after the
+        // restore holds only the bundle's — so the device's are cleared first.
+        const here = { "plinky:takes:x": x(300), "plinky:takes:y": x(300) };
+        const there = { "plinky:takes:p": x(250), "plinky:takes:q": x(250) };
+        const target = quotaStore(here, sizeOf(memoryStore(here)));
 
-        const result = importProgress(target, exportProgress(memoryStore(device), ""));
+        const result = importProgress(target, exportProgress(memoryStore(there), ""));
 
-        expect(result).toMatchObject({ ok: false, problem: "storage" });
-        expect(target.get("plinky:mastery:keep-me")).toBe("{}");
+        expect(result).toEqual({ ok: true, restored: 2, savedAt: "" });
+        expect(snapshotOf(target)).toEqual(there);
     });
 
-    it("puts back what it had already written when the device fills mid-restore", () => {
-        // A restore is all or nothing. Stopping at the first refusal used to leave
-        // mastery from the bundle beside takes and ghosts from this device — one
-        // player's progress spliced out of two, with no way back and a message on
-        // screen saying nothing had changed.
-        const before = {
-            "plinky:mastery:one": '{"bestScore":10}',
-            "plinky:mastery:two": '{"bestScore":20}',
-        };
-        const target = noRoomForMore({ ...before }, 0);
+    it("keeps what the device had when the bundle cannot fit at all", () => {
+        const before = { "plinky:mastery:keep-me": "{}", "other-app": "keep" };
+        const target = quotaStore(before, sizeOf(memoryStore(before)) + 20);
 
         const result = importProgress(target, exportProgress(memoryStore(device), ""));
 
         expect(result).toEqual({ ok: false, problem: "storage", undone: true });
-        expect(Object.fromEntries(target.keys().map((k) => [k, target.get(k)]))).toEqual(before);
+        expect(snapshotOf(target)).toEqual(before);
     });
 
-    it("removes a key the bundle brought, rather than leaving half of it behind", () => {
-        // The rollback has two halves: put back what was overwritten, and take away what
-        // was never here. Only doing the first would leave the bundle's own keys behind.
-        const target = noRoomForMore({ "plinky:mastery:mine": "{}" }, 1);
+    it("puts back what it had already written when the device fills mid-restore", () => {
+        // A restore is all or nothing. Stopping at the first refusal would leave mastery
+        // from the bundle beside takes and ghosts from this device — one player's
+        // progress spliced out of two, with no way back and a message on screen saying
+        // nothing had changed. Here the first write lands and the second is refused, so
+        // both halves of the rollback run: the bundle's key goes, the device's come back.
+        const before = {
+            "plinky:mastery:one": '{"bestScore":10}',
+            "plinky:mastery:two": '{"bestScore":20}',
+        };
+        const target = quotaStore(before, sizeOf(memoryStore(before)));
 
-        importProgress(target, exportProgress(memoryStore(device), ""));
+        const result = importProgress(target, exportProgress(memoryStore(device), ""));
 
-        expect(target.keys()).toEqual(["plinky:mastery:mine"]);
+        expect(result).toEqual({ ok: false, problem: "storage", undone: true });
+        expect(snapshotOf(target)).toEqual(before);
+    });
+
+    it("puts a larger value back only once the room it needs is free", () => {
+        // The bundle shrinks a value the device holds, then brings a large new one. Putting
+        // the old value back while the new one is still stored would need more room than
+        // the device ever had, so the new one goes first.
+        const before = { "plinky:a": x(100), "plinky:z": x(50) };
+        const bundle = { "plinky:a": x(10), "plinky:b": x(130), "plinky:c": x(100) };
+        const target = quotaStore(before, sizeOf(memoryStore(before)));
+
+        const result = importProgress(target, exportProgress(memoryStore(bundle), ""));
+
+        expect(result).toEqual({ ok: false, problem: "storage", undone: true });
+        expect(snapshotOf(target)).toEqual(before);
+    });
+
+    it("clears nothing on a device that refuses every write", () => {
+        // Such a device could not take back a value once cleared, whatever its size, so
+        // it is found out before anything is removed and keeps all it held.
+        const before = { "plinky:mastery:keep-me": "{}", "plinky:takes:mine": "[]" };
+        const target = crowdedStore(before, 0);
+
+        const result = importProgress(target, exportProgress(memoryStore(device), ""));
+
+        expect(result).toEqual({ ok: false, problem: "storage", undone: true });
+        expect(snapshotOf(target)).toEqual(before);
+    });
+
+    it("says so when a value it cleared cannot be put back", () => {
+        // A device that takes one write and then refuses the rest gets past the check,
+        // clears its own values and cannot take them back. The copy has to say the
+        // device changed rather than claim nothing did.
+        const target = crowdedStore({ "plinky:mastery:keep-me": "{}" }, 1);
+
+        const result = importProgress(target, exportProgress(memoryStore(device), ""));
+
+        expect(result).toEqual({ ok: false, problem: "storage", undone: false });
     });
 
     it("says so when it cannot even undo itself", () => {

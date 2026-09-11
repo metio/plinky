@@ -65,12 +65,14 @@ export type RestoreResult =
 // A restore is all or nothing. Writing straight through and stopping at the first
 // refusal leaves the device holding half of one device's progress and half of
 // another's — mastery from the bundle, takes and ghosts from here — with no way back
-// and nothing on screen saying so. So the previous values are held first, and a refusal
-// puts them back.
+// and nothing on screen saying so. So every change is recorded with the value it
+// replaced, and a refusal puts them all back.
 //
-// The pruning runs last and only on success: dropping keys the bundle does not carry is
-// what makes this a restore rather than a merge, so a piece deleted before backing up
-// does not come back to life on the other device.
+// Dropping keys the bundle does not carry is what makes this a restore rather than a
+// merge, so a piece deleted before backing up does not come back to life on the other
+// device. It runs first: the device's per-piece keys (takes, ghosts, mastery) and the
+// bundle's are different keys, and writing the bundle beside them would need room for
+// both at once, when the device afterwards holds only the bundle's.
 export function importProgress(kv: KeyValueStore, json: string): RestoreResult {
     const result = parseProgressPack(json);
     if (!result.ok) {
@@ -78,40 +80,62 @@ export function importProgress(kv: KeyValueStore, json: string): RestoreResult {
     }
 
     const { entries, savedAt } = result.pack;
-    // Each write, with what the device held there before it. Only what actually landed
-    // needs undoing — a refusal on the first key has changed nothing, and there is no
-    // sense reporting a failed rollback of nothing.
-    const landed: [string, string | null][] = [];
+    const keep = new Set(Object.keys(entries).map((key) => PREFIX + key));
+    const changes: Change[] = [];
 
+    const stale = kv.keys().filter((key) => key.startsWith(PREFIX) && !keep.has(key));
+    // Clearing the device's values first is safe only where one can be put back. Under a
+    // quota it always can, since the room it held is still free; a device that refuses
+    // every write would lose them for good. So it is first asked to take back a value it
+    // already holds, which needs no room at all, and one that refuses is left untouched.
+    const probe = stale[0];
+    const held = probe === undefined ? null : kv.get(probe);
+    if (probe !== undefined && held !== null && !kv.set(probe, held)) {
+        return { ok: false, problem: "storage", undone: true };
+    }
+    for (const key of stale) {
+        const before = kv.get(key);
+        kv.remove(key);
+        if (before !== null) {
+            changes.push({ key, before, after: null });
+        }
+    }
+
+    let restored = 0;
     for (const [key, value] of Object.entries(entries)) {
         const full = PREFIX + key;
         const before = kv.get(full);
-        if (kv.set(full, value)) {
-            landed.push([full, before]);
-            continue;
+        if (!kv.set(full, value)) {
+            return { ok: false, problem: "storage", undone: rollBack(kv, changes) };
         }
-        // Put back everything written so far. A key the device did not hold before is
-        // removed rather than restored, so a failed restore leaves no half of the bundle
-        // behind.
-        let undone = true;
-        for (const [written, previous] of landed) {
-            if (previous === null) {
-                kv.remove(written);
-            } else if (!kv.set(written, previous)) {
-                // The device refused even a value it was already holding. Nothing more
-                // can be done from here, and saying "nothing changed" would be a lie.
-                undone = false;
-            }
-        }
-        return { ok: false, problem: "storage", undone };
-    }
-    const restored = landed.length;
-
-    const keep = new Set(Object.keys(entries).map((key) => PREFIX + key));
-    for (const key of kv.keys()) {
-        if (key.startsWith(PREFIX) && !keep.has(key)) {
-            kv.remove(key);
-        }
+        changes.push({ key: full, before, after: value });
+        restored += 1;
     }
     return { ok: true, restored, savedAt };
+}
+
+// One change a restore made: the value a key held before (null when it was absent) and
+// the value it holds now (null when it was removed).
+type Change = { key: string; before: string | null; after: string | null };
+
+// Undoes every change, and says whether all of them landed.
+//
+// The undos that free room run before the ones that need it. Taking away a key the
+// bundle brought frees room; putting back a value larger than the one there now needs
+// room. Applied smallest growth first, the device only shrinks from where the refusal
+// left it and then grows back to exactly what it held before the restore began — both
+// of which fit — so a quota that admitted the device once admits every step back.
+function rollBack(kv: KeyValueStore, changes: Change[]): boolean {
+    const growth = ({ before, after }: Change) => (before?.length ?? 0) - (after?.length ?? 0);
+    let undone = true;
+    for (const { key, before } of [...changes].sort((a, b) => growth(a) - growth(b))) {
+        if (before === null) {
+            kv.remove(key);
+        } else if (!kv.set(key, before)) {
+            // The device refused a value it held a moment ago. Nothing more can be done
+            // from here, and saying "nothing changed" would be a lie.
+            undone = false;
+        }
+    }
+    return undone;
 }

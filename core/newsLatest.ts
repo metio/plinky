@@ -105,6 +105,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A take saved as MusicXML carries the piece's name.** The file was named after the\npiece, but opened in MuseScore or another notation program every take was headed\n\"Improvisation\". It now shows the piece's title, and your computer recognises the\nfile as sheet music rather than plain XML.",
                 twip: true,
             },
+            {
+                body: "**A backup of your progress restores on a nearly full device.** Restoring made room\nfor the backup's recordings only after writing them, so a phone holding plenty of\nits own takes could refuse a backup that would have fitted easily once they were\nreplaced, and say its storage was full. The device's own values now make way\nfirst, and a backup that still cannot fit leaves everything exactly as it was.",
+                twip: true,
+            },
         ],
     },
     {

@@ -142,6 +142,12 @@
       piece, but opened in MuseScore or another notation program every take was headed
       "Improvisation". It now shows the piece's title, and your computer recognises the
       file as sheet music rather than plain XML.
+    - |-
+      **A backup of your progress restores on a nearly full device.** Restoring made room
+      for the backup's recordings only after writing them, so a phone holding plenty of
+      its own takes could refuse a backup that would have fitted easily once they were
+      replaced, and say its storage was full. The device's own values now make way
+      first, and a backup that still cannot fit leaves everything exactly as it was.
 
 - date: 2026-09-09
   label: night
