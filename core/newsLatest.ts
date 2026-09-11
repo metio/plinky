@@ -117,6 +117,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A book of studies keeps its name while its page loads.** Opening a collection's\npage, such as Czerny's eight-bar exercises, blanked its heading and the name in your\nbrowser tab until the list of books arrived, and left both blank for good if it never\ndid. The tab keeps the book's name throughout, and the heading shows the page's\naddress until the name is ready.",
                 twip: true,
             },
+            {
+                body: "**A screen reader names the colour theme in your language.** The button that\nswitches between light, dark and your system's theme read its choice out in English,\nso a German reader heard \"Design: dark\" while the button said Dunkel. It now says the\ntheme's name in the language Plinky speaks to you, and leaves out the picture beside\nit.",
+                twip: true,
+            },
         ],
     },
     {

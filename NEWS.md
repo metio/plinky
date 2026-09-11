@@ -167,6 +167,12 @@ browser tab until the list of books arrived, and left both blank for good if it 
 did. The tab keeps the book's name throughout, and the heading shows the page's
 address until the name is ready.
 
+**A screen reader names the colour theme in your language.** The button that
+switches between light, dark and your system's theme read its choice out in English,
+so a German reader heard "Design: dark" while the button said Dunkel. It now says the
+theme's name in the language Plinky speaks to you, and leaves out the picture beside
+it.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down
