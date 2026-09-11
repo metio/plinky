@@ -59,6 +59,9 @@ ist = "ist"
 # codes are fixed by the format (moov, trak, mdia, mdhd), and dev/clip-durations.mjs reads
 # a clip's length straight out of them.
 trak = "trak"
+# "objekt" is Swedish for "item", one form for one and several. The singular-copies check in
+# dev/singular-copies.mjs names it as the reason the Swedish backup count may repeat itself.
+objekt = "objekt"
 
 # The translation catalogs and the song catalogue are intentionally in many
 # languages, and the imported PDMX manifest holds real-world titles/composers plus
