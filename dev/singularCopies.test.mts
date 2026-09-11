@@ -57,6 +57,83 @@ describe("singularCopies", () => {
         ).toEqual([]);
     });
 
+    it("flags a singular copied from the genitive plural while the few arm differs", () => {
+        const problems = singularCopies("pl", {
+            progress_notes: plural({
+                "countPlural=one": "{count} nut",
+                "countPlural=few": "{count} nuty",
+                "countPlural=many": "{count} nut",
+                "countPlural=other": "{count} nut",
+            }),
+        });
+        expect(problems).toHaveLength(1);
+        expect(problems[0]).toMatch(/^progress_notes:/);
+    });
+
+    // Each language's real forms, and the arm its singular must never read like.
+    const FORMS: [string, string, Record<string, string>][] = [
+        [
+            "ru",
+            "many",
+            {
+                one: "{count} нота",
+                few: "{count} ноты",
+                many: "{count} нот",
+                other: "{count} ноты",
+            },
+        ],
+        [
+            "uk",
+            "many",
+            {
+                one: "{count} нота",
+                few: "{count} ноти",
+                many: "{count} нот",
+                other: "{count} ноти",
+            },
+        ],
+        [
+            "cs",
+            "other",
+            {
+                one: "{count} nota",
+                few: "{count} noty",
+                many: "{count} noty",
+                other: "{count} not",
+            },
+        ],
+        [
+            "sk",
+            "other",
+            {
+                one: "{count} nota",
+                few: "{count} noty",
+                many: "{count} noty",
+                other: "{count} nôt",
+            },
+        ],
+        ["hr", "few", { one: "{count} nota", few: "{count} note", other: "{count} nota" }],
+        ["sr", "few", { one: "{count} нота", few: "{count} ноте", other: "{count} нота" }],
+        ["ro", "few", { one: "{count} notă", few: "{count} note", other: "{count} de note" }],
+    ];
+    const asPlural = (forms: Record<string, string>) =>
+        plural(
+            Object.fromEntries(
+                Object.entries(forms).map(([category, text]) => [`countPlural=${category}`, text]),
+            ),
+        );
+
+    it.each(FORMS)(
+        "in %s, passes real forms and flags a singular copied from %s",
+        (locale, apart, forms) => {
+            const copied = { ...forms, one: forms[apart]! };
+            expect(singularCopies(locale, { progress_notes: asPlural(forms) }, {})).toEqual([]);
+            expect(singularCopies(locale, { progress_notes: asPlural(copied) }, {})).toHaveLength(
+                1,
+            );
+        },
+    );
+
     it("asks nothing of a language with one form for every count", () => {
         expect(
             singularCopies("ja", {
@@ -83,9 +160,12 @@ describe("singularCopies", () => {
         };
         expect(singularCopies("sq", invariant, exemptions)).toEqual([]);
 
-        const changed = { today_stand_one: "{count} copë", today_stand_other: "{count} copë" };
         expect(
-            singularCopies("sq", { ...changed, today_stand_one: "{count} copa" }, exemptions),
+            singularCopies(
+                "sq",
+                { today_stand_one: "{count} copa", today_stand_other: "{count} copë" },
+                exemptions,
+            ),
         ).toHaveLength(1);
         expect(singularCopies("sq", {}, exemptions)[0]).toMatch(/no longer does/);
     });

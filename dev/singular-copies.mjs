@@ -11,12 +11,29 @@
 // Two shapes of counted message exist: a `_one`/`_other` pair the caller branches between,
 // and paraglide's plural message, whose arms the locale's plural rules choose. A pair is a
 // copy when the two strings are equal. A plural message is a copy when every arm reads the
-// same: Croatian and Serbian say "1 nota" and "5 nota" and differ only at "2 note", so
-// comparing the `one` arm with `other` alone would condemn a correct translation.
+// same, or when its singular reads like the one arm the language always sets apart from
+// it. Which arm that is differs by language: Croatian and Serbian say "1 nota" and "5 nota"
+// and differ only at "2 note", so comparing `one` with `other` would condemn a correct
+// translation there, while in Polish "1 nut" beside "2 nuty" is a copy of the "5 nut" arm
+// that the all-arms rule alone would miss.
 
 // Languages whose numerals take the singular noun, so one and many read the same in every
 // counted message: Hungarian "3 darab", Turkish "3 parça".
 const SINGULAR_AFTER_NUMERAL = new Set(["hu", "tr"]);
+
+// Per language, the arm a singular never reads like. Polish, Russian and Ukrainian put the
+// genitive plural in `many` (5 nut, 5 нот, 5 нот), Czech and Slovak in `other` (5 not),
+// Croatian, Serbian and Romanian their second form in `few` (2 note, 2 ноте, 2 note).
+const SINGULAR_DIFFERS_FROM = {
+    pl: "many",
+    ru: "many",
+    uk: "many",
+    cs: "other",
+    sk: "other",
+    hr: "few",
+    sr: "few",
+    ro: "few",
+};
 
 const INVARIANT_PJESE = "pjesë is one word for one piece and several";
 const INVARIANT_DITE = "ditë is one word for one day and several";
@@ -52,9 +69,16 @@ const SAME_FOR_ONE_AND_MANY = {
 const isComplex = (value) =>
     Array.isArray(value) && typeof value[0]?.match === "object" && value[0].match !== null;
 
-// Every counted message in one locale's catalogue, as its name and whether all its forms
-// read the same.
-function countedMessages(messages) {
+// A plural message's arms by category: "countPlural=few" is the `few` arm.
+function armsByCategory(value) {
+    return Object.fromEntries(
+        Object.entries(value[0].match).map(([arm, text]) => [arm.split("=").at(-1), text]),
+    );
+}
+
+// Every counted message in one locale's catalogue, as its name and whether its singular
+// reads like a plural.
+function countedMessages(locale, messages) {
     const counted = [];
     for (const [key, value] of Object.entries(messages)) {
         if (key.endsWith("_one") && typeof value === "string") {
@@ -64,9 +88,16 @@ function countedMessages(messages) {
                 counted.push({ name, same: value === other });
             }
         } else if (isComplex(value)) {
-            const arms = Object.values(value[0].match);
-            if (arms.length > 1) {
-                counted.push({ name: key, same: arms.every((arm) => arm === arms[0]) });
+            const arms = armsByCategory(value);
+            const texts = Object.values(arms);
+            if (texts.length > 1) {
+                const apart = arms[SINGULAR_DIFFERS_FROM[locale]];
+                counted.push({
+                    name: key,
+                    same:
+                        texts.every((text) => text === texts[0]) ||
+                        (apart !== undefined && arms.one === apart),
+                });
             }
         }
     }
@@ -84,7 +115,7 @@ export function singularCopies(locale, messages, exemptions = SAME_FOR_ONE_AND_M
     const allowed = exemptions[locale] ?? {};
     const problems = [];
     const excused = new Set();
-    for (const { name, same } of countedMessages(messages)) {
+    for (const { name, same } of countedMessages(locale, messages)) {
         if (!same) {
             continue;
         }
