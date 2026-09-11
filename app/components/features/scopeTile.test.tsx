@@ -44,6 +44,21 @@ describe("ScopeTile", () => {
         expect(screen.getByText(m.scope_all_name())).toBeTruthy();
     });
 
+    it("counts a best day of one note in the singular", () => {
+        render(
+            <ScopeTile
+                scope="week"
+                summary={{
+                    totalNotes: 1,
+                    daysPracticed: 1,
+                    bestDay: { date: "2026-08-12", notes: 1 },
+                }}
+                now={NOW}
+            />,
+        );
+        expect(screen.getByText("Best day: 1 note")).toBeTruthy();
+    });
+
     it("says nothing about a best day when there was none", () => {
         render(
             <ScopeTile

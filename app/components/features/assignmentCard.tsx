@@ -7,6 +7,7 @@ import type { Assignment } from "../../../core/assignment";
 import { todayKey } from "../../../core/daily";
 import { deadlineFor } from "../../../core/repertoire";
 import type { trackSteps } from "../../../core/tracks";
+import { deadlineText } from "../../lib/deadlineText";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { CheckIcon } from "../ui/icons";
@@ -155,9 +156,7 @@ export function AssignmentCard({
             </div>
             {due && (
                 <p className="text-xs text-muted">
-                    {due.passed
-                        ? m.repertoire_date_passed({ date: due.date })
-                        : m.repertoire_days_left({ date: due.date, count: due.daysLeft })}
+                    {deadlineText(due)}
                     {doneCount < steps.length &&
                         ` · ${m.assignments_left({ count: steps.length - doneCount })}`}
                 </p>

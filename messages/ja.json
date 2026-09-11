@@ -110,7 +110,20 @@
     "refresh_why": "曲は少しずつ間隔を広げて再登場するので、学んだことがしっかり定着します。",
     "grades_all_fresh": "すべて新鮮 — 今は復習するものはありません。",
     "review_heading": "復習セッション",
-    "review_start": "▶ {count} 曲を復習",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "▶ {count} 曲を復習"
+            }
+        }
+    ],
     "review_progress": "{total} 曲中 {index} 曲目",
     "review_next": "次へ →",
     "review_skip": "スキップ",
@@ -268,10 +281,36 @@
     "today_stand_other": "譜面台に {count} 曲",
     "arcade_title": "初見演奏アーケード",
     "surprise_me": "おまかせ",
-    "recap_best_day": "ベストな日：{count} 音",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "ベストな日：{count} 音"
+            }
+        }
+    ],
     "recap_boast": "{month}、{days} 日間で {notes} 音を Plinky で 🎹",
     "recap_card_detail": "{month} · {days} 日",
-    "today_review": "{count} 曲を復習",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 曲を復習"
+            }
+        }
+    ],
     "today_daily": "今日のデイリーチャレンジ",
     "today_daily_done": "デイリー完了 — 結果を見る",
     "today_learn": "「{title}」を覚える",
@@ -473,7 +512,20 @@
     "drill_leap": "最大の跳躍",
     "drill_leap_help": "続く2音がどこまで離れてよいか。自由なら音域内のどこへでも跳びます。",
     "drill_leap_free": "自由",
-    "drill_leap_semitones": "{count}半音",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}半音"
+            }
+        }
+    ],
     "drill_smoothness": "近くに保つ",
     "drill_smoothness_help": "次の音を前の音の近くに保とうとする度合い。",
     "drill_less": "{field}を減らす",
@@ -1156,7 +1208,22 @@
     "repertoire_stage_maintenance": "維持",
     "repertoire_slipping": "薄れかけ",
     "repertoire_deadline": "期日",
-    "repertoire_days_left": "{date} — あと {count} 日",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{date} — あと {count} 日"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — 今日",
     "repertoire_date_passed": "{date} — その日は過ぎました",
     "methods_title": "練習のしかた",
     "methods_intro": "先生なら勧める七つのこと — それぞれがなぜ効くのか、そして試してみるための素材。",
@@ -1384,8 +1451,35 @@
     "stats_q_ladder_hint": "はしご全体と、これまでに手に入れたもの",
     "stats_q_share": "進み具合を見せる",
     "stats_q_share_hint": "あなたの弾き方の姿",
-    "stats_opening_days": "今月は {days} 日弾きました。",
-    "stats_opening_days_more": "今月は {days} 日弾きました。先月より {more} 日多いです。",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "今月は {days} 日弾きました。"
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "今月は {days} 日弾きました。先月より {more} 日多いです。"
+            }
+        }
+    ],
     "stats_opening_first": "鍵盤に触れた最初の日々 — ここから始まります。",
     "help_text_stats": "進み具合のページはこれひとつです。八段の梯子のいまいる段と次までの残り、腕前、練習した日数と弾いた音の数、正確さ・タイミング・流れからできたゆっくり動く指紋、そして復習の時期がきた曲とひと押しの復習が並びます。\n\nほかにも、レベル判定のテスト。見つけるのにいちばん時間のかかる音 — 毎回あなたを遅らせるひと握りを名指しします。「あなたの練習」は一週間・一か月・三か月・一年でまとめた日誌で、練習がどこへ向かったかを濃淡のマス目で示します。手書きの分数を足すことも、記録を表計算として保存することもできます。「譜面台の上」は取り組み中のものと、それぞれの曲の段階 — 覚える、なじませる、磨く、保つ。そして「達成」は手にした段とバッジのすべてで、まだのものは目標として並びます。\n\n空いた日があってもかまいません。Plinky は連続記録を数えず、休んだ日を責めることもありません。静かな一週間は、ただ静かな一週間として描かれます。",
     "help_shot_stats": "あなたの進み具合",

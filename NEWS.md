@@ -173,6 +173,13 @@ so a German reader heard "Design: dark" while the button said Dunkel. It now say
 theme's name in the language Plinky speaks to you, and leaves out the picture beside
 it.
 
+**One of something is counted as one.** With a single piece due, the button offered
+to "Review 1 pieces"; a month with one day of playing said "1 days", a best day of
+one note said "1 notes", and a date set for tomorrow was "1 days away". Each now
+reads the way you would say it, in every language Plinky speaks, including those
+that use a third or fourth form for a number, as Polish and Russian do. A date that
+falls today says "today" rather than "0 days away".
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

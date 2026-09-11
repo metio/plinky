@@ -110,7 +110,22 @@
     "refresh_why": "As peças voltam à tona num intervalo cada vez maior, para que o que aprendeste realmente se fixe.",
     "grades_all_fresh": "Tudo em dia — nada para revisar agora.",
     "review_heading": "Sessão de revisão",
-    "review_start": "▶ Revisar {count} peças",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Revisar {count} peça",
+                "countPlural=many": "▶ Revisar {count} peças",
+                "countPlural=other": "▶ Revisar {count} peças"
+            }
+        }
+    ],
     "review_progress": "Peça {index} de {total}",
     "review_next": "Próxima →",
     "review_skip": "Pular",
@@ -268,10 +283,40 @@
     "today_stand_other": "{count} peças na estante",
     "arcade_title": "Arcade de leitura",
     "surprise_me": "Surpreende-me",
-    "recap_best_day": "Melhor dia: {count} notas",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Melhor dia: {count} nota",
+                "countPlural=many": "Melhor dia: {count} notas",
+                "countPlural=other": "Melhor dia: {count} notas"
+            }
+        }
+    ],
     "recap_boast": "{notes} notas em {days} dias em {month}, no Plinky 🎹",
     "recap_card_detail": "{month} · {days} dias",
-    "today_review": "Revisar {count} peças",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Revisar {count} peça",
+                "countPlural=many": "Revisar {count} peças",
+                "countPlural=other": "Revisar {count} peças"
+            }
+        }
+    ],
     "today_daily": "Desafio diário de hoje",
     "today_daily_done": "Diário concluído — vê o teu resultado",
     "today_learn": "Aprenda “{title}”",
@@ -475,7 +520,22 @@
     "drill_leap": "Maior salto",
     "drill_leap_help": "A que distância podem ficar duas notas seguidas. Livre deixa o exercício saltar para onde quiser.",
     "drill_leap_free": "Livre",
-    "drill_leap_semitones": "{count} semitons",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} semitom",
+                "countPlural=many": "{count} semitons",
+                "countPlural=other": "{count} semitons"
+            }
+        }
+    ],
     "drill_smoothness": "Ficar perto",
     "drill_smoothness_help": "O quanto o exercício tenta manter a nota seguinte perto da anterior.",
     "drill_less": "Menos {field}",
@@ -1161,7 +1221,24 @@
     "repertoire_stage_maintenance": "A manter",
     "repertoire_slipping": "A enferrujar",
     "repertoire_deadline": "Até",
-    "repertoire_days_left": "{date} — daqui a {count} dias",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — daqui a {count} dia",
+                "countPlural=many": "{date} — daqui a {count} dias",
+                "countPlural=other": "{date} — daqui a {count} dias"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — hoje",
     "repertoire_date_passed": "{date} — essa data já passou",
     "methods_title": "Formas de praticar",
     "methods_intro": "Sete coisas que um professor sugeriria — porque funciona cada uma, e algo em que a experimentar.",
@@ -1388,8 +1465,39 @@
     "stats_q_ladder_hint": "A escada toda e o que já conquistaste",
     "stats_q_share": "Partilha o teu progresso",
     "stats_q_share_hint": "Uma imagem de como tocas",
-    "stats_opening_days": "Este mês tocaste {days} dias.",
-    "stats_opening_days_more": "Este mês tocaste {days} dias, mais {more} do que no mês passado.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Este mês tocaste {days} dia.",
+                "daysPlural=many": "Este mês tocaste {days} dias.",
+                "daysPlural=other": "Este mês tocaste {days} dias."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Este mês tocaste {days} dia, mais {more} do que no mês passado.",
+                "daysPlural=many": "Este mês tocaste {days} dias, mais {more} do que no mês passado.",
+                "daysPlural=other": "Este mês tocaste {days} dias, mais {more} do que no mês passado."
+            }
+        }
+    ],
     "stats_opening_first": "Os teus primeiros dias às teclas — é aqui que começa.",
     "help_text_stats": "A tua única página de progresso. Mostra o grau em que estás na escada de oito e o que falta para o seguinte, o teu nível, os dias de estudo e as notas tocadas, uma impressão digital de movimento lento feita de rigor, tempo e fluência, e as peças a rever com uma sessão a um toque.\n\nEncontras ali também Encontra o teu nível, o teste de colocação; as notas que demoras mais a encontrar, que nomeiam o punhado que te atrasa sempre; O teu estudo, um diário reunido por semana, mês, três meses ou ano, com uma grelha sombreada a mostrar para onde foi o estudo, onde podes acrescentar minutos apontados à mão e descarregar o registo como folha de cálculo; Na estante, o que estás a trabalhar e a fase de cada peça — aprender, assentar, polir, manter; e as Conquistas, cada grau e cada emblema que ganhaste, com os que faltam mostrados como objectivos.\n\nAs falhas não fazem mal. O Plinky não conta séries e nunca censura um dia em falta: uma semana calma é simplesmente desenhada como uma semana calma.",
     "help_shot_stats": "o teu progresso",

@@ -110,7 +110,21 @@
     "refresh_why": "Kappaleet palaavat esiin laajenevalla aikataululla, jotta oppimasi todella jää mieleen.",
     "grades_all_fresh": "Kaikki tuoretta — ei mitään kerrattavaa juuri nyt.",
     "review_heading": "Kertausistunto",
-    "review_start": "▶ Kertaa {count} kappaletta",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Kertaa {count} kappale",
+                "countPlural=other": "▶ Kertaa {count} kappaletta"
+            }
+        }
+    ],
     "review_progress": "Kappale {index}/{total}",
     "review_next": "Seuraava →",
     "review_skip": "Ohita",
@@ -268,10 +282,38 @@
     "today_stand_other": "{count} kappaletta nuottitelineellä",
     "arcade_title": "Prima vista -arcade",
     "surprise_me": "Yllätä minut",
-    "recap_best_day": "Paras päivä: {count} nuottia",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Paras päivä: {count} nuotti",
+                "countPlural=other": "Paras päivä: {count} nuottia"
+            }
+        }
+    ],
     "recap_boast": "{notes} nuottia {days} päivänä kuussa {month}, Plinkyllä 🎹",
     "recap_card_detail": "{month} · {days} päivää",
-    "today_review": "Kertaa {count} kappaletta",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Kertaa {count} kappale",
+                "countPlural=other": "Kertaa {count} kappaletta"
+            }
+        }
+    ],
     "today_daily": "Tämän päivän haaste",
     "today_daily_done": "Päivän haaste tehty — katso tuloksesi",
     "today_learn": "Opettele ”{title}”",
@@ -474,7 +516,21 @@
     "drill_leap": "Suurin hyppy",
     "drill_leap_help": "Kuinka kaukana kaksi peräkkäistä säveltä voi olla. Vapaa antaa harjoituksen hypätä minne vain.",
     "drill_leap_free": "Vapaa",
-    "drill_leap_semitones": "{count} puolisävelaskelta",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} puolisävelaskel",
+                "countPlural=other": "{count} puolisävelaskelta"
+            }
+        }
+    ],
     "drill_smoothness": "Pysy lähellä",
     "drill_smoothness_help": "Kuinka lujasti harjoitus yrittää pitää seuraavan sävelen lähellä edellistä.",
     "drill_less": "Vähemmän {field}",
@@ -1159,7 +1215,23 @@
     "repertoire_stage_maintenance": "Ylläpito",
     "repertoire_slipping": "Haipumassa",
     "repertoire_deadline": "Mennessä",
-    "repertoire_days_left": "{date} — {count} päivän päässä",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — {count} päivän päässä",
+                "countPlural=other": "{date} — {count} päivän päässä"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — tänään",
     "repertoire_date_passed": "{date} — se päivä on jo mennyt",
     "methods_title": "Tapoja harjoitella",
     "methods_intro": "Seitsemän asiaa, joita opettaja ehdottaisi — miksi kukin toimii, ja jotain, millä kokeilla.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "Koko tikkaat ja se, minkä olet jo saavuttanut",
     "stats_q_share": "Jaa edistymisesi",
     "stats_q_share_hint": "Kuva siitä, miltä soittosi näyttää",
-    "stats_opening_days": "Soitit tässä kuussa {days} päivänä.",
-    "stats_opening_days_more": "Soitit tässä kuussa {days} päivänä, {more} enemmän kuin viime kuussa.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Soitit tässä kuussa {days} päivänä.",
+                "daysPlural=other": "Soitit tässä kuussa {days} päivänä."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Soitit tässä kuussa {days} päivänä, {more} enemmän kuin viime kuussa.",
+                "daysPlural=other": "Soitit tässä kuussa {days} päivänä, {more} enemmän kuin viime kuussa."
+            }
+        }
+    ],
     "stats_opening_first": "Ensimmäiset päiväsi koskettimilla — tästä se alkaa.",
     "help_text_stats": "Ainoa edistymissivusi. Se näyttää tason, jolla olet kahdeksan portaan tikkailla, ja mitä seuraavaan on jäljellä, taitotasosi, harjoitellut päivät ja soitetut sävelet, hitaasti liikkuvan sormenjäljen tarkkuudesta, ajoituksesta ja soljuvuudesta, sekä kerrattavat kappaleet yhden napautuksen harjoituskerralla.\n\nSieltä löytyvät myös Etsi tasosi, sijoituskoe; sävelet, joiden löytämiseen sinulta menee kauimmin, eli se kourallinen joka hidastaa sinua joka kerta; Harjoittelusi, päiväkirja koottuna viikolta, kuukaudelta, kolmelta kuukaudelta tai vuodelta, sävytettynä ruudukkona joka näyttää mihin harjoittelu meni, ja johon voit lisätä käsin kirjatut minuutit ja ladata lokin taulukkona; Nuottitelineellä, mitä työstät ja missä vaiheessa kukin kappale on — opettelu, asettuminen, viimeistely, ylläpito; ja Saavutukset, jokainen taso ja merkki jonka olet saanut, saavuttamattomat tavoitteina näytettyinä.\n\nAukot eivät haittaa. Plinky ei laske putkia eikä koskaan moiti väliin jäänyttä päivää: hiljainen viikko piirretään yksinkertaisesti hiljaisena viikkona.",
     "help_shot_stats": "edistymisesi",

@@ -110,7 +110,21 @@
     "refresh_why": "Stykker dukker opp igjen etter en stadig lengre plan, så det du har lært faktisk sitter.",
     "grades_all_fresh": "Alt friskt — ingenting å repetere akkurat nå.",
     "review_heading": "Repetisjonsøkt",
-    "review_start": "▶ Repeter {count} stykker",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Repeter {count} stykke",
+                "countPlural=other": "▶ Repeter {count} stykker"
+            }
+        }
+    ],
     "review_progress": "Stykke {index} av {total}",
     "review_next": "Neste →",
     "review_skip": "Hopp over",
@@ -268,10 +282,38 @@
     "today_stand_other": "{count} stykker på notestativet",
     "arcade_title": "Bladlesing-arkade",
     "surprise_me": "Overrask meg",
-    "recap_best_day": "Beste dag: {count} noter",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Beste dag: {count} note",
+                "countPlural=other": "Beste dag: {count} noter"
+            }
+        }
+    ],
     "recap_boast": "{notes} noter på {days} dager i {month}, med Plinky 🎹",
     "recap_card_detail": "{month} · {days} dager",
-    "today_review": "Frisk opp {count} stykker",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Frisk opp {count} stykke",
+                "countPlural=other": "Frisk opp {count} stykker"
+            }
+        }
+    ],
     "today_daily": "Dagens utfordring",
     "today_daily_done": "Dagens ferdig — se resultatet ditt",
     "today_learn": "Lær «{title}»",
@@ -474,7 +516,21 @@
     "drill_leap": "Største sprang",
     "drill_leap_help": "Hvor langt fra hverandre to toner på rad kan ligge. Fritt lar øvelsen hoppe hvor som helst.",
     "drill_leap_free": "Fritt",
-    "drill_leap_semitones": "{count} halvtoner",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} halvtone",
+                "countPlural=other": "{count} halvtoner"
+            }
+        }
+    ],
     "drill_smoothness": "Hold deg nær",
     "drill_smoothness_help": "Hvor hardt øvelsen prøver å holde neste tone nær den forrige.",
     "drill_less": "Færre {field}",
@@ -1159,7 +1215,23 @@
     "repertoire_stage_maintenance": "Holder ved like",
     "repertoire_slipping": "Blekner",
     "repertoire_deadline": "Innen",
-    "repertoire_days_left": "{date} — om {count} dager",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — om {count} dag",
+                "countPlural=other": "{date} — om {count} dager"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — i dag",
     "repertoire_date_passed": "{date} — den datoen er passert",
     "methods_title": "Måter å øve på",
     "methods_intro": "Sju ting en lærer ville foreslå — hvorfor hver av dem virker, og noe å prøve det på.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "Hele stigen, og hva du allerede har nådd",
     "stats_q_share": "Del framgangen din",
     "stats_q_share_hint": "Et bilde av hvordan spillet ditt ser ut",
-    "stats_opening_days": "Du spilte {days} dager denne måneden.",
-    "stats_opening_days_more": "Du spilte {days} dager denne måneden, {more} flere enn forrige.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Du spilte {days} dag denne måneden.",
+                "daysPlural=other": "Du spilte {days} dager denne måneden."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Du spilte {days} dag denne måneden, {more} flere enn forrige.",
+                "daysPlural=other": "Du spilte {days} dager denne måneden, {more} flere enn forrige."
+            }
+        }
+    ],
     "stats_opening_first": "Dine første dager ved tangentene — her begynner det.",
     "help_text_stats": "Den ene framgangssiden din. Den viser trinnet du står på av de åtte og hva som gjenstår til det neste, nivået ditt, dager med øving og toner spilt, et langsomt bevegelig fingeravtrykk av presisjon, timing og flyt, og stykkene som skal friskes opp med en økt på ett trykk.\n\nDu finner også Finn nivået ditt, plasseringsprøven; tonene du bruker lengst tid på å finne, som peker ut den håndfullen som bremser deg hver gang; Øvingen din, en dagbok samlet over en uke, en måned, tre måneder eller et år, med et skravert rutenett som viser hvor øvingen gikk, der du kan legge til minutter ført for hånd og laste ned loggen som regneark; På notestativet, det du jobber med og hvilket stadium hvert stykke er i — lære, sette seg, pusse, holde ved like; og Bragder, hvert trinn og hvert merke du har nådd, med de gjenstående vist som mål.\n\nHull gjør ingenting. Plinky teller ingen rekker og bebreider deg aldri en hoppet dag: en stille uke tegnes rett og slett som en stille uke.",
     "help_shot_stats": "framgangen din",

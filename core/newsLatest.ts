@@ -121,6 +121,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A screen reader names the colour theme in your language.** The button that\nswitches between light, dark and your system's theme read its choice out in English,\nso a German reader heard \"Design: dark\" while the button said Dunkel. It now says the\ntheme's name in the language Plinky speaks to you, and leaves out the picture beside\nit.",
                 twip: true,
             },
+            {
+                body: '**One of something is counted as one.** With a single piece due, the button offered\nto "Review 1 pieces"; a month with one day of playing said "1 days", a best day of\none note said "1 notes", and a date set for tomorrow was "1 days away". Each now\nreads the way you would say it, in every language Plinky speaks, including those\nthat use a third or fourth form for a number, as Polish and Russian do. A date that\nfalls today says "today" rather than "0 days away".',
+                twip: true,
+            },
         ],
     },
     {

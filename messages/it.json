@@ -110,7 +110,22 @@
     "refresh_why": "I brani ritornano a intervalli sempre più ampi, così ciò che hai imparato resta davvero.",
     "grades_all_fresh": "Tutto fresco — niente da ripassare ora.",
     "review_heading": "Sessione di ripasso",
-    "review_start": "▶ Ripassa {count} brani",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Ripassa {count} brano",
+                "countPlural=many": "▶ Ripassa {count} brani",
+                "countPlural=other": "▶ Ripassa {count} brani"
+            }
+        }
+    ],
     "review_progress": "Brano {index} di {total}",
     "review_next": "Avanti →",
     "review_skip": "Salta",
@@ -268,10 +283,40 @@
     "today_stand_other": "{count} brani sul leggio",
     "arcade_title": "Arcade a prima vista",
     "surprise_me": "Sorprendimi",
-    "recap_best_day": "Giorno migliore: {count} note",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Giorno migliore: {count} nota",
+                "countPlural=many": "Giorno migliore: {count} note",
+                "countPlural=other": "Giorno migliore: {count} note"
+            }
+        }
+    ],
     "recap_boast": "{notes} note in {days} giorni a {month}, su Plinky 🎹",
     "recap_card_detail": "{month} · {days} giorni",
-    "today_review": "Rinfresca {count} brani",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Rinfresca {count} brano",
+                "countPlural=many": "Rinfresca {count} brani",
+                "countPlural=other": "Rinfresca {count} brani"
+            }
+        }
+    ],
     "today_daily": "La sfida del giorno",
     "today_daily_done": "Sfida fatta — guarda il tuo risultato",
     "today_learn": "Impara “{title}”",
@@ -475,7 +520,22 @@
     "drill_leap": "Salto massimo",
     "drill_leap_help": "Quanto possono distare due note di seguito. Libero lascia saltare l'esercizio ovunque.",
     "drill_leap_free": "Libero",
-    "drill_leap_semitones": "{count} semitoni",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} semitono",
+                "countPlural=many": "{count} semitoni",
+                "countPlural=other": "{count} semitoni"
+            }
+        }
+    ],
     "drill_smoothness": "Restare vicino",
     "drill_smoothness_help": "Quanto l'esercizio cerca di tenere la nota successiva vicino alla precedente.",
     "drill_less": "Meno {field}",
@@ -1161,7 +1221,24 @@
     "repertoire_stage_maintenance": "Da mantenere",
     "repertoire_slipping": "Si sta sfilacciando",
     "repertoire_deadline": "Entro",
-    "repertoire_days_left": "{date} — tra {count} giorni",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — tra {count} giorno",
+                "countPlural=many": "{date} — tra {count} giorni",
+                "countPlural=other": "{date} — tra {count} giorni"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — oggi",
     "repertoire_date_passed": "{date} — quella data è passata",
     "methods_title": "Modi di esercitarsi",
     "methods_intro": "Sette cose che suggerirebbe un insegnante — perché ognuna funziona, e qualcosa su cui provarla.",
@@ -1388,8 +1465,39 @@
     "stats_q_ladder_hint": "Tutta la scala e quello che hai già ottenuto",
     "stats_q_share": "Condividi i tuoi progressi",
     "stats_q_share_hint": "Un'immagine di come suoni",
-    "stats_opening_days": "Questo mese hai suonato {days} giorni.",
-    "stats_opening_days_more": "Questo mese hai suonato {days} giorni, {more} in più del mese scorso.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Questo mese hai suonato {days} giorno.",
+                "daysPlural=many": "Questo mese hai suonato {days} giorni.",
+                "daysPlural=other": "Questo mese hai suonato {days} giorni."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Questo mese hai suonato {days} giorno, {more} in più del mese scorso.",
+                "daysPlural=many": "Questo mese hai suonato {days} giorni, {more} in più del mese scorso.",
+                "daysPlural=other": "Questo mese hai suonato {days} giorni, {more} in più del mese scorso."
+            }
+        }
+    ],
     "stats_opening_first": "I tuoi primi giorni ai tasti: si comincia da qui.",
     "help_text_stats": "La tua unica pagina dei progressi. Mostra il grado in cui sei sulla scala a otto e quanto manca al successivo, il tuo livello, i giorni di studio e le note suonate, un'impronta che si muove lentamente fatta di precisione, tempo e scorrevolezza, e i brani da ripassare con una sessione a un tocco.\n\nCi trovi anche Trova il tuo livello, il test di collocamento; le note che ci metti più tempo a trovare, che indicano la manciata che ti rallenta ogni volta; Il tuo studio, un diario raccolto su una settimana, un mese, tre mesi o un anno, con una griglia sfumata che mostra dove è andato lo studio, dove puoi aggiungere minuti annotati a mano e scaricare il registro come foglio di calcolo; Sul leggio, ciò su cui stai lavorando e la fase di ogni brano — imparare, assestare, rifinire, mantenere; e i Traguardi, ogni grado e ogni distintivo ottenuto, con quelli mancanti mostrati come obiettivi.\n\nI vuoti vanno benissimo. Plinky non conta serie e non rimprovera mai un giorno saltato: una settimana tranquilla viene semplicemente disegnata come una settimana tranquilla.",
     "help_shot_stats": "i tuoi progressi",

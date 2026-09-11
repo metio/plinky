@@ -110,7 +110,21 @@
     "refresh_why": "Pjesët rishfaqen sipas një orari që zgjerohet, kështu që ajo që ke mësuar vërtet të ngulitet.",
     "grades_all_fresh": "Të gjitha të freskëta — asgjë për të përsëritur tani.",
     "review_heading": "Seancë përsëritjeje",
-    "review_start": "▶ Përsërit {count} pjesë",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Përsërit {count} pjesë",
+                "countPlural=other": "▶ Përsërit {count} pjesë"
+            }
+        }
+    ],
     "review_progress": "Pjesa {index} nga {total}",
     "review_next": "Tjetra →",
     "review_skip": "Kapërce",
@@ -268,10 +282,38 @@
     "today_stand_other": "{count} pjesë te mbajtësja e notave",
     "arcade_title": "Arkadë leximi në shikim",
     "surprise_me": "Më surprizo",
-    "recap_best_day": "Dita më e mirë: {count} nota",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Dita më e mirë: {count} notë",
+                "countPlural=other": "Dita më e mirë: {count} nota"
+            }
+        }
+    ],
     "recap_boast": "{notes} nota në {days} ditë në {month}, në Plinky 🎹",
     "recap_card_detail": "{month} · {days} ditë",
-    "today_review": "Fresko {count} pjesë",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Fresko {count} pjesë",
+                "countPlural=other": "Fresko {count} pjesë"
+            }
+        }
+    ],
     "today_daily": "Sfida ditore e sotme",
     "today_daily_done": "Ditorja u krye — shih rezultatin",
     "today_learn": "Mëso “{title}”",
@@ -474,7 +516,21 @@
     "drill_leap": "Kërcimi më i madh",
     "drill_leap_help": "Sa larg mund të jenë dy nota radhazi. I lirë e lë ushtrimin të kërcejë kudo.",
     "drill_leap_free": "I lirë",
-    "drill_leap_semitones": "{count} gjysmëtone",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} gjysmëton",
+                "countPlural=other": "{count} gjysmëtone"
+            }
+        }
+    ],
     "drill_smoothness": "Rri afër",
     "drill_smoothness_help": "Sa shumë përpiqet ushtrimi ta mbajë notën tjetër pranë së fundit.",
     "drill_less": "Më pak {field}",
@@ -1158,7 +1214,23 @@
     "repertoire_stage_maintenance": "Në mbajtje",
     "repertoire_slipping": "Po zbehet",
     "repertoire_deadline": "Deri më",
-    "repertoire_days_left": "{date} — {count} ditë larg",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — {count} ditë larg",
+                "countPlural=other": "{date} — {count} ditë larg"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — sot",
     "repertoire_date_passed": "{date} — ajo datë ka kaluar",
     "methods_title": "Mënyra për të ushtruar",
     "methods_intro": "Shtatë gjëra që do të sugjeronte një mësues — pse funksionon secila, dhe diçka për ta provuar.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "E gjithë shkalla dhe ajo që ke arritur tashmë",
     "stats_q_share": "Ndaj përparimin tënd",
     "stats_q_share_hint": "Një pamje e mënyrës si luan",
-    "stats_opening_days": "Këtë muaj ke luajtur {days} ditë.",
-    "stats_opening_days_more": "Këtë muaj ke luajtur {days} ditë, {more} më shumë se muajin e kaluar.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Këtë muaj ke luajtur {days} ditë.",
+                "daysPlural=other": "Këtë muaj ke luajtur {days} ditë."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Këtë muaj ke luajtur {days} ditë, {more} më shumë se muajin e kaluar.",
+                "daysPlural=other": "Këtë muaj ke luajtur {days} ditë, {more} më shumë se muajin e kaluar."
+            }
+        }
+    ],
     "stats_opening_first": "Ditët e tua të para te tastet — këtu fillon.",
     "help_text_stats": "Faqja jote e vetme e përparimit. Tregon shkallën ku ndodhesh nga tetë dhe sa mbetet për të ardhshmen, nivelin tënd, ditët e ushtruara dhe tingujt e luajtur, një gjurmë gishti që lëviz ngadalë e përbërë nga saktësia, koha dhe rrjedhshmëria, si dhe pjesët për përsëritje me një seancë me një prekje.\n\nAty do të gjesh edhe Gjej nivelin tënd, provën e vendosjes; tingujt që i gjen më ngadalë, atë grusht që të ngadalëson çdo herë; Ushtrimi yt, një ditar i përmbledhur për një javë, një muaj, tre muaj ose një vit, me një rrjetë me hije që tregon ku shkoi ushtrimi, ku mund të shtosh minuta të shënuara me dorë dhe të shkarkosh regjistrin si fletë llogaritjeje; Në leksionar, atë që po punon dhe fazën e secilës pjesë — mësim, ulje, lëmim, mbajtje; dhe Arritjet, çdo shkallë e çdo distinktiv që ke fituar, me ato të pafituarat të treguara si synime.\n\nBoshllëqet s'kanë rëndësi. Plinky nuk numëron vargje dhe kurrë s'ta përplas një ditë të kapërcyer: një javë e qetë thjesht vizatohet si javë e qetë.",
     "help_shot_stats": "përparimi yt",

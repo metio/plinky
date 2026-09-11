@@ -110,7 +110,22 @@
     "refresh_why": "Skladbe se vraćaju po sve širem rasporedu, pa ono što naučiš doista ostane.",
     "grades_all_fresh": "Sve je svježe — trenutačno nema ništa za ponoviti.",
     "review_heading": "Ponavljanje",
-    "review_start": "▶ Ponovi {count} skladbi",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Ponovi {count} skladbu",
+                "countPlural=few": "▶ Ponovi {count} skladbe",
+                "countPlural=other": "▶ Ponovi {count} skladbi"
+            }
+        }
+    ],
     "review_progress": "Skladba {index} od {total}",
     "review_next": "Dalje →",
     "review_skip": "Preskoči",
@@ -268,10 +283,40 @@
     "today_stand_other": "{count} skladbi na notnom pultu",
     "arcade_title": "Arkada čitanja s lista",
     "surprise_me": "Iznenadi me",
-    "recap_best_day": "Najbolji dan: {count} nota",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Najbolji dan: {count} nota",
+                "countPlural=few": "Najbolji dan: {count} note",
+                "countPlural=other": "Najbolji dan: {count} nota"
+            }
+        }
+    ],
     "recap_boast": "{notes} nota u {days} dana u {month}, na Plinkyju 🎹",
     "recap_card_detail": "{month} · {days} dana",
-    "today_review": "Osvježi {count} skladbi",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Osvježi {count} skladbu",
+                "countPlural=few": "Osvježi {count} skladbe",
+                "countPlural=other": "Osvježi {count} skladbi"
+            }
+        }
+    ],
     "today_daily": "Današnji dnevni izazov",
     "today_daily_done": "Dnevni riješen — pogledaj rezultat",
     "today_learn": "Nauči “{title}”",
@@ -475,7 +520,22 @@
     "drill_leap": "Najveći skok",
     "drill_leap_help": "Koliko daleko mogu biti dva uzastopna tona. Slobodno pušta vježbu da skače bilo kamo.",
     "drill_leap_free": "Slobodno",
-    "drill_leap_semitones": "{count} polustepena",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} poluton",
+                "countPlural=few": "{count} polutona",
+                "countPlural=other": "{count} polutonova"
+            }
+        }
+    ],
     "drill_smoothness": "Ostati blizu",
     "drill_smoothness_help": "Koliko se vježba trudi držati sljedeći ton blizu prethodnog.",
     "drill_less": "Manje {field}",
@@ -1161,7 +1221,24 @@
     "repertoire_stage_maintenance": "Održavanje",
     "repertoire_slipping": "Blijedi",
     "repertoire_deadline": "Do",
-    "repertoire_days_left": "{date} — preostalo dana: {count}",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — za {count} dan",
+                "countPlural=few": "{date} — za {count} dana",
+                "countPlural=other": "{date} — za {count} dana"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — danas",
     "repertoire_date_passed": "{date} — taj je datum prošao",
     "methods_title": "Načini vježbanja",
     "methods_intro": "Sedam stvari koje bi učitelj predložio — zašto svaka djeluje i na čemu je isprobati.",
@@ -1388,8 +1465,39 @@
     "stats_q_ladder_hint": "Cijele ljestve i ono što si već postigao",
     "stats_q_share": "Podijeli svoj napredak",
     "stats_q_share_hint": "Slika toga kako sviraš",
-    "stats_opening_days": "Ovaj mjesec svirao si {days} dana.",
-    "stats_opening_days_more": "Ovaj mjesec svirao si {days} dana, {more} više nego prošli.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Ovaj mjesec svirao si {days} dan.",
+                "daysPlural=few": "Ovaj mjesec svirao si {days} dana.",
+                "daysPlural=other": "Ovaj mjesec svirao si {days} dana."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Ovaj mjesec svirao si {days} dan, {more} više nego prošli.",
+                "daysPlural=few": "Ovaj mjesec svirao si {days} dana, {more} više nego prošli.",
+                "daysPlural=other": "Ovaj mjesec svirao si {days} dana, {more} više nego prošli."
+            }
+        }
+    ],
     "stats_opening_first": "Tvoji prvi dani za tipkama — ovdje počinje.",
     "help_text_stats": "Tvoja jedina stranica napretka. Pokazuje stupanj na kojem stojiš od osam i što je ostalo do sljedećeg, tvoju razinu, dane vježbanja i odsvirane tonove, sporo pomični otisak sastavljen od točnosti, vremena i tečnosti, te skladbe za ponavljanje uz sesiju na jedan dodir.\n\nOndje ćeš naći i Pronađi svoju razinu, test razvrstavanja; tonove koje najdulje tražiš, onu šačicu koja te svaki put usporava; Tvoje vježbanje, dnevnik zbrojen po tjednu, mjesecu, tri mjeseca ili godini, sa sjenčanom mrežom koja pokazuje kamo je vježbanje otišlo, gdje možeš dodati ručno zapisane minute i preuzeti zapis kao proračunsku tablicu; Na pultu, ono na čemu radiš i u kojoj je fazi svaka skladba — učenje, slijeganje, uglađivanje, održavanje; i Postignuća, svaki stupanj i svaku značku koju si osvojio, s neosvojenima prikazanima kao ciljevi.\n\nPraznine ne smetaju. Plinky ne broji nizove i nikad ne predbacuje preskočen dan: miran tjedan jednostavno je nacrtan kao miran tjedan.",
     "help_shot_stats": "tvoj napredak",

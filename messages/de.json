@@ -110,7 +110,21 @@
     "refresh_why": "Stücke tauchen in wachsenden Abständen wieder auf, damit das Gelernte wirklich sitzt.",
     "grades_all_fresh": "Alles frisch – gerade nichts zu wiederholen.",
     "review_heading": "Wiederholungssitzung",
-    "review_start": "▶ {count} Stücke wiederholen",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ {count} Stück wiederholen",
+                "countPlural=other": "▶ {count} Stücke wiederholen"
+            }
+        }
+    ],
     "review_progress": "Stück {index} von {total}",
     "review_next": "Weiter →",
     "review_skip": "Überspringen",
@@ -268,10 +282,38 @@
     "today_stand_other": "{count} Stücke auf dem Notenpult",
     "arcade_title": "Blattspiel-Arcade",
     "surprise_me": "Überrasch mich",
-    "recap_best_day": "Bester Tag: {count} Noten",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Bester Tag: {count} Note",
+                "countPlural=other": "Bester Tag: {count} Noten"
+            }
+        }
+    ],
     "recap_boast": "{notes} Noten an {days} Tagen im {month}, mit Plinky 🎹",
     "recap_card_detail": "{month} · {days} Tage",
-    "today_review": "{count} Stücke auffrischen",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Stück auffrischen",
+                "countPlural=other": "{count} Stücke auffrischen"
+            }
+        }
+    ],
     "today_daily": "Die heutige tägliche Herausforderung",
     "today_daily_done": "Tägliche erledigt – sieh dir dein Ergebnis an",
     "today_learn": "„{title}“ lernen",
@@ -474,7 +516,21 @@
     "drill_leap": "Größter Sprung",
     "drill_leap_help": "Wie weit zwei Töne nacheinander auseinanderliegen dürfen. Frei lässt die Übung überall hinspringen.",
     "drill_leap_free": "Frei",
-    "drill_leap_semitones": "{count} Halbtöne",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Halbton",
+                "countPlural=other": "{count} Halbtöne"
+            }
+        }
+    ],
     "drill_smoothness": "Nah bleiben",
     "drill_smoothness_help": "Wie sehr die Übung versucht, den nächsten Ton nah am letzten zu halten.",
     "drill_less": "Weniger {field}",
@@ -1159,7 +1215,23 @@
     "repertoire_stage_maintenance": "Halten",
     "repertoire_slipping": "Verblasst",
     "repertoire_deadline": "Bis",
-    "repertoire_days_left": "{date} — noch {count} Tage",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — noch {count} Tag",
+                "countPlural=other": "{date} — noch {count} Tage"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — heute",
     "repertoire_date_passed": "{date} — dieses Datum ist vorbei",
     "methods_title": "Wege zum Üben",
     "methods_intro": "Sieben Dinge, die eine Lehrerin vorschlagen würde — warum jedes funktioniert, und etwas zum Ausprobieren.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "Die ganze Leiter – und was du schon erreicht hast",
     "stats_q_share": "Zeig deinen Fortschritt",
     "stats_q_share_hint": "Ein Bild davon, wie dein Spiel aussieht",
-    "stats_opening_days": "Du hast diesen Monat an {days} Tagen gespielt.",
-    "stats_opening_days_more": "Du hast diesen Monat an {days} Tagen gespielt, {more} mehr als im letzten.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Du hast diesen Monat an {days} Tag gespielt.",
+                "daysPlural=other": "Du hast diesen Monat an {days} Tagen gespielt."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Du hast diesen Monat an {days} Tag gespielt, {more} mehr als im letzten.",
+                "daysPlural=other": "Du hast diesen Monat an {days} Tagen gespielt, {more} mehr als im letzten."
+            }
+        }
+    ],
     "stats_opening_first": "Deine ersten Tage an den Tasten – hier fängt es an.",
     "help_text_stats": "Deine eine Fortschrittsseite. Sie zeigt die Stufe, auf der du auf der achtstufigen Leiter stehst, und was bis zur nächsten fehlt, deine Spielstärke, geübte Tage und gespielte Noten, einen langsam wandernden Fingerabdruck aus Genauigkeit, Timing und Fluss sowie die Stücke, die zur Wiederholung anstehen, mit einer Sitzung auf einen Tipp.\n\nAußerdem findest du dort Finde dein Niveau, den Einstufungstest; die Noten, für die du am längsten brauchst, die die Handvoll benennen, die dich immer wieder bremsen; Dein Üben, ein Tagebuch über eine Woche, einen Monat, drei Monate oder ein Jahr, mit einem Raster, das zeigt, wohin das Üben ging, wo du von Hand notierte Minuten ergänzen und das Protokoll als Tabelle herunterladen kannst; Auf dem Notenpult, was du gerade erarbeitest und in welchem Stadium jedes Stück steht — lernen, sich setzen, polieren, halten; und Erfolge, jede Stufe und jedes Abzeichen, das du erreicht hast, mit den offenen als Ziele.\n\nLücken sind in Ordnung. Plinky zählt keine Serien und macht dir einen ausgelassenen Tag nie zum Vorwurf: eine ruhige Woche wird schlicht als ruhige Woche gezeichnet.",
     "help_shot_stats": "dein Fortschritt",

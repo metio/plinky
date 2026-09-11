@@ -8,6 +8,7 @@ import { setDeadline } from "../../../core/mastery";
 import { useMasteryStore } from "../../contexts/services";
 import { useStoreVersion } from "../../hooks/useStoreVersion";
 import type { GradedMastery } from "../../lib/gradeProgress";
+import { deadlineText } from "../../lib/deadlineText";
 import { m } from "../../paraglide/messages.js";
 import { compactFieldClasses, linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
@@ -80,14 +81,7 @@ export function RepertoirePanel({
                             <span className="text-xs text-warn-ink">{m.repertoire_slipping()}</span>
                         )}
                         {deadline && (
-                            <span className="text-xs text-muted">
-                                {deadline.passed
-                                    ? m.repertoire_date_passed({ date: deadline.date })
-                                    : m.repertoire_days_left({
-                                          date: deadline.date,
-                                          count: deadline.daysLeft,
-                                      })}
-                            </span>
+                            <span className="text-xs text-muted">{deadlineText(deadline)}</span>
                         )}
                         <label className="ml-auto flex items-center gap-2 text-xs text-muted">
                             <span>{m.repertoire_deadline()}</span>

@@ -110,7 +110,23 @@
     "refresh_why": "Skladby se vracejí podle rozšiřujícího se plánu, aby vám naučené skutečně zůstalo.",
     "grades_all_fresh": "Vše čerstvé — právě teď není co opakovat.",
     "review_heading": "Opakovací kolo",
-    "review_start": "▶ Opakovat {count} skladeb",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Opakovat {count} skladbu",
+                "countPlural=few": "▶ Opakovat {count} skladby",
+                "countPlural=many": "▶ Opakovat {count} skladby",
+                "countPlural=other": "▶ Opakovat {count} skladeb"
+            }
+        }
+    ],
     "review_progress": "Skladba {index} z {total}",
     "review_next": "Další →",
     "review_skip": "Přeskočit",
@@ -268,10 +284,42 @@
     "today_stand_other": "{count} skladeb na pultu",
     "arcade_title": "Arkáda čtení z listu",
     "surprise_me": "Překvap mě",
-    "recap_best_day": "Nejlepší den: {count} not",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Nejlepší den: {count} nota",
+                "countPlural=few": "Nejlepší den: {count} noty",
+                "countPlural=many": "Nejlepší den: {count} noty",
+                "countPlural=other": "Nejlepší den: {count} not"
+            }
+        }
+    ],
     "recap_boast": "{notes} not za {days} dní v {month}, na Plinky 🎹",
     "recap_card_detail": "{month} · {days} dní",
-    "today_review": "Osvěžte {count} skladeb",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Osvěžte {count} skladbu",
+                "countPlural=few": "Osvěžte {count} skladby",
+                "countPlural=many": "Osvěžte {count} skladby",
+                "countPlural=other": "Osvěžte {count} skladeb"
+            }
+        }
+    ],
     "today_daily": "Dnešní denní výzva",
     "today_daily_done": "Denní výzva hotova — podívejte se na výsledek",
     "today_learn": "Naučte se „{title}“",
@@ -476,7 +524,23 @@
     "drill_leap": "Největší skok",
     "drill_leap_help": "Jak daleko od sebe můžou být dva tóny po sobě. Volně nechá cvičení skákat kamkoli.",
     "drill_leap_free": "Volně",
-    "drill_leap_semitones": "{count} půltónů",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} půltón",
+                "countPlural=few": "{count} půltóny",
+                "countPlural=many": "{count} půltónu",
+                "countPlural=other": "{count} půltónů"
+            }
+        }
+    ],
     "drill_smoothness": "Držet se blízko",
     "drill_smoothness_help": "Jak moc se cvičení snaží držet další tón blízko předchozího.",
     "drill_less": "Méně {field}",
@@ -1162,7 +1226,25 @@
     "repertoire_stage_maintenance": "Udržuji",
     "repertoire_slipping": "Vytrácí se",
     "repertoire_deadline": "Do",
-    "repertoire_days_left": "{date} — za {count} dní",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — za {count} den",
+                "countPlural=few": "{date} — za {count} dny",
+                "countPlural=many": "{date} — za {count} dne",
+                "countPlural=other": "{date} — za {count} dní"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — dnes",
     "repertoire_date_passed": "{date} — tenhle den už je za námi",
     "methods_title": "Jak cvičit",
     "methods_intro": "Sedm věcí, které by navrhl učitel — proč každá funguje a na čem ji vyzkoušet.",
@@ -1390,8 +1472,41 @@
     "stats_q_ladder_hint": "Celý žebřík a to, co už máš",
     "stats_q_share": "Sdílej svůj pokrok",
     "stats_q_share_hint": "Obrázek toho, jak hraješ",
-    "stats_opening_days": "Tento měsíc jsi hrál {days} dní.",
-    "stats_opening_days_more": "Tento měsíc jsi hrál {days} dní, o {more} víc než minulý.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Tento měsíc jsi hrál {days} den.",
+                "daysPlural=few": "Tento měsíc jsi hrál {days} dny.",
+                "daysPlural=many": "Tento měsíc jsi hrál {days} dne.",
+                "daysPlural=other": "Tento měsíc jsi hrál {days} dní."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Tento měsíc jsi hrál {days} den, o {more} víc než minulý.",
+                "daysPlural=few": "Tento měsíc jsi hrál {days} dny, o {more} víc než minulý.",
+                "daysPlural=many": "Tento měsíc jsi hrál {days} dne, o {more} víc než minulý.",
+                "daysPlural=other": "Tento měsíc jsi hrál {days} dní, o {more} víc než minulý."
+            }
+        }
+    ],
     "stats_opening_first": "Tvé první dny u kláves — tady to začíná.",
     "help_text_stats": "Tvoje jediná stránka pokroku. Ukazuje stupeň, na kterém stojíš z osmi, a co zbývá do dalšího, tvou úroveň, dny cvičení a zahrané tóny, pomalu se měnící otisk složený z přesnosti, času a plynulosti a skladby k zopakování se sezením na jedno klepnutí.\n\nNajdeš tam také Najdi svou úroveň, rozřazovací test; tóny, které hledáš nejdéle, tedy tu hrstku, která tě pokaždé zdržuje; Tvoje cvičení, deník shrnutý za týden, měsíc, tři měsíce nebo rok, se stínovanou mřížkou ukazující, kam cvičení šlo, kam můžeš doplnit ručně zapsané minuty a stáhnout záznam jako tabulku; Na pultu, na čem pracuješ a v jaké fázi každá skladba je — učení, usazování, leštění, udržování; a Úspěchy, každý stupeň a odznak, který jsi získal, s nezískanými ukázanými jako cíle.\n\nMezery nevadí. Plinky nepočítá série a nikdy nevyčítá vynechaný den: klidný týden se prostě nakreslí jako klidný týden.",
     "help_shot_stats": "tvůj pokrok",

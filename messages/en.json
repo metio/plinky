@@ -110,7 +110,21 @@
     "refresh_why": "Pieces resurface on a widening schedule, so what you've learned actually sticks.",
     "grades_all_fresh": "All fresh — nothing to review right now.",
     "review_heading": "Review session",
-    "review_start": "▶ Review {count} pieces",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Review {count} piece",
+                "countPlural=other": "▶ Review {count} pieces"
+            }
+        }
+    ],
     "review_progress": "Piece {index} of {total}",
     "review_next": "Next →",
     "review_skip": "Skip",
@@ -401,10 +415,38 @@
     "today_stand_other": "{count} pieces on the stand",
     "arcade_title": "Sight-reading arcade",
     "surprise_me": "Surprise me",
-    "recap_best_day": "Best day: {count} notes",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Best day: {count} note",
+                "countPlural=other": "Best day: {count} notes"
+            }
+        }
+    ],
     "recap_boast": "{notes} notes across {days} days in {month}, on Plinky 🎹",
     "recap_card_detail": "{month} · {days} days",
-    "today_review": "Refresh {count} pieces",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Refresh {count} piece",
+                "countPlural=other": "Refresh {count} pieces"
+            }
+        }
+    ],
     "today_daily": "Today's daily challenge",
     "today_daily_done": "Daily done — see your result",
     "today_learn": "Learn “{title}”",
@@ -607,7 +649,21 @@
     "drill_leap": "Biggest jump",
     "drill_leap_help": "How far apart two notes in a row can sit. Free lets the drill leap anywhere in range.",
     "drill_leap_free": "Free",
-    "drill_leap_semitones": "{count} semitones",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} semitone",
+                "countPlural=other": "{count} semitones"
+            }
+        }
+    ],
     "drill_smoothness": "Stay close",
     "drill_smoothness_help": "How hard the drill tries to keep the next note near the last one.",
     "drill_less": "Fewer {field}",
@@ -1169,7 +1225,23 @@
     "repertoire_stage_maintenance": "Keeping it",
     "repertoire_slipping": "Slipping",
     "repertoire_deadline": "By",
-    "repertoire_days_left": "{date} — {count} days away",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — {count} day away",
+                "countPlural=other": "{date} — {count} days away"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — today",
     "repertoire_date_passed": "{date} — that date has gone by",
     "methods_title": "Ways to practise",
     "methods_intro": "Seven things a teacher would suggest — why each one works, and something to try it on.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "The whole ladder, and what you have earned so far",
     "stats_q_share": "Share your progress",
     "stats_q_share_hint": "A picture of how your playing looks",
-    "stats_opening_days": "You played on {days} days this month.",
-    "stats_opening_days_more": "You played on {days} days this month, {more} more than last month.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "You played on {days} day this month.",
+                "daysPlural=other": "You played on {days} days this month."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "You played on {days} day this month, {more} more than last month.",
+                "daysPlural=other": "You played on {days} days this month, {more} more than last month."
+            }
+        }
+    ],
     "stats_opening_first": "Your first days at the keys — this is where it starts.",
     "help_text_stats": "Your one progress page. It shows the grade you are at on the eight-grade ladder and what is left to reach the next, your skill rating, days practised and notes played, a slow-moving fingerprint of your accuracy, timing and flow, and the pieces due for review with a one-tap session.\n\nYou will also find Find your level, the placement test; the notes you take longest to find, which names the handful that consistently slow you down; Your practice, a diary rolled up over a week, a month, three months or a year with a shading grid showing where the practice went, where you can add hand-logged minutes and download the log as a spreadsheet; On the music stand, what you are working on and each piece's stage — learning, settling in, polishing, keeping it; and Achievements, every grade and badge you have earned, with the unearned ones shown as goals.\n\nGaps are fine. Plinky never counts streaks and never reproaches a missed day: a quiet week is simply drawn as a quiet week.",
     "help_shot_stats": "A screenshot of your progress",

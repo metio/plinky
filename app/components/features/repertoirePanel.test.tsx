@@ -70,6 +70,17 @@ describe("RepertoirePanel", () => {
         ).toBeTruthy();
     });
 
+    it("counts a date one day off in the singular", () => {
+        mount([item("exam", "Exam piece", { bestScore: 40, deadline: "2026-06-24" })]);
+        expect(screen.getByText("2026-06-24 — 1 day away")).toBeTruthy();
+    });
+
+    it("says a date that is today is today, rather than no days away", () => {
+        mount([item("exam", "Exam piece", { bestScore: 40, deadline: "2026-06-23" })]);
+        expect(screen.getByText("2026-06-23 — today")).toBeTruthy();
+        expect(screen.queryByText(/0 days away/)).toBeNull();
+    });
+
     it("says plainly when a date has gone by, without reproaching", () => {
         mount([item("late", "Late one", { bestScore: 40, deadline: "2026-06-01" })]);
         expect(screen.getByText(m.repertoire_date_passed({ date: "2026-06-01" }))).toBeTruthy();

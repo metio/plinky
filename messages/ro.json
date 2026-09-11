@@ -110,7 +110,22 @@
     "refresh_why": "Piesele reapar după un program tot mai rar, așa că ce ai învățat chiar rămâne.",
     "grades_all_fresh": "Toate proaspete — nimic de recapitulat acum.",
     "review_heading": "Sesiune de recapitulare",
-    "review_start": "▶ Recapitulează {count} piese",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Recapitulează {count} piesă",
+                "countPlural=few": "▶ Recapitulează {count} piese",
+                "countPlural=other": "▶ Recapitulează {count} de piese"
+            }
+        }
+    ],
     "review_progress": "Piesa {index} din {total}",
     "review_next": "Următoarea →",
     "review_skip": "Sari",
@@ -268,10 +283,40 @@
     "today_stand_other": "{count} piese pe pupitru",
     "arcade_title": "Arcade citire la prima vedere",
     "surprise_me": "Surprinde-mă",
-    "recap_best_day": "Cea mai bună zi: {count} note",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Cea mai bună zi: {count} notă",
+                "countPlural=few": "Cea mai bună zi: {count} note",
+                "countPlural=other": "Cea mai bună zi: {count} de note"
+            }
+        }
+    ],
     "recap_boast": "{notes} note în {days} zile în {month}, pe Plinky 🎹",
     "recap_card_detail": "{month} · {days} zile",
-    "today_review": "Împrospătează {count} piese",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Împrospătează {count} piesă",
+                "countPlural=few": "Împrospătează {count} piese",
+                "countPlural=other": "Împrospătează {count} de piese"
+            }
+        }
+    ],
     "today_daily": "Provocarea de azi",
     "today_daily_done": "Provocarea făcută — vezi rezultatul",
     "today_learn": "Învață „{title}”",
@@ -475,7 +520,22 @@
     "drill_leap": "Cel mai mare salt",
     "drill_leap_help": "Cât de departe pot sta două note la rând. Liber lasă exercițiul să sară oriunde.",
     "drill_leap_free": "Liber",
-    "drill_leap_semitones": "{count} semitonuri",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} semiton",
+                "countPlural=few": "{count} semitonuri",
+                "countPlural=other": "{count} de semitonuri"
+            }
+        }
+    ],
     "drill_smoothness": "Stai aproape",
     "drill_smoothness_help": "Cât de mult încearcă exercițiul să țină nota următoare aproape de cea dinainte.",
     "drill_less": "Mai puține {field}",
@@ -1160,7 +1220,24 @@
     "repertoire_stage_maintenance": "Întreținere",
     "repertoire_slipping": "Pălește",
     "repertoire_deadline": "Până la",
-    "repertoire_days_left": "{date} — peste {count} zile",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — peste {count} zi",
+                "countPlural=few": "{date} — peste {count} zile",
+                "countPlural=other": "{date} — peste {count} de zile"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — astăzi",
     "repertoire_date_passed": "{date} — data aceea a trecut",
     "methods_title": "Feluri de a exersa",
     "methods_intro": "Șapte lucruri pe care le-ar sugera un profesor — de ce funcționează fiecare și pe ce să le încerci.",
@@ -1388,8 +1465,39 @@
     "stats_q_ladder_hint": "Toată scara și ce ai obținut deja",
     "stats_q_share": "Împarte-ți progresul",
     "stats_q_share_hint": "O imagine a felului în care cânți",
-    "stats_opening_days": "Luna aceasta ai cântat {days} zile.",
-    "stats_opening_days_more": "Luna aceasta ai cântat {days} zile, cu {more} mai multe decât luna trecută.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Luna aceasta ai cântat {days} zi.",
+                "daysPlural=few": "Luna aceasta ai cântat {days} zile.",
+                "daysPlural=other": "Luna aceasta ai cântat {days} de zile."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Luna aceasta ai cântat {days} zi, cu {more} mai multe decât luna trecută.",
+                "daysPlural=few": "Luna aceasta ai cântat {days} zile, cu {more} mai multe decât luna trecută.",
+                "daysPlural=other": "Luna aceasta ai cântat {days} de zile, cu {more} mai multe decât luna trecută."
+            }
+        }
+    ],
     "stats_opening_first": "Primele tale zile la clape — de aici începe.",
     "help_text_stats": "Singura ta pagină de progres. Arată treapta pe care ești din cele opt și ce mai e până la următoarea, nivelul tău, zilele de exercițiu și sunetele cântate, o amprentă cu mișcare lentă alcătuită din acuratețe, timp și cursivitate, precum și piesele de reluat, cu o sesiune dintr-o atingere.\n\nMai găsești acolo Află-ți nivelul, testul de plasare; sunetele pe care le găsești cel mai greu, adică pumnul acela care te încetinește de fiecare dată; Exercițiul tău, un jurnal adunat pe o săptămână, o lună, trei luni sau un an, cu o grilă în nuanțe care arată unde s-a dus exercițiul, unde poți adăuga minute notate de mână și descărca jurnalul ca foaie de calcul; Pe pupitru, la ce lucrezi și în ce etapă e fiecare piesă — învățare, așezare, șlefuire, întreținere; și Realizările, fiecare treaptă și fiecare insignă câștigate, cu cele necâștigate arătate drept ținte.\n\nGolurile nu sunt o problemă. Plinky nu numără serii și nu îți reproșează niciodată o zi sărită: o săptămână liniștită este pur și simplu desenată ca o săptămână liniștită.",
     "help_shot_stats": "progresul tău",

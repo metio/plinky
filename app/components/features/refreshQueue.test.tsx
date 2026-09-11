@@ -32,6 +32,12 @@ describe("RefreshQueue", () => {
         ).toContain("/review");
     });
 
+    it("counts a single due piece in the singular", () => {
+        // The copy is what is asserted: the plural form alone read "Review 1 pieces".
+        mount([{ id: "a", title: "Minuet", kind: "piece" }]);
+        expect(screen.getByRole("link", { name: "▶ Review 1 piece" })).toBeTruthy();
+    });
+
     it("offers the guided session and links each due piece", () => {
         mount([
             { id: "a", title: "Minuet", kind: "piece" },

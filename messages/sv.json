@@ -110,7 +110,21 @@
     "refresh_why": "Stycken dyker upp igen med allt längre mellanrum, så att det du lärt dig verkligen fastnar.",
     "grades_all_fresh": "Allt färskt — inget att repetera just nu.",
     "review_heading": "Repetitionspass",
-    "review_start": "▶ Repetera {count} stycken",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Repetera {count} stycke",
+                "countPlural=other": "▶ Repetera {count} stycken"
+            }
+        }
+    ],
     "review_progress": "Stycke {index} av {total}",
     "review_next": "Nästa →",
     "review_skip": "Hoppa över",
@@ -268,10 +282,38 @@
     "today_stand_other": "{count} stycken på notstället",
     "arcade_title": "Notläsnings-arkad",
     "surprise_me": "Överraska mig",
-    "recap_best_day": "Bästa dag: {count} noter",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Bästa dag: {count} not",
+                "countPlural=other": "Bästa dag: {count} noter"
+            }
+        }
+    ],
     "recap_boast": "{notes} noter på {days} dagar i {month}, med Plinky 🎹",
     "recap_card_detail": "{month} · {days} dagar",
-    "today_review": "Fräscha upp {count} stycken",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Fräscha upp {count} stycke",
+                "countPlural=other": "Fräscha upp {count} stycken"
+            }
+        }
+    ],
     "today_daily": "Dagens utmaning",
     "today_daily_done": "Dagens klar — se ditt resultat",
     "today_learn": "Lär dig ”{title}”",
@@ -474,7 +516,21 @@
     "drill_leap": "Största språng",
     "drill_leap_help": "Hur långt isär två toner i rad får ligga. Fritt låter övningen hoppa var som helst.",
     "drill_leap_free": "Fritt",
-    "drill_leap_semitones": "{count} halvtoner",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} halvton",
+                "countPlural=other": "{count} halvtoner"
+            }
+        }
+    ],
     "drill_smoothness": "Håll dig nära",
     "drill_smoothness_help": "Hur hårt övningen försöker hålla nästa ton nära den förra.",
     "drill_less": "Färre {field}",
@@ -1159,7 +1215,23 @@
     "repertoire_stage_maintenance": "Håller vid liv",
     "repertoire_slipping": "Bleknar",
     "repertoire_deadline": "Till",
-    "repertoire_days_left": "{date} — om {count} dagar",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — om {count} dag",
+                "countPlural=other": "{date} — om {count} dagar"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — i dag",
     "repertoire_date_passed": "{date} — det datumet har passerat",
     "methods_title": "Sätt att öva",
     "methods_intro": "Sju saker en lärare skulle föreslå — varför var och en fungerar, och något att pröva det på.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "Hela stegen, och vad du redan nått",
     "stats_q_share": "Dela dina framsteg",
     "stats_q_share_hint": "En bild av hur ditt spelande ser ut",
-    "stats_opening_days": "Du spelade {days} dagar den här månaden.",
-    "stats_opening_days_more": "Du spelade {days} dagar den här månaden, {more} fler än förra.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Du spelade {days} dag den här månaden.",
+                "daysPlural=other": "Du spelade {days} dagar den här månaden."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Du spelade {days} dag den här månaden, {more} fler än förra.",
+                "daysPlural=other": "Du spelade {days} dagar den här månaden, {more} fler än förra."
+            }
+        }
+    ],
     "stats_opening_first": "Dina första dagar vid tangenterna — här börjar det.",
     "help_text_stats": "Din enda framstegssida. Den visar steget du står på av de åtta och vad som återstår till nästa, din nivå, övade dagar och spelade toner, ett långsamt rörligt fingeravtryck av precision, timing och flyt, och styckena som ska repeteras med ett pass på ett tryck.\n\nDu hittar också Hitta din nivå, placeringsprovet; tonerna du tar längst tid på dig att hitta, som pekar ut den handfull som bromsar dig varje gång; Din övning, en dagbok samlad över en vecka, en månad, tre månader eller ett år, med ett skuggat rutnät som visar vart övningen gick, där du kan lägga till minuter förda för hand och ladda ner loggen som kalkylark; På notstället, det du arbetar med och vilket skede varje stycke är i — lära in, låta sätta sig, putsa, hålla vid liv; och Bedrifter, varje steg och varje märke du nått, med de återstående visade som mål.\n\nLuckor gör inget. Plinky räknar inga rader och förebrår dig aldrig en överhoppad dag: en lugn vecka ritas helt enkelt som en lugn vecka.",
     "help_shot_stats": "dina framsteg",

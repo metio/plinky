@@ -110,7 +110,21 @@
     "refresh_why": "A darabok egyre táguló ütemezés szerint bukkannak fel újra, így amit megtanultál, tényleg megragad.",
     "grades_all_fresh": "Minden friss — most nincs mit ismételni.",
     "review_heading": "Ismétlő gyakorlás",
-    "review_start": "▶ {count} darab ismétlése",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ {count} darab ismétlése",
+                "countPlural=other": "▶ {count} darab ismétlése"
+            }
+        }
+    ],
     "review_progress": "{index}. darab a(z) {total}-ból",
     "review_next": "Következő →",
     "review_skip": "Kihagyás",
@@ -268,10 +282,38 @@
     "today_stand_other": "{count} darab a kottatartón",
     "arcade_title": "Lapról olvasás arcade",
     "surprise_me": "Lepj meg",
-    "recap_best_day": "Legjobb nap: {count} hang",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Legjobb nap: {count} hang",
+                "countPlural=other": "Legjobb nap: {count} hang"
+            }
+        }
+    ],
     "recap_boast": "{notes} hang {days} napon át — {month}, a Plinkyn 🎹",
     "recap_card_detail": "{month} · {days} nap",
-    "today_review": "{count} darab felfrissítése",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} darab felfrissítése",
+                "countPlural=other": "{count} darab felfrissítése"
+            }
+        }
+    ],
     "today_daily": "A mai napi kihívás",
     "today_daily_done": "Napi kész — nézd meg az eredményed",
     "today_learn": "Tanuld meg: „{title}”",
@@ -474,7 +516,21 @@
     "drill_leap": "Legnagyobb ugrás",
     "drill_leap_help": "Milyen messze lehet egymástól két egymást követő hang. A szabad bárhová engedi ugrani.",
     "drill_leap_free": "Szabad",
-    "drill_leap_semitones": "{count} félhang",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} félhang",
+                "countPlural=other": "{count} félhang"
+            }
+        }
+    ],
     "drill_smoothness": "Maradj közel",
     "drill_smoothness_help": "Mennyire igyekszik a gyakorlat a következő hangot az előzőhöz közel tartani.",
     "drill_less": "Kevesebb {field}",
@@ -1158,7 +1214,23 @@
     "repertoire_stage_maintenance": "Szinten tartás",
     "repertoire_slipping": "Halványul",
     "repertoire_deadline": "Eddigre",
-    "repertoire_days_left": "{date} — {count} nap múlva",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — {count} nap múlva",
+                "countPlural=other": "{date} — {count} nap múlva"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — ma",
     "repertoire_date_passed": "{date} — ez a nap elmúlt",
     "methods_title": "Gyakorlási módok",
     "methods_intro": "Hét dolog, amit egy tanár javasolna — miért működik mindegyik, és min próbáld ki.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "A teljes létra, és amit már elértél",
     "stats_q_share": "Oszd meg a fejlődésed",
     "stats_q_share_hint": "Egy kép arról, hogyan játszol",
-    "stats_opening_days": "Ebben a hónapban {days} napon játszottál.",
-    "stats_opening_days_more": "Ebben a hónapban {days} napon játszottál, {more} nappal többön, mint az előzőben.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Ebben a hónapban {days} napon játszottál.",
+                "daysPlural=other": "Ebben a hónapban {days} napon játszottál."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Ebben a hónapban {days} napon játszottál, {more} nappal többön, mint az előzőben.",
+                "daysPlural=other": "Ebben a hónapban {days} napon játszottál, {more} nappal többön, mint az előzőben."
+            }
+        }
+    ],
     "stats_opening_first": "Első napjaid a billentyűknél — itt kezdődik.",
     "help_text_stats": "Az egyetlen haladási oldalad. Megmutatja, melyik fokon állsz a nyolcból, és mi van hátra a következőig, a szintedet, a gyakorolt napokat és a lejátszott hangokat, a pontosságból, időzítésből és folyamatosságból álló, lassan mozduló ujjlenyomatot, valamint az ismétlésre váró darabokat egy koppintásos gyakorlással.\n\nMegtalálod ott a Találd meg a szinted besoroló tesztet is; a hangokat, amelyek megtalálása a legtovább tart, vagyis azt a maroknyit, amely minden alkalommal lassít; a Gyakorlásod naplót egy hétre, egy hónapra, három hónapra vagy egy évre összesítve, árnyalt ráccsal, amely mutatja, hová ment a gyakorlás, ahol kézzel jegyzett perceket adhatsz hozzá, és táblázatként töltheted le a naplót; a Kottatartón részt, vagyis amin dolgozol, és hogy melyik darab milyen szakaszban van — tanulás, ülepedés, csiszolás, szinten tartás; és az Eredményeket, minden megszerzett fokot és jelvényt, a még megszerzendőkkel célként megmutatva.\n\nA hézagok rendben vannak. A Plinky nem számol sorozatokat, és sosem veti a szemedre a kihagyott napot: egy csendes hét egyszerűen csendes hétként van felrajzolva.",
     "help_shot_stats": "a haladásod",

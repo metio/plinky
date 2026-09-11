@@ -110,7 +110,20 @@
     "refresh_why": "曲目会按逐渐拉长的周期重新出现，让你学到的真正留得住。",
     "grades_all_fresh": "全都熟练——暂时没有需要复习的。",
     "review_heading": "复习环节",
-    "review_start": "▶ 复习 {count} 首",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "▶ 复习 {count} 首"
+            }
+        }
+    ],
     "review_progress": "第 {index} / {total} 首",
     "review_next": "下一首 →",
     "review_skip": "跳过",
@@ -268,10 +281,36 @@
     "today_stand_other": "谱架上 {count} 首",
     "arcade_title": "视奏街机",
     "surprise_me": "给我惊喜",
-    "recap_best_day": "最佳一天：{count} 个音符",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "最佳一天：{count} 个音符"
+            }
+        }
+    ],
     "recap_boast": "{month}，{days} 天弹了 {notes} 个音，用 Plinky 🎹",
     "recap_card_detail": "{month} · {days} 天",
-    "today_review": "巩固 {count} 首",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "巩固 {count} 首"
+            }
+        }
+    ],
     "today_daily": "今天的每日挑战",
     "today_daily_done": "每日挑战已完成——看看你的成绩",
     "today_learn": "学习《{title}》",
@@ -473,7 +512,20 @@
     "drill_leap": "最大跳进",
     "drill_leap_help": "相邻两个音最远能差多少。自由则可以在音域内任意跳。",
     "drill_leap_free": "自由",
-    "drill_leap_semitones": "{count} 个半音",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 个半音"
+            }
+        }
+    ],
     "drill_smoothness": "保持靠近",
     "drill_smoothness_help": "练习会多努力让下一个音靠近上一个音。",
     "drill_less": "减少{field}",
@@ -1157,7 +1209,22 @@
     "repertoire_stage_maintenance": "保持",
     "repertoire_slipping": "有点生了",
     "repertoire_deadline": "目标日",
-    "repertoire_days_left": "{date} — 还有 {count} 天",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{date} — 还有 {count} 天"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — 今天",
     "repertoire_date_passed": "{date} — 这个日子已经过去了",
     "methods_title": "练琴的方法",
     "methods_intro": "老师会建议的七件事——每一件为什么有效，以及可以拿来试试的材料。",
@@ -1384,8 +1451,35 @@
     "stats_q_ladder_hint": "整段阶梯，以及你已经获得的",
     "stats_q_share": "分享你的进展",
     "stats_q_share_hint": "你弹奏样子的一张图",
-    "stats_opening_days": "这个月你弹了 {days} 天。",
-    "stats_opening_days_more": "这个月你弹了 {days} 天，比上个月多 {more} 天。",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "这个月你弹了 {days} 天。"
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "这个月你弹了 {days} 天，比上个月多 {more} 天。"
+            }
+        }
+    ],
     "stats_opening_first": "你在琴键前的最初几天 —— 一切从这里开始。",
     "help_text_stats": "你唯一的一页进度。它显示你在八级阶梯上的位置、到下一级还差什么，你的水平、练习的天数和弹过的音数，一枚由准确度、时间和流畅构成、缓慢移动的指纹，以及该复习的曲子和一按即开的复习。\n\n你还会看到「找到你的程度」这个分级测试；你找得最慢的那些音——每次都拖慢你的那一小把；「你的练习」，一本按一周、一月、三月或一年汇总的日志，用深浅方格显示练习都去了哪里，你可以在这里补上手记的分钟数，也可以把记录下载成表格；「谱架上」，你正在弄的东西和每首曲子的阶段——学习、沉淀、打磨、保持；以及「成就」，你拿到的每个级别和徽章，未拿到的则作为目标列出。\n\n有空档也没关系。Plinky 从不计算连续天数，也绝不会因为你漏了一天而责怪你：安静的一周，就只是被画成安静的一周。",
     "help_shot_stats": "你的进度",

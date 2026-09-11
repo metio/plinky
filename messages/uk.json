@@ -110,7 +110,23 @@
     "refresh_why": "П’єси повертаються за дедалі рідшим графіком, тож вивчене справді закріплюється.",
     "grades_all_fresh": "Усе свіже — зараз нічого повторювати.",
     "review_heading": "Сеанс повторення",
-    "review_start": "▶ Повторити {count} п’єс",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ Повторити {count} п’єсу",
+                "countPlural=few": "▶ Повторити {count} п’єси",
+                "countPlural=many": "▶ Повторити {count} п’єс",
+                "countPlural=other": "▶ Повторити {count} п’єс"
+            }
+        }
+    ],
     "review_progress": "П’єса {index} з {total}",
     "review_next": "Далі →",
     "review_skip": "Пропустити",
@@ -268,10 +284,42 @@
     "today_stand_other": "{count} п’єс на пюпітрі",
     "arcade_title": "Аркада читання з листа",
     "surprise_me": "Здивуй мене",
-    "recap_best_day": "Найкращий день: {count} нот",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Найкращий день: {count} нота",
+                "countPlural=few": "Найкращий день: {count} ноти",
+                "countPlural=many": "Найкращий день: {count} нот",
+                "countPlural=other": "Найкращий день: {count} нот"
+            }
+        }
+    ],
     "recap_boast": "{notes} нот за {days} днів у {month}, у Plinky 🎹",
     "recap_card_detail": "{month} · {days} днів",
-    "today_review": "Оновити {count} п’єс",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Оновити {count} п’єсу",
+                "countPlural=few": "Оновити {count} п’єси",
+                "countPlural=many": "Оновити {count} п’єс",
+                "countPlural=other": "Оновити {count} п’єс"
+            }
+        }
+    ],
     "today_daily": "Сьогоднішній щоденний виклик",
     "today_daily_done": "Щоденне виконано — перегляньте результат",
     "today_learn": "Розучіть «{title}»",
@@ -476,7 +524,23 @@
     "drill_leap": "Найбільший стрибок",
     "drill_leap_help": "Як далеко можуть стояти два звуки поспіль. Вільно дозволяє вправі стрибати будь-куди.",
     "drill_leap_free": "Вільно",
-    "drill_leap_semitones": "{count} півтонів",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} півтон",
+                "countPlural=few": "{count} півтони",
+                "countPlural=many": "{count} півтонів",
+                "countPlural=other": "{count} півтонів"
+            }
+        }
+    ],
     "drill_smoothness": "Триматися поруч",
     "drill_smoothness_help": "Наскільки вправа намагається тримати наступний звук близько до попереднього.",
     "drill_less": "Менше {field}",
@@ -1163,7 +1227,25 @@
     "repertoire_stage_maintenance": "Підтримання",
     "repertoire_slipping": "Забувається",
     "repertoire_deadline": "До",
-    "repertoire_days_left": "{date} — через {count} дн.",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — через {count} день",
+                "countPlural=few": "{date} — через {count} дні",
+                "countPlural=many": "{date} — через {count} днів",
+                "countPlural=other": "{date} — через {count} днів"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — сьогодні",
     "repertoire_date_passed": "{date} — ця дата вже минула",
     "methods_title": "Способи практики",
     "methods_intro": "Сім речей, які запропонував би вчитель — чому кожна працює і на чому її спробувати.",
@@ -1390,8 +1472,41 @@
     "stats_q_ladder_hint": "Уся драбина й те, чого ви вже досягли",
     "stats_q_share": "Поділіться поступом",
     "stats_q_share_hint": "Картина того, як ви граєте",
-    "stats_opening_days": "Цього місяця ви грали {days} днів.",
-    "stats_opening_days_more": "Цього місяця ви грали {days} днів — на {more} більше, ніж торік місяця тому.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Цього місяця ви грали {days} день.",
+                "daysPlural=few": "Цього місяця ви грали {days} дні.",
+                "daysPlural=many": "Цього місяця ви грали {days} днів.",
+                "daysPlural=other": "Цього місяця ви грали {days} днів."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Цього місяця ви грали {days} день — на {more} більше, ніж минулого місяця.",
+                "daysPlural=few": "Цього місяця ви грали {days} дні — на {more} більше, ніж минулого місяця.",
+                "daysPlural=many": "Цього місяця ви грали {days} днів — на {more} більше, ніж минулого місяця.",
+                "daysPlural=other": "Цього місяця ви грали {days} днів — на {more} більше, ніж минулого місяця."
+            }
+        }
+    ],
     "stats_opening_first": "Ваші перші дні за клавішами — усе починається тут.",
     "help_text_stats": "Твоя єдина сторінка поступу. Вона показує щабель, на якому ти стоїш із восьми, і що лишилося до наступного, твій рівень, дні занять і зіграні звуки, повільно рухомий відбиток із точності, часу і плинності, а також п'єси на повторення із заняттям в один дотик.\n\nТам же ти знайдеш Знайди свій рівень — вступний тест; звуки, які ти шукаєш найдовше, ту жменьку, що гальмує тебе щоразу; Твої заняття — щоденник, зібраний за тиждень, місяць, три місяці або рік, із відтіненою сіткою, що показує, куди пішли заняття, де можна додати записані від руки хвилини і звантажити журнал таблицею; На пюпітрі — над чим ти працюєш і на якій стадії кожна п'єса: вивчення, осідання, шліфування, підтримання; і Досягнення — кожен щабель і значок, які ти здобув, з нездобутими у вигляді цілей.\n\nПрогалини не біда. Plinky не рахує серій і ніколи не докоряє пропущеним днем: тихий тиждень просто намальований як тихий тиждень.",
     "help_shot_stats": "твій поступ",

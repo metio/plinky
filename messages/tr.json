@@ -110,7 +110,21 @@
     "refresh_why": "Parçalar giderek genişleyen bir programda yeniden karşına çıkar, böylece öğrendiklerin gerçekten kalıcı olur.",
     "grades_all_fresh": "Hepsi taze — şu an tekrar edilecek bir şey yok.",
     "review_heading": "Tekrar seansı",
-    "review_start": "▶ {count} parçayı tekrar et",
+    "review_start": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "▶ {count} parçayı tekrar et",
+                "countPlural=other": "▶ {count} parçayı tekrar et"
+            }
+        }
+    ],
     "review_progress": "Parça {index}/{total}",
     "review_next": "Sonraki →",
     "review_skip": "Atla",
@@ -268,10 +282,38 @@
     "today_stand_other": "{count} parça nota sehpasında",
     "arcade_title": "Deşifre arcade",
     "surprise_me": "Beni şaşırt",
-    "recap_best_day": "En iyi gün: {count} nota",
+    "recap_best_day": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "En iyi gün: {count} nota",
+                "countPlural=other": "En iyi gün: {count} nota"
+            }
+        }
+    ],
     "recap_boast": "{month} ayında {days} günde {notes} nota, Plinky'de 🎹",
     "recap_card_detail": "{month} · {days} gün",
-    "today_review": "{count} parçayı tazele",
+    "today_review": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} parçayı tazele",
+                "countPlural=other": "{count} parçayı tazele"
+            }
+        }
+    ],
     "today_daily": "Bugünün günlük meydan okuması",
     "today_daily_done": "Günlük tamam — sonucunu gör",
     "today_learn": "“{title}” öğren",
@@ -474,7 +516,21 @@
     "drill_leap": "En büyük atlama",
     "drill_leap_help": "Peş peşe iki ses ne kadar uzak olabilir. Serbest, alıştırmanın her yere atlamasına izin verir.",
     "drill_leap_free": "Serbest",
-    "drill_leap_semitones": "{count} yarım ses",
+    "drill_leap_semitones": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} yarım ses",
+                "countPlural=other": "{count} yarım ses"
+            }
+        }
+    ],
     "drill_smoothness": "Yakın kal",
     "drill_smoothness_help": "Alıştırmanın sonraki sesi bir öncekine ne kadar yakın tutmaya çalıştığı.",
     "drill_less": "Daha az {field}",
@@ -1158,7 +1214,23 @@
     "repertoire_stage_maintenance": "Elde tutuluyor",
     "repertoire_slipping": "Soluyor",
     "repertoire_deadline": "Hedef tarih",
-    "repertoire_days_left": "{date} — {count} gün var",
+    "repertoire_days_left": [
+        {
+            "declarations": [
+                "input date",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{date} — {count} gün var",
+                "countPlural=other": "{date} — {count} gün var"
+            }
+        }
+    ],
+    "repertoire_due_today": "{date} — bugün",
     "repertoire_date_passed": "{date} — o tarih geçti",
     "methods_title": "Çalışma yolları",
     "methods_intro": "Bir öğretmenin önereceği yedi şey — her birinin neden işe yaradığı ve deneyecek bir şey.",
@@ -1386,8 +1458,37 @@
     "stats_q_ladder_hint": "Merdivenin tamamı ve şimdiye dek kazandıkların",
     "stats_q_share": "İlerlemeni paylaş",
     "stats_q_share_hint": "Nasıl çaldığının bir resmi",
-    "stats_opening_days": "Bu ay {days} gün çaldın.",
-    "stats_opening_days_more": "Bu ay {days} gün çaldın, geçen aydan {more} gün fazla.",
+    "stats_opening_days": [
+        {
+            "declarations": [
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Bu ay {days} gün çaldın.",
+                "daysPlural=other": "Bu ay {days} gün çaldın."
+            }
+        }
+    ],
+    "stats_opening_days_more": [
+        {
+            "declarations": [
+                "input days",
+                "input more",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "Bu ay {days} gün çaldın, geçen aydan {more} gün fazla.",
+                "daysPlural=other": "Bu ay {days} gün çaldın, geçen aydan {more} gün fazla."
+            }
+        }
+    ],
     "stats_opening_first": "Tuşlardaki ilk günlerin — her şey burada başlıyor.",
     "help_text_stats": "Tek ilerleme sayfan. Sekiz basamaklı merdivende hangi basamakta olduğunu ve bir sonrakine ne kaldığını, seviyeni, çalıştığın günleri ve çaldığın sesleri, doğruluk, zamanlama ve akıştan oluşan yavaş kımıldayan bir parmak izini ve tekrar sırası gelen parçaları tek dokunuşluk bir oturumla gösterir.\n\nAyrıca Seviyeni bul yerleştirme sınavını; bulman en uzun süren sesleri, yani seni her seferinde yavaşlatan o avuç dolusunu; Çalışman'ı, bir hafta, bir ay, üç ay ya da bir yıl üzerinden toplanmış, çalışmanın nereye gittiğini gösteren gölgeli bir ızgarayla, elle yazdığın dakikaları ekleyebildiğin ve günlüğü hesap tablosu olarak indirebildiğin bir günlüğü; Nota sehpasında, üzerinde çalıştıklarını ve her parçanın hangi aşamada olduğunu — öğrenme, oturma, cilalama, koruma; ve Başarımlar'ı, kazandığın her basamağı ve rozeti, kazanılmayanlar hedef olarak gösterilmiş hâlde bulursun.\n\nBoşluklar sorun değil. Plinky seri saymaz ve atlanan bir günü asla yüzüne vurmaz: sakin bir hafta yalnızca sakin bir hafta olarak çizilir.",
     "help_shot_stats": "ilerlemen",

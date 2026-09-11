@@ -55,6 +55,12 @@ describe("DrillSetup", () => {
         expect(screen.getByText(m.drill_leap_free())).toBeTruthy();
     });
 
+    it("counts a leap of one semitone in the singular", () => {
+        mount({ maxLeap: 1 });
+
+        expect(screen.getByText("1 semitone")).toBeTruthy();
+    });
+
     it("hands back a whole drill, not a patch", () => {
         const { onChange } = mount({ bars: 8 });
 
