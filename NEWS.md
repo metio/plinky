@@ -66,6 +66,11 @@ time, the practice report said there was nothing here yet, however much you had
 logged, while the week, the month and the year showed it. It now adds up every
 sitting since your first, and its calendar starts on that day.
 
+**An address without a language opens its page, slash or no slash.** Typing
+plinky.fun/music/, or taking the language out of a link you copied, opened the Today
+page, while the same address without the final slash opened Music. Both now open the
+page they name, in your language.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

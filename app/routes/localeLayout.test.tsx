@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { isLocale } from "../paraglide/runtime.js";
 import { renderWithServices } from "../testing/renderWithServices";
 import LocaleLayout from "./localeLayout";
+import UnlocalizedRedirect from "./unlocalizedRedirect";
 
 afterEach(cleanup);
 
@@ -25,7 +26,13 @@ function routerAt(initial: string) {
                     <Route index element={<Destination />} />
                     <Route path="play/:scoreId" element={<Destination />} />
                     <Route path="music" element={<Destination />} />
+                    <Route path="piano" element={<Destination />} />
+                    <Route path="theory" element={<Destination />} />
+                    <Route path="theory/:lesson" element={<Destination />} />
                 </Route>
+                {/* The app's catch-all, so a bare address that no child under ":locale"
+                    matches settles where the real route table would send it. */}
+                <Route path="*" element={<UnlocalizedRedirect />} />
             </Routes>
         </MemoryRouter>
     );
@@ -58,6 +65,45 @@ describe("LocaleLayout", () => {
         const dest = (await screen.findByTestId("dest")).textContent ?? "";
         expect(dest).toMatch(/\/music\/$/);
         expect(isLocale(dest.split("/")[1])).toBe(true);
+    });
+
+    it("reads a lone segment with the canonical trailing slash as the page too", async () => {
+        // Every address the app writes ends in a slash, so "/music/" is the spelling a
+        // player copies out of the address bar and strips the language from.
+        for (const page of ["music", "piano", "theory"]) {
+            renderWithServices(routerAt(`/${page}/`));
+            const dest = (await screen.findByTestId("dest")).textContent ?? "";
+            expect(dest).toMatch(new RegExp(`^/[^/]+/${page}/$`));
+            expect(isLocale(dest.split("/")[1])).toBe(true);
+            cleanup();
+        }
+    });
+
+    it("keeps the query and the fragment on a lone page name with its slash", async () => {
+        renderWithServices(routerAt("/music/?due=1#shelf"));
+        const dest = (await screen.findByTestId("dest")).textContent ?? "";
+        expect(dest).toMatch(/^\/[^/]+\/music\/\?due=1#shelf$/);
+    });
+
+    it("sends a deeper bare address to the same page under a language", async () => {
+        // No child of ":locale" matches "major", so this one is the catch-all's to answer.
+        renderWithServices(routerAt("/theory/major/"));
+        const dest = (await screen.findByTestId("dest")).textContent ?? "";
+        expect(dest).toMatch(/^\/[^/]+\/theory\/major\/$/);
+        expect(isLocale(dest.split("/")[1])).toBe(true);
+    });
+
+    it("drops an unknown first segment that has a page after it, slash and all", async () => {
+        renderWithServices(routerAt("/zz/play/abc/"));
+        const dest = (await screen.findByTestId("dest")).textContent ?? "";
+        expect(dest).toMatch(/^\/[^/]+\/play\/abc\/$/);
+        expect(dest.startsWith("/zz/")).toBe(false);
+    });
+
+    it("leaves a known locale's home page untouched, slash included", async () => {
+        renderWithServices(routerAt("/en/"));
+        const dest = (await screen.findByTestId("dest")).textContent ?? "";
+        expect(dest).toBe("/en/");
     });
 
     it("leaves a known locale untouched", async () => {

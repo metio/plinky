@@ -49,6 +49,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**All time on the Stats page shows your practice.** With the period set to All\ntime, the practice report said there was nothing here yet, however much you had\nlogged, while the week, the month and the year showed it. It now adds up every\nsitting since your first, and its calendar starts on that day.",
                 twip: true,
             },
+            {
+                body: "**An address without a language opens its page, slash or no slash.** Typing\nplinky.fun/music/, or taking the language out of a link you copied, opened the Today\npage, while the same address without the final slash opened Music. Both now open the\npage they name, in your language.",
+                twip: true,
+            },
         ],
     },
     {

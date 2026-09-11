@@ -32,7 +32,9 @@ export default function LocaleLayout() {
     // "/music" is not a mistyped language at all. It is a page name that arrived with no
     // language in front of it, from a hand-typed address or an old link, and dropping it
     // would answer a request for the library with the home page. So a lone segment is kept
-    // and localised. The cost is that a bare "/zz" now lands on the not-found page instead
+    // and localised, with or without the trailing slash every canonical address carries —
+    // "/music/" is the spelling a player copies out of the address bar. The cost is that a
+    // bare "/zz" now lands on the not-found page instead
     // of the home page: nothing at runtime can tell "/music" from "/zz", and of the two
     // readings the one that serves a real address is worth more than the one that tidies
     // away a typo.
@@ -46,14 +48,10 @@ export default function LocaleLayout() {
             return null;
         }
         const rest = pathname.replace(/^\/[^/]+/, "");
+        const lone = rest === "" || rest === "/";
         // The query and the fragment travel with the page: a piece opened by a link that
         // asks for one hand, or a help page opened at a heading, keeps the ask.
-        return (
-            <Navigate
-                to={localizedHref(`${rest === "" ? pathname : rest}${search}${hash}`)}
-                replace
-            />
-        );
+        return <Navigate to={localizedHref(`${lone ? pathname : rest}${search}${hash}`)} replace />;
     }
 
     return (
