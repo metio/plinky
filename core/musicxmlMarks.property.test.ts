@@ -84,13 +84,19 @@ describe("transposeScoreMarks", () => {
         );
     });
 
-    it("moves each key's tonic by the transposition and never leaves a signature past seven", () => {
+    it("moves the tonic by the transposition and every key by the same signature move", () => {
         fc.assert(
             fc.property(marks, shift, (read, semitones) => {
                 const moved = transposeScoreMarks(read, semitones);
                 const expected = (((tonicOf(read.fifths) + semitones) % 12) + 12) % 12;
                 expect(tonicOf(moved.fifths)).toBe(expected);
                 expect(Math.abs(moved.fifths)).toBeLessThanOrEqual(7);
+                // One move for the whole piece, as the engraver prints it, so a modulation
+                // keeps its distance from the opening key.
+                const delta = moved.fifths - read.fifths;
+                expect(moved.keys.map((point) => point.fifths)).toEqual(
+                    read.keys.map((point) => point.fifths + delta),
+                );
             }),
         );
     });

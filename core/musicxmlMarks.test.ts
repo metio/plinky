@@ -299,6 +299,31 @@ describe("transposeScoreMarks", () => {
         expect(moved.keys.map((point) => point.fifths)).toEqual([2]);
     });
 
+    it("names the keys the transposed page prints", () => {
+        // A bar in the opening key, then one after a change of signature.
+        const modulating = (
+            opening: number,
+            later: number,
+        ) => `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
+<part id="P1"><measure number="1">${ATTR.replace("FIFTHS", String(opening))}${note("C", 16)}</measure><measure number="2"><attributes><key><fifths>${later}</fifths></key></attributes>${note("C", 16)}</measure></part></score-partwise>`;
+        // D major up a major seventh; C major into D♭ up a semitone; F♯ major down one.
+        const cases: Array<[number, number, number]> = [
+            [2, 2, 11],
+            [0, -5, 1],
+            [6, 6, -1],
+            [-3, 4, 6],
+            [0, 3, -7],
+        ];
+        for (const [opening, later, semitones] of cases) {
+            const xml = modulating(opening, later);
+            const moved = transposeScoreMarks(readScoreMarks(parse(xml)), semitones);
+            const page = readScoreMarks(parse(transposeMusicXml(domXmlCodec, xml, semitones)));
+            expect(moved.fifths).toBe(page.fifths);
+            expect(moved.keys).toEqual(page.keys);
+        }
+    });
+
     it("leaves a piece nobody transposed exactly as the file wrote it", () => {
         const read = readScoreMarks(parse(xml));
         expect(transposeScoreMarks(read, 0)).toBe(read);

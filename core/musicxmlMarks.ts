@@ -14,7 +14,7 @@ import { child, text } from "./musicxmlDom";
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
 import { type GlissandoSpan, readGlissandos } from "./glissando";
-import { transposeFifths } from "./ornament";
+import { keyShift } from "./transpose";
 import type { PedalSpan, SoftSpan } from "./pedal";
 import { readTremolos, type TremoloSpan } from "./tremolo";
 import type { SlurSpan } from "./slur";
@@ -457,6 +457,10 @@ export function transposeScoreMarks(marks: ScoreMarks, semitones: number): Score
         return marks;
     }
     const move = (pitches: readonly number[]) => pitches.map((pitch) => pitch + semitones);
+    // The engraver's own move, chosen from the key the piece opens in and applied to every
+    // signature: a key wrapped on its own would name D♭ where the page prints C♯, or D major
+    // where a modulation the page moved with the rest reads ten flats.
+    const { fifthsDelta } = keyShift(marks.fifths, semitones);
     return {
         ...marks,
         tremolos: marks.tremolos.map((span) => ({
@@ -469,10 +473,7 @@ export function transposeScoreMarks(marks: ScoreMarks, semitones: number): Score
             arrivesAt: span.arrivesAt + semitones,
             ...(span.pitch === undefined ? {} : { pitch: span.pitch + semitones }),
         })),
-        fifths: transposeFifths(marks.fifths, semitones),
-        keys: marks.keys.map((point) => ({
-            ...point,
-            fifths: transposeFifths(point.fifths, semitones),
-        })),
+        fifths: marks.fifths + fifthsDelta,
+        keys: marks.keys.map((point) => ({ ...point, fifths: point.fifths + fifthsDelta })),
     };
 }
