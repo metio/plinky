@@ -1,8 +1,37 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { effectiveTempo, listenStepMs, MIN_STEP_MS } from "./playback";
+import { effectiveTempo, listenStepMs, MIN_STEP_MS, writtenStepMs } from "./playback";
+
+describe("writtenStepMs", () => {
+    it("reads the shortest length at the tempo, with no floor under it", () => {
+        // A thirty-second note at 300bpm is 25ms, which listenStepMs floors and this does not.
+        expect(writtenStepMs([0.125], 300)).toBe(25);
+        expect(writtenStepMs([4, 0.5], 120)).toBe(250);
+        expect(writtenStepMs([1], 60, 2)).toBe(2000);
+    });
+
+    it("falls back to a single beat when nothing is listed", () => {
+        expect(writtenStepMs([], 120)).toBe(500);
+    });
+
+    it("is what listenStepMs floors", () => {
+        fc.assert(
+            fc.property(
+                fc.array(fc.double({ min: 0, max: 8, noNaN: true }), { maxLength: 4 }),
+                fc.integer({ min: 20, max: 400 }),
+                fc.double({ min: 1, max: 3, noNaN: true }),
+                (lengths, tempo, stretch) => {
+                    expect(listenStepMs(lengths, tempo, stretch)).toBe(
+                        Math.max(MIN_STEP_MS, writtenStepMs(lengths, tempo, stretch)),
+                    );
+                },
+            ),
+        );
+    });
+});
 
 describe("listenStepMs", () => {
     it("dwells a note for its own length at the tempo", () => {

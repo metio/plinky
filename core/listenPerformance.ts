@@ -8,8 +8,7 @@ import { type GlissandoSpan, glissandoNotes } from "./glissando";
 import type { Hand2 } from "./matcher";
 import { type OrnamentKind, ornamentNotes } from "./ornament";
 import { SOFT_SCALE } from "./pedal";
-import { quartersMs } from "./elapsed";
-import { effectiveTempo, listenStepMs, MIN_STEP_MS } from "./playback";
+import { effectiveTempo, listenStepMs, MIN_STEP_MS, writtenStepMs } from "./playback";
 import { fingeringOfHands } from "./scorePerformance";
 import { noteDelayMs, rubatoStretch, touchVelocity } from "./touch";
 import { type TremoloSpan, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
@@ -420,13 +419,6 @@ export function subStepsOf(
     return { from, to };
 }
 
-// A step's length as written, with no floor under it: the shortest length at it, or a
-// beat when nothing is listed, exactly as listenStepMs reads it.
-function writtenStepMs(lengths: readonly number[], tempo: number, stretch: number): number {
-    const nextOnset = lengths.length > 0 ? Math.min(...lengths) : 1;
-    return Math.max(0, nextOnset * quartersMs(1, tempo) * stretch);
-}
-
 // How long one sub-step of a position holds, so that together they last exactly what the
 // position is written to last — its sub-steps' written lengths added up, under the same
 // MIN_STEP_MS floor a single step gets.
@@ -438,8 +430,8 @@ function writtenStepMs(lengths: readonly number[], tempo: number, stretch: numbe
 // the piece further behind the onsets a graded run and Keep up count against. So the
 // earlier sub-steps keep the floor while the position has room for it and the last takes
 // what is left; a position too short to give each its floor shares its time out in the
-// written proportions instead. Where nothing needs the floor, every sub-step holds exactly
-// what it always did.
+// written proportions instead. Where no sub-step is shorter than the floor, each holds its
+// own written length.
 function subStepAdvanceMs(
     steps: readonly ListenStep[],
     index: number,

@@ -26,10 +26,23 @@ export const MIN_STEP_MS = 40;
 export const TEMPO_MIN = 20;
 export const TEMPO_MAX = 400;
 
-export function listenStepMs(quarterLengths: number[], tempo: number, stretch = 1): number {
-    const beatMs = quartersMs(1, tempo);
+export function listenStepMs(
+    quarterLengths: readonly number[],
+    tempo: number,
+    stretch = 1,
+): number {
+    return Math.max(MIN_STEP_MS, writtenStepMs(quarterLengths, tempo, stretch));
+}
+
+// A step's length as written, with no floor under it: the shortest length at it, or a
+// beat when nothing is listed.
+export function writtenStepMs(
+    quarterLengths: readonly number[],
+    tempo: number,
+    stretch = 1,
+): number {
     const nextOnset = quarterLengths.length > 0 ? Math.min(...quarterLengths) : 1;
-    return Math.max(MIN_STEP_MS, nextOnset * beatMs * stretch);
+    return Math.max(0, nextOnset * quartersMs(1, tempo) * stretch);
 }
 
 // The tempo to count a position at: the dial, held in the same proportion to the mark in
