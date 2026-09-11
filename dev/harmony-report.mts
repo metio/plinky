@@ -15,7 +15,8 @@ import { readFileSync } from "node:fs";
 import { decompressMxl } from "../core/musicxmlFile.ts";
 import { readTimeline } from "../core/musicxmlTimeline.ts";
 import { type ChordSpan, readHarmony } from "../core/harmony.ts";
-import { NOTE_TEXT, noteNameOf } from "../core/theory.ts";
+import { letterNameOf } from "../core/noteNaming.ts";
+import { noteNameOf } from "../core/theory.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { readSongsSync, scorePath } from "./manifest.mts";
 
@@ -41,7 +42,7 @@ function spansOf(id: string, license: string): ChordSpan[] | null {
 }
 
 const symbol = (span: ChordSpan) =>
-    `${NOTE_TEXT[noteNameOf(span.root, span.key.mode === "major" && span.key.tonic <= 6 ? "sharp" : "flat")]} ${span.quality}${span.inversion > 0 ? ` /${NOTE_TEXT[noteNameOf(span.bass)]}` : ""}`;
+    `${letterNameOf(noteNameOf(span.root, span.key.mode === "major" && span.key.tonic <= 6 ? "sharp" : "flat"))} ${span.quality}${span.inversion > 0 ? ` /${letterNameOf(noteNameOf(span.bass))}` : ""}`;
 
 const songs = readSongsSync().filter((song) => song.scoreKind === "solo-piano");
 

@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_DRILL, type DrillOptions, generateDrill, MAX_FIFTHS, MIN_FIFTHS } from "./drill";
 import { clampDrill, DRILL_FIELDS, majorTonicOf } from "./drillSpec";
-import { NOTE_TEXT } from "./theory";
+import { NOTE_NAME_IDS } from "./theory";
 
 describe("majorTonicOf", () => {
     it("spells the tonic of the major key a signature reads as", () => {
@@ -19,7 +19,7 @@ describe("majorTonicOf", () => {
     it("spells a real note for every signature the fields offer, each once", () => {
         const tonics = new Set<string>();
         for (let fifths = MIN_FIFTHS; fifths <= MAX_FIFTHS; fifths++) {
-            expect(NOTE_TEXT).toHaveProperty(majorTonicOf(fifths));
+            expect(NOTE_NAME_IDS).toContain(majorTonicOf(fifths));
             tonics.add(majorTonicOf(fifths));
         }
         expect(tonics.size).toBe(MAX_FIFTHS - MIN_FIFTHS + 1);

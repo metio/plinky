@@ -19,7 +19,8 @@
 
 import { escapeXml } from "./xmlText";
 import { isWhite, keyLane, whiteKeys } from "./keyboardGeometry";
-import { NOTE_TEXT, type NoteNameId, noteNameOf, pitchClassOf, type Spelling } from "./theory";
+import { letterNameOf } from "./noteNaming";
+import { type NoteNameId, noteNameOf, pitchClassOf, type Spelling } from "./theory";
 
 // A marked key, and optionally the finger that plays it.
 export type DiagramKey = { note: number; finger?: number };
@@ -44,7 +45,7 @@ export type DiagramOptions = {
 export type NoteSpeller = (name: NoteNameId) => string;
 
 // The letter names, for a picture drawn with no reader in mind.
-export const letterSpeller: NoteSpeller = (name) => NOTE_TEXT[name];
+export const letterSpeller: NoteSpeller = letterNameOf;
 
 const WIDTH = 1200;
 const KEYBED_TOP = 40;

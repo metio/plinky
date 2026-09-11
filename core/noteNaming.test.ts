@@ -21,7 +21,7 @@ import {
     spokenKeyIn,
     spokenNoteIn,
 } from "./noteNaming";
-import { NOTE_TEXT, type NoteNameId } from "./theory";
+import { NOTE_NAME_IDS } from "./theory";
 
 // Stand-in translations: the real ones are paraglide messages, which core never reads.
 const WORDS: NoteWords = {
@@ -31,7 +31,7 @@ const WORDS: NoteWords = {
     spokenSharp: (note) => `${note} sharp`,
 };
 
-const NOTE_IDS = Object.keys(NOTE_TEXT) as NoteNameId[];
+const NOTE_IDS = NOTE_NAME_IDS;
 const text = (name: string, system: NoteSystem) => noteTextIn(name, system, WORDS);
 
 // What a device that has chosen nothing reads, in each language.
@@ -128,9 +128,32 @@ describe("spelling in each language's letters", () => {
         expect(text("c-flat", "hungarian")).toBe("Cesz");
     });
 
-    it("writes every spelled note exactly as the letter table does, in letters", () => {
+    it("writes every spelled note in letters with its sign", () => {
+        const expected: Record<(typeof NOTE_IDS)[number], string> = {
+            c: "C",
+            "c-sharp": "C♯",
+            "d-flat": "D♭",
+            d: "D",
+            "d-sharp": "D♯",
+            "e-flat": "E♭",
+            e: "E",
+            f: "F",
+            "f-sharp": "F♯",
+            "g-flat": "G♭",
+            g: "G",
+            "g-sharp": "G♯",
+            "a-flat": "A♭",
+            a: "A",
+            "a-sharp": "A♯",
+            "b-flat": "B♭",
+            b: "B",
+            "e-sharp": "E♯",
+            "b-sharp": "B♯",
+            "c-flat": "C♭",
+            "f-flat": "F♭",
+        };
         for (const id of NOTE_IDS) {
-            expect(text(id, "letters")).toBe(NOTE_TEXT[id]);
+            expect(text(id, "letters")).toBe(expected[id]);
         }
     });
 

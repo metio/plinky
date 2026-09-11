@@ -18,7 +18,7 @@ import {
     spokenKeyIn,
     spokenNoteIn,
 } from "./noteNaming";
-import { NOTE_TEXT, type NoteNameId, noteNameOf, pitchClassOf } from "./theory";
+import { NOTE_NAME_IDS, noteNameOf, pitchClassOf } from "./theory";
 
 const WORDS: NoteWords = {
     syllables: ["do", "re", "mi", "fa", "sol", "la", "si"],
@@ -63,7 +63,7 @@ const key = fc.integer({ min: 0, max: 127 });
 const labels = fc.constantFrom<NoteLabels>("all", "c", "solfege", "off");
 const letters = fc.constantFrom<NoteLetters>("auto", "b", "h");
 const locale = fc.constantFrom(...LOCALES);
-const noteId = fc.constantFrom(...(Object.keys(NOTE_TEXT) as NoteNameId[]));
+const noteId = fc.constantFrom(...NOTE_NAME_IDS);
 
 describe("one name per note, whatever the surface", () => {
     it("names a pitch everywhere exactly as the keys print it, for every choice and language", () => {

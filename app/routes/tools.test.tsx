@@ -5,7 +5,8 @@
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { CIRCLE } from "../../core/circleOfFifths";
-import { NOTE_TEXT, noteNameOf } from "../../core/theory";
+import { letterNameOf } from "../../core/noteNaming";
+import { noteNameOf } from "../../core/theory";
 import { m } from "../paraglide/messages.js";
 import { baseLocale, overwriteGetLocale } from "../paraglide/runtime.js";
 import { renderWithServices } from "../testing/renderWithServices";
@@ -74,7 +75,7 @@ describe("ToolsRoute", () => {
         renderWithServices(<ToolsRoute />);
         for (const key of CIRCLE) {
             // Each key spells its own tonic: the flat side reads D♭, not C♯.
-            const name = NOTE_TEXT[noteNameOf(key.tonic, key.spelling)];
+            const name = letterNameOf(noteNameOf(key.tonic, key.spelling));
             // The keys are one control now, not twelve buttons: picking one of twelve is
             // the same gesture as picking one of thirteen scales below them.
             expect(screen.getAllByRole("tab", { name }).length).toBeGreaterThan(0);

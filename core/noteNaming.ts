@@ -27,7 +27,8 @@
 // No name is ever written into a translated string: a message carries a {note} slot and
 // this module fills it.
 
-import type { NoteNameId } from "./theory";
+import { LETTERS } from "./notes";
+import { type NoteNameId, noteNameOf, pitchClassOf } from "./theory";
 
 export type NoteSystem =
     | "letters"
@@ -220,14 +221,15 @@ export function everyKeyLabels(current: NoteLabels): "auto" | "all" | "solfege" 
     return current === "all" || current === "solfege" ? current : "auto";
 }
 
-const LETTER_NATURAL = ["C", "D", "E", "F", "G", "A", "B"];
-const H_NATURAL = ["C", "D", "E", "F", "G", "A", "H"];
+const H_NATURAL = [...LETTERS.slice(0, 6), "H"];
 const SHARP_SUFFIX: Record<"german" | "swedish" | "hungarian", string> = {
     german: "is",
     swedish: "iss",
     hungarian: "isz",
 };
-const INDEX: Record<string, number> = { c: 0, d: 1, e: 2, f: 3, g: 4, a: 5, b: 6 };
+const INDEX: Record<string, number> = Object.fromEntries(
+    LETTERS.map((letter, index) => [letter.toLowerCase(), index]),
+);
 
 type Accidental = -1 | 0 | 1;
 
@@ -260,16 +262,30 @@ function hName(index: number, accidental: Accidental, system: keyof typeof SHARP
     return natural === "E" || natural === "A" ? `${natural}${flat.slice(1)}` : `${natural}${flat}`;
 }
 
+// A note in letters with its sign: C♯, B♭. The letter system, and what a chord symbol or
+// a picture drawn with no reader in mind falls back on.
+export function letterNameOf(name: NoteNameId | string): string {
+    const parsed = parse(name);
+    if (parsed === null) {
+        return name.toUpperCase();
+    }
+    const natural = LETTERS[parsed.index] as string;
+    return parsed.accidental === 1
+        ? `${natural}♯`
+        : parsed.accidental === -1
+          ? `${natural}♭`
+          : natural;
+}
+
 function spell(name: string, system: NoteSystem, words: NoteWords, glyphs: boolean): string {
+    if (system === "letters") {
+        return letterNameOf(name);
+    }
     const parsed = parse(name);
     if (parsed === null) {
         return name.toUpperCase();
     }
     const { index, accidental } = parsed;
-    if (system === "letters") {
-        const natural = LETTER_NATURAL[index] as string;
-        return accidental === 1 ? `${natural}♯` : accidental === -1 ? `${natural}♭` : natural;
-    }
     if (system !== "solfege") {
         return hName(index, accidental, system);
     }
@@ -329,22 +345,7 @@ export function openingIn(text: string, system: NoteSystem, locale: string): str
 }
 
 // The keyboard's own spelling: a black key is named from the white key below it.
-const KEY_SLUGS = [
-    "c",
-    "csharp",
-    "d",
-    "dsharp",
-    "e",
-    "f",
-    "fsharp",
-    "g",
-    "gsharp",
-    "a",
-    "asharp",
-    "b",
-];
-
-const slugOf = (midi: number) => KEY_SLUGS[((midi % 12) + 12) % 12] as string;
+const slugOf = (midi: number): string => noteNameOf(pitchClassOf(midi));
 
 // What a key prints when it is named, any octave.
 export function pitchLabelIn(midi: number, system: NoteSystem, words: NoteWords): string {
@@ -395,5 +396,5 @@ export function spokenKeyIn(midi: number, naming: Naming, words: NoteWords): str
 // The natural names of the letter systems, in scale order: the two choices a player is
 // offered for the last white key of the octave.
 export function naturalsIn(letters: "b" | "h"): readonly string[] {
-    return letters === "h" ? H_NATURAL : LETTER_NATURAL;
+    return letters === "h" ? H_NATURAL : LETTERS;
 }

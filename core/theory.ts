@@ -30,32 +30,36 @@ export function pitchClassOf(midi: number): PitchClass {
 // spelled either way and the caller picks.
 export type Spelling = "sharp" | "flat";
 
-export type NoteNameId =
-    | "c"
-    | "c-sharp"
-    | "d-flat"
-    | "d"
-    | "d-sharp"
-    | "e-flat"
-    | "e"
-    | "f"
-    | "f-sharp"
-    | "g-flat"
-    | "g"
-    | "g-sharp"
-    | "a-flat"
-    | "a"
-    | "a-sharp"
-    | "b-flat"
-    | "b"
-    // The four names no pitch ever canonicalises to, because a pitch is spelled by the
-    // simplest name that fits it. A KEY SIGNATURE is not: the order of sharps runs
-    // F C G D A E B and the sixth of them is E sharp, whatever pitch it sounds. Without
-    // these a signature at the circle's cut has to print the wrong letter.
-    | "e-sharp"
-    | "b-sharp"
-    | "c-flat"
-    | "f-flat";
+// Every name a note can be spelled with. The last four are names no pitch ever
+// canonicalises to, because a pitch is spelled by the simplest name that fits it. A KEY
+// SIGNATURE is not: the order of sharps runs F C G D A E B and the sixth of them is E
+// sharp, whatever pitch it sounds. Without these a signature at the circle's cut has to
+// print the wrong letter.
+export const NOTE_NAME_IDS = [
+    "c",
+    "c-sharp",
+    "d-flat",
+    "d",
+    "d-sharp",
+    "e-flat",
+    "e",
+    "f",
+    "f-sharp",
+    "g-flat",
+    "g",
+    "g-sharp",
+    "a-flat",
+    "a",
+    "a-sharp",
+    "b-flat",
+    "b",
+    "e-sharp",
+    "b-sharp",
+    "c-flat",
+    "f-flat",
+] as const;
+
+export type NoteNameId = (typeof NOTE_NAME_IDS)[number];
 
 const SHARP_NAMES: NoteNameId[] = [
     "c",
@@ -86,36 +90,6 @@ const FLAT_NAMES: NoteNameId[] = [
     "b-flat",
     "b",
 ];
-
-// How each note name is written in English letters — one of the naming systems
-// core/noteNaming chooses between, and the one a chord symbol or a picture drawn with no
-// reader in mind falls back on. What a player reads is named by core/noteNaming, which
-// may say H or ré instead. Both spellings of a black key are here because a key
-// signature has to be able to say D flat rather than C sharp — the key of D flat
-// contains no C sharp.
-export const NOTE_TEXT: Record<NoteNameId, string> = {
-    c: "C",
-    "c-sharp": "C♯",
-    "d-flat": "D♭",
-    d: "D",
-    "d-sharp": "D♯",
-    "e-flat": "E♭",
-    e: "E",
-    f: "F",
-    "f-sharp": "F♯",
-    "g-flat": "G♭",
-    g: "G",
-    "g-sharp": "G♯",
-    "a-flat": "A♭",
-    a: "A",
-    "a-sharp": "A♯",
-    "b-flat": "B♭",
-    b: "B",
-    "e-sharp": "E♯",
-    "b-sharp": "B♯",
-    "c-flat": "C♭",
-    "f-flat": "F♭",
-};
 
 export function noteNameOf(pitchClass: PitchClass, spelling: Spelling = "sharp"): NoteNameId {
     const names = spelling === "flat" ? FLAT_NAMES : SHARP_NAMES;
