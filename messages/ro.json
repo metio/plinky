@@ -279,8 +279,22 @@
     "today_greeting_afternoon": "{day} după-amiaza",
     "today_greeting_evening": "{day} seara",
     "today_greeting_night": "{day} noaptea",
-    "today_stand_one": "{count} piesă pe pupitru",
-    "today_stand_other": "{count} piese pe pupitru",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} piesă pe pupitru",
+                "countPlural=few": "{count} piese pe pupitru",
+                "countPlural=other": "{count} de piese pe pupitru"
+            }
+        }
+    ],
     "arcade_title": "Arcade citire la prima vedere",
     "surprise_me": "Surprinde-mă",
     "recap_best_day": [
@@ -1032,8 +1046,38 @@
     "achievement_star": "Prima stea de {tier}",
     "achievement_first_s": "Prima notă S",
     "achievement_flawless": "O execuție fără greșeală",
-    "achievement_days": "{count} zile de cântat",
-    "achievement_notes": "{count} note cântate",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} zi de cântat",
+                "countPlural=few": "{count} zile de cântat",
+                "countPlural=other": "{count} de zile de cântat"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} notă cântată",
+                "countPlural=few": "{count} note cântate",
+                "countPlural=other": "{count} de note cântate"
+            }
+        }
+    ],
     "achievement_earned": "Câștigat",
     "achievement_locked": "Încă necâștigat",
     "mic_heading": "Cântă la un pian adevărat",

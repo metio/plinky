@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day} délután",
     "today_greeting_evening": "{day} este",
     "today_greeting_night": "{day} éjjel",
-    "today_stand_one": "{count} darab a kottatartón",
-    "today_stand_other": "{count} darab a kottatartón",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} darab a kottatartón",
+                "countPlural=other": "{count} darab a kottatartón"
+            }
+        }
+    ],
     "arcade_title": "Lapról olvasás arcade",
     "surprise_me": "Lepj meg",
     "recap_best_day": [
@@ -1024,8 +1037,36 @@
     "achievement_star": "Első {tier} csillag",
     "achievement_first_s": "Első S osztályzat",
     "achievement_flawless": "Hibátlan lejátszás",
-    "achievement_days": "{count} nap játék",
-    "achievement_notes": "{count} lejátszott hang",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nap játék",
+                "countPlural=other": "{count} nap játék"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} lejátszott hang",
+                "countPlural=other": "{count} lejátszott hang"
+            }
+        }
+    ],
     "achievement_earned": "Megszerezve",
     "achievement_locked": "Még nincs megszerezve",
     "mic_heading": "Játssz igazi zongorán",

@@ -110,6 +110,11 @@ describe("every plural message in every locale", () => {
         expect(m.progress_notes({ count: 101 }, { locale: "ro" })).toBe("101 note");
     });
 
+    it("counts a hundred days of playing with Romanian's 'de'", () => {
+        expect(m.achievement_days({ count: 100 }, { locale: "ro" })).toBe("100 de zile de cântat");
+        expect(m.achievement_days({ count: 10 }, { locale: "ro" })).toBe("10 zile de cântat");
+    });
+
     it("tells Czech two from five", () => {
         expect(m.scores_count({ count: 2 }, { locale: "cs" })).toBe("2 skladby");
         expect(m.scores_count({ count: 5 }, { locale: "cs" })).toBe("5 skladeb");

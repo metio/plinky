@@ -280,8 +280,23 @@
     "today_greeting_afternoon": "{day} удень",
     "today_greeting_evening": "{day} увечері",
     "today_greeting_night": "{day} уночі",
-    "today_stand_one": "{count} п’єса на пюпітрі",
-    "today_stand_other": "{count} п’єс на пюпітрі",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} п’єса на пюпітрі",
+                "countPlural=few": "{count} п’єси на пюпітрі",
+                "countPlural=many": "{count} п’єс на пюпітрі",
+                "countPlural=other": "{count} п’єс на пюпітрі"
+            }
+        }
+    ],
     "arcade_title": "Аркада читання з листа",
     "surprise_me": "Здивуй мене",
     "recap_best_day": [
@@ -1041,8 +1056,40 @@
     "achievement_star": "Перша зірка ({tier})",
     "achievement_first_s": "Перша оцінка S",
     "achievement_flawless": "Бездоганне виконання",
-    "achievement_days": "{count} днів гри",
-    "achievement_notes": "{count} зіграних нот",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} день гри",
+                "countPlural=few": "{count} дні гри",
+                "countPlural=many": "{count} днів гри",
+                "countPlural=other": "{count} днів гри"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} зіграна нота",
+                "countPlural=few": "{count} зіграні ноти",
+                "countPlural=many": "{count} зіграних нот",
+                "countPlural=other": "{count} зіграних нот"
+            }
+        }
+    ],
     "achievement_earned": "Здобуто",
     "achievement_locked": "Ще не здобуто",
     "mic_heading": "Грай на справжньому піаніно",

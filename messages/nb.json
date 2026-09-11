@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day} ettermiddag",
     "today_greeting_evening": "{day} kveld",
     "today_greeting_night": "{day} natt",
-    "today_stand_one": "{count} stykke på notestativet",
-    "today_stand_other": "{count} stykker på notestativet",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stykke på notestativet",
+                "countPlural=other": "{count} stykker på notestativet"
+            }
+        }
+    ],
     "arcade_title": "Bladlesing-arkade",
     "surprise_me": "Overrask meg",
     "recap_best_day": [
@@ -1025,8 +1038,36 @@
     "achievement_star": "Første {tier}-stjerne",
     "achievement_first_s": "Første S-karakter",
     "achievement_flawless": "En feilfri runde",
-    "achievement_days": "{count} dager med spilling",
-    "achievement_notes": "{count} toner spilt",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} dag med spilling",
+                "countPlural=other": "{count} dager med spilling"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} tone spilt",
+                "countPlural=other": "{count} toner spilt"
+            }
+        }
+    ],
     "achievement_earned": "Opptjent",
     "achievement_locked": "Ikke opptjent ennå",
     "mic_heading": "Spill på et ekte piano",

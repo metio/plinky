@@ -280,8 +280,23 @@
     "today_greeting_afternoon": "{day} днём",
     "today_greeting_evening": "{day} вечером",
     "today_greeting_night": "{day} ночью",
-    "today_stand_one": "{count} пьеса на пюпитре",
-    "today_stand_other": "{count} пьес на пюпитре",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} пьеса на пюпитре",
+                "countPlural=few": "{count} пьесы на пюпитре",
+                "countPlural=many": "{count} пьес на пюпитре",
+                "countPlural=other": "{count} пьес на пюпитре"
+            }
+        }
+    ],
     "arcade_title": "Аркада чтения с листа",
     "surprise_me": "Удиви меня",
     "recap_best_day": [
@@ -1040,8 +1055,40 @@
     "achievement_star": "Первая звезда ({tier})",
     "achievement_first_s": "Первая оценка S",
     "achievement_flawless": "Безошибочное исполнение",
-    "achievement_days": "{count} дней игры",
-    "achievement_notes": "{count} сыгранных нот",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} день игры",
+                "countPlural=few": "{count} дня игры",
+                "countPlural=many": "{count} дней игры",
+                "countPlural=other": "{count} дней игры"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} сыгранная нота",
+                "countPlural=few": "{count} сыгранные ноты",
+                "countPlural=many": "{count} сыгранных нот",
+                "countPlural=other": "{count} сыгранных нот"
+            }
+        }
+    ],
     "achievement_earned": "Получено",
     "achievement_locked": "Ещё не получено",
     "mic_heading": "Играй на настоящем пианино",

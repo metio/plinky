@@ -279,8 +279,22 @@
     "today_greeting_afternoon": "{day} popodne",
     "today_greeting_evening": "{day} navečer",
     "today_greeting_night": "{day} noću",
-    "today_stand_one": "{count} skladba na notnom pultu",
-    "today_stand_other": "{count} skladbi na notnom pultu",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba na notnom pultu",
+                "countPlural=few": "{count} skladbe na notnom pultu",
+                "countPlural=other": "{count} skladbi na notnom pultu"
+            }
+        }
+    ],
     "arcade_title": "Arkada čitanja s lista",
     "surprise_me": "Iznenadi me",
     "recap_best_day": [
@@ -1033,8 +1047,38 @@
     "achievement_star": "Prva {tier} zvjezdica",
     "achievement_first_s": "Prva ocjena S",
     "achievement_flawless": "Izvedba bez greške",
-    "achievement_days": "{count} dana sviranja",
-    "achievement_notes": "{count} odsviranih nota",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} dan sviranja",
+                "countPlural=few": "{count} dana sviranja",
+                "countPlural=other": "{count} dana sviranja"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} odsvirana nota",
+                "countPlural=few": "{count} odsvirane note",
+                "countPlural=other": "{count} odsviranih nota"
+            }
+        }
+    ],
     "achievement_earned": "Zarađeno",
     "achievement_locked": "Još nije zarađeno",
     "mic_heading": "Sviraj na pravom klaviru",

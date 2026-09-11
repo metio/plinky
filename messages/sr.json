@@ -279,8 +279,22 @@
     "today_greeting_afternoon": "{day} поподне",
     "today_greeting_evening": "{day} увече",
     "today_greeting_night": "{day} ноћу",
-    "today_stand_one": "{count} комад на нотном пулту",
-    "today_stand_other": "{count} комада на нотном пулту",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} комад на нотном пулту",
+                "countPlural=few": "{count} комада на нотном пулту",
+                "countPlural=other": "{count} комада на нотном пулту"
+            }
+        }
+    ],
     "arcade_title": "Аркада читања с листа",
     "surprise_me": "Изненади ме",
     "recap_best_day": [
@@ -1032,8 +1046,38 @@
     "achievement_star": "Прва {tier} звездица",
     "achievement_first_s": "Прва оцена S",
     "achievement_flawless": "Изведба без грешке",
-    "achievement_days": "{count} дана свирања",
-    "achievement_notes": "{count} одсвираних нота",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} дан свирања",
+                "countPlural=few": "{count} дана свирања",
+                "countPlural=other": "{count} дана свирања"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} одсвирана нота",
+                "countPlural=few": "{count} одсвиране ноте",
+                "countPlural=other": "{count} одсвираних нота"
+            }
+        }
+    ],
     "achievement_earned": "Зарађено",
     "achievement_locked": "Још није зарађено",
     "mic_heading": "Свирај на правом клавиру",

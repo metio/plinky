@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day} eftermiddag",
     "today_greeting_evening": "{day} aften",
     "today_greeting_night": "{day} nat",
-    "today_stand_one": "{count} stykke på nodestativet",
-    "today_stand_other": "{count} stykker på nodestativet",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stykke på nodestativet",
+                "countPlural=other": "{count} stykker på nodestativet"
+            }
+        }
+    ],
     "arcade_title": "Bladlæsnings-arkade",
     "surprise_me": "Overrask mig",
     "recap_best_day": [
@@ -1025,8 +1038,36 @@
     "achievement_star": "Første {tier}-stjerne",
     "achievement_first_s": "Første S-karakter",
     "achievement_flawless": "En fejlfri gennemspilning",
-    "achievement_days": "{count} dages spil",
-    "achievement_notes": "{count} noder spillet",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} dags spil",
+                "countPlural=other": "{count} dages spil"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} node spillet",
+                "countPlural=other": "{count} noder spillet"
+            }
+        }
+    ],
     "achievement_earned": "Optjent",
     "achievement_locked": "Ikke optjent endnu",
     "mic_heading": "Spil på et rigtigt klaver",

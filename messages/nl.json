@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day}middag",
     "today_greeting_evening": "{day}avond",
     "today_greeting_night": "{day}nacht",
-    "today_stand_one": "{count} stuk op de lessenaar",
-    "today_stand_other": "{count} stukken op de lessenaar",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stuk op de lessenaar",
+                "countPlural=other": "{count} stukken op de lessenaar"
+            }
+        }
+    ],
     "arcade_title": "Van-blad-arcade",
     "surprise_me": "Verras me",
     "recap_best_day": [
@@ -1025,8 +1038,36 @@
     "achievement_star": "Eerste {tier} ster",
     "achievement_first_s": "Eerste S-beoordeling",
     "achievement_flawless": "Een foutloze run",
-    "achievement_days": "{count} dagen gespeeld",
-    "achievement_notes": "{count} noten gespeeld",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} dag gespeeld",
+                "countPlural=other": "{count} dagen gespeeld"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} noot gespeeld",
+                "countPlural=other": "{count} noten gespeeld"
+            }
+        }
+    ],
     "achievement_earned": "Verdiend",
     "achievement_locked": "Nog niet verdiend",
     "mic_heading": "Speel op een echte piano",

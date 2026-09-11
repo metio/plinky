@@ -275,8 +275,7 @@ const STANDING_PART: Record<StandingPart, (standing: Standing) => string> = {
     grade: ({ level }) => m.grade_label({ level }),
     "not-graded": () => m.grades_not_started(),
     skill: ({ skill }) => m.grades_skill({ rating: skill }),
-    stand: ({ onStand }) =>
-        onStand === 1 ? m.today_stand_one({ count: 1 }) : m.today_stand_other({ count: onStand }),
+    stand: ({ onStand }) => m.today_stand({ count: onStand }),
     notes: ({ notes }) => m.achievement_notes({ count: notes }),
 };
 

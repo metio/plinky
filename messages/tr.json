@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day} öğleden sonra",
     "today_greeting_evening": "{day} akşamı",
     "today_greeting_night": "{day} gecesi",
-    "today_stand_one": "{count} parça nota sehpasında",
-    "today_stand_other": "{count} parça nota sehpasında",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} parça nota sehpasında",
+                "countPlural=other": "{count} parça nota sehpasında"
+            }
+        }
+    ],
     "arcade_title": "Deşifre arcade",
     "surprise_me": "Beni şaşırt",
     "recap_best_day": [
@@ -1024,8 +1037,36 @@
     "achievement_star": "İlk {tier} yıldız",
     "achievement_first_s": "İlk S notu",
     "achievement_flawless": "Hatasız bir çalış",
-    "achievement_days": "{count} gün çalma",
-    "achievement_notes": "{count} nota çalındı",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} gün çalma",
+                "countPlural=other": "{count} gün çalma"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota çalındı",
+                "countPlural=other": "{count} nota çalındı"
+            }
+        }
+    ],
     "achievement_earned": "Kazanıldı",
     "achievement_locked": "Henüz kazanılmadı",
     "mic_heading": "Gerçek bir piyanoda çal",

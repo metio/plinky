@@ -13,6 +13,8 @@ import { m } from "../../paraglide/messages.js";
 import { advanceScheduler } from "../../testing/advanceScheduler";
 import { fakeScheduler } from "../../testing/fakeScheduler";
 import { fakeMidi } from "../../adapters/fakeMidi";
+import { memoryStore } from "../../adapters/memoryStore";
+import { createHistoryStore } from "../../stores/historyStore";
 import { MidiProvider } from "../../contexts/midi";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { HomeToday } from "./homeToday";
@@ -182,6 +184,17 @@ describe("HomeToday", () => {
         catalogueMock.mockResolvedValue([]);
         mount();
         expect(await screen.findByText("Refresh 1 piece")).toBeTruthy();
+        // The same piece is the one learned piece on the stand.
+        expect(await screen.findByText(/\b1 piece on the stand\b/)).toBeTruthy();
+    });
+
+    it("counts a single note played before any grade as one note", async () => {
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([]);
+        const store = memoryStore();
+        createHistoryStore(store).record(1);
+        mount({ store });
+        expect(await screen.findByText(/\b1 note played\b/)).toBeTruthy();
     });
 
     it("returns to the gentlest suggestion once the starter is finished", async () => {

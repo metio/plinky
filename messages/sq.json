@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day} pasdite",
     "today_greeting_evening": "{day} në mbrëmje",
     "today_greeting_night": "{day} natën",
-    "today_stand_one": "{count} pjesë te mbajtësja e notave",
-    "today_stand_other": "{count} pjesë te mbajtësja e notave",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} pjesë te mbajtësja e notave",
+                "countPlural=other": "{count} pjesë te mbajtësja e notave"
+            }
+        }
+    ],
     "arcade_title": "Arkadë leximi në shikim",
     "surprise_me": "Më surprizo",
     "recap_best_day": [
@@ -1024,8 +1037,36 @@
     "achievement_star": "Ylli i parë {tier}",
     "achievement_first_s": "Nota e parë S",
     "achievement_flawless": "Një luajtje pa gabime",
-    "achievement_days": "{count} ditë duke luajtur",
-    "achievement_notes": "{count} nota të luajtura",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ditë duke luajtur",
+                "countPlural=other": "{count} ditë duke luajtur"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} notë e luajtur",
+                "countPlural=other": "{count} nota të luajtura"
+            }
+        }
+    ],
     "achievement_earned": "E fituar",
     "achievement_locked": "Ende e pafituar",
     "mic_heading": "Luaj në një piano të vërtetë",

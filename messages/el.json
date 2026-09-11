@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day} απόγευμα",
     "today_greeting_evening": "{day} βράδυ",
     "today_greeting_night": "{day} νύχτα",
-    "today_stand_one": "{count} κομμάτι στο αναλόγιο",
-    "today_stand_other": "{count} κομμάτια στο αναλόγιο",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} κομμάτι στο αναλόγιο",
+                "countPlural=other": "{count} κομμάτια στο αναλόγιο"
+            }
+        }
+    ],
     "arcade_title": "Αρκέιντ ανάγνωσης",
     "surprise_me": "Έκπληξέ με",
     "recap_best_day": [
@@ -1025,8 +1038,36 @@
     "achievement_star": "Πρώτο {tier} αστέρι",
     "achievement_first_s": "Πρώτος βαθμός S",
     "achievement_flawless": "Μια άψογη εκτέλεση",
-    "achievement_days": "{count} μέρες παιξίματος",
-    "achievement_notes": "{count} νότες παιγμένες",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} μέρα παιξίματος",
+                "countPlural=other": "{count} μέρες παιξίματος"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} νότα παιγμένη",
+                "countPlural=other": "{count} νότες παιγμένες"
+            }
+        }
+    ],
     "achievement_earned": "Κερδισμένο",
     "achievement_locked": "Όχι ακόμα",
     "mic_heading": "Παίξε σε αληθινό πιάνο",

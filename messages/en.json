@@ -411,8 +411,21 @@
     "today_greeting_afternoon": "{day} afternoon",
     "today_greeting_evening": "{day} evening",
     "today_greeting_night": "{day} night",
-    "today_stand_one": "{count} piece on the stand",
-    "today_stand_other": "{count} pieces on the stand",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} piece on the stand",
+                "countPlural=other": "{count} pieces on the stand"
+            }
+        }
+    ],
     "arcade_title": "Sight-reading arcade",
     "surprise_me": "Surprise me",
     "recap_best_day": [
@@ -1035,8 +1048,36 @@
     "achievement_star": "First {tier} star",
     "achievement_first_s": "First S grade",
     "achievement_flawless": "A flawless run",
-    "achievement_days": "{count} days of playing",
-    "achievement_notes": "{count} notes played",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} day of playing",
+                "countPlural=other": "{count} days of playing"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} note played",
+                "countPlural=other": "{count} notes played"
+            }
+        }
+    ],
     "achievement_earned": "Earned",
     "achievement_locked": "Not earned yet",
     "mic_heading": "Play on a real piano",

@@ -279,8 +279,22 @@
     "today_greeting_afternoon": "{day} à tarde",
     "today_greeting_evening": "{day} à noite",
     "today_greeting_night": "{day} de madrugada",
-    "today_stand_one": "{count} peça na estante",
-    "today_stand_other": "{count} peças na estante",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} peça na estante",
+                "countPlural=many": "{count} peças na estante",
+                "countPlural=other": "{count} peças na estante"
+            }
+        }
+    ],
     "arcade_title": "Arcade de leitura",
     "surprise_me": "Surpreende-me",
     "recap_best_day": [
@@ -1033,8 +1047,38 @@
     "achievement_star": "Primeira estrela {tier}",
     "achievement_first_s": "Primeira nota S",
     "achievement_flawless": "Uma execução perfeita",
-    "achievement_days": "{count} dias de prática",
-    "achievement_notes": "{count} notas tocadas",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} dia de prática",
+                "countPlural=many": "{count} dias de prática",
+                "countPlural=other": "{count} dias de prática"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota tocada",
+                "countPlural=many": "{count} notas tocadas",
+                "countPlural=other": "{count} notas tocadas"
+            }
+        }
+    ],
     "achievement_earned": "Conquistado",
     "achievement_locked": "Ainda não conquistado",
     "mic_heading": "Toque num piano de verdade",

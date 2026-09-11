@@ -280,8 +280,23 @@
     "today_greeting_afternoon": "{day} po południu",
     "today_greeting_evening": "{day} wieczorem",
     "today_greeting_night": "{day} nocą",
-    "today_stand_one": "{count} utwór na pulpicie",
-    "today_stand_other": "{count} utworów na pulpicie",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} utwór na pulpicie",
+                "countPlural=few": "{count} utwory na pulpicie",
+                "countPlural=many": "{count} utworów na pulpicie",
+                "countPlural=other": "{count} utworów na pulpicie"
+            }
+        }
+    ],
     "arcade_title": "Arkada czytania nut",
     "surprise_me": "Zaskocz mnie",
     "recap_best_day": [
@@ -1041,8 +1056,40 @@
     "achievement_star": "Pierwsza {tier} gwiazdka",
     "achievement_first_s": "Pierwsza ocena S",
     "achievement_flawless": "Bezbłędne wykonanie",
-    "achievement_days": "{count} dni grania",
-    "achievement_notes": "{count} zagranych nut",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} dzień grania",
+                "countPlural=few": "{count} dni grania",
+                "countPlural=many": "{count} dni grania",
+                "countPlural=other": "{count} dni grania"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} zagrana nuta",
+                "countPlural=few": "{count} zagrane nuty",
+                "countPlural=many": "{count} zagranych nut",
+                "countPlural=other": "{count} zagranych nut"
+            }
+        }
+    ],
     "achievement_earned": "Zdobyte",
     "achievement_locked": "Jeszcze nie zdobyte",
     "mic_heading": "Graj na prawdziwym pianinie",

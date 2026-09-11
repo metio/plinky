@@ -158,7 +158,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: '**Every count in Plinky agrees with its number.** In Portuguese, a search with no\nmatches found "0 partitura", as though nothing were one score. Zero now takes the\nplural there, as it does in the Portuguese of Portugal.',
+                body: '**Every count in Plinky agrees with its number.** With one learned piece, the home\npage said "1 pieces on the stand", and your very first note was "1 notes played".\nEach now reads the way you would say it, in every language Plinky speaks, with the\nthird and fourth forms Polish, Czech, Russian and their neighbours use for two, five\nor twenty-one. In Portuguese, a search with no matches found "0 partitura", as though\nnothing were one score; zero now takes the plural there, as it does in Portugal.',
                 twip: true,
             },
             {

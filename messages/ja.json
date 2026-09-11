@@ -277,8 +277,20 @@
     "today_greeting_afternoon": "{day}の午後",
     "today_greeting_evening": "{day}の夜",
     "today_greeting_night": "{day}の深夜",
-    "today_stand_one": "譜面台に {count} 曲",
-    "today_stand_other": "譜面台に {count} 曲",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "譜面台に {count} 曲"
+            }
+        }
+    ],
     "arcade_title": "初見演奏アーケード",
     "surprise_me": "おまかせ",
     "recap_best_day": [
@@ -1016,8 +1028,34 @@
     "achievement_star": "はじめての{tier}スター",
     "achievement_first_s": "はじめてのSランク",
     "achievement_flawless": "ノーミスでえんそう",
-    "achievement_days": "{count}日あそんだ",
-    "achievement_notes": "{count}この音をひいた",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}日あそんだ"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}この音をひいた"
+            }
+        }
+    ],
     "achievement_earned": "かくとく",
     "achievement_locked": "まだこれから",
     "mic_heading": "本物のピアノでひこう",

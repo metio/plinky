@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day}nachmittag",
     "today_greeting_evening": "{day}abend",
     "today_greeting_night": "{day}nacht",
-    "today_stand_one": "{count} Stück auf dem Notenpult",
-    "today_stand_other": "{count} Stücke auf dem Notenpult",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Stück auf dem Notenpult",
+                "countPlural=other": "{count} Stücke auf dem Notenpult"
+            }
+        }
+    ],
     "arcade_title": "Blattspiel-Arcade",
     "surprise_me": "Überrasch mich",
     "recap_best_day": [
@@ -1025,8 +1038,36 @@
     "achievement_star": "Erster {tier}-Stern",
     "achievement_first_s": "Erste S-Note",
     "achievement_flawless": "Ein fehlerfreier Durchlauf",
-    "achievement_days": "{count} Tage gespielt",
-    "achievement_notes": "{count} Noten gespielt",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Tag gespielt",
+                "countPlural=other": "{count} Tage gespielt"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Note gespielt",
+                "countPlural=other": "{count} Noten gespielt"
+            }
+        }
+    ],
     "achievement_earned": "Verdient",
     "achievement_locked": "Noch nicht verdient",
     "mic_heading": "Auf einem echten Klavier spielen",

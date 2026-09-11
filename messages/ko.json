@@ -277,8 +277,20 @@
     "today_greeting_afternoon": "{day} 오후",
     "today_greeting_evening": "{day} 저녁",
     "today_greeting_night": "{day} 밤",
-    "today_stand_one": "보면대 위에 {count}곡",
-    "today_stand_other": "보면대 위에 {count}곡",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "보면대 위에 {count}곡"
+            }
+        }
+    ],
     "arcade_title": "초견 아케이드",
     "surprise_me": "무작위 선곡",
     "recap_best_day": [
@@ -1016,8 +1028,34 @@
     "achievement_star": "첫 {tier} 별",
     "achievement_first_s": "첫 S 등급",
     "achievement_flawless": "실수 없는 연주",
-    "achievement_days": "{count}일 동안 연주",
-    "achievement_notes": "음표 {count}개 연주",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}일 동안 연주"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "음표 {count}개 연주"
+            }
+        }
+    ],
     "achievement_earned": "획득함",
     "achievement_locked": "아직 획득 전",
     "mic_heading": "진짜 피아노로 연주하기",

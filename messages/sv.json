@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day} eftermiddag",
     "today_greeting_evening": "{day} kväll",
     "today_greeting_night": "{day} natt",
-    "today_stand_one": "{count} stycke på notstället",
-    "today_stand_other": "{count} stycken på notstället",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stycke på notstället",
+                "countPlural=other": "{count} stycken på notstället"
+            }
+        }
+    ],
     "arcade_title": "Notläsnings-arkad",
     "surprise_me": "Överraska mig",
     "recap_best_day": [
@@ -1025,8 +1038,36 @@
     "achievement_star": "Första {tier}-stjärnan",
     "achievement_first_s": "Första S-betyget",
     "achievement_flawless": "En felfri runda",
-    "achievement_days": "{count} dagars spelande",
-    "achievement_notes": "{count} spelade toner",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} dags spelande",
+                "countPlural=other": "{count} dagars spelande"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} spelad ton",
+                "countPlural=other": "{count} spelade toner"
+            }
+        }
+    ],
     "achievement_earned": "Förtjänad",
     "achievement_locked": "Inte förtjänad än",
     "mic_heading": "Spela på ett riktigt piano",

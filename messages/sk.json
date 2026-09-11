@@ -280,8 +280,23 @@
     "today_greeting_afternoon": "{day} popoludní",
     "today_greeting_evening": "{day} večer",
     "today_greeting_night": "{day} v noci",
-    "today_stand_one": "{count} skladba na notovom pulte",
-    "today_stand_other": "{count} skladieb na notovom pulte",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba na notovom pulte",
+                "countPlural=few": "{count} skladby na notovom pulte",
+                "countPlural=many": "{count} skladby na notovom pulte",
+                "countPlural=other": "{count} skladieb na notovom pulte"
+            }
+        }
+    ],
     "arcade_title": "Arkáda čítania z listu",
     "surprise_me": "Prekvap ma",
     "recap_best_day": [
@@ -1040,8 +1055,40 @@
     "achievement_star": "Prvá {tier} hviezda",
     "achievement_first_s": "Prvá známka S",
     "achievement_flawless": "Bezchybné zahranie",
-    "achievement_days": "{count} dní hrania",
-    "achievement_notes": "{count} zahraných nôt",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} deň hrania",
+                "countPlural=few": "{count} dni hrania",
+                "countPlural=many": "{count} dňa hrania",
+                "countPlural=other": "{count} dní hrania"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} zahraná nota",
+                "countPlural=few": "{count} zahrané noty",
+                "countPlural=many": "{count} zahrané noty",
+                "countPlural=other": "{count} zahraných nôt"
+            }
+        }
+    ],
     "achievement_earned": "Získané",
     "achievement_locked": "Zatiaľ nezískané",
     "mic_heading": "Hraj na skutočnom klavíri",

@@ -278,8 +278,21 @@
     "today_greeting_afternoon": "{day}-iltapäivä",
     "today_greeting_evening": "{day}-ilta",
     "today_greeting_night": "{day}yö",
-    "today_stand_one": "{count} kappale nuottitelineellä",
-    "today_stand_other": "{count} kappaletta nuottitelineellä",
+    "today_stand": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kappale nuottitelineellä",
+                "countPlural=other": "{count} kappaletta nuottitelineellä"
+            }
+        }
+    ],
     "arcade_title": "Prima vista -arcade",
     "surprise_me": "Yllätä minut",
     "recap_best_day": [
@@ -1025,8 +1038,36 @@
     "achievement_star": "Ensimmäinen {tier}tähti",
     "achievement_first_s": "Ensimmäinen S-arvosana",
     "achievement_flawless": "Virheetön suoritus",
-    "achievement_days": "{count} päivää soittoa",
-    "achievement_notes": "{count} soitettua nuottia",
+    "achievement_days": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} päivä soittoa",
+                "countPlural=other": "{count} päivää soittoa"
+            }
+        }
+    ],
+    "achievement_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} soitettu nuotti",
+                "countPlural=other": "{count} soitettua nuottia"
+            }
+        }
+    ],
     "achievement_earned": "Ansaittu",
     "achievement_locked": "Ei vielä ansaittu",
     "mic_heading": "Soita oikealla pianolla",
