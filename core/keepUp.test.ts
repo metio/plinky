@@ -127,6 +127,29 @@ describe("the beat's window", () => {
         expect(settleKeepUp(closed.state).state.hits).toEqual([true, false]);
     });
 
+    it("leaves a later, short beat open when a settle queued for the beat before it arrives", () => {
+        // A beat closes at 1500 and queues its settle for 1600. A 40 ms grace opens and
+        // closes at 1540, which settles the first beat and opens the grace's own window
+        // to 1640. The first beat's settle then arrives at 1600, inside the grace's window.
+        let state = openKeepUpStep(startKeepUp(), [60], timing);
+        state = strikeKeepUp(state, 60, 1010).state;
+        state = closeKeepUpStep(state, 1500).state;
+        const first = state.closing?.beat;
+        state = openKeepUpStep(state, [62], { at: 1500, dwellMs: 40, next: [64] });
+        state = closeKeepUpStep(state, 1540).state;
+        const grace = state.closing?.beat;
+        expect(grace).not.toBe(first);
+        const stale = settleKeepUp(state, first);
+        expect(stale.hit).toBeNull();
+        expect(stale.state).toBe(state);
+        // The grace struck 80 ms late, inside its window, still counts.
+        const late = strikeKeepUp(stale.state, 62, 1620);
+        expect(late.expected).toBe(true);
+        const settled = settleKeepUp(late.state, grace);
+        expect(settled.hit).toBe(true);
+        expect(settled.state.hits).toEqual([true, true]);
+    });
+
     it("gives a repeated pitch to the beat still owed it, then to the open one", () => {
         let state = openKeepUpStep(startKeepUp(), [60], { at: 1000, dwellMs: 500, next: [60] });
         state = closeKeepUpStep(state, 1500).state;
@@ -246,6 +269,46 @@ describe("keep-up reducer properties", () => {
                 const twice = playStep(startKeepUp(), expected, [...expected, ...expected]);
                 expect(twice.state.hits).toEqual(once.state.hits);
             }),
+        );
+    });
+
+    it("a settle keyed to one beat settles that beat and never another", () => {
+        // However the beats run — short or long, owed or not — a settle names the beat it
+        // was queued for, and a late strike inside the beat now closing always lands.
+        fc.assert(
+            fc.property(
+                fc.array(fc.tuple(pitches, fc.integer({ min: 10, max: 400 })), {
+                    minLength: 1,
+                    maxLength: 10,
+                }),
+                fc.integer({ min: 0, max: KEEP_UP_LATE_MS }),
+                (beats, lateBy) => {
+                    let state = startKeepUp();
+                    let at = 1000;
+                    const queued: number[] = [];
+                    for (const [expected, dwellMs] of beats) {
+                        state = openKeepUpStep(state, expected, { at, dwellMs, next: [] });
+                        at += dwellMs;
+                        state = closeKeepUpStep(state, at).state;
+                        if (state.closing !== null) {
+                            queued.push(state.closing.beat);
+                        }
+                    }
+                    const { closing } = state;
+                    for (const beat of queued) {
+                        if (beat !== closing?.beat) {
+                            expect(settleKeepUp(state, beat).state).toBe(state);
+                        }
+                    }
+                    if (closing !== null) {
+                        const [note] = closing.expected;
+                        const late = strikeKeepUp(state, note as number, at + lateBy);
+                        expect(late.expected).toBe(true);
+                        const settled = settleKeepUp(late.state, closing.beat);
+                        expect(settled.state.hits).toHaveLength(closing.beat + 1);
+                    }
+                },
+            ),
         );
     });
 

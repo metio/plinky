@@ -358,6 +358,50 @@ describe("useKeepUp", () => {
         expect(result.current.result).toMatchObject({ inTime: 2, total: 3 });
     });
 
+    it("keeps a short grace open for its whole late window, whatever the beat before queued", () => {
+        // The beat before the grace closes and queues its settle a window later. The grace
+        // dwells only 40 ms, so by then it has closed too, and its own window runs on past
+        // that settle. A grace struck 80 ms late is inside its window and must count.
+        const osmd = fakeOsmd([
+            [{ midi: 60, staff: 0, quarters: 1 }],
+            [
+                { midi: 62, staff: 0, quarters: 0.0625, grace: true },
+                { midi: 64, staff: 0, quarters: 1 },
+            ],
+        ]);
+        const onFinish = vi.fn();
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote: () => {} },
+                tempo: () => 160,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                markPainted: () => {},
+                onFinish,
+            }),
+        );
+        const now = () => performance.now();
+        const beat = listenStepMs([1], 160);
+
+        act(() => result.current.start({ hand: "both", guideNotes: false, accompany: false }));
+        // The count-in, then the first beat opens: strike it on the beat.
+        act(() => vi.advanceTimersByTime(beat));
+        act(() => result.current.registerNote(60, now()));
+        // It closes one beat later and the grace opens; the grace closes 40 ms on and the
+        // beat it decorates opens, which is struck on time.
+        act(() => vi.advanceTimersByTime(beat + 40));
+        act(() => result.current.registerNote(64, now()));
+        // The grace, 80 ms after it closed — past the first beat's queued settle, inside
+        // the grace's own window.
+        act(() => vi.advanceTimersByTime(80));
+        act(() => result.current.registerNote(62, now()));
+        act(() => vi.advanceTimersByTime(2000));
+
+        expect(onFinish).toHaveBeenCalled();
+        expect(result.current.result).toMatchObject({ inTime: 3, total: 3 });
+    });
+
     it("hands the synth the device a strike came from, so a piano is not doubled", () => {
         const osmd = fakeOsmd([[{ midi: 60, staff: 0 }]]);
         const playNote = vi.fn();

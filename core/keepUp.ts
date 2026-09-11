@@ -33,7 +33,10 @@ export type KeepUpStep = {
 };
 
 // A beat that has closed but whose late window has not passed: strikes still count.
-type ClosingBeat = { expected: number[]; struck: number[]; until: number };
+// `beat` is the place its verdict will take in `hits`, which names the beat for a settle
+// queued while it closed: by the time that settle runs, a beat shorter than the window
+// has closed after it, and the settle must leave that one open.
+type ClosingBeat = { expected: number[]; struck: number[]; until: number; beat: number };
 
 export type KeepUpState = {
     // The open beat: what it owes, what has landed.
@@ -143,17 +146,27 @@ export function closeKeepUpStep(
     const closing: ClosingBeat | null =
         after.expected.length === 0
             ? null
-            : { expected: after.expected, struck: after.struck, until: at + KEEP_UP_LATE_MS };
+            : {
+                  expected: after.expected,
+                  struck: after.struck,
+                  until: at + KEEP_UP_LATE_MS,
+                  beat: after.hits.length,
+              };
     return {
         state: { ...after, expected: [], struck: [], closesAt: Number.POSITIVE_INFINITY, closing },
         settled: hit,
     };
 }
 
-// The late window of the last closed beat has passed: its verdict is final.
-export function settleKeepUp(state: KeepUpState): { state: KeepUpState; hit: boolean | null } {
+// The late window of the last closed beat has passed: its verdict is final. Given `beat`
+// (a closing beat's own `beat`), only that beat settles: a later beat closing in the
+// meantime is still inside its own window and stays open.
+export function settleKeepUp(
+    state: KeepUpState,
+    beat?: number,
+): { state: KeepUpState; hit: boolean | null } {
     const { closing } = state;
-    if (closing === null) {
+    if (closing === null || (beat !== undefined && closing.beat !== beat)) {
         return { state, hit: null };
     }
     const hit = complete(closing.expected, closing.struck);

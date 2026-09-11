@@ -17,6 +17,12 @@ again. Playing a sketch back in Compose did the same after Stop. The notes now f
 the moment you stop, and anything you are holding on your own keys keeps sounding. A
 piece that plays to its end still lets its last chord ring.
 
+**Keep up counts a grace note played a hair late.** A beat in Keep up stays open
+for a moment after the cursor moves on, so a note played just after it still counts.
+A very short beat, such as a grace note or a fast semiquaver, could have that moment
+cut short by the beat before it, and a note played inside it was marked as missed.
+Every beat now keeps its full moment.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

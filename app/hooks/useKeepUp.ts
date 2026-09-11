@@ -253,11 +253,12 @@ export function useKeepUp({
             litHalos(closingNotesRef.current.map((element) => ({ element, color })));
             setProgress(keepUpProgress(state));
         };
-        const settle = () => {
+        // Settle the beat still closing — or, given one, that beat only: see closeStep.
+        const settle = (beat?: number) => {
             if (!activeRef.current) {
                 return;
             }
-            const { state, hit } = settleKeepUp(stateRef.current);
+            const { state, hit } = settleKeepUp(stateRef.current, beat);
             stateRef.current = state;
             paintVerdict(hit, state);
         };
@@ -265,14 +266,18 @@ export function useKeepUp({
         // Close the open beat. It stays open to a late strike for a moment, so its
         // verdict comes with the settle scheduled here; a beat still waiting for that
         // moment when the next one closes is settled first, so verdicts stay in order.
+        // The settle is keyed to this beat: on a beat shorter than the window — a grace
+        // at 40 ms — the next beat has closed by the time it fires, and settling that one
+        // would cut its late window short and lose a strike still inside it.
         const closeStep = () => {
             const { state, settled } = closeKeepUpStep(stateRef.current, scheduler.now());
             stateRef.current = state;
             paintVerdict(settled, state);
             closingNotesRef.current = notesRef.current;
             notesRef.current = [];
-            if (state.closing !== null) {
-                chain.push(settle, KEEP_UP_LATE_MS);
+            const { closing } = state;
+            if (closing !== null) {
+                chain.push(() => settle(closing.beat), KEEP_UP_LATE_MS);
             }
         };
 
