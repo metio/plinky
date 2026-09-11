@@ -762,7 +762,21 @@
     "collect_intro": "Paste the codes you were sent and read them as a class list. Nothing is stored — close the page and it's gone.",
     "collect_paste": "Codes",
     "collect_nothing": "Nothing readable in there yet.",
-    "collect_found": "{count} reports",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} report",
+                "countPlural=other": "{count} reports"
+            }
+        }
+    ],
     "collect_csv": "Download as CSV",
     "collect_who": "Name",
     "collect_played": "Played",

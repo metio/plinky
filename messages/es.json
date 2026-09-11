@@ -639,7 +639,22 @@
     "collect_intro": "Pega los códigos que te enviaron y léelos como una lista de clase. No se guarda nada — cierras la página y desaparece.",
     "collect_paste": "Códigos",
     "collect_nothing": "Ahí todavía no hay nada legible.",
-    "collect_found": "{count} informes",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} informe",
+                "countPlural=many": "{count} informes",
+                "countPlural=other": "{count} informes"
+            }
+        }
+    ],
     "collect_csv": "Descargar como CSV",
     "collect_who": "Nombre",
     "collect_played": "Tocado",

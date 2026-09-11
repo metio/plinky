@@ -629,7 +629,21 @@
     "collect_intro": "Επικόλλησε τους κωδικούς που έλαβες και διάβασέ τους σαν κατάσταση τάξης. Τίποτα δεν αποθηκεύεται — κλείνεις τη σελίδα και χάθηκε.",
     "collect_paste": "Κωδικοί",
     "collect_nothing": "Δεν υπάρχει ακόμα κάτι αναγνώσιμο εκεί.",
-    "collect_found": "{count} αναφορές",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} αναφορά",
+                "countPlural=other": "{count} αναφορές"
+            }
+        }
+    ],
     "collect_csv": "Λήψη ως CSV",
     "collect_who": "Όνομα",
     "collect_played": "Παίχτηκαν",

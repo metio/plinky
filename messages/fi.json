@@ -629,7 +629,21 @@
     "collect_intro": "Liitä saamasi koodit ja lue ne luettelona luokasta. Mitään ei tallenneta — suljet sivun ja se on poissa.",
     "collect_paste": "Koodit",
     "collect_nothing": "Siellä ei ole vielä mitään luettavaa.",
-    "collect_found": "{count} raporttia",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} raportti",
+                "countPlural=other": "{count} raporttia"
+            }
+        }
+    ],
     "collect_csv": "Lataa CSV-tiedostona",
     "collect_who": "Nimi",
     "collect_played": "Soitettu",

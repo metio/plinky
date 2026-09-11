@@ -629,7 +629,21 @@
     "collect_intro": "Gelen kodları yapıştır ve sınıf listesi gibi oku. Hiçbir şey saklanmaz — sayfayı kapat, gitti.",
     "collect_paste": "Kodlar",
     "collect_nothing": "Orada henüz okunacak bir şey yok.",
-    "collect_found": "{count} rapor",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} rapor",
+                "countPlural=other": "{count} rapor"
+            }
+        }
+    ],
     "collect_csv": "CSV olarak indir",
     "collect_who": "Ad",
     "collect_played": "Çalınan",

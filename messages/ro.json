@@ -639,7 +639,22 @@
     "collect_intro": "Lipește codurile primite și citește-le ca pe o listă de clasă. Nu se salvează nimic — închizi pagina și s-a dus.",
     "collect_paste": "Coduri",
     "collect_nothing": "Încă nu e nimic lizibil acolo.",
-    "collect_found": "{count} rapoarte",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} raport",
+                "countPlural=few": "{count} rapoarte",
+                "countPlural=other": "{count} de rapoarte"
+            }
+        }
+    ],
     "collect_csv": "Descarcă drept CSV",
     "collect_who": "Nume",
     "collect_played": "Cântat",

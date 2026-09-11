@@ -629,7 +629,21 @@
     "collect_intro": "Klistra in koderna du fick och läs dem som en klasslista. Inget sparas — stäng sidan så är det borta.",
     "collect_paste": "Koder",
     "collect_nothing": "Inget läsbart där än.",
-    "collect_found": "{count} rapporter",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} rapport",
+                "countPlural=other": "{count} rapporter"
+            }
+        }
+    ],
     "collect_csv": "Ladda ner som CSV",
     "collect_who": "Namn",
     "collect_played": "Spelat",

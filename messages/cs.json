@@ -649,7 +649,23 @@
     "collect_intro": "Vlož kódy, které jsi dostal, a čti je jako seznam třídy. Nic se neukládá — zavřeš stránku a je to pryč.",
     "collect_paste": "Kódy",
     "collect_nothing": "Zatím tam není nic čitelného.",
-    "collect_found": "{count} hlášení",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} hlášení",
+                "countPlural=few": "{count} hlášení",
+                "countPlural=many": "{count} hlášení",
+                "countPlural=other": "{count} hlášení"
+            }
+        }
+    ],
     "collect_csv": "Stáhnout jako CSV",
     "collect_who": "Jméno",
     "collect_played": "Zahráno",

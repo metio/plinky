@@ -639,7 +639,22 @@
     "collect_intro": "Colle les codes reçus et lis-les comme une liste de classe. Rien n'est conservé — ferme la page et c'est parti.",
     "collect_paste": "Codes",
     "collect_nothing": "Rien de lisible là-dedans pour l'instant.",
-    "collect_found": "{count} retours",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} retour",
+                "countPlural=many": "{count} retours",
+                "countPlural=other": "{count} retours"
+            }
+        }
+    ],
     "collect_csv": "Télécharger en CSV",
     "collect_who": "Nom",
     "collect_played": "Joué",

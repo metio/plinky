@@ -649,7 +649,23 @@
     "collect_intro": "Вставь полученные коды и читай их как список класса. Ничего не сохраняется — закрыл страницу, и всё.",
     "collect_paste": "Коды",
     "collect_nothing": "Пока там нет ничего читаемого.",
-    "collect_found": "{count} отчётов",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} отчёт",
+                "countPlural=few": "{count} отчёта",
+                "countPlural=many": "{count} отчётов",
+                "countPlural=other": "{count} отчётов"
+            }
+        }
+    ],
     "collect_csv": "Скачать как CSV",
     "collect_who": "Имя",
     "collect_played": "Сыграно",

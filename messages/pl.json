@@ -649,7 +649,23 @@
     "collect_intro": "Wklej otrzymane kody i czytaj je jak listę klasy. Nic nie jest zapisywane — zamykasz stronę i znika.",
     "collect_paste": "Kody",
     "collect_nothing": "Nie ma tam jeszcze nic czytelnego.",
-    "collect_found": "{count} raportów",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} raport",
+                "countPlural=few": "{count} raporty",
+                "countPlural=many": "{count} raportów",
+                "countPlural=other": "{count} raportów"
+            }
+        }
+    ],
     "collect_csv": "Pobierz jako CSV",
     "collect_who": "Imię",
     "collect_played": "Zagrane",

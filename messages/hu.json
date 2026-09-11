@@ -629,7 +629,21 @@
     "collect_intro": "Illeszd be a kapott kódokat, és olvasd őket osztálylistaként. Semmi nem tárolódik — bezárod az oldalt, és nincs többé.",
     "collect_paste": "Kódok",
     "collect_nothing": "Még nincs ott semmi olvasható.",
-    "collect_found": "{count} jelentés",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} jelentés",
+                "countPlural=other": "{count} jelentés"
+            }
+        }
+    ],
     "collect_csv": "Letöltés CSV-ként",
     "collect_who": "Név",
     "collect_played": "Lejátszva",

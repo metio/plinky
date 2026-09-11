@@ -43,6 +43,14 @@ describe("Collect", () => {
         expect(screen.getByRole("rowheader", { name: "Grace" })).toBeTruthy();
     });
 
+    it("counts a single pasted report as one report", () => {
+        renderWithServices(<Collect />, { store: memoryStore() });
+
+        paste(codeFor("Ada", { twinkle: 91 }));
+
+        expect(screen.getByText("1 report")).toBeTruthy();
+    });
+
     it("says so when the paste holds nothing readable", () => {
         renderWithServices(<Collect />, { store: memoryStore() });
 

@@ -649,7 +649,23 @@
     "collect_intro": "Vlož kódy, ktoré si dostal, a čítaj ich ako zoznam triedy. Nič sa neukladá — zavrieš stránku a je preč.",
     "collect_paste": "Kódy",
     "collect_nothing": "Zatiaľ tam nie je nič čitateľné.",
-    "collect_found": "{count} hlásení",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} hlásenie",
+                "countPlural=few": "{count} hlásenia",
+                "countPlural=many": "{count} hlásenia",
+                "countPlural=other": "{count} hlásení"
+            }
+        }
+    ],
     "collect_csv": "Stiahnuť ako CSV",
     "collect_who": "Meno",
     "collect_played": "Zahrané",

@@ -47,6 +47,7 @@ const FINNISH_CASE =
 const SAME_FOR_ONE_AND_MANY = {
     cs: {
         music_remove_used: "zadání reads the same for one and five, and so does the verb",
+        collect_found: "hlášení is one word for one report, two and five",
     },
     hr: {
         balance_last: "prije takes the genitive, and dana serves one, two and five: prije 1 dana",

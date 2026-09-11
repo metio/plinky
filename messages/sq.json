@@ -629,7 +629,21 @@
     "collect_intro": "Ngjit kodet që more dhe lexoji si listë klase. Asgjë nuk ruhet — mbyll faqen dhe iku.",
     "collect_paste": "Kodet",
     "collect_nothing": "Atje ende s'ka gjë të lexueshme.",
-    "collect_found": "{count} raporte",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} raport",
+                "countPlural=other": "{count} raporte"
+            }
+        }
+    ],
     "collect_csv": "Shkarko si CSV",
     "collect_who": "Emri",
     "collect_played": "Luajtur",

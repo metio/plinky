@@ -619,7 +619,20 @@
     "collect_intro": "받은 코드를 붙여넣으면 반 명단처럼 볼 수 있어요. 아무것도 저장되지 않아요 — 페이지를 닫으면 사라져요.",
     "collect_paste": "코드",
     "collect_nothing": "아직 읽을 수 있는 게 없어요.",
-    "collect_found": "보고 {count}건",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "보고 {count}건"
+            }
+        }
+    ],
     "collect_csv": "CSV로 내려받기",
     "collect_who": "이름",
     "collect_played": "연주함",

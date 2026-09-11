@@ -629,7 +629,21 @@
     "collect_intro": "Lim inn kodene du fikk, og les dem som en klasseliste. Ingenting lagres — lukk siden, så er det borte.",
     "collect_paste": "Koder",
     "collect_nothing": "Ingenting lesbart der ennå.",
-    "collect_found": "{count} rapporter",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} rapport",
+                "countPlural=other": "{count} rapporter"
+            }
+        }
+    ],
     "collect_csv": "Last ned som CSV",
     "collect_who": "Navn",
     "collect_played": "Spilt",

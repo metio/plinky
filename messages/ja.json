@@ -619,7 +619,20 @@
     "collect_intro": "受け取ったコードを貼り付けると、名簿のように読めます。何も保存されません。ページを閉じれば消えます。",
     "collect_paste": "コード",
     "collect_nothing": "まだ読み取れるものがありません。",
-    "collect_found": "{count}件の報告",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}件の報告"
+            }
+        }
+    ],
     "collect_csv": "CSVでダウンロード",
     "collect_who": "名前",
     "collect_played": "弾いた数",

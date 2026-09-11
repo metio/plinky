@@ -649,7 +649,23 @@
     "collect_intro": "Встав отримані коди й читай їх як список класу. Нічого не зберігається — закрив сторінку, і все.",
     "collect_paste": "Коди",
     "collect_nothing": "Поки там немає нічого читабельного.",
-    "collect_found": "{count} звітів",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} звіт",
+                "countPlural=few": "{count} звіти",
+                "countPlural=many": "{count} звітів",
+                "countPlural=other": "{count} звітів"
+            }
+        }
+    ],
     "collect_csv": "Завантажити як CSV",
     "collect_who": "Ім'я",
     "collect_played": "Зіграно",

@@ -629,7 +629,21 @@
     "collect_intro": "Plak de codes die je kreeg en lees ze als een klassenlijst. Er wordt niets bewaard — pagina dicht en weg is het.",
     "collect_paste": "Codes",
     "collect_nothing": "Daar zit nog niets leesbaars bij.",
-    "collect_found": "{count} verslagen",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} verslag",
+                "countPlural=other": "{count} verslagen"
+            }
+        }
+    ],
     "collect_csv": "Downloaden als CSV",
     "collect_who": "Naam",
     "collect_played": "Gespeeld",

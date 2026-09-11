@@ -639,7 +639,22 @@
     "collect_intro": "Налепи кодове које си добио и читај их као списак разреда. Ништа се не чува — затвориш страницу и нема га.",
     "collect_paste": "Кодови",
     "collect_nothing": "Тамо још нема ничега читљивог.",
-    "collect_found": "{count} извештаја",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} извештај",
+                "countPlural=few": "{count} извештаја",
+                "countPlural=other": "{count} извештаја"
+            }
+        }
+    ],
     "collect_csv": "Преузми као CSV",
     "collect_who": "Име",
     "collect_played": "Одсвирано",

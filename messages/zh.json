@@ -619,7 +619,20 @@
     "collect_intro": "把收到的代码粘进来，就能当作名单来看。不会保存任何内容——关掉页面就没了。",
     "collect_paste": "代码",
     "collect_nothing": "这里还没有能读取的内容。",
-    "collect_found": "{count} 份报告",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 份报告"
+            }
+        }
+    ],
     "collect_csv": "下载为 CSV",
     "collect_who": "姓名",
     "collect_played": "已弹",

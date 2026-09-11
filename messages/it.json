@@ -639,7 +639,22 @@
     "collect_intro": "Incolla i codici che hai ricevuto e leggili come un elenco di classe. Non si salva nulla — chiudi la pagina e sparisce.",
     "collect_paste": "Codici",
     "collect_nothing": "Lì dentro non c'è ancora nulla di leggibile.",
-    "collect_found": "{count} resoconti",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} resoconto",
+                "countPlural=many": "{count} resoconti",
+                "countPlural=other": "{count} resoconti"
+            }
+        }
+    ],
     "collect_csv": "Scarica come CSV",
     "collect_who": "Nome",
     "collect_played": "Suonato",

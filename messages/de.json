@@ -629,7 +629,21 @@
     "collect_intro": "Füge die Codes ein, die du bekommen hast, und lies sie als Klassenliste. Nichts wird gespeichert — Seite zu, und es ist weg.",
     "collect_paste": "Codes",
     "collect_nothing": "Da ist noch nichts Lesbares dabei.",
-    "collect_found": "{count} Rückmeldungen",
+    "collect_found": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Rückmeldung",
+                "countPlural=other": "{count} Rückmeldungen"
+            }
+        }
+    ],
     "collect_csv": "Als CSV herunterladen",
     "collect_who": "Name",
     "collect_played": "Gespielt",
