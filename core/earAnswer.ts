@@ -20,3 +20,34 @@ export function optionVerdict<Id>(option: Id, answer: Id | null, given: Id | nul
     }
     return option === given ? "wrong" : null;
 }
+
+// The seven diatonic numerals, lowercased, in degree order: index + 1 is the degree.
+const NUMERALS = ["i", "ii", "iii", "iv", "v", "vi", "vii"];
+
+// A Roman numeral and whatever quality marks follow it (°, ø, +, a figure). Anything with a
+// letter after the numeral is a different chord, and anything before it — a flat, a sharp —
+// names a degree outside the key, so neither is read as a numeral at all.
+const NUMERAL = /^([iv]+)[^a-z]*$/i;
+
+// The number key that answers with this option, or null when none does. A plain scale
+// degree is its own digit. A Roman numeral takes the digit of the degree it stands on, so
+// IV is 4 and vii° is 7, whatever its case or quality mark says. A chromatic degree (♭3, ♯4)
+// has no digit: 3 has to mean the third the level plainly offers, and a key that answered
+// with the flat one on a level holding both would be a coin toss.
+export function digitFor(option: string): string | null {
+    if (/^[1-7]$/.test(option)) {
+        return option;
+    }
+    const numeral = NUMERAL.exec(option)?.[1]?.toLowerCase();
+    if (numeral === undefined) {
+        return null;
+    }
+    const degree = NUMERALS.indexOf(numeral);
+    return degree < 0 ? null : String(degree + 1);
+}
+
+// The option a pressed key answers with, or null when that key answers with nothing here —
+// an 8, a letter, or a degree this question does not offer.
+export function optionForDigit<T extends string>(key: string, options: readonly T[]): T | null {
+    return options.find((option) => digitFor(option) === key) ?? null;
+}
