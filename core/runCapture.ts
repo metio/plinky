@@ -14,6 +14,7 @@
 
 import type { OutcomeNote } from "./runOutcome";
 import { type ActiveHolds, beginHold, endHold } from "./takes";
+import { lastStruckGap } from "./rhythm";
 import { instantaneousBpm } from "./tempo";
 
 // A cleared note plus the pitches sounded at that step — the run's raw record.
@@ -244,13 +245,11 @@ export function flushHolds(capture: RunCapture, atMs: number): void {
 export function liveTempo(capture: RunCapture, runTempo: number, previous: number): number {
     // Only notes that were struck: a position the forgiving advance moved past carries the
     // next note's moment, and the zero gap to that note says nothing about the pace.
-    const struck = capture.notes.filter((note) => !note.skipped);
-    const a = struck[struck.length - 2];
-    const b = struck[struck.length - 1];
-    if (!a || !b) {
+    const gap = lastStruckGap(capture.notes);
+    if (!gap) {
         return previous;
     }
-    const instant = instantaneousBpm(runTempo, b.targetMs - a.targetMs, b.playedMs - a.playedMs);
+    const instant = instantaneousBpm(runTempo, gap.notated, gap.played);
     if (instant <= 0 || !Number.isFinite(instant)) {
         return previous;
     }

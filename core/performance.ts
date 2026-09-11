@@ -12,10 +12,11 @@ import type { RunNote } from "./shareCard";
 
 export type PerfNote = {
     ordinal: number;
-    // Signed offset from the note's target time: negative early, positive late.
-    deltaMs: number;
-    // Timing band derived from |deltaMs|.
-    rating: Rating;
+    // Signed offset from the note's target time: negative early, positive late. Null for a
+    // skipped position, which was never struck and so has no moment to be early or late at.
+    deltaMs: number | null;
+    // Timing band derived from |deltaMs|; null along with it.
+    rating: Rating | null;
     // The right key first try — no wrong note preceded it.
     hit: boolean;
     // Reached without a disproportionate pause.
@@ -29,11 +30,11 @@ export function performanceNotes(notes: RunNote[], tolerance = PRECISE_TOLERANCE
     const fluent = fluentNotes(notes);
     const deltas = timingDeltas(notes);
     return notes.map((note, index) => {
-        const deltaMs = deltas[index] ?? 0;
+        const deltaMs = deltas[index] ?? null;
         return {
             ordinal: index,
             deltaMs,
-            rating: rate(Math.abs(deltaMs), tolerance),
+            rating: deltaMs === null ? null : rate(Math.abs(deltaMs), tolerance),
             hit: note.wrongBefore === 0,
             fluent: fluent[index] ?? true,
         };
@@ -48,7 +49,8 @@ const FULL_MS = 200;
 
 // Projects notes onto a [0, width] × [0, height] field: x by play order, y by how
 // early or late each landed, clamped so a wild outlier stays on the strip. A note
-// dead-on the beat sits on the centre line.
+// dead-on the beat sits on the centre line, and so does a skipped one, which has no height
+// of its own; the strip draws it without a timing dot.
 export function plotPerformance(
     notes: PerfNote[],
     width: number,
@@ -57,7 +59,7 @@ export function plotPerformance(
     const mid = height / 2;
     const step = notes.length > 1 ? width / (notes.length - 1) : 0;
     return notes.map((note, index) => {
-        const offset = Math.max(-1, Math.min(1, note.deltaMs / FULL_MS));
+        const offset = Math.max(-1, Math.min(1, (note.deltaMs ?? 0) / FULL_MS));
         return { ...note, x: index * step, y: mid + offset * mid };
     });
 }

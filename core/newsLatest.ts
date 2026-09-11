@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**A note Keep going passes over no longer counts as perfectly timed.** The share\ngrid and the note-by-note strip after a run scored a skipped note as played on the\nbeat and at full speed, so a slow run with a few skips looked greener than it was,\nand could even name the wrong hand as the one lagging. Your grade already left skips\nout of its timing, and now the grid and the strip do too. A skipped note still counts\nas a slip, and on the strip it shows as just its red ring, with no timing dot.",
+                twip: true,
+            },
+            {
                 body: "**With the microphone on, your first notes after stopping Listen are heard.** Plinky\nignores what the microphone hears of its own speaker, and it kept ignoring a note\nListen had played for as long as that note would have rung, even once Stop had\nsilenced it. Start a piece straight after listening and its opening notes, the ones\nListen had just played, could go unheard for a few seconds. A stopped note now stops\ncounting as Plinky's own the moment it goes quiet.",
                 twip: true,
             },

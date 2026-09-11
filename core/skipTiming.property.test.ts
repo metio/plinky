@@ -9,7 +9,7 @@ import { performanceNotes } from "./performance";
 import { tempoScale, timingDeltas } from "./rhythm";
 import { deriveRunOutcome } from "./runOutcome";
 import { captureCleared, liveTempo, startCapture } from "./runCapture";
-import { speedFactors } from "./shareCard";
+import { computeSegments, speedFactors } from "./shareCard";
 
 // Crotchets at 500 ms, the third never struck: it carries the fourth note's moment.
 const SKIP = [
@@ -21,7 +21,8 @@ const SKIP = [
 
 describe("the timing readers, across a skip", () => {
     it("time the note after a skip from the last note struck", () => {
-        expect(timingDeltas(SKIP)).toEqual([0, 0, 0, 0]);
+        // The skip itself has no timing: a zero would be a note dead on its beat.
+        expect(timingDeltas(SKIP)).toEqual([0, 0, null, 0]);
         expect(tempoScale(SKIP)).toBe(1);
         // The inverse: the same moments with nothing marked read as a late note and an
         // early one, which is what a note that really was struck there would be.
@@ -30,7 +31,8 @@ describe("the timing readers, across a skip", () => {
     });
 
     it("read no pace from a skip", () => {
-        expect(speedFactors(SKIP)).toEqual([1, 1, 1, 1]);
+        // The skip has no pace: a one would be a note at full speed.
+        expect(speedFactors(SKIP)).toEqual([1, 1, null, 1]);
         // A crawl after the skip is still a crawl, measured from the last note struck.
         const slow = SKIP.map((note, at) => (at === 3 ? { ...note, playedMs: 3500 } : note));
         expect(speedFactors(slow)[3]).toBeCloseTo(1000 / 3000);
@@ -127,8 +129,11 @@ describe("timing across a forgiving skip", () => {
         const strip = performanceNotes(notes);
         expect(strip[3]?.rating).toBe("perfect");
         expect(strip[3]?.deltaMs).toBeCloseTo(0);
-        // The skipped position is still a miss on the strip, and only that.
+        // The skipped position is still a miss on the strip, and only that: no timing, so
+        // it is not drawn as dead on the beat.
         expect(strip[2]?.hit).toBe(false);
+        expect(strip[2]?.rating).toBeNull();
+        expect(strip[2]?.deltaMs).toBeNull();
         const outcome = deriveRunOutcome({
             notes,
             correct: 3,
@@ -143,6 +148,36 @@ describe("timing across a forgiving skip", () => {
             true,
         );
         expect(outcome.tempoCurve?.hotspots).toEqual([]);
+    });
+
+    it("gives a skip no speed or timing on the share grid: a slow run is not lifted by what it skipped", () => {
+        fc.assert(
+            fc.property(
+                fc.integer({ min: 3, max: 16 }),
+                fc.integer({ min: 250, max: 1000 }),
+                fc.double({ min: 1.2, max: 3, noNaN: true }),
+                fc.array(fc.boolean(), { minLength: 16, maxLength: 16 }),
+                (count, gapMs, pace, marks) => {
+                    const skipped = new Set<number>();
+                    for (let at = 0; at < count - 1; at++) {
+                        if (marks[at] && !skipped.has(at - 1)) {
+                            skipped.add(at);
+                        }
+                    }
+                    const { notes } = playSteady(count, gapMs, pace, skipped);
+                    const struck = notes.filter((note) => !note.skipped);
+                    const [withSkips] = computeSegments(notes, 1);
+                    const [withoutSkips] = computeSegments(struck, 1);
+                    expect(withSkips!.speed).toBeCloseTo(withoutSkips!.speed, 9);
+                    expect(withSkips!.timing).toBeCloseTo(withoutSkips!.timing, 9);
+                },
+            ),
+        );
+    });
+
+    it("scores a moment of nothing but skips zero on speed and timing", () => {
+        const [, middle] = computeSegments(SKIP.slice(1), 3);
+        expect(middle).toEqual({ accuracy: 0.5, speed: 0, timing: 0 });
     });
 
     it("never moves the timing of the notes that were played, whatever was skipped", () => {
@@ -166,7 +201,7 @@ describe("timing across a forgiving skip", () => {
                     for (const [at, note] of strip.entries()) {
                         if (!skipped.has(at)) {
                             expect(note.rating).toBe("perfect");
-                            expect(Math.abs(note.deltaMs)).toBeLessThan(1e-6);
+                            expect(Math.abs(note.deltaMs ?? Number.NaN)).toBeLessThan(1e-6);
                         }
                     }
                     const outcome = deriveRunOutcome({

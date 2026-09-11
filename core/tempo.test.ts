@@ -32,12 +32,15 @@ describe("instantaneousBpm", () => {
 });
 
 describe("tempoSeries", () => {
+    const onsets = (notated: number[], actual: number[]) =>
+        notated.map((targetMs, index) => ({ targetMs, playedMs: actual[index]! }));
+
     it("emits one point per gap, starting at the second note", () => {
         // Notated quarter notes at 100 bpm are 600 ms apart.
         const notated = [0, 600, 1200, 1800];
         // Played steadily at 120 bpm: 500 ms apart.
         const actual = [0, 500, 1000, 1500];
-        const series = tempoSeries(100, notated, actual);
+        const series = tempoSeries(100, onsets(notated, actual));
         expect(series.map((p) => p.index)).toEqual([1, 2, 3]);
         expect(series.every((p) => p.bpm === 120)).toBe(true);
     });
@@ -47,7 +50,7 @@ describe("tempoSeries", () => {
         // repeats: both gaps are non-positive and would otherwise score 0 bpm.
         const notated = [0, 600, 600, 1200];
         const actual = [0, 500, 500, 1000];
-        const series = tempoSeries(100, notated, actual);
+        const series = tempoSeries(100, onsets(notated, actual));
         // Only the two real gaps survive; no 0-bpm point sneaks in.
         expect(series.map((p) => p.index)).toEqual([1, 3]);
         expect(series.some((p) => p.bpm === 0)).toBe(false);

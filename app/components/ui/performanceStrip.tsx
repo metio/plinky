@@ -19,8 +19,9 @@ const PAD = 16;
 
 // One dot per note across a single strip: its height is how early (high) or late
 // (low) it landed, its colour the timing band, a red ring marks a wrong key, and a
-// dashed line marks a hesitation. The centre line is dead-on the beat. Needs at
-// least two notes to span the axis.
+// dashed line marks a hesitation. The centre line is dead-on the beat. A skipped
+// position was never struck, so it gets no timing dot, only the ring of its miss. Needs
+// at least two notes to span the axis.
 export function PerformanceStrip({
     notes,
     tolerance = PRECISE_TOLERANCE,
@@ -67,7 +68,9 @@ export function PerformanceStrip({
                                     strokeDasharray="3 4"
                                 />
                             )}
-                            <circle cx={x} cy={y} r="5" className={FILL[note.rating]} />
+                            {note.rating !== null && (
+                                <circle cx={x} cy={y} r="5" className={FILL[note.rating]} />
+                            )}
                             {!note.hit && (
                                 <circle
                                     cx={x}

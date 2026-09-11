@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { escapeXml } from "./xmlText";
-import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
+import { PRECISE_TOLERANCE, struckGaps, timingDeltas } from "./rhythm";
 
 // Compiles a finished run into a Wordle-style share artifact: the run is sliced into six
 // moments, each scored on Accuracy, Speed and Timing, and those three are collapsed into
@@ -40,8 +40,9 @@ export type RunNote = {
 
 // A run note tagged with how close to the piece's tempo it was played and its timing
 // deviation from the player's own pace — both decided once over the whole run, not a
-// six-note slice, so pace and rhythm are judged across the whole performance.
-type ScoredNote = RunNote & { speed: number; timingDelta: number };
+// six-note slice, so pace and rhythm are judged across the whole performance. Both are
+// null for a skipped position.
+type ScoredNote = RunNote & { speed: number | null; timingDelta: number | null };
 
 // The three scored dimensions of a segment, collapsed into one combined cell for the
 // shared grid.
@@ -98,50 +99,52 @@ export function levelFor(value: number): Level {
 // practice tempo was dialled. Playing faster than the piece is capped at the top band
 // rather than rewarded past it. The first note has no preceding gap, so it borrows the
 // next note's pace instead of being judged on an unmeasurable one.
-export function speedFactors(notes: RunNote[], tempoScale = 1): number[] {
-    // Each gap runs from the last note that was struck: a skipped position has no moment of
-    // its own, so it has no pace either, and the note after it is not judged against it.
-    let previous: RunNote | undefined;
-    const speeds = notes.map((note) => {
-        if (note.skipped) {
-            return 1;
+//
+// A skipped position reads null: it was never struck, so it has no pace, and the note after
+// it is measured from the last note that was (see struckGaps).
+export function speedFactors(notes: RunNote[], tempoScale = 1): (number | null)[] {
+    const speeds = struckGaps(notes).map((gap, index) => {
+        if (notes[index]?.skipped) {
+            return null;
         }
-        const before = previous;
-        previous = note;
-        if (before === undefined) {
-            return 1;
-        }
-        const notatedGap = note.targetMs - before.targetMs;
-        const playedGap = note.playedMs - before.playedMs;
         // A non-positive gap (a repeated onset, or clock noise) carries no pace signal.
-        if (notatedGap <= 0 || playedGap <= 0) {
+        if (!gap || gap.notated <= 0 || gap.played <= 0) {
             return 1;
         }
-        return clamp01((tempoScale * notatedGap) / playedGap);
+        return clamp01((tempoScale * gap.notated) / gap.played);
     });
-    if (speeds.length > 1) {
-        speeds[0] = speeds[1]!;
+    const first = speeds.findIndex((speed) => speed !== null);
+    const next = speeds.findIndex((speed, index) => index > first && speed !== null);
+    if (first >= 0 && next >= 0) {
+        speeds[first] = speeds[next]!;
     }
     return speeds;
 }
 
+function average(values: number[]): number {
+    return values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+}
+
 // Scores one segment's notes on each dimension. An empty segment (a piece with
-// fewer notes than segments, or one abandoned early) scores zero everywhere.
+// fewer notes than segments, or one abandoned early) scores zero everywhere. A skipped
+// position counts against Accuracy through its wrongBefore and not at all toward Speed or
+// Timing, having no pace and no moment; a segment of nothing but skips scores zero on both.
 function metricsFor(notes: ScoredNote[], tolerance: number): SegmentMetrics {
     if (notes.length === 0) {
         return { accuracy: 0, speed: 0, timing: 0 };
     }
     const wrong = notes.reduce((sum, note) => sum + note.wrongBefore, 0);
-    const speed = notes.reduce((sum, note) => sum + note.speed, 0);
     const zero = TIMING_ZERO_MS * tolerance;
-    const timing = notes.reduce((sum, note) => {
-        const off = Math.min(1, Math.abs(note.timingDelta) / zero);
-        return sum + (1 - off);
-    }, 0);
     return {
         accuracy: notes.length / (notes.length + wrong),
-        speed: speed / notes.length,
-        timing: timing / notes.length,
+        speed: average(notes.flatMap((note) => (note.speed === null ? [] : [note.speed]))),
+        timing: average(
+            notes.flatMap((note) =>
+                note.timingDelta === null
+                    ? []
+                    : [1 - Math.min(1, Math.abs(note.timingDelta) / zero)],
+            ),
+        ),
     };
 }
 
@@ -163,8 +166,8 @@ export function computeSegments(
         const slice = Math.min(count - 1, Math.floor((index * count) / notes.length));
         buckets[slice]?.push({
             ...note,
-            speed: speeds[index] ?? 1,
-            timingDelta: deltas[index] ?? 0,
+            speed: speeds[index] ?? null,
+            timingDelta: deltas[index] ?? null,
         });
     });
     return buckets.map((bucket) => metricsFor(bucket, tolerance));

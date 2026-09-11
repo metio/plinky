@@ -8,6 +8,8 @@
 // that already read the curve's helpers find it alongside them.
 export { median } from "./stats";
 
+import { type Onset, struckGaps } from "./rhythm";
+
 export type TempoPoint = {
     // The note the gap leads into (>= 1); index 0 has no preceding gap.
     index: number;
@@ -33,27 +35,19 @@ export function instantaneousBpm(
     return (referenceTempo * notatedGapMs) / actualGapMs;
 }
 
-// Build the tempo curve from the notated onset times (at the reference tempo) and
-// the actual onset timestamps, one point per gap between consecutive notes.
-export function tempoSeries(
-    referenceTempo: number,
-    notatedMs: number[],
-    actualMs: number[],
-): TempoPoint[] {
-    const points: TempoPoint[] = [];
-    const count = Math.min(notatedMs.length, actualMs.length);
-    for (let i = 1; i < count; i++) {
-        const notatedGap = notatedMs[i]! - notatedMs[i - 1]!;
-        const actualGap = actualMs[i]! - actualMs[i - 1]!;
-        // A non-positive gap — two onsets at the same instant (a chord) or out of
-        // order — has no measurable tempo. Skip it rather than emit a 0 bpm point,
-        // which would drag the baseline median down and read as a drag hotspot.
-        if (notatedGap <= 0 || actualGap <= 0) {
-            continue;
-        }
-        points.push({ index: i, bpm: instantaneousBpm(referenceTempo, notatedGap, actualGap) });
-    }
-    return points;
+// Build the tempo curve from the run's onsets — notated (at the reference tempo) and
+// played — one point per gap between consecutive struck notes, each naming the note the
+// gap leads into. A skipped position is passed over (see struckGaps): its zero gap to the
+// next note is no tempo.
+export function tempoSeries(referenceTempo: number, onsets: readonly Onset[]): TempoPoint[] {
+    // A non-positive gap — two onsets at the same instant (a chord) or out of order — has
+    // no measurable tempo. Skip it rather than emit a 0 bpm point, which would drag the
+    // baseline median down and read as a drag hotspot.
+    return struckGaps(onsets).flatMap((gap, index) =>
+        gap && gap.notated > 0 && gap.played > 0
+            ? [{ index, bpm: instantaneousBpm(referenceTempo, gap.notated, gap.played) }]
+            : [],
+    );
 }
 
 export type HotspotOptions = {

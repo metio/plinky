@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { struckGaps } from "./rhythm";
 import { median } from "./stats";
 
 // Flow measures continuity — did the player keep moving like a musician rather
@@ -30,18 +31,9 @@ const HESITATION_FACTOR = 3;
 // Dividing by the median makes this tempo-agnostic — playing the whole piece
 // slowly but steadily flags nothing.
 export function fluentNotes(notes: FlowNote[]): boolean[] {
-    const ratios: (number | null)[] = [];
-    let previous: FlowNote | undefined;
-    for (const note of notes) {
-        if (note.skipped) {
-            ratios.push(null);
-            continue;
-        }
-        const expected = previous ? note.targetMs - previous.targetMs : 0;
-        const actual = previous ? note.playedMs - previous.playedMs : 0;
-        ratios.push(previous && expected > 0 ? actual / expected : null);
-        previous = note;
-    }
+    const ratios = struckGaps(notes).map((gap) =>
+        gap && gap.notated > 0 ? gap.played / gap.notated : null,
+    );
     const baseline = median(ratios.filter((ratio): ratio is number => ratio !== null && ratio > 0));
     return notes.map((note, index) => {
         if (note.wrongBefore > 0) {

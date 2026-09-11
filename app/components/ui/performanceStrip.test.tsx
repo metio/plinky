@@ -30,6 +30,15 @@ describe("PerformanceStrip", () => {
         expect(container.querySelectorAll("circle")).toHaveLength(3);
     });
 
+    it("draws a skipped position with no timing dot, only the ring of its miss", () => {
+        const skipped: RunNote = { targetMs: 500, playedMs: 1000, wrongBefore: 1, skipped: true };
+        const { container } = render(
+            <PerformanceStrip notes={[note(0, 0), skipped, note(1000, 1000)]} />,
+        );
+        expect(container.querySelectorAll('circle:not([fill="none"])')).toHaveLength(2);
+        expect(container.querySelectorAll("circle.stroke-band-weak")).toHaveLength(1);
+    });
+
     it("rings a note played after a wrong key in red", () => {
         const clean = render(
             <PerformanceStrip notes={[note(0, 0), note(500, 510), note(1000, 1005)]} />,

@@ -147,7 +147,7 @@ export function deriveRunOutcome({
     // A skipped position was never struck, so it is no timing sample: it is already a
     // miss, and scoring it as on time or late would count it a second time.
     const hits = timingDeltas(notes).flatMap((delta, index) =>
-        notes[index]?.skipped ? [] : [makeHit(index, delta, tolerance, notes[index]?.slackMs ?? 0)],
+        delta === null ? [] : [makeHit(index, delta, tolerance, notes[index]?.slackMs ?? 0)],
     );
     const grade = computeGrade({
         correct,
@@ -167,14 +167,7 @@ export function deriveRunOutcome({
     // in time); the scale re-references the run to the piece's tempo for the share grid.
     const scale = tempoScale(runTempo, intendedTempo);
     const grid = handGrid(notes, { tempoScale: scale });
-    // The curve runs through the struck notes only, its points still naming each note's
-    // place in the run: a skipped position's zero gap to the next note is no tempo.
-    const struck = notes.flatMap((note, index) => (note.skipped ? [] : [{ note, index }]));
-    const points = tempoSeries(
-        runTempo,
-        struck.map(({ note }) => note.targetMs),
-        struck.map(({ note }) => note.playedMs),
-    ).map((point) => ({ ...point, index: struck[point.index]?.index ?? point.index }));
+    const points = tempoSeries(runTempo, notes);
     const med = median(points.map((point) => point.bpm));
     const tempoCurve =
         points.length > 0 ? { points, median: med, hotspots: findHotspots(points, med) } : null;

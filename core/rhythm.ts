@@ -67,22 +67,61 @@ export function makeHit(
 // moment, so it is no evidence of pace and has no timing of its own.
 export type Onset = { targetMs: number; playedMs: number; skipped?: boolean };
 
+// The gap leading into a note, as notated and as played, in milliseconds.
+export type Gap = { notated: number; played: number };
+
+// The gap into each note from the last note that was struck. A skipped position has no
+// moment of its own, so it has no gap and is passed over: the note after it is measured
+// from the note before it. The first note struck has nothing to measure from. Both read
+// null. Every timing reader measures through this, so none can time a note from a skip.
+export function struckGaps(onsets: readonly Onset[]): (Gap | null)[] {
+    let last: Onset | undefined;
+    return onsets.map((onset) => {
+        if (onset.skipped) {
+            return null;
+        }
+        const before = last;
+        last = onset;
+        return before === undefined
+            ? null
+            : {
+                  notated: onset.targetMs - before.targetMs,
+                  played: onset.playedMs - before.playedMs,
+              };
+    });
+}
+
+// The gap between the last two notes struck, walked back from the end, for a reader that
+// runs on every cleared note and must not rescan the whole run each time.
+export function lastStruckGap(onsets: readonly Onset[]): Gap | null {
+    let later: Onset | undefined;
+    for (let index = onsets.length - 1; index >= 0; index--) {
+        const onset = onsets[index]!;
+        if (onset.skipped) {
+            continue;
+        }
+        if (later === undefined) {
+            later = onset;
+            continue;
+        }
+        return {
+            notated: later.targetMs - onset.targetMs,
+            played: later.playedMs - onset.playedMs,
+        };
+    }
+    return null;
+}
+
 // The player's pace relative to the score: the median of each gap's played/notated
 // ratio. 1.0 means they matched the notated tempo, 2.0 that they played at half
 // speed. Practice is self-paced, so timing is judged against this personal pace
 // rather than the absolute notated clock — otherwise a steady run at any tempo but
 // the preset one drifts ever further from target and scores zero. The median
 // shrugs off a few wild gaps, and a non-positive result falls back to 1.0.
-export function tempoScale(onsets: Onset[]): number {
-    const struck = onsets.filter((onset) => !onset.skipped);
-    const ratios: number[] = [];
-    for (let index = 1; index < struck.length; index++) {
-        const dt = struck[index]!.targetMs - struck[index - 1]!.targetMs;
-        const dp = struck[index]!.playedMs - struck[index - 1]!.playedMs;
-        if (dt > 0) {
-            ratios.push(dp / dt);
-        }
-    }
+export function tempoScale(onsets: readonly Onset[]): number {
+    const ratios = struckGaps(onsets).flatMap((gap) =>
+        gap && gap.notated > 0 ? [gap.played / gap.notated] : [],
+    );
     const scale = median(ratios);
     return scale > 0 ? scale : 1;
 }
@@ -93,26 +132,16 @@ export function tempoScale(onsets: Onset[]): number {
 // matched key by key carries no rhythm of its own. A steady run reads as on-time at
 // any tempo; only a gap that breaks the player's established pace counts as off.
 //
-// A skipped onset reads zero and is passed over: the note after it is timed from the last
-// note that was struck. Measured from the skip instead, a note played exactly on its beat
-// reads a whole gap early, and the skip a whole gap late.
-export function timingDeltas(onsets: Onset[]): number[] {
+// A skipped onset was never struck, so it has no timing at all and reads null — a zero
+// would be a note dead on its beat, which every average and every plot would count as one.
+// The note after it is timed from the last note that was struck (see struckGaps).
+export function timingDeltas(onsets: readonly Onset[]): (number | null)[] {
     const scale = tempoScale(onsets);
-    let prev: Onset | undefined;
-    return onsets.map((onset) => {
-        if (onset.skipped) {
-            return 0;
+    return struckGaps(onsets).map((gap, index) => {
+        if (onsets[index]?.skipped) {
+            return null;
         }
-        const before = prev;
-        prev = onset;
-        if (before === undefined) {
-            return 0;
-        }
-        const dt = onset.targetMs - before.targetMs;
-        if (dt <= 0) {
-            return 0;
-        }
-        return onset.playedMs - before.playedMs - dt * scale;
+        return gap && gap.notated > 0 ? gap.played - gap.notated * scale : 0;
     });
 }
 
