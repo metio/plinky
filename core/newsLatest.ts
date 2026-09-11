@@ -97,6 +97,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A video or sound file of a take finishes even when Plinky updates.** A long video\ntakes minutes to make, and if a new version of Plinky arrived meanwhile, switching\ntabs and coming back could reload the page halfway through, so the file never\narrived and nothing said why. Plinky now waits until the file is saved before it\nupdates.",
                 twip: true,
             },
+            {
+                body: "**A score you just added can be backed up straight away.** Add a score on the\nManage tab of Music and the backup section right below it still said you had none,\nwith its download button greyed out until you left the tab and came back. It now\ncounts the new score the moment it is added, and one you remove just as quickly.",
+                twip: true,
+            },
         ],
     },
     {

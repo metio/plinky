@@ -9,9 +9,11 @@ import {
     loadBundledScores,
     loadCatalog,
     loadUserScores,
+    parseUserScores,
     removeUserScore,
     resolveScore,
     saveUserScore,
+    subscribeUserScores,
 } from "./catalog";
 import { browserStore } from "../adapters/browserStore";
 import { memoryStore } from "../adapters/memoryStore";
@@ -31,6 +33,85 @@ const codec: XmlCodec = { parse: () => null, serialize: () => "" };
 let kv: KeyValueStore;
 beforeEach(() => {
     kv = memoryStore();
+});
+
+describe("subscribeUserScores", () => {
+    const score = (id: string) => ({
+        id,
+        title: id,
+        composer: "",
+        description: "",
+        xml: xml(id),
+        tempo: 90,
+        beatsPerBar: 4,
+        bundled: false,
+    });
+
+    it("hears a save, a removal and a bundle import, and nothing after unsubscribing", () => {
+        let heard = 0;
+        const off = subscribeUserScores(kv, () => {
+            heard += 1;
+        });
+        saveUserScore(kv, score("a"));
+        expect(heard).toBe(1);
+        removeUserScore(kv, "a");
+        expect(heard).toBe(2);
+        importScoresPack(kv, codec, exportAllPack(memoryStoreWith(score("b"))));
+        expect(heard).toBe(3);
+        off();
+        saveUserScore(kv, score("c"));
+        expect(heard).toBe(3);
+    });
+
+    it("stays quiet about a write the device refused", () => {
+        const refusing: KeyValueStore = { ...memoryStore(), set: () => false };
+        let heard = 0;
+        subscribeUserScores(refusing, () => {
+            heard += 1;
+        });
+        expect(saveUserScore(refusing, score("a"))).toBe(false);
+        expect(heard).toBe(0);
+    });
+
+    it("keeps one store's library news to that store", () => {
+        const other = memoryStore();
+        let heard = 0;
+        subscribeUserScores(other, () => {
+            heard += 1;
+        });
+        saveUserScore(kv, score("a"));
+        expect(heard).toBe(0);
+    });
+
+    function memoryStoreWith(...scores: ReturnType<typeof score>[]): KeyValueStore {
+        const store = memoryStore();
+        for (const one of scores) {
+            saveUserScore(store, one);
+        }
+        return store;
+    }
+});
+
+describe("parseUserScores", () => {
+    it("reads what loadUserScores reads, from the raw string alone", () => {
+        saveUserScore(kv, {
+            id: "a",
+            title: "A",
+            composer: "",
+            description: "",
+            xml: xml("A"),
+            tempo: 90,
+            beatsPerBar: 4,
+            bundled: false,
+        });
+        expect(parseUserScores(kv.get("plinky:scores"))).toEqual(loadUserScores(kv));
+    });
+
+    it("reads nothing stored, corrupt JSON and a non-array as an empty library", () => {
+        expect(parseUserScores(null)).toEqual([]);
+        expect(parseUserScores("{not json")).toEqual([]);
+        expect(parseUserScores('{"id":"a"}')).toEqual([]);
+    });
 });
 
 describe("loadUserScores robustness", () => {

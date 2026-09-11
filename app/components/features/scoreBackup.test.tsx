@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { m } from "../../paraglide/messages.js";
 import { afterEach, describe, expect, it } from "vitest";
+import { memoryStore } from "../../adapters/memoryStore";
+import { removeUserScore, type Score, saveUserScore } from "../../lib/catalog";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { ScoreBackup } from "./scoreBackup";
 
 const PACK = JSON.stringify({
@@ -25,7 +28,10 @@ function fileInput(container: HTMLElement): HTMLInputElement {
     return input as HTMLInputElement;
 }
 
-afterEach(() => localStorage.clear());
+afterEach(() => {
+    cleanup();
+    localStorage.clear();
+});
 
 describe("ScoreBackup", () => {
     it("imports a bundle from a file and reports the count", async () => {
@@ -93,5 +99,69 @@ describe("ScoreBackup", () => {
         await new Promise((r) => setTimeout(r, 0));
         expect(screen.queryByText("Imported 1 score.")).toBeNull();
         expect(screen.getByText("Imported 3 scores.")).toBeTruthy();
+    });
+});
+
+describe("ScoreBackup's count of the library", () => {
+    const score: Score = {
+        id: "mine",
+        title: "Mine",
+        composer: "",
+        description: "",
+        xml: "<score-partwise><part/></score-partwise>",
+        tempo: 90,
+        beatsPerBar: 4,
+        bundled: false,
+    };
+    const mount = () =>
+        renderWithServices(
+            <MemoryRouter>
+                <ScoreBackup />
+            </MemoryRouter>,
+        );
+    const downloadMine = () => screen.getByRole("button", { name: m.backup_download() });
+    const intro = (count: number) => m.backup_intro({ count: m.backup_scores({ count }) });
+
+    it("follows a score added elsewhere on the page", () => {
+        // The import sits right above the backup on the Manage tab and saves through the
+        // catalogue, not through this component — the backup has to hear about it anyway.
+        const { services } = mount();
+        expect(screen.getByText(intro(0))).toBeTruthy();
+        expect(downloadMine().hasAttribute("disabled")).toBe(true);
+
+        act(() => {
+            saveUserScore(services.store, score);
+        });
+
+        expect(screen.getByText(intro(1))).toBeTruthy();
+        expect(downloadMine().hasAttribute("disabled")).toBe(false);
+    });
+
+    it("follows a score removed elsewhere, back to nothing to download", () => {
+        const store = memoryStore();
+        saveUserScore(store, score);
+        renderWithServices(
+            <MemoryRouter>
+                <ScoreBackup />
+            </MemoryRouter>,
+            { store },
+        );
+        expect(downloadMine().hasAttribute("disabled")).toBe(false);
+
+        act(() => {
+            removeUserScore(store, score.id);
+        });
+
+        expect(screen.getByText(intro(0))).toBeTruthy();
+        expect(downloadMine().hasAttribute("disabled")).toBe(true);
+    });
+
+    it("counts what its own bundle import brought in", async () => {
+        const { container } = mount();
+        fireEvent.change(fileInput(container), {
+            target: { files: [new File([PACK], "pack.json", { type: "application/json" })] },
+        });
+        expect(await screen.findByText(intro(2))).toBeTruthy();
+        expect(downloadMine().hasAttribute("disabled")).toBe(false);
     });
 });

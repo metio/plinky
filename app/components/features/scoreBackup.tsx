@@ -1,8 +1,15 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useRef, useState } from "react";
-import { exportAllPack, exportFullPack, importScoresPack, loadUserScores } from "../../lib/catalog";
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+    exportAllPack,
+    exportFullPack,
+    importScoresPack,
+    parseUserScores,
+    subscribeUserScores,
+    userScoresRaw,
+} from "../../lib/catalog";
 import { downloadBlob } from "../../lib/download";
 import { useStore, useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
@@ -16,16 +23,26 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 export function ScoreBackup() {
     const store = useStore();
     const xmlCodec = useXmlCodec();
-    const [count, setCount] = useState(0);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
     // Identifies the latest pack read so a slower earlier import can't report its
     // (stale) result over a newer pick that has already landed.
     const readSeq = useRef(0);
 
-    useEffect(() => {
-        setCount(loadUserScores(store).length);
-    }, [store]);
+    // Read live from the library, so a score imported or removed anywhere on the page
+    // (the import right above this on the Manage tab) is counted the moment it lands.
+    // The raw string is the snapshot because it is stable until the library changes;
+    // the count is parsed from it only then.
+    const subscribe = useCallback(
+        (onChange: () => void) => subscribeUserScores(store, onChange),
+        [store],
+    );
+    const raw = useSyncExternalStore(
+        subscribe,
+        () => userScoresRaw(store),
+        () => null,
+    );
+    const count = useMemo(() => parseUserScores(raw).length, [raw]);
 
     const download = () => {
         downloadBlob(exportAllPack(store), "application/json", "plinky-scores.json");
@@ -51,7 +68,6 @@ export function ScoreBackup() {
             setStatus(
                 `${m.backup_imported_scores({ count: m.backup_scores({ count: result.imported }) })}.`,
             );
-            setCount(loadUserScores(store).length);
         } catch {
             if (mine !== readSeq.current) {
                 return;

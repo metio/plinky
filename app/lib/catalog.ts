@@ -4,7 +4,8 @@
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { readScoreMeta, readScoreMetaFromText } from "../../core/scoreMeta";
 import type { XmlCodec } from "../../core/xml";
-import { readJson, writeJson } from "../stores/jsonStore";
+import { createJsonStore, type JsonStore } from "../stores/jsonStore";
+import { jsonOf, NOT_JSON } from "../../core/json";
 import { parsePack, serializePack } from "../../core/scorePack";
 import { songId } from "../../core/songId";
 import { slugify } from "../../core/slug";
@@ -100,16 +101,44 @@ export function userScoresRaw(kv: KeyValueStore): string | null {
     return kv.get(STORAGE_KEY);
 }
 
-export function loadUserScores(kv: KeyValueStore): Score[] {
-    const parsed = readJson(kv, STORAGE_KEY);
-    if (!Array.isArray(parsed)) {
+// The imported scores held in a raw stored string — nothing stored, corrupt JSON and a
+// non-array all read as an empty library. A view subscribed to the library holds the
+// raw string as its snapshot and parses it only when it changes.
+export function parseUserScores(raw: string | null): Score[] {
+    const parsed = raw === null ? null : jsonOf(raw);
+    if (parsed === NOT_JSON || !Array.isArray(parsed)) {
         return [];
     }
     return parsed.map(normalizeUserScore).filter((score): score is Score => score !== null);
 }
 
+export function loadUserScores(kv: KeyValueStore): Score[] {
+    return parseUserScores(userScoresRaw(kv));
+}
+
+// The library's change bus, one per store. Every write goes through storeUserScores, so
+// a save, a removal and a bundle import all reach whoever subscribed, whichever
+// component made them; a refused write notifies no one, and another tab's write arrives
+// as the browser's storage event. Only its save and subscribe are used — the library is
+// read through parseUserScores, which keeps the normalisation in one place.
+const LIBRARIES = new WeakMap<KeyValueStore, JsonStore<unknown>>();
+
+function library(kv: KeyValueStore): JsonStore<unknown> {
+    let found = LIBRARIES.get(kv);
+    if (!found) {
+        found = createJsonStore<unknown>(kv, STORAGE_KEY, (raw) => raw);
+        LIBRARIES.set(kv, found);
+    }
+    return found;
+}
+
 function storeUserScores(kv: KeyValueStore, scores: Score[]): boolean {
-    return writeJson(kv, STORAGE_KEY, scores);
+    return library(kv).save(scores);
+}
+
+// Calls `onChange` whenever the imported scores change; returns the unsubscribe.
+export function subscribeUserScores(kv: KeyValueStore, onChange: () => void): () => void {
+    return library(kv).subscribe(onChange);
 }
 
 // Returns false when the write fails (e.g. storage quota), so callers can tell
