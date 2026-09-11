@@ -52,6 +52,12 @@ export function createActivitySignal(): ActivitySignal {
 // It is tied to the work, not to a component: a job whose button unmounts keeps
 // running and still delivers its file, so the reload waits for it rather than for the
 // button.
+//
+// A job that never settles therefore holds the reload until the tab closes. There is no
+// ceiling on purpose: a long take legitimately encodes for minutes, and any cut-off short
+// of that would reload a file away. What ends a broken job is its own failure path, which
+// is why the exporters fail an encode on the encoder's error callback rather than waiting
+// on a flush that may never come.
 export async function holdWhile<T>(signal: ActivitySignal, work: () => Promise<T>): Promise<T> {
     const end = signal.begin();
     try {
