@@ -86,6 +86,8 @@ export type ClearedNote = {
     timeMs: number;
     velocity: number;
     wrongBefore: number;
+    // The forgiving advance moved past this position; see ClearedEvent.skipped.
+    skipped?: boolean;
     staves: number[];
     // When each staff's part of this position landed, on the same clock as `timestamp`.
     staffTimes?: Record<number, number>;
@@ -129,6 +131,7 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
         targetMs: info.timeMs - capture.baseOffsetMs,
         playedMs: info.timestamp - capture.startedAt,
         wrongBefore: info.wrongBefore,
+        ...(info.skipped ? { skipped: true } : {}),
         velocity: info.velocity,
         pitches: [...info.pitches],
         staves: info.staves,
@@ -239,8 +242,11 @@ export function flushHolds(capture: RunCapture, atMs: number): void {
 // own range; `previous` unchanged until two notes exist or when the gap gives no
 // usable estimate (a chord's zero gap, a rewound clock).
 export function liveTempo(capture: RunCapture, runTempo: number, previous: number): number {
-    const a = capture.notes[capture.notes.length - 2];
-    const b = capture.notes[capture.notes.length - 1];
+    // Only notes that were struck: a position the forgiving advance moved past carries the
+    // next note's moment, and the zero gap to that note says nothing about the pace.
+    const struck = capture.notes.filter((note) => !note.skipped);
+    const a = struck[struck.length - 2];
+    const b = struck[struck.length - 1];
     if (!a || !b) {
         return previous;
     }

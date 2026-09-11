@@ -376,6 +376,9 @@ export type CorrectInfo = {
     // zero means a clean first try, the signal Flow and per-segment accuracy are
     // built from.
     wrongBefore: number;
+    // The forgiving advance moved past this position without it being struck, so its
+    // timestamp is the next note's and it carries no timing of its own.
+    skipped: boolean;
     // The staves this position sits on (0 = treble/right, 1 = bass/left), so a run can be
     // scored per hand. Both when a chord spans the grand staff.
     staves: number[];
@@ -710,6 +713,7 @@ export function useScoreMatcher(
                     velocity,
                     velocities: event.velocities,
                     wrongBefore: event.wrongBefore,
+                    skipped: event.skipped,
                     staves: event.step.staves,
                     staffTimes: staffArrivals(event),
                     pitchTimes: event.arrivals,

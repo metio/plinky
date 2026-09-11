@@ -23,6 +23,13 @@ A very short beat, such as a grace note or a fast semiquaver, could have that mo
 cut short by the beat before it, and a note played inside it was marked as missed.
 Every beat now keeps its full moment.
 
+**With Keep going on, a missed note no longer makes the next one look early.** When
+you skipped a note and played the next one right on its beat, the result timed the
+skipped note as late and the one you played as early, so a single miss cost you
+twice on timing and put a note you got right on the strip as off the beat. The
+missed note still counts as missed, and the notes you played are timed as you
+played them.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

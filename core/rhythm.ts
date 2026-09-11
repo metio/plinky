@@ -62,8 +62,10 @@ export function makeHit(
 }
 
 // One played note relative to the run's first note: its notated onset (the ideal)
-// and when it was actually played, both in milliseconds.
-export type Onset = { targetMs: number; playedMs: number };
+// and when it was actually played, both in milliseconds. `skipped` marks a position the
+// forgiving advance moved past without it being struck: its `playedMs` is the next note's
+// moment, so it is no evidence of pace and has no timing of its own.
+export type Onset = { targetMs: number; playedMs: number; skipped?: boolean };
 
 // The player's pace relative to the score: the median of each gap's played/notated
 // ratio. 1.0 means they matched the notated tempo, 2.0 that they played at half
@@ -72,10 +74,11 @@ export type Onset = { targetMs: number; playedMs: number };
 // the preset one drifts ever further from target and scores zero. The median
 // shrugs off a few wild gaps, and a non-positive result falls back to 1.0.
 export function tempoScale(onsets: Onset[]): number {
+    const struck = onsets.filter((onset) => !onset.skipped);
     const ratios: number[] = [];
-    for (let index = 1; index < onsets.length; index++) {
-        const dt = onsets[index]!.targetMs - onsets[index - 1]!.targetMs;
-        const dp = onsets[index]!.playedMs - onsets[index - 1]!.playedMs;
+    for (let index = 1; index < struck.length; index++) {
+        const dt = struck[index]!.targetMs - struck[index - 1]!.targetMs;
+        const dp = struck[index]!.playedMs - struck[index - 1]!.playedMs;
         if (dt > 0) {
             ratios.push(dp / dt);
         }
@@ -89,18 +92,27 @@ export function tempoScale(onsets: Onset[]): number {
 // it. The first note anchors the run (zero), as do simultaneous onsets — a chord
 // matched key by key carries no rhythm of its own. A steady run reads as on-time at
 // any tempo; only a gap that breaks the player's established pace counts as off.
+//
+// A skipped onset reads zero and is passed over: the note after it is timed from the last
+// note that was struck. Measured from the skip instead, a note played exactly on its beat
+// reads a whole gap early, and the skip a whole gap late.
 export function timingDeltas(onsets: Onset[]): number[] {
     const scale = tempoScale(onsets);
-    return onsets.map((onset, index) => {
-        if (index === 0) {
+    let prev: Onset | undefined;
+    return onsets.map((onset) => {
+        if (onset.skipped) {
             return 0;
         }
-        const prev = onsets[index - 1]!;
-        const dt = onset.targetMs - prev.targetMs;
+        const before = prev;
+        prev = onset;
+        if (before === undefined) {
+            return 0;
+        }
+        const dt = onset.targetMs - before.targetMs;
         if (dt <= 0) {
             return 0;
         }
-        return onset.playedMs - prev.playedMs - dt * scale;
+        return onset.playedMs - before.playedMs - dt * scale;
     });
 }
 

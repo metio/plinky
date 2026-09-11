@@ -213,6 +213,10 @@ export type ClearedEvent = {
     // advance moved on without it being played in full: a note missed is a stumble at
     // that position, so it is neither a clean first try for Flow nor a hit on the strip.
     wrongBefore: number;
+    // The forgiving advance moved past this position: it clears at the moment of the note
+    // that belongs to the NEXT one, which is no moment of its own. The timing readers leave
+    // it out, so the note after it is timed from the last note actually played.
+    skipped: boolean;
 };
 
 export type MatchEvent =
@@ -418,6 +422,7 @@ function clear(
             (pitch) => state.hit.find((arrival) => arrival.note === pitch)?.velocity ?? 0,
         ),
         wrongBefore: state.sinceWrong + (skipped ? 1 : 0),
+        skipped,
     });
     const index = state.index + 1;
     return {

@@ -21,6 +21,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Keep up counts a grace note played a hair late.** A beat in Keep up stays open\nfor a moment after the cursor moves on, so a note played just after it still counts.\nA very short beat, such as a grace note or a fast semiquaver, could have that moment\ncut short by the beat before it, and a note played inside it was marked as missed.\nEvery beat now keeps its full moment.",
                 twip: true,
             },
+            {
+                body: "**With Keep going on, a missed note no longer makes the next one look early.** When\nyou skipped a note and played the next one right on its beat, the result timed the\nskipped note as late and the one you played as early, so a single miss cost you\ntwice on timing and put a note you got right on the strip as off the beat. The\nmissed note still counts as missed, and the notes you played are timed as you\nplayed them.",
+                twip: true,
+            },
         ],
     },
     {

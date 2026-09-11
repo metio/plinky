@@ -11,7 +11,14 @@ import { median } from "./stats";
 
 // One cleared note of a run: its notated onset, when it was actually played (both
 // relative to the run's first note), and how many wrong notes preceded it.
-export type FlowNote = { targetMs: number; playedMs: number; wrongBefore: number };
+// `skipped` marks a position the forgiving advance moved past: it is already a stumble
+// by its wrongBefore, and its moment is the next note's, so no gap is read to or from it.
+export type FlowNote = {
+    targetMs: number;
+    playedMs: number;
+    wrongBefore: number;
+    skipped?: boolean;
+};
 
 // A note reached after this many times its expected share of the run's pace counts
 // as a hesitation — a stop to find the key, not a musical breath.
@@ -26,6 +33,10 @@ export function fluentNotes(notes: FlowNote[]): boolean[] {
     const ratios: (number | null)[] = [];
     let previous: FlowNote | undefined;
     for (const note of notes) {
+        if (note.skipped) {
+            ratios.push(null);
+            continue;
+        }
         const expected = previous ? note.targetMs - previous.targetMs : 0;
         const actual = previous ? note.playedMs - previous.playedMs : 0;
         ratios.push(previous && expected > 0 ? actual / expected : null);

@@ -257,6 +257,25 @@ describe("matchNote", () => {
         expect(expectedPitches(result.state)).toEqual([65]);
     });
 
+    it("forgiving: marks the position moved past as skipped, and only that one", () => {
+        // A skipped position was never struck: its clearing moment is the NEXT note's, so
+        // every timing reader has to know to leave it out.
+        let state = startMatch([step([60]), step([62]), step([64]), step([65, 67])]);
+        state = matchNote(state, 60, 0, true).state;
+        const skip = matchNote(state, 64, 1000, true);
+        expect(cleared(skip.events).map((event) => [event.ordinal, event.skipped])).toEqual([
+            [1, true],
+            [2, false],
+        ]);
+        // Into a chord the forgiven position clears alone, and is still skipped.
+        const intoChord = matchNote(startMatch([step([60]), step([62, 65])]), 62, 0, true);
+        expect(cleared(intoChord.events).map((event) => [event.ordinal, event.skipped])).toEqual([
+            [0, true],
+        ]);
+        const played = cleared(matchNote(startMatch([step([60])]), 60, 0, true).events);
+        expect(played.map((event) => event.skipped)).toEqual([false]);
+    });
+
     it("forgiving: a note starting a multi-pitch next position carries into its chord", () => {
         let state = startMatch([step([60]), step([62, 65])]);
         const result = matchNote(state, 62, 0, true);

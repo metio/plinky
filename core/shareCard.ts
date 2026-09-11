@@ -27,6 +27,9 @@ export type RunNote = {
     targetMs: number;
     playedMs: number;
     wrongBefore: number;
+    // A position Keep going moved past without it being struck. Its `playedMs` is the
+    // moment of the note after it, so it carries no pace or timing of its own.
+    skipped?: boolean;
     staves?: number[];
     // When each hand struck this position, on the run clock. `playedMs` is when the
     // position cleared — its LAST pitch — so on a chord both hands share it and neither
@@ -96,13 +99,20 @@ export function levelFor(value: number): Level {
 // rather than rewarded past it. The first note has no preceding gap, so it borrows the
 // next note's pace instead of being judged on an unmeasurable one.
 export function speedFactors(notes: RunNote[], tempoScale = 1): number[] {
-    const speeds = notes.map((note, index) => {
-        if (index === 0) {
+    // Each gap runs from the last note that was struck: a skipped position has no moment of
+    // its own, so it has no pace either, and the note after it is not judged against it.
+    let previous: RunNote | undefined;
+    const speeds = notes.map((note) => {
+        if (note.skipped) {
             return 1;
         }
-        const previous = notes[index - 1]!;
-        const notatedGap = note.targetMs - previous.targetMs;
-        const playedGap = note.playedMs - previous.playedMs;
+        const before = previous;
+        previous = note;
+        if (before === undefined) {
+            return 1;
+        }
+        const notatedGap = note.targetMs - before.targetMs;
+        const playedGap = note.playedMs - before.playedMs;
         // A non-positive gap (a repeated onset, or clock noise) carries no pace signal.
         if (notatedGap <= 0 || playedGap <= 0) {
             return 1;
