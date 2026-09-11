@@ -18,11 +18,10 @@ import {
     spellOutGlissando,
     spellOutOrnament,
     spellOutTremolo,
-    subStepsOf,
     tremoloAt,
 } from "./listenPerformance";
 import { SOFT_SCALE } from "./pedal";
-import { listenStepMs, MIN_STEP_MS } from "./playback";
+import { listenStepMs, MIN_STEP_MS, subStepsOf } from "./playback";
 
 const note = (pitch: number, over: Partial<ListenNote> = {}): ListenNote => ({
     pitch,

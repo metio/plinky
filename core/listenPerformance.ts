@@ -8,7 +8,7 @@ import { type GlissandoSpan, glissandoNotes } from "./glissando";
 import type { Hand2 } from "./matcher";
 import { type OrnamentKind, ornamentNotes } from "./ornament";
 import { SOFT_SCALE } from "./pedal";
-import { effectiveTempo, listenStepMs, MIN_STEP_MS, writtenStepMs } from "./playback";
+import { effectiveTempo, subStepAdvanceMs, subStepsOf } from "./playback";
 import { fingeringOfHands } from "./scorePerformance";
 import { noteDelayMs, rubatoStretch, touchVelocity } from "./touch";
 import { type TremoloSpan, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
@@ -394,77 +394,6 @@ export function finalBarProgress(steps: readonly ListenStep[], index: number): n
         at = to + 1;
     }
     return places <= 1 ? 1 : place / (places - 1);
-}
-
-// The steps one position was spelled out into — a rolled chord's notes, an ornament's or a
-// tremolo's figure, a beat and the graces leaning on it: consecutive steps at one cursor
-// position, every one but the last holding the cursor where it is.
-export function subStepsOf(
-    steps: readonly ListenStep[],
-    index: number,
-): { from: number; to: number } {
-    const joined = (earlier: ListenStep | undefined, later: ListenStep | undefined) =>
-        earlier !== undefined &&
-        later !== undefined &&
-        !earlier.advancesCursor &&
-        earlier.position === later.position;
-    let from = index;
-    while (joined(steps[from - 1], steps[from])) {
-        from -= 1;
-    }
-    let to = index;
-    while (joined(steps[to], steps[to + 1])) {
-        to += 1;
-    }
-    return { from, to };
-}
-
-// How long one sub-step of a position holds, so that together they last exactly what the
-// position is written to last — its sub-steps' written lengths added up, under the same
-// MIN_STEP_MS floor a single step gets.
-//
-// A roll's spread is a fixed fraction of a beat, so above about 90 bpm it is shorter than
-// that floor, and so are the notes of a quick figure. Floored one by one, each would
-// overstay by the difference while the last still counted on having its written share, and
-// the position would end late — every rolled chord and every grace pushing the rest of
-// the piece further behind the onsets a graded run and Keep up count against. So the
-// earlier sub-steps keep the floor while the position has room for it and the last takes
-// what is left; a position too short to give each its floor shares its time out in the
-// written proportions instead. Where no sub-step is shorter than the floor, each holds its
-// own written length.
-function subStepAdvanceMs(
-    steps: readonly ListenStep[],
-    index: number,
-    tempo: number,
-    stretchAt: (at: number) => number,
-): number {
-    const step = steps[index] as ListenStep;
-    const { from, to } = subStepsOf(steps, index);
-    if (from === to) {
-        return listenStepMs(step.lengths, tempo, stretchAt(index));
-    }
-    const written: number[] = [];
-    for (let at = from; at <= to; at++) {
-        written.push(writtenStepMs((steps[at] as ListenStep).lengths, tempo, stretchAt(at)));
-    }
-    const total = written.reduce((sum, ms) => sum + ms, 0);
-    const positionMs = Math.max(MIN_STEP_MS, total);
-    const earlier = written.slice(0, -1).map((ms) => Math.max(MIN_STEP_MS, ms));
-    const taken = earlier.reduce((sum, ms) => sum + ms, 0);
-    const offset = index - from;
-    if (taken < positionMs) {
-        if (index < to) {
-            return earlier[offset] as number;
-        }
-        const lastWritten = written[offset] as number;
-        const floored = earlier.some((ms, at) => ms !== written[at]);
-        return !floored && lastWritten >= MIN_STEP_MS
-            ? listenStepMs(step.lengths, tempo, stretchAt(index))
-            : positionMs - taken;
-    }
-    return total > 0
-        ? ((written[offset] as number) * positionMs) / total
-        : positionMs / written.length;
 }
 
 // One position performed: every note with its own moment, length and touch, and how long

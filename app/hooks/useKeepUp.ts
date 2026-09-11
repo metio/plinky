@@ -19,7 +19,8 @@ import { useScheduler } from "../contexts/services";
 import type { Hand } from "../../core/matcher";
 import { NOMINAL_BPM, positionAdvances } from "../../core/elapsed";
 import { readParts, readStartTempo } from "../lib/scoreExpression";
-import { effectiveTempo, listenStepMs } from "../../core/playback";
+import { effectiveTempo, subStepAdvanceMs } from "../../core/playback";
+import { fitGraces } from "../../core/listenPerformance";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalos } from "../lib/scoreColor";
 import { useLatest } from "./useLatest";
@@ -64,7 +65,21 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
     const advances = positionAdvances(positions.map(shortestAt));
     for (const [at, position] of positions.entries()) {
         const { whole } = position;
+        const advance = advances[at] ?? 0;
+        // A grace is written with a length it does not have: it borrows from the beat it
+        // decorates. Its time comes out of that beat, fitted the way Listen fits it, so a
+        // decorated position lasts what it is written to rather than grace and beat both.
+        const fitted = fitGraces(
+            position.groups
+                .slice(0, -1)
+                .map((group) =>
+                    Math.max(0, ...group.map((entry) => entry.expression.notatedQuarters)),
+                ),
+            advance,
+        );
+        const graceTaken = fitted.graces.reduce((sum, one) => sum + one, 0);
         for (const [order, group] of position.groups.entries()) {
+            const isBeat = order === position.groups.length - 1;
             const play: KeepUpStep["play"] = [];
             const accompany: KeepUpStep["accompany"] = [];
             const lengths: number[] = [];
@@ -87,14 +102,20 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                     accompany.push(note);
                 }
             }
+            const beatLengths = withAdvance(lengths, advance);
             steps.push({
                 whole,
                 play,
                 accompany,
-                lengths: withAdvance(lengths, advances[at] ?? 0),
+                lengths: !isBeat
+                    ? [fitted.graces[order] ?? 0]
+                    : graceTaken > 0
+                      ? beatLengths.map((length) => Math.max(0, length - graceTaken))
+                      : beatLengths,
                 bpm: position.bpm,
                 stretch: position.stretch,
-                advancesCursor: order === position.groups.length - 1,
+                position: at,
+                advancesCursor: isBeat,
             });
         }
     }
@@ -339,7 +360,14 @@ export function useKeepUp({
                 }, KEEP_UP_LATE_MS);
                 return;
             }
-            const dwell = listenStepMs(current.lengths, localTempo(current), current.stretch);
+            // The same sub-step rule Listen keeps time by: the graces ahead of a beat and
+            // the beat itself last, together, what the position is written to last.
+            const dwell = subStepAdvanceMs(
+                steps,
+                step,
+                localTempo(current),
+                (at) => steps[at]?.stretch ?? 1,
+            );
             openStep(current, dwell, steps[step + 1]);
             // Mirror the reducer's position onto the visual cursor, in lock-step
             // with the collected steps, so the painter recolours the right notes — an

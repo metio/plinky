@@ -26,6 +26,9 @@ export type KeepUpStep = {
     lengths: number[];
     bpm: number;
     stretch: number;
+    // The cursor position the step was read at. The graces ahead of a beat share it with
+    // the beat, which is how the clock tells one decorated position from its neighbours.
+    position: number;
     advancesCursor: boolean;
 };
 

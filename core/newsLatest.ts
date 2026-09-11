@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**Keep up keeps time through grace notes.** In Keep up, a grace note held on for\nits whole written length before the note it decorates, and a very quick one a little\nlonger still, so every ornament pushed the beat later and the notes you were chasing\ndrifted away from the metronome. Grace notes now take their time from the note they\nlean on, the way Listen plays them, and the beat stays where the score puts it.",
+                twip: true,
+            },
+            {
                 body: "**A chord you moved on from reads amber, not green.** With Keep going on, playing\npart of a chord and going straight on to the next note painted the notes you did\nget the same green as a chord read cleanly, and with hidden notes on it was revealed\nas found, even though the grade already counted it as missed. It is now amber, the\ncolour for a note found after a slip, so the score and the grade tell the same\nstory.",
                 twip: true,
             },

@@ -6,6 +6,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
+import { listenStepMs } from "../../core/playback";
 import { litHalos } from "../lib/scoreColor";
 import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
 
@@ -21,7 +22,15 @@ vi.mock("../lib/scoreColor", () => ({
 // written length in quarter notes, or a rest carrying only a length.
 // staff omitted models a note whose engraved ParentStaff is undefined.
 type Voice =
-    | { midi: number; staff?: number; quarters?: number; tie?: "start" | "stop" }
+    | {
+          midi: number;
+          staff?: number;
+          quarters?: number;
+          tie?: "start" | "stop";
+          // An ornament's note, on a voice entry of its own, so two graces are two
+          // groups ahead of the beat rather than one grace chord.
+          grace?: boolean;
+      }
     | { rest: number };
 
 // A cursor over a fixed sequence of positions, standing in for the OSMD graphic.
@@ -51,6 +60,7 @@ function fakeOsmd(positions: Voice[][], onsets?: number[]) {
                           halfTone: voice.midi - 12,
                           // A tie's later note reports a tie whose start is another note.
                           ...(voice.tie === "stop" ? { NoteTie: { StartNote: {} } } : {}),
+                          ...(voice.grace ? { IsGraceNote: true, ParentVoiceEntry: {} } : {}),
                           ParentStaff:
                               voice.staff === undefined
                                   ? undefined
@@ -97,6 +107,7 @@ describe("collectKeepUpSteps", () => {
                 lengths: [1, 2],
                 bpm: NOMINAL_BPM,
                 stretch: 1,
+                position: 0,
                 advancesCursor: true,
             },
             {
@@ -106,6 +117,7 @@ describe("collectKeepUpSteps", () => {
                 lengths: [1],
                 bpm: NOMINAL_BPM,
                 stretch: 1,
+                position: 1,
                 advancesCursor: true,
             },
             {
@@ -115,6 +127,7 @@ describe("collectKeepUpSteps", () => {
                 lengths: [1],
                 bpm: NOMINAL_BPM,
                 stretch: 1,
+                position: 2,
                 advancesCursor: true,
             },
         ]);
@@ -126,6 +139,7 @@ describe("collectKeepUpSteps", () => {
             lengths: [1, 2],
             bpm: NOMINAL_BPM,
             stretch: 1,
+            position: 0,
             advancesCursor: true,
         });
     });
@@ -242,6 +256,41 @@ describe("useKeepUp", () => {
         const verdicts = vi.mocked(litHalos).mock.invocationCallOrder;
         expect(verdicts.length).toBeGreaterThan(0);
         expect(verdicts.every((at) => at < rewoundAt)).toBe(true);
+        act(() => result.current.stop());
+    });
+
+    it("holds a position with graces for its written time, however quick the graces", () => {
+        // Two graces of a sixteenth of a beat ahead of a crotchet, at 160 bpm: 23 ms
+        // apiece, under the floor. The position after them still opens one crotchet after
+        // this one does, where Listen and a graded run put it.
+        const osmd = fakeOsmd([
+            [
+                { midi: 62, staff: 0, quarters: 0.0625, grace: true },
+                { midi: 64, staff: 0, quarters: 0.0625, grace: true },
+                { midi: 60, staff: 0, quarters: 1 },
+            ],
+            [{ midi: 65, staff: 0, quarters: 1 }],
+        ]);
+        const onPosition = vi.fn();
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote: () => {} },
+                tempo: () => 160,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                onPosition,
+                markPainted: () => {},
+                onFinish: () => {},
+            }),
+        );
+        act(() => result.current.start({ hand: "both", guideNotes: false, accompany: false }));
+        const beat = listenStepMs([1], 160);
+        // A one-beat count-in, then the decorated position.
+        act(() => vi.advanceTimersByTime(beat * 2 - 1));
+        expect(onPosition).not.toHaveBeenCalledWith(0.25);
+        act(() => vi.advanceTimersByTime(1));
+        expect(onPosition).toHaveBeenLastCalledWith(0.25);
         act(() => result.current.stop());
     });
 
