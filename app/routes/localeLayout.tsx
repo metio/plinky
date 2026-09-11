@@ -34,10 +34,9 @@ export default function LocaleLayout() {
     // would answer a request for the library with the home page. So a lone segment is kept
     // and localised, with or without the trailing slash every canonical address carries —
     // "/music/" is the spelling a player copies out of the address bar. The cost is that a
-    // bare "/zz" now lands on the not-found page instead
-    // of the home page: nothing at runtime can tell "/music" from "/zz", and of the two
-    // readings the one that serves a real address is worth more than the one that tidies
-    // away a typo.
+    // bare "/zz" lands on the not-found page instead of the home page: nothing at runtime
+    // can tell "/music" from "/zz", and of the two readings the one that serves a real
+    // address is worth more than the one that tidies away a typo.
     //
     // localizedHref picks the language the way the bare "/" does — the one last chosen,
     // else the browser's, else English. During prerender there is no navigator to resolve
