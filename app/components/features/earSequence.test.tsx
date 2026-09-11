@@ -104,6 +104,39 @@ describe("EarSequence digit legends", () => {
         expect(hint()).toBeTruthy();
     });
 
+    it("gives a chromatic degree no shortcut and no corner digit, and leaves 3 to the plain third", () => {
+        // A dictation level offering the flat third beside the plain one: 3 can only mean one
+        // of them, so the flat third answers by tap alone.
+        pointer(true);
+        const onComplete = vi.fn();
+        renderWithServices(
+            <EarSequence
+                sequence={["1", "3"]}
+                choices={["1", "♭3", "3"]}
+                settled={false}
+                onComplete={onComplete}
+                label="melody"
+            />,
+        );
+        const flat = screen.getByRole("button", { name: "♭3" });
+        expect(flat.hasAttribute("aria-keyshortcuts")).toBe(false);
+        expect(flat.querySelector("[aria-hidden]")).toBeNull();
+        // A plain degree's label is its number already, so it carries the shortcut and no badge.
+        const third = screen.getByRole("button", { name: "3" });
+        expect(third.getAttribute("aria-keyshortcuts")).toBe("3");
+        expect(third.querySelector("[aria-hidden]")).toBeNull();
+        // One press at a time, as a player makes them: each is its own event and render.
+        for (const [key, code] of [
+            ["1", "Digit1"],
+            ["3", "Digit3"],
+        ]) {
+            act(() => {
+                window.dispatchEvent(new KeyboardEvent("keydown", { key, code }));
+            });
+        }
+        expect(onComplete).toHaveBeenCalledWith("1-3");
+    });
+
     it("takes nothing typed into a text field as proof", () => {
         // A phone's own on-screen keyboard only ever types into a field, so a key pressed
         // there says nothing about a keyboard the player could answer with.

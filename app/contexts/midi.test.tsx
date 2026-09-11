@@ -746,6 +746,24 @@ describe("claimed keys", () => {
         expect(result.current.heldNotes).toEqual([]);
     });
 
+    it("lets a claim go once, however often its release runs, and leaves another claim holding", () => {
+        const { result } = renderHook(() => usePlayingSurface(), {
+            wrapper: wrapperWith(fakeMidi()),
+        });
+        // Two surfaces claim 3; the first lets go twice over, as a cleanup run again would.
+        let release: () => void = () => {};
+        act(() => {
+            release = result.current.claimKeys(["3"]);
+            result.current.claimKeys(["3"]);
+        });
+        act(() => {
+            release();
+            release();
+        });
+        down("3", "Digit3");
+        expect(result.current.heldNotes).toEqual([]);
+    });
+
     it("is nothing at all outside a provider", () => {
         expect(() => renderHook(() => useClaimedKeys(["3"]))).not.toThrow();
     });
