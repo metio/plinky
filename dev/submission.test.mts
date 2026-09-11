@@ -7,7 +7,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { checkSubmission } from "./submission.mjs";
+import { parse } from "yaml";
+import { checkSubmission, LICENSES } from "./submission.mjs";
 
 const SCRIPT = fileURLToPath(
     new URL("../.github/scripts/validate-submission.mjs", import.meta.url),
@@ -51,6 +52,20 @@ const HOSTILE = form({
         "z<<PLINKY_EOF",
         "y",
     ].join("\n"),
+});
+
+describe("the licence options", () => {
+    it("are the issue form's dropdown, so an honest choice is never rejected", () => {
+        type Item = { id?: string; attributes?: { options?: unknown } };
+        const template = parse(
+            readFileSync(
+                new URL("../.github/ISSUE_TEMPLATE/score-submission.yml", import.meta.url),
+                "utf8",
+            ),
+        ) as { body: Item[] };
+        const license = template.body.find((item) => item.id === "license");
+        expect(license?.attributes?.options).toEqual(LICENSES);
+    });
 });
 
 describe("the submission validator's outputs", () => {
