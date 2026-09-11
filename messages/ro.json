@@ -1343,6 +1343,7 @@
     "video_show_watermark": "Filigran",
     "keyboard_label": "Claviatură de pian",
     "keyboard_wrong_note": "Notă greșită: {note}",
+    "keyboard_key_sharp": "{note} diez",
     "meta_ear_title": "Antrenamentul auzului — Plinky",
     "meta_ear_description": "Numește ce auzi — intervale și note izolate, direct în browser. Fără pian, fără cont, fără costuri.",
     "home_ear_blurb": "Departe de pian? Urechile tot pot exersa — numește notele și distanțele dintre ele.",

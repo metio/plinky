@@ -1370,6 +1370,7 @@
     "video_show_watermark": "Znak wodny",
     "keyboard_label": "Klawiatura fortepianu",
     "keyboard_wrong_note": "Zła nuta: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Kształcenie słuchu — Plinky",
     "meta_ear_description": "Nazwij to, co słyszysz — interwały i pojedyncze dźwięki, prosto w przeglądarce. Bez pianina, bez rejestracji, za darmo.",
     "home_ear_blurb": "Z dala od pianina? Uszy wciąż mogą ćwiczyć — nazywaj dźwięki i odległości między nimi.",

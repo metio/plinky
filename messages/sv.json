@@ -1318,6 +1318,7 @@
     "video_show_watermark": "Vattenstämpel",
     "keyboard_label": "Pianoklaviatur",
     "keyboard_wrong_note": "Fel ton: {note}",
+    "keyboard_key_sharp": "{note}iss",
     "meta_ear_title": "Gehörsträning — Plinky",
     "meta_ear_description": "Sätt namn på det du hör — intervall och enskilda toner, direkt i webbläsaren. Inget piano, ingen registrering, ingen kostnad.",
     "home_ear_blurb": "Långt från pianot? Öronen kan öva ändå — sätt namn på tonerna och avstånden mellan dem.",

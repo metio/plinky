@@ -1344,6 +1344,7 @@
     "video_show_watermark": "Filigrane",
     "keyboard_label": "Clavier de piano",
     "keyboard_wrong_note": "Mauvaise note : {note}",
+    "keyboard_key_sharp": "{note} dièse",
     "meta_ear_title": "Travail de l'oreille — Plinky",
     "meta_ear_description": "Nommez ce que vous entendez — intervalles et notes isolées, directement dans votre navigateur. Sans piano, sans inscription, sans frais.",
     "home_ear_blurb": "Loin du piano ? Vos oreilles peuvent travailler quand même — nommez les notes et les distances qui les séparent.",

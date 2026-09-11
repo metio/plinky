@@ -1291,6 +1291,7 @@
     "video_show_watermark": "워터마크",
     "keyboard_label": "피아노 건반",
     "keyboard_wrong_note": "틀린 음: {note}",
+    "keyboard_key_sharp": "{note}샵",
     "meta_ear_title": "청음 훈련 — Plinky",
     "meta_ear_description": "들리는 소리에 이름을 붙여 보세요 — 음정과 단음을, 브라우저에서 바로. 피아노도, 가입도, 비용도 필요 없어요.",
     "home_ear_blurb": "피아노에서 떨어져 있나요? 귀는 계속 연습할 수 있어요 — 음과 그 사이의 거리에 이름을 붙여 보세요.",

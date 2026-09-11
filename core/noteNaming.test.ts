@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { keyNameIn, minorKeyTextIn, noteSystemFor, noteTextIn } from "./noteNaming";
+import { keyNameIn, minorKeyTextIn, noteSystemFor, noteTextIn, spokenKeyIn } from "./noteNaming";
 import { NOTE_TEXT, type NoteNameId } from "./theory";
 
 const NOTE_IDS = Object.keys(NOTE_TEXT) as NoteNameId[];
@@ -37,6 +37,29 @@ describe("noteTextIn", () => {
         for (const name of names) {
             expect(name).not.toMatch(/[♯♭]/);
         }
+    });
+});
+
+describe("spokenKeyIn", () => {
+    it("names a black key from the white key below it and asks for the sharp word", () => {
+        expect(spokenKeyIn(61, "letters")).toEqual({ name: "C", sharp: true, octave: 4 });
+        expect(spokenKeyIn(70, "letters")).toEqual({ name: "A", sharp: true, octave: 4 });
+    });
+
+    it("spaces nothing onto a white key", () => {
+        expect(spokenKeyIn(60, "letters")).toEqual({ name: "C", sharp: false, octave: 4 });
+        expect(spokenKeyIn(59, "letters")).toEqual({ name: "B", sharp: false, octave: 3 });
+    });
+
+    it("spells the sharp into a German name and calls B natural H", () => {
+        expect(spokenKeyIn(61, "german")).toEqual({ name: "Cis", sharp: false, octave: 4 });
+        expect(spokenKeyIn(70, "german")).toEqual({ name: "Ais", sharp: false, octave: 4 });
+        expect(spokenKeyIn(59, "german")).toEqual({ name: "H", sharp: false, octave: 3 });
+    });
+
+    it("numbers the octaves the way a piano is labelled, middle C in the fourth", () => {
+        expect(spokenKeyIn(21, "letters")).toEqual({ name: "A", sharp: false, octave: 0 });
+        expect(spokenKeyIn(108, "letters")).toEqual({ name: "C", sharp: false, octave: 8 });
     });
 });
 

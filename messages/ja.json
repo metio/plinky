@@ -1291,6 +1291,7 @@
     "video_show_watermark": "透かし",
     "keyboard_label": "ピアノの鍵盤",
     "keyboard_wrong_note": "違う音: {note}",
+    "keyboard_key_sharp": "{note}シャープ",
     "meta_ear_title": "耳のトレーニング — Plinky",
     "meta_ear_description": "聞こえた音に名前をつけよう — 音程も単音も、ブラウザだけで。ピアノも登録も費用もいりません。",
     "home_ear_blurb": "ピアノから離れていても、耳はいつでも練習できます — 音と、その間の距離に名前をつけてみて。",

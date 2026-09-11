@@ -1369,6 +1369,7 @@
     "video_show_watermark": "Vodoznak",
     "keyboard_label": "Klaviatúra",
     "keyboard_wrong_note": "Nesprávna nota: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Tréning sluchu — Plinky",
     "meta_ear_description": "Pomenuj, čo počuješ — intervaly aj jednotlivé tóny, priamo v prehliadači. Bez klavíra, bez registrácie, zadarmo.",
     "home_ear_blurb": "Ďaleko od klavíra? Uši môžu cvičiť aj tak — pomenuj tóny a vzdialenosti medzi nimi.",

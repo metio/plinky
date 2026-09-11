@@ -1318,6 +1318,7 @@
     "video_show_watermark": "Wasserzeichen",
     "keyboard_label": "Klaviatur",
     "keyboard_wrong_note": "Falsche Note: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Gehörbildung – Plinky",
     "meta_ear_description": "Benenne, was du hörst – Intervalle und einzelne Töne, direkt im Browser. Kein Klavier, keine Anmeldung, keine Kosten.",
     "home_ear_blurb": "Gerade kein Klavier in der Nähe? Deine Ohren können trotzdem üben – benenne die Töne und die Abstände dazwischen.",

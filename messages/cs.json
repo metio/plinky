@@ -1369,6 +1369,7 @@
     "video_show_watermark": "Vodoznak",
     "keyboard_label": "Klaviatura",
     "keyboard_wrong_note": "Špatná nota: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Sluchová výchova — Plinky",
     "meta_ear_description": "Pojmenujte, co slyšíte — intervaly a jednotlivé tóny přímo v prohlížeči. Bez klavíru, bez registrace, zdarma.",
     "home_ear_blurb": "Zrovna nejste u klavíru? Cvičit může i samotný sluch — pojmenujte tóny a vzdálenosti mezi nimi.",

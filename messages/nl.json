@@ -1318,6 +1318,7 @@
     "video_show_watermark": "Watermerk",
     "keyboard_label": "Pianoklavier",
     "keyboard_wrong_note": "Verkeerde noot: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Gehoortraining — Plinky",
     "meta_ear_description": "Benoem wat je hoort — intervallen en losse noten, gewoon in je browser. Geen piano, geen account, geen kosten.",
     "home_ear_blurb": "Even geen piano in de buurt? Je oren kunnen nog steeds oefenen — benoem de noten en de afstanden ertussen.",

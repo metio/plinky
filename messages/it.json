@@ -1344,6 +1344,7 @@
     "video_show_watermark": "Filigrana",
     "keyboard_label": "Tastiera del pianoforte",
     "keyboard_wrong_note": "Nota sbagliata: {note}",
+    "keyboard_key_sharp": "{note} diesis",
     "meta_ear_title": "Educazione dell’orecchio — Plinky",
     "meta_ear_description": "Dai un nome a quello che senti — intervalli e note singole, direttamente nel browser. Senza pianoforte, senza registrazione, gratis.",
     "home_ear_blurb": "Lontano dal pianoforte? Le orecchie possono comunque esercitarsi — dai un nome alle note e alle distanze fra loro.",

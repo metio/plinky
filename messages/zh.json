@@ -1292,6 +1292,7 @@
     "video_show_watermark": "水印",
     "keyboard_label": "钢琴键盘",
     "keyboard_wrong_note": "错误的音符：{note}",
+    "keyboard_key_sharp": "升{note}",
     "meta_ear_title": "听音训练——Plinky",
     "meta_ear_description": "说出你听到的音——音程和单音，直接在浏览器里。不用钢琴，不用注册，也不花钱。",
     "home_ear_blurb": "不在钢琴边？耳朵照样能练——说出听到的音，还有音与音之间的距离。",

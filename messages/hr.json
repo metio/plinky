@@ -1344,6 +1344,7 @@
     "video_show_watermark": "Vodeni žig",
     "keyboard_label": "Klavijatura",
     "keyboard_wrong_note": "Pogrešna nota: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Trening sluha — Plinky",
     "meta_ear_description": "Imenuj što čuješ — intervale i pojedinačne note, ravno u pregledniku. Bez klavira, bez registracije, bez troška.",
     "home_ear_blurb": "Daleko od klavira? Uši i dalje mogu vježbati — imenuj note i razmake među njima.",

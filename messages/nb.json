@@ -1318,6 +1318,7 @@
     "video_show_watermark": "Vannmerke",
     "keyboard_label": "Pianotastatur",
     "keyboard_wrong_note": "Feil tone: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Gehørtrening — Plinky",
     "meta_ear_description": "Sett navn på det du hører — intervaller og enkelttoner, rett i nettleseren. Uten piano, uten konto, uten kostnad.",
     "home_ear_blurb": "Borte fra pianoet? Ørene kan øve likevel — sett navn på tonene og avstandene mellom dem.",

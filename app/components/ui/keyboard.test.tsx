@@ -4,9 +4,51 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { m } from "../../paraglide/messages.js";
+import { baseLocale, overwriteGetLocale } from "../../paraglide/runtime.js";
 import { Keyboard } from "./keyboard";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    overwriteGetLocale(() => baseLocale);
+});
+
+// A key's accessible name is what a screen reader says for it, so it is said in the
+// reader's language: English words inside a German page are a fragment nobody asked for.
+describe("Keyboard's spoken key names", () => {
+    it("says a German key the way a German reader names it, B natural as H", () => {
+        overwriteGetLocale(() => "de");
+        render(<Keyboard from={59} to={61} />);
+        expect(screen.getByLabelText("H 3")).toBeTruthy();
+        expect(screen.getByLabelText("C 4")).toBeTruthy();
+        expect(screen.getByLabelText("Cis 4")).toBeTruthy();
+        expect(screen.queryByLabelText(/sharp/)).toBeNull();
+    });
+
+    it("says the sharp in the reader's own word", () => {
+        overwriteGetLocale(() => "fr");
+        render(<Keyboard from={60} to={61} />);
+        expect(screen.getByLabelText(`${m.keyboard_key_sharp({ note: "C" })} 4`)).toBeTruthy();
+        expect(screen.queryByLabelText("C sharp 4")).toBeNull();
+    });
+
+    it("announces a wrong note in German", async () => {
+        overwriteGetLocale(() => "de");
+        render(<Keyboard from={60} to={67} wrong={{ note: 66, seq: 1 }} />);
+        await waitFor(() =>
+            expect(screen.getByRole("status").textContent).toBe(
+                m.keyboard_wrong_note({ note: "Fis 4" }),
+            ),
+        );
+    });
+
+    it("announces a wrong note in English as it always read", async () => {
+        render(<Keyboard from={60} to={67} wrong={{ note: 66, seq: 1 }} />);
+        await waitFor(() =>
+            expect(screen.getByRole("status").textContent).toBe("Wrong note: F sharp 4"),
+        );
+    });
+});
 
 // jsdom does no layout, so document.elementFromPoint is absent; stand it in with the
 // key the finger is meant to be over, and restore the original binding afterwards.

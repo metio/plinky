@@ -78,6 +78,39 @@ export function noteTextIn(name: NoteNameId, system: NoteSystem): string {
     return keyNameIn(name, system);
 }
 
+// A key as a screen reader should say it, in parts. A ♯ glyph is announced as "number" or
+// not at all, and an octave digit run onto the letter is spoken as one word, so the name,
+// the sharp and the octave come apart and the caller says them in the reader's words.
+// German spells the sharp into the name (Cis) and calls B natural H, so it needs no word
+// for the sharp; a letter system names the white key below and says the sharp after it.
+export type SpokenKey = { name: string; sharp: boolean; octave: number };
+
+// The keyboard's own spelling: a black key is named from the white key below it.
+const KEY_SLUGS = [
+    "c",
+    "csharp",
+    "d",
+    "dsharp",
+    "e",
+    "f",
+    "fsharp",
+    "g",
+    "gsharp",
+    "a",
+    "asharp",
+    "b",
+];
+
+export function spokenKeyIn(midi: number, system: NoteSystem): SpokenKey {
+    const slug = KEY_SLUGS[((midi % 12) + 12) % 12] as string;
+    const octave = Math.floor(midi / 12) - 1;
+    if (system === "german") {
+        return { name: keyNameIn(slug, system), sharp: false, octave };
+    }
+    const sharp = slug.endsWith("sharp");
+    return { name: keyNameIn(sharp ? slug.slice(0, 1) : slug, system), sharp, octave };
+}
+
 // The tonic of a minor key. German writes it in lower case — h-Moll, fis-Moll, es-Moll —
 // which is how a German reader tells the minor key from its major at a glance.
 export function minorKeyTextIn(name: NoteNameId, system: NoteSystem): string {

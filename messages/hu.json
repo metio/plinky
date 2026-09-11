@@ -1317,6 +1317,7 @@
     "video_show_watermark": "Vízjel",
     "keyboard_label": "Zongorabillentyűzet",
     "keyboard_wrong_note": "Rossz hang: {note}",
+    "keyboard_key_sharp": "{note}isz",
     "meta_ear_title": "Hallásfejlesztés — Plinky",
     "meta_ear_description": "Nevezd meg, amit hallasz — hangközöket és egyes hangokat, egyenesen a böngésződben. Zongora nélkül, regisztráció nélkül, ingyen.",
     "home_ear_blurb": "Távol a zongorától? A füled akkor is gyakorolhat — nevezd meg a hangokat és a köztük lévő távolságot.",

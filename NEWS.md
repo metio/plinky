@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 11 September 2026 — evening
 
+**A screen reader names the piano's keys in your language.** Every key on the
+on-screen keyboard, and the wrong-note announcement, was read out in English
+whatever language Plinky was in, so a German page said "Falsche Note: F sharp 4".
+Keys are now named the way your language names them, "Falsche Note: Fis 4" and H for
+B natural in German, and with your language's own word for a sharp everywhere else.
+
 **In German, the circle of fifths calls B natural H.** German reads the letter B as
 B flat, so the Tools page told a German reader that D major's relative minor was
 B-Moll, and named the key of five sharps B. The circle, its signatures, the chord

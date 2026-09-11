@@ -1317,6 +1317,7 @@
     "video_show_watermark": "Filigrani",
     "keyboard_label": "Tastiera e pianos",
     "keyboard_wrong_note": "Notë e gabuar: {note}",
+    "keyboard_key_sharp": "{note} diez",
     "meta_ear_title": "Stërvitje e veshit — Plinky",
     "meta_ear_description": "Emërto atë që dëgjon — intervale dhe nota të veçuara, drejt e në shfletuesin tënd. Pa piano, pa regjistrim, pa pagesë.",
     "home_ear_blurb": "Larg pianos? Veshët e tu prapë mund të stërviten — emërto notat dhe distancat mes tyre.",

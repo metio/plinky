@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: '**A screen reader names the piano\'s keys in your language.** Every key on the\non-screen keyboard, and the wrong-note announcement, was read out in English\nwhatever language Plinky was in, so a German page said "Falsche Note: F sharp 4".\nKeys are now named the way your language names them, "Falsche Note: Fis 4" and H for\nB natural in German, and with your language\'s own word for a sharp everywhere else.',
+                twip: true,
+            },
+            {
                 body: "**In German, the circle of fifths calls B natural H.** German reads the letter B as\nB flat, so the Tools page told a German reader that D major's relative minor was\nB-Moll, and named the key of five sharps B. The circle, its signatures, the chord\nsheet you can save, the scale, chord and interval pickers and the Theory lessons now\nuse the German names: h-Moll, Fis · Cis, H for B natural and B for B flat.",
                 twip: true,
             },

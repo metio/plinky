@@ -1317,6 +1317,7 @@
     "video_show_watermark": "Filigran",
     "keyboard_label": "Piyano klavyesi",
     "keyboard_wrong_note": "Yanlış nota: {note}",
+    "keyboard_key_sharp": "{note} diyez",
     "meta_ear_title": "Kulak eğitimi — Plinky",
     "meta_ear_description": "Duyduğunu adlandır — aralıklar ve tek notalar, doğrudan tarayıcında. Piyano yok, kayıt yok, ücret yok.",
     "home_ear_blurb": "Piyanodan uzakta mısın? Kulakların yine de çalışabilir — notaları ve aralarındaki mesafeleri adlandır.",

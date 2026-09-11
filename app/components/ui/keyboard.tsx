@@ -4,12 +4,13 @@
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
-import { spokenPitch } from "../../../core/midi";
+import { type NoteSystem, noteSystemFor, spokenKeyIn } from "../../../core/noteNaming";
 import { keyLabelOf } from "../../../core/notes";
 import type { NoteLabels } from "../../../core/prefs";
 import { isWhite, keybedMaxWidthPx, whiteKeys } from "../../../core/keyboardGeometry";
 import { type KeyState, keyState } from "../../../core/keyState";
 import { m } from "../../paraglide/messages.js";
+import { getLocale } from "../../paraglide/runtime.js";
 import { finishFor, type KeyboardFinish } from "../../../core/keyboardFinish";
 
 // What a pointer calls itself when it sounds and silences a note. One name, because a
@@ -83,6 +84,14 @@ function keyLabel(note: number, labels: NoteLabels): string | null {
         return label.letter;
     }
     return `${SYLLABLES[label.degree]?.() ?? ""}${label.sharp ? SHARP_GLYPH : ""}`;
+}
+
+// A key as a screen reader says it, in the reader's language: "C sharp 4", "C dièse 4",
+// "Cis 4". core names the key in the locale's note system; the sharp word is translated
+// copy, so this spells it.
+function spokenName(note: number, system: NoteSystem): string {
+    const { name, sharp, octave } = spokenKeyIn(note, system);
+    return `${sharp ? m.keyboard_key_sharp({ note: name }) : name} ${octave}`;
 }
 
 const NONE: ReadonlySet<number> = new Set();
@@ -199,6 +208,19 @@ export function Keyboard({
     // black keys are positioned as a percentage of this same container, so capping the
     // container (rather than the white keys alone) keeps white and black keys aligned.
     const maxWidth = whites.length ? keybedMaxWidthPx(from, to) : undefined;
+
+    // Every key's spoken name, worked out once per range and language rather than for
+    // each key on every frame a hold fill redraws.
+    const locale = getLocale();
+    const spoken = useMemo(() => {
+        const system = noteSystemFor(locale);
+        const names = new Map<number, string>();
+        for (let note = from; note <= to; note++) {
+            names.set(note, spokenName(note, system));
+        }
+        return names;
+    }, [from, to, locale]);
+    const sayKey = (note: number) => spoken.get(note) ?? spokenName(note, noteSystemFor(locale));
 
     const keysRef = useRef<HTMLDivElement>(null);
     // The one key in the tab order (roving tabindex): Tab reaches the keybed once, then
@@ -508,7 +530,7 @@ export function Keyboard({
     const onKeyBlur = (event: React.FocusEvent<HTMLButtonElement>) => blur(noteOf(event))();
     const keyProps = (note: number) => ({
         type: "button" as const,
-        "aria-label": spokenPitch(note),
+        "aria-label": sayKey(note),
         "aria-pressed": lit.has(note),
         tabIndex: note === roved ? 0 : -1,
         "data-note": note,
@@ -619,7 +641,7 @@ export function Keyboard({
                 )}
             </div>
             <span key={flash?.seq} className="sr-only" role="status" aria-live="assertive">
-                {flashNote !== null ? m.keyboard_wrong_note({ note: spokenPitch(flashNote) }) : ""}
+                {flashNote !== null ? m.keyboard_wrong_note({ note: sayKey(flashNote) }) : ""}
             </span>
         </div>
     );

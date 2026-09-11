@@ -1328,6 +1328,7 @@
     "video_show_watermark": "Watermark",
     "keyboard_label": "Piano keyboard",
     "keyboard_wrong_note": "Wrong note: {note}",
+    "keyboard_key_sharp": "{note} sharp",
     "meta_ear_title": "Ear training — Plinky",
     "meta_ear_description": "Name what you hear — intervals and single notes, straight in your browser. No piano, no sign-up, no cost.",
     "home_ear_blurb": "Away from the piano? Your ears can still practise — name the notes and the distances between them.",

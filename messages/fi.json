@@ -1318,6 +1318,7 @@
     "video_show_watermark": "Vesileima",
     "keyboard_label": "Pianon koskettimisto",
     "keyboard_wrong_note": "Väärä nuotti: {note}",
+    "keyboard_key_sharp": "{note}is",
     "meta_ear_title": "Kuulonharjoittelu — Plinky",
     "meta_ear_description": "Nimeä se, minkä kuulet — intervallit ja yksittäiset sävelet suoraan selaimessa. Ei pianoa, ei rekisteröitymistä, ei maksua.",
     "home_ear_blurb": "Poissa pianon äärestä? Korvat pääsevät silti harjoittelemaan — nimeä sävelet ja niiden väliset etäisyydet.",

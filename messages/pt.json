@@ -1344,6 +1344,7 @@
     "video_show_watermark": "Marca d'água",
     "keyboard_label": "Teclado de piano",
     "keyboard_wrong_note": "Nota errada: {note}",
+    "keyboard_key_sharp": "{note} sustenido",
     "meta_ear_title": "Treino auditivo — Plinky",
     "meta_ear_description": "Dá nome ao que ouves — intervalos e notas soltas, mesmo no teu navegador. Sem piano, sem inscrição, sem custos.",
     "home_ear_blurb": "Longe do piano? Os teus ouvidos podem praticar na mesma — dá nome às notas e às distâncias entre elas.",
