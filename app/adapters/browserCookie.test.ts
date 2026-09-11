@@ -16,6 +16,18 @@ describe("browserCookies", () => {
         expect(browserCookies.read()).toContain("plinky-test=de");
     });
 
+    it("scopes the cookie to the whole site and gives it the lifetime asked for", () => {
+        // The read-back above cannot see attributes, and passes without path=/ on a page at
+        // the root. Written from /de/music/ without it, the cookie would be scoped there,
+        // and the edge answering the bare "/" would never be sent it.
+        const written: string[] = [];
+        vi.spyOn(document, "cookie", "set").mockImplementation((value: string) => {
+            written.push(value);
+        });
+        browserCookies.write("plinky-test", "de", 60);
+        expect(written).toEqual(["plinky-test=de; path=/; max-age=60"]);
+    });
+
     it("forgets a cookie written with no lifetime left", () => {
         browserCookies.write("plinky-test", "de", 60);
         browserCookies.write("plinky-test", "", 0);
