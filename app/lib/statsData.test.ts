@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
+import { NO_BADGE_MARKS } from "../../core/achievements";
+import { EAR_ITEMS } from "../../core/earCatalog";
 import type { Mastery } from "../../core/mastery";
 import type { Grid } from "../../core/shareCard";
 import type { GradeCatalogItem, GradedMastery } from "./gradeProgress";
@@ -40,6 +42,7 @@ function input(overrides: Partial<YouInput> = {}): YouInput {
         fingerprint: null,
         reachedGrade: 0,
         flawless: false,
+        badgeMarks: NO_BADGE_MARKS,
         now: NOW,
         ...overrides,
     };
@@ -126,6 +129,66 @@ describe("buildStatsData", () => {
             const lapsed = pieces(1, STAR_THRESHOLDS.bronze, { reviewAt: NOW - 400 * DAY });
             const data = buildStatsData(input({ items: lapsed, mode: "competitive" }));
             expect(earned(data, "star-bronze")).toBe(true);
+        });
+
+        it("keeps a kept star after a piece behind it is shelved", () => {
+            const shelved = [
+                ...pieces(1, STAR_THRESHOLDS.bronze - 1),
+                piece("shelved", 1, { backlog: true }),
+            ];
+            const data = buildStatsData(
+                input({ items: shelved, badgeMarks: { star: "bronze", earMastered: false } }),
+            );
+            expect(earned(data, "star-bronze")).toBe(true);
+            expect(data.badgeMarks.star).toBe("bronze");
+        });
+
+        it("keeps a kept star after a piece behind it is un-marked", () => {
+            const unmarked = [
+                ...pieces(1, STAR_THRESHOLDS.bronze - 1),
+                piece("unmarked", 1, { learned: false, reviewAt: 0 }),
+            ];
+            const data = buildStatsData(
+                input({ items: unmarked, badgeMarks: { star: "bronze", earMastered: false } }),
+            );
+            expect(earned(data, "star-bronze")).toBe(true);
+        });
+
+        it("raises the kept star when more pieces are mastered", () => {
+            const data = buildStatsData(
+                input({
+                    items: pieces(1, STAR_THRESHOLDS.silver),
+                    badgeMarks: { star: "bronze", earMastered: false },
+                }),
+            );
+            expect(earned(data, "star-silver")).toBe(true);
+            expect(data.badgeMarks.star).toBe("silver");
+        });
+
+        it("earns the tiers below a gold star held in one grade", () => {
+            const data = buildStatsData(input({ items: pieces(1, STAR_THRESHOLDS.gold) }));
+            expect(earned(data, "star-bronze")).toBe(true);
+            expect(earned(data, "star-silver")).toBe(true);
+            expect(earned(data, "star-gold")).toBe(true);
+        });
+
+        it("keeps the ear-mastered badge once every ear exercise has been learned", () => {
+            const ear = (learned: boolean) =>
+                EAR_ITEMS.map((item, i) => ({
+                    ...piece(item.id, 1, i === 0 ? { learned } : {}),
+                    kind: "ear" as const,
+                }));
+            const all = buildStatsData(input({ items: ear(true) }));
+            expect(earned(all, "ear-mastered")).toBe(true);
+            expect(all.badgeMarks.earMastered).toBe(true);
+
+            const oneUnmarked = buildStatsData(
+                input({ items: ear(false), badgeMarks: all.badgeMarks }),
+            );
+            expect(earned(oneUnmarked, "ear-mastered")).toBe(true);
+            expect(earned(buildStatsData(input({ items: ear(false) })), "ear-mastered")).toBe(
+                false,
+            );
         });
 
         it("celebrates the highest grade ever reached, not the current standing", () => {

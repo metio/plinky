@@ -45,6 +45,41 @@ const NOTE_TARGETS = [1_000, 10_000];
 const STAR_ORDER: StarKind[] = ["bronze", "silver", "gold"];
 const EAR_BADGES: EarBadge[] = ["first", "flawless", "mastered"];
 
+// Two badge facts are read off the current mastery, and the mastery can fall back: the best
+// star tier held in any grade, and whether every ear exercise is learned, both drop when a
+// piece is shelved or un-marked. So they are kept as high-water marks beside the celebrated
+// grade, raised whenever the mastery shows more and never lowered, which is what keeps the
+// promise above.
+export type BadgeMarks = { star: StarKind | null; earMastered: boolean };
+
+export const NO_BADGE_MARKS: BadgeMarks = { star: null, earMastered: false };
+
+function starRank(star: StarKind | null): number {
+    return star === null ? -1 : STAR_ORDER.indexOf(star);
+}
+
+// The kept marks raised to whatever `seen` shows beyond them. Returns `kept` itself when
+// nothing is new, so a caller can skip a write that would change nothing.
+export function raiseBadgeMarks(kept: BadgeMarks, seen: BadgeMarks): BadgeMarks {
+    const star = starRank(seen.star) > starRank(kept.star) ? seen.star : kept.star;
+    const earMastered = kept.earMastered || seen.earMastered;
+    return star === kept.star && earMastered === kept.earMastered ? kept : { star, earMastered };
+}
+
+// Every star tier up to the best one held: a gold star was reached through bronze and silver.
+export function starsThrough(star: StarKind | null): Set<StarKind> {
+    return new Set(STAR_ORDER.slice(0, starRank(star) + 1));
+}
+
+// Stored marks read defensively: anything that is not a known tier holds no star.
+export function normalizeBadgeMarks(raw: unknown): BadgeMarks {
+    const value = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+    return {
+        star: STAR_ORDER.find((tier) => tier === value.star) ?? null,
+        earMastered: value.earMastered === true,
+    };
+}
+
 export function collectAchievements(facts: AchievementFacts): Achievement[] {
     return [
         ...Array.from({ length: MAX_GRADE }, (_, i) => {

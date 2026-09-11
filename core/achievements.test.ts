@@ -2,7 +2,53 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { type AchievementFacts, collectAchievements } from "./achievements";
+import {
+    type AchievementFacts,
+    collectAchievements,
+    NO_BADGE_MARKS,
+    normalizeBadgeMarks,
+    raiseBadgeMarks,
+    starsThrough,
+} from "./achievements";
+
+describe("badge marks", () => {
+    it("raises the star to a higher tier and never lowers it", () => {
+        const bronze = raiseBadgeMarks(NO_BADGE_MARKS, { star: "bronze", earMastered: false });
+        expect(bronze.star).toBe("bronze");
+        expect(raiseBadgeMarks(bronze, { star: null, earMastered: false }).star).toBe("bronze");
+        expect(raiseBadgeMarks(bronze, { star: "gold", earMastered: false }).star).toBe("gold");
+        const gold = { star: "gold" as const, earMastered: false };
+        expect(raiseBadgeMarks(gold, { star: "silver", earMastered: false }).star).toBe("gold");
+    });
+
+    it("latches the ear-mastered mark", () => {
+        const mastered = raiseBadgeMarks(NO_BADGE_MARKS, { star: null, earMastered: true });
+        expect(mastered.earMastered).toBe(true);
+        expect(raiseBadgeMarks(mastered, NO_BADGE_MARKS).earMastered).toBe(true);
+    });
+
+    it("hands back the kept marks themselves when nothing is new", () => {
+        const kept = { star: "silver" as const, earMastered: true };
+        expect(raiseBadgeMarks(kept, { star: "bronze", earMastered: false })).toBe(kept);
+    });
+
+    it("earns every tier up to the best one held", () => {
+        expect(starsThrough(null)).toEqual(new Set());
+        expect(starsThrough("bronze")).toEqual(new Set(["bronze"]));
+        expect(starsThrough("gold")).toEqual(new Set(["bronze", "silver", "gold"]));
+    });
+
+    it("reads anything unrecognised as no marks", () => {
+        expect(normalizeBadgeMarks(null)).toEqual(NO_BADGE_MARKS);
+        expect(normalizeBadgeMarks({ star: "platinum", earMastered: "yes" })).toEqual(
+            NO_BADGE_MARKS,
+        );
+        expect(normalizeBadgeMarks({ star: "silver", earMastered: true })).toEqual({
+            star: "silver",
+            earMastered: true,
+        });
+    });
+});
 
 const NOTHING: AchievementFacts = {
     reachedGrade: 0,

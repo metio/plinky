@@ -114,6 +114,12 @@ though you had kept it for months. A run now moves the review further out only o
 the review has come due, or nearly. Playing again before then still keeps your best
 score, and a run that goes badly still brings the review back to tomorrow.
 
+**A star you have earned stays earned.** Put one of the pieces behind a star back on
+the shelf, or take the learned tick off it, and the star vanished from your badges on
+the Stats page, although badges are meant to be yours for good. Stars now stay once you
+have seen them, and so does the badge for learning every ear exercise. A gold star in
+any grade now also counts as the bronze and silver you passed on the way.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

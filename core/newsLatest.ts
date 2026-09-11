@@ -81,6 +81,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Playing a piece again straight away no longer pushes its review months away.** Once\na piece was learned, every good run counted as a review, so playing it six times in\none sitting scheduled the next review half a year out, and the piece went quiet as\nthough you had kept it for months. A run now moves the review further out only once\nthe review has come due, or nearly. Playing again before then still keeps your best\nscore, and a run that goes badly still brings the review back to tomorrow.",
                 twip: true,
             },
+            {
+                body: "**A star you have earned stays earned.** Put one of the pieces behind a star back on\nthe shelf, or take the learned tick off it, and the star vanished from your badges on\nthe Stats page, although badges are meant to be yours for good. Stars now stay once you\nhave seen them, and so does the badge for learning every ear exercise. A gold star in\nany grade now also counts as the bronze and silver you passed on the way.",
+                twip: true,
+            },
         ],
     },
     {

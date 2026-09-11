@@ -45,6 +45,73 @@ const wrapper = ({ children }: { children: ReactNode }) => (
     </ServicesProvider>
 );
 
+const earned = (data: ReturnType<typeof useStatsData>, id: string) =>
+    data?.achievements.find((achievement) => achievement.id === id)?.earned;
+
+const gradeOne = (count: number, mastery: (i: number) => Mastery = () => fresh) =>
+    Array.from({ length: count }, (_, i) => ({
+        id: `g1-${i}`,
+        title: `g1-${i}`,
+        grade: 1,
+        cost: 1,
+        kind: "piece" as const,
+        mastery: mastery(i),
+    }));
+
+describe("useStatsData badges", () => {
+    // One device across visits to the page: the badge a visit showed is still there on the
+    // next, whatever happened to the pieces behind it in between.
+    function visits() {
+        const services = createServices({ store: memoryStore(), activity: createActivitySignal() });
+        const own = ({ children }: { children: ReactNode }) => (
+            <ServicesProvider services={services}>{children}</ServicesProvider>
+        );
+        return async () => {
+            const { result, unmount } = renderHook(() => useStatsData(), { wrapper: own });
+            await waitFor(() => expect(result.current).not.toBeNull());
+            const data = result.current;
+            unmount();
+            return data;
+        };
+    }
+
+    it("keeps a star badge after one of the pieces that earned it is shelved", async () => {
+        const visit = visits();
+        catalogueMock.mockResolvedValue([]);
+        masteryMock.mockResolvedValue(gradeOne(5));
+        expect(earned(await visit(), "star-bronze")).toBe(true);
+
+        masteryMock.mockResolvedValue(
+            gradeOne(5, (i) => (i === 0 ? { ...fresh, backlog: true } : fresh)),
+        );
+        expect(earned(await visit(), "star-bronze")).toBe(true);
+    });
+
+    it("keeps a star badge after one of the pieces that earned it is un-marked", async () => {
+        const visit = visits();
+        catalogueMock.mockResolvedValue([]);
+        masteryMock.mockResolvedValue(gradeOne(5));
+        expect(earned(await visit(), "star-bronze")).toBe(true);
+
+        masteryMock.mockResolvedValue(
+            gradeOne(5, (i) => (i === 0 ? { ...fresh, learned: false, reviewAt: 0 } : fresh)),
+        );
+        expect(earned(await visit(), "star-bronze")).toBe(true);
+    });
+
+    it("still raises the badge when more pieces are mastered later", async () => {
+        const visit = visits();
+        catalogueMock.mockResolvedValue([]);
+        masteryMock.mockResolvedValue(gradeOne(5));
+        expect(earned(await visit(), "star-silver")).toBe(false);
+
+        masteryMock.mockResolvedValue(gradeOne(12));
+        const later = await visit();
+        expect(earned(later, "star-silver")).toBe(true);
+        expect(earned(later, "star-gold")).toBe(false);
+    });
+});
+
 describe("useStatsData", () => {
     it("is null until the mastery loads, then derives the standing in one shot", async () => {
         masteryMock.mockResolvedValue(

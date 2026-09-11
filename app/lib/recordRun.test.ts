@@ -147,6 +147,33 @@ describe("recordRun", () => {
         );
     });
 
+    it("keeps the star a run completes, so shelving a piece later cannot take it back", async () => {
+        const services = createServices({ store: memoryStore() });
+        const learned = {
+            bestScore: 90,
+            learned: true,
+            backlog: false,
+            intervalDays: 1,
+            reviewAt: 2000 + 86_400_000,
+            updatedAt: 1000,
+            deadline: "",
+        };
+        loadMock.mockResolvedValue(
+            Array.from({ length: 5 }, (_, i) => ({
+                id: `g1-${i}`,
+                title: `g1-${i}`,
+                grade: 1,
+                cost: 1,
+                kind: "piece" as const,
+                mastery: learned,
+            })),
+        );
+
+        recordRun(run(), services, 1000, vi.fn());
+
+        await vi.waitFor(() => expect(services.milestones.badgeMarks().star).toBe("bronze"));
+    });
+
     describe("the verdict", () => {
         // A device with full or blocked storage still grades the run, still sounds the
         // flourish and still paints the panel. Without a verdict the player is shown a

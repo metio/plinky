@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { progressGrid } from "../../core/lifetime";
 import type { Grid } from "../../core/shareCard";
 import { useServices } from "../contexts/services";
@@ -45,6 +45,8 @@ export function useStatsData(): StatsData | null {
     // value rather than freezing it.
     const reachedGrade = services.milestones.reachedGrade();
     const flawless = services.milestones.flawlessDone();
+    // A cached snapshot, the same object until the stored marks really change.
+    const badgeMarks = services.milestones.badgeMarks();
     const { decayMode, reviewCap } = prefs;
 
     // Derived once per change of input rather than once per render. Inside, this filters
@@ -68,10 +70,29 @@ export function useStatsData(): StatsData | null {
                       fingerprint,
                       reachedGrade,
                       flawless,
+                      badgeMarks,
                       now: Date.now(),
                   }),
-        [items, catalogue, decayMode, reviewCap, summary, fingerprint, reachedGrade, flawless],
+        [
+            items,
+            catalogue,
+            decayMode,
+            reviewCap,
+            summary,
+            fingerprint,
+            reachedGrade,
+            flawless,
+            badgeMarks,
+        ],
     );
+
+    // A badge this page has shown stays earned: shelving or un-marking one of the pieces
+    // behind a star later lowers what the mastery shows, never what is kept.
+    useEffect(() => {
+        if (data) {
+            services.milestones.recordBadgeMarks(data.badgeMarks);
+        }
+    }, [data, services]);
 
     return data;
 }

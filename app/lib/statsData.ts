@@ -1,7 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { type Achievement, collectAchievements, type StarKind } from "../../core/achievements";
+import {
+    type Achievement,
+    type BadgeMarks,
+    collectAchievements,
+    NO_BADGE_MARKS,
+    raiseBadgeMarks,
+    starsThrough,
+} from "../../core/achievements";
 import { EAR_ITEMS } from "../../core/earCatalog";
 import type { ItemKind } from "../../core/practisable";
 import { letterFor } from "../../core/grade";
@@ -41,6 +48,9 @@ export type StatsData = {
     fingerprint: Grid | null;
     // The collectible badge set, earned flags included.
     achievements: Achievement[];
+    // The kept badge marks raised by what the mastery shows now: what the page should
+    // record, so every badge it has shown stays earned.
+    badgeMarks: BadgeMarks;
 };
 
 export type YouInput = {
@@ -56,6 +66,9 @@ export type YouInput = {
     // once earned cannot be taken back by a later slump.
     reachedGrade: number;
     flawless: boolean;
+    // The best star tier and ear mastery ever shown, which the current mastery may
+    // have fallen back from.
+    badgeMarks: BadgeMarks;
     now: number;
 };
 
@@ -66,6 +79,7 @@ export type YouInput = {
 export function buildStatsData(input: YouInput): StatsData {
     const { items, catalogue, mode, now } = input;
     const { level, workingGrade, mastered } = ladderStanding(items);
+    const badgeMarks = raiseBadgeMarks(input.badgeMarks, seenBadgeMarks(items, now));
 
     return {
         items,
@@ -83,38 +97,46 @@ export function buildStatsData(input: YouInput): StatsData {
         })),
         summary: input.summary,
         fingerprint: input.fingerprint,
-        achievements: earnedAchievements(input, level),
+        achievements: earnedAchievements(input, level, badgeMarks),
+        badgeMarks,
     };
 }
 
-// Badge facts are counted cumulatively: the celebrated grade never lowers, best
-// scores never drop, and stars are judged under gentle decay regardless of the
-// player's chosen mode — so an earned badge can never quietly disappear.
-function earnedAchievements(input: YouInput, level: number): Achievement[] {
-    const { items, summary, now } = input;
-    const stars = new Set<StarKind>();
+// What the mastery shows today toward the two badges that could otherwise fall back: the
+// best star tier held in any grade, judged under gentle decay whatever the player's mode,
+// and whether every ear exercise is learned, so the whole set must be present.
+export function seenBadgeMarks(items: GradedMastery[], now: number): BadgeMarks {
+    let marks = NO_BADGE_MARKS;
     for (let grade = 1; grade <= MAX_GRADE; grade++) {
         const tier = starTier(masteredInGrade(items, grade, "gentle", now));
         if (tier !== "none") {
-            stars.add(tier);
+            marks = raiseBadgeMarks(marks, { star: tier, earMastered: false });
         }
     }
+    const earMastered =
+        EAR_ITEMS.length > 0 &&
+        EAR_ITEMS.every((ear) =>
+            items.some((item) => item.kind === "ear" && item.id === ear.id && item.mastery.learned),
+        );
+    return raiseBadgeMarks(marks, { star: null, earMastered });
+}
+
+// Badge facts are counted cumulatively: the celebrated grade never lowers, best
+// scores never drop, and the star and ear-mastery marks are kept at the most the
+// mastery has ever shown — so an earned badge can never quietly disappear.
+function earnedAchievements(input: YouInput, level: number, marks: BadgeMarks): Achievement[] {
+    const { items, summary } = input;
     const earItems = items.filter((item) => item.kind === "ear");
     return collectAchievements({
         reachedGrade: Math.max(input.reachedGrade, level),
         hasS: items.some((item) => letterFor(item.mastery.bestScore) === "S"),
         flawless: input.flawless,
-        stars,
+        stars: starsThrough(marks.star),
         daysPracticed: summary?.daysPracticed ?? 0,
         totalNotes: summary?.totalNotes ?? 0,
-        // A touched ear item means a session finished; a best of 100 is a flawless run;
-        // mastered means every ear exercise is learned, so the whole set must be present.
+        // A touched ear item means a session finished; a best of 100 is a flawless run.
         earTrained: earItems.length > 0,
         earFlawless: earItems.some((item) => item.mastery.bestScore >= 100),
-        earMastered:
-            EAR_ITEMS.length > 0 &&
-            EAR_ITEMS.every((ear) =>
-                earItems.some((item) => item.id === ear.id && item.mastery.learned),
-            ),
+        earMastered: marks.earMastered,
     });
 }

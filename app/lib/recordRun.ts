@@ -8,6 +8,7 @@ import type { CapturedNote } from "../../core/runCapture";
 import type { Grid } from "../../core/shareCard";
 import type { AppServices } from "../contexts/services";
 import { currentGrade, loadGradedMastery, skillRating } from "./gradeProgress";
+import { seenBadgeMarks } from "./statsData";
 
 // A finished run, plus the context and derived outcome that decide where it's remembered.
 export type RecordedRun = {
@@ -148,6 +149,9 @@ export function recordRun(
     const flawlessNow = isFlawless(grade) && !services.milestones.flawlessDone();
     const decayMode = services.prefs.load().decayMode;
     loadGradedMastery(services.mastery, services).then((items) => {
+        // A star or the ear set earned by this run is kept from here, so shelving a piece
+        // later cannot take it back.
+        services.milestones.recordBadgeMarks(seenBadgeMarks(items, now));
         const reached = currentGrade(items);
         if (reached > services.milestones.reachedGrade()) {
             services.milestones.recordReachedGrade(reached);

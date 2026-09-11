@@ -46,9 +46,40 @@ describe("milestonesStore", () => {
         expect(store.flawlessDone()).toBe(false);
     });
 
+    it("starts with no badge marks and raises them without ever lowering", () => {
+        const kv = memoryStore();
+        const store = createMilestonesStore(kv);
+        expect(store.badgeMarks()).toEqual({ star: null, earMastered: false });
+        expect(store.recordBadgeMarks({ star: "silver", earMastered: false })).toBe(true);
+        store.recordBadgeMarks({ star: "bronze", earMastered: true });
+        expect(store.badgeMarks()).toEqual({ star: "silver", earMastered: true });
+        store.recordBadgeMarks({ star: null, earMastered: false });
+        expect(createMilestonesStore(kv).badgeMarks()).toEqual({
+            star: "silver",
+            earMastered: true,
+        });
+    });
+
+    it("writes badge marks only when something is new", () => {
+        const store = createMilestonesStore(memoryStore());
+        store.recordBadgeMarks({ star: "gold", earMastered: false });
+        const onChange = vi.fn();
+        store.subscribe(onChange);
+        expect(store.recordBadgeMarks({ star: "silver", earMastered: false })).toBe(true);
+        expect(onChange).not.toHaveBeenCalled();
+        store.recordBadgeMarks({ star: "gold", earMastered: true });
+        expect(onChange).toHaveBeenCalledTimes(1);
+    });
+
+    it("reads corrupt badge marks as none", () => {
+        const store = createMilestonesStore(memoryStore({ "plinky:badge-marks": "{bad" }));
+        expect(store.badgeMarks()).toEqual({ star: null, earMastered: false });
+    });
+
     it("reports refused writes so a celebration may repeat rather than vanish", () => {
         const store = createMilestonesStore({ ...memoryStore(), set: () => false });
         expect(store.recordReachedGrade(4)).toBe(false);
         expect(store.recordFlawless()).toBe(false);
+        expect(store.recordBadgeMarks({ star: "bronze", earMastered: false })).toBe(false);
     });
 });
