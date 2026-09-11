@@ -70,6 +70,7 @@ const SAME_FOR_ONE_AND_MANY = {
         rhythm_staff_label:
             "the noun stays in the genitive singular after any numeral: yhden sävelen, kolmen sävelen",
         music_remove_used: FINNISH_CASE,
+        recap_boast: FINNISH_CASE,
         repertoire_days_left: FINNISH_CASE,
         stats_opening_days: FINNISH_CASE,
         stats_opening_days_more: FINNISH_CASE,
@@ -82,6 +83,8 @@ const SAME_FOR_ONE_AND_MANY = {
         assignments_available_count: INVARIANT_PJESE,
         assignments_imported_partial: INVARIANT_PJESE,
         achievement_days: INVARIANT_DITE,
+        recap_boast: INVARIANT_DITE,
+        recap_card_detail: INVARIANT_DITE,
         balance_last: INVARIANT_DITE,
         repertoire_days_left: INVARIANT_DITE,
         stats_opening_days: INVARIANT_DITE,

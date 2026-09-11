@@ -330,8 +330,61 @@
             }
         }
     ],
-    "recap_boast": "{notes} нот за {days} днів у {month}, у Plinky 🎹",
-    "recap_card_detail": "{month} · {days} днів",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} за {days} день у {month}, у Plinky 🎹",
+                "daysPlural=few": "{notes} за {days} дні у {month}, у Plinky 🎹",
+                "daysPlural=many": "{notes} за {days} днів у {month}, у Plinky 🎹",
+                "daysPlural=other": "{notes} за {days} днів у {month}, у Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} нота",
+                "countPlural=few": "{notes} ноти",
+                "countPlural=many": "{notes} нот",
+                "countPlural=other": "{notes} нот"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} день",
+                "daysPlural=few": "{month} · {days} дні",
+                "daysPlural=many": "{month} · {days} днів",
+                "daysPlural=other": "{month} · {days} днів"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

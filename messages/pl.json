@@ -330,8 +330,61 @@
             }
         }
     ],
-    "recap_boast": "{notes} nut przez {days} dni w {month}, na Plinky 🎹",
-    "recap_card_detail": "{month} · {days} dni",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} przez {days} dzień w {month}, na Plinky 🎹",
+                "daysPlural=few": "{notes} przez {days} dni w {month}, na Plinky 🎹",
+                "daysPlural=many": "{notes} przez {days} dni w {month}, na Plinky 🎹",
+                "daysPlural=other": "{notes} przez {days} dni w {month}, na Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} nuta",
+                "countPlural=few": "{notes} nuty",
+                "countPlural=many": "{notes} nut",
+                "countPlural=other": "{notes} nut"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} dzień",
+                "daysPlural=few": "{month} · {days} dni",
+                "daysPlural=many": "{month} · {days} dni",
+                "daysPlural=other": "{month} · {days} dni"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

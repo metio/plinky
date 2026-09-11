@@ -330,8 +330,61 @@
             }
         }
     ],
-    "recap_boast": "{notes} nôt za {days} dní v {month}, na Plinky 🎹",
-    "recap_card_detail": "{month} · {days} dní",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} za {days} deň v {month}, na Plinky 🎹",
+                "daysPlural=few": "{notes} za {days} dni v {month}, na Plinky 🎹",
+                "daysPlural=many": "{notes} za {days} dňa v {month}, na Plinky 🎹",
+                "daysPlural=other": "{notes} za {days} dní v {month}, na Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} nota",
+                "countPlural=few": "{notes} noty",
+                "countPlural=many": "{notes} noty",
+                "countPlural=other": "{notes} nôt"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} deň",
+                "daysPlural=few": "{month} · {days} dni",
+                "daysPlural=many": "{month} · {days} dňa",
+                "daysPlural=other": "{month} · {days} dní"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

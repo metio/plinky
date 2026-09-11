@@ -318,8 +318,52 @@
             }
         }
     ],
-    "recap_boast": "{month}、{days} 日間で {notes} 音を Plinky で 🎹",
-    "recap_card_detail": "{month} · {days} 日",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "{month}、{days} 日間で {notes}を Plinky で 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{notes} 音"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "{month} · {days} 日"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

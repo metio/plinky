@@ -322,8 +322,55 @@
             }
         }
     ],
-    "recap_boast": "{notes} νότες σε {days} μέρες τον {month}, στο Plinky 🎹",
-    "recap_card_detail": "{month} · {days} μέρες",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} σε {days} μέρα τον {month}, στο Plinky 🎹",
+                "daysPlural=other": "{notes} σε {days} μέρες τον {month}, στο Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} νότα",
+                "countPlural=other": "{notes} νότες"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} μέρα",
+                "daysPlural=other": "{month} · {days} μέρες"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

@@ -326,8 +326,58 @@
             }
         }
     ],
-    "recap_boast": "{notes} нота за {days} дана у {month}, у Plinky 🎹",
-    "recap_card_detail": "{month} · {days} дана",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} за {days} дан у {month}, у Plinky 🎹",
+                "daysPlural=few": "{notes} за {days} дана у {month}, у Plinky 🎹",
+                "daysPlural=other": "{notes} за {days} дана у {month}, у Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} нота",
+                "countPlural=few": "{notes} ноте",
+                "countPlural=other": "{notes} нота"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} дан",
+                "daysPlural=few": "{month} · {days} дана",
+                "daysPlural=other": "{month} · {days} дана"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

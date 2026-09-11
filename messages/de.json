@@ -322,8 +322,55 @@
             }
         }
     ],
-    "recap_boast": "{notes} Noten an {days} Tagen im {month}, mit Plinky 🎹",
-    "recap_card_detail": "{month} · {days} Tage",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} an {days} Tag im {month}, mit Plinky 🎹",
+                "daysPlural=other": "{notes} an {days} Tagen im {month}, mit Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} Note",
+                "countPlural=other": "{notes} Noten"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} Tag",
+                "daysPlural=other": "{month} · {days} Tage"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

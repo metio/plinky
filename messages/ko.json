@@ -318,8 +318,52 @@
             }
         }
     ],
-    "recap_boast": "{month}, {days}일 동안 {notes}개의 음을 Plinky에서 🎹",
-    "recap_card_detail": "{month} · {days}일",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "{month}, {days}일 동안 {notes}을 Plinky에서 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{notes}개의 음"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "{month} · {days}일"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

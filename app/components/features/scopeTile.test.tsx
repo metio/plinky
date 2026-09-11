@@ -37,6 +37,26 @@ describe("ScopeTile", () => {
         );
     });
 
+    it("shares a month of one note on one day in the singular", () => {
+        render(
+            <ScopeTile
+                scope="month"
+                summary={{
+                    totalNotes: 1,
+                    daysPracticed: 1,
+                    bestDay: { date: "2026-08-12", notes: 1 },
+                }}
+                now={NOW}
+            />,
+        );
+        const posted = screen
+            .getAllByRole("link")
+            .map((link) => decodeURIComponent(link.getAttribute("href") ?? ""));
+        expect(posted.some((href) => href.includes("1 note across 1 day in August 2026"))).toBe(
+            true,
+        );
+    });
+
     it("names the window it is reporting on, so a figure is never unlabelled", () => {
         // The page's own bug: a lifetime fingerprint sat at the foot with no period on it
         // at all, and a month card at the other end, and nothing said which was which.

@@ -322,8 +322,55 @@
             }
         }
     ],
-    "recap_boast": "{notes} nota në {days} ditë në {month}, në Plinky 🎹",
-    "recap_card_detail": "{month} · {days} ditë",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} në {days} ditë në {month}, në Plinky 🎹",
+                "daysPlural=other": "{notes} në {days} ditë në {month}, në Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} notë",
+                "countPlural=other": "{notes} nota"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} ditë",
+                "daysPlural=other": "{month} · {days} ditë"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

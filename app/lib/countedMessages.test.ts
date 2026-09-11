@@ -63,10 +63,10 @@ describe("a counted message in a language with more than two forms", () => {
 // takes the number out of the sentence, so each rendering must be neither.
 const locales: string[] = JSON.parse(readFileSync("project.inlang/settings.json", "utf8")).locales;
 const contract: Record<string, unknown> = JSON.parse(readFileSync("messages/en.json", "utf8"));
-type Declared = [{ declarations: string[]; selectors: string[] }];
+type Declared = [{ declarations: string[]; selectors: string[]; match: Record<string, string> }];
 const counted = Object.entries(contract)
     .filter((entry): entry is [string, Declared] => Array.isArray(entry[1]))
-    .map(([key, [{ declarations, selectors }]]) => {
+    .map(([key, [{ declarations, selectors, match }]]) => {
         const inputs = declarations
             .filter((line) => line.startsWith("input "))
             .map((line) => line.slice("input ".length));
@@ -74,7 +74,10 @@ const counted = Object.entries(contract)
         const selector = declarations
             .find((line) => line.startsWith(`local ${selectors[0]} =`))
             ?.match(/= (\w+): plural/)?.[1];
-        return { key, inputs, selector: selector ?? "" };
+        // Whether that input is the figure the reader sees. A message can choose by a raw
+        // count and show the same number written the locale's way through another input.
+        const shown = Object.values(match).some((text) => text.includes(`{${selector}}`));
+        return { key, inputs, selector: selector ?? "", shown };
     });
 const render = m as unknown as Record<
     string,
@@ -90,19 +93,24 @@ describe("every plural message in every locale", () => {
     });
 
     it.each(
-        counted.flatMap(({ key, inputs, selector }) =>
-            locales.map((locale) => ({ key, inputs, selector, locale })),
+        counted.flatMap(({ key, inputs, selector, shown }) =>
+            locales.map((locale) => ({ key, inputs, selector, shown, locale })),
         ),
-    )("$key in $locale reads its number at every count", ({ key, inputs, selector, locale }) => {
-        for (const n of [0, 1, 2, 5, 20, 21, 22, 101]) {
-            const values = Object.fromEntries(
-                inputs.map((name) => [name, name === selector ? n : "‹x›"]),
-            );
-            const text = render[key]!(values, { locale });
-            expect(text, `${key} ${locale} ${n}`).not.toBe(key);
-            expect(text, `${key} ${locale} ${n}`).toContain(String(n));
-        }
-    });
+    )(
+        "$key in $locale reads its number at every count",
+        ({ key, inputs, selector, shown, locale }) => {
+            for (const n of [0, 1, 2, 5, 20, 21, 22, 101]) {
+                // Where the count only chooses the form, every input carries it, so the figure
+                // that is shown still has to reach the page.
+                const values = Object.fromEntries(
+                    inputs.map((name) => [name, name === selector || !shown ? n : "‹x›"]),
+                );
+                const text = render[key]!(values, { locale });
+                expect(text, `${key} ${locale} ${n}`).not.toBe(key);
+                expect(text, `${key} ${locale} ${n}`).toContain(String(n));
+            }
+        },
+    );
 
     it("takes Romanian's 'de' from twenty up", () => {
         expect(m.progress_notes({ count: 19 }, { locale: "ro" })).toBe("19 note");
@@ -169,6 +177,19 @@ describe("every plural message in every locale", () => {
         expect(m.assignments_available_count({ available: 0, total: 1 }, { locale: "pl" })).toBe(
             "Na tym urządzeniu dostępnych jest 0 z 1 utworu.",
         );
+    });
+
+    it("chooses the recap's note phrase by the raw count and shows the written one", () => {
+        const notes = (count: number, locale: "en" | "ru") =>
+            m.recap_boast_notes({ notes: count.toLocaleString(locale), count }, { locale });
+        expect(notes(1, "en")).toBe("1 note");
+        expect(notes(1234, "en")).toBe("1,234 notes");
+        // 1 234 ends in four, so Russian takes the few form, which "1 234" as text hides.
+        expect(notes(1234, "ru")).toBe(`${(1234).toLocaleString("ru")} ноты`);
+        expect(m.recap_boast({ notes: notes(1, "en"), days: 1, month: "May" })).toBe(
+            "1 note across 1 day in May, on Plinky 🎹",
+        );
+        expect(m.recap_card_detail({ month: "May", days: 1 })).toBe("May · 1 day");
     });
 
     it("tells Czech two from five", () => {

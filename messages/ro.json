@@ -326,8 +326,58 @@
             }
         }
     ],
-    "recap_boast": "{notes} note în {days} zile în {month}, pe Plinky 🎹",
-    "recap_card_detail": "{month} · {days} zile",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} în {days} zi în {month}, pe Plinky 🎹",
+                "daysPlural=few": "{notes} în {days} zile în {month}, pe Plinky 🎹",
+                "daysPlural=other": "{notes} în {days} de zile în {month}, pe Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} notă",
+                "countPlural=few": "{notes} note",
+                "countPlural=other": "{notes} de note"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} zi",
+                "daysPlural=few": "{month} · {days} zile",
+                "daysPlural=other": "{month} · {days} de zile"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

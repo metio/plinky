@@ -47,7 +47,13 @@ export function ScopeTile({
     const notes = summary.totalNotes.toLocaleString(getLocale());
     // Every figure on the tile, in one sentence. The share used to carry the month's name
     // and none of its practice.
-    const boast = m.recap_boast({ notes, days: summary.daysPracticed, month: name });
+    // The note count arrives written the locale's way ("12,345"), which no plural rule can
+    // read, so its phrase is chosen by the raw number and set into the sentence whole.
+    const boast = m.recap_boast({
+        notes: m.recap_boast_notes({ notes, count: summary.totalNotes }),
+        days: summary.daysPracticed,
+        month: name,
+    });
     return (
         <section className="space-y-4 rounded-xl border border-accent-line bg-gradient-to-br from-accent-surface to-ghost-surface p-5 dark:to-ghost-surface/40">
             <h3 className="font-semibold text-accent-ink text-lg">{name}</h3>

@@ -322,8 +322,55 @@
             }
         }
     ],
-    "recap_boast": "{notes} hang {days} napon át — {month}, a Plinkyn 🎹",
-    "recap_card_detail": "{month} · {days} nap",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} {days} napon át — {month}, a Plinkyn 🎹",
+                "daysPlural=other": "{notes} {days} napon át — {month}, a Plinkyn 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} hang",
+                "countPlural=other": "{notes} hang"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} nap",
+                "daysPlural=other": "{month} · {days} nap"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

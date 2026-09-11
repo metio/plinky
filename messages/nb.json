@@ -322,8 +322,55 @@
             }
         }
     ],
-    "recap_boast": "{notes} noter på {days} dager i {month}, med Plinky 🎹",
-    "recap_card_detail": "{month} · {days} dager",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} på {days} dag i {month}, med Plinky 🎹",
+                "daysPlural=other": "{notes} på {days} dager i {month}, med Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} note",
+                "countPlural=other": "{notes} noter"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} dag",
+                "daysPlural=other": "{month} · {days} dager"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

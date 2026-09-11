@@ -326,8 +326,58 @@
             }
         }
     ],
-    "recap_boast": "{notes} notas em {days} dias em {month}, no Plinky 🎹",
-    "recap_card_detail": "{month} · {days} dias",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} em {days} dia em {month}, no Plinky 🎹",
+                "daysPlural=many": "{notes} em {days} dias em {month}, no Plinky 🎹",
+                "daysPlural=other": "{notes} em {days} dias em {month}, no Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} nota",
+                "countPlural=many": "{notes} notas",
+                "countPlural=other": "{notes} notas"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} dia",
+                "daysPlural=many": "{month} · {days} dias",
+                "daysPlural=other": "{month} · {days} dias"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

@@ -318,8 +318,52 @@
             }
         }
     ],
-    "recap_boast": "{month}，{days} 天弹了 {notes} 个音，用 Plinky 🎹",
-    "recap_card_detail": "{month} · {days} 天",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "{month}，{days} 天弹了 {notes}，用 Plinky 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{notes} 个音"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=other": "{month} · {days} 天"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [

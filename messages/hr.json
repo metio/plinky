@@ -326,8 +326,58 @@
             }
         }
     ],
-    "recap_boast": "{notes} nota u {days} dana u {month}, na Plinkyju 🎹",
-    "recap_card_detail": "{month} · {days} dana",
+    "recap_boast": [
+        {
+            "declarations": [
+                "input notes",
+                "input days",
+                "input month",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{notes} za {days} dan u {month}, na Plinkyju 🎹",
+                "daysPlural=few": "{notes} za {days} dana u {month}, na Plinkyju 🎹",
+                "daysPlural=other": "{notes} za {days} dana u {month}, na Plinkyju 🎹"
+            }
+        }
+    ],
+    "recap_boast_notes": [
+        {
+            "declarations": [
+                "input notes",
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{notes} nota",
+                "countPlural=few": "{notes} note",
+                "countPlural=other": "{notes} nota"
+            }
+        }
+    ],
+    "recap_card_detail": [
+        {
+            "declarations": [
+                "input month",
+                "input days",
+                "local daysPlural = days: plural"
+            ],
+            "selectors": [
+                "daysPlural"
+            ],
+            "match": {
+                "daysPlural=one": "{month} · {days} dan",
+                "daysPlural=few": "{month} · {days} dana",
+                "daysPlural=other": "{month} · {days} dana"
+            }
+        }
+    ],
     "today_review": [
         {
             "declarations": [
