@@ -159,6 +159,31 @@ describe("HomeToday", () => {
         ).toBeTruthy();
     });
 
+    it("offers a single fading piece as one piece to refresh", async () => {
+        const piece = loadBundledScores()[0]!;
+        masteryMock.mockResolvedValue([
+            {
+                id: piece.id,
+                title: piece.title,
+                grade: 1,
+                cost: 1,
+                kind: "piece" as const,
+                mastery: {
+                    bestScore: 95,
+                    learned: true,
+                    backlog: false,
+                    intervalDays: 3,
+                    reviewAt: 1,
+                    updatedAt: 0,
+                    deadline: "",
+                },
+            },
+        ]);
+        catalogueMock.mockResolvedValue([]);
+        mount();
+        expect(await screen.findByText("Refresh 1 piece")).toBeTruthy();
+    });
+
     it("returns to the gentlest suggestion once the starter is finished", async () => {
         masteryMock.mockResolvedValue([]);
         catalogueMock.mockResolvedValue([

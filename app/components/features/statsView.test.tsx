@@ -92,6 +92,27 @@ describe("StatsView", () => {
         expect(screen.getAllByText(m.progress_days_practiced()).length).toBeGreaterThan(0);
     });
 
+    it("counts a single day of playing as one day", async () => {
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([]);
+        const kv = memoryStore();
+        const history = createHistoryStore(kv);
+        const now = new Date();
+        // A day last month keeps this from reading as the first month, and matching this
+        // month's one day leaves nothing "more" to say.
+        history.record(120, new Date(now.getFullYear(), now.getMonth() - 1, 1, 12));
+        history.record(240, now);
+
+        renderWithServices(
+            <MemoryRouter>
+                <StatsView />
+            </MemoryRouter>,
+            { store: kv },
+        );
+
+        expect(await screen.findByText("You played on 1 day this month.")).toBeTruthy();
+    });
+
     it("says nothing about days and notes before anything has been played", async () => {
         // A pair of zeros over an empty week is a frame promising insight it does not
         // have; the practice diary further down says it in a sentence, with what to do.
