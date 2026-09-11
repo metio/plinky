@@ -48,6 +48,8 @@ function mount(patch: Partial<Prefs> = {}) {
 
 const presses = (audio: ReturnType<typeof fakeAudioEngine>) =>
     audio.voices.filter((voice) => voice.kind === "press").map((voice) => voice.note);
+const releases = (audio: ReturnType<typeof fakeAudioEngine>) =>
+    audio.voices.filter((voice) => voice.kind === "release").map((voice) => voice.note);
 
 describe("useVoicedInput", () => {
     it("presses a voice for a tap and lets it ring on a little after", () => {
@@ -143,7 +145,7 @@ describe("the sources that already make their own sound", () => {
                 pitch.emit({ kind: "on", note: 60, velocity: 80 });
                 pitch.emit({ kind: "off", note: 60 });
             });
-            expect(presses(audio)).toEqual([]);
+            expect(audio.voices).toEqual([]);
             cleanup();
         }
     });
@@ -184,11 +186,53 @@ describe("the sources that already make their own sound", () => {
             tap(64);
         });
         expect(presses(audio)).toEqual([64]);
+        // Nothing was opened for the piano's note, so nothing of the piano's is ended.
+        expect(releases(audio)).toEqual([]);
     });
 
     it("voices a silent MIDI controller", () => {
         const { audio } = mount({ instrumentSounds: false });
         act(() => window.__plinky?.play(60));
         expect(presses(audio)).toEqual([60]);
+    });
+});
+
+describe("leaving with keys still down", () => {
+    it("ends a MIDI note still held, since its key-off will reach another page", () => {
+        const { audio, leave } = mount();
+        act(() => window.__plinky?.play(60, 100));
+        leave();
+        expect(audio.voices.at(-1)).toEqual({ kind: "release", note: 60, holdScale: 1 });
+    });
+
+    it("ends a tap still held, whose release arrives after the surface stopped listening", () => {
+        const { audio, leave } = mount();
+        act(() => tap(64));
+        leave();
+        expect(releases(audio)).toEqual([64]);
+    });
+
+    it("ends each held note once, and none it had already let go", () => {
+        const { audio, leave } = mount();
+        act(() => {
+            window.__plinky?.play(60);
+            window.__plinky?.play(64);
+            window.__plinky?.play(67);
+            window.__plinky?.release(64);
+        });
+        leave();
+        expect(releases(audio)).toEqual([64, 60, 67]);
+    });
+
+    it("ends nothing it did not start", () => {
+        // A muted surface and a piano that sounds itself opened no voice, so any voice at
+        // those pitches belongs to somebody else.
+        for (const patch of [{ sound: false }, { instrumentSounds: true }]) {
+            const { audio, leave } = mount(patch);
+            act(() => window.__plinky?.play(60));
+            leave();
+            expect(audio.voices).toEqual([]);
+            cleanup();
+        }
     });
 });

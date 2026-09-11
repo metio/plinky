@@ -214,6 +214,14 @@ describe("when the player's own instrument makes the sound", () => {
         }
     });
 
+    it("says whether a press opened a voice, so a caller ends only its own", () => {
+        const sounding = harness({ instrumentSounds: true }).synth;
+        expect(sounding.pressNote(60, { device: ON_SCREEN_DEVICE })).toBe(true);
+        expect(sounding.pressNote(60, { device: MIDI })).toBe(false);
+        expect(sounding.pressNote(60, { device: MIC_DEVICE })).toBe(false);
+        expect(harness({ sound: false }).synth.pressNote(60)).toBe(false);
+    });
+
     it("answers the instrument when the setting is off", () => {
         const { audio, synth } = harness({ instrumentSounds: false });
 

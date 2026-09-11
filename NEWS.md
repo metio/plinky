@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 10 September 2026
 
+**Notes you are holding stop when you leave the page.** Hold a chord on the Piano
+page, in Compose, in the keyboard tour or on the home page's keyboard and follow a
+link away, and those notes rang on through their whole fade on the next page, whether
+you were holding them on a MIDI piano or on the keys on screen. They now end as you
+leave.
+
 **The microphone hears every note you play, the same one twice included.** With the
 microphone listening on the Piano page, in Compose, on the home page's keyboard or in
 Keep up, Plinky played each note back over your piano, and a note you repeated soon

@@ -4,7 +4,10 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
+import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider, useMidiConnection } from "../../contexts/midi";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { HeroKeyboard } from "./heroKeyboard";
 
 afterEach(cleanup);
@@ -53,5 +56,18 @@ describe("HeroKeyboard", () => {
         );
         fireEvent.click(screen.getByText("play"));
         expect(screen.getByLabelText("C 4").className).toContain("bg-success-fill");
+    });
+
+    it("ends the voice of a key still held down when the hero goes", () => {
+        // The drawn keys let a held key go as they unmount, and that release reaches the
+        // funnel only after the hero has stopped listening to it, so the hero has to end
+        // the voice itself.
+        const audio = fakeAudioEngine();
+        const tree = (shown: boolean) => <MidiProvider>{shown && <HeroKeyboard />}</MidiProvider>;
+        const view = renderWithServices(tree(true), { audio, midi: fakeMidi() });
+        fireEvent.pointerDown(screen.getByLabelText("C 4"));
+        expect(audio.voices).toEqual([{ kind: "press", note: 60, gain: expect.any(Number) }]);
+        view.rerender(tree(false));
+        expect(audio.voices.at(-1)).toMatchObject({ kind: "release", note: 60 });
     });
 });

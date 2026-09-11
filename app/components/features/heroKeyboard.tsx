@@ -32,12 +32,9 @@ export function HeroKeyboard() {
 
     // Sound the app's own piano voice for whatever the funnel reports, so the hold shapes
     // the sound exactly as it does in the trainer. Notes outside this octave (from a full
-    // MIDI keyboard) still sound, and so do the pedals.
+    // MIDI keyboard) still sound, and so do the pedals. A key still held when the hero
+    // unmounts, drawn or on a MIDI piano, has its voice ended there too.
     useVoicedInput();
-
-    // A key still held when the hero unmounts never delivers its pointer-up; the shared
-    // Keyboard releases its own on-screen sources on teardown, so its voice does not ring
-    // on. A MIDI note held then is genuinely still down and left to its device's note-off.
 
     return (
         <>

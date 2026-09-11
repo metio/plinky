@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**Notes you are holding stop when you leave the page.** Hold a chord on the Piano\npage, in Compose, in the keyboard tour or on the home page's keyboard and follow a\nlink away, and those notes rang on through their whole fade on the next page, whether\nyou were holding them on a MIDI piano or on the keys on screen. They now end as you\nleave.",
+                twip: true,
+            },
+            {
                 body: "**The microphone hears every note you play, the same one twice included.** With the\nmicrophone listening on the Piano page, in Compose, on the home page's keyboard or in\nKeep up, Plinky played each note back over your piano, and a note you repeated soon\nafter was taken for that echo and never heard, so it went missing from a sketch or a\nrun. Plinky now leaves a piano it hears through the microphone to make its own sound.",
                 twip: true,
             },

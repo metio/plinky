@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useEffect, useRef } from "react";
 import { holdScaleFor } from "../../core/midi";
 import { useMidiInput } from "../contexts/midi";
 import { useHeldPedals } from "./useHeldPedals";
@@ -20,13 +21,38 @@ import { useSynth } from "./useSynth";
 export function useVoicedInput(): void {
     const synth = useSynth();
     useHeldPedals();
+    // The pitches this surface opened a voice for and has not let go yet. A note the synth
+    // declined — muted, or an instrument or microphone sounding it already — opened nothing,
+    // so a voice at that pitch is somebody else's and this surface never ends it.
+    const sounding = useRef(new Set<number>());
     useMidiInput({
         keys: true,
-        onNoteOn: (event) =>
-            synth.pressNote(event.note, { velocity: event.velocity, device: event.device }),
+        onNoteOn: (event) => {
+            if (synth.pressNote(event.note, { velocity: event.velocity, device: event.device })) {
+                sounding.current.add(event.note);
+            }
+        },
         // A tap or a computer key rings on a little (holdScaleFor), so even a quick jab
         // sings; a MIDI key keeps its own articulation.
-        onNoteOff: (event) => synth.releaseNote(event.note, holdScaleFor(event.device)),
+        onNoteOff: (event) => {
+            if (sounding.current.delete(event.note)) {
+                synth.releaseNote(event.note, holdScaleFor(event.device));
+            }
+        },
         onPedal: (pedal, down) => synth.setPedal(pedal, down),
     });
+    // A key still down when the surface goes has its key-off delivered to whatever page
+    // comes next, which may voice nothing. So does a drawn key: the keyboard lets its own
+    // held keys go as it unmounts, after this surface has already unsubscribed. Either way
+    // the voice would ring on through its whole decay and the engine would go on counting
+    // the key as down, so the surface ends what it started as it leaves.
+    useEffect(() => {
+        const held = sounding.current;
+        return () => {
+            for (const note of held) {
+                synth.releaseNote(note);
+            }
+            held.clear();
+        };
+    }, [synth]);
 }

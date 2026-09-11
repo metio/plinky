@@ -40,7 +40,8 @@ export type UseSynthResult = {
     // sustains — the articulation the player actually gave.
     // `device` names what pressed the key, so a note an instrument is already sounding
     // is not sounded twice. Omitted where the caller is not an instrument path.
-    pressNote: (note: number, options?: { velocity?: number; device?: string }) => void;
+    // Answers whether a voice was opened, so a caller can end exactly the voices it started.
+    pressNote: (note: number, options?: { velocity?: number; device?: string }) => boolean;
     // holdScale (default 1) lets an imprecise input's short tap ring on; see the engine's
     // release. A real MIDI key leaves it at 1.
     releaseNote: (note: number, holdScale?: number) => void;
@@ -124,14 +125,15 @@ export function useSynth(): UseSynthResult {
     const pressNote = useCallback(
         (note: number, options: { velocity?: number; device?: string } = {}) => {
             if (ownVoice(options.device)) {
-                return;
+                return false;
             }
             const gain = gainFor(options.velocity ?? 90);
             if (gain === null) {
-                return;
+                return false;
             }
             audio.resume();
             audio.press(note, gain, options.velocity ?? 90);
+            return true;
         },
         [gainFor, audio, ownVoice],
     );
