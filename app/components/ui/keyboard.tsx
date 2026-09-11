@@ -168,7 +168,7 @@ export function Keyboard({
     // naming, which every other surface also reads — or, for a keyboard shown with no
     // player behind it, what these labels mean in this language.
     const locale = getLocale();
-    const named = naming ?? namingFor(labels, locale);
+    const named = useMemo(() => naming ?? namingFor(labels, locale), [naming, labels, locale]);
     const words = useMemo(() => noteWords(locale), [locale]);
     // Every key's spoken name, worked out once per range and naming rather than for
     // each key on every frame a hold fill redraws. A wrong note outside the drawn range
