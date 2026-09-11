@@ -9,7 +9,7 @@ import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { fakeMidi } from "../adapters/fakeMidi";
 import { fakePitch } from "../adapters/fakePitch";
 import { memoryStore } from "../adapters/memoryStore";
-import { MidiProvider, useMidiConnection, useMidiInput } from "../contexts/midi";
+import { MidiProvider, useMidiConnection } from "../contexts/midi";
 import { createPrefsStore } from "../stores/prefsStore";
 import { renderWithServices } from "../testing/renderWithServices";
 import { useVoicedInput } from "./useVoicedInput";
@@ -19,12 +19,11 @@ afterEach(cleanup);
 let tap: (note: number) => void = () => {};
 let lift: (note: number) => void = () => {};
 let listen: () => void = () => {};
-// Every note-on that reached the page.
+// Every note-on the surface was told about, through the hook's own observer.
 let heard: number[] = [];
 
 function Voiced() {
-    useVoicedInput();
-    useMidiInput({ onNoteOn: (event) => heard.push(event.note) });
+    useVoicedInput({ onNoteOn: (event) => heard.push(event.note) });
     // The entry points the drawn keys and the microphone button use, borrowed so a test
     // can tap or listen without a keybed.
     const { pressKey, releaseKey, startMic } = useMidiConnection();
@@ -130,6 +129,30 @@ describe("useVoicedInput", () => {
         });
         expect(window.__plinky).toBeDefined();
         expect(audio.voices).toHaveLength(0);
+    });
+});
+
+describe("what the surface hears besides the sound", () => {
+    it("tells the surface about every note it hears, from every source", () => {
+        const { pitch } = mount();
+        act(() => {
+            tap(60);
+            window.__plinky?.play(62);
+            listen();
+        });
+        act(() => pitch.emit({ kind: "on", note: 64, velocity: 80 }));
+        expect(heard).toEqual([60, 62, 64]);
+    });
+
+    it("tells it about a note the synth left silent", () => {
+        // The tour still counts a step played on a muted device, and the piano page still
+        // follows a piano that sounds on its own.
+        for (const patch of [{ sound: false }, { instrumentSounds: true }]) {
+            mount(patch);
+            act(() => window.__plinky?.play(60));
+            expect(heard).toEqual([60]);
+            cleanup();
+        }
     });
 });
 

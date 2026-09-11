@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useRef } from "react";
-import { holdScaleFor } from "../../core/midi";
+import { holdScaleFor, type MidiNoteEvent } from "../../core/midi";
 import { useMidiInput } from "../contexts/midi";
 import { useHeldPedals } from "./useHeldPedals";
 import { useSynth } from "./useSynth";
@@ -18,7 +18,11 @@ import { useSynth } from "./useSynth";
 //
 // Also a keys-on surface, since a page that sounds the instrument is a page somebody is
 // playing, and the computer keyboard is one of the instruments.
-export function useVoicedInput(): void {
+//
+// `onNoteOn` hears every note-on too, whether or not it opened a voice, for a surface that
+// does something with what is played besides sounding it — the piano page slides its keybed
+// after it, the tour checks it against the step. One subscription carries both.
+export function useVoicedInput(observe: { onNoteOn?: (event: MidiNoteEvent) => void } = {}): void {
     const synth = useSynth();
     useHeldPedals();
     // The pitches this surface opened a voice for and has not let go yet. A note the synth
@@ -31,6 +35,7 @@ export function useVoicedInput(): void {
             if (synth.pressNote(event.note, { velocity: event.velocity, device: event.device })) {
                 sounding.current.add(event.note);
             }
+            observe.onNoteOn?.(event);
         },
         // A tap or a computer key rings on a little (holdScaleFor), so even a quick jab
         // sings; a MIDI key keeps its own articulation.

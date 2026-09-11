@@ -17,7 +17,7 @@ import {
     tourProgress,
 } from "../../../core/keyboardTour";
 import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../../core/glossaryScore";
-import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
+import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useVoicedInput } from "../../hooks/useVoicedInput";
@@ -87,12 +87,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     // and the on-screen keys are the same thing as far as a step is concerned.
     const heard = useCallback((note: number) => setState((current) => observe(current, note)), []);
 
-    useVoicedInput();
-    useMidiInput({
-        // The tour teaches the computer-keyboard map, so it has to hear it.
-        keys: true,
-        onNoteOn: (event) => heard(event.note),
-    });
+    useVoicedInput({ onNoteOn: (event) => heard(event.note) });
 
     const xml = useMemo(() => (step ? staffXml(step) : null), [step]);
 

@@ -1,9 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
-import { useMidiInput } from "../contexts/midi";
 import { PianoKeyboard } from "../components/features/pianoKeyboard";
 import { PageHeader } from "../components/ui/pageHeader";
 import { useVoicedInput } from "../hooks/useVoicedInput";
@@ -53,19 +52,14 @@ export default function Piano() {
     );
 
     // The sound. The keybed only lights what the funnel holds; nothing about drawing a key
-    // makes it heard, so the page voices the funnel itself, pedals and all.
-    useVoicedInput();
-
-    // The computer keyboard is an instrument here, which every surface has to say for
-    // itself: elsewhere the letter keys belong to the page, and taking them from a page
-    // nobody is playing on breaks typing and scrolling for nothing.
-    useMidiInput({
-        keys: true,
-        onNoteOn: useCallback((event: { note: number }) => {
+    // makes it heard, so the page voices the funnel itself, pedals and all — and takes the
+    // computer keyboard as one of the instruments.
+    useVoicedInput({
+        onNoteOn: (event) => {
             // Slide the keybed toward what is being played, so climbing off the end of the
             // window carries you into the next octave instead of stopping you at its edge.
             setKeyWindow((prev) => followKeyboardWindow(prev, event.note, SPAN, REACH));
-        }, []),
+        },
     });
 
     return (
