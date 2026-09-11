@@ -129,7 +129,7 @@ describe("Compose", () => {
         });
     });
 
-    it("holds a shared take's tempo to what the tempo field offers", async () => {
+    it("halves a shared take's tempo into what the tempo field offers", async () => {
         const { encodeComposition } = await import("../../core/composition");
         const code = encodeComposition({
             notes: [{ pitch: 60, startMs: 0, durationMs: 400, velocity: 90 }],
@@ -152,7 +152,8 @@ describe("Compose", () => {
 
         expect(await screen.findByText("1 notes")).toBeTruthy();
         const field = screen.getByLabelText(m.compose_tempo_label()) as HTMLInputElement;
-        expect(field.value).toBe("240");
+        // 300 is past the field's 240, and half of it keeps every note on the beat grid.
+        expect(field.value).toBe("150");
     });
 
     it("does not reload a shared take over the work when the address changes", async () => {
