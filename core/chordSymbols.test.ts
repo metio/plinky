@@ -163,7 +163,8 @@ describe("withChordSymbols", () => {
         // C major for a bar, then the same F♯ major triad under six sharps or six flats: the
         // second symbol is written F♯ under sharps and G♭ under flats.
         const modulated = (fifths: number) => {
-            const [root, third, fifth]: Array<[string, number]> =
+            type Tone = [string, number];
+            const [root, third, fifth]: [Tone, Tone, Tone] =
                 fifths > 0
                     ? [
                           ["F", 1],
