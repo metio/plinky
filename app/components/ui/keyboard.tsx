@@ -13,7 +13,8 @@ import {
 } from "../../../core/noteNaming";
 import { noteWords } from "./noteWords";
 import { isWhite, keybedMaxWidthPx, whiteKeys } from "../../../core/keyboardGeometry";
-import { type KeyState, keyState } from "../../../core/keyState";
+import { HOLD_FILL, keyFaces } from "../../../core/keyFace";
+import { keyState } from "../../../core/keyState";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { finishFor, type KeyboardFinish } from "../../../core/keyboardFinish";
@@ -42,26 +43,6 @@ const NAVIGATION: Record<string, (note: number, from: number, to: number) => num
 const MIN_TAP_VELOCITY = 45;
 const MAX_TAP_VELOCITY = 120;
 
-// What a key wears in each state that does not depend on the chosen skin. Held at module
-// scope because these are constants: building them per key per render allocated fifty
-// objects a frame on the one render path that runs at sixty frames a second.
-const WHITE_STATE = {
-    wrong: "bg-danger-fill",
-    held: "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held",
-    left: "bg-hand-left-soft",
-    right: "bg-hand-right-soft",
-    next: "bg-accent-surface",
-} as const;
-
-// A black key's `next` is skin-dependent (it is ringed rather than repainted), so it is
-// composed at the call site; everything else here is fixed.
-const BLACK_STATE = {
-    wrong: "bg-danger",
-    held: "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held",
-    left: "bg-hand-left",
-    right: "bg-hand-right",
-} as const;
-
 const NONE: ReadonlySet<number> = new Set();
 const NO_SOUNDING: ReadonlyMap<number, "left" | "right"> = new Map();
 const NO_HOLDS: ReadonlyMap<number, number> = new Map();
@@ -74,7 +55,7 @@ function HoldFill({ fraction }: { fraction: number }) {
     return (
         <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-0 bg-key-next/45 dark:bg-key-next/40"
+            className={`pointer-events-none absolute inset-x-0 bottom-0 ${HOLD_FILL}`}
             style={{ height: `${Math.min(1, Math.max(0, fraction)) * 100}%` }}
         />
     );
@@ -459,37 +440,10 @@ export function Keyboard({
     // than a styling one, and it was written out three times here before.
     const stateOf = (note: number) =>
         keyState(note, { flash: flash?.note ?? null, lit, sounding, expected });
-    // Only `rest` depends on the skin, so the rest of the table is a module constant. It
-    // was rebuilt for every key of every render, and this render happens once an animation
-    // frame for as long as a note is held.
-    const whiteState = (note: number) => {
-        const state = stateOf(note);
-        return state === "rest" ? theme.white : WHITE_STATE[state];
-    };
-    // An expected black key is ringed, not repainted. Filling it with the next-note colour
-    // stops it being a black key — fine mid-piece, where the key is pointed at rather than
-    // named, and wrong in the first lesson of all, which says "press any black key" over a
-    // keyboard whose black keys have turned blue.
-    //
-    // A sounding black key IS filled, unlike an expected one: the reason an expected black
-    // key is only ringed is that "press any black key" must still read as black, and
-    // nothing is being asked for here.
-    const blackState = (state: KeyState) => {
-        if (state === "rest") {
-            return theme.black;
-        }
-        return state === "next"
-            ? `${theme.black} ring-2 ring-inset ring-key-next`
-            : BLACK_STATE[state];
-    };
-    // A black key's name is pale because the key is nearly black — but every state that
-    // means something (wrong, held, play this) fills it with a bright colour, and pale
-    // grey on those is well under the contrast floor. The name follows the fill.
-    //
-    // The expected key keeps its black fill, so its name keeps the pale ink that reads on
-    // black; only the states that flood the key with colour change it.
-    const blackLabel = (state: KeyState) =>
-        state === "next" || state === "rest" ? "text-key-black-ink" : "text-key-ink";
+    // Each key's fill and the ink its name is printed in, per state, decided together in
+    // core/keyFace — a name is only readable against the fill beneath it. Built once per
+    // skin: this render happens once an animation frame for as long as a note is held.
+    const faces = useMemo(() => keyFaces(theme), [theme]);
 
     // What every key carries, whichever colour it is: its name for a screen reader, whether
     // it is sounding, its place in the roving tab order, and the four handlers. Written once
@@ -535,7 +489,7 @@ export function Keyboard({
     // What sits ON a key: the shrinking hold fill, and the key's name where names are shown.
     // The label is read ONCE — it was computed twice per key, once to decide whether to draw
     // the span and once to fill it.
-    const keyFace = (note: number, labelClass: string) => {
+    const keyTop = (note: number, labelClass: string) => {
         const label = keyLabelIn(note, labels, named.system, words);
         return (
             <>
@@ -570,22 +524,25 @@ export function Keyboard({
             >
                 {badge}
                 <div className="flex h-full w-full gap-px">
-                    {whites.map((note, index) => (
-                        <button
-                            key={note}
-                            {...keyProps(note)}
-                            style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
-                            className={`${finish.whiteKey} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
-                        >
-                            {keyFace(
-                                note,
-                                "pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium text-key-label",
-                            )}
-                        </button>
-                    ))}
+                    {whites.map((note, index) => {
+                        const face = faces.white[stateOf(note)];
+                        return (
+                            <button
+                                key={note}
+                                {...keyProps(note)}
+                                style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
+                                className={`${finish.whiteKey} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${face.fill}`}
+                            >
+                                {keyTop(
+                                    note,
+                                    `pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium ${face.label}`,
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
                 {blacks.map((note, index) => {
-                    const state = stateOf(note);
+                    const face = faces.black[stateOf(note)];
                     // A black key sits over the gap after its white neighbour. When the
                     // range begins or ends on a black key it has no neighbour on one
                     // side, so clamp it within [0, 100%] rather than hang it off the edge.
@@ -603,11 +560,11 @@ export function Keyboard({
                                 width: `${width}%`,
                                 ...(rise ? { animationDelay: `${index * 45}ms` } : {}),
                             }}
-                            className={`${finish.blackKey} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${blackState(state)}`}
+                            className={`${finish.blackKey} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${face.fill}`}
                         >
-                            {keyFace(
+                            {keyTop(
                                 note,
-                                `pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight ${blackLabel(state)}`,
+                                `pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight ${face.label}`,
                             )}
                         </button>
                     );

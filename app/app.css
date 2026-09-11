@@ -123,7 +123,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        invert: `ink` would go pale in dark mode and vanish into the fill. */
     --color-key-ink: var(--color-gray-900);
     --color-key-black: var(--color-gray-900);
-    --color-key-black-ink: var(--color-gray-300);
+    /* Gray-200, not the gray-300 a black key could carry on its own: the hold bar
+       can rise over a key, and on the lighter skin blacks (forest, berry, their
+       hovers) it lifts the fill until gray-300 measures 4.0:1. */
+    --color-key-black-ink: var(--color-gray-200);
     --color-key-spent: var(--color-gray-400); /* a key the round is done with */
     --color-key-spent-ink: var(--color-gray-200);
     --color-key-hover: #f0eafe;
@@ -131,10 +134,21 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     /* What the score asks of a key — which one comes next, and the hold bar
        draining down it for as long as the note is written to last. */
     --color-key-next: var(--color-indigo-400);
-    /* The note name printed on a white key. It darkens in dark mode rather than
-       lightening, because the key it sits on does not invert — `faint` would
-       lighten it against a light key and sink it under the contrast floor. */
-    --color-key-label: var(--color-gray-400);
+    /* The note name printed on a resting white key. The same value in both
+       themes, because the key it sits on does not invert — `faint` would lighten
+       it against a light key and sink it under the contrast floor. Gray-700 is
+       the quietest step that still clears 4.5:1 on every skin's white with the
+       hold bar over it; gray-500 misses on the pastel skins even bare. */
+    --color-key-label: var(--color-gray-700);
+    /* The name on a key lit by a state, one ink per fill (core/keyFace.ts pairs
+       them). The dark theme floods a wrong or held white key with a deep fill,
+       so its name turns white there; the right hand's indigo sits where neither
+       gray-900 nor white clears the floor, and only black does. */
+    --color-key-wrong-ink: var(--color-gray-700);
+    --color-key-held-ink: var(--color-gray-700);
+    --color-key-right-ink: var(--color-gray-900);
+    --color-key-black-wrong-ink: var(--color-white);
+    --color-key-black-right-ink: var(--color-black);
     /* How a run went, as a fixed scale. These are data, not chrome: the steps
        are matched to the share emoji (🟩 🟨 🟧 🟥 ⬜), and the share card is an
        image other people look at, so they hold the same value in both themes.
@@ -294,13 +308,18 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-white: var(--color-gray-100);
     --color-key-ink: var(--color-gray-900);
     --color-key-black: var(--color-gray-800);
-    --color-key-black-ink: var(--color-gray-300);
+    --color-key-black-ink: var(--color-gray-200);
     --color-key-spent: var(--color-gray-700);
     --color-key-spent-ink: var(--color-gray-500);
     --color-key-hover: #e2d7fd;
     --color-key-held: var(--color-green-500);
     --color-key-next: var(--color-indigo-400);
-    --color-key-label: var(--color-gray-600);
+    --color-key-label: var(--color-gray-700);
+    --color-key-wrong-ink: var(--color-white);
+    --color-key-held-ink: var(--color-white);
+    --color-key-right-ink: var(--color-black);
+    --color-key-black-wrong-ink: var(--color-gray-900);
+    --color-key-black-right-ink: var(--color-gray-900);
 
     /* The run scale holds its values across themes — see above. */
     --color-band-best: var(--color-green-500);

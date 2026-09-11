@@ -5,6 +5,12 @@
   label: evening
   entries:
     - |-
+      **Note names on the keys are easier to read.** The names printed on the on-screen
+      keys were a pale grey that was hard to make out on a white key, and harder still on
+      one lit green, red or blue. They are darker now, and on a lit key they change with
+      its colour, so a name stays readable whichever state the key is in, on every
+      keyboard look, in light and dark mode.
+    - |-
       **A note Keep going passes over no longer counts as perfectly timed.** The share
       grid and the note-by-note strip after a run scored a skipped note as played on the
       beat and at full speed, so a slow run with a few skips looked greener than it was,

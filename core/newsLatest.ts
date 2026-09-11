@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**Note names on the keys are easier to read.** The names printed on the on-screen\nkeys were a pale grey that was hard to make out on a white key, and harder still on\none lit green, red or blue. They are darker now, and on a lit key they change with\nits colour, so a name stays readable whichever state the key is in, on every\nkeyboard look, in light and dark mode.",
+                twip: true,
+            },
+            {
                 body: "**A note Keep going passes over no longer counts as perfectly timed.** The share\ngrid and the note-by-note strip after a run scored a skipped note as played on the\nbeat and at full speed, so a slow run with a few skips looked greener than it was,\nand could even name the wrong hand as the one lagging. Your grade already left skips\nout of its timing, and now the grid and the strip do too. A skipped note still counts\nas a slip, and on the strip it shows as just its red ring, with no timing dot.",
                 twip: true,
             },
