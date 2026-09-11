@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PREFS, defaultPrefsFor } from "./prefs";
+import { DEFAULT_PREFS } from "./prefs";
 import { type AidPrefs, READING_LEVELS, levelAids, levelOf } from "./readingLevel";
 
 describe("levelAids", () => {
@@ -80,8 +80,10 @@ describe("levelOf", () => {
         expect(levelAids("sightReader", "solfege").noteLabels).toBe("off");
     });
 
-    it("is the level a fresh device reads as in a do-re-mi language too", () => {
-        expect(levelOf(defaultPrefsFor("fr"))).toBe("starter");
+    it("reads every key named the language's way as the same rung as letters", () => {
+        expect(levelOf(levelAids("starter", "auto"))).toBe("starter");
+        expect(levelOf(levelAids("learning", "auto"))).toBe("learning");
+        expect(levelAids("confident", "auto").noteLabels).toBe("c");
     });
 
     it("is the level a fresh device reads as", () => {

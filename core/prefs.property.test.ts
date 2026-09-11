@@ -23,7 +23,7 @@ import {
 
 const LETTERS = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS = ["always", "miss", "never"];
-const NOTE_LABELS = ["all", "c", "off"];
+const NOTE_LABELS = ["auto", "all", "c", "solfege", "off"];
 const DECAY_MODES = ["gentle", "competitive"];
 
 // Every constraint the Prefs type cannot express: ranges, closed choice sets, and the

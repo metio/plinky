@@ -9,7 +9,6 @@ import {
 } from "../../../core/readingLevel";
 import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
-import { getLocale } from "../../paraglide/runtime.js";
 import { everyKeyLabels } from "../../../core/noteNaming";
 import { SegmentedControl } from "../ui/segmentedControl";
 
@@ -54,7 +53,7 @@ export function ReadingLevel({ labelled = true }: { labelled?: boolean } = {}) {
                 onChange={(id) => {
                     if (id !== "custom") {
                         // A level turns names on or off; what they are stays the player's.
-                        update(levelAids(id, everyKeyLabels(prefs.noteLabels, getLocale())));
+                        update(levelAids(id, everyKeyLabels(prefs.noteLabels)));
                     }
                 }}
             />

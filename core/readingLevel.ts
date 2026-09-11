@@ -67,13 +67,17 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
 // A level decides HOW MANY keys are named, never what a note is called: letters and do
 // re mi are two ways of naming every key, and a French player on do re mi who picks
 // "starter" keeps do re mi. `every` is the naming a level that names every key uses.
-export function levelAids(level: ReadingLevel, every: "all" | "solfege" = "all"): AidPrefs {
+export function levelAids(
+    level: ReadingLevel,
+    every: "auto" | "all" | "solfege" = "all",
+): AidPrefs {
     const aids = AIDS[level];
     return aids.noteLabels === "all" ? { ...aids, noteLabels: every } : aids;
 }
 
-// Two label settings that name every key, differing only in the names.
-const rungOf = (labels: AidPrefs["noteLabels"]) => (labels === "solfege" ? "all" : labels);
+// Three label settings that name every key, differing only in the names.
+const rungOf = (labels: AidPrefs["noteLabels"]) =>
+    labels === "solfege" || labels === "auto" ? "all" : labels;
 
 // The level whose aids exactly match the current prefs, or "custom" when the mix
 // matches none — what the level control highlights, and the marker of a hand-tuned

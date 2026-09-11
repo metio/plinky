@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {
-    defaultNoteLabels,
     minorKeyTextIn,
     type Naming,
     namingFor,
@@ -26,8 +25,7 @@ export function namingOf(prefs: Pick<Prefs, "noteLabels" | "noteLetters">): Nami
 // The naming of a device that has chosen nothing: what a surface shown with no player
 // behind it — a story, an isolated test — says.
 export function localNaming(): Naming {
-    const locale = getLocale();
-    return namingFor(defaultNoteLabels(locale), locale);
+    return namingFor("auto", getLocale());
 }
 
 // A note in a sentence: C♯, Cis, "ré dièse".

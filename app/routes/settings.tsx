@@ -49,7 +49,13 @@ import { type Groove, GROOVES } from "../../core/groove";
 import { BARS_PER_ROW, METRONOME_SUBDIVISIONS, NOTE_SCALES, REVEAL_TRIES } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, type Prefs, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
-import { lettersIn, naturalsIn } from "../../core/noteNaming";
+import {
+    labelsIn,
+    lettersIn,
+    naturalsIn,
+    pickedLabels,
+    pickedLetters,
+} from "../../core/noteNaming";
 import { namingOf } from "../lib/noteNames";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -404,8 +410,10 @@ export default function Settings() {
                         />
                         <ChoiceField
                             label={m.settings_note_labels()}
-                            value={prefs.noteLabels}
-                            onChange={(noteLabels: NoteLabels) => update({ noteLabels })}
+                            value={labelsIn(prefs.noteLabels, getLocale())}
+                            onChange={(noteLabels: NoteLabels) =>
+                                update({ noteLabels: pickedLabels(noteLabels, getLocale()) })
+                            }
                             options={[
                                 { id: "all", label: m.note_labels_all() },
                                 { id: "c", label: m.note_labels_c() },
@@ -421,7 +429,9 @@ export default function Settings() {
                             <ChoiceField
                                 label={m.settings_note_letters()}
                                 value={lettersIn(prefs.noteLetters, getLocale())}
-                                onChange={(noteLetters: "b" | "h") => update({ noteLetters })}
+                                onChange={(noteLetters: "b" | "h") =>
+                                    update({ noteLetters: pickedLetters(noteLetters, getLocale()) })
+                                }
                                 options={[
                                     { id: "b", label: naturalsIn("b").join(" ") },
                                     { id: "h", label: naturalsIn("h").join(" ") },

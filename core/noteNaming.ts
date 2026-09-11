@@ -42,13 +42,17 @@ export type NoteSystem =
 // Whether the keys carry their note name, for a player still learning where the notes
 // are: every key in letters (all), only the C keys as orientation landmarks (c — the
 // white key left of each two-black-key group), every key in do re mi (solfege), or bare
-// (off) once the map is second nature.
-export type NoteLabels = "all" | "c" | "solfege" | "off";
+// (off) once the map is second nature. Auto is every key named the way the page's
+// language names a note, which is what the keys show until the player picks.
+export type NoteLabels = "auto" | "all" | "c" | "solfege" | "off";
 
 // Which name the letter systems give the last white key of the octave: B, H, or whatever
-// the page's language uses (auto). Stored as auto until the player picks, so it follows a
-// change of language rather than freezing the first one's habit.
+// the page's language uses (auto).
 export type NoteLetters = "auto" | "b" | "h";
+
+// Both choices are stored as auto until the player picks something other than the
+// language's own, so a device follows a change of language rather than freezing the
+// first one's habit — and picking the language's own again is the way back to auto.
 
 // The whole decision, as every surface consumes it.
 export type Naming = {
@@ -155,9 +159,12 @@ function localeNaming(locale: string): LocaleNaming {
     return LOCALE_NAMING[locale.split("-")[0]?.toLowerCase() ?? ""] ?? LETTERS_B;
 }
 
-// What the keys show on a device that has chosen nothing: do re mi in a fixed-do
+// The label choice, once auto is resolved for this language: do re mi in a fixed-do
 // language, letters everywhere else.
-export function defaultNoteLabels(locale: string): "all" | "solfege" {
+export function labelsIn(labels: NoteLabels, locale: string): Exclude<NoteLabels, "auto"> {
+    if (labels !== "auto") {
+        return labels;
+    }
     return localeNaming(locale).names === "solfege" ? "solfege" : "all";
 }
 
@@ -166,9 +173,18 @@ export function lettersIn(letters: NoteLetters, locale: string): "b" | "h" {
     return letters === "auto" ? localeNaming(locale).b : letters;
 }
 
+// What a pick stores: the language's own choice is stored as auto.
+export function pickedLabels(labels: NoteLabels, locale: string): NoteLabels {
+    return labels === labelsIn("auto", locale) ? "auto" : labels;
+}
+
+export function pickedLetters(letters: NoteLetters, locale: string): NoteLetters {
+    return letters === lettersIn("auto", locale) ? "auto" : letters;
+}
+
 // The one decision. Letters on the keys mean letters everywhere, do re mi on the keys
-// means do re mi everywhere; with only C or nothing printed, the keys cannot contradict
-// anything and the language's own way stands.
+// means do re mi everywhere; with auto, only C or nothing printed, the keys cannot
+// contradict anything and the language's own way stands.
 export function namingFor(
     labels: NoteLabels,
     locale: string,
@@ -198,8 +214,8 @@ export function namingFor(
 // Every key named, in the naming the player already reads: do re mi stays do re mi and
 // letters stay letters, and a player showing only C or nothing gets the language's own.
 // What a reading level asks for when it turns every key's name on.
-export function everyKeyLabels(current: NoteLabels, locale: string): "all" | "solfege" {
-    return current === "all" || current === "solfege" ? current : defaultNoteLabels(locale);
+export function everyKeyLabels(current: NoteLabels): "auto" | "all" | "solfege" {
+    return current === "all" || current === "solfege" ? current : "auto";
 }
 
 const LETTER_NATURAL = ["C", "D", "E", "F", "G", "A", "B"];

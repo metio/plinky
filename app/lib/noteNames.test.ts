@@ -10,7 +10,7 @@ import {
     pitchLabelIn,
     spokenNoteIn,
 } from "../../core/noteNaming";
-import { defaultPrefsFor } from "../../core/prefs";
+import { DEFAULT_PREFS } from "../../core/prefs";
 import { noteWords } from "../components/ui/noteWords";
 import { m } from "../paraglide/messages.js";
 import { baseLocale, type Locale, locales, overwriteGetLocale } from "../paraglide/runtime.js";
@@ -71,7 +71,7 @@ describe.each(locales.map((locale) => [locale]))("note names in %s", (locale) =>
 
     it("prints on a fresh device's keys the names every other surface uses", () => {
         inLocale(locale, () => {
-            const prefs = defaultPrefsFor(locale);
+            const prefs = DEFAULT_PREFS;
             const naming = namingOf(prefs);
             for (let step = 0; step < 12; step += 1) {
                 const printed = keyLabelIn(60 + step, prefs.noteLabels, naming.system, noteWords());

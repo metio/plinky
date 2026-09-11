@@ -9,7 +9,6 @@ import { KeyboardTour } from "../components/features/keyboardTour";
 import { ServicesProvider, useOnboardingStore, usePrefsStore } from "../contexts/services";
 import { localizedHref } from "../components/ui/href";
 import { m } from "../paraglide/messages.js";
-import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/basics";
 import { PageHeader } from "../components/ui/pageHeader";
 import { useUnaidedServices } from "../hooks/useUnaidedServices";
@@ -53,7 +52,7 @@ export default function Basics() {
                         const prefs = prefsStore.load();
                         prefsStore.save({
                             ...prefs,
-                            ...levelAids("starter", everyKeyLabels(prefs.noteLabels, getLocale())),
+                            ...levelAids("starter", everyKeyLabels(prefs.noteLabels)),
                         });
                         navigate(localizedHref("/"));
                     }}

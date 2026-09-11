@@ -32,7 +32,6 @@ import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignm
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { exerciseName } from "../lib/exerciseNames";
 import { namingOf } from "../lib/noteNames";
-import { getLocale } from "../paraglide/runtime.js";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
 import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
@@ -178,8 +177,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     // rest of the app is given — a test that injects a fake clock drives the
     // mic's loop with it too, rather than the mic quietly keeping its own.
     const scheduler = overrides.scheduler ?? browserScheduler;
-    // A device that has chosen nothing names notes the way its page's language does.
-    const prefs = overrides.prefs ?? createPrefsStore(store, getLocale());
+    const prefs = overrides.prefs ?? createPrefsStore(store);
     return {
         store,
         persistence: overrides.persistence ?? webStoragePersistence,

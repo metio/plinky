@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it, vi } from "vitest";
+import { namingFor } from "../../core/noteNaming";
 import { DEFAULT_PREFS } from "../../core/prefs";
 import { memoryStore } from "../adapters/memoryStore";
 import { createPrefsStore } from "./prefsStore";
@@ -15,6 +16,18 @@ describe("prefsStore", () => {
         store.save({ ...store.load(), sound: false, volume: 40 });
         expect(store.load().sound).toBe(false);
         expect(store.load().volume).toBe(40);
+    });
+
+    // A French page names the keys do re mi until the player picks; nudging the volume is
+    // not a pick, so the same device on an English page names them in letters.
+    it("keeps the language's note names a default through an unrelated save", () => {
+        const kv = memoryStore();
+        const device = createPrefsStore(kv);
+        device.save({ ...device.load(), volume: 40 });
+        const prefs = createPrefsStore(kv).load();
+        expect(prefs.volume).toBe(40);
+        expect(namingFor(prefs.noteLabels, "en", prefs.noteLetters).system).toBe("letters");
+        expect(namingFor(prefs.noteLabels, "fr", prefs.noteLetters).system).toBe("solfege");
     });
 
     it("clamps the volume on the way in", () => {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { nextIn } from "../../../core/cycle";
+import { labelsIn, pickedLabels } from "../../../core/noteNaming";
 import {
     NOTE_HINT_CYCLE,
     NOTE_LABEL_CYCLE,
@@ -9,6 +10,7 @@ import {
     type NoteLabels,
 } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
+import { getLocale } from "../../paraglide/runtime.js";
 import { KeysIcon, SpeakerOffIcon, SpeakerIcon } from "../ui/icons";
 import { ToggleIconButton } from "../ui/toggleIconButton";
 
@@ -27,7 +29,7 @@ const CYCLE_BUTTON =
 
 // The glyph stands for the naming itself: letters, the one landmark letter, the
 // first solfège syllable, or nothing.
-const labelGlyph: Record<NoteLabels, string> = {
+const labelGlyph: Record<Exclude<NoteLabels, "auto">, string> = {
     all: "ABC",
     c: "C",
     solfege: "do",
@@ -64,6 +66,8 @@ export function KeyboardQuickControls({
     // the keys frees their whole strip for the score.
     floating?: boolean;
 }) {
+    const locale = getLocale();
+    const labels = labelsIn(noteLabels, locale);
     return (
         <div
             className={`flex items-center justify-end gap-1 ${
@@ -74,19 +78,21 @@ export function KeyboardQuickControls({
                 <>
                     <button
                         type="button"
-                        onClick={() => onNoteLabels(nextIn(NOTE_LABEL_CYCLE, noteLabels))}
+                        onClick={() =>
+                            onNoteLabels(pickedLabels(nextIn(NOTE_LABEL_CYCLE, labels), locale))
+                        }
                         aria-label={`${m.settings_note_labels()}: ${
-                            noteLabels === "all"
+                            labels === "all"
                                 ? m.note_labels_all()
-                                : noteLabels === "c"
+                                : labels === "c"
                                   ? m.note_labels_c()
-                                  : noteLabels === "solfege"
+                                  : labels === "solfege"
                                     ? m.note_labels_solfege()
                                     : m.note_labels_off()
                         }`}
                         className={CYCLE_BUTTON}
                     >
-                        {labelGlyph[noteLabels]}
+                        {labelGlyph[labels]}
                     </button>
                     {noteHints !== undefined && onNoteHints !== undefined && (
                         <button

@@ -148,8 +148,8 @@ describe("Settings", () => {
 
     it("relabels the example piano when the note-labels choice changes", () => {
         const { services } = mount();
-        // The default labels every key, so a non-C key carries its letter.
-        expect(services.prefs.load().noteLabels).toBe("all");
+        // The default labels every key the language's way, so a non-C key carries its letter.
+        expect(services.prefs.load().noteLabels).toBe("auto");
         expect(screen.getByLabelText("D 4").textContent).toContain("D");
 
         choose(m.settings_note_labels, m.note_labels_c);

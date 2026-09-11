@@ -3,9 +3,9 @@
 
 import { describe, expect, it } from "vitest";
 import {
-    defaultNoteLabels,
     everyKeyLabels,
     keyLabelIn,
+    labelsIn,
     lettersIn,
     minorKeyTextIn,
     type NoteSystem,
@@ -15,6 +15,8 @@ import {
     noteSymbolIn,
     noteTextIn,
     openingIn,
+    pickedLabels,
+    pickedLetters,
     pitchLabelIn,
     spokenKeyIn,
     spokenNoteIn,
@@ -33,7 +35,7 @@ const NOTE_IDS = Object.keys(NOTE_TEXT) as NoteNameId[];
 const text = (name: string, system: NoteSystem) => noteTextIn(name, system, WORDS);
 
 // What a device that has chosen nothing reads, in each language.
-const fresh = (locale: string) => namingFor(defaultNoteLabels(locale), locale);
+const fresh = (locale: string) => namingFor("auto", locale);
 
 describe("each language's default", () => {
     it.each([
@@ -66,7 +68,7 @@ describe("each language's default", () => {
         ["ru", "solfege", "solfege", false],
         ["uk", "solfege", "solfege", false],
     ] as const)("%s prints %s and names notes in %s", (locale, labels, system, lowerMinor) => {
-        expect(defaultNoteLabels(locale)).toBe(labels);
+        expect(labelsIn("auto", locale)).toBe(labels);
         expect(fresh(locale)).toMatchObject({ system, lowerMinor });
     });
 
@@ -203,10 +205,29 @@ describe("namingFor", () => {
 
 describe("the player's choices resolved", () => {
     it("names every key in the naming the player already reads", () => {
-        expect(everyKeyLabels("solfege", "en")).toBe("solfege");
-        expect(everyKeyLabels("all", "fr")).toBe("all");
-        expect(everyKeyLabels("off", "fr")).toBe("solfege");
-        expect(everyKeyLabels("c", "de")).toBe("all");
+        expect(everyKeyLabels("solfege")).toBe("solfege");
+        expect(everyKeyLabels("all")).toBe("all");
+        expect(everyKeyLabels("off")).toBe("auto");
+        expect(everyKeyLabels("c")).toBe("auto");
+        expect(everyKeyLabels("auto")).toBe("auto");
+    });
+
+    it("resolves auto labels to the language's and keeps a chosen one", () => {
+        expect(labelsIn("auto", "fr")).toBe("solfege");
+        expect(labelsIn("auto", "de")).toBe("all");
+        expect(labelsIn("c", "fr")).toBe("c");
+        expect(labelsIn("all", "fr")).toBe("all");
+    });
+
+    it("stores a pick of the language's own choice as auto, and any other as picked", () => {
+        expect(pickedLabels("solfege", "fr")).toBe("auto");
+        expect(pickedLabels("all", "fr")).toBe("all");
+        expect(pickedLabels("all", "en")).toBe("auto");
+        expect(pickedLabels("off", "en")).toBe("off");
+        expect(pickedLetters("h", "de")).toBe("auto");
+        expect(pickedLetters("b", "de")).toBe("b");
+        expect(pickedLetters("b", "en")).toBe("auto");
+        expect(pickedLetters("h", "en")).toBe("h");
     });
 
     it("resolves auto letters to the language's and keeps a chosen one", () => {
