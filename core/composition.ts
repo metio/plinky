@@ -54,16 +54,32 @@ export function snapTempo(tempo: number): number {
     return Math.abs(tempo - whole) < TEMPO_SNAP ? whole : tempo;
 }
 
-// A tempo arriving from outside, made one Compose can hold: snapped, and brought inside the
-// range its tempo field offers, or the default when it is no tempo at all. Every way a
-// composition enters Compose passes through here, so the field never shows a tempo it would
-// not itself accept. decodeComposition does not clamp, because it also reads stored takes,
-// and a take keeps the tempo of the piece it was played at, which may lie outside that range.
+// A tempo arriving from outside, made one Compose can hold: snapped, and halved or doubled
+// until it lies inside the range its tempo field offers, or the default when it is no tempo
+// at all. Every way a composition enters Compose passes through here, so the field never
+// shows a tempo it would not itself accept. decodeComposition does not fold, because it also
+// reads stored takes, and a take keeps the tempo of the piece it was played at, which may lie
+// outside that range.
+//
+// Folded by octaves rather than clamped, because the tempo is the grid the staff measures
+// the notes against while the notes stay in milliseconds. A take at 300 beats a minute read
+// at 150 writes its quarters as eighths, each still on the beat; clamped to 240, each would
+// land 0.8 of a beat after the last and engrave as a tied remainder. The range spans more
+// than an octave, so exactly one fold lands inside it.
 export function composeTempo(tempo: number): number {
-    if (!Number.isFinite(tempo) || tempo <= 0) {
+    // Snapped before it is judged: a few thousandths of a beat a minute snaps to zero, and
+    // zero doubled never reaches the range.
+    let folded = Number.isFinite(tempo) ? snapTempo(tempo) : 0;
+    if (folded <= 0) {
         return COMPOSE_DEFAULT_TEMPO;
     }
-    return Math.min(COMPOSE_MAX_TEMPO, Math.max(COMPOSE_MIN_TEMPO, snapTempo(tempo)));
+    while (folded > COMPOSE_MAX_TEMPO) {
+        folded /= 2;
+    }
+    while (folded < COMPOSE_MIN_TEMPO) {
+        folded *= 2;
+    }
+    return folded;
 }
 
 // The pitch at and above which a note belongs on the treble (right-hand) staff;

@@ -13,6 +13,7 @@ import {
     decodeComposition,
     encodeComposition,
     MAX_SKETCH_BARS,
+    midiFileFor,
     quantize,
     type RecordedNote,
     snapTempo,
@@ -21,6 +22,8 @@ import {
     toReplayEvents,
     truncateTo,
 } from "./composition";
+import { quartersMs } from "./elapsed";
+import { parseMidiFile } from "./midiParse";
 import { packToCode } from "./shareCode";
 
 describe("snapTempo", () => {
@@ -36,10 +39,14 @@ describe("snapTempo", () => {
 });
 
 describe("composeTempo", () => {
-    it("brings a loaded tempo inside the range the tempo field offers", () => {
-        expect(composeTempo(300)).toBe(COMPOSE_MAX_TEMPO);
-        expect(composeTempo(60_000_000)).toBe(COMPOSE_MAX_TEMPO);
-        expect(composeTempo(12)).toBe(COMPOSE_MIN_TEMPO);
+    it("halves or doubles a loaded tempo into the range the tempo field offers", () => {
+        expect(composeTempo(300)).toBe(150);
+        expect(composeTempo(480)).toBe(COMPOSE_MAX_TEMPO);
+        expect(composeTempo(241)).toBe(120.5);
+        expect(composeTempo(60_000_000)).toBe(60_000_000 / 2 ** 18);
+        expect(composeTempo(12)).toBe(48);
+        expect(composeTempo(20)).toBe(COMPOSE_MIN_TEMPO);
+        expect(composeTempo(39)).toBe(78);
     });
 
     it("snaps a near-whole tempo and keeps one already in range", () => {
@@ -53,12 +60,62 @@ describe("composeTempo", () => {
         expect(composeTempo(Number.POSITIVE_INFINITY)).toBe(COMPOSE_DEFAULT_TEMPO);
         expect(composeTempo(0)).toBe(COMPOSE_DEFAULT_TEMPO);
         expect(composeTempo(-90)).toBe(COMPOSE_DEFAULT_TEMPO);
+        expect(composeTempo(0.004)).toBe(COMPOSE_DEFAULT_TEMPO);
     });
 
     it("fixes every whole tempo in the range", () => {
         for (let tempo = COMPOSE_MIN_TEMPO; tempo <= COMPOSE_MAX_TEMPO; tempo++) {
             expect(composeTempo(tempo)).toBe(tempo);
         }
+    });
+});
+
+describe("a take loaded at a tempo the field does not offer", () => {
+    // Four quarter notes at the file's own tempo, written to MIDI and read back the way
+    // Compose loads a file: the notes as they are, the tempo through composeTempo.
+    const loadQuarters = (tempo: number): Composition => {
+        const beat = quartersMs(1, tempo);
+        const file = midiFileFor({
+            notes: [0, 1, 2, 3].map((index) =>
+                note({ pitch: 60 + index, startMs: index * beat, durationMs: beat }),
+            ),
+            tempo,
+            beatsPerBar: 4,
+        });
+        const loaded = parseMidiFile(file);
+        if (!loaded) {
+            throw new Error("the file did not read back");
+        }
+        return { ...loaded, tempo: composeTempo(loaded.tempo) };
+    };
+
+    it.each([
+        [300, 150, "eighth"],
+        [30, 60, "half"],
+        [20, 40, "half"],
+    ])("reads %d beats a minute as %d, every note still on the grid", (from, to, type) => {
+        const loaded = loadQuarters(from);
+        expect(loaded.tempo).toBe(to);
+        // Each onset and length a whole number of the engraving's sixteenth cells, so
+        // snapping to the grid moves nothing. The file's ticks come back as milliseconds
+        // a rounding error off; a note off the grid is a fifth of a beat off or more.
+        const cells = (quarters: number) => Math.abs(quarters * 4 - Math.round(quarters * 4));
+        for (const one of toMidiNotes(loaded)) {
+            expect(cells(one.startQuarters)).toBeLessThan(1e-6);
+            expect(cells(one.durationQuarters)).toBeLessThan(1e-6);
+        }
+        const xml = toMusicXml(loaded);
+        const types = [...xml.matchAll(/<type>(\w+)<\/type>/g)].map((match) => match[1]);
+        // The four notes at their written value, one of them or two per bar, the rest of
+        // the staff rests: never a dotted or tied remainder.
+        expect(types.filter((one) => one === type).length).toBeGreaterThanOrEqual(4);
+        expect(xml).not.toContain("<tie ");
+        expect(xml).not.toContain("<dot/>");
+    });
+
+    it("sounds exactly as the file did", () => {
+        const loaded = loadQuarters(300);
+        expect(toReplayEvents(loaded).map((event) => event.atMs)).toEqual([0, 200, 400, 600]);
     });
 });
 

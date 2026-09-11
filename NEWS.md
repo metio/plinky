@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 10 September 2026
 
+**A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played
+faster than 240 or slower than 40 beats a minute set the tempo to the nearest end of
+the range while the notes kept their own timing, so a line of plain quarter notes came
+out on the staff as dotted and tied fragments. Compose now halves or doubles such a
+tempo until it fits, so the notes stay on the beat, written at half or twice their
+value, and the take sounds exactly as the file did.
+
 **Plinky opens without a connection, from its icon too.** With no network, opening
 Plinky from its icon on your home screen, or opening a page you had never visited on
 that device, showed your browser's own error page in place of Plinky. Both now open

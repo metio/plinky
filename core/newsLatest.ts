@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played\nfaster than 240 or slower than 40 beats a minute set the tempo to the nearest end of\nthe range while the notes kept their own timing, so a line of plain quarter notes came\nout on the staff as dotted and tied fragments. Compose now halves or doubles such a\ntempo until it fits, so the notes stay on the beat, written at half or twice their\nvalue, and the take sounds exactly as the file did.",
+                twip: true,
+            },
+            {
                 body: "**Plinky opens without a connection, from its icon too.** With no network, opening\nPlinky from its icon on your home screen, or opening a page you had never visited on\nthat device, showed your browser's own error page in place of Plinky. Both now open\nPlinky, and the pages you have visited open as they always did.",
                 twip: true,
             },

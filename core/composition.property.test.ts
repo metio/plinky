@@ -7,9 +7,14 @@ import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
+    COMPOSE_DEFAULT_TEMPO,
+    COMPOSE_MAX_TEMPO,
+    COMPOSE_MIN_TEMPO,
     type Composition,
+    composeTempo,
     decodeComposition,
     encodeComposition,
+    snapTempo,
     toMusicXml,
     toReplayEvents,
 } from "./composition";
@@ -98,6 +103,28 @@ describe("composition codec + engraving properties", () => {
                 }) => `${n.startMs}:${n.pitch}:${n.durationMs}:${n.velocity}`;
                 expect(flattened.map(key).sort()).toEqual(composition.notes.map(key).sort());
             }),
+        );
+    });
+});
+
+describe("composeTempo", () => {
+    it("lands every tempo in the field's range, a whole number of octaves from where it was", () => {
+        fc.assert(
+            fc.property(
+                fc.double({ min: 1e-6, max: 1e9, noNaN: true, noDefaultInfinity: true }),
+                (tempo) => {
+                    const folded = composeTempo(tempo);
+                    if (snapTempo(tempo) === 0) {
+                        expect(folded).toBe(COMPOSE_DEFAULT_TEMPO);
+                        return;
+                    }
+                    expect(folded).toBeGreaterThanOrEqual(COMPOSE_MIN_TEMPO);
+                    expect(folded).toBeLessThanOrEqual(COMPOSE_MAX_TEMPO);
+                    // A power of two apart, so a note on a beat of the file's grid is on a
+                    // beat, or a half or double of one, of the grid it is read against.
+                    expect(Number.isInteger(Math.log2(folded / snapTempo(tempo)))).toBe(true);
+                },
+            ),
         );
     });
 });
