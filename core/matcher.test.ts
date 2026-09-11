@@ -386,39 +386,46 @@ describe("when each pitch of a position landed", () => {
     });
 });
 
+// Grade a run the way a finished run is graded, with every played note landing exactly on
+// its notated onset, so accuracy and flow are the only dimensions that can fall.
+function gradeRun(steps: MatchStep[], strikes: number[], forgiving: boolean) {
+    let state = startMatch(steps);
+    const events: ClearedEvent[] = [];
+    for (const note of strikes) {
+        const result = matchNote(state, note, 0, forgiving);
+        state = result.state;
+        events.push(...cleared(result.events));
+    }
+    const notes: OutcomeNote[] = events.map((event) => ({
+        targetMs: event.ordinal * 500,
+        playedMs: event.ordinal * 500,
+        wrongBefore: event.wrongBefore,
+        staves: [0],
+        velocity: 80,
+    }));
+    const tally = gradedTally({
+        positions: steps.length,
+        wrong: state.wrong,
+        missed: state.missed,
+    });
+    const outcome = deriveRunOutcome({
+        notes,
+        ...tally,
+        imprecise: false,
+        intendedTempo: 120,
+        runTempo: 120,
+    });
+    return { state, events, tally, grade: outcome.grade };
+}
+
 describe("grading a forgiving run", () => {
     // Single notes alternating between two keys, so the next position's key is never the
     // current one's.
     const piece = (length: number) =>
         Array.from({ length }, (_, index) => step([index % 2 === 0 ? 60 : 62]));
 
-    // Grade a run the way a finished run is graded, with every played note landing exactly
-    // on its notated onset, so accuracy and flow are the only dimensions that can fall.
-    function grade(strikes: number[], length: number, forgiving: boolean) {
-        let state = startMatch(piece(length));
-        const events: ClearedEvent[] = [];
-        for (const note of strikes) {
-            const result = matchNote(state, note, 0, forgiving);
-            state = result.state;
-            events.push(...cleared(result.events));
-        }
-        const notes: OutcomeNote[] = events.map((event) => ({
-            targetMs: event.ordinal * 500,
-            playedMs: event.ordinal * 500,
-            wrongBefore: event.wrongBefore,
-            staves: [0],
-            velocity: 80,
-        }));
-        const tally = gradedTally({ positions: length, wrong: state.wrong, missed: state.missed });
-        const outcome = deriveRunOutcome({
-            notes,
-            ...tally,
-            imprecise: false,
-            intendedTempo: 120,
-            runTempo: 120,
-        });
-        return { state, events, tally, grade: outcome.grade };
-    }
+    const grade = (strikes: number[], length: number, forgiving: boolean) =>
+        gradeRun(piece(length), strikes, forgiving);
 
     it("counts a position it moved past as a miss, not a right note", () => {
         const { state, events } = grade([62], 2, true);
@@ -473,6 +480,74 @@ describe("grading a forgiving run", () => {
 
     it("never tallies below zero right notes", () => {
         expect(gradedTally({ positions: 0, wrong: 0, missed: 3 }).correct).toBe(0);
+    });
+});
+
+describe("an omitted grace note", () => {
+    // A grace note is a position of its own, and leaving it out misses it in either mode.
+    // Keep going lets the run carry on to the principal without it, and credits nothing
+    // the player did not play; strict mode waits for it. Ornaments are never optional
+    // by way of Keep going.
+    const ornamented = (grace: Partial<MatchStep> = { advancesCursor: false, slackMs: 120 }) => [
+        step([60], { position: 0 }),
+        step([62], { position: 1, ...grace }),
+        step([64], { position: 1 }),
+        step([65], { position: 2 }),
+    ];
+    const withGrace = [60, 62, 64, 65];
+    const withoutGrace = [60, 64, 65];
+
+    it("counts the grace position as missed when Keep going moves on to the principal", () => {
+        const { state, events, tally } = gradeRun(ornamented(), withoutGrace, true);
+        expect(state.complete).toBe(true);
+        expect(state.missed).toBe(1);
+        expect(state.wrong).toBe(0);
+        expect(events[1]?.step.advancesCursor).toBe(false);
+        expect(events[1]?.playedPitches).toEqual([]);
+        expect(events[1]?.wrongBefore).toBe(1);
+        expect(events.map((event) => event.wrongBefore)).toEqual([0, 1, 0, 0]);
+        expect(tally).toEqual({ correct: 3, wrong: 1 });
+    });
+
+    it("costs exactly what leaving out an ordinary note costs", () => {
+        const grace = gradeRun(ornamented(), withoutGrace, true);
+        const plain = gradeRun(ornamented({ advancesCursor: true }), withoutGrace, true);
+        expect(grace.tally).toEqual(plain.tally);
+        expect(grace.grade.accuracy).toBe(plain.grade.accuracy);
+        expect(grace.grade.flow).toBe(plain.grade.flow);
+    });
+
+    it("marks the grace position as a stumble in strict mode too", () => {
+        // Strict mode takes the principal struck over a pending grace as a wrong note and
+        // waits there; the player goes back for the grace before the run continues.
+        let state = startMatch(ornamented());
+        state = matchNote(state, 60, 0).state;
+        const early = matchNote(state, 64, 0);
+        expect(early.events.map((event) => event.kind)).toEqual(["wrong"]);
+        expect(early.state.index).toBe(1);
+
+        const strict = gradeRun(ornamented(), [60, 64, ...withGrace.slice(1)], false);
+        const forgiving = gradeRun(ornamented(), withoutGrace, true);
+        expect(strict.events.map((event) => event.wrongBefore)).toEqual([0, 1, 0, 0]);
+        expect(forgiving.events.map((event) => event.wrongBefore)).toEqual(
+            strict.events.map((event) => event.wrongBefore),
+        );
+        expect(forgiving.grade.flow).toBe(strict.grade.flow);
+        expect(strict.grade.accuracy).toBeLessThan(100);
+        // Keep going credits the grace no more than strict mode does: strict mode at least
+        // hears it played, late.
+        expect(forgiving.grade.accuracy).toBeLessThanOrEqual(strict.grade.accuracy);
+    });
+
+    it("misses nothing when the grace is played, and grades as strict mode does", () => {
+        const forgiving = gradeRun(ornamented(), withGrace, true);
+        const strict = gradeRun(ornamented(), withGrace, false);
+        expect(forgiving.state.missed).toBe(0);
+        expect(forgiving.events[1]?.playedPitches).toEqual([62]);
+        expect(forgiving.events.map((event) => event.wrongBefore)).toEqual([0, 0, 0, 0]);
+        expect(forgiving.tally).toEqual({ correct: 4, wrong: 0 });
+        expect(forgiving.events).toEqual(strict.events);
+        expect(forgiving.grade).toEqual(strict.grade);
     });
 });
 

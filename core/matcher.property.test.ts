@@ -262,6 +262,95 @@ describe("resumeIndex properties", () => {
     });
 });
 
+describe("a run with its grace notes left out", () => {
+    // Positions that are either a plain chord or a single grace note ahead of the chord it
+    // decorates, printed in one place. The grace is never one of its principal's keys, so
+    // the principal struck over it is always the next position's note.
+    const figuresArb = fc.array(
+        fc.uniqueArray(pitch, { minLength: 2, maxLength: 4 }).chain(([grace, ...principal]) =>
+            fc.record({
+                grace: fc.constant(grace as number),
+                principal: fc.constant(principal),
+                ornamented: fc.boolean(),
+                omitted: fc.boolean(),
+            }),
+        ),
+        { minLength: 1, maxLength: 8 },
+    );
+
+    const stepOf = (pitches: number[], index: number, advancesCursor: boolean): MatchStep => ({
+        pitches,
+        pitchStaves: [0],
+        pitchHands: ["right"],
+        staves: [0],
+        whole: index,
+        elapsedMs: index * 1000,
+        holdMs: 1000,
+        advancesCursor,
+        position: index,
+        slackMs: advancesCursor ? 0 : 120,
+        pedalled: false,
+        bar: index >> 2,
+        holdQuarters: 1,
+    });
+
+    // A grace note left out is missed in forgiving mode exactly as any position is: the run
+    // goes on to its principal, and the grace is never credited as a right note.
+    it("misses exactly the graces left out, and credits none of them", () => {
+        fc.assert(
+            fc.property(figuresArb, (figures) => {
+                const steps = figures.flatMap((figure, index) =>
+                    figure.ornamented
+                        ? [
+                              stepOf([figure.grace], index, false),
+                              stepOf(figure.principal, index, true),
+                          ]
+                        : [stepOf(figure.principal, index, true)],
+                );
+                const strikes = figures.flatMap((figure) =>
+                    figure.ornamented && !figure.omitted
+                        ? [figure.grace, ...figure.principal]
+                        : figure.principal,
+                );
+                const left = figures.filter((figure) => figure.ornamented && figure.omitted);
+
+                const { state, events } = play(steps, strikes, true);
+                expect(state.complete).toBe(true);
+                expect(state.wrong).toBe(0);
+                expect(state.missed).toBe(left.length);
+
+                const graces = events.filter(
+                    (e): e is Extract<MatchEvent, { kind: "cleared" }> =>
+                        e.kind === "cleared" && !e.step.advancesCursor,
+                );
+                const unplayed = graces.filter((e) => e.playedPitches.length === 0);
+                expect(unplayed).toHaveLength(left.length);
+                for (const e of unplayed) {
+                    expect(e.wrongBefore).toBe(1);
+                }
+
+                const tally = gradedTally({
+                    positions: steps.length,
+                    wrong: state.wrong,
+                    missed: state.missed,
+                });
+                expect(tally).toEqual({
+                    correct: steps.length - left.length,
+                    wrong: left.length,
+                });
+                // Playing every grace is never worth fewer right notes than leaving some out.
+                const whole = play(
+                    steps,
+                    steps.flatMap((step) => step.pitches),
+                    true,
+                ).state;
+                expect(whole.missed).toBe(0);
+                expect(tally.correct).toBeLessThanOrEqual(steps.length - whole.missed);
+            }),
+        );
+    });
+});
+
 describe("a finished run", () => {
     // A skip needs a next position to move on to, so the last one is always played in
     // full: however much was skipped, a run that completes has cleared at least one
