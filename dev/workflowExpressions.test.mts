@@ -7,7 +7,7 @@ import { parse } from "yaml";
 
 type Step = { name?: string; uses?: string; run?: unknown; with?: Record<string, unknown> };
 type Job = { permissions?: Record<string, string>; steps?: Step[] };
-type Workflow = { permissions?: unknown; jobs?: Record<string, Job> };
+type Workflow = { permissions?: unknown; concurrency?: unknown; jobs?: Record<string, Job> };
 
 const DIR = new URL("../.github/workflows/", import.meta.url);
 const FILES = readdirSync(DIR).filter((file) => /\.ya?ml$/.test(file));
@@ -61,6 +61,16 @@ describe("the score-submission workflow", () => {
             .filter(([, job]) => JSON.stringify(job).includes("github.event.issue.body"))
             .map(([name]) => name);
         expect(readers).toEqual(["check"]);
+    });
+
+    // Two quick edits would otherwise run side by side, each comment job finding no marker
+    // and posting its own, and the older verdict could land last and win.
+    it("runs once per issue at a time, the latest edit replacing any run in progress", () => {
+        expect(workflow.concurrency).toEqual({
+            // biome-ignore lint/suspicious/noTemplateCurlyInString: an Actions expression, compared as written
+            group: "score-submission-${{ github.event.issue.number }}",
+            "cancel-in-progress": true,
+        });
     });
 
     it("saves no dependency cache from an issue anyone can open", () => {

@@ -4,6 +4,11 @@ name: Score submission
 on:
   issues:
     types: [opened, edited]
+# One run per issue: a quick second edit would otherwise run beside the first, each
+# posting its own check comment, and the older verdict could be written last.
+concurrency:
+  group: score-submission-${{ github.event.issue.number }}
+  cancel-in-progress: true
 # The issue body is untrusted: anyone can open an issue, and one opened through the API
 # or edited afterwards can hold anything in any section. So the job that reads and
 # renders it holds a read-only token and leaves none in the checkout, and only the job
