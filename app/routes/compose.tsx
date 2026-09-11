@@ -17,7 +17,12 @@ import { useCompositionTransport } from "../hooks/useCompositionTransport";
 import { useMetronome } from "../hooks/useMetronome";
 import { useStaffSketch } from "../hooks/useStaffSketch";
 import { useVoicedInput } from "../hooks/useVoicedInput";
-import { type Composition, composeTempo, decodeComposition } from "../../core/composition";
+import {
+    COMPOSE_DEFAULT_TEMPO,
+    type Composition,
+    composeTempo,
+    decodeComposition,
+} from "../../core/composition";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { stepDurationMs, type StepValue } from "../../core/stepInput";
 import { routeMeta } from "../../core/site";
@@ -40,7 +45,7 @@ export default function Compose() {
     const _onboarding = useOnboardingStore();
     const [searchParams] = useSearchParams();
     const [title, setTitle] = useState("Improvisation");
-    const [tempo, setTempo] = useState(120);
+    const [tempo, setTempo] = useState(COMPOSE_DEFAULT_TEMPO);
     const [beatsPerBar, setBeatsPerBar] = useState(4);
     const [quantizeOn, setQuantizeOn] = useState(true);
     const [metronomeOn, setMetronomeOn] = useState(false);
