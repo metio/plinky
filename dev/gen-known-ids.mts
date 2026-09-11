@@ -23,6 +23,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { PEOPLE_INDEX } from "../core/peopleIndex.ts";
 import { canonicalPeople, personSlugs } from "../core/person.ts";
+import { type PluralForms, pluralForms } from "../core/plural.ts";
 import { readScoreMetaFromText } from "../core/scoreMeta.ts";
 import { ogLocale } from "../core/site.ts";
 import { songId } from "../core/songId.ts";
@@ -77,7 +78,8 @@ export type KnownCollection = { name: string; pieces: string[] };
 export type KnownStrings = {
     playBy: string;
     play: string;
-    playFacts: string;
+    // Counts bars, so it carries each plural form and the middleware picks by the count.
+    playFacts: PluralForms;
     person: string;
     home: string;
     music: string;
@@ -103,24 +105,34 @@ export type KnownIds = {
 
 // The messages read straight from their JSON rather than through paraglide, whose
 // compiled output is per-locale and gitignored — and this runs once, for all of them.
-function stringsFor(locale: string): KnownStrings {
+export function stringsFor(locale: string): KnownStrings {
     const messages = JSON.parse(readFileSync(`messages/${locale}.json`, "utf8")) as Record<
         string,
-        string
+        unknown
     >;
+    const blank = (key: string) =>
+        new Error(
+            `messages/${locale}.json: ${key} is missing, so the edge documents in ${locale} would be blank`,
+        );
     const need = (key: string): string => {
         const value = messages[key];
         if (typeof value !== "string" || value === "") {
-            throw new Error(
-                `messages/${locale}.json: ${key} is missing, so the edge documents in ${locale} would be blank`,
-            );
+            throw blank(key);
         }
         return value;
+    };
+    // A counted message, as every plural form it holds.
+    const needForms = (key: string): PluralForms => {
+        const forms = pluralForms(messages[key]);
+        if (!forms) {
+            throw blank(key);
+        }
+        return forms;
     };
     return {
         playBy: need("meta_play_description_by"),
         play: need("meta_play_description"),
-        playFacts: need("meta_play_facts"),
+        playFacts: needForms("meta_play_facts"),
         person: need("meta_person_description"),
         home: need("nav_today"),
         music: need("music_title"),

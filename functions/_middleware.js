@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cookieValue } from "../core/localeCarry";
+import { pickPlural } from "../core/plural";
 
 // Answer a real page with a real document.
 //
@@ -332,9 +333,12 @@ export function describe(list, page, about = null) {
         // same sentence with two words swapped, which matches a search for the title and
         // nothing else. The page reads the same three off the score it holds, so the
         // document a crawler is served and the one the running app writes agree.
+        // The line counts bars, so its form follows the bar count, by the rules of the
+        // language whose strings are being written.
+        const language = list.strings[page.locale] ? page.locale : list.base;
         const facts =
             piece.grade !== undefined && piece.bars !== undefined && piece.tempo !== undefined
-                ? fill(strings.playFacts ?? "", {
+                ? fill(pickPlural(strings.playFacts ?? {}, language, piece.bars), {
                       grade: piece.grade,
                       bars: piece.bars,
                       tempo: piece.tempo,

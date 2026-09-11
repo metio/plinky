@@ -51,7 +51,10 @@ const KNOWN: Known = {
         en: {
             playBy: 'Play "{title}" by {composer} in your browser.',
             play: 'Play "{title}" in your browser.',
-            playFacts: "Grade {grade}, {bars} bars, {tempo} beats per minute.",
+            playFacts: {
+                one: "Grade {grade}, {bars} bar, {tempo} beats per minute.",
+                other: "Grade {grade}, {bars} bars, {tempo} beats per minute.",
+            },
             person: "{name}’s pieces on Plinky.",
             home: "Today",
             music: "Music",
@@ -69,7 +72,10 @@ const KNOWN: Known = {
         de: {
             playBy: "Spiele „{title}“ von {composer} im Browser.",
             play: "Spiele „{title}“ im Browser.",
-            playFacts: "Stufe {grade}, {bars} Takte, {tempo} Schläge pro Minute.",
+            playFacts: {
+                one: "Stufe {grade}, {bars} Takt, {tempo} Schläge pro Minute.",
+                other: "Stufe {grade}, {bars} Takte, {tempo} Schläge pro Minute.",
+            },
             person: "Stücke von {name} auf Plinky.",
             home: "Heute",
             music: "Musik",
@@ -84,8 +90,8 @@ const KNOWN: Known = {
             hubCollection: "Stücke aus {name}.",
             og: "de_DE",
         },
-        zh: { playBy: "{title}", play: "{title}", playFacts: "", person: "{name}", home: "今天", music: "音乐", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", hubCollection: "{name}", og: "zh_CN" },
-        pt: { playBy: "{title}", play: "{title}", playFacts: "", person: "{name}", home: "Hoje", music: "Música", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", hubCollection: "{name}", og: "pt_PT" },
+        zh: { playBy: "{title}", play: "{title}", playFacts: {},person: "{name}", home: "今天", music: "音乐", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", hubCollection: "{name}", og: "zh_CN" },
+        pt: { playBy: "{title}", play: "{title}", playFacts: {},person: "{name}", home: "Hoje", music: "Música", grade: "{grade}", hubGrade: "{grade}", hubGradeAbout: "{grade}", hubEra_baroque: "1", hubEra_classical: "2", hubEra_romantic: "3", hubEra_modern: "4", hubEraAbout: "-", hubCollection: "{name}", og: "pt_PT" },
     },
 };
 
@@ -674,6 +680,40 @@ describe("the catalogue's shelves", () => {
             'Play "Nocturne <Op. 9>" by Frédéric Chopin in your browser. ' +
                 "Grade 7, 34 bars, 66 beats per minute.",
         );
+    });
+
+    it("counts a piece's bars in the form its number takes", () => {
+        const tiny = { title: "Tiny", composer: "", grade: 1, bars: 1, tempo: 60 };
+        const few = { ...tiny, bars: 3 };
+        const many = { ...tiny, bars: 5 };
+        const list = {
+            ...KNOWN,
+            pieces: { ...KNOWN.pieces, tiny, few, many },
+            locales: [...KNOWN.locales, "pl"],
+            strings: {
+                ...KNOWN.strings,
+                pl: {
+                    ...KNOWN.strings.en,
+                    play: "{title}.",
+                    playFacts: {
+                        one: "{bars} takt.",
+                        few: "{bars} takty.",
+                        many: "{bars} taktów.",
+                        other: "{bars} taktu.",
+                    },
+                },
+            },
+        } as Known;
+        const said = (locale: string, id: string) =>
+            describePage(list, { locale, kind: "play", id })?.description;
+        expect(said("en", "tiny")).toBe('Play "Tiny" in your browser. Grade 1, 1 bar, 60 beats per minute.');
+        expect(said("de", "tiny")).toBe("Spiele „Tiny“ im Browser. Stufe 1, 1 Takt, 60 Schläge pro Minute.");
+        expect(said("pl", "tiny")).toBe("Tiny. 1 takt.");
+        expect(said("pl", "few")).toBe("Tiny. 3 takty.");
+        expect(said("pl", "many")).toBe("Tiny. 5 taktów.");
+        // A language the list holds no strings for is written in the base language, by the
+        // base language's rules.
+        expect(said("fr", "tiny")).toBe('Play "Tiny" in your browser. Grade 1, 1 bar, 60 beats per minute.');
     });
 
     it("leaves the numbers out of a piece the catalogue has not measured", () => {

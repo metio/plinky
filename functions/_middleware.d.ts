@@ -37,7 +37,8 @@ export type Known = {
         {
             playBy: string;
             play: string;
-            playFacts: string;
+            // The facts line's plural forms, chosen by the piece's bar count.
+            playFacts: Readonly<Record<string, string>>;
             person: string;
             home: string;
             music: string;
