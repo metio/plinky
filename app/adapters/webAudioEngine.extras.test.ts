@@ -136,6 +136,48 @@ describe("a panic", () => {
     });
 });
 
+describe("taking back one playback's strikes", () => {
+    it("cuts that playback's notes, including one still waiting on its delay, and nothing else", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake, silentPack);
+        const listen = Symbol("listen");
+        const other = Symbol("other");
+        engine.strike({ note: 48, gain: 0.3, velocity: 90, duration: 5, delay: 0, owner: listen });
+        engine.strike({
+            note: 64,
+            gain: 0.3,
+            velocity: 90,
+            duration: 5,
+            delay: 0.5,
+            owner: listen,
+        });
+        engine.strike({ note: 72, gain: 0.3, velocity: 90, duration: 5, delay: 0, owner: other });
+        engine.strike({ note: 76, gain: 0.3, velocity: 90, duration: 5, delay: 0 });
+        engine.press(60, 0.3, 90);
+        const before = fake.ringingAt(1);
+        engine.silenceStrikes(listen);
+        // A second of the audio clock later, the two strikes it owned are gone and the rest —
+        // another owner's, an unowned one, the player's own held key — still sound.
+        const after = fake.ringingAt(1);
+        expect(after).toBeGreaterThan(0);
+        expect(after).toBeLessThan(before);
+        engine.silenceStrikes(other);
+        engine.strike({ note: 79, gain: 0.3, velocity: 90, duration: 5, delay: 0, owner: listen });
+        const withNew = fake.ringingAt(1);
+        engine.silenceStrikes(listen);
+        expect(fake.ringingAt(1)).toBeLessThan(withNew);
+    });
+
+    it("is harmless twice over", async () => {
+        const fake = fakeAudioContext();
+        const engine = await engineWith(fake, silentPack);
+        const listen = Symbol("listen");
+        engine.strike({ note: 48, gain: 0.3, velocity: 90, duration: 5, delay: 0, owner: listen });
+        engine.silenceStrikes(listen);
+        expect(() => engine.silenceStrikes(listen)).not.toThrow();
+    });
+});
+
 describe("sympathetic resonance", () => {
     it("answers a note struck with the pedal down", async () => {
         const fake = fakeAudioContext();

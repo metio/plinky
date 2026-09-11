@@ -29,7 +29,15 @@ export type NoteStrike = {
     // engine would see a piece with a pedal marking on every bar as one played with the
     // pedal up. Live play sets the pedal for real and answers the same question from it.
     pedalled?: boolean;
+    // Which playback struck this note, so that playback's stop can silence what it started
+    // (silenceStrikes) without touching a note anything else is sounding. Absent for a
+    // strike no transport will ever need to take back.
+    owner?: StrikeOwner;
 };
+
+// The identity a playback strikes its notes under — one per transport, compared by
+// identity alone.
+export type StrikeOwner = symbol;
 
 // A metronome tick: the accented downbeat, a plain beat, or a subdivision.
 export type ClickKind = "accent" | "beat" | "sub";
@@ -80,6 +88,13 @@ export interface AudioEngine {
     // dropped here would stay dropped under a foot still holding it. Idempotent; safe with
     // no audio context.
     allNotesOff(): void;
+    // Cut short every fixed-length strike made under `owner` — ringing, or still waiting on
+    // its delay — with a short fade. A strike is scheduled whole, so a transport that stops
+    // would otherwise leave the notes it already struck sounding for their full written
+    // (and pedal-lengthened) length. Live voices, the pedals and anything struck under
+    // another owner are left alone: a player holding keys over Listen keeps their notes.
+    // Idempotent; safe with no audio context.
+    silenceStrikes(owner: StrikeOwner): void;
     // How much of the room is heard around the instrument, as a final wet gain (0 = dry).
     //
     // A graph-level property rather than a per-note one, which is why it is a method here

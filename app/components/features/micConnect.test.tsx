@@ -73,6 +73,7 @@ describe("MicConnect", () => {
             release: () => {},
             setPedal: () => {},
             allNotesOff: () => {},
+            silenceStrikes: () => {},
             click: () => () => {},
             setRoom: () => {},
             commitVoice: () => {},

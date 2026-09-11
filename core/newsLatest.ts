@@ -11,6 +11,16 @@ import type { Release } from "./changelog";
 export const LATEST_RELEASES: Release[] = [
     {
         date: "2026-09-11",
+        label: "evening",
+        entries: [
+            {
+                body: "**Stopping Listen stops the sound.** Press Listen again to stop it, restart it, or\nstop a run you are replaying, and the cursor stopped while the notes already played\nrang on, a pedalled bass for a bar or more, and under the next pass if you started\nagain. Playing a sketch back in Compose did the same after Stop. The notes now fade\nthe moment you stop, and anything you are holding on your own keys keeps sounding. A\npiece that plays to its end still lets its last chord ring.",
+                twip: true,
+            },
+        ],
+    },
+    {
+        date: "2026-09-11",
         label: null,
         entries: [
             {
@@ -163,16 +173,6 @@ export const LATEST_RELEASES: Release[] = [
             },
             {
                 body: '**Seconds are written with your own decimal comma.** The notes you are slowest to\nread on the Stats page, and the margin you beat or lost to a ghost by, always used a\nfull stop: a German reader saw "1.4s" beside figures that elsewhere read "1,4". Both\nnow follow the language Plinky speaks to you.',
-                twip: true,
-            },
-        ],
-    },
-    {
-        date: "2026-09-09",
-        label: "night",
-        entries: [
-            {
-                body: "**The theory course opens on a lesson, and every lesson is a link.** The list down\nthe side used to jump you around one very long page. Each of the fourteen lessons\nnow has a page of its own and the list points straight at it, so you can open one in\na new tab, send it to somebody, or find it by searching for the question it answers.\nOpening the course lands on the first lesson rather than on all of them at once, the\nway the glossary has always opened on the first mark — and the glossary's list is\nmade of real links now too.",
                 twip: true,
             },
         ],

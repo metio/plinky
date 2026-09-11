@@ -137,6 +137,7 @@ function fakeOsmd(
 }
 
 const playNote = vi.fn();
+const silenceStrikes = vi.fn();
 const onLap = vi.fn();
 let loopState: { on: boolean; from: number; to: number };
 
@@ -148,7 +149,7 @@ function mount(osmd: OpenSheetMusicDisplay | null, marks: ScoreMarks = NO_SCORE_
     return renderHook(() =>
         useListenPlayback({
             getOsmd: () => osmd,
-            synth: { playNote },
+            synth: { playNote, silenceStrikes },
             tempo: () => 120,
             loop: () => loopState,
             onLap,
@@ -444,6 +445,7 @@ describe("useListenPlayback", () => {
             velocity: 90,
             pedalled: false,
             delay: 0,
+            owner: expect.any(Symbol),
         });
 
         // Each quarter at 120 BPM is 500ms; after both entries the walk ends.
@@ -527,11 +529,19 @@ describe("useListenPlayback", () => {
 
         act(() => result.current.replay(take));
         expect(result.current.activeReplayId).toBe("t1");
-        expect(playNote).toHaveBeenCalledWith(60, { velocity: 80, duration: 0.4 });
+        expect(playNote).toHaveBeenCalledWith(60, {
+            velocity: 80,
+            duration: 0.4,
+            owner: expect.any(Symbol),
+        });
 
         // The second event fires at its recorded offset, then the tail closes.
         act(() => void vi.advanceTimersByTime(300));
-        expect(playNote).toHaveBeenCalledWith(64, { velocity: 90, duration: 0.4 });
+        expect(playNote).toHaveBeenCalledWith(64, {
+            velocity: 90,
+            duration: 0.4,
+            owner: expect.any(Symbol),
+        });
         act(() => void vi.advanceTimersByTime(500));
         expect(result.current.playing).toBe(false);
         expect(result.current.activeReplayId).toBeNull();
@@ -572,6 +582,7 @@ describe("useListenPlayback", () => {
             velocity: 90,
             pedalled: false,
             delay: 0,
+            owner: expect.any(Symbol),
         });
         act(() => staccato.result.current.stop());
         playNote.mockClear();
@@ -597,6 +608,7 @@ describe("useListenPlayback", () => {
             velocity: 40,
             pedalled: false,
             delay: 0,
+            owner: expect.any(Symbol),
         });
         act(() => soft.result.current.stop());
     });
@@ -625,7 +637,7 @@ describe("useListenPlayback", () => {
         const { result } = renderHook(() =>
             useListenPlayback({
                 getOsmd: () => osmd,
-                synth: { playNote },
+                synth: { playNote, silenceStrikes },
                 tempo: () => 120,
                 loop: () => loopState,
                 onLap,
@@ -702,6 +714,7 @@ function heard(osmd: OpenSheetMusicDisplay, marks: ScoreMarks = NO_SCORE_MARKS) 
                         options?.pedalled ?? false,
                     ]);
                 },
+                silenceStrikes,
             },
             tempo: () => 120,
             loop: () => loopState,
@@ -737,6 +750,7 @@ describe("the human touch", () => {
                         delays.push([pitch, Math.round((options?.delay ?? 0) * 1000)]);
                         ticks.push(Date.now() - started);
                     },
+                    silenceStrikes,
                 },
                 tempo: () => 120,
                 loop: () => loopState,
@@ -850,7 +864,7 @@ describe("Listen over a written repeat", () => {
         const { result } = renderHook(() =>
             useListenPlayback({
                 getOsmd: () => osmd,
-                synth: { playNote },
+                synth: { playNote, silenceStrikes },
                 tempo: () => 120,
                 loop: () => loopState,
                 onLap,
@@ -882,7 +896,7 @@ describe("Listen over a written repeat", () => {
         const { result } = renderHook(() =>
             useListenPlayback({
                 getOsmd: () => osmd,
-                synth: { playNote },
+                synth: { playNote, silenceStrikes },
                 tempo: () => 120,
                 loop: () => loopState,
                 onLap,
@@ -910,7 +924,7 @@ describe("Listen over a written repeat", () => {
         const { result } = renderHook(() =>
             useListenPlayback({
                 getOsmd: () => osmd,
-                synth: { playNote },
+                synth: { playNote, silenceStrikes },
                 tempo: () => 120,
                 loop: () => loopState,
                 onLap,
@@ -930,7 +944,7 @@ describe("Listen over a written repeat", () => {
     it("hands back the same object across a render that changes nothing", () => {
         const options = {
             getOsmd: () => fakeOsmd(2),
-            synth: { playNote: () => {} },
+            synth: { playNote: () => {}, silenceStrikes: () => {} },
             tempo: () => 120,
             loop: () => loopState,
             onLap,
@@ -943,5 +957,83 @@ describe("Listen over a written repeat", () => {
         const before = result.current;
         rerender();
         expect(result.current).toBe(before);
+    });
+});
+
+describe("stopping", () => {
+    const REPLAYED: Take = {
+        id: "take",
+        composition: {
+            tempo: 120,
+            beatsPerBar: 4,
+            notes: [
+                { pitch: 60, startMs: 0, durationMs: 4000, velocity: 80 },
+                { pitch: 64, startMs: 500, durationMs: 4000, velocity: 80 },
+            ],
+        },
+    } as unknown as Take;
+
+    const ownersStruck = () =>
+        new Set(playNote.mock.calls.map(([, options]) => (options as { owner?: symbol }).owner));
+
+    it("takes back the notes Listen struck, under the owner it struck them with", () => {
+        // A strike is scheduled whole: a pedalled note stretched to the pedal lift keeps
+        // sounding after the cursor has stopped unless the stop reaches the engine.
+        const { result } = mount(fakeOsmd(4));
+        act(() => result.current.start(0));
+        const owners = ownersStruck();
+        expect(owners.size).toBe(1);
+        const [owner] = owners;
+        expect(typeof owner).toBe("symbol");
+        act(() => result.current.stop());
+        expect(silenceStrikes).toHaveBeenCalledWith(owner);
+    });
+
+    it("lets the last notes ring when Listen plays to the end", () => {
+        // The end of the piece is not a request for silence: the final chord rings for the
+        // length the score gives it.
+        const { result } = mount(fakeOsmd(2));
+        act(() => result.current.start(0));
+        act(() => void vi.advanceTimersByTime(5_000));
+        expect(result.current.playing).toBe(false);
+        expect(onLap).toHaveBeenCalled();
+        expect(silenceStrikes).not.toHaveBeenCalled();
+    });
+
+    it("takes back a replayed take's notes when the replay is stopped", () => {
+        const { result } = mount(fakeOsmd(4));
+        act(() => result.current.replay(REPLAYED));
+        const [owner] = ownersStruck();
+        act(() => result.current.stop());
+        expect(silenceStrikes).toHaveBeenCalledWith(owner);
+    });
+
+    it("lets a replayed take's last note ring when the take plays out", () => {
+        const { result } = mount(fakeOsmd(4));
+        act(() => result.current.replay(REPLAYED));
+        act(() => void vi.advanceTimersByTime(5_000));
+        expect(result.current.playing).toBe(false);
+        expect(silenceStrikes).not.toHaveBeenCalled();
+    });
+
+    it("silences the previous pass when a replay takes over from Listen", () => {
+        const { result } = mount(fakeOsmd(4));
+        act(() => result.current.start(0));
+        act(() => result.current.replay(REPLAYED));
+        expect(silenceStrikes).toHaveBeenCalledTimes(1);
+        // One transport, one owner: the replay's notes can be taken back the same way.
+        expect(ownersStruck().size).toBe(1);
+    });
+
+    it("gives each transport its own owner, so one's stop leaves the other's notes", () => {
+        const first = mount(fakeOsmd(4));
+        const second = mount(fakeOsmd(4));
+        act(() => first.result.current.start(0));
+        act(() => second.result.current.start(0));
+        expect(ownersStruck().size).toBe(2);
+        act(() => first.result.current.stop());
+        const [firstOwner] = ownersStruck();
+        expect(silenceStrikes.mock.calls).toEqual([[firstOwner]]);
+        act(() => second.result.current.stop());
     });
 });

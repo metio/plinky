@@ -30,6 +30,8 @@ export type FakeAudioEngine = AudioEngine & {
     // How many times the panic (allNotesOff) fired — a test asserts a play surface
     // silences everything on teardown.
     silenced: number;
+    // Every owner whose strikes were cut short, in order.
+    strikesSilenced: symbol[];
     // The wet level the room was last set to.
     room: number;
     // The fake audio clock, advanced by the test.
@@ -48,6 +50,7 @@ export function fakeAudioEngine(): FakeAudioEngine {
         asleep: false,
         unlocked: 0,
         silenced: 0,
+        strikesSilenced: [],
         room: ROOM_WET,
         time: 0,
         now() {
@@ -78,6 +81,9 @@ export function fakeAudioEngine(): FakeAudioEngine {
         },
         allNotesOff() {
             engine.silenced += 1;
+        },
+        silenceStrikes(owner) {
+            engine.strikesSilenced.push(owner);
         },
         click(time, kind, gain) {
             const queued = { time, kind, gain };

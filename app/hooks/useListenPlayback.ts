@@ -21,15 +21,23 @@ import {
     trailNotes,
 } from "../lib/scoreColor";
 import { seekToBar, seekToOrdinal, seekToWhole } from "../lib/scoreCursor";
+import type { StrikeOwner } from "../ports/audioEngine";
 import { useTimerChain } from "./useTimerChain";
 
 // The synth slice playback needs: Listen scales sustain by tempo, a replay
-// replays the recorded velocity and hold.
+// replays the recorded velocity and hold, and a stop takes back what was struck.
 type NoteSink = {
     playNote(
         note: number,
-        options?: { duration?: number; velocity?: number; pedalled?: boolean; delay?: number },
+        options?: {
+            duration?: number;
+            velocity?: number;
+            pedalled?: boolean;
+            delay?: number;
+            owner?: StrikeOwner;
+        },
     ): void;
+    silenceStrikes(owner: StrikeOwner): void;
 };
 
 // One shared empty map rather than a fresh one per silent position: the keyboard re-renders
@@ -100,6 +108,9 @@ export function useListenPlayback({
     shaped?: () => boolean;
 }) {
     const chain = useTimerChain();
+    // Every note this transport strikes goes out under this, so a stop can silence exactly
+    // what playback started and nothing the player is sounding themselves.
+    const [owner] = useState<StrikeOwner>(() => Symbol("listen"));
     // Through a ref: the walk is set up inside a callback that must not be rebuilt every
     // time a new marks object arrives, and what it needs is whatever is current when a
     // playback actually starts.
@@ -126,7 +137,9 @@ export function useListenPlayback({
     // Whether the transport currently owns the cursor — synchronous.
     const active = () => activeRef.current;
 
-    const stop = () => {
+    // Everything a stop does except cut the sound. A pass that plays to its end calls this
+    // alone, so its last notes ring out for the length the score gives them.
+    const finish = () => {
         chain.clear();
         // Playback holds its echoed notes open on a timer, not on the audio engine,
         // so clearing the chain alone would leave the instrument lit for up to a
@@ -147,6 +160,15 @@ export function useListenPlayback({
         activeRef.current = false;
         setPlaying(false);
         setActiveReplayId(null);
+    };
+
+    // A stop the player asked for, or another transport taking over. A strike is scheduled
+    // whole on the audio clock, so the notes already struck — a pedalled bass stretched to
+    // the pedal lift, a rolled chord's later notes still waiting on their delay — would
+    // otherwise sound on after the cursor stopped, and under the next pass.
+    const stop = () => {
+        synth.silenceStrikes(owner);
+        finish();
     };
 
     // Listen from a notated onset in whole notes (0 = the top; an active loop's
@@ -212,7 +234,7 @@ export function useListenPlayback({
                 // bar) resolves its lap start outside [from, to]; laping there would spin on
                 // step 0 every tick, re-firing onLap and re-sounding note 0. Stop instead.
                 if ((steps[lapStart]?.measureIndex ?? 0) > range.to - 1) {
-                    stop();
+                    finish();
                     onLap();
                     return;
                 }
@@ -220,7 +242,7 @@ export function useListenPlayback({
                 seekToBar(cursor, range.from);
                 step = lapStart;
             } else if (step >= steps.length) {
-                stop();
+                finish();
                 onLap();
                 return;
             }
@@ -274,6 +296,7 @@ export function useListenPlayback({
                     velocity: voiced,
                     pedalled: note.pedalled,
                     delay: delayMs / 1000,
+                    owner,
                 });
                 // …and light the same note on a connected instrument, so the piece
                 // can be watched as well as heard. Inert unless asked for.
@@ -310,7 +333,7 @@ export function useListenPlayback({
         let step = 0;
         const tick = () => {
             if (step >= events.length) {
-                stop();
+                finish();
                 return;
             }
             restoreNotes(highlightRef.current);
@@ -320,6 +343,7 @@ export function useListenPlayback({
                 synth.playNote(note.pitch, {
                     velocity: note.velocity,
                     duration: note.durationMs / 1000,
+                    owner,
                 });
                 echoNote(note.pitch, note.velocity, note.durationMs);
             }

@@ -30,9 +30,21 @@ const CHORD_SCORE = buildScore({
     bass: [{ pitch: { step: "C", octave: 4, alter: 0 }, value: "half" }],
 });
 
+// Eight bars of held minims: long enough that Listen is still sounding when the test stops
+// it, however slowly the browser gets there.
+const LONG_SCORE = buildScore({
+    title: "Long",
+    fifths: 0,
+    beatsPerBar: 4,
+    treble: Array.from({ length: 16 }, () => ({
+        pitch: { step: "C" as const, octave: 4, alter: 0 },
+        value: "half" as const,
+    })),
+});
+
 // The Runs tab belongs to the route's mode bar; this stand-in button plays that part, so a
 // kept take can be replayed the way the page replays it.
-function Surface() {
+function Surface({ xml = CHORD_SCORE }: { xml?: string }) {
     const [runsView, setRunsView] = useState(false);
     return (
         <>
@@ -41,7 +53,7 @@ function Surface() {
             </button>
             <ScoreViewer
                 id="chord"
-                xml={CHORD_SCORE}
+                xml={xml}
                 title="Chord"
                 runsView={runsView}
                 onShowScore={() => setRunsView(false)}
@@ -50,14 +62,14 @@ function Surface() {
     );
 }
 
-function mount({ surface = true } = {}) {
+function mount({ surface = true, xml = CHORD_SCORE } = {}) {
     // Inject a fake MIDI seam (the browser grants real Web MIDI otherwise) and a
     // recording audio engine so the test can assert what would have sounded.
     const audio = fakeAudioEngine();
     const tree = (shown: boolean) => (
         <MemoryRouter>
             <ServicesProvider services={{ midi: fakeMidi(), audio }}>
-                <MidiProvider>{shown && <Surface />}</MidiProvider>
+                <MidiProvider>{shown && <Surface xml={xml} />}</MidiProvider>
             </ServicesProvider>
         </MemoryRouter>
     );
@@ -129,6 +141,20 @@ describe("play-surface audio cleanup", () => {
         // The engine's voices are a process-lifetime singleton, so unmount must panic
         // them — nothing can outlive the surface, whatever state it was left in.
         expect(audio.silenced).toBeGreaterThan(0);
+    });
+
+    it("takes back the notes Listen struck when the player stops it on the resting page", async () => {
+        // A resting-page Listen never enters full screen, so nothing but the stop itself can
+        // reach the engine — and each note is a strike scheduled whole on the audio clock.
+        const { audio } = mount({ xml: LONG_SCORE });
+        await awaitReady();
+        fireEvent.click(listenButton());
+        await expect.poll(() => audio.strikes.length, { timeout: 30000 }).toBeGreaterThan(0);
+        const owner = audio.strikes[0]?.owner;
+        expect(typeof owner).toBe("symbol");
+        fireEvent.click(listenButton());
+        await expect.poll(listening, { timeout: 30000 }).toBe("false");
+        expect(audio.strikesSilenced).toContain(owner);
     });
 
     it("starts under a pedal the player was already holding as the surface opened", async () => {

@@ -2,6 +2,17 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-09-11
+  label: evening
+  entries:
+    - |-
+      **Stopping Listen stops the sound.** Press Listen again to stop it, restart it, or
+      stop a run you are replaying, and the cursor stopped while the notes already played
+      rang on, a pedalled bass for a bar or more, and under the next pass if you started
+      again. Playing a sketch back in Compose did the same after Stop. The notes now fade
+      the moment you stop, and anything you are holding on your own keys keeps sounding. A
+      piece that plays to its end still lets its last chord ring.
+
+- date: 2026-09-11
   entries:
     - |-
       **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

@@ -64,6 +64,7 @@ describe("the Learn page", () => {
             release: () => {},
             setPedal: () => {},
             allNotesOff: () => {},
+            silenceStrikes: () => {},
             click: () => () => {},
             setRoom: () => {},
             commitVoice: () => {},

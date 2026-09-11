@@ -64,6 +64,49 @@ describe("useCompositionTransport", () => {
         expect(result.current.playing).toBe(false);
     });
 
+    it("stop takes back the notes playback already struck", () => {
+        // A note the player held for seconds in the take is one long strike on the audio
+        // clock; cancelling the timers alone leaves it ringing after Stop.
+        const { result, audio } = harness(NOTES);
+        act(() => result.current.play());
+        act(() => vi.advanceTimersByTime(0));
+        const owner = audio.strikes[0]?.owner;
+        expect(typeof owner).toBe("symbol");
+        act(() => result.current.stop());
+        expect(audio.strikesSilenced).toContain(owner);
+        // Only the playback's own notes: the voices under the player's hands stay.
+        expect(audio.silenced).toBe(0);
+    });
+
+    it("lets the last note ring when the take plays out", () => {
+        const { result, audio } = harness(NOTES);
+        act(() => result.current.play());
+        // Play starts from a clean stop, so whatever it took back is from before the take.
+        const before = audio.strikesSilenced.length;
+        act(() => vi.runAllTimers());
+        expect(result.current.playing).toBe(false);
+        expect(audio.strikesSilenced).toHaveLength(before);
+    });
+
+    it("takes back the last pass when Play is pressed again mid-take", () => {
+        const { result, audio } = harness(NOTES);
+        act(() => result.current.play());
+        act(() => vi.advanceTimersByTime(0));
+        const owner = audio.strikes[0]?.owner;
+        const before = audio.strikesSilenced.length;
+        act(() => result.current.play());
+        expect(audio.strikesSilenced.slice(before)).toEqual([owner]);
+    });
+
+    it("takes back what playback struck when the page goes away", () => {
+        const { result, unmount, audio } = harness(NOTES);
+        act(() => result.current.play());
+        act(() => vi.advanceTimersByTime(0));
+        const owner = audio.strikes[0]?.owner;
+        unmount();
+        expect(audio.strikesSilenced).toContain(owner);
+    });
+
     it("counts in one bar, then hands the downbeat over exactly once", () => {
         const { result, onDownbeat } = harness([]);
         act(() => result.current.countIn());

@@ -7,6 +7,7 @@ import { soundsOnItsOwn } from "../../core/midi";
 import { wetFor } from "../../core/room";
 import type { PedalKind } from "../../core/pedals";
 import { useAudioEngine, usePrefsStore } from "../contexts/services";
+import type { StrikeOwner } from "../ports/audioEngine";
 
 export type PlayNoteOptions = {
     velocity?: number; // 0..127
@@ -30,6 +31,9 @@ export type PlayNoteOptions = {
     // back — a keep-up run sounds each strike over the guide. An instrument that makes
     // its own sound is not answered with a second one; see pressNote.
     device?: string;
+    // The playback striking this note, so its stop can take the note back; see
+    // silenceStrikes.
+    owner?: StrikeOwner;
 };
 
 export type UseSynthResult = {
@@ -51,6 +55,9 @@ export type UseSynthResult = {
     // teardown so a guide voice can never ring on past the run. The pedals stay where the
     // player's foot has them; see AudioEngine.allNotesOff.
     silenceAll: () => void;
+    // Cut short the fixed-length notes one playback struck under its owner — its stop, where
+    // silenceAll would also take the notes out from under the player's own hands.
+    silenceStrikes: (owner: StrikeOwner) => void;
     // The instrument for the run that starts now; see AudioEngine.commitVoice.
     commitVoice: () => void;
     // The run is over; see AudioEngine.uncommitVoice.
@@ -117,6 +124,7 @@ export function useSynth(): UseSynthResult {
                 velocity: options.velocity ?? 90,
                 duration: options.duration ?? 1.1,
                 delay: Math.max(0, options.delay ?? 0),
+                ...(options.owner === undefined ? {} : { owner: options.owner }),
             });
         },
         [gainFor, audio, ownVoice],
@@ -151,6 +159,12 @@ export function useSynth(): UseSynthResult {
     // Reaches the engine regardless of the volume preference — it clears the voices and
     // held keys, which must happen even for a muted session that opened none.
     const silenceAll = useCallback(() => audio.allNotesOff(), [audio]);
+    // Also regardless of the volume preference: a note struck before the player muted is
+    // still ringing.
+    const silenceStrikes = useCallback(
+        (owner: StrikeOwner) => audio.silenceStrikes(owner),
+        [audio],
+    );
 
     // A stable result so callers can list the synth in an effect's dependencies without the
     // effect re-firing every render.
@@ -163,9 +177,19 @@ export function useSynth(): UseSynthResult {
             releaseNote,
             setPedal,
             silenceAll,
+            silenceStrikes,
             commitVoice,
             uncommitVoice,
         }),
-        [playNote, pressNote, releaseNote, setPedal, silenceAll, commitVoice, uncommitVoice],
+        [
+            playNote,
+            pressNote,
+            releaseNote,
+            setPedal,
+            silenceAll,
+            silenceStrikes,
+            commitVoice,
+            uncommitVoice,
+        ],
     );
 }

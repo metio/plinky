@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { midiToFrequency } from "../../core/pitch";
-import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
+import type { AudioEngine, ClickKind, NoteStrike, StrikeOwner } from "../ports/audioEngine";
 import { ROOM_SECONDS, ROOM_WET, roomImpulse } from "../../core/room";
 import type { ExtraKind } from "../../core/sampledPiano";
 import type { SampleLookup, SampleVoice } from "../ports/sampleSource";
@@ -710,17 +710,22 @@ function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): 
 const struckUntil = new Map<number, number>();
 
 // Fixed-length struck notes still ringing (or scheduled ahead by a delay) on the shared
-// live context. Unlike a pressed voice they open no entry in `voices`, so allNotesOff can
-// only silence them by tracking them here; each removes itself once its ring-out ends.
-const scheduledStrikes = new Set<StruckStrike>();
+// live context, each with the owner it was struck under. Unlike a pressed voice they open no
+// entry in `voices`, so allNotesOff can only silence them by tracking them here; each
+// removes itself once its ring-out ends.
+const scheduledStrikes = new Map<StruckStrike, StrikeOwner | undefined>();
 
-// Ring out and stop every scheduled/ringing struck note now — the strike counterpart to
-// fading the live voices. A strike still waiting on its delay has not ramped up yet, so the
-// fast fade lands it silent, and stopping an oscillator before its start time simply keeps
-// it from ever sounding.
-function silenceStrikes(ctx: AudioContext): void {
+// Ring out and stop the scheduled/ringing struck notes now — every one, or only those struck
+// under `owner` — the strike counterpart to fading the live voices. A strike still waiting
+// on its delay has not ramped up yet, so the fast fade lands it silent, and stopping an
+// oscillator before its start time simply keeps it from ever sounding.
+function silenceStrikes(ctx: AudioContext, owner?: StrikeOwner): void {
     const now = ctx.currentTime;
-    for (const strike of scheduledStrikes) {
+    for (const [strike, struckBy] of scheduledStrikes) {
+        if (owner !== undefined && struckBy !== owner) {
+            continue;
+        }
+        scheduledStrikes.delete(strike);
         const gain = strike.envelope.gain;
         const shelf = Math.max(0.0001, gain.value);
         gain.cancelScheduledValues(now);
@@ -734,7 +739,6 @@ function silenceStrikes(ctx: AudioContext): void {
             }
         }
     }
-    scheduledStrikes.clear();
 }
 
 // The context the engine plays through, for whatever has to decode into it: an AudioBuffer
@@ -826,7 +830,7 @@ export const webAudioEngine: AudioEngine = {
             // renderStrike alongside the note — one place, so an exported video carries
             // them exactly as the speakers just did.
             const strike = renderStrike(ctx, note, voiceFor(note.note, note.velocity));
-            scheduledStrikes.add(strike);
+            scheduledStrikes.set(strike, note.owner);
             // Drop it from the tracked set once it has finished ringing, so the set holds
             // only strikes that are still (or not yet) sounding.
             strike.oscillators.at(-1)?.addEventListener("ended", () => {
@@ -950,6 +954,12 @@ export const webAudioEngine: AudioEngine = {
         // cannot linger either.
         voices.clear();
         keyDown.clear();
+    },
+    silenceStrikes(owner) {
+        const ctx = context();
+        if (ctx) {
+            silenceStrikes(ctx, owner);
+        }
     },
     setRoom(wet) {
         wetLevel = Math.max(0, wet);

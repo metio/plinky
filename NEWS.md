@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 11 September 2026 — evening
+
+**Stopping Listen stops the sound.** Press Listen again to stop it, restart it, or
+stop a run you are replaying, and the cursor stopped while the notes already played
+rang on, a pedalled bass for a bar or more, and under the next pass if you started
+again. Playing a sketch back in Compose did the same after Stop. The notes now fade
+the moment you stop, and anything you are holding on your own keys keeps sounding. A
+piece that plays to its end still lets its last chord ring.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

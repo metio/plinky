@@ -90,6 +90,26 @@ describe("useSynth", () => {
         expect(audio.silenced).toBe(1);
     });
 
+    it("tags a strike with the playback that struck it, and none when nobody asked", () => {
+        const { audio, playNote } = harness();
+        const owner = Symbol("listen");
+        playNote(60, { owner });
+        playNote(62);
+        expect(audio.strikes[0]?.owner).toBe(owner);
+        expect(audio.strikes[1]).not.toHaveProperty("owner");
+    });
+
+    it("takes back one playback's strikes through the engine, even muted", () => {
+        // A note struck before the player muted is still ringing, so the stop reaches the
+        // engine whatever the volume says now.
+        const { audio, synth } = harness({ sound: false });
+        const owner = Symbol("listen");
+        synth.silenceStrikes(owner);
+        expect(audio.strikesSilenced).toEqual([owner]);
+        // The strikes only: the voices under the player's hands are not touched.
+        expect(audio.silenced).toBe(0);
+    });
+
     it("stays silent at volume 0", () => {
         // An exponential gain ramp to 0 is a RangeError in the engine, so a
         // zero-gain strike must never reach it.
