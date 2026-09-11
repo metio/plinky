@@ -142,6 +142,31 @@ describe("applyRun", () => {
         expect(next.reviewAt).toBe(NOW + 2 * DAY);
     });
 
+    it("counts a pass landing exactly a tenth of the interval before the review", () => {
+        const before = learned({ intervalDays: 10, reviewAt: NOW + DAY });
+        const next = applyRun(before, 90, 85, NOW);
+        expect(next.intervalDays).toBe(23);
+        expect(next.reviewAt).toBe(NOW + 23 * DAY);
+    });
+
+    it("keeps the schedule on a pass a millisecond before that tenth", () => {
+        const before = learned({ intervalDays: 10, reviewAt: NOW + DAY + 1 });
+        const next = applyRun(before, 90, 85, NOW);
+        expect(next.intervalDays).toBe(10);
+        expect(next.reviewAt).toBe(NOW + DAY + 1);
+    });
+
+    it("counts a repeat in the same sitting once it reaches the window an early pass left", () => {
+        // The first pass is a millisecond too early and moves nothing; the next one lands
+        // on the window's edge, and is the review.
+        const before = learned({ intervalDays: 1, reviewAt: NOW + 0.1 * DAY + 1 });
+        const early = applyRun(before, 90, 85, NOW);
+        expect(early.reviewAt).toBe(before.reviewAt);
+        const next = applyRun(early, 90, 85, NOW + 1);
+        expect(next.intervalDays).toBe(2);
+        expect(next.reviewAt).toBe(NOW + 1 + 2 * DAY);
+    });
+
     it("still resets on a failing run made before the review is due", () => {
         const before = learned({ intervalDays: 30, reviewAt: NOW + 20 * DAY });
         const next = applyRun(before, 60, 85, NOW);

@@ -24,25 +24,56 @@ const learnedPiece: fc.Arbitrary<Mastery> = fc.record({
 });
 
 describe("applyRun (properties)", () => {
-    it("repeat passes after one pass leave the schedule where that pass put it", () => {
-        // Within the 21.6 hours after a pass, however many further passes land, the
+    // Passes landing within 21.6 hours of the first, in order.
+    const sitting = fc
+        .array(fc.tuple(fc.integer({ min: 0, max: 0.9 * DAY - 1 }), passing), { maxLength: 12 })
+        .map((repeats) => [...repeats].sort((a, b) => a[0] - b[0]));
+
+    it("repeat passes after a pass that counted leave the schedule where it put it", () => {
+        // Within the 21.6 hours after a counted pass, however many further passes land, the
         // schedule does not move: the earliest review is a day out, and an early pass
-        // counts only inside the last tenth of its interval.
+        // counts only inside the last tenth of its interval. A first pass that was itself
+        // too early moved nothing, so the window it left can open during the sitting —
+        // the property below covers that case.
         fc.assert(
             fc.property(
                 fc.option(learnedPiece, { nil: null }),
                 passing,
-                fc.array(fc.tuple(fc.integer({ min: 0, max: 0.9 * DAY - 1 }), passing), {
-                    maxLength: 12,
-                }),
+                sitting,
                 (start, first, repeats) => {
                     const once = applyRun(start, first, THRESHOLD, NOW);
+                    fc.pre(once.reviewAt === NOW + once.intervalDays * DAY);
                     let state = once;
-                    for (const [offset, score] of [...repeats].sort((a, b) => a[0] - b[0])) {
+                    for (const [offset, score] of repeats) {
                         state = applyRun(state, score, THRESHOLD, NOW + offset);
                     }
                     expect(state.reviewAt).toBe(once.reviewAt);
                     expect(state.intervalDays).toBe(once.intervalDays);
+                },
+            ),
+        );
+    });
+
+    it("passes within 21.6 hours of each other move the schedule at most once", () => {
+        fc.assert(
+            fc.property(
+                fc.option(learnedPiece, { nil: null }),
+                passing,
+                sitting,
+                (start, first, repeats) => {
+                    let state = start;
+                    let moves = 0;
+                    for (const [offset, score] of [[0, first] as const, ...repeats]) {
+                        const next = applyRun(state, score, THRESHOLD, NOW + offset);
+                        if (
+                            next.reviewAt !== state?.reviewAt ||
+                            next.intervalDays !== state.intervalDays
+                        ) {
+                            moves += 1;
+                        }
+                        state = next;
+                    }
+                    expect(moves).toBeLessThanOrEqual(1);
                 },
             ),
         );
