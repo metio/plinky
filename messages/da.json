@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Ikke prøvet endnu",
     "music_built_on": "Bygget på {progression}",
     "music_show_everything": "Vis alt",
-    "music_remove_used_one": "Bruges af {count} opgave — fjern?",
-    "music_remove_used_other": "Bruges af {count} opgaver — fjern?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Bruges af {count} opgave — fjern?",
+                "countPlural=other": "Bruges af {count} opgaver — fjern?"
+            }
+        }
+    ],
     "music_group_kind": "Type",
     "music_group_grade": "Karakter",
     "music_group_show": "Vis",
@@ -962,7 +975,21 @@
     "takes_download_video_portrait": "Gem en lodret video (9:16, til Reels og Shorts)",
     "takes_video_progress": "Gengiver… {percent}%",
     "person_eyebrow": "Komponist",
-    "person_pieces": "{count} stykker at spille",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stykke at spille",
+                "countPlural=other": "{count} stykker at spille"
+            }
+        }
+    ],
     "person_empty": "Ingen med det navn i kataloget endnu.",
     "person_born": "født {year}",
     "person_died": "død {year}",

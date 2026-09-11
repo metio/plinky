@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Noch nicht probiert",
     "music_built_on": "Gebaut auf {progression}",
     "music_show_everything": "Alles zeigen",
-    "music_remove_used_one": "Wird von {count} Aufgabe verwendet — entfernen?",
-    "music_remove_used_other": "Wird von {count} Aufgaben verwendet — entfernen?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Wird von {count} Aufgabe verwendet — entfernen?",
+                "countPlural=other": "Wird von {count} Aufgaben verwendet — entfernen?"
+            }
+        }
+    ],
     "music_group_kind": "Art",
     "music_group_grade": "Note",
     "music_group_show": "Anzeigen",
@@ -962,7 +975,21 @@
     "takes_download_video_portrait": "Video im Hochformat speichern (9:16, für Reels und Shorts)",
     "takes_video_progress": "Rendern… {percent}%",
     "person_eyebrow": "Komponist",
-    "person_pieces": "{count} Stücke zum Spielen",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Stück zum Spielen",
+                "countPlural=other": "{count} Stücke zum Spielen"
+            }
+        }
+    ],
     "person_empty": "Niemanden mit diesem Namen im Katalog gefunden.",
     "person_born": "geboren {year}",
     "person_died": "gestorben {year}",

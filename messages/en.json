@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Not tried yet",
     "music_built_on": "Built on {progression}",
     "music_show_everything": "Show everything",
-    "music_remove_used_one": "Used by {count} assignment — remove?",
-    "music_remove_used_other": "Used by {count} assignments — remove?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Used by {count} assignment — remove?",
+                "countPlural=other": "Used by {count} assignments — remove?"
+            }
+        }
+    ],
     "music_group_kind": "Kind",
     "music_group_grade": "Grade",
     "music_group_show": "Show",
@@ -972,7 +985,21 @@
     "takes_download_video_portrait": "Save a portrait video (9:16, for Reels and Shorts)",
     "takes_video_progress": "Rendering… {percent}%",
     "person_eyebrow": "Composer",
-    "person_pieces": "{count} pieces to play",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} piece to play",
+                "countPlural=other": "{count} pieces to play"
+            }
+        }
+    ],
     "person_empty": "Nobody by that name in the catalogue yet.",
     "person_born": "born {year}",
     "person_died": "died {year}",

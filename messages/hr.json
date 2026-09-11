@@ -34,8 +34,22 @@
     "music_filter_fresh": "✨ Još neisprobano",
     "music_built_on": "Građeno na {progression}",
     "music_show_everything": "Prikaži sve",
-    "music_remove_used_one": "Koristi ga {count} zadatak — ukloniti?",
-    "music_remove_used_other": "Koristi ga {count} zadataka — ukloniti?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Koristi ga {count} zadatak — ukloniti?",
+                "countPlural=few": "Koriste ga {count} zadatka — ukloniti?",
+                "countPlural=other": "Koristi ga {count} zadataka — ukloniti?"
+            }
+        }
+    ],
     "music_group_kind": "Vrsta",
     "music_group_grade": "Ocjena",
     "music_group_show": "Prikaži",
@@ -971,7 +985,22 @@
     "takes_download_video_portrait": "Spremi uspravni video (9:16, za Reels i Shorts)",
     "takes_video_progress": "Iscrtavanje… {percent}%",
     "person_eyebrow": "Skladatelj",
-    "person_pieces": "{count} skladbi za sviranje",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba za sviranje",
+                "countPlural=few": "{count} skladbe za sviranje",
+                "countPlural=other": "{count} skladbi za sviranje"
+            }
+        }
+    ],
     "person_empty": "Nitko s tim imenom još nije u katalogu.",
     "person_born": "rođen {year}",
     "person_died": "umro {year}",

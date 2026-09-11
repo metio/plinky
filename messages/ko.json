@@ -34,8 +34,20 @@
     "music_filter_fresh": "✨ 아직 안 쳐 본 곡",
     "music_built_on": "{progression} 위에 만들어진 곡",
     "music_show_everything": "전체 보기",
-    "music_remove_used_one": "과제 {count}개에서 사용 중이에요 — 삭제할까요?",
-    "music_remove_used_other": "과제 {count}개에서 사용 중이에요 — 삭제할까요?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "과제 {count}개에서 사용 중이에요 — 삭제할까요?"
+            }
+        }
+    ],
     "music_group_kind": "종류",
     "music_group_grade": "등급",
     "music_group_show": "표시",
@@ -952,7 +964,20 @@
     "takes_download_video_portrait": "세로 영상 저장 (9:16, 릴스·쇼츠용)",
     "takes_video_progress": "렌더링 중… {percent}%",
     "person_eyebrow": "작곡가",
-    "person_pieces": "연습할 수 있는 곡 {count}개",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "연습할 수 있는 곡 {count}개"
+            }
+        }
+    ],
     "person_empty": "카탈로그에 아직 그 이름의 작곡가가 없습니다.",
     "person_born": "{year}년 출생",
     "person_died": "{year}년 사망",

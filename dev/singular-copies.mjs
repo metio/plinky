@@ -58,6 +58,7 @@ const SAME_FOR_ONE_AND_MANY = {
         review_start: INVARIANT_PJESE,
         today_review: INVARIANT_PJESE,
         today_stand: INVARIANT_PJESE,
+        person_pieces: INVARIANT_PJESE,
         achievement_days: INVARIANT_DITE,
         balance_last: INVARIANT_DITE,
         repertoire_days_left: INVARIANT_DITE,

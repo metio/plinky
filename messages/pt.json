@@ -34,8 +34,22 @@
     "music_filter_fresh": "✨ Ainda não experimentado",
     "music_built_on": "Construídas sobre {progression}",
     "music_show_everything": "Mostrar tudo",
-    "music_remove_used_one": "Usada por {count} tarefa — remover?",
-    "music_remove_used_other": "Usada por {count} tarefas — remover?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Usada por {count} tarefa — remover?",
+                "countPlural=many": "Usada por {count} tarefas — remover?",
+                "countPlural=other": "Usada por {count} tarefas — remover?"
+            }
+        }
+    ],
     "music_group_kind": "Tipo",
     "music_group_grade": "Nível",
     "music_group_show": "Mostrar",
@@ -971,7 +985,22 @@
     "takes_download_video_portrait": "Guardar um vídeo vertical (9:16, para Reels e Shorts)",
     "takes_video_progress": "A renderizar… {percent}%",
     "person_eyebrow": "Compositor",
-    "person_pieces": "{count} peças para tocar",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} peça para tocar",
+                "countPlural=many": "{count} peças para tocar",
+                "countPlural=other": "{count} peças para tocar"
+            }
+        }
+    ],
     "person_empty": "Ainda ninguém com esse nome no catálogo.",
     "person_born": "nascido em {year}",
     "person_died": "falecido em {year}",

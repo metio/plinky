@@ -34,8 +34,23 @@
     "music_filter_fresh": "✨ Ešte neskúšané",
     "music_built_on": "Postavené na {progression}",
     "music_show_everything": "Zobraziť všetko",
-    "music_remove_used_one": "Používa ho {count} zadanie — odstrániť?",
-    "music_remove_used_other": "Používa ho {count} zadaní — odstrániť?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Používa ho {count} zadanie — odstrániť?",
+                "countPlural=few": "Používajú ho {count} zadania — odstrániť?",
+                "countPlural=many": "Používa ho {count} zadania — odstrániť?",
+                "countPlural=other": "Používa ho {count} zadaní — odstrániť?"
+            }
+        }
+    ],
     "music_group_kind": "Druh",
     "music_group_grade": "Známka",
     "music_group_show": "Zobraziť",
@@ -979,7 +994,23 @@
     "takes_download_video_portrait": "Uložiť video na výšku (9:16, pre Reels a Shorts)",
     "takes_video_progress": "Vykresľovanie… {percent}%",
     "person_eyebrow": "Skladateľ",
-    "person_pieces": "{count} skladieb na precvičovanie",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba na precvičovanie",
+                "countPlural=few": "{count} skladby na precvičovanie",
+                "countPlural=many": "{count} skladby na precvičovanie",
+                "countPlural=other": "{count} skladieb na precvičovanie"
+            }
+        }
+    ],
     "person_empty": "Nikto s takým menom zatiaľ v katalógu nie je.",
     "person_born": "nar. {year}",
     "person_died": "zomr. {year}",

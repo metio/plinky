@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Nog niet geprobeerd",
     "music_built_on": "Gebouwd op {progression}",
     "music_show_everything": "Alles tonen",
-    "music_remove_used_one": "In gebruik door {count} opdracht — verwijderen?",
-    "music_remove_used_other": "In gebruik door {count} opdrachten — verwijderen?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "In gebruik door {count} opdracht — verwijderen?",
+                "countPlural=other": "In gebruik door {count} opdrachten — verwijderen?"
+            }
+        }
+    ],
     "music_group_kind": "Soort",
     "music_group_grade": "Niveau",
     "music_group_show": "Tonen",
@@ -962,7 +975,21 @@
     "takes_download_video_portrait": "Een staande video opslaan (9:16, voor Reels en Shorts)",
     "takes_video_progress": "Renderen… {percent}%",
     "person_eyebrow": "Componist",
-    "person_pieces": "{count} stukken om te spelen",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stuk om te spelen",
+                "countPlural=other": "{count} stukken om te spelen"
+            }
+        }
+    ],
     "person_empty": "Nog niemand met die naam in de catalogus.",
     "person_born": "geboren {year}",
     "person_died": "overleden {year}",

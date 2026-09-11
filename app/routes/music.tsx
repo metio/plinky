@@ -73,9 +73,7 @@ export default function MusicRoute() {
         if (used === 0) {
             return m.action_remove_confirm();
         }
-        return used === 1
-            ? m.music_remove_used_one({ count: used })
-            : m.music_remove_used_other({ count: used });
+        return m.music_remove_used({ count: used });
     };
 
     // The composers this shelf actually holds, grouped from the same items it lists — so

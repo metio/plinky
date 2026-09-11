@@ -50,9 +50,9 @@ describe("ComposerList", () => {
     it("counts what there is of theirs to play", () => {
         show();
         const beach = screen.getByRole("link", { name: "Amy Beach" }).closest("li");
-        expect(beach?.textContent).toContain("1");
+        expect(beach?.textContent).toBe("Amy Beach1 piece to play");
         const debussy = screen.getByRole("link", { name: "Claude Debussy" }).closest("li");
-        expect(debussy?.textContent).toContain("3");
+        expect(debussy?.textContent).toBe("Claude Debussy3 pieces to play");
     });
 
     it("reads alphabetically, not by how much of theirs there is", () => {

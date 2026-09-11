@@ -34,8 +34,23 @@
     "music_filter_fresh": "✨ Ещё не пробовали",
     "music_built_on": "Построено на {progression}",
     "music_show_everything": "Показать всё",
-    "music_remove_used_one": "Используется в {count} задании — удалить?",
-    "music_remove_used_other": "Используется в {count} заданиях — удалить?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Используется в {count} задании — удалить?",
+                "countPlural=few": "Используется в {count} заданиях — удалить?",
+                "countPlural=many": "Используется в {count} заданиях — удалить?",
+                "countPlural=other": "Используется в {count} заданиях — удалить?"
+            }
+        }
+    ],
     "music_group_kind": "Тип",
     "music_group_grade": "Уровень",
     "music_group_show": "Показать",
@@ -979,7 +994,23 @@
     "takes_download_video_portrait": "Сохранить вертикальное видео (9:16, для Reels и Shorts)",
     "takes_video_progress": "Рендеринг… {percent}%",
     "person_eyebrow": "Композитор",
-    "person_pieces": "{count} пьес для занятий",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} пьеса для занятий",
+                "countPlural=few": "{count} пьесы для занятий",
+                "countPlural=many": "{count} пьес для занятий",
+                "countPlural=other": "{count} пьес для занятий"
+            }
+        }
+    ],
     "person_empty": "В каталоге пока нет никого с таким именем.",
     "person_born": "родился в {year}",
     "person_died": "умер в {year}",

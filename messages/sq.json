@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Ende të paprovuara",
     "music_built_on": "Ndërtuar mbi {progression}",
     "music_show_everything": "Shfaq gjithçka",
-    "music_remove_used_one": "Përdoret nga {count} detyrë — ta heq?",
-    "music_remove_used_other": "Përdoret nga {count} detyra — ta heq?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Përdoret nga {count} detyrë — ta heq?",
+                "countPlural=other": "Përdoret nga {count} detyra — ta heq?"
+            }
+        }
+    ],
     "music_group_kind": "Lloji",
     "music_group_grade": "Nota",
     "music_group_show": "Shfaq",
@@ -961,7 +974,21 @@
     "takes_download_video_portrait": "Ruaj një video vertikale (9:16, për Reels dhe Shorts)",
     "takes_video_progress": "Duke përpunuar… {percent}%",
     "person_eyebrow": "Kompozitor",
-    "person_pieces": "{count} pjesë për të luajtur",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} pjesë për të luajtur",
+                "countPlural=other": "{count} pjesë për të luajtur"
+            }
+        }
+    ],
     "person_empty": "Askush me këtë emër në katalog ende.",
     "person_born": "lindur {year}",
     "person_died": "vdiq {year}",

@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Még nem próbált",
     "music_built_on": "Erre épül: {progression}",
     "music_show_everything": "Mutasd mindet",
-    "music_remove_used_one": "{count} feladat használja — eltávolítod?",
-    "music_remove_used_other": "{count} feladat használja — eltávolítod?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} feladat használja — eltávolítod?",
+                "countPlural=other": "{count} feladat használja — eltávolítod?"
+            }
+        }
+    ],
     "music_group_kind": "Típus",
     "music_group_grade": "Szint",
     "music_group_show": "Megjelenítés",
@@ -961,7 +974,21 @@
     "takes_download_video_portrait": "Álló videó mentése (9:16, Reels és Shorts számára)",
     "takes_video_progress": "Renderelés… {percent}%",
     "person_eyebrow": "Zeneszerző",
-    "person_pieces": "{count} darab, amit játszhatsz",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} darab, amit játszhatsz",
+                "countPlural=other": "{count} darab, amit játszhatsz"
+            }
+        }
+    ],
     "person_empty": "Ilyen néven még senki sincs a katalógusban.",
     "person_born": "született {year}",
     "person_died": "meghalt {year}",

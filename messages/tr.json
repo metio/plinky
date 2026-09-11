@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Henüz denenmedi",
     "music_built_on": "{progression} üzerine kurulu",
     "music_show_everything": "Hepsini göster",
-    "music_remove_used_one": "{count} ödevde kullanılıyor — kaldırılsın mı?",
-    "music_remove_used_other": "{count} ödevde kullanılıyor — kaldırılsın mı?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} ödevde kullanılıyor — kaldırılsın mı?",
+                "countPlural=other": "{count} ödevde kullanılıyor — kaldırılsın mı?"
+            }
+        }
+    ],
     "music_group_kind": "Tür",
     "music_group_grade": "Seviye",
     "music_group_show": "Göster",
@@ -961,7 +974,21 @@
     "takes_download_video_portrait": "Dikey video kaydet (9:16, Reels ve Shorts için)",
     "takes_video_progress": "İşleniyor… {percent}%",
     "person_eyebrow": "Besteci",
-    "person_pieces": "Çalınacak {count} parça",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Çalınacak {count} parça",
+                "countPlural=other": "Çalınacak {count} parça"
+            }
+        }
+    ],
     "person_empty": "Katalogda henüz bu isimde kimse yok.",
     "person_born": "{year} doğumlu",
     "person_died": "{year} yılında öldü",

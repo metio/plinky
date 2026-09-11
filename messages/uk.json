@@ -34,8 +34,23 @@
     "music_filter_fresh": "✨ Ще не пробували",
     "music_built_on": "Побудовано на {progression}",
     "music_show_everything": "Показати все",
-    "music_remove_used_one": "Використовується в {count} завданні — видалити?",
-    "music_remove_used_other": "Використовується в {count} завданнях — видалити?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Використовується в {count} завданні — видалити?",
+                "countPlural=few": "Використовується в {count} завданнях — видалити?",
+                "countPlural=many": "Використовується в {count} завданнях — видалити?",
+                "countPlural=other": "Використовується в {count} завданнях — видалити?"
+            }
+        }
+    ],
     "music_group_kind": "Тип",
     "music_group_grade": "Рівень",
     "music_group_show": "Показати",
@@ -980,7 +995,23 @@
     "takes_download_video_portrait": "Зберегти вертикальне відео (9:16, для Reels і Shorts)",
     "takes_video_progress": "Рендеринг… {percent}%",
     "person_eyebrow": "Композитор",
-    "person_pieces": "{count} п’єс, щоб зіграти",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} п’єса, щоб зіграти",
+                "countPlural=few": "{count} п’єси, щоб зіграти",
+                "countPlural=many": "{count} п’єс, щоб зіграти",
+                "countPlural=other": "{count} п’єс, щоб зіграти"
+            }
+        }
+    ],
     "person_empty": "У каталозі поки немає нікого з таким ім’ям.",
     "person_born": "народився {year}",
     "person_died": "помер {year}",

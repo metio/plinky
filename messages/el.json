@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Αδοκίμαστα ακόμη",
     "music_built_on": "Χτισμένα πάνω σε {progression}",
     "music_show_everything": "Εμφάνιση όλων",
-    "music_remove_used_one": "Χρησιμοποιείται από {count} εργασία — αφαίρεση;",
-    "music_remove_used_other": "Χρησιμοποιείται από {count} εργασίες — αφαίρεση;",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Χρησιμοποιείται από {count} εργασία — αφαίρεση;",
+                "countPlural=other": "Χρησιμοποιείται από {count} εργασίες — αφαίρεση;"
+            }
+        }
+    ],
     "music_group_kind": "Είδος",
     "music_group_grade": "Βαθμός",
     "music_group_show": "Εμφάνιση",
@@ -962,7 +975,21 @@
     "takes_download_video_portrait": "Αποθήκευση κάθετου βίντεο (9:16, για Reels και Shorts)",
     "takes_video_progress": "Απόδοση… {percent}%",
     "person_eyebrow": "Συνθέτης",
-    "person_pieces": "{count} κομμάτια να παίξεις",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} κομμάτι να παίξεις",
+                "countPlural=other": "{count} κομμάτια να παίξεις"
+            }
+        }
+    ],
     "person_empty": "Κανείς με αυτό το όνομα στον κατάλογο ακόμη.",
     "person_born": "γεννήθηκε το {year}",
     "person_died": "πέθανε το {year}",

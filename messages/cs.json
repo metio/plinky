@@ -34,8 +34,23 @@
     "music_filter_fresh": "✨ Ještě nezkoušené",
     "music_built_on": "Postavené na {progression}",
     "music_show_everything": "Zobrazit vše",
-    "music_remove_used_one": "Používá ho {count} zadání — odebrat?",
-    "music_remove_used_other": "Používá ho {count} zadání — odebrat?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Používá ho {count} zadání — odebrat?",
+                "countPlural=few": "Používají ho {count} zadání — odebrat?",
+                "countPlural=many": "Používá ho {count} zadání — odebrat?",
+                "countPlural=other": "Používá ho {count} zadání — odebrat?"
+            }
+        }
+    ],
     "music_group_kind": "Druh",
     "music_group_grade": "Úroveň",
     "music_group_show": "Zobrazit",
@@ -979,7 +994,23 @@
     "takes_download_video_portrait": "Uložit video na výšku (9:16, pro Reels a Shorts)",
     "takes_video_progress": "Vykreslování… {percent}%",
     "person_eyebrow": "Skladatel",
-    "person_pieces": "{count} skladeb k zahrání",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba k zahrání",
+                "countPlural=few": "{count} skladby k zahrání",
+                "countPlural=many": "{count} skladby k zahrání",
+                "countPlural=other": "{count} skladeb k zahrání"
+            }
+        }
+    ],
     "person_empty": "Nikdo takový v katalogu zatím není.",
     "person_born": "nar. {year}",
     "person_died": "zemř. {year}",

@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Ikke prøvd ennå",
     "music_built_on": "Bygd på {progression}",
     "music_show_everything": "Vis alt",
-    "music_remove_used_one": "Brukes av {count} oppgave — fjerne?",
-    "music_remove_used_other": "Brukes av {count} oppgaver — fjerne?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Brukes av {count} oppgave — fjerne?",
+                "countPlural=other": "Brukes av {count} oppgaver — fjerne?"
+            }
+        }
+    ],
     "music_group_kind": "Type",
     "music_group_grade": "Karakter",
     "music_group_show": "Vis",
@@ -962,7 +975,21 @@
     "takes_download_video_portrait": "Lagre en stående video (9:16, for Reels og Shorts)",
     "takes_video_progress": "Gjengir… {percent}%",
     "person_eyebrow": "Komponist",
-    "person_pieces": "{count} stykker å spille",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stykke å spille",
+                "countPlural=other": "{count} stykker å spille"
+            }
+        }
+    ],
     "person_empty": "Ingen med det navnet i katalogen ennå.",
     "person_born": "født {year}",
     "person_died": "død {year}",

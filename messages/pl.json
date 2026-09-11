@@ -34,8 +34,23 @@
     "music_filter_fresh": "✨ Jeszcze niegrane",
     "music_built_on": "Zbudowane na {progression}",
     "music_show_everything": "Pokaż wszystko",
-    "music_remove_used_one": "Używane przez {count} zadanie — usunąć?",
-    "music_remove_used_other": "Używane przez {count} zadań — usunąć?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Używane przez {count} zadanie — usunąć?",
+                "countPlural=few": "Używane przez {count} zadania — usunąć?",
+                "countPlural=many": "Używane przez {count} zadań — usunąć?",
+                "countPlural=other": "Używane przez {count} zadań — usunąć?"
+            }
+        }
+    ],
     "music_group_kind": "Rodzaj",
     "music_group_grade": "Poziom",
     "music_group_show": "Pokaż",
@@ -980,7 +995,23 @@
     "takes_download_video_portrait": "Zapisz pionowe wideo (9:16, do Reels i Shorts)",
     "takes_video_progress": "Renderowanie… {percent}%",
     "person_eyebrow": "Kompozytor",
-    "person_pieces": "{count} utworów do zagrania",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} utwór do zagrania",
+                "countPlural=few": "{count} utwory do zagrania",
+                "countPlural=many": "{count} utworów do zagrania",
+                "countPlural=other": "{count} utworów do zagrania"
+            }
+        }
+    ],
     "person_empty": "Nikogo o tym nazwisku nie ma jeszcze w katalogu.",
     "person_born": "ur. {year}",
     "person_died": "zm. {year}",

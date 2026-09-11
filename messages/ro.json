@@ -34,8 +34,22 @@
     "music_filter_fresh": "✨ Neîncercate încă",
     "music_built_on": "Construite pe {progression}",
     "music_show_everything": "Arată tot",
-    "music_remove_used_one": "Folosită de {count} temă — elimini?",
-    "music_remove_used_other": "Folosită de {count} teme — elimini?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Folosită de {count} temă — elimini?",
+                "countPlural=few": "Folosită de {count} teme — elimini?",
+                "countPlural=other": "Folosită de {count} de teme — elimini?"
+            }
+        }
+    ],
     "music_group_kind": "Tip",
     "music_group_grade": "Nivel",
     "music_group_show": "Arată",
@@ -970,7 +984,22 @@
     "takes_download_video_portrait": "Salvează un video vertical (9:16, pentru Reels și Shorts)",
     "takes_video_progress": "Se redă… {percent}%",
     "person_eyebrow": "Compozitor",
-    "person_pieces": "{count} piese de cântat",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} piesă de cântat",
+                "countPlural=few": "{count} piese de cântat",
+                "countPlural=other": "{count} de piese de cântat"
+            }
+        }
+    ],
     "person_empty": "Nimeni cu acest nume în catalog deocamdată.",
     "person_born": "născut în {year}",
     "person_died": "decedat în {year}",

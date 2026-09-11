@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Inte provat än",
     "music_built_on": "Byggda på {progression}",
     "music_show_everything": "Visa allt",
-    "music_remove_used_one": "Används av {count} uppgift — ta bort?",
-    "music_remove_used_other": "Används av {count} uppgifter — ta bort?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Används av {count} uppgift — ta bort?",
+                "countPlural=other": "Används av {count} uppgifter — ta bort?"
+            }
+        }
+    ],
     "music_group_kind": "Typ",
     "music_group_grade": "Nivå",
     "music_group_show": "Visa",
@@ -962,7 +975,21 @@
     "takes_download_video_portrait": "Spara en stående video (9:16, för Reels och Shorts)",
     "takes_video_progress": "Renderar… {percent}%",
     "person_eyebrow": "Kompositör",
-    "person_pieces": "{count} stycken att spela",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stycke att spela",
+                "countPlural=other": "{count} stycken att spela"
+            }
+        }
+    ],
     "person_empty": "Ingen med det namnet i katalogen ännu.",
     "person_born": "född {year}",
     "person_died": "död {year}",

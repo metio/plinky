@@ -34,8 +34,22 @@
     "music_filter_fresh": "✨ Још непробано",
     "music_built_on": "Грађено на {progression}",
     "music_show_everything": "Прикажи све",
-    "music_remove_used_one": "Користи га {count} задатак — уклонити?",
-    "music_remove_used_other": "Користи га {count} задатака — уклонити?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Користи га {count} задатак — уклонити?",
+                "countPlural=few": "Користе га {count} задатка — уклонити?",
+                "countPlural=other": "Користи га {count} задатака — уклонити?"
+            }
+        }
+    ],
     "music_group_kind": "Врста",
     "music_group_grade": "Оцена",
     "music_group_show": "Прикажи",
@@ -970,7 +984,22 @@
     "takes_download_video_portrait": "Сачувај усправни видео (9:16, за Reels и Shorts)",
     "takes_video_progress": "Исцртавање… {percent}%",
     "person_eyebrow": "Композитор",
-    "person_pieces": "{count} комада за вежбање",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} комад за вежбање",
+                "countPlural=few": "{count} комада за вежбање",
+                "countPlural=other": "{count} комада за вежбање"
+            }
+        }
+    ],
     "person_empty": "Још нема никога с тим именом у каталогу.",
     "person_born": "рођен {year}",
     "person_died": "умро {year}",

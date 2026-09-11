@@ -34,8 +34,21 @@
     "music_filter_fresh": "✨ Ei vielä kokeiltu",
     "music_built_on": "Rakennettu kiertoon {progression}",
     "music_show_everything": "Näytä kaikki",
-    "music_remove_used_one": "Käytössä {count} tehtävässä — poistetaanko?",
-    "music_remove_used_other": "Käytössä {count} tehtävässä — poistetaanko?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Käytössä {count} tehtävässä — poistetaanko?",
+                "countPlural=other": "Käytössä {count} tehtävässä — poistetaanko?"
+            }
+        }
+    ],
     "music_group_kind": "Tyyppi",
     "music_group_grade": "Arvosana",
     "music_group_show": "Näytä",
@@ -962,7 +975,21 @@
     "takes_download_video_portrait": "Tallenna pystyvideo (9:16, Reelsiä ja Shortsia varten)",
     "takes_video_progress": "Hahmonnetaan… {percent}%",
     "person_eyebrow": "Säveltäjä",
-    "person_pieces": "{count} kappaletta soitettavaksi",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kappale soitettavaksi",
+                "countPlural=other": "{count} kappaletta soitettavaksi"
+            }
+        }
+    ],
     "person_empty": "Ketään sen nimistä ei vielä ole luettelossa.",
     "person_born": "syntyi {year}",
     "person_died": "kuoli {year}",

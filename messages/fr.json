@@ -34,8 +34,22 @@
     "music_filter_fresh": "✨ Pas encore essayé",
     "music_built_on": "Construits sur {progression}",
     "music_show_everything": "Tout afficher",
-    "music_remove_used_one": "Utilisé par {count} devoir — supprimer ?",
-    "music_remove_used_other": "Utilisé par {count} devoirs — supprimer ?",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "Utilisé par {count} devoir — supprimer ?",
+                "countPlural=many": "Utilisé par {count} devoirs — supprimer ?",
+                "countPlural=other": "Utilisé par {count} devoirs — supprimer ?"
+            }
+        }
+    ],
     "music_group_kind": "Type",
     "music_group_grade": "Niveau",
     "music_group_show": "Afficher",
@@ -971,7 +985,22 @@
     "takes_download_video_portrait": "Enregistrer une vidéo verticale (9:16, pour Reels et Shorts)",
     "takes_video_progress": "Rendu… {percent}%",
     "person_eyebrow": "Compositeur",
-    "person_pieces": "{count} morceaux à jouer",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} morceau à jouer",
+                "countPlural=many": "{count} morceaux à jouer",
+                "countPlural=other": "{count} morceaux à jouer"
+            }
+        }
+    ],
     "person_empty": "Personne de ce nom dans le catalogue pour l’instant.",
     "person_born": "né en {year}",
     "person_died": "mort en {year}",

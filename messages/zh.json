@@ -34,8 +34,20 @@
     "music_filter_fresh": "✨ 还没弹过",
     "music_built_on": "建立在 {progression} 之上",
     "music_show_everything": "显示全部",
-    "music_remove_used_one": "被 {count} 个作业使用——确定移除？",
-    "music_remove_used_other": "被 {count} 个作业使用——确定移除？",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "被 {count} 个作业使用——确定移除？"
+            }
+        }
+    ],
     "music_group_kind": "类型",
     "music_group_grade": "评级",
     "music_group_show": "显示",
@@ -953,7 +965,20 @@
     "takes_download_video_portrait": "保存竖屏视频（9:16，适用于 Reels 和 Shorts）",
     "takes_video_progress": "正在渲染… {percent}%",
     "person_eyebrow": "作曲家",
-    "person_pieces": "可弹奏的乐曲 {count} 首",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "可弹奏的乐曲 {count} 首"
+            }
+        }
+    ],
     "person_empty": "目录中还没有这个名字的作曲家。",
     "person_born": "生于 {year}",
     "person_died": "卒于 {year}",

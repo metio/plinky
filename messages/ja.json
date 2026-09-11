@@ -34,8 +34,20 @@
     "music_filter_fresh": "✨ まだ弾いてない",
     "music_built_on": "{progression} で作られた曲",
     "music_show_everything": "すべて表示",
-    "music_remove_used_one": "{count} 件の課題で使われています — 削除しますか？",
-    "music_remove_used_other": "{count} 件の課題で使われています — 削除しますか？",
+    "music_remove_used": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 件の課題で使われています — 削除しますか？"
+            }
+        }
+    ],
     "music_group_kind": "種類",
     "music_group_grade": "グレード",
     "music_group_show": "表示",
@@ -952,7 +964,20 @@
     "takes_download_video_portrait": "縦型動画を保存（9:16、リール・ショート向け）",
     "takes_video_progress": "書き出し中… {percent}%",
     "person_eyebrow": "作曲家",
-    "person_pieces": "弾ける曲 {count} 曲",
+    "person_pieces": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "弾ける曲 {count} 曲"
+            }
+        }
+    ],
     "person_empty": "その名前の作曲家はまだカタログにありません。",
     "person_born": "{year}年生まれ",
     "person_died": "{year}年没",
