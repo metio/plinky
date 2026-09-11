@@ -63,7 +63,7 @@ jobs:
             const marker = "<!-- plinky-score-check -->";
             const message = [
               marker,
-              process.env.REPORT,
+              JSON.parse(process.env.REPORT),
               "",
               "_Automated check — edit the issue to run it again._",
             ].join("\n");

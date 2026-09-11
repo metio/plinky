@@ -7,16 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import {
-    checkLicense,
-    formatFileCommand,
-    licenseProblem,
-    parseFileCommand,
-    readSubmission,
-    renderReport,
-    submissionOutputs,
-    xmlProblem,
-} from "./submission.mjs";
+import { checkSubmission } from "./submission.mjs";
 
 const SCRIPT = fileURLToPath(
     new URL("../.github/scripts/validate-submission.mjs", import.meta.url),
@@ -28,8 +19,15 @@ const form = (fields: Record<string, string>) =>
         .map(([label, value]) => `### ${label}\n\n${value}`)
         .join("\n\n");
 
-// Runs the real validator as the workflow does and reads its outputs as the runner would.
-// An empty MusicXML section keeps it from launching a browser.
+// Reads a GITHUB_OUTPUT text, asserting it holds exactly the two one-line outputs.
+function readOutputs(text: string) {
+    const match = text.match(/^valid=(true|false)\nreport=([^\r\n]*)\n$/);
+    expect(match, text).not.toBeNull();
+    return { valid: match?.[1], report: JSON.parse(match?.[2] ?? "") as unknown };
+}
+
+// Runs the real validator as the workflow does. An empty MusicXML section keeps it from
+// launching a browser.
 function runValidator(body: string) {
     const dir = mkdtempSync(join(tmpdir(), "plinky-submission-"));
     const output = join(dir, "output");
@@ -40,7 +38,7 @@ function runValidator(body: string) {
         encoding: "utf8",
     });
     expect(run.status, run.stderr).toBe(0);
-    return parseFileCommand(readFileSync(output, "utf8"));
+    return readOutputs(readFileSync(output, "utf8"));
 }
 
 const HOSTILE = form({
@@ -57,145 +55,98 @@ const HOSTILE = form({
 
 describe("the submission validator's outputs", () => {
     it("cannot be extended by a hostile issue body", () => {
-        const entries = runValidator(HOSTILE);
-        expect(entries.map(([key]) => key)).toEqual(["valid", "report"]);
-        expect(Object.fromEntries(entries).valid).toBe("false");
-        expect(Object.fromEntries(entries).report).not.toContain("github.rest");
+        const outputs = runValidator(HOSTILE);
+        expect(outputs.valid).toBe("false");
+        expect(outputs.report).not.toContain("github.rest");
     });
 
     it("reports an honest body that fails the check", () => {
-        const entries = runValidator(
+        const outputs = runValidator(
             form({ "Score title": "Ode", MusicXML: "_No response_", License: "CC-BY-4.0" }),
         );
-        const outputs = Object.fromEntries(entries);
-        expect(entries.map(([key]) => key)).toEqual(["valid", "report"]);
         expect(outputs.valid).toBe("false");
         expect(outputs.report).toContain("No MusicXML was provided.");
         expect(outputs.report).toContain("License: `CC-BY-4.0`");
     });
 });
 
-describe("readSubmission", () => {
-    it("unwraps the fenced MusicXML and reads the licence", () => {
-        const body = form({
+// A render stand-in that records the MusicXML it was given.
+function rendering(result: { ok: boolean; count: number }) {
+    const seen: string[] = [];
+    const render = async (xml: string) => {
+        seen.push(xml);
+        return result;
+    };
+    return { seen, render };
+}
+
+const check = async (fields: Record<string, string>, result = { ok: true, count: 1 }) => {
+    const { seen, render } = rendering(result);
+    return { ...readOutputs(await checkSubmission(form(fields), render)), seen };
+};
+
+describe("checkSubmission", () => {
+    it("renders the fenced MusicXML and passes a good score under a listed licence", async () => {
+        const outputs = await check({
             MusicXML: "```xml\n<score-partwise/>\n```",
             License: "CC0-1.0",
         });
-        expect(readSubmission(body)).toEqual({ xml: "<score-partwise/>", license: "CC0-1.0" });
-    });
-
-    it("reads a missing section as empty", () => {
-        expect(readSubmission("")).toEqual({ xml: "", license: "" });
-    });
-});
-
-describe("checkLicense", () => {
-    it("accepts exactly the form's options", () => {
-        expect(checkLicense("CC0-1.0")).toBe("CC0-1.0");
-        expect(checkLicense("CC-BY-SA-4.0")).toBe("CC-BY-SA-4.0");
-    });
-
-    it("rejects anything else, including an option with more after it", () => {
-        expect(checkLicense("")).toBeNull();
-        expect(checkLicense("CC-BY-NC-4.0")).toBeNull();
-        expect(checkLicense("CC0-1.0\nPLINKY_EOF")).toBeNull();
-        expect(checkLicense("cc0-1.0")).toBeNull();
-    });
-});
-
-describe("xmlProblem", () => {
-    it("passes a MusicXML document on to be rendered", () => {
-        expect(xmlProblem("<score-partwise>")).toBeNull();
-        expect(xmlProblem("<score-timewise>")).toBeNull();
-    });
-
-    it("names a missing score and a document that is not one", () => {
-        expect(xmlProblem("")).toBe("No MusicXML was provided.");
-        expect(xmlProblem("_No response_")).toBe("No MusicXML was provided.");
-        expect(xmlProblem("<html>")).toContain("MusicXML");
-    });
-});
-
-describe("licenseProblem", () => {
-    it("accepts a listed licence and names every option otherwise", () => {
-        expect(licenseProblem("CC-BY-4.0")).toBeNull();
-        expect(licenseProblem("MIT")).toBe(
-            "The license must be one of `CC0-1.0`, `CC-BY-4.0`, `CC-BY-SA-4.0`.",
-        );
-    });
-});
-
-describe("renderReport", () => {
-    it("counts the notes and names the licence when there are no problems", () => {
-        expect(renderReport({ problems: [], notes: 1, license: "CC0-1.0" })).toBe(
+        expect(outputs.seen).toEqual(["<score-partwise/>"]);
+        expect(outputs.valid).toBe("true");
+        expect(outputs.report).toBe(
             "✅ **Looks good!** This renders and plays 1 note in Plinky. A maintainer will review it and add it to the catalog.\n\nLicense: `CC0-1.0`",
         );
     });
 
-    it("lists the problems and leaves out a licence that is not an option", () => {
-        const report = renderReport({ problems: ["A", "B"], notes: 0, license: "evil`" });
-        expect(report).toBe("⚠️ **This needs a change before it can be added:**\n- A\n- B");
-    });
-});
-
-describe("submissionOutputs", () => {
-    it("spells the verdict true only for a real true", () => {
-        expect(submissionOutputs({ valid: true, report: "" }).valid).toBe("true");
-        expect(submissionOutputs({ valid: false, report: "" }).valid).toBe("false");
-        expect(submissionOutputs({ valid: "true", report: "" }).valid).toBe("false");
-        expect(submissionOutputs({ valid: 1, report: "" }).valid).toBe("false");
-    });
-});
-
-describe("formatFileCommand", () => {
-    it("writes each output as a block the runner reads back", () => {
-        const text = formatFileCommand({ valid: "true", report: "a\nb" }, "D");
-        expect(text).toBe("valid<<D\ntrue\nD\nreport<<D\na\nb\nD\n");
-        expect(parseFileCommand(text)).toEqual([
-            ["valid", "true"],
-            ["report", "a\nb"],
-        ]);
+    it("counts several notes in the plural", async () => {
+        const outputs = await check(
+            { MusicXML: "<score-timewise>", License: "CC-BY-SA-4.0" },
+            { ok: true, count: 12 },
+        );
+        expect(outputs.valid).toBe("true");
+        expect(outputs.report).toContain("plays 12 notes");
     });
 
-    it("refuses a value that contains its delimiter as a line", () => {
-        expect(() => formatFileCommand({ report: "x\nD\nvalid=1" }, "D")).toThrow(/delimiter/);
-        expect(() => formatFileCommand({ report: "x\nD\r\nvalid=1" }, "D")).toThrow(/delimiter/);
+    it("renders nothing for a missing score or a document that is not one", async () => {
+        const empty = await check({ MusicXML: "_No response_", License: "CC0-1.0" });
+        expect(empty.seen).toEqual([]);
+        expect(empty.report).toContain("No MusicXML was provided.");
+        const html = await check({ MusicXML: "<html>", License: "CC0-1.0" });
+        expect(html.seen).toEqual([]);
+        expect(html.valid).toBe("false");
+        expect(html.report).toContain("it should be a `<score-partwise>` document");
+        expect((await check({})).report).toContain("No MusicXML was provided.");
     });
 
-    it("refuses a delimiter or a name the runner would misread", () => {
-        expect(() => formatFileCommand({ a: "" }, "")).toThrow();
-        expect(() => formatFileCommand({ a: "" }, "a\nb")).toThrow();
-        expect(() => formatFileCommand({ "a=b": "" }, "D")).toThrow();
-        expect(() => formatFileCommand({ "a<<b": "" }, "D")).toThrow();
+    it("names a score that fails to render or has no playable notes", async () => {
+        const broken = await check(
+            { MusicXML: "<score-partwise>", License: "CC0-1.0" },
+            { ok: false, count: 0 },
+        );
+        expect(broken.valid).toBe("false");
+        expect(broken.report).toContain("couldn't render this MusicXML");
+        const silent = await check(
+            { MusicXML: "<score-partwise>", License: "CC0-1.0" },
+            { ok: true, count: 0 },
+        );
+        expect(silent.valid).toBe("false");
+        expect(silent.report).toContain("no playable notes");
     });
 
-    it("refuses a trailing carriage return the runner would drop", () => {
-        expect(() => formatFileCommand({ a: "x\r" }, "D")).toThrow(/carriage/);
-    });
-});
-
-describe("parseFileCommand", () => {
-    it("reads key=value lines and skips blank ones", () => {
-        expect(parseFileCommand("a=1\n\nb=x<<y\n")).toEqual([
-            ["a", "1"],
-            ["b", "x<<y"],
-        ]);
+    it("rejects any licence but the form's options, and leaves it out of the report", async () => {
+        for (const License of ["", "CC-BY-NC-4.0", "CC0-1.0\nPLINKY_EOF", "cc0-1.0", "evil`"]) {
+            const outputs = await check({ MusicXML: "<score-partwise>", License });
+            expect(outputs.valid).toBe("false");
+            expect(outputs.report).toBe(
+                "⚠️ **This needs a change before it can be added:**\n- The license must be one of `CC0-1.0`, `CC-BY-4.0`, `CC-BY-SA-4.0`.",
+            );
+        }
     });
 
-    it("keeps every assignment in order, so a repeated key is visible", () => {
-        expect(parseFileCommand("a=1\na<<E\n2\nE\n")).toEqual([
-            ["a", "1"],
-            ["a", "2"],
-        ]);
-    });
-
-    it("ends a block at a delimiter line terminated by CRLF", () => {
-        expect(parseFileCommand("a<<E\r\nx\r\ny\r\nE\r\n")).toEqual([["a", "x\r\ny"]]);
-    });
-
-    it("rejects an unterminated block and a line with neither form", () => {
-        expect(() => parseFileCommand("a<<E\nx\n")).toThrow(/delimiter/);
-        expect(() => parseFileCommand("nonsense\n")).toThrow(/invalid/);
-        expect(() => parseFileCommand("=1\n")).toThrow(/invalid/);
+    it("lists every problem at once", async () => {
+        const outputs = await check({ MusicXML: "<html>", License: "MIT" });
+        expect(outputs.report).toBe(
+            "⚠️ **This needs a change before it can be added:**\n- That doesn't look like MusicXML — it should be a `<score-partwise>` document.\n- The license must be one of `CC0-1.0`, `CC-BY-4.0`, `CC-BY-SA-4.0`.",
+        );
     });
 });
