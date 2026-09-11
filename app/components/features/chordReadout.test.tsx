@@ -57,14 +57,14 @@ describe("ChordReadout", () => {
     it("names a German chord the way the German keys do, B natural as H", () => {
         overwriteGetLocale(() => "de");
         render(<ChordReadout notes={chordPitches(71, "major")} naming={namingFor("all", "de")} />);
-        expect(shown()).toBe(m.chord_named({ root: "H", quality: m.theory_chord_major() }));
+        expect(shown()).toBe(m.root_named({ root: "H", name: m.theory_chord_major() }));
     });
 
     it("names a French chord in do re mi, the sharp as a word, opening in capitals", () => {
         overwriteGetLocale(() => "fr");
         render(<ChordReadout notes={chordPitches(66, "minor")} />);
         const root = m.note_sharp_word({ note: m.solfege_fa() });
-        const line = m.chord_named({ root, quality: m.theory_chord_minor() });
+        const line = m.root_named({ root, name: m.theory_chord_minor() });
         expect(shown()).toBe(`${line.charAt(0).toUpperCase()}${line.slice(1)}`);
         expect(shown()).not.toContain("F♯");
     });
@@ -72,7 +72,7 @@ describe("ChordReadout", () => {
     it("follows the player's letters on a French page", () => {
         overwriteGetLocale(() => "fr");
         render(<ChordReadout notes={chordPitches(62, "major")} naming={namingFor("all", "fr")} />);
-        expect(shown()).toBe(m.chord_named({ root: "D", quality: m.theory_chord_major() }));
+        expect(shown()).toBe(m.root_named({ root: "D", name: m.theory_chord_major() }));
     });
 
     it("announces itself politely, so a screen reader is told without being interrupted", () => {

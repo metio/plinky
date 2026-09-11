@@ -1424,7 +1424,7 @@
     "theory_chord_dominant_ninth": "Novena de dominante",
     "theory_chord_major_ninth": "Novena mayor",
     "theory_chord_minor_ninth": "Novena menor",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Mayor",
     "theory_scale_natural_minor": "Menor natural",
     "theory_scale_harmonic_minor": "Menor armónica",

@@ -1371,7 +1371,7 @@
     "theory_chord_dominant_ninth": "属九の和音",
     "theory_chord_major_ninth": "長九の和音",
     "theory_chord_minor_ninth": "短九の和音",
-    "chord_named": "{root}{quality}",
+    "root_named": "{root}{name}",
     "theory_scale_major": "長音階",
     "theory_scale_natural_minor": "自然的短音階",
     "theory_scale_harmonic_minor": "和声的短音階",

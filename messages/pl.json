@@ -1450,7 +1450,7 @@
     "theory_chord_dominant_ninth": "Nonowy dominantowy",
     "theory_chord_major_ninth": "Nonowy durowy",
     "theory_chord_minor_ninth": "Nonowy molowy",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Durowa",
     "theory_scale_natural_minor": "Molowa naturalna",
     "theory_scale_harmonic_minor": "Molowa harmoniczna",

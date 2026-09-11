@@ -1449,7 +1449,7 @@
     "theory_chord_dominant_ninth": "Dominantný nonový akord",
     "theory_chord_major_ninth": "Durový nonový akord",
     "theory_chord_minor_ninth": "Molový nonový akord",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Durová",
     "theory_scale_natural_minor": "Prirodzená molová",
     "theory_scale_harmonic_minor": "Harmonická molová",

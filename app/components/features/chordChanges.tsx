@@ -36,9 +36,9 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
     // Named as the player's keys name them.
     const naming = useNoteNaming();
     const label = (root: string, quality: ChordQuality) =>
-        m.chord_named({
+        m.root_named({
             root: pitchSymbol(rootNote + Number(root), naming),
-            quality: chordName(quality),
+            name: chordName(quality),
         });
 
     // Each pair of pickers is headed by the chord it currently names. Four controls

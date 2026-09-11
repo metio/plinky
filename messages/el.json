@@ -1398,7 +1398,7 @@
     "theory_chord_dominant_ninth": "Δεσπόζουσα ένατη",
     "theory_chord_major_ninth": "Μείζων ένατη",
     "theory_chord_minor_ninth": "Ελάσσων ένατη",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Μείζονα",
     "theory_scale_natural_minor": "Φυσική ελάσσονα",
     "theory_scale_harmonic_minor": "Αρμονική ελάσσονα",

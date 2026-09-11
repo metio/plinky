@@ -1449,7 +1449,7 @@
     "theory_chord_dominant_ninth": "Доминантнонаккорд",
     "theory_chord_major_ninth": "Мажорный нонаккорд",
     "theory_chord_minor_ninth": "Минорный нонаккорд",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Мажорная",
     "theory_scale_natural_minor": "Натуральный минор",
     "theory_scale_harmonic_minor": "Гармонический минор",

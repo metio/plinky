@@ -1397,7 +1397,7 @@
     "theory_chord_dominant_ninth": "Dominant 9'lu",
     "theory_chord_major_ninth": "Majör 9'lu",
     "theory_chord_minor_ninth": "Minör 9'lu",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Majör",
     "theory_scale_natural_minor": "Doğal minör",
     "theory_scale_harmonic_minor": "Armonik minör",

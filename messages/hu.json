@@ -1397,7 +1397,7 @@
     "theory_chord_dominant_ninth": "Domináns nónakkord",
     "theory_chord_major_ninth": "Dúr nónakkord",
     "theory_chord_minor_ninth": "Moll nónakkord",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Dúr",
     "theory_scale_natural_minor": "Természetes moll",
     "theory_scale_harmonic_minor": "Harmonikus moll",

@@ -1397,7 +1397,7 @@
     "theory_chord_dominant_ninth": "Nona e dominantes",
     "theory_chord_major_ninth": "Nona madhore",
     "theory_chord_minor_ninth": "Nona minore",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Madhore",
     "theory_scale_natural_minor": "Minore natyrore",
     "theory_scale_harmonic_minor": "Minore harmonike",

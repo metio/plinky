@@ -28,9 +28,9 @@ function say(sound: HeldSound, naming: Naming): string {
         case "interval":
             return `${note(sound.lower)} · ${intervalName(sound.interval)}`;
         case "chord": {
-            const named = m.chord_named({
+            const named = m.root_named({
                 root: note(sound.root),
-                quality: chordName(sound.quality),
+                name: chordName(sound.quality),
             });
             if (sound.inversion === 0) {
                 return named;

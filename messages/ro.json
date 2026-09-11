@@ -1423,7 +1423,7 @@
     "theory_chord_dominant_ninth": "Nonă de dominantă",
     "theory_chord_major_ninth": "Nonă majoră",
     "theory_chord_minor_ninth": "Nonă minoră",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Major",
     "theory_scale_natural_minor": "Minor natural",
     "theory_scale_harmonic_minor": "Minor armonic",

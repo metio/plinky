@@ -1371,7 +1371,7 @@
     "theory_chord_dominant_ninth": "딸림9화음",
     "theory_chord_major_ninth": "장9화음",
     "theory_chord_minor_ninth": "단9화음",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "장음계",
     "theory_scale_natural_minor": "자연단음계",
     "theory_scale_harmonic_minor": "화성단음계",

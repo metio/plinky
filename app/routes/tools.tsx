@@ -209,7 +209,10 @@ function ScaleExplorer() {
                 from={ROOT}
                 to={ROOT + 24}
                 keys={pitches.map((note) => ({ note }))}
-                caption={`${pitchSymbol(ROOT + Number(tonic), naming)} ${scaleName(scale)}`}
+                caption={m.root_named({
+                    root: pitchSymbol(ROOT + Number(tonic), naming),
+                    name: scaleName(scale),
+                })}
                 filename="plinky-scale"
             />
         </Panel>
@@ -243,9 +246,9 @@ function ChordExplorer() {
                 from={ROOT}
                 to={top}
                 keys={pitches.map((note) => ({ note }))}
-                caption={m.chord_named({
+                caption={m.root_named({
                     root: pitchSymbol(ROOT + Number(root), naming),
-                    quality: chordName(quality),
+                    name: chordName(quality),
                 })}
                 filename="plinky-chord"
             />

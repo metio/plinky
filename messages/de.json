@@ -1398,7 +1398,7 @@
     "theory_chord_dominant_ninth": "Dominantnonakkord",
     "theory_chord_major_ninth": "Dur-Nonakkord",
     "theory_chord_minor_ninth": "Moll-Nonakkord",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Dur",
     "theory_scale_natural_minor": "Natürliches Moll",
     "theory_scale_harmonic_minor": "Harmonisches Moll",

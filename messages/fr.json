@@ -1424,7 +1424,7 @@
     "theory_chord_dominant_ninth": "9e de dominante",
     "theory_chord_major_ninth": "9e majeure",
     "theory_chord_minor_ninth": "9e mineure",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Majeure",
     "theory_scale_natural_minor": "Mineure naturelle",
     "theory_scale_harmonic_minor": "Mineure harmonique",

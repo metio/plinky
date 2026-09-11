@@ -1423,7 +1423,7 @@
     "theory_chord_dominant_ninth": "Доминантни нонакорд",
     "theory_chord_major_ninth": "Дур нонакорд",
     "theory_chord_minor_ninth": "Мол нонакорд",
-    "chord_named": "{root} {quality}",
+    "root_named": "{root} {name}",
     "theory_scale_major": "Дур",
     "theory_scale_natural_minor": "Природни мол",
     "theory_scale_harmonic_minor": "Хармонски мол",

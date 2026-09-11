@@ -1372,7 +1372,7 @@
     "theory_chord_dominant_ninth": "属九和弦",
     "theory_chord_major_ninth": "大九和弦",
     "theory_chord_minor_ninth": "小九和弦",
-    "chord_named": "{root}{quality}",
+    "root_named": "{root}{name}",
     "theory_scale_major": "大调音阶",
     "theory_scale_natural_minor": "自然小调",
     "theory_scale_harmonic_minor": "和声小调",
