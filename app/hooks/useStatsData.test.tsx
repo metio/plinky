@@ -99,6 +99,26 @@ describe("useStatsData badges", () => {
         expect(earned(await visit(), "star-bronze")).toBe(true);
     });
 
+    it("wakes no one when a later visit shows the marks already kept", async () => {
+        const services = createServices({ store: memoryStore(), activity: createActivitySignal() });
+        const own = ({ children }: { children: ReactNode }) => (
+            <ServicesProvider services={services}>{children}</ServicesProvider>
+        );
+        catalogueMock.mockResolvedValue([]);
+        masteryMock.mockResolvedValue(gradeOne(5));
+        const first = renderHook(() => useStatsData(), { wrapper: own });
+        await waitFor(() => expect(earned(first.result.current, "star-bronze")).toBe(true));
+        first.unmount();
+
+        const heard = vi.fn();
+        const off = services.milestones.subscribe(heard);
+        const second = renderHook(() => useStatsData(), { wrapper: own });
+        await waitFor(() => expect(earned(second.result.current, "star-bronze")).toBe(true));
+        expect(heard).not.toHaveBeenCalled();
+        off();
+        second.unmount();
+    });
+
     it("still raises the badge when more pieces are mastered later", async () => {
         const visit = visits();
         catalogueMock.mockResolvedValue([]);
