@@ -109,6 +109,42 @@ describe("ExportAudioButton", () => {
         await waitFor(() => expect(downloadName).toMatch(/\.wav$/));
     });
 
+    it("holds off a silent app update until the file is saved", async () => {
+        // A reload while the render runs would throw the file away with nothing on disk.
+        let finish: (file: { blob: Blob; extension: string }) => void = () => {};
+        const { services } = mount({
+            export: () => new Promise((resolve) => (finish = resolve)),
+        });
+        fireEvent.click(screen.getByRole("button", { name: m.takes_download_audio() }));
+        await waitFor(() => expect(services.activity.active()).toBe(true));
+        finish({ blob: new Blob(["x"], { type: "audio/wav" }), extension: "wav" });
+        await waitFor(() => expect(downloadName).toMatch(/\.wav$/));
+        expect(services.activity.active()).toBe(false);
+    });
+
+    it("lets the update through again when the export fails", async () => {
+        const { services } = mount({ export: async () => Promise.reject(new Error("no")) });
+        fireEvent.click(screen.getByRole("button", { name: m.takes_download_audio() }));
+        await waitFor(() => expect(screen.queryByRole("status")).not.toBeNull());
+        expect(services.activity.active()).toBe(false);
+    });
+
+    it("keeps holding after the button unmounts, until the export it started is done", async () => {
+        // Closing the drawer does not stop the render, and its file still downloads — so
+        // the reload waits for the work, not for the button.
+        let finish: (file: { blob: Blob; extension: string }) => void = () => {};
+        const { services, unmount } = mount({
+            export: () => new Promise((resolve) => (finish = resolve)),
+        });
+        fireEvent.click(screen.getByRole("button", { name: m.takes_download_audio() }));
+        await waitFor(() => expect(services.activity.active()).toBe(true));
+        unmount();
+        expect(services.activity.active()).toBe(true);
+        finish({ blob: new Blob(["x"], { type: "audio/wav" }), extension: "wav" });
+        await waitFor(() => expect(services.activity.active()).toBe(false));
+        expect(downloadName).toMatch(/\.wav$/);
+    });
+
     it("refuses a second export while one is running", async () => {
         let started = 0;
         mount({

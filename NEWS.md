@@ -133,6 +133,12 @@ plain rest without its dot, and a triplet taken out lost its bracket and was dra
 ordinary quavers, so the bar on the page no longer added up. The rest now prints at
 exactly the value the note had, dot and triplet bracket included.
 
+**A video or sound file of a take finishes even when Plinky updates.** A long video
+takes minutes to make, and if a new version of Plinky arrived meanwhile, switching
+tabs and coming back could reload the page halfway through, so the file never
+arrived and nothing said why. Plinky now waits until the file is saved before it
+updates.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

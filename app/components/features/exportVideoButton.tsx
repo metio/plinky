@@ -5,8 +5,9 @@ import { useState } from "react";
 import type { Take } from "../../../core/takes";
 import { fingeredFreely } from "../../../core/scorePerformance";
 import { videoDurationMs } from "../../../core/videoFrames";
-import { useVideoExporter } from "../../contexts/services";
+import { useServices, useVideoExporter } from "../../contexts/services";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
+import { holdWhile } from "../../lib/activity";
 import { downloadBlob } from "../../lib/download";
 import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot";
 import { takeFileStem } from "../../lib/takeFile";
@@ -71,6 +72,7 @@ export function ExportVideoButton({
     original?: OriginalScore | null;
 }) {
     const exporter = useVideoExporter();
+    const { activity } = useServices();
     // The chosen on-screen keyboard skin, so the exported video's keys match the app.
     const theme = useKeyboardTheme();
     const finish = useKeyboardFinish();
@@ -114,65 +116,9 @@ export function ExportVideoButton({
         setProgress(0);
         setFailed(false);
         try {
-            const base = SIZES[quality];
-            const width = orientation === "portrait" ? base.height : base.width;
-            const height = orientation === "portrait" ? base.width : base.height;
-            // Colouring by finger needs a finger on every note. A take carries none — it
-            // is somebody playing, not a score — so the cost model is asked for one,
-            // which is also what decides the hands.
-            const notes =
-                format === "highway" && noteColor === BY_FINGER
-                    ? fingeredFreely(take.composition.notes)
-                    : take.composition.notes;
-            const durationMs = videoDurationMs(notes);
-            const keyColors = { white: theme.whiteHex, black: theme.blackHex };
-            // The take's own notation, rendered off-screen and rasterized once, so
-            // the video shows the sheet music with each note tinted as it sounds.
-            // A take the renderer can't draw exports keyboard-only instead. The
-            // highway format never uses the staff.
-            const score =
-                format === "staff" && showScore
-                    ? await buildScoreSnapshot(take, original, treadmill)
-                    : null;
-            const paint =
-                format === "highway"
-                    ? takeHighwayPainter({
-                          title,
-                          credit,
-                          license,
-                          notes,
-                          durationMs,
-                          width,
-                          height,
-                          showTitle,
-                          showWordmark,
-                          keyColors,
-                          finish,
-                          accent: noteColorHex(noteColor),
-                          scheme: noteColor,
-                          keyboardDepth: keyboardDepthFraction(keyboardDepth),
-                      })
-                    : takeScenePainter({
-                          title,
-                          credit,
-                          license,
-                          notes,
-                          durationMs,
-                          width,
-                          height,
-                          score,
-                          keyboard: showKeyboard,
-                          treadmill,
-                          showTitle,
-                          showWordmark,
-                          keyColors,
-                          finish,
-                      });
-            const blob = await exporter.export(
-                { width, height, fps, durationMs, paint, notes },
-                setProgress,
-            );
-            downloadBlob(blob, "video/mp4", `${takeFileStem(title, take)}.mp4`);
+            // A long take encodes for minutes and nothing is on disk until the download
+            // fires, so a silent app update must wait for it rather than reload it away.
+            await holdWhile(activity, () => render());
         } catch {
             // An encoder that gives up, a frame the painter cannot draw, a browser that
             // refuses the codec. Without this the rejection escapes the handler entirely
@@ -182,6 +128,68 @@ export function ExportVideoButton({
         } finally {
             setProgress(null);
         }
+    };
+
+    const render = async () => {
+        const base = SIZES[quality];
+        const width = orientation === "portrait" ? base.height : base.width;
+        const height = orientation === "portrait" ? base.width : base.height;
+        // Colouring by finger needs a finger on every note. A take carries none — it
+        // is somebody playing, not a score — so the cost model is asked for one,
+        // which is also what decides the hands.
+        const notes =
+            format === "highway" && noteColor === BY_FINGER
+                ? fingeredFreely(take.composition.notes)
+                : take.composition.notes;
+        const durationMs = videoDurationMs(notes);
+        const keyColors = { white: theme.whiteHex, black: theme.blackHex };
+        // The take's own notation, rendered off-screen and rasterized once, so
+        // the video shows the sheet music with each note tinted as it sounds.
+        // A take the renderer can't draw exports keyboard-only instead. The
+        // highway format never uses the staff.
+        const score =
+            format === "staff" && showScore
+                ? await buildScoreSnapshot(take, original, treadmill)
+                : null;
+        const paint =
+            format === "highway"
+                ? takeHighwayPainter({
+                      title,
+                      credit,
+                      license,
+                      notes,
+                      durationMs,
+                      width,
+                      height,
+                      showTitle,
+                      showWordmark,
+                      keyColors,
+                      finish,
+                      accent: noteColorHex(noteColor),
+                      scheme: noteColor,
+                      keyboardDepth: keyboardDepthFraction(keyboardDepth),
+                  })
+                : takeScenePainter({
+                      title,
+                      credit,
+                      license,
+                      notes,
+                      durationMs,
+                      width,
+                      height,
+                      score,
+                      keyboard: showKeyboard,
+                      treadmill,
+                      showTitle,
+                      showWordmark,
+                      keyColors,
+                      finish,
+                  });
+        const blob = await exporter.export(
+            { width, height, fps, durationMs, paint, notes },
+            setProgress,
+        );
+        downloadBlob(blob, "video/mp4", `${takeFileStem(title, take)}.mp4`);
     };
 
     return (

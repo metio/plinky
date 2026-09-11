@@ -3,7 +3,8 @@
 
 import { useState } from "react";
 import type { Take } from "../../../core/takes";
-import { useAudioExporter } from "../../contexts/services";
+import { useAudioExporter, useServices } from "../../contexts/services";
+import { holdWhile } from "../../lib/activity";
 import { downloadBlob } from "../../lib/download";
 import { takeFileStem } from "../../lib/takeFile";
 import { m } from "../../paraglide/messages.js";
@@ -21,6 +22,7 @@ import { Button } from "../ui/button";
 // on which the answer is "you cannot have this".
 export function ExportAudioButton({ take, title }: { take: Take; title: string }) {
     const exporter = useAudioExporter();
+    const { activity } = useServices();
     const [working, setWorking] = useState(false);
     const [failed, setFailed] = useState(false);
 
@@ -28,8 +30,12 @@ export function ExportAudioButton({ take, title }: { take: Take; title: string }
         setWorking(true);
         setFailed(false);
         try {
-            const { blob, extension } = await exporter.export(take.composition.notes);
-            downloadBlob(blob, blob.type, `${takeFileStem(title, take)}.${extension}`);
+            // Nothing is on disk until the download fires, so a silent app update must
+            // wait for the render rather than reload it away.
+            await holdWhile(activity, async () => {
+                const { blob, extension } = await exporter.export(take.composition.notes);
+                downloadBlob(blob, blob.type, `${takeFileStem(title, take)}.${extension}`);
+            });
         } catch {
             // A rejection inside an async click handler reaches no error boundary, so
             // without this the button simply returns to idle and the player is told

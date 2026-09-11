@@ -6,6 +6,7 @@ import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Take } from "../../../core/takes";
 import { takeFileStem } from "../../lib/takeFile";
+import { m } from "../../paraglide/messages.js";
 import type { VideoExporter } from "../../ports/videoExporter";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { ExportVideoButton } from "./exportVideoButton";
@@ -70,6 +71,35 @@ describe("ExportVideoButton", () => {
         // The default orientation is landscape 720p.
         expect(exportMock.mock.calls[0]?.[0]?.width).toBe(1280);
         expect(exportMock.mock.calls[0]?.[0]?.height).toBe(720);
+    });
+
+    it("holds off a silent app update for the whole encode", async () => {
+        // Minutes of encoding with nothing on disk until the end: a reload in between
+        // would lose the file without a word.
+        let finish: (blob: Blob) => void = () => {};
+        const { services } = mount({
+            supported: async () => true,
+            export: () => new Promise((resolve) => (finish = resolve)),
+        });
+        fireEvent.click(await screen.findByRole("button", { name: m.video_export() }));
+        fireEvent.click(screen.getByRole("button", { name: m.takes_download_video() }));
+        await waitFor(() => expect(services.activity.active()).toBe(true));
+        finish(new Blob(["mp4"], { type: "video/mp4" }));
+        await waitFor(() => expect(downloadName).toBe(`${takeFileStem("Menuet", take)}.mp4`));
+        expect(services.activity.active()).toBe(false);
+    });
+
+    it("lets the update through again when the encoder gives up", async () => {
+        const { services } = mount({
+            supported: async () => true,
+            export: async () => Promise.reject(new Error("codec")),
+        });
+        fireEvent.click(await screen.findByRole("button", { name: m.video_export() }));
+        fireEvent.click(screen.getByRole("button", { name: m.takes_download_video() }));
+        await waitFor(() =>
+            expect(screen.getByRole("status").textContent).toBe(m.feature_broken()),
+        );
+        expect(services.activity.active()).toBe(false);
     });
 
     it("swaps the axes when the 9:16 format is picked", async () => {

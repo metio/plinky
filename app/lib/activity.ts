@@ -44,6 +44,23 @@ export function createActivitySignal(): ActivitySignal {
     };
 }
 
+// Holds the signal for exactly as long as `work` runs, success or failure — for an
+// async job (an export) whose unsaved result a reload would throw away. The hold is
+// taken before the first await and released in a finally, so a throw, a synchronous
+// one included, cannot leave the app counting as busy for the rest of the session.
+//
+// It is tied to the work, not to a component: a job whose button unmounts keeps
+// running and still delivers its file, so the reload waits for it rather than for the
+// button.
+export async function holdWhile<T>(signal: ActivitySignal, work: () => Promise<T>): Promise<T> {
+    const end = signal.begin();
+    try {
+        return await work();
+    } finally {
+        end();
+    }
+}
+
 // The app-wide instance: the composition root (app/root.tsx) watches it to time
 // reloads, and the default service set hands it to the screens that begin
 // activities — one shared signal, so a run started anywhere holds the reload.
