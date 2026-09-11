@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 11 September 2026 — night
+
+**Ear training answers from your number keys.** On a scale-degree question, typing 3
+answers "3" just as clicking it does, and in melodic dictation each number you type
+fills the next note. Chord progressions take the number of the chord's degree, so 4
+is IV and 5 is V; each chord button now shows its number in the corner. A number the
+question doesn't offer is left alone.
+
 ## 11 September 2026 — evening
 
 **The last few English note names now use your keys' names too.** The notes held

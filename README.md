@@ -246,7 +246,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   you to hear against it: **Scale degrees** (name where one note sits in the key),
   **Intervals in context** (name an interval with the key to lean on), and **Melodic
   dictation** (write a little tune down degree by degree). **Perfect pitch** plays one note
-  and you name it on a keyboard. Every round can be
+  and you name it on a keyboard. Wherever the answers are numbers — scale degrees, melodic
+  dictation, and the Roman numerals of a progression — typing the number answers too: 3
+  for the third degree, 4 for IV. A number the question doesn't offer stays a piano key.
+  Every round can be
   replayed as often as you like, and a miss shows what played rather than marking you
   down. A round is ten questions, and finishing one **counts toward your grades** the
   same way playing a piece does — each exercise sits on the grade ladder, so ear practice
