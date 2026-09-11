@@ -17,7 +17,7 @@ import { useCompositionTransport } from "../hooks/useCompositionTransport";
 import { useMetronome } from "../hooks/useMetronome";
 import { useStaffSketch } from "../hooks/useStaffSketch";
 import { useVoicedInput } from "../hooks/useVoicedInput";
-import { type Composition, decodeComposition } from "../../core/composition";
+import { type Composition, composeTempo, decodeComposition } from "../../core/composition";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { stepDurationMs, type StepValue } from "../../core/stepInput";
 import { routeMeta } from "../../core/site";
@@ -135,7 +135,7 @@ export default function Compose() {
         const loaded = decodeComposition(code);
         if (loaded) {
             recorder.load(loaded.notes);
-            setTempo(loaded.tempo);
+            setTempo(composeTempo(loaded.tempo));
             setBeatsPerBar(loaded.beatsPerBar);
         }
         // Only the initial code matters; later edits should not reload over the work.
@@ -158,7 +158,7 @@ export default function Compose() {
         (loaded: Composition) => {
             transport.stop();
             recorder.load(loaded.notes);
-            setTempo(loaded.tempo);
+            setTempo(composeTempo(loaded.tempo));
             setBeatsPerBar(loaded.beatsPerBar);
         },
         [transport.stop, recorder.load],

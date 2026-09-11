@@ -85,6 +85,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A star you have earned stays earned.** Put one of the pieces behind a star back on\nthe shelf, or take the learned tick off it, and the star vanished from your badges on\nthe Stats page, although badges are meant to be yours for good. Stars now stay once you\nhave seen them, and so does the badge for learning every ear exercise. A gold star in\nany grade now also counts as the bronze and silver you passed on the way.",
                 twip: true,
             },
+            {
+                body: "**A take you carry over as a MIDI file comes back at the tempo you set.** Download a\ntake composed at 90 beats a minute, open it in Compose, and the tempo box read\n89.9999550000225, a number that then travelled on in every link you shared. It now\nreads 90. A file or a shared link with a tempo the box cannot hold, faster than 240 or\nslower than 40, opens at the nearest one it can, where it used to drive the\nmetronome at whatever the file said.",
+                twip: true,
+            },
         ],
     },
     {

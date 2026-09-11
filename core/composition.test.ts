@@ -5,18 +5,62 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    COMPOSE_DEFAULT_TEMPO,
+    COMPOSE_MAX_TEMPO,
+    COMPOSE_MIN_TEMPO,
     type Composition,
+    composeTempo,
     decodeComposition,
     encodeComposition,
     MAX_SKETCH_BARS,
     quantize,
     type RecordedNote,
+    snapTempo,
     toMidiNotes,
     toMusicXml,
     toReplayEvents,
     truncateTo,
 } from "./composition";
 import { packToCode } from "./shareCode";
+
+describe("snapTempo", () => {
+    it("settles a rounding residue on the whole number it came from", () => {
+        expect(snapTempo(89.9999550000225)).toBe(90);
+        expect(snapTempo(110.00009166675069)).toBe(110);
+    });
+
+    it("leaves a tempo that really is fractional alone", () => {
+        expect(snapTempo(97.5)).toBe(97.5);
+        expect(snapTempo(120.25)).toBe(120.25);
+    });
+});
+
+describe("composeTempo", () => {
+    it("brings a loaded tempo inside the range the tempo field offers", () => {
+        expect(composeTempo(300)).toBe(COMPOSE_MAX_TEMPO);
+        expect(composeTempo(60_000_000)).toBe(COMPOSE_MAX_TEMPO);
+        expect(composeTempo(12)).toBe(COMPOSE_MIN_TEMPO);
+    });
+
+    it("snaps a near-whole tempo and keeps one already in range", () => {
+        expect(composeTempo(89.9999550000225)).toBe(90);
+        expect(composeTempo(96)).toBe(96);
+        expect(composeTempo(97.5)).toBe(97.5);
+    });
+
+    it("falls back to the default for a tempo that is no tempo at all", () => {
+        expect(composeTempo(Number.NaN)).toBe(COMPOSE_DEFAULT_TEMPO);
+        expect(composeTempo(Number.POSITIVE_INFINITY)).toBe(COMPOSE_DEFAULT_TEMPO);
+        expect(composeTempo(0)).toBe(COMPOSE_DEFAULT_TEMPO);
+        expect(composeTempo(-90)).toBe(COMPOSE_DEFAULT_TEMPO);
+    });
+
+    it("fixes every whole tempo in the range", () => {
+        for (let tempo = COMPOSE_MIN_TEMPO; tempo <= COMPOSE_MAX_TEMPO; tempo++) {
+            expect(composeTempo(tempo)).toBe(tempo);
+        }
+    });
+});
 
 function note(partial: Partial<RecordedNote>): RecordedNote {
     return { pitch: 60, startMs: 0, durationMs: 500, velocity: 90, ...partial };

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { Composition, RecordedNote } from "./composition";
+import { type Composition, type RecordedNote, snapTempo } from "./composition";
 import { cleanBeatsPerBar } from "./meter";
 
 // Reads a Standard MIDI File back into a composition, the inverse of midiFile.ts, so
@@ -198,7 +198,10 @@ export function parseMidiFile(bytes: Uint8Array): Composition | null {
             return null;
         }
 
-        const tempo = 60_000_000 / microsecondsPerQuarter;
+        // The writer rounds microseconds per quarter to a whole number, so dividing back
+        // leaves a residue on most tempos (90 reads as 89.99995); snapping returns the
+        // tempo it started from. Note times are unaffected: they come from msPerTick.
+        const tempo = snapTempo(60_000_000 / microsecondsPerQuarter);
         const msPerTick = microsecondsPerQuarter / 1000 / ticksPerQuarter;
         notes.sort((a, b) => a.startTicks - b.startTicks);
         const origin = notes[0]!.startTicks;

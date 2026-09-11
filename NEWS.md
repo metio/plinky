@@ -120,6 +120,13 @@ the Stats page, although badges are meant to be yours for good. Stars now stay o
 have seen them, and so does the badge for learning every ear exercise. A gold star in
 any grade now also counts as the bronze and silver you passed on the way.
 
+**A take you carry over as a MIDI file comes back at the tempo you set.** Download a
+take composed at 90 beats a minute, open it in Compose, and the tempo box read
+89.9999550000225, a number that then travelled on in every link you shared. It now
+reads 90. A file or a shared link with a tempo the box cannot hold, faster than 240 or
+slower than 40, opens at the nearest one it can, where it used to drive the
+metronome at whatever the file said.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

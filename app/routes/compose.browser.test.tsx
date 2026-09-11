@@ -129,6 +129,32 @@ describe("Compose", () => {
         });
     });
 
+    it("holds a shared take's tempo to what the tempo field offers", async () => {
+        const { encodeComposition } = await import("../../core/composition");
+        const code = encodeComposition({
+            notes: [{ pitch: 60, startMs: 0, durationMs: 400, velocity: 90 }],
+            tempo: 300,
+            beatsPerBar: 4,
+        });
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        mounted.push(container);
+        render(
+            <MemoryRouter initialEntries={[`/compose?c=${code}`]}>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Compose />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+            { container },
+        );
+
+        expect(await screen.findByText("1 notes")).toBeTruthy();
+        const field = screen.getByLabelText(m.compose_tempo_label()) as HTMLInputElement;
+        expect(field.value).toBe("240");
+    });
+
     it("does not reload a shared take over the work when the address changes", async () => {
         // The loader runs whenever anything in the address changes, not only on arrival.
         // Every run used to apply the shared notes again — over whatever the player had
@@ -239,6 +265,31 @@ describe("Compose", () => {
             fireEvent.change(input, { target: { files: [file] } });
         });
         expect(await screen.findByText("3 notes")).toBeTruthy();
+    });
+
+    it("opens a MIDI file at the tempo it was written at", async () => {
+        const { toMidiNotes } = await import("../../core/composition");
+        const { buildMidiFile } = await import("../../core/midiFile");
+        const bytes = buildMidiFile(
+            toMidiNotes({
+                notes: [
+                    { pitch: 60, startMs: 0, durationMs: 400, velocity: 90 },
+                    { pitch: 64, startMs: 700, durationMs: 400, velocity: 90 },
+                ],
+                tempo: 90,
+                beatsPerBar: 4,
+            }),
+            { tempo: 90 },
+        );
+        const container = mount();
+        const file = new File([bytes], "take.mid", { type: "audio/midi" });
+        const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+        await act(async () => {
+            fireEvent.change(input, { target: { files: [file] } });
+        });
+        expect(await screen.findByText("2 notes")).toBeTruthy();
+        const field = screen.getByLabelText(m.compose_tempo_label()) as HTMLInputElement;
+        expect(field.value).toBe("90");
     });
 
     it("silences the recording metronome when leaving full screen", async () => {

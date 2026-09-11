@@ -38,6 +38,34 @@ export type Composition = {
     beatsPerBar: number;
 };
 
+// The tempos Compose's tempo field offers, and the one a new take starts at.
+export const COMPOSE_MIN_TEMPO = 40;
+export const COMPOSE_MAX_TEMPO = 240;
+export const COMPOSE_DEFAULT_TEMPO = 120;
+
+// How close to a whole number a tempo must be to be read as that number. A MIDI file stores
+// microseconds per quarter rounded to an integer, so dividing back leaves a residue of well
+// under a thousandth of a beat per minute at any tempo a person plays, while a tempo that
+// really is fractional, 97.5 say, sits far outside it.
+const TEMPO_SNAP = 0.01;
+
+export function snapTempo(tempo: number): number {
+    const whole = Math.round(tempo);
+    return Math.abs(tempo - whole) < TEMPO_SNAP ? whole : tempo;
+}
+
+// A tempo arriving from outside, made one Compose can hold: snapped, and brought inside the
+// range its tempo field offers, or the default when it is no tempo at all. Every way a
+// composition enters Compose passes through here, so the field never shows a tempo it would
+// not itself accept. decodeComposition does not clamp, because it also reads stored takes,
+// and a take keeps the tempo of the piece it was played at, which may lie outside that range.
+export function composeTempo(tempo: number): number {
+    if (!Number.isFinite(tempo) || tempo <= 0) {
+        return COMPOSE_DEFAULT_TEMPO;
+    }
+    return Math.min(COMPOSE_MAX_TEMPO, Math.max(COMPOSE_MIN_TEMPO, snapTempo(tempo)));
+}
+
 // The pitch at and above which a note belongs on the treble (right-hand) staff;
 // anything lower falls to the bass staff. Middle C is the conventional split.
 export const DEFAULT_SPLIT_POINT = 60;

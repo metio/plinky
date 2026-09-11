@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
+import {
+    COMPOSE_DEFAULT_TEMPO as DEFAULT_TEMPO,
+    COMPOSE_MAX_TEMPO as MAX_TEMPO,
+    COMPOSE_MIN_TEMPO as MIN_TEMPO,
+} from "../../../core/composition";
 import { m } from "../../paraglide/messages.js";
 import { fieldClasses } from "../ui/classes";
 import { SwitchField } from "../ui/fields";
-
-const MIN_TEMPO = 40;
-const MAX_TEMPO = 240;
-const DEFAULT_TEMPO = 120;
 
 // The tempo field keeps what is being typed to itself until it is a tempo. A controlled
 // number input that clamps on every keystroke cannot be typed into: selecting "120" and

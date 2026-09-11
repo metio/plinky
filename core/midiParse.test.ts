@@ -54,7 +54,30 @@ describe("parseMidiFile", () => {
             tempo: 90,
             beatsPerBar: 4,
         });
-        expect(parsed!.tempo).toBeCloseTo(90, 0);
+        expect(parsed!.tempo).toBe(90);
+    });
+
+    it("returns the whole-number tempo a file was written at, not its rounding residue", () => {
+        // 90 and 110 do not divide 60,000,000 microseconds evenly, so the stored
+        // microseconds-per-quarter is rounded and dividing back leaves a fraction.
+        for (const tempo of [70, 80, 90, 110, 130, 140]) {
+            const parsed = roundTrip({
+                notes: [{ pitch: 60, startMs: 0, durationMs: 500, velocity: 80 }],
+                tempo,
+                beatsPerBar: 4,
+            });
+            expect(parsed!.tempo).toBe(tempo);
+        }
+    });
+
+    it("keeps a tempo that really is fractional", () => {
+        const parsed = roundTrip({
+            notes: [{ pitch: 60, startMs: 0, durationMs: 500, velocity: 80 }],
+            tempo: 97.5,
+            beatsPerBar: 4,
+        });
+        expect(parsed!.tempo).toBeCloseTo(97.5, 3);
+        expect(Number.isInteger(parsed!.tempo)).toBe(false);
     });
 
     it("preserves a non-4/4 meter across the round-trip", () => {
