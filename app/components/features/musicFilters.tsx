@@ -61,7 +61,9 @@ type LibraryFiltersProps = {
     freshOnly: boolean;
     onToggleFreshOnly: () => void;
     onToggleDueOnly: () => void;
-    // The Due chip only appears while something is actually due.
+    // The Due chip appears while something is actually due, and while the filter is on
+    // whatever is due: a filter carried in the address outlives the last due piece, and
+    // an active filter with no control left to turn it off strands the list empty.
     showDue: boolean;
 };
 
@@ -187,7 +189,7 @@ export function MusicFilters({
                     <Chip selected={freshOnly} aria-pressed={freshOnly} onClick={onToggleFreshOnly}>
                         {m.music_filter_fresh()}
                     </Chip>
-                    <Show when={showDue}>
+                    <Show when={showDue || dueOnly}>
                         <Chip selected={dueOnly} aria-pressed={dueOnly} onClick={onToggleDueOnly}>
                             {m.music_filter_due()}
                         </Chip>

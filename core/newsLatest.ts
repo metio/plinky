@@ -53,6 +53,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**An address without a language opens its page, slash or no slash.** Typing\nplinky.fun/music/, or taking the language out of a link you copied, opened the Today\npage, while the same address without the final slash opened Music. Both now open the\npage they name, in your language.",
                 twip: true,
             },
+            {
+                body: "**The Due now filter keeps its button when nothing is due.** Filter Music to Due\nnow, play the piece that was due, come back, and the list was empty with no button\nleft to turn the filter off. The Due now button now stays while the filter is on,\nso one tap brings the whole shelf back.",
+                twip: true,
+            },
         ],
     },
     {

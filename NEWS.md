@@ -71,6 +71,11 @@ plinky.fun/music/, or taking the language out of a link you copied, opened the T
 page, while the same address without the final slash opened Music. Both now open the
 page they name, in your language.
 
+**The Due now filter keeps its button when nothing is due.** Filter Music to Due
+now, play the piece that was due, come back, and the list was empty with no button
+left to turn the filter off. The Due now button now stays while the filter is on,
+so one tap brings the whole shelf back.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

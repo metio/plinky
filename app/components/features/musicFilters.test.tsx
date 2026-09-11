@@ -62,6 +62,21 @@ describe("MusicFilters", () => {
         expect(onToggleDueOnly).toHaveBeenCalledTimes(1);
     });
 
+    it("keeps the Due chip while the filter is on, even with nothing due", () => {
+        // A ?due=1 carried back from a piece whose review was just rescheduled: the list
+        // is empty, and the chip is the one control that can turn the filter off.
+        const onToggleDueOnly = vi.fn();
+        mount({ dueOnly: true, showDue: false, onToggleDueOnly });
+        const chip = screen.getByRole("button", { name: m.music_filter_due() });
+        expect(chip.getAttribute("aria-pressed")).toBe("true");
+        fireEvent.click(chip);
+        expect(onToggleDueOnly).toHaveBeenCalledTimes(1);
+        // The summary line still names the filter, so the reason for the short list shows.
+        expect(screen.getByRole("button", { expanded: false }).textContent).toContain(
+            m.music_filter_due(),
+        );
+    });
+
     it("announces the favorites toggle state", () => {
         const onToggleFavoritesOnly = vi.fn();
         mount({ favoritesOnly: true, onToggleFavoritesOnly });
