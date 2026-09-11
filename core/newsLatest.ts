@@ -61,6 +61,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Compose's replace question follows the last file you opened.** Asked whether to\nreplace your take with one file, you could open another instead; if that one would\nnot open, the question stayed up, and Replace loaded the first file after all.\nOpening a new file now withdraws the question about the earlier one.",
                 twip: true,
             },
+            {
+                body: "**A damaged MIDI file no longer spoils a Compose link.** A file carrying a note\nhigher than the top of the keyboard, or louder than MIDI allows, opened in Compose\nwithout complaint, and the link you shared from it opened an empty take for the\nperson you sent it to. Compose now leaves those damaged notes out when it opens the\nfile, so everything it shows can be shared.",
+                twip: true,
+            },
         ],
     },
     {

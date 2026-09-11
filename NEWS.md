@@ -81,6 +81,12 @@ replace your take with one file, you could open another instead; if that one wou
 not open, the question stayed up, and Replace loaded the first file after all.
 Opening a new file now withdraws the question about the earlier one.
 
+**A damaged MIDI file no longer spoils a Compose link.** A file carrying a note
+higher than the top of the keyboard, or louder than MIDI allows, opened in Compose
+without complaint, and the link you shared from it opened an empty take for the
+person you sent it to. Compose now leaves those damaged notes out when it opens the
+file, so everything it shows can be shared.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played

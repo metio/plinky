@@ -315,6 +315,30 @@ describe("parseMidiFile", () => {
         expect(parsed!.notes.map((n) => n.pitch).sort()).toEqual([60, 64]);
     });
 
+    it("skips a note-on whose key is not a seven-bit data byte", () => {
+        // Key 0xC8 (200), then the real C4 from ONE_NOTE.
+        const events = [0x00, 0x90, 0xc8, 0x40, 0x10, 0x80, 0xc8, 0x00, ...ONE_NOTE];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed?.notes.map((note) => note.pitch)).toEqual([0x3c]);
+    });
+
+    it("skips a note-on whose level is not a seven-bit data byte", () => {
+        const events = [0x00, 0x90, 0x3e, 0xc8, 0x10, 0x80, 0x3e, 0x00, ...ONE_NOTE];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed?.notes.map((note) => [note.pitch, note.velocity])).toEqual([[0x3c, 0x40]]);
+    });
+
+    it("returns null for a file whose only notes are corrupt", () => {
+        const events = [0x00, 0x90, 0xc8, 0x40, 0x60, 0x80, 0xc8, 0x00, 0x00, 0xff, 0x2f, 0x00];
+        expect(parseMidiFile(file(...HEADER, ...track(events.length, events)))).toBeNull();
+    });
+
+    it("still reads the highest key and the loudest level", () => {
+        const events = [0x00, 0x90, 0x7f, 0x7f, 0x60, 0x80, 0x7f, 0x00, 0x00, 0xff, 0x2f, 0x00];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed?.notes.map((note) => [note.pitch, note.velocity])).toEqual([[127, 127]]);
+    });
+
     describe("a corrupt file cannot capture the parser", () => {
         // Seven VLQ continuation bytes. Shifting the accumulator left by seven for each
         // one runs it past 32 bits and back to a negative number, and a negative length

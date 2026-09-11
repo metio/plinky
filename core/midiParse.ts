@@ -167,6 +167,12 @@ export function parseMidiFile(bytes: Uint8Array): Composition | null {
                 if (type === 0x90 || type === 0x80) {
                     const note = reader.u8();
                     const velocity = reader.u8();
+                    // A MIDI data byte is seven bits. A key or a level of 0x80 or more is a
+                    // corrupt event, not a note: kept, it would become a pitch no voice can
+                    // play and a take the share-code decoder refuses as a whole.
+                    if (note > 0x7f || velocity > 0x7f) {
+                        continue;
+                    }
                     const key = channel * 128 + note;
                     if (type === 0x90 && velocity > 0) {
                         const stack = open.get(key) ?? [];
