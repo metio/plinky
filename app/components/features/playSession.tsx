@@ -74,7 +74,7 @@ import { useVanishingBars } from "../../hooks/useVanishingBars";
 import { useSynth } from "../../hooks/useSynth";
 import { useTempoControls } from "../../hooks/useTempoControls";
 import { cursorOrdinal, cursorWhole, seekToBar, seekToOrdinal } from "../../lib/scoreCursor";
-import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
+import { foundColor } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
@@ -666,9 +666,13 @@ function usePlaySessionValue({
             }
             // A hidden note earned its reveal — lift the blank before the green
             // paint below, so the note appears already coloured.
-            // Green for a clean read, amber for one that took a wrong key first.
-            const foundColor = stumbledRef.current.has(info.index) ? ASSISTED_COLOR : PLAYED_COLOR;
-            hidden.revealCorrect(info.index, foundColor);
+            // Green for a clean read, amber for one that took a wrong key first or that the
+            // forgiving advance moved past before it was played in full.
+            const color = foundColor({
+                stumbled: stumbledRef.current.has(info.index),
+                wrongBefore: info.wrongBefore,
+            });
+            hidden.revealCorrect(info.index, color);
             // Take away whatever bar the run has now left behind (inert unless the
             // read-ahead drill is armed).
             vanishing.advance(info.index);
@@ -676,7 +680,7 @@ function usePlaySessionValue({
             // only advances after this callback — so the score shows progress.
             const osmd = getOsmd();
             if (osmd) {
-                paintPlayedNotes(osmd, info.pitches, foundColor);
+                paintPlayedNotes(osmd, info.pitches, color);
                 markPainted();
             }
             // Show how long to keep holding, but only in the full-guidance hint mode

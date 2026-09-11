@@ -1629,6 +1629,38 @@ describe("ScoreViewer", () => {
             );
         });
 
+        it("ambers a chord the forgiving advance moved past", async () => {
+            // C and E together, then D. Striking C and going straight on to D leaves E
+            // unplayed: the run moves on, and the C it did get reads as a stumble rather
+            // than a clean read.
+            const pitch = (step: string, chord = false) =>
+                `<note>${chord ? "<chord/>" : ""}<pitch><step>${step}</step><octave>4</octave></pitch><duration>2</duration><type>half</type></note>`;
+            const chordThenNote = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
+  <part id="P1">
+   <measure number="1">
+    <attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>
+    ${pitch("C")}${pitch("E", true)}${pitch("D")}
+   </measure>
+  </part>
+</score-partwise>`;
+            const { container } = mount(chordThenNote, { beatsPerBar: 4 });
+            fireEvent.click(await awaitReady());
+            const c = await screen.findByLabelText("C 4");
+            const d = await screen.findByLabelText("D 4");
+
+            fireEvent.pointerDown(c);
+            fireEvent.pointerUp(c);
+            fireEvent.pointerDown(d);
+            fireEvent.pointerUp(d);
+
+            await waitFor(
+                () => expect(container.querySelector(`[fill="${ASSISTED_COLOR}"]`)).toBeTruthy(),
+                { timeout: 30000 },
+            );
+        });
+
         it("forgets the slip when the run starts over", async () => {
             const { container } = mount(oneNote(), { beatsPerBar: 4 });
             fireEvent.click(await awaitReady());

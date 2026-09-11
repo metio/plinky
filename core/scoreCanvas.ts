@@ -37,6 +37,19 @@ export const SELECT_COLOR = "#ef4444";
 // actually hesitated.
 export const ASSISTED_COLOR = "#f59e0b";
 
+// The colour a cleared position is found in: amber once the run has stumbled there — a
+// wrong key on any pass (`stumbled`), or a miss on this one, which is what a position the
+// forgiving advance moved past carries in `wrongBefore` — and green for a clean read.
+export function foundColor({
+    stumbled,
+    wrongBefore,
+}: {
+    stumbled: boolean;
+    wrongBefore: number;
+}): string {
+    return stumbled || wrongBefore > 0 ? ASSISTED_COLOR : PLAYED_COLOR;
+}
+
 // A hidden note revealed by failure (the tries budget spent) — the same red the
 // wrong-key flash and the loop selection use, so "red = missed" stays one meaning.
 export const MISSED_COLOR = "#ef4444";

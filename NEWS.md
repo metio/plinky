@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 10 September 2026
 
+**A chord you moved on from reads amber, not green.** With Keep going on, playing
+part of a chord and going straight on to the next note painted the notes you did
+get the same green as a chord read cleanly, and with hidden notes on it was revealed
+as found, even though the grade already counted it as missed. It is now amber, the
+colour for a note found after a slip, so the score and the grade tell the same
+story.
+
 **You hear what you play in Compose.** The keys under the sketch, your computer keys
 and a MIDI piano without speakers of its own all wrote notes onto the staff in
 complete silence, so the only way to hear a take was to stop and play it back. Every

@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: null,
         entries: [
             {
+                body: "**A chord you moved on from reads amber, not green.** With Keep going on, playing\npart of a chord and going straight on to the next note painted the notes you did\nget the same green as a chord read cleanly, and with hidden notes on it was revealed\nas found, even though the grade already counted it as missed. It is now amber, the\ncolour for a note found after a slip, so the score and the grade tell the same\nstory.",
+                twip: true,
+            },
+            {
                 body: "**You hear what you play in Compose.** The keys under the sketch, your computer keys\nand a MIDI piano without speakers of its own all wrote notes onto the staff in\ncomplete silence, so the only way to hear a take was to stop and play it back. Every\nnote now sounds as you play it, on the same piano and with the same pedals as the\nrest of Plinky.",
                 twip: true,
             },
