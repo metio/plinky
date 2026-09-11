@@ -48,6 +48,28 @@ describe("localeToCarry, whatever the cookies and the stored value", () => {
         );
     });
 
+    it("never changes the language the app shows, and leaves the cookie naming it", () => {
+        // What the runtime shows from the two records: the cookie first, then localStorage.
+        const shown = (cookies: string, choice: string | null) => {
+            const cookie = cookieValue(cookies, NAME);
+            if (cookie !== null && LOCALES.includes(cookie)) {
+                return cookie;
+            }
+            return choice !== null && LOCALES.includes(choice) ? choice : null;
+        };
+        fc.assert(
+            fc.property(header, stored, (cookies, choice) => {
+                const carried = localeToCarry(cookies, choice, LOCALES, NAME);
+                const after = carried === null ? cookies : `${NAME}=${carried}; ${cookies}`;
+                const before = shown(cookies, choice);
+                expect(shown(after, choice)).toBe(before);
+                if (before !== null) {
+                    expect(cookieValue(after, NAME)).toBe(before);
+                }
+            }),
+        );
+    });
+
     it("has nothing left to carry once it has been carried", () => {
         fc.assert(
             fc.property(header, stored, (cookies, choice) => {

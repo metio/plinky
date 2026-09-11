@@ -21,7 +21,18 @@ export function cookieValue(cookies: string, name: string): string | null {
 // cookie names, and it cannot read localStorage, so a choice kept there alone is overruled by
 // the browser's own language on every visit. Null when there is nothing to carry: no stored
 // choice, a stored value that is no language the site speaks, or a cookie that already names
-// one — the cookie is the newer record, so it is never overwritten.
+// one.
+//
+// A cookie naming a language is never overwritten, because the carry copies a choice and
+// never makes one. The runtime reads the cookie before localStorage, so the language the app
+// shows is the cookie's whenever it names one, and the carry leaves that language as it was.
+// setLocale writes both records with the same value, so they disagree only when one write
+// went missing: a localStorage write that failed after the cookie's, where the cookie is the
+// newer record, or a pick made in a tab still running a build from before the cookie
+// existed, which wrote localStorage alone. Nothing records which of the two happened, and
+// carrying localStorage over the cookie would turn the first into the player's earlier
+// language coming back. The second lasts only while a tab from before the cookie is open,
+// and the player's next pick writes both records again.
 export function localeToCarry(
     cookies: string,
     stored: string | null,
