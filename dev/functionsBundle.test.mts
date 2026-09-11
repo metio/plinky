@@ -12,7 +12,9 @@ import { describe, expect, it } from "vitest";
 const compile = (source: string, file: string) =>
     transformWithEsbuild(source, file, { loader: file.endsWith(".js") ? "js" : "ts" });
 
-const modules = readdirSync("functions").filter(
+// Recursive, as the Pages build is: a route under functions/v1/ is compiled like the
+// middleware beside it, and fails the deploy the same way.
+const modules = readdirSync("functions", { recursive: true, encoding: "utf8" }).filter(
     (file) => /\.(js|ts)$/.test(file) && !file.includes(".test."),
 );
 
