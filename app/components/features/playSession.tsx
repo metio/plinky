@@ -908,7 +908,10 @@ function usePlaySessionValue({
         capture: recorder.capture,
         tempo,
         beatsPerBar,
-        hand,
+        // The hand the run was graded on, which a single-staff piece holds at both whatever
+        // the link seeded the selector with: a take stamped with a hand the score does not
+        // have finds none of its notes when the video export looks for them.
+        hand: activeHand,
         finishedGrade: grading.finishedGrade,
         save: takesList.save,
         onSaved: runResult.markSaved,
@@ -1404,7 +1407,10 @@ function usePlaySessionValue({
             showMine,
             setShowMine,
             hasSaved,
+            // What the selector shows, and the hand the run actually plays — both on a
+            // single-staff piece whatever the selector holds.
             hand,
+            activeHand,
             setHand,
         }),
         [
@@ -1438,6 +1444,7 @@ function usePlaySessionValue({
             showMine,
             hasSaved,
             hand,
+            activeHand,
             setShowMine,
             setGuideNotes,
             setEnforceTempo,

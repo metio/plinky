@@ -20,6 +20,7 @@ import { memoryStore } from "../../adapters/memoryStore";
 import { DEFAULT_PREFS, type Prefs } from "../../../core/prefs";
 import { createPrefsStore } from "../../stores/prefsStore";
 import { createGhostStore } from "../../stores/ghostStore";
+import { createTakesStore } from "../../stores/takesStore";
 import {
     ASSISTED_COLOR,
     GHOST_COLOR,
@@ -209,6 +210,23 @@ describe("ScoreViewer", () => {
                 screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"),
             )
             .toBe("true");
+    });
+
+    it("keeps a one-staff piece's take under both hands whatever hand the link asked for", async () => {
+        // The run plays both hands on a single staff, so the take must say so: the video
+        // export finds the take's notes in the score by this hand, and a single staff has
+        // no left-hand notes to find.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        mount(fourCs(), { beatsPerBar: 4, options: { hands: "left" } });
+        fireEvent.click(await awaitReady());
+        const key = await screen.findByLabelText("C 5");
+        for (let i = 0; i < 4; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        expect(await screen.findByText("Run saved", undefined, { timeout: 30000 })).toBeTruthy();
+        const [take] = createTakesStore(browserStore).list("t");
+        expect(take?.hand).toBe("both");
     });
 
     it("frames the keyboard to the piece's own range, not a fixed two octaves", async () => {

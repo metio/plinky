@@ -26,7 +26,9 @@ export function PlaySurface() {
     const { assessment, credit, daily, ephemeral, id, license, measureCount, ready, title, xml } =
         usePlayPiece();
     const { fullscreen, gradePanelRef, runsView, showScore } = usePlayShell();
-    const { hand } = usePlaySetup();
+    // The hand the run played, not the selector: the video export looks the take's notes up
+    // in the score by it, and a one-staff piece has only "both" to find them under.
+    const { activeHand } = usePlaySetup();
     const {
         deleteTake,
         ghostRace,
@@ -61,7 +63,7 @@ export function PlaySurface() {
                         license={license}
                         activeReplayId={listenPlayback.activeReplayId}
                         playing={listenPlayback.playing}
-                        original={{ xml, hand }}
+                        original={{ xml, hand: activeHand }}
                         onReplay={(take) => {
                             showScore();
                             replayTake(take);

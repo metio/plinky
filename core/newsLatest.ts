@@ -25,6 +25,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**With Keep going on, a missed note no longer makes the next one look early.** When\nyou skipped a note and played the next one right on its beat, the result timed the\nskipped note as late and the one you played as early, so a single miss cost you\ntwice on timing and put a note you got right on the strip as off the beat. The\nmissed note still counts as missed, and the notes you played are timed as you\nplayed them.",
                 twip: true,
             },
+            {
+                body: "**A run's video shows the piece's own notation after One hand at a time.** Trying\nOne hand at a time from Ways to practise can open a tune written on a single staff.\nYou play it with both hands, but the run was kept as a left-hand run, so its video\ncould not find those notes in the score and drew your playing out as new notation\ninstead. The run is now kept as the both-hands run it was, and its video shows the\npiece as written.",
+                twip: true,
+            },
         ],
     },
     {

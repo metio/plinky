@@ -30,6 +30,13 @@ twice on timing and put a note you got right on the strip as off the beat. The
 missed note still counts as missed, and the notes you played are timed as you
 played them.
 
+**A run's video shows the piece's own notation after One hand at a time.** Trying
+One hand at a time from Ways to practise can open a tune written on a single staff.
+You play it with both hands, but the run was kept as a left-hand run, so its video
+could not find those notes in the score and drew your playing out as new notation
+instead. The run is now kept as the both-hands run it was, and its video shows the
+piece as written.
+
 ## 11 September 2026
 
 **A very fast or very slow MIDI file reads cleanly in Compose.** Opening a file played
