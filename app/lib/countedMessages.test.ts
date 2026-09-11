@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { m } from "../paraglide/messages.js";
 
@@ -53,6 +54,72 @@ describe("a counted message in a language with more than two forms", () => {
         expect(m.drill_leap_semitones({ count: 21 }, { locale: "ru" })).toBe("21 полутон");
         expect(m.drill_leap_semitones({ count: 22 }, { locale: "ru" })).toBe("22 полутона");
         expect(m.drill_leap_semitones({ count: 25 }, { locale: "ru" })).toBe("25 полутонов");
+    });
+});
+
+// Every plural message in every locale, at the counts where the arms change hands: zero,
+// one, the few forms (2, 22), the many forms (5, 20, 101) and the twenty-one that Slavic
+// languages count as one. A missing arm prints the message key and a dropped placeholder
+// takes the number out of the sentence, so each rendering must be neither.
+const locales: string[] = JSON.parse(readFileSync("project.inlang/settings.json", "utf8")).locales;
+const contract: Record<string, unknown> = JSON.parse(readFileSync("messages/en.json", "utf8"));
+type Declared = [{ declarations: string[]; selectors: string[] }];
+const counted = Object.entries(contract)
+    .filter((entry): entry is [string, Declared] => Array.isArray(entry[1]))
+    .map(([key, [{ declarations, selectors }]]) => {
+        const inputs = declarations
+            .filter((line) => line.startsWith("input "))
+            .map((line) => line.slice("input ".length));
+        // "local countPlural = count: plural" — the input the arms are chosen by.
+        const selector = declarations
+            .find((line) => line.startsWith(`local ${selectors[0]} =`))
+            ?.match(/= (\w+): plural/)?.[1];
+        return { key, inputs, selector: selector ?? "" };
+    });
+const render = m as unknown as Record<
+    string,
+    (inputs: Record<string, unknown>, options: { locale: string }) => string
+>;
+
+describe("every plural message in every locale", () => {
+    it("finds the plural messages and what each counts", () => {
+        expect(counted.length).toBeGreaterThan(10);
+        for (const { key, inputs, selector } of counted) {
+            expect(inputs, key).toContain(selector);
+        }
+    });
+
+    it.each(
+        counted.flatMap(({ key, inputs, selector }) =>
+            locales.map((locale) => ({ key, inputs, selector, locale })),
+        ),
+    )("$key in $locale reads its number at every count", ({ key, inputs, selector, locale }) => {
+        for (const n of [0, 1, 2, 5, 20, 21, 22, 101]) {
+            const values = Object.fromEntries(
+                inputs.map((name) => [name, name === selector ? n : "‹x›"]),
+            );
+            const text = render[key]!(values, { locale });
+            expect(text, `${key} ${locale} ${n}`).not.toBe(key);
+            expect(text, `${key} ${locale} ${n}`).toContain(String(n));
+        }
+    });
+
+    it("takes Romanian's 'de' from twenty up", () => {
+        expect(m.progress_notes({ count: 19 }, { locale: "ro" })).toBe("19 note");
+        expect(m.progress_notes({ count: 20 }, { locale: "ro" })).toBe("20 de note");
+        expect(m.progress_notes({ count: 101 }, { locale: "ro" })).toBe("101 note");
+    });
+
+    it("tells Czech two from five", () => {
+        expect(m.scores_count({ count: 2 }, { locale: "cs" })).toBe("2 skladby");
+        expect(m.scores_count({ count: 5 }, { locale: "cs" })).toBe("5 skladeb");
+    });
+
+    it("tells Croatian and Serbian two from five", () => {
+        expect(m.progress_notes({ count: 2 }, { locale: "hr" })).toBe("2 note");
+        expect(m.progress_notes({ count: 5 }, { locale: "hr" })).toBe("5 nota");
+        expect(m.progress_notes({ count: 2 }, { locale: "sr" })).toBe("2 ноте");
+        expect(m.progress_notes({ count: 5 }, { locale: "sr" })).toBe("5 нота");
     });
 });
 
