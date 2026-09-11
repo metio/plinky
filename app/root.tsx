@@ -21,11 +21,11 @@ import { UpdateBanner } from "./components/features/updateBanner";
 import { MilestoneBannerHost } from "./components/features/milestoneBanner";
 import { MilestoneProvider } from "./contexts/milestone";
 import { SoundHint } from "./components/features/soundHint";
-import { localeToCarry } from "../core/localeCarry";
 import { isInAppBrowser, isIosLike } from "../core/platform";
 import { browserCookies } from "./adapters/browserCookie";
 import { browserStore, storageHealth } from "./adapters/browserStore";
 import { runActivity } from "./lib/activity";
+import { carryLocaleChoice } from "./lib/carryLocale";
 import { describeError, issueUrl, REPO_ISSUES } from "./lib/errorReport";
 import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
 import { keepOfflineAnnouncer } from "./lib/keepOffline";
@@ -38,12 +38,9 @@ import { ogLocale, SITE_URL } from "../core/site";
 import { m } from "./paraglide/messages.js";
 import {
     baseLocale,
-    cookieMaxAge,
-    cookieName,
     deLocalizeHref,
     getLocale,
     locales,
-    localStorageKey,
     localizeUrl,
 } from "./paraglide/runtime.js";
 // Self-hosted Inter (variable). The wght CSS covers every weight across the
@@ -189,18 +186,8 @@ function useServiceWorkerUpdate() {
 
 export function Layout({ children }: { children: React.ReactNode }) {
     const { updateBroken } = useServiceWorkerUpdate();
-    // A language picked while the choice was kept only in localStorage is copied into the
-    // locale cookie once, since the cookie is what the edge reads to open the bare "/".
     useEffect(() => {
-        const locale = localeToCarry(
-            browserCookies.read(),
-            browserStore.get(localStorageKey),
-            locales,
-            cookieName,
-        );
-        if (locale !== null) {
-            browserCookies.write(cookieName, locale, cookieMaxAge);
-        }
+        carryLocaleChoice(browserCookies, browserStore);
     }, []);
     // Apply the saved theme (following the OS when "system") here in the layout,
     // so even the error page is themed — App's render is skipped on an error.
