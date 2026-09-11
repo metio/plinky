@@ -329,8 +329,23 @@
     "scores_search_placeholder": "Поиск партитур…",
     "scores_filter_all": "Все",
     "scores_filter_favorites": "★ Избранное",
-    "scores_count_one": "{count} партитур",
-    "scores_count_other": "{count} партитур",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} партитура",
+                "countPlural=few": "{count} партитуры",
+                "countPlural=many": "{count} партитур",
+                "countPlural=other": "{count} партитур"
+            }
+        }
+    ],
     "scores_empty": "Нет партитур по вашему запросу.",
     "scores_favorite": "Добавить в избранное",
     "scores_unfavorite": "Убрать из избранного",
@@ -661,8 +676,23 @@
     "home_assignments_blurb": "Последовательность пьес — учительская или составленная вами — как путь с указателями, где каждый шаг получает оценку по мере прохождения.",
     "progress_days_practiced": "Дней занятий",
     "progress_notes_played": "Сыграно нот",
-    "progress_notes_one": "{count} нот",
-    "progress_notes_other": "{count} нот",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} нота",
+                "countPlural=few": "{count} ноты",
+                "countPlural=many": "{count} нот",
+                "countPlural=other": "{count} нот"
+            }
+        }
+    ],
     "progress_share_caption": "Поделитесь прогрессом",
     "progress_grid_label": "Точность, ритм и плавность на последних занятиях",
     "progress_share_boast": "Мой прогресс на фортепиано в Plinky",

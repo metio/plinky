@@ -323,8 +323,21 @@
     "scores_search_placeholder": "Kották keresése…",
     "scores_filter_all": "Mind",
     "scores_filter_favorites": "★ Kedvencek",
-    "scores_count_one": "{count} kotta",
-    "scores_count_other": "{count} kotta",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} kotta",
+                "countPlural=other": "{count} kotta"
+            }
+        }
+    ],
     "scores_empty": "Nincs a keresésnek megfelelő kotta.",
     "scores_favorite": "Hozzáadás a kedvencekhez",
     "scores_unfavorite": "Eltávolítás a kedvencekből",
@@ -651,8 +664,21 @@
     "home_assignments_blurb": "Darabok sorozata — egy tanáré, vagy amit magad állítasz össze — vezetett gyakorlóútként, ahol minden lépés értékelést kap, ahogy teljesíted.",
     "progress_days_practiced": "Gyakorolt napok",
     "progress_notes_played": "Lejátszott hangok",
-    "progress_notes_one": "{count} hang",
-    "progress_notes_other": "{count} hang",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} hang",
+                "countPlural=other": "{count} hang"
+            }
+        }
+    ],
     "progress_share_caption": "Oszd meg a fejlődésed",
     "progress_grid_label": "Pontosság, ritmus és folyékonyság a legutóbbi gyakorlásaidon",
     "progress_share_boast": "A zongorás fejlődésem a Plinky-n",

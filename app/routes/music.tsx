@@ -174,9 +174,7 @@ export default function MusicRoute() {
                     />
 
                     <p className="text-xs text-muted">
-                        {matches.length === 1
-                            ? m.scores_count_one({ count: matches.length })
-                            : m.scores_count_other({ count: matches.length })}
+                        {m.scores_count({ count: matches.length })}
                     </p>
 
                     {!loaded ? (

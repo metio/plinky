@@ -326,8 +326,22 @@
     "scores_search_placeholder": "Buscar partituras…",
     "scores_filter_all": "Todas",
     "scores_filter_favorites": "★ Favoritas",
-    "scores_count_one": "{count} partituras",
-    "scores_count_other": "{count} partituras",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} partitura",
+                "countPlural=many": "{count} partituras",
+                "countPlural=other": "{count} partituras"
+            }
+        }
+    ],
     "scores_empty": "Ninguna partitura coincide con tu búsqueda.",
     "scores_favorite": "Añadir a favoritas",
     "scores_unfavorite": "Quitar de favoritas",
@@ -656,8 +670,22 @@
     "home_assignments_blurb": "Una secuencia de piezas, de un profesor o creada por ti mismo, como un camino guiado, con cada paso calificado al superarlo.",
     "progress_days_practiced": "Días practicados",
     "progress_notes_played": "Notas tocadas",
-    "progress_notes_one": "{count} notas",
-    "progress_notes_other": "{count} notas",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=many": "{count} notas",
+                "countPlural=other": "{count} notas"
+            }
+        }
+    ],
     "progress_share_caption": "Comparte tu progreso",
     "progress_grid_label": "Precisión, sincronización y fluidez a lo largo de tus sesiones recientes",
     "progress_share_boast": "Mi progreso al piano en Plinky",

@@ -323,8 +323,21 @@
     "scores_search_placeholder": "Hae nuotteja…",
     "scores_filter_all": "Kaikki",
     "scores_filter_favorites": "★ Suosikit",
-    "scores_count_one": "{count} nuottia",
-    "scores_count_other": "{count} nuottia",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nuotti",
+                "countPlural=other": "{count} nuottia"
+            }
+        }
+    ],
     "scores_empty": "Hakuasi ei vastaa yksikään nuotti.",
     "scores_favorite": "Lisää suosikkeihin",
     "scores_unfavorite": "Poista suosikeista",
@@ -651,8 +664,21 @@
     "home_assignments_blurb": "Kappalesarja — opettajan tai itse rakentamasi — ohjattuna polkuna, jossa jokainen askel arvostellaan, kun suoritat sen.",
     "progress_days_practiced": "Harjoituspäiviä",
     "progress_notes_played": "Soitettuja nuotteja",
-    "progress_notes_one": "{count} nuottia",
-    "progress_notes_other": "{count} nuottia",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nuotti",
+                "countPlural=other": "{count} nuottia"
+            }
+        }
+    ],
     "progress_share_caption": "Jaa edistymisesi",
     "progress_grid_label": "Tarkkuus, ajoitus ja sujuvuus viime harjoituksissasi",
     "progress_share_boast": "Pianoedistymiseni Plinkyssä",

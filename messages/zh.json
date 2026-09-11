@@ -320,8 +320,20 @@
     "scores_search_placeholder": "搜索乐谱…",
     "scores_filter_all": "全部",
     "scores_filter_favorites": "★ 收藏",
-    "scores_count_one": "{count} 份乐谱",
-    "scores_count_other": "{count} 份乐谱",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 份乐谱"
+            }
+        }
+    ],
     "scores_empty": "没有乐谱符合你的搜索。",
     "scores_favorite": "添加到收藏",
     "scores_unfavorite": "从收藏中移除",
@@ -646,8 +658,20 @@
     "home_assignments_blurb": "一串曲目——老师留的，或你自己编排的——组成一条引导式练习路线，每闯过一步都会评级。",
     "progress_days_practiced": "练习天数",
     "progress_notes_played": "已弹奏音符",
-    "progress_notes_one": "{count} 个音符",
-    "progress_notes_other": "{count} 个音符",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count} 个音符"
+            }
+        }
+    ],
     "progress_share_caption": "分享你的进度",
     "progress_grid_label": "近期练习的准确度、节奏与流畅",
     "progress_share_boast": "我在 Plinky 上的钢琴进步",

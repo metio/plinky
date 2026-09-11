@@ -329,8 +329,23 @@
     "scores_search_placeholder": "Hľadať skladby…",
     "scores_filter_all": "Všetko",
     "scores_filter_favorites": "★ Obľúbené",
-    "scores_count_one": "{count} skladieb",
-    "scores_count_other": "{count} skladieb",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba",
+                "countPlural=few": "{count} skladby",
+                "countPlural=many": "{count} skladby",
+                "countPlural=other": "{count} skladieb"
+            }
+        }
+    ],
     "scores_empty": "Žiadna skladba nezodpovedá vášmu hľadaniu.",
     "scores_favorite": "Pridať k obľúbeným",
     "scores_unfavorite": "Odstrániť z obľúbených",
@@ -661,8 +676,23 @@
     "home_assignments_blurb": "Postupnosť skladieb — od učiteľa, alebo taká, ktorú si zostavíte sami — ako vedená cesta, kde každý krok dostane známku, keď ho zvládnete.",
     "progress_days_practiced": "Precvičené dni",
     "progress_notes_played": "Zahrané noty",
-    "progress_notes_one": "{count} nôt",
-    "progress_notes_other": "{count} nôt",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=few": "{count} noty",
+                "countPlural=many": "{count} noty",
+                "countPlural=other": "{count} nôt"
+            }
+        }
+    ],
     "progress_share_caption": "Zdieľaj svoj pokrok",
     "progress_grid_label": "Presnosť, načasovanie a plynulosť naprieč nedávnymi cvičeniami",
     "progress_share_boast": "Môj pokrok v hraní na klavíri na Plinky",

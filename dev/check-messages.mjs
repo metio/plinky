@@ -19,6 +19,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { singularCopies } from "./singular-copies.mjs";
 import { OFFLINE_MESSAGES } from "./stamp-sw.mjs";
 
 const settings = JSON.parse(readFileSync("./project.inlang/settings.json", "utf8"));
@@ -104,10 +105,16 @@ if (unreferenced.length > 0) {
 }
 
 for (const locale of locales) {
+    const messages = messagesOf(locale);
+    // A singular copied from the plural passes every check below, so it is looked for on
+    // its own — in the contract too, which a later edit could break the same way.
+    const copies = singularCopies(locale, messages);
     if (locale === baseLocale) {
+        if (copies.length > 0) {
+            problems.push({ locale, missing: [], orphan: [], mismatched: [], copies });
+        }
         continue;
     }
-    const messages = messagesOf(locale);
     const localeKeys = new Set(Object.keys(messages));
     const missing = [...baseKeys].filter((key) => !localeKeys.has(key));
     const orphan = [...localeKeys].filter((key) => !baseKeys.has(key));
@@ -150,8 +157,8 @@ for (const locale of locales) {
         }
     }
 
-    if (missing.length > 0 || orphan.length > 0 || mismatched.length > 0) {
-        problems.push({ locale, missing, orphan, mismatched });
+    if (missing.length > 0 || orphan.length > 0 || mismatched.length > 0 || copies.length > 0) {
+        problems.push({ locale, missing, orphan, mismatched, copies });
     }
 }
 
@@ -162,7 +169,13 @@ if (problems.length === 0) {
     process.exit(0);
 }
 
-for (const { locale, missing, orphan, mismatched } of problems) {
+for (const { locale, missing, orphan, mismatched, copies } of problems) {
+    if (copies.length > 0) {
+        console.error(
+            `✗ ${locale}: ${copies.length} counted message(s) read the same for one and many:` +
+                `\n    ${copies.join("\n    ")}`,
+        );
+    }
     if (missing.length > 0) {
         console.error(`✗ ${locale}: missing ${missing.length} — ${missing.join(", ")}`);
     }
@@ -181,6 +194,7 @@ for (const { locale, missing, orphan, mismatched } of problems) {
 console.error(
     `\n${problems.length} locale(s) out of sync with ${baseLocale}. Translate the missing keys ` +
         `into each messages/<locale>.json, remove the orphaned ones, and give every ` +
-        `translation the same {placeholders} its ${baseLocale} message has — then re-run.`,
+        `translation the same {placeholders} its ${baseLocale} message has, and a singular ` +
+        `of its own where the language has one — then re-run.`,
 );
 process.exit(1);

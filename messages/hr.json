@@ -326,8 +326,22 @@
     "scores_search_placeholder": "Pretraži skladbe…",
     "scores_filter_all": "Sve",
     "scores_filter_favorites": "★ Favoriti",
-    "scores_count_one": "{count} skladbi",
-    "scores_count_other": "{count} skladbi",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} skladba",
+                "countPlural=few": "{count} skladbe",
+                "countPlural=other": "{count} skladbi"
+            }
+        }
+    ],
     "scores_empty": "Nijedna skladba ne odgovara vašoj pretrazi.",
     "scores_favorite": "Dodaj u favorite",
     "scores_unfavorite": "Ukloni iz favorita",
@@ -656,8 +670,22 @@
     "home_assignments_blurb": "Niz skladbi — učiteljev ili onaj koji sam sastaviš — kao vođena staza vježbanja, uz ocjenu svakog koraka koji svladaš.",
     "progress_days_practiced": "Dana vježbanja",
     "progress_notes_played": "Odsviranih nota",
-    "progress_notes_one": "{count} nota",
-    "progress_notes_other": "{count} nota",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=few": "{count} note",
+                "countPlural=other": "{count} nota"
+            }
+        }
+    ],
     "progress_share_caption": "Podijeli svoj napredak",
     "progress_grid_label": "Preciznost, ritam i tečnost kroz vaše nedavne vježbe",
     "progress_share_boast": "Moj napredak u sviranju klavira na Plinky",

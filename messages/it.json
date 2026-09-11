@@ -326,8 +326,22 @@
     "scores_search_placeholder": "Cerca spartiti…",
     "scores_filter_all": "Tutti",
     "scores_filter_favorites": "★ Preferiti",
-    "scores_count_one": "{count} spartiti",
-    "scores_count_other": "{count} spartiti",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} spartito",
+                "countPlural=many": "{count} spartiti",
+                "countPlural=other": "{count} spartiti"
+            }
+        }
+    ],
     "scores_empty": "Nessuno spartito corrisponde alla tua ricerca.",
     "scores_favorite": "Aggiungi ai preferiti",
     "scores_unfavorite": "Rimuovi dai preferiti",
@@ -656,8 +670,22 @@
     "home_assignments_blurb": "Una sequenza di brani — di un insegnante, o una che crei tu — come percorso guidato, con ogni passo valutato man mano che lo superi.",
     "progress_days_practiced": "Giorni di esercizio",
     "progress_notes_played": "Note suonate",
-    "progress_notes_one": "{count} note",
-    "progress_notes_other": "{count} note",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=many": "{count} note",
+                "countPlural=other": "{count} note"
+            }
+        }
+    ],
     "progress_share_caption": "Condividi i tuoi progressi",
     "progress_grid_label": "Precisione, tempismo e fluidità nelle tue sessioni recenti",
     "progress_share_boast": "I miei progressi al pianoforte su Plinky",

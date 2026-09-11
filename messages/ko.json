@@ -320,8 +320,20 @@
     "scores_search_placeholder": "악보 검색…",
     "scores_filter_all": "전체",
     "scores_filter_favorites": "★ 즐겨찾기",
-    "scores_count_one": "악보 {count}개",
-    "scores_count_other": "악보 {count}개",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "악보 {count}개"
+            }
+        }
+    ],
     "scores_empty": "검색과 일치하는 악보가 없어요.",
     "scores_favorite": "즐겨찾기에 추가",
     "scores_unfavorite": "즐겨찾기에서 제거",
@@ -646,8 +658,20 @@
     "home_assignments_blurb": "곡들을 순서대로 이어놓은 안내 경로예요 — 선생님이 만든 것이든 직접 만든 것이든, 단계를 통과할 때마다 채점돼요.",
     "progress_days_practiced": "연습한 날",
     "progress_notes_played": "연주한 음표",
-    "progress_notes_one": "{count}개 음표",
-    "progress_notes_other": "{count}개 음표",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=other": "{count}개 음표"
+            }
+        }
+    ],
     "progress_share_caption": "진행 상황 공유",
     "progress_grid_label": "최근 세션의 정확도, 타이밍, 흐름",
     "progress_share_boast": "Plinky에서의 내 피아노 실력 향상",

@@ -323,8 +323,21 @@
     "scores_search_placeholder": "Kërko partitura…",
     "scores_filter_all": "Të gjitha",
     "scores_filter_favorites": "★ Të preferuarat",
-    "scores_count_one": "{count} partitura",
-    "scores_count_other": "{count} partitura",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} partiturë",
+                "countPlural=other": "{count} partitura"
+            }
+        }
+    ],
     "scores_empty": "Asnjë partiturë s'përputhet me kërkimin.",
     "scores_favorite": "Shto te të preferuarat",
     "scores_unfavorite": "Hiq nga të preferuarat",
@@ -651,8 +664,21 @@
     "home_assignments_blurb": "Një varg pjesësh — i një mësuesi, ose një që ndërton vetë — si një shteg i udhëhequr, ku çdo hap vlerësohet ndërsa e kalon.",
     "progress_days_practiced": "Ditë praktike",
     "progress_notes_played": "Nota të luajtura",
-    "progress_notes_one": "{count} nota",
-    "progress_notes_other": "{count} nota",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} notë",
+                "countPlural=other": "{count} nota"
+            }
+        }
+    ],
     "progress_share_caption": "Ndaje progresin tënd",
     "progress_grid_label": "Saktësia, ritmi dhe rrjedhshmëria gjatë seancave të tua të fundit",
     "progress_share_boast": "Progresi im në piano me Plinky",

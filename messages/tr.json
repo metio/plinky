@@ -323,8 +323,21 @@
     "scores_search_placeholder": "Parça ara…",
     "scores_filter_all": "Tümü",
     "scores_filter_favorites": "★ Favoriler",
-    "scores_count_one": "{count} parça",
-    "scores_count_other": "{count} parça",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} parça",
+                "countPlural=other": "{count} parça"
+            }
+        }
+    ],
     "scores_empty": "Aramanla eşleşen parça yok.",
     "scores_favorite": "Favorilere ekle",
     "scores_unfavorite": "Favorilerden çıkar",
@@ -651,8 +664,21 @@
     "home_assignments_blurb": "Bir parça dizisi — bir öğretmeninkini ya da kendi oluşturduğunu — rehberli bir patika olarak, her adımı geçtikçe notlanır.",
     "progress_days_practiced": "Çalışılan gün",
     "progress_notes_played": "Çalınan nota",
-    "progress_notes_one": "{count} nota",
-    "progress_notes_other": "{count} nota",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nota",
+                "countPlural=other": "{count} nota"
+            }
+        }
+    ],
     "progress_share_caption": "İlerlemeni paylaş",
     "progress_grid_label": "Son seanslarındaki doğruluk, zamanlama ve akıcılık",
     "progress_share_boast": "Plinky'deki piyano ilerlemem",

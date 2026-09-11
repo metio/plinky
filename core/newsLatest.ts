@@ -125,6 +125,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: '**One of something is counted as one.** With a single piece due, the button offered\nto "Review 1 pieces"; a month with one day of playing said "1 days", a best day of\none note said "1 notes", and a date set for tomorrow was "1 days away". Each now\nreads the way you would say it, in every language Plinky speaks, including those\nthat use a third or fourth form for a number, as Polish and Russian do. A date that\nfalls today says "today" rather than "0 days away".',
                 twip: true,
             },
+            {
+                body: '**A single note is one note in your language too.** In German, French, Spanish,\nPolish and most other languages, a day in this week\'s chart with one note played\nshowed "1 Noten", "1 notes" or "1 notas", and a Music search with one match counted\none score as several. Both now use the singular, and Polish, Czech, Russian and the\nother languages with more than two forms get the right one for every count.',
+                twip: true,
+            },
         ],
     },
     {

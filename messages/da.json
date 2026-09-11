@@ -323,8 +323,21 @@
     "scores_search_placeholder": "Søg i stykker…",
     "scores_filter_all": "Alle",
     "scores_filter_favorites": "★ Favoritter",
-    "scores_count_one": "{count} stykker",
-    "scores_count_other": "{count} stykker",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} stykke",
+                "countPlural=other": "{count} stykker"
+            }
+        }
+    ],
     "scores_empty": "Ingen stykker matcher din søgning.",
     "scores_favorite": "Føj til favoritter",
     "scores_unfavorite": "Fjern fra favoritter",
@@ -651,8 +664,21 @@
     "home_assignments_blurb": "En række af stykker — en lærers, eller en du selv bygger — som en guidet vej, hvor hvert trin bedømmes, når du klarer det.",
     "progress_days_practiced": "Dage øvet",
     "progress_notes_played": "Noder spillet",
-    "progress_notes_one": "{count} noder",
-    "progress_notes_other": "{count} noder",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} node",
+                "countPlural=other": "{count} noder"
+            }
+        }
+    ],
     "progress_share_caption": "Del dit fremskridt",
     "progress_grid_label": "Præcision, timing og flow over dine seneste sessioner",
     "progress_share_boast": "Mit klaverfremskridt på Plinky",

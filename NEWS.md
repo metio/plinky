@@ -180,6 +180,12 @@ reads the way you would say it, in every language Plinky speaks, including those
 that use a third or fourth form for a number, as Polish and Russian do. A date that
 falls today says "today" rather than "0 days away".
 
+**A single note is one note in your language too.** In German, French, Spanish,
+Polish and most other languages, a day in this week's chart with one note played
+showed "1 Noten", "1 notes" or "1 notas", and a Music search with one match counted
+one score as several. Both now use the singular, and Polish, Czech, Russian and the
+other languages with more than two forms get the right one for every count.
+
 ## 9 September 2026 — night
 
 **The theory course opens on a lesson, and every lesson is a link.** The list down

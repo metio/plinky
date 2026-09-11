@@ -456,8 +456,21 @@
     "scores_search_placeholder": "Search scores…",
     "scores_filter_all": "All",
     "scores_filter_favorites": "★ Favourites",
-    "scores_count_one": "{count} score",
-    "scores_count_other": "{count} scores",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} score",
+                "countPlural=other": "{count} scores"
+            }
+        }
+    ],
     "scores_empty": "No scores match your search.",
     "scores_favorite": "Add to favourites",
     "scores_unfavorite": "Remove from favourites",
@@ -785,8 +798,21 @@
     "home_assignments_blurb": "A sequence of pieces — a teacher's, or one you build yourself — as a guided path, with each step graded as you clear it.",
     "progress_days_practiced": "Days practised",
     "progress_notes_played": "Notes played",
-    "progress_notes_one": "{count} note",
-    "progress_notes_other": "{count} notes",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} note",
+                "countPlural=other": "{count} notes"
+            }
+        }
+    ],
     "progress_share_caption": "Share your progress",
     "progress_grid_label": "Accuracy, timing and flow across your recent sessions",
     "progress_share_boast": "My piano progress on Plinky",

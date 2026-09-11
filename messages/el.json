@@ -323,8 +323,21 @@
     "scores_search_placeholder": "Αναζήτηση παρτιτουρών…",
     "scores_filter_all": "Όλα",
     "scores_filter_favorites": "★ Αγαπημένα",
-    "scores_count_one": "{count} παρτιτούρες",
-    "scores_count_other": "{count} παρτιτούρες",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} παρτιτούρα",
+                "countPlural=other": "{count} παρτιτούρες"
+            }
+        }
+    ],
     "scores_empty": "Καμία παρτιτούρα δεν ταιριάζει με την αναζήτησή σου.",
     "scores_favorite": "Προσθήκη στα αγαπημένα",
     "scores_unfavorite": "Αφαίρεση από τα αγαπημένα",
@@ -651,8 +664,21 @@
     "home_assignments_blurb": "Μια σειρά κομματιών — ενός δασκάλου, ή μια που φτιάχνεις μόνος σου — σαν καθοδηγούμενη διαδρομή, με κάθε βήμα να βαθμολογείται καθώς το ολοκληρώνεις.",
     "progress_days_practiced": "Μέρες που έπαιξες",
     "progress_notes_played": "Νότες που παίχτηκαν",
-    "progress_notes_one": "{count} νότες",
-    "progress_notes_other": "{count} νότες",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} νότα",
+                "countPlural=other": "{count} νότες"
+            }
+        }
+    ],
     "progress_share_caption": "Μοιράσου την πρόοδό σου",
     "progress_grid_label": "Ακρίβεια, συγχρονισμός και ροή στις πρόσφατες συνεδρίες σου",
     "progress_share_boast": "Η πρόοδός μου στο πιάνο με το Plinky",

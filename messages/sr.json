@@ -326,8 +326,22 @@
     "scores_search_placeholder": "Претражи нумере…",
     "scores_filter_all": "Све",
     "scores_filter_favorites": "★ Омиљене",
-    "scores_count_one": "{count} нумера",
-    "scores_count_other": "{count} нумера",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} нумера",
+                "countPlural=few": "{count} нумере",
+                "countPlural=other": "{count} нумера"
+            }
+        }
+    ],
     "scores_empty": "Ниједна нумера не одговара претрази.",
     "scores_favorite": "Додај у омиљене",
     "scores_unfavorite": "Уклони из омиљених",
@@ -656,8 +670,22 @@
     "home_assignments_blurb": "Низ комада — наставников, или онај који сам направиш — као вођена стаза вежбања, где се сваки корак оцењује када га пређеш.",
     "progress_days_practiced": "Дана вежбања",
     "progress_notes_played": "Одсвираних нота",
-    "progress_notes_one": "{count} нота",
-    "progress_notes_other": "{count} нота",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} нота",
+                "countPlural=few": "{count} ноте",
+                "countPlural=other": "{count} нота"
+            }
+        }
+    ],
     "progress_share_caption": "Подели свој напредак",
     "progress_grid_label": "Тачност, ритам и течност кроз твоја недавна вежбања",
     "progress_share_boast": "Мој напредак у свирању клавира на Plinky",

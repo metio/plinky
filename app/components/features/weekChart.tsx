@@ -17,11 +17,7 @@ export function WeekChart({ days }: { days: DaySeries }) {
                     <div
                         key={day.date}
                         className="flex h-full flex-1 flex-col items-center justify-end gap-1"
-                        title={
-                            day.notes === 1
-                                ? m.progress_notes_one({ count: day.notes })
-                                : m.progress_notes_other({ count: day.notes })
-                        }
+                        title={m.progress_notes({ count: day.notes })}
                     >
                         <div
                             className="w-full rounded-t bg-chart-peak"

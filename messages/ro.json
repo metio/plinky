@@ -326,8 +326,22 @@
     "scores_search_placeholder": "Caută partituri…",
     "scores_filter_all": "Toate",
     "scores_filter_favorites": "★ Preferate",
-    "scores_count_one": "{count} partituri",
-    "scores_count_other": "{count} partituri",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} partitură",
+                "countPlural=few": "{count} partituri",
+                "countPlural=other": "{count} de partituri"
+            }
+        }
+    ],
     "scores_empty": "Nicio partitură nu se potrivește căutării.",
     "scores_favorite": "Adaugă la preferate",
     "scores_unfavorite": "Elimină din preferate",
@@ -656,8 +670,22 @@
     "home_assignments_blurb": "O succesiune de piese — a unui profesor, sau una construită de tine — ca un traseu ghidat, cu fiecare pas notat pe măsură ce-l parcurgi.",
     "progress_days_practiced": "Zile de exersare",
     "progress_notes_played": "Note cântate",
-    "progress_notes_one": "{count} note",
-    "progress_notes_other": "{count} note",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} notă",
+                "countPlural=few": "{count} note",
+                "countPlural=other": "{count} de note"
+            }
+        }
+    ],
     "progress_share_caption": "Distribuie progresul tău",
     "progress_grid_label": "Acuratețe, sincronizare și fluență de-a lungul sesiunilor tale recente",
     "progress_share_boast": "Progresul meu la pian pe Plinky",

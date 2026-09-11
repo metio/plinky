@@ -329,8 +329,23 @@
     "scores_search_placeholder": "Szukaj utworów…",
     "scores_filter_all": "Wszystkie",
     "scores_filter_favorites": "★ Ulubione",
-    "scores_count_one": "Utwory: {count}",
-    "scores_count_other": "Utwory: {count}",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} utwór",
+                "countPlural=few": "{count} utwory",
+                "countPlural=many": "{count} utworów",
+                "countPlural=other": "{count} utworów"
+            }
+        }
+    ],
     "scores_empty": "Żaden utwór nie pasuje do wyszukiwania.",
     "scores_favorite": "Dodaj do ulubionych",
     "scores_unfavorite": "Usuń z ulubionych",
@@ -661,8 +676,23 @@
     "home_assignments_blurb": "Sekwencja utworów — od nauczyciela albo zbudowana przez ciebie — jako prowadzona ścieżka, w której każdy krok dostaje ocenę, gdy go pokonasz.",
     "progress_days_practiced": "Dni ćwiczeń",
     "progress_notes_played": "Zagrane nuty",
-    "progress_notes_one": "{count} nut",
-    "progress_notes_other": "{count} nut",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} nuta",
+                "countPlural=few": "{count} nuty",
+                "countPlural=many": "{count} nut",
+                "countPlural=other": "{count} nut"
+            }
+        }
+    ],
     "progress_share_caption": "Udostępnij swoje postępy",
     "progress_grid_label": "Dokładność, synchronizacja i płynność w ostatnich sesjach ćwiczeń",
     "progress_share_boast": "Moje postępy w grze na pianinie na Plinky",

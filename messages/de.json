@@ -323,8 +323,21 @@
     "scores_search_placeholder": "Stücke suchen…",
     "scores_filter_all": "Alle",
     "scores_filter_favorites": "★ Favoriten",
-    "scores_count_one": "{count} Stücke",
-    "scores_count_other": "{count} Stücke",
+    "scores_count": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Stück",
+                "countPlural=other": "{count} Stücke"
+            }
+        }
+    ],
     "scores_empty": "Keine Stücke passen zu deiner Suche.",
     "scores_favorite": "Zu den Favoriten hinzufügen",
     "scores_unfavorite": "Aus den Favoriten entfernen",
@@ -651,8 +664,21 @@
     "home_assignments_blurb": "Eine Folge von Stücken – von einer Lehrkraft oder von dir selbst zusammengestellt – als geführter Pfad, jeder Schritt bewertet, sobald du ihn schaffst.",
     "progress_days_practiced": "Tage geübt",
     "progress_notes_played": "Gespielte Noten",
-    "progress_notes_one": "{count} Noten",
-    "progress_notes_other": "{count} Noten",
+    "progress_notes": [
+        {
+            "declarations": [
+                "input count",
+                "local countPlural = count: plural"
+            ],
+            "selectors": [
+                "countPlural"
+            ],
+            "match": {
+                "countPlural=one": "{count} Note",
+                "countPlural=other": "{count} Noten"
+            }
+        }
+    ],
     "progress_share_caption": "Teile deinen Fortschritt",
     "progress_grid_label": "Genauigkeit, Timing und Fluss über deine letzten Sitzungen",
     "progress_share_boast": "Mein Klavierfortschritt mit Plinky",
