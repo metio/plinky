@@ -24,6 +24,13 @@ const quarter = (step: string, octave: number, staff = 1, voice = "1", notations
         notations ? `<notations>${notations}</notations>` : ""
     }</note>`;
 
+const BASS_STAFF = `<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>F</sign><line>4</line></clef></attributes>`;
+
+const whole = (step: string, octave: number, notations = "") =>
+    `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>16</duration><voice>1</voice><type>whole</type>${
+        notations ? `<notations>${notations}</notations>` : ""
+    }</note>`;
+
 const BACK = "<backup><duration>16</duration></backup>";
 const STACCATO = "<articulations><staccato/></articulations>";
 
@@ -139,4 +146,45 @@ describe("an art song's arches, with the singer taken off the page", () => {
             });
         });
     }
+});
+
+describe("a tremolo on a score of more than one part", () => {
+    const TREMOLO = '<ornaments><tremolo type="single">3</tremolo></ornaments>';
+
+    it("shakes the right hand's note alone on a piano written as two single-staff parts", () => {
+        return engrave(
+            partwise([
+                { id: "RH", body: `${ONE_STAFF}${whole("C", 5, TREMOLO)}` },
+                { id: "LH", body: `${BASS_STAFF}${whole("C", 3)}` },
+            ]),
+            false,
+        ).then(({ osmd, marks }) => {
+            const figure = collectListenSteps(osmd, marks).filter((step) => step.whole === 0);
+            expect(figure.length).toBeGreaterThan(2);
+            // The C5 shakes; the bass C3 struck with it sounds once.
+            expect(figure.every((step) => step.notes.some((note) => note.pitch === 72))).toBe(true);
+            expect(
+                figure.filter((step) => step.notes.some((note) => note.pitch === 48)),
+            ).toHaveLength(1);
+        });
+    });
+
+    it("never sounds the singer's note, which is not on the page", () => {
+        return engrave(
+            partwise([
+                { id: "P1", body: SINGER },
+                {
+                    id: "P2",
+                    body: `${TWO_STAVES}${quarter("C", 5, 1, "1", TREMOLO)}${quarter("D", 5)}${quarter("E", 5)}${quarter("F", 5)}`,
+                },
+            ]),
+            false,
+        ).then(({ osmd, marks }) => {
+            const sounded = collectListenSteps(osmd, marks).flatMap((step) =>
+                step.notes.map((note) => note.pitch),
+            );
+            expect(sounded).not.toContain(67);
+            expect(sounded.filter((pitch) => pitch === 72).length).toBeGreaterThan(2);
+        });
+    });
 });

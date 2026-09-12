@@ -94,7 +94,7 @@ const note = (
     wholes = 0.5,
     staff = 1,
     voice = "1",
-) => ({ whole, wholes, midi, staff, voice, marks: { tremolo } });
+) => ({ whole, wholes, midi, staffId: staff, voice, marks: { tremolo } });
 
 describe("readTremolos", () => {
     it("reads a single-note tremolo over its own note", () => {

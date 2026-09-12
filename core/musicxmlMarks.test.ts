@@ -417,4 +417,55 @@ describe("a score written for more than one part", () => {
             { from: 0, to: 0.25, staff: 0 },
         ]);
     });
+    it("rocks only the part that carries a tremolo, not the other single-staff hand", () => {
+        // A piano written as two parts of one staff each: both hands are staff 1, voice 1,
+        // in their own part.
+        const tremolo = '<tremolo type="single">3</tremolo>';
+        const doc = partwise([
+            {
+                id: "RH",
+                body: `${ONE_STAFF}<note><pitch><step>C</step><octave>5</octave></pitch><duration>16</duration><voice>1</voice><type>whole</type><notations><ornaments>${tremolo}</ornaments></notations></note>`,
+            },
+            {
+                id: "LH",
+                body: `${ONE_STAFF}<note><pitch><step>C</step><octave>3</octave></pitch><duration>16</duration><voice>1</voice><type>whole</type></note>`,
+            },
+        ]);
+        expect(readScoreMarks(doc).tremolos.map((span) => span.pitches)).toEqual([[72]]);
+    });
+
+    it("rocks only the piano's note under a tremolo, not the singer's at the same onset", () => {
+        const tremolo = '<ornaments><tremolo type="single">3</tremolo></ornaments>';
+        const doc = partwise([
+            { id: "P1", body: SINGER },
+            {
+                id: "P2",
+                body: `${TWO_STAVES}${quarter("C", 5, 1, "1", tremolo)}${quarter("D", 5)}${quarter("E", 5)}${quarter("F", 5)}`,
+            },
+        ]);
+        for (const accompaniment of [false, true]) {
+            expect(
+                readScoreMarks(doc, { accompaniment }).tremolos.map((span) => span.pitches),
+            ).toEqual([[72]]);
+        }
+    });
+
+    it("ends a glissando in the part it starts in", () => {
+        // The singer ends a slide between the piano's two written ends: none of the singer's
+        // marks may close the piano's sweep or open one of its own that the piano closes.
+        const gliss = (type: string) => `<glissando type="${type}"/>`;
+        const doc = partwise([
+            {
+                id: "P1",
+                body: `${ONE_STAFF}${quarter("G", 4)}${quarter("A", 4, 1, "1", `<slide type="stop"/>`)}${quarter("B", 4)}${quarter("D", 4)}`,
+            },
+            {
+                id: "P2",
+                body: `${TWO_STAVES}${quarter("C", 5, 1, "1", gliss("start"))}${quarter("D", 5)}${quarter("C", 6, 1, "1", gliss("stop"))}${quarter("F", 5)}`,
+            },
+        ]);
+        expect(readScoreMarks(doc).glissandos).toEqual([
+            { from: 0, to: 0.75, arrivesAt: 84, pitch: 72 },
+        ]);
+    });
 });

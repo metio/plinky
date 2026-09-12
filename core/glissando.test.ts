@@ -98,4 +98,23 @@ describe("readGlissandos", () => {
     it("ignores an unmarked note and a rest", () => {
         expect(readGlissandos([note(0, 60, null), note(1, null, "stop")])).toEqual([]);
     });
+
+    it("ends a sweep in the part it starts in", () => {
+        const inPart = (
+            part: string,
+            whole: number,
+            midi: number,
+            glissando: "start" | "stop",
+        ) => ({
+            ...note(whole, midi, glissando),
+            part,
+        });
+        expect(
+            readGlissandos([
+                inPart("Piano", 0, 60, "start"),
+                inPart("Voice", 0.25, 67, "stop"),
+                inPart("Piano", 0.5, 72, "stop"),
+            ]),
+        ).toEqual([{ from: 0, to: 1, arrivesAt: 72, pitch: 60 }]);
+    });
 });

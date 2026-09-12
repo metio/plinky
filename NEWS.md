@@ -16,6 +16,12 @@ moving one staff down: the tune under a slur played detached, while a staccato b
 under it was held long, in Listen and in what a run asked of you. Each slur now
 stays on the staff it is drawn on, with the singer on the page or off it.
 
+**A tremolo shakes only its own note.** When a piano's right hand had a tremolo and
+the other hand, or a singer, had a note at the same moment, Listen shook that note
+too, over and over, even a singer's note that wasn't on the page. Now the other
+note sounds once while the tremolo shakes. A glissando also ends where its own part
+says, never on a note the singer slides to.
+
 ## 12 September 2026
 
 **Ear training answers from your number keys.** On a scale-degree question, typing 3

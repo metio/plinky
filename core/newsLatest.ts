@@ -17,6 +17,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Slurs in songs land on the right hand again.** In a song for voice and piano, the\nsinger's line is left off the page, and every slur the piano's music carries was\nmoving one staff down: the tune under a slur played detached, while a staccato bass\nunder it was held long, in Listen and in what a run asked of you. Each slur now\nstays on the staff it is drawn on, with the singer on the page or off it.",
                 twip: true,
             },
+            {
+                body: "**A tremolo shakes only its own note.** When a piano's right hand had a tremolo and\nthe other hand, or a singer, had a note at the same moment, Listen shook that note\ntoo, over and over, even a singer's note that wasn't on the page. Now the other\nnote sounds once while the tremolo shakes. A glissando also ends where its own part\nsays, never on a note the singer slides to.",
+                twip: true,
+            },
         ],
     },
     {

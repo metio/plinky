@@ -110,20 +110,23 @@ export function readTremolos(
         wholes: number;
         midi: number | null;
         // The staff and voice the note sits in: a tremolo rocks the chord that carries the
-        // mark, and the other hand's note struck at the same onset is not part of it.
-        staff?: number;
+        // mark, and the other hand's note struck at the same onset is not part of it. The
+        // staff is numbered across the page rather than within its part, because every part
+        // counts its own staves from 1: a singer's line and the piano's right hand are both
+        // staff 1 of their part, and a piano written as two single-staff parts has two.
+        staffId?: number;
         voice?: string;
         marks: { tremolo: { beams: number; part: "single" | "start" | "stop" } | null };
     }[],
 ): TremoloSpan[] {
     const spans: TremoloSpan[] = [];
-    const chordAt = (whole: number, staff?: number, voice?: string) =>
+    const chordAt = (whole: number, staffId?: number, voice?: string) =>
         notes
             .filter(
                 (one) =>
                     one.whole === whole &&
                     one.midi !== null &&
-                    one.staff === staff &&
+                    one.staffId === staffId &&
                     one.voice === voice,
             )
             .map((one) => one.midi as number);
@@ -133,7 +136,7 @@ export function readTremolos(
         at: number;
         wholes: number;
         beams: number;
-        staff?: number;
+        staffId?: number;
         voice?: string;
     } | null = null;
     for (const note of notes) {
@@ -149,7 +152,7 @@ export function readTremolos(
                 from: note.whole,
                 to: note.whole + note.wholes,
                 beams: mark.beams,
-                pitches: chordAt(note.whole, note.staff, note.voice),
+                pitches: chordAt(note.whole, note.staffId, note.voice),
                 pair: null,
             });
         } else if (mark.part === "start") {
@@ -157,12 +160,12 @@ export function readTremolos(
                 at: note.whole,
                 wholes: note.wholes,
                 beams: mark.beams,
-                staff: note.staff,
+                staffId: note.staffId,
                 voice: note.voice,
             };
         } else if (open !== null && note.whole > open.at) {
-            const start = { at: open.at, pitches: chordAt(open.at, open.staff, open.voice) };
-            const stop = { at: note.whole, pitches: chordAt(note.whole, note.staff, note.voice) };
+            const start = { at: open.at, pitches: chordAt(open.at, open.staffId, open.voice) };
+            const stop = { at: note.whole, pitches: chordAt(note.whole, note.staffId, note.voice) };
             const pair = [start, stop];
             // One span per written note, each over its own time, both spelling the same
             // alternation — so the two run together into one unbroken figure.

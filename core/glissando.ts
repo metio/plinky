@@ -99,25 +99,31 @@ export function readGlissandos(
         whole: number;
         wholes: number;
         midi: number | null;
+        // The part the note is written in. A sweep ends in the part it starts in, so a
+        // singer's slide cannot close the piano's glissando, or open one the piano ends.
+        part?: string;
         marks: { glissando: "start" | "stop" | null };
     }[],
 ): GlissandoSpan[] {
     const spans: GlissandoSpan[] = [];
-    let open: { whole: number; pitch: number } | null = null;
+    const open = new Map<string | undefined, { whole: number; pitch: number }>();
     for (const note of notes) {
         if (note.marks.glissando === null || note.midi === null) {
             continue;
         }
+        const opened = open.get(note.part);
         if (note.marks.glissando === "start") {
-            open ??= { whole: note.whole, pitch: note.midi };
-        } else if (open !== null && note.whole > open.whole) {
+            if (!opened) {
+                open.set(note.part, { whole: note.whole, pitch: note.midi });
+            }
+        } else if (opened && note.whole > opened.whole) {
             spans.push({
-                from: open.whole,
+                from: opened.whole,
                 to: note.whole + note.wholes,
                 arrivesAt: note.midi,
-                pitch: open.pitch,
+                pitch: opened.pitch,
             });
-            open = null;
+            open.delete(note.part);
         }
     }
     return spans;
