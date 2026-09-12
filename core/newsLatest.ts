@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**Grades line up with the teaching books again.** Each grade is measured against\nwell-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions\nand more. Once chords were fingered the right way up, those books measured a little\ndifferently, so the grades were re-cut to match them. Around four hundred pieces move\nup a grade and a few move down; nothing about how you play them changes.",
+                twip: true,
+            },
+            {
                 body: "**A missing page speaks your language.** Following a stale or mistyped link, or\nlanding on a page that stopped working, used to show a page in English whatever\nlanguage the rest of the site was in. It now speaks yours, with a way home and the\nsame way to report the problem.",
                 twip: true,
             },

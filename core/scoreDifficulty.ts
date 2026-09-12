@@ -409,7 +409,7 @@ export const MAX_GRADE = 8;
 // piano student. A grade now means the same thing after an import as before it, and a piece
 // only moves when the model that measures it changes.
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
-    piece: [5.498, 7.785, 10.513, 13.079, 15.349, 18.984, 22.041],
+    piece: [5.336, 8.037, 10.298, 12.513, 15.093, 18.135, 20.813],
     scale: [0.95, 1.05, 1.75, 2.45, 3.1, 3.25, 3.9],
     arpeggio: [1.117, 1.817, 1.983, 2.683, 3.336, 3.917, 4.25],
     // Block chords cost more to finger than either: three keys under one hand at every
