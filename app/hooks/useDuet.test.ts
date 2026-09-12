@@ -213,6 +213,41 @@ describe("stopping the duet", () => {
         expect(second.silenceStrikes).not.toHaveBeenCalled();
     });
 
+    it("stops like any other interruption when the page leaves", () => {
+        const { result, playNote, silenceStrikes, pendingCount, unmount } = setup();
+        result.current.prime();
+        result.current.onCleared(0, 120);
+        const [owner] = ownersOf(playNote);
+        silenceStrikes.mockClear();
+        unmount();
+        expect(pendingCount()).toBe(0);
+        expect(silenceStrikes).toHaveBeenCalledWith(owner);
+    });
+
+    it("stops like any other interruption when it is turned off mid-run", () => {
+        const playNote = vi.fn();
+        const silenceStrikes = vi.fn();
+        const { scheduler, pendingCount } = fakeScheduler();
+        const { result, rerender } = renderHook(
+            ({ enabled }: { enabled: boolean }) =>
+                useDuet({
+                    getOsmd: () => osmd,
+                    synth: { playNote, silenceStrikes },
+                    scheduler,
+                    enabled,
+                    hand: "right",
+                }),
+            { initialProps: { enabled: true } },
+        );
+        result.current.prime();
+        result.current.onCleared(0, 120);
+        const [owner] = ownersOf(playNote);
+        silenceStrikes.mockClear();
+        rerender({ enabled: false });
+        expect(pendingCount()).toBe(0);
+        expect(silenceStrikes).toHaveBeenCalledWith(owner);
+    });
+
     it("is safe to stop before anything was scheduled", () => {
         const { result, silenceStrikes } = setup();
         expect(() => result.current.stop()).not.toThrow();

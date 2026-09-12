@@ -129,14 +129,13 @@ export function useDuet({
         [cancel, synth, owner, scheduler],
     );
 
-    // Turning the duet off — or leaving the surface — must not leave a scheduled
-    // note to sound after the run it belonged to.
+    // Turning the duet off, or leaving the surface, stops it like any other interruption.
     useEffect(() => {
         if (!enabled) {
-            cancel();
+            stop();
         }
-    }, [enabled, cancel]);
-    useEffect(() => cancel, [cancel]);
+    }, [enabled, stop]);
+    useEffect(() => stop, [stop]);
 
     return { prime, onCleared, stop };
 }
