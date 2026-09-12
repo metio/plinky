@@ -8,8 +8,6 @@
     "error_missing_body": "Se on ehkä siirtynyt, tai linkissä on pieni virhe.",
     "error_crash_title": "Jokin meni pieleen",
     "error_crash_body": "Vika on Plinkyssä, ei missään, mitä teit. Edistymisesi on tallessa tällä laitteella — palaa takaisin tai kokeile ladata sivu uudelleen.",
-    "error_home": "Takaisin etusivulle",
-    "error_reload": "Lataa sivu uudelleen",
     "error_details": "Tekniset tiedot",
     "problems_title": "Viimeaikaiset ongelmat",
     "problems_hint": "Tällä laitteella meni jokin pieleen. Mitään ei ole lähetetty minnekään — lähetä raportti, jos osaat kertoa mitä olit tekemässä.",

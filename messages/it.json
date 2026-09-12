@@ -8,8 +8,6 @@
     "error_missing_body": "Forse è stata spostata, o nel link c'è un piccolo errore.",
     "error_crash_title": "Qualcosa è andato storto",
     "error_crash_body": "È un errore di Plinky, non di qualcosa che hai fatto. I tuoi progressi sono al sicuro su questo dispositivo: torna indietro o prova a ricaricare.",
-    "error_home": "Torna all'inizio",
-    "error_reload": "Ricarica la pagina",
     "error_details": "Dettagli tecnici",
     "problems_title": "Problemi recenti",
     "problems_hint": "Qualcosa è andato storto su questo dispositivo. Nulla è stato inviato da nessuna parte: manda una segnalazione se sai dire cosa stavi facendo.",

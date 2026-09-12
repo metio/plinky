@@ -8,8 +8,6 @@
     "error_missing_body": "Mund të jetë zhvendosur, ose lidhja ka një gabim të vogël.",
     "error_crash_title": "Diçka shkoi keq",
     "error_crash_body": "Është një gabim i Plinky-t, jo diçka që bëre ti. Përparimi yt është i sigurt në këtë pajisje — kthehu mbrapa ose provo ta ringarkosh faqen.",
-    "error_home": "Kthehu te kreu",
-    "error_reload": "Ringarko faqen",
     "error_details": "Detaje teknike",
     "problems_title": "Probleme së fundmi",
     "problems_hint": "Diçka shkoi keq në këtë pajisje. Asgjë nuk u dërgua askund — dërgo një raport nëse mund të thuash çfarë po bëje.",

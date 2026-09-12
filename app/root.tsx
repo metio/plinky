@@ -374,7 +374,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                     to="/"
                     className="rounded-md bg-accent-solid px-4 py-2 text-sm font-medium text-white"
                 >
-                    {m.error_home()}
+                    {m.offline_home()}
                 </Link>
                 {!notFound && (
                     <button
@@ -382,7 +382,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                         onClick={() => window.location.reload()}
                         className="rounded-md border border-line-strong px-4 py-2 text-sm font-medium text-body"
                     >
-                        {m.error_reload()}
+                        {m.action_try_again()}
                     </button>
                 )}
                 <a

@@ -171,8 +171,8 @@ describe("ErrorBoundary", () => {
         renderBoundary({ status: 404, statusText: "Not Found", internal: false, data: null });
         expect(screen.getByRole("heading").textContent).toBe(m.error_missing_title());
         expect(screen.getByText(m.error_missing_body())).toBeTruthy();
-        expect(screen.queryByRole("button", { name: m.error_reload() })).toBeNull();
-        expect(screen.getByRole("link", { name: m.error_home() })).toBeTruthy();
+        expect(screen.queryByRole("button", { name: m.action_try_again() })).toBeNull();
+        expect(screen.getByRole("link", { name: m.offline_home() })).toBeTruthy();
         const report = screen.getByRole("link", { name: m.action_report_problem() });
         expect(report.getAttribute("href")).toContain(encodeURIComponent("Page not found"));
     });
@@ -181,7 +181,7 @@ describe("ErrorBoundary", () => {
         renderBoundary(new Error("boom"));
         expect(screen.getByRole("heading").textContent).toBe(m.error_crash_title());
         expect(screen.getByText(m.error_crash_body())).toBeTruthy();
-        expect(screen.getByRole("button", { name: m.error_reload() })).toBeTruthy();
+        expect(screen.getByRole("button", { name: m.action_try_again() })).toBeTruthy();
         expect(screen.getByText(m.error_details())).toBeTruthy();
         expect(screen.getByText(/boom/)).toBeTruthy();
         const report = screen.getByRole("link", { name: m.action_report_problem() });
@@ -197,7 +197,9 @@ describe("ErrorBoundary", () => {
         const heading = screen.getByRole("heading").textContent;
         expect(heading).toBe(m.error_missing_title({}, { locale: "de" }));
         expect(heading).not.toBe(m.error_missing_title({}, { locale: "en" }));
-        expect(screen.getByRole("link", { name: m.error_home({}, { locale: "de" }) })).toBeTruthy();
+        expect(
+            screen.getByRole("link", { name: m.offline_home({}, { locale: "de" }) }),
+        ).toBeTruthy();
         expect(
             screen.getByRole("link", { name: m.action_report_problem({}, { locale: "de" }) }),
         ).toBeTruthy();
@@ -213,7 +215,7 @@ describe("ErrorBoundary", () => {
             m.error_crash_title({}, { locale: "fr" }),
         );
         expect(
-            screen.getByRole("button", { name: m.error_reload({}, { locale: "fr" }) }),
+            screen.getByRole("button", { name: m.action_try_again({}, { locale: "fr" }) }),
         ).toBeTruthy();
         expect(screen.getByText(m.error_details({}, { locale: "fr" }))).toBeTruthy();
     });
@@ -221,7 +223,7 @@ describe("ErrorBoundary", () => {
     it("sends the way home to the home page in the page's language", () => {
         overwriteGetLocale(() => "de");
         renderBoundary(new NotFoundError("/de/lernen/"));
-        const home = screen.getByRole("link", { name: m.error_home() });
+        const home = screen.getByRole("link", { name: m.offline_home() });
         expect(home.getAttribute("href")).toBe("/de/");
     });
 

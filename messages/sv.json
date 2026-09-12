@@ -8,8 +8,6 @@
     "error_missing_body": "Den kan ha flyttat, eller så är länken lite fel.",
     "error_crash_title": "Något gick fel",
     "error_crash_body": "Det är ett fel i Plinky, inte något du gjorde. Dina framsteg är trygga på den här enheten — gå tillbaka, eller prova att ladda om sidan.",
-    "error_home": "Tillbaka till start",
-    "error_reload": "Ladda om sidan",
     "error_details": "Tekniska detaljer",
     "problems_title": "Nyliga problem",
     "problems_hint": "Något gick fel på den här enheten. Inget har skickats någonstans — skicka en rapport om du kan säga vad du höll på med.",

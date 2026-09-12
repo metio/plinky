@@ -8,8 +8,6 @@
     "error_missing_body": "它可能已经移走了，或者链接有一点小错误。",
     "error_crash_title": "出了点问题",
     "error_crash_body": "这是 Plinky 的错误，不是你做错了什么。你的进度在这台设备上是安全的——返回上一页，或者试试重新加载。",
-    "error_home": "返回首页",
-    "error_reload": "重新加载页面",
     "error_details": "技术细节",
     "problems_title": "最近的问题",
     "problems_hint": "此设备上出了点问题。这些内容没有发送到任何地方——如果你能说清当时在做什么，请发送一份报告。",

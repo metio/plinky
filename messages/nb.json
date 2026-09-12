@@ -8,8 +8,6 @@
     "error_missing_body": "Den kan ha flyttet, eller lenken er litt feil.",
     "error_crash_title": "Noe gikk galt",
     "error_crash_body": "Det er en feil i Plinky, ikke noe du har gjort. Framgangen din er trygg på denne enheten — gå tilbake, eller prøv å laste inn siden på nytt.",
-    "error_home": "Tilbake til start",
-    "error_reload": "Last inn siden på nytt",
     "error_details": "Tekniske detaljer",
     "problems_title": "Nylige problemer",
     "problems_hint": "Noe gikk galt på denne enheten. Ingenting er sendt noe sted — send en rapport hvis du kan si hva du holdt på med.",

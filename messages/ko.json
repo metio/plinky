@@ -8,8 +8,6 @@
     "error_missing_body": "옮겨졌거나 링크가 조금 잘못되었을 수 있어요.",
     "error_crash_title": "문제가 생겼어요",
     "error_crash_body": "Plinky의 오류이지, 당신이 뭔가 잘못한 게 아니에요. 진행 기록은 이 기기에 안전하게 남아 있어요. 돌아가거나 새로 고쳐 보세요.",
-    "error_home": "홈으로 돌아가기",
-    "error_reload": "페이지 새로 고침",
     "error_details": "기술 정보",
     "problems_title": "최근 문제",
     "problems_hint": "이 기기에서 무언가 잘못되었습니다. 어디에도 전송되지 않았습니다. 무엇을 하던 중이었는지 쓸 수 있다면 보고를 보내 주세요.",

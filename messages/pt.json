@@ -8,8 +8,6 @@
     "error_missing_body": "Talvez tenha mudado de sítio, ou a ligação tenha um pequeno erro.",
     "error_crash_title": "Algo correu mal",
     "error_crash_body": "É uma falha do Plinky, não de algo que tenhas feito. O teu progresso está seguro neste dispositivo — volta atrás ou tenta recarregar a página.",
-    "error_home": "Voltar ao início",
-    "error_reload": "Recarregar a página",
     "error_details": "Detalhes técnicos",
     "problems_title": "Problemas recentes",
     "problems_hint": "Algo correu mal neste dispositivo. Nada foi enviado para lado nenhum — envia um relatório se souberes dizer o que estavas a fazer.",

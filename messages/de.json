@@ -8,8 +8,6 @@
     "error_missing_body": "Vielleicht ist sie umgezogen, oder im Link steckt ein kleiner Fehler.",
     "error_crash_title": "Da ist etwas schiefgegangen",
     "error_crash_body": "Das ist ein Fehler in Plinky, nicht in dem, was du getan hast. Dein Fortschritt ist auf diesem Gerät sicher — geh zurück oder lade die Seite neu.",
-    "error_home": "Zurück zum Start",
-    "error_reload": "Seite neu laden",
     "error_details": "Technische Details",
     "problems_title": "Neuere Probleme",
     "problems_hint": "Auf diesem Gerät ist etwas schiefgegangen. Nichts davon wurde irgendwohin gesendet — schick einen Bericht, wenn du sagen kannst, was du gerade gemacht hast.",

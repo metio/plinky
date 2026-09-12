@@ -8,8 +8,6 @@
     "error_missing_body": "It may have moved, or the link is slightly off.",
     "error_crash_title": "Something went wrong",
     "error_crash_body": "It's a fault in Plinky, not anything you did. Your progress is safe on this device — head back, or try reloading.",
-    "error_home": "Back home",
-    "error_reload": "Reload the page",
     "error_details": "Technical details",
     "problems_title": "Recent problems",
     "problems_hint": "Something went wrong on this device. Nothing here has been sent anywhere — send a report if you can say what you were doing.",

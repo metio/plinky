@@ -8,8 +8,6 @@
     "error_missing_body": "Možná se přestěhovala, nebo je v odkazu drobná chyba.",
     "error_crash_title": "Něco se pokazilo",
     "error_crash_body": "Je to chyba v Plinky, ne v tom, co jsi udělal. Tvůj postup je na tomto zařízení v bezpečí — vrať se zpět, nebo zkus stránku načíst znovu.",
-    "error_home": "Zpět na úvod",
-    "error_reload": "Načíst stránku znovu",
     "error_details": "Technické podrobnosti",
     "problems_title": "Nedávné problémy",
     "problems_hint": "Na tomto zařízení se něco pokazilo. Nic se nikam neodeslalo — pošli hlášení, pokud dokážeš říct, co jsi dělal.",

@@ -8,8 +8,6 @@
     "error_missing_body": "Elle a peut-être changé d'adresse, ou le lien est légèrement faux.",
     "error_crash_title": "Quelque chose s'est mal passé",
     "error_crash_body": "C'est une erreur de Plinky, pas de ta faute. Ta progression est en sécurité sur cet appareil — reviens en arrière ou essaie de recharger la page.",
-    "error_home": "Retour à l'accueil",
-    "error_reload": "Recharger la page",
     "error_details": "Détails techniques",
     "problems_title": "Problèmes récents",
     "problems_hint": "Quelque chose s'est mal passé sur cet appareil. Rien n'a été envoyé où que ce soit — envoie un rapport si tu peux dire ce que tu faisais.",
