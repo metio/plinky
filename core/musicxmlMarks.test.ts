@@ -468,4 +468,36 @@ describe("a score written for more than one part", () => {
             { from: 0, to: 0.75, arrivesAt: 84, pitch: 72 },
         ]);
     });
+    it("sets the loudness from the piano's dynamics, not the singer's", () => {
+        const doc = partwise([
+            {
+                id: "P1",
+                body: `${ONE_STAFF}${quarter("G", 4)}${direction("<dynamics><pp/></dynamics>")}${quarter("A", 4)}${direction('<wedge type="crescendo"/>')}${quarter("B", 4)}${quarter("C", 5)}`,
+            },
+            {
+                id: "P2",
+                body: `${TWO_STAVES}${direction("<dynamics><f/></dynamics>")}${quarter("C", 5)}${quarter("D", 5)}${quarter("E", 5)}${quarter("F", 5)}`,
+            },
+        ]);
+        for (const accompaniment of [false, true]) {
+            expect(readScoreMarks(doc, { accompaniment }).dynamics).toEqual([
+                { whole: 0, volume: 96, ramp: false },
+            ]);
+        }
+    });
+
+    it("still takes the tempo from whichever part writes it", () => {
+        // Every part of a score shares one pulse, and an engraver writes the tempo over
+        // the top staff — which on an art song is the singer's.
+        const doc = partwise([
+            {
+                id: "P1",
+                body: `${ONE_STAFF}<direction><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>72</per-minute></metronome></direction-type></direction>${quarter("G", 4)}`,
+            },
+            { id: "P2", body: `${TWO_STAVES}${quarter("C", 5)}` },
+        ]);
+        expect(readScoreMarks(doc, { accompaniment: false }).tempi).toEqual([
+            { whole: 0, bpm: 72 },
+        ]);
+    });
 });

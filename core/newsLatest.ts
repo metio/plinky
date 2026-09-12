@@ -21,6 +21,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A tremolo shakes only its own note.** When a piano's right hand had a tremolo and\nthe other hand, or a singer, had a note at the same moment, Listen shook that note\ntoo, over and over, even a singer's note that wasn't on the page. Now the other\nnote sounds once while the tremolo shakes. A glissando also ends where its own part\nsays, never on a note the singer slides to.",
                 twip: true,
             },
+            {
+                body: "**The piano follows its own dynamics in a song.** Where the singer was marked\nquieter or louder than the piano, or had a crescendo the piano didn't, Listen\nplayed the piano at the singer's level, and a run asked you for it too. The piano\nnow keeps to the dynamics and pedalling written for it.",
+                twip: true,
+            },
         ],
     },
     {

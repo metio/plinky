@@ -31,6 +31,9 @@ const whole = (step: string, octave: number, notations = "") =>
         notations ? `<notations>${notations}</notations>` : ""
     }</note>`;
 
+const dynamic = (mark: string) =>
+    `<direction placement="below"><direction-type><dynamics><${mark}/></dynamics></direction-type></direction>`;
+
 const BACK = "<backup><duration>16</duration></backup>";
 const STACCATO = "<articulations><staccato/></articulations>";
 
@@ -187,4 +190,31 @@ describe("a tremolo on a score of more than one part", () => {
             expect(sounded.filter((pitch) => pitch === 72).length).toBeGreaterThan(2);
         });
     });
+});
+
+describe("an art song whose singer is marked softer than the piano", () => {
+    const xml = partwise([
+        {
+            id: "P1",
+            body: `${ONE_STAFF}${quarter("G", 4)}${dynamic("pp")}${quarter("A", 4)}${quarter("B", 4)}${quarter("C", 5)}`,
+        },
+        {
+            id: "P2",
+            body: `${TWO_STAVES}${dynamic("f")}${quarter("C", 5)}${quarter("D", 5)}${quarter("E", 5)}${quarter("F", 5)}`,
+        },
+    ]);
+
+    for (const accompaniment of [false, true]) {
+        it(`plays and asks for the piano at its own forte (${accompaniment ? "singer drawn" : "singer taken off"})`, () => {
+            return engrave(xml, accompaniment).then(({ osmd, marks }) => {
+                const listened = collectListenSteps(osmd, marks).map((step) => step.dynamicVolume);
+                expect(listened).toEqual([96, 96, 96, 96]);
+                const asked = collectMatchSteps(osmd, "right", marks).map(
+                    (step) => step.expected?.[0]?.velocity ?? null,
+                );
+                expect(asked).toHaveLength(4);
+                expect(new Set(asked).size).toBe(1);
+            });
+        });
+    }
 });

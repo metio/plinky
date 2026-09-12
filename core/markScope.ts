@@ -18,6 +18,10 @@ export type MarkScope = {
     // its part and its 1-based number within that part — or null for a part the page does
     // not draw.
     engraved: (part: string, staff: number) => number | null;
+    // Whether a part is the played instrument's. The loudness and the pedalling a
+    // performance follows are the piano's own: a singer marked pianissimo over a forte
+    // accompaniment is asking the singer to be quiet, not the piano.
+    played: (part: string) => boolean;
 };
 
 // `accompaniment` says whether the page draws the parts besides the played instrument's,
@@ -37,7 +41,12 @@ export function markScope(doc: Document, accompaniment: boolean): MarkScope {
         }
         running += stavesOf(part);
     }
+    // A score with no part to call the piano's is played whole.
+    const playedIds = new Set(
+        (piano.length > 0 ? piano : every).map((part) => part.getAttribute("id") ?? ""),
+    );
     return {
+        played: (part) => playedIds.has(part),
         engraved: (part, staff) => {
             const offset = offsets.get(part);
             return offset === undefined ? null : offset + Math.max(1, staff) - 1;

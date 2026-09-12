@@ -439,8 +439,15 @@ export function readScoreMarks(
         return NO_SCORE_MARKS;
     }
     const timeline = readTimeline(doc);
-    const directions = readDirections(timeline);
-    const onPage = notesOnPage(timeline.notes, markScope(doc, accompaniment));
+    const scope = markScope(doc, accompaniment);
+    // The dynamics and the pedalling are read from the played instrument's parts alone. The
+    // tempo is read from every part: a score shares one pulse, and an art song writes it
+    // over the top staff, which is the singer's.
+    const directions = readDirections({
+        ...timeline,
+        directions: timeline.directions.filter((one) => scope.played(one.part)),
+    });
+    const onPage = notesOnPage(timeline.notes, scope);
     return {
         slurs: slurSpans(onPage),
         pedals: directions.pedals,

@@ -22,6 +22,11 @@ too, over and over, even a singer's note that wasn't on the page. Now the other
 note sounds once while the tremolo shakes. A glissando also ends where its own part
 says, never on a note the singer slides to.
 
+**The piano follows its own dynamics in a song.** Where the singer was marked
+quieter or louder than the piano, or had a crescendo the piano didn't, Listen
+played the piano at the singer's level, and a run asked you for it too. The piano
+now keeps to the dynamics and pedalling written for it.
+
 ## 12 September 2026
 
 **Ear training answers from your number keys.** On a scale-degree question, typing 3
