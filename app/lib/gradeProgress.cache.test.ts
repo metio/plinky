@@ -7,9 +7,14 @@ import { markLearned } from "../../core/mastery";
 import { buildScore } from "../../core/musicxmlBuild";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import { memoryStore } from "../adapters/memoryStore";
+import type { Fetcher } from "../ports/fetcher";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import { createExerciseSource } from "../stores/exerciseSource";
+import { createPrefsStore } from "../stores/prefsStore";
 import { saveUserScore } from "./catalog";
+import { exerciseName } from "./exerciseNames";
 import { type CatalogSources, loadGradeCatalogue, loadGradedMastery } from "./gradeProgress";
+import { namingOf } from "./noteNames";
 
 // The assembled catalogue is cached per store, because building it walks every manifest
 // entry and parses the MusicXML of every score held on the device — and both loaders want
@@ -189,6 +194,53 @@ describe("the catalogue cache", () => {
         });
         expect(titleIn(catalogue, "study-1")).toBe("Etüde");
         expect(titleIn(catalogue, "s1")).toBe("One");
+    });
+
+    it("names a scale from the saved note naming through the real exercise source", async () => {
+        // The path a player takes: Settings saves the prefs, and the source the app wires
+        // names each scale-arpeggio row from its config with the naming those prefs ask
+        // for. A study keeps the name its composer gave it.
+        const store = memoryStore();
+        const prefs = createPrefsStore(store);
+        const manifest = [
+            {
+                id: "scale-c",
+                title: "baked title",
+                grade: 1,
+                cost: 1,
+                kind: "scale-arpeggio",
+                config: {
+                    type: "major-scale",
+                    key: "c",
+                    octaves: 1,
+                    hands: "right",
+                    inversion: 0,
+                    interval: "single",
+                },
+                tempo: 90,
+                beatsPerBar: 4,
+            },
+            { id: "study-1", title: "Etüde", composer: "Czerny", grade: 1, cost: 2, kind: "study" },
+        ];
+        const fetcher: Fetcher = async () => new Response(JSON.stringify(manifest));
+        const sources: CatalogSources = {
+            ...sourcesOver(store),
+            exercises: createExerciseSource(fetcher, (config) =>
+                exerciseName(config, namingOf(prefs.load())),
+            ),
+        };
+        const titleIn = (list: { id: string; title: string }[], id: string) =>
+            list.find((one) => one.id === id)?.title;
+
+        const lettered = titleIn(await loadGradeCatalogue(sources), "scale-c");
+        expect(lettered).toBe("C major scale");
+
+        expect(prefs.save({ ...prefs.load(), noteLabels: "solfege" })).toBe(true);
+        const catalogue = await loadGradeCatalogue(sources);
+        const sung = titleIn(catalogue, "scale-c");
+        expect(sung).not.toBe(lettered);
+        expect(sung?.toLowerCase().startsWith("do")).toBe(true);
+        expect(titleIn(catalogue, "study-1")).toBe("Etüde");
     });
 
     it("keeps the cached title when the exercise manifest cannot be read", async () => {
