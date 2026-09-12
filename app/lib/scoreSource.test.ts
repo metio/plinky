@@ -9,7 +9,7 @@ import { transposeMusicXml } from "../../core/transpose";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import { fingerKey } from "../stores/fingeringStore";
 import { annotateFingerings } from "./fingerScore";
-import { prepareScoreSource, type ScoreSourceInputs } from "./scoreSource";
+import { pageMarks, prepareScoreSource, type ScoreSourceInputs } from "./scoreSource";
 
 const note = (step: string, octave: number, beam = "") =>
     `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>1</duration><type>eighth</type>${beam}</note>`;
@@ -63,5 +63,45 @@ describe("prepareScoreSource", () => {
             saved: { [fingerKey("right", 0, 0, 0)]: 5 },
         });
         expect(read(source, "fingering")[0]?.textContent).toBe("5");
+    });
+});
+
+describe("pageMarks", () => {
+    // An art song with an arch over the piano's right hand, and the singer above it.
+    const crotchet = (step: string, octave: number, notations = "") =>
+        `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>2</duration><voice>1</voice><type>quarter</type><staff>1</staff>${notations}</note>`;
+    const SONG = `<?xml version="1.0"?><score-partwise><part-list><score-part id="P1"><part-name>Voice</part-name></score-part><score-part id="P2"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>2</divisions></attributes>${crotchet("G", 4)}${crotchet("A", 4)}</measure></part><part id="P2"><measure number="1"><attributes><divisions>2</divisions><staves>2</staves></attributes>${crotchet("C", 5, '<notations><slur number="1" type="start"/></notations>')}${crotchet("D", 5, '<notations><slur number="1" type="stop"/></notations>')}</measure></part></score-partwise>`;
+    const marksOf = (showAccompaniment: boolean) =>
+        pageMarks(domXmlCodec, { xml: SONG, transpose: 0, showAccompaniment });
+
+    it("numbers the piano's arch for the page drawn with or without the singer", () => {
+        expect(marksOf(false).slurs).toEqual([{ from: 0, to: 0.25, staff: 0 }]);
+        expect(marksOf(true).slurs).toEqual([{ from: 0, to: 0.25, staff: 1 }]);
+    });
+
+    it("puts the arch on the staff the engraver's source draws the piano's right hand on", () => {
+        for (const showAccompaniment of [false, true]) {
+            const source = domXmlCodec.parse(
+                prepareScoreSource(domXmlCodec, {
+                    ...asWritten,
+                    xml: SONG,
+                    showAccompaniment,
+                }),
+            );
+            const above = [...(source?.querySelectorAll("part") ?? [])]
+                .filter((part) => part.getAttribute("id") !== "P2")
+                .reduce(
+                    (sum, part) =>
+                        sum + Number(part.querySelector("attributes > staves")?.textContent ?? 1),
+                    0,
+                );
+            expect(marksOf(showAccompaniment).slurs[0]?.staff).toBe(above);
+        }
+    });
+
+    it("moves the key with the transposition", () => {
+        expect(
+            pageMarks(domXmlCodec, { xml: SONG, transpose: 2, showAccompaniment: false }).fifths,
+        ).toBe(2);
     });
 });

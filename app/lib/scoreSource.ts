@@ -4,6 +4,7 @@
 import { stripAccompaniment } from "../../core/accompaniment";
 import { stripBeams } from "../../core/beams";
 import { withChordSymbols } from "../../core/chordSymbols";
+import { readScoreMarks, type ScoreMarks, transposeScoreMarks } from "../../core/musicxmlMarks";
 import type { HandSpan } from "../../core/prefs";
 import type { Reduction } from "../../core/reduction";
 import { simplify } from "../../core/simplify";
@@ -55,4 +56,21 @@ export function prepareScoreSource(codec: XmlCodec, inputs: ScoreSourceInputs): 
     // the page as it will be drawn, in its key.
     const labelled = inputs.chordSymbols ? withChordSymbols(codec, reduced) : reduced;
     return inputs.showBeams ? labelled : stripBeams(codec, labelled);
+}
+
+// What the score writes — the dynamics, the arches, the pedal, the key — for the page
+// prepareScoreSource draws from the same inputs. Numbered for that page, which leaves the
+// other parts off unless the player asks for them: on an art song that makes the piano's
+// right hand staff 0.
+//
+// Read from the untransposed file, because that is what the file says; every key and
+// every pitch a mark carries is then moved to wherever the transposition put the music.
+export function pageMarks(
+    codec: XmlCodec,
+    inputs: Pick<ScoreSourceInputs, "xml" | "transpose" | "showAccompaniment">,
+): ScoreMarks {
+    return transposeScoreMarks(
+        readScoreMarks(codec.parse(inputs.xml), { accompaniment: inputs.showAccompaniment }),
+        inputs.transpose,
+    );
 }

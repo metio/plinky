@@ -26,7 +26,7 @@ import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import type { Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
-import { readScoreMarks, transposeScoreMarks } from "../../../core/musicxmlMarks";
+import { pageMarks } from "../../lib/scoreSource";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
@@ -336,21 +336,12 @@ function usePlaySessionValue({
         () => (transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose)),
         [xml, transpose, xmlCodec],
     );
-    // What the score writes, read from the file rather than off the engraver: the
-    // dynamics, the arches, the pedal, the octave lines and the key. Parsed once per piece
-    // — the parse is the cost, and every surface asking separately would pay it again.
-    //
-    // From the untransposed document, because that is what the file says; every key and
-    // every pitch a mark carries is then moved to wherever the transposition put the music.
-    // Numbered for the page the engraver draws, which leaves the other parts off unless the
-    // player asks for them — on an art song that makes the piano's right hand staff 0.
+    // What the score writes, read from the file rather than off the engraver, for the page
+    // the engraver draws. Parsed once per piece — the parse is the cost, and every surface
+    // asking separately would pay it again.
     const showAccompaniment = reading.showAccompaniment;
     const marks = useMemo(
-        () =>
-            transposeScoreMarks(
-                readScoreMarks(xmlCodec.parse(xml), { accompaniment: showAccompaniment }),
-                transpose,
-            ),
+        () => pageMarks(xmlCodec, { xml, transpose, showAccompaniment }),
         [xml, transpose, xmlCodec, showAccompaniment],
     );
 
