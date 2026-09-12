@@ -26,7 +26,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**Grades line up with the teaching books again.** Each grade is measured against\nwell-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions\nand more. Once chords were fingered the right way up, those books measured a little\ndifferently, so the grades were re-cut to match them. Around four hundred pieces move\nup a grade and a few move down; nothing about how you play them changes.",
+                body: "**Grades line up with the teaching books.** Each grade is measured against\nwell-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions\nand more. With chords now fingered by their pitches, every piece was measured again\nand the grades were re-cut against those books. About five hundred pieces sit at a new\ngrade, most of them one step up and some one step down; nothing about how you play\nthem changes.",
                 twip: true,
             },
             {
@@ -78,7 +78,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**Finger numbers sit the right way up on every chord.** Some scores write a chord's\nnotes from the top down, and on those the suggested fingering came out upside down:\nthe thumb printed on the top note of a right-hand chord and the little finger on the\nbottom, in the score and in the finger-position editor. A chord is now fingered by its\npitches, whichever order they were written in. About a hundred pieces sit at a new\ngrade because of it — most by one step — along with pieces printed as a separate line\nfor each hand, which are now graded on both hands rather than one.",
+                body: "**Finger numbers sit the right way up on every chord.** Some scores write a chord's\nnotes from the top down, and on those the suggested fingering came out upside down:\nthe thumb printed on the top note of a right-hand chord and the little finger on the\nbottom, in the score and in the finger-position editor. A chord is now fingered by its\npitches, whichever order they were written in.",
                 twip: true,
             },
         ],

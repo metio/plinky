@@ -26,11 +26,12 @@ seven or twelve beats to the bar wrote its bars out that way, while the Time men
 read 2/4 — and picking 2/4 from it did nothing. The menu now lists the piece's own
 time beside the usual four, and choosing any of them changes it.
 
-**Grades line up with the teaching books again.** Each grade is measured against
+**Grades line up with the teaching books.** Each grade is measured against
 well-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions
-and more. Once chords were fingered the right way up, those books measured a little
-differently, so the grades were re-cut to match them. Around four hundred pieces move
-up a grade and a few move down; nothing about how you play them changes.
+and more. With chords now fingered by their pitches, every piece was measured again
+and the grades were re-cut against those books. About five hundred pieces sit at a new
+grade, most of them one step up and some one step down; nothing about how you play
+them changes.
 
 **A missing page speaks your language.** Following a stale or mistyped link, or
 landing on a page that stopped working, used to show a page in English whatever
@@ -98,9 +99,7 @@ out too high. The test now always sets each drill in full.
 notes from the top down, and on those the suggested fingering came out upside down:
 the thumb printed on the top note of a right-hand chord and the little finger on the
 bottom, in the score and in the finger-position editor. A chord is now fingered by its
-pitches, whichever order they were written in. About a hundred pieces sit at a new
-grade because of it — most by one step — along with pieces printed as a separate line
-for each hand, which are now graded on both hands rather than one.
+pitches, whichever order they were written in.
 
 ## 12 September 2026
 
