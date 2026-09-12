@@ -27,6 +27,9 @@ function routerAt(initial: string) {
                     <Route path="play/:scoreId" element={<Destination />} />
                     <Route path="music" element={<Destination />} />
                     <Route path="piano" element={<Destination />} />
+                    <Route path="compose" element={<Destination />} />
+                    <Route path="glossary" element={<Destination />} />
+                    <Route path="glossary/:term" element={<Destination />} />
                     <Route path="theory" element={<Destination />} />
                     <Route path="theory/:lesson" element={<Destination />} />
                 </Route>
@@ -91,6 +94,26 @@ describe("LocaleLayout", () => {
         const dest = (await screen.findByTestId("dest")).textContent ?? "";
         expect(dest).toMatch(/^\/[^/]+\/theory\/major\/$/);
         expect(isLocale(dest.split("/")[1])).toBe(true);
+    });
+
+    it("keeps a bare page's sub-path whole when it is itself a page name", async () => {
+        // "/glossary/piano/" matches ":locale/piano" with a locale of "glossary", so it
+        // reaches the layout rather than the catch-all. "glossary" is a page, not a
+        // mistyped language, and the reader asked for the glossary's mark "piano" — not
+        // the free-play keyboard.
+        for (const path of ["/glossary/piano/", "/glossary/compose/", "/glossary/piano"]) {
+            renderWithServices(routerAt(path));
+            const dest = (await screen.findByTestId("dest")).textContent ?? "";
+            expect(dest).toMatch(new RegExp(`^/[^/]+${path.replace(/\/?$/, "/")}$`));
+            expect(isLocale(dest.split("/")[1])).toBe(true);
+            cleanup();
+        }
+    });
+
+    it("keeps the query and the fragment on a bare page's sub-path", async () => {
+        renderWithServices(routerAt("/glossary/piano/?x=1#top"));
+        const dest = (await screen.findByTestId("dest")).textContent ?? "";
+        expect(dest).toMatch(/^\/[^/]+\/glossary\/piano\/\?x=1#top$/);
     });
 
     it("drops an unknown first segment that has a page after it, slash and all", async () => {

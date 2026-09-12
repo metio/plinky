@@ -22,6 +22,10 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
+                body: "**A glossary link without a language opens the glossary.** An address like\nplinky.fun/glossary/piano/, typed by hand or copied without its language, opened\nthe free-play keyboard instead of the entry for the piano mark. It now opens the\nentry, in your language.",
+                twip: true,
+            },
+            {
                 body: "**Slurs in songs land on the right hand again.** In a song for voice and piano, the\nsinger's line is left off the page, and every slur the piano's music carries was\nmoving one staff down: the tune under a slur played detached, while a staccato bass\nunder it was held long, in Listen and in what a run asked of you. Each slur now\nstays on the staff it is drawn on, with the singer on the page or off it.",
                 twip: true,
             },

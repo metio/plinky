@@ -7,6 +7,7 @@ import { BottomNav } from "../components/ui/navBar";
 import { SiteFooter } from "../components/ui/siteFooter";
 import { isLocale } from "../paraglide/runtime.js";
 import { localizedHref } from "../components/ui/href";
+import { unlocalizedPath } from "../../core/pageNames";
 
 // The parent of every localized page. The active locale comes from the URL
 // prefix (the `url` strategy reads it directly), so this validates the segment
@@ -22,21 +23,10 @@ export default function LocaleLayout() {
         }
     }, [valid, locale]);
 
-    // A first segment that is not a language can be two different mistakes, and which one
-    // it is can be read off whether anything follows it.
-    //
-    // "/zz/play/abc" fills the language slot with something that is not a language — a
-    // typo, a stale link, a bot probing paths — and the page after it is recoverable: drop
-    // the bad segment, keep the rest, localise that.
-    //
-    // "/music" is not a mistyped language at all. It is a page name that arrived with no
-    // language in front of it, from a hand-typed address or an old link, and dropping it
-    // would answer a request for the library with the home page. So a lone segment is kept
-    // and localised, with or without the trailing slash every canonical address carries —
-    // "/music/" is the spelling a player copies out of the address bar. The cost is that a
-    // bare "/zz" lands on the not-found page instead of the home page: nothing at runtime
-    // can tell "/music" from "/zz", and of the two readings the one that serves a real
-    // address is worth more than the one that tidies away a typo.
+    // A first segment that is not a language is either a mistyped one — "/zz/play/abc",
+    // whose page survives the bad segment being dropped — or a page name that arrived with
+    // no language in front of it — "/music/", "/glossary/piano/" — which is kept whole.
+    // unlocalizedPath makes that call from the page names the route table declares.
     //
     // localizedHref picks the language the way the bare "/" does — the one last chosen,
     // else the browser's, else English. During prerender there is no navigator to resolve
@@ -46,11 +36,11 @@ export default function LocaleLayout() {
         if (typeof window === "undefined") {
             return null;
         }
-        const rest = pathname.replace(/^\/[^/]+/, "");
-        const lone = rest === "" || rest === "/";
         // The query and the fragment travel with the page: a piece opened by a link that
         // asks for one hand, or a help page opened at a heading, keeps the ask.
-        return <Navigate to={localizedHref(`${lone ? pathname : rest}${search}${hash}`)} replace />;
+        return (
+            <Navigate to={localizedHref(`${unlocalizedPath(pathname)}${search}${hash}`)} replace />
+        );
     }
 
     return (

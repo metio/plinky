@@ -19,6 +19,11 @@ same way to report the problem.
 announced the logo's link home in English on every page, in the middle of a
 French or Japanese one. It now reads in the language of the page.
 
+**A glossary link without a language opens the glossary.** An address like
+plinky.fun/glossary/piano/, typed by hand or copied without its language, opened
+the free-play keyboard instead of the entry for the piano mark. It now opens the
+entry, in your language.
+
 **Slurs in songs land on the right hand again.** In a song for voice and piano, the
 singer's line is left off the page, and every slur the piano's music carries was
 moving one staff down: the tune under a slur played detached, while a staccato bass
