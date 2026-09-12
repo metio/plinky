@@ -7,11 +7,90 @@ import {
     fingeringCost,
     fingerPositions,
     fingerSteps,
+    HAND_REACH,
     positionsCost,
     moveEase,
     MOVE_EASE_FLOOR,
     MOVE_URGENT_SECONDS,
+    reachingCost,
 } from "./fingering";
+
+// One leap, as the default hand model prices it: what the notes a hand gives away cost.
+const LEAP = 7;
+
+describe("a position wider than one hand", () => {
+    // Mozart K.331, Variation 4: the right staff writes the right hand's thirds with the
+    // left hand's crossing thirds an octave above them, between repeated E4s.
+    const crossing = [[64], [69, 73, 81, 85], [64], [71, 74, 83, 86], [64]];
+    const free = crossing.map(() => []);
+
+    it("prices a sequence within reach exactly as the one-hand search does", () => {
+        const within = [[60, 64, 67], [72], [55, 59, 62, 67], [48]];
+        for (const hand of ["right", "left"] as const) {
+            expect(reachingCost(within, hand)).toBe(
+                positionsCost(within, fingerPositions(within, hand), hand),
+            );
+        }
+    });
+
+    it("prices an octave, the widest a hand holds, as a chord", () => {
+        expect(reachingCost([[60, 72]], "right")).toBe(
+            positionsCost([[60, 72]], fingerPositions([[60, 72]], "right"), "right"),
+        );
+        expect(72 - 60).toBe(HAND_REACH);
+    });
+
+    it("hands what the right hand cannot reach to a free left hand, for one leap", () => {
+        // C2 and C6 are four octaves apart and both white keys: one of them is held for
+        // nothing, the other is the crossing.
+        expect(reachingCost([[36, 84]], "right", undefined, [[]])).toBe(LEAP);
+    });
+
+    it("keeps a chord no hand is free to share whole, priced as the one-hand search does", () => {
+        const oneHand = (chord: number[]) =>
+            positionsCost([chord], fingerPositions([chord], "right"), "right");
+        // The other hand unknown, and the other hand busy too far away to help.
+        expect(reachingCost([[36, 84]], "right")).toBe(oneHand([36, 84]));
+        expect(reachingCost([[36, 84]], "right", undefined, [[60, 64]])).toBe(oneHand([36, 84]));
+        expect(reachingCost([[60, 74]], "right", undefined, [[57]])).toBe(oneHand([60, 74]));
+    });
+
+    it("never shares a chord when keeping it whole is cheaper", () => {
+        // A minor ninth is past an octave, and still costs less stretched than handed over.
+        const ninth = positionsCost([[60, 73]], fingerPositions([[60, 73]], "right"), "right");
+        expect(ninth).toBeLessThan(LEAP);
+        expect(reachingCost([[60, 73]], "right", undefined, [[]])).toBe(ninth);
+    });
+
+    it("lets a busy other hand take the note when it can reach it from where it is", () => {
+        // The left hand strikes E2; C2 fits beside it, so it takes C2 and the right keeps C6.
+        expect(reachingCost([[36, 84]], "right", undefined, [[40]])).toBe(LEAP);
+    });
+
+    it("leads the move out of the position from the notes the hand kept", () => {
+        const shared = reachingCost(crossing, "right", undefined, free);
+        // Everything costs at least what the kept thirds alone cost, and at most that plus
+        // one crossing for each of the two wide positions.
+        const kept = [[64], [69, 73], [64], [71, 74], [64]];
+        const thirds = reachingCost(kept, "right");
+        expect(shared).toBeGreaterThan(thirds);
+        expect(shared).toBeLessThanOrEqual(thirds + 2 * LEAP);
+        // Fingered as one impossible hand, the same notes cost several times as much.
+        expect(
+            positionsCost(crossing, fingerPositions(crossing, "right"), "right"),
+        ).toBeGreaterThan(3 * shared);
+    });
+
+    it("charges a hand-over one leap however long the hands have", () => {
+        expect(reachingCost([[36, 84]], "right", [0.1], [[]])).toBe(LEAP);
+        expect(reachingCost([[36, 84]], "right", [3], [[]])).toBe(LEAP);
+    });
+
+    it("costs nothing for an empty sequence and finitely around an empty position", () => {
+        expect(reachingCost([], "right")).toBe(0);
+        expect(Number.isFinite(reachingCost([[60], [], [36, 84]], "left"))).toBe(true);
+    });
+});
 
 describe("a chord written top-down", () => {
     it("puts the right thumb on the bottom note, whatever order the chord was written in", () => {

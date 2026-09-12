@@ -11,6 +11,7 @@ import {
     gradeOf,
     MAX_GRADE,
     measureScore,
+    otherHandAt,
     paceCost,
     parsePositions,
     pieceBoundaries,
@@ -507,6 +508,91 @@ describe("parsePositions reads how long the hand has between positions", () => {
     });
 });
 
+describe("parsePositions reads where each position sits in time", () => {
+    const timed = (notes: string) =>
+        `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">` +
+        `<attributes><divisions>2</divisions><staves>2</staves></attributes>${notes}` +
+        `</measure></part></score-partwise>`;
+
+    it("reads each position's beat, the hands side by side", () => {
+        const { onsets } = parsePositions(
+            domXmlCodec,
+            timed(
+                note("C", 5, 1) +
+                    note("D", 5, 1) +
+                    `<backup><duration>4</duration></backup>` +
+                    note("C", 3, 2) +
+                    note("E", 3, 2, true),
+            ),
+        );
+        expect(onsets.right).toEqual([0, 1]);
+        // The bass chord rewinds to the start of the bar: it sounds with C5.
+        expect(onsets.left).toEqual([0]);
+    });
+
+    it("starts every part at the beginning", () => {
+        const twoParts =
+            `<?xml version="1.0"?><score-partwise>` +
+            `<part id="P1"><measure number="1"><attributes><divisions>2</divisions></attributes>` +
+            `${note("C", 5)}${note("D", 5)}</measure></part>` +
+            `<part id="P2"><measure number="1"><attributes><divisions>2</divisions></attributes>` +
+            `${note("C", 3)}${note("D", 3)}</measure></part></score-partwise>`;
+        const { right, left, onsets } = parsePositions(domXmlCodec, twoParts);
+        expect(right.length + left.length).toBe(4);
+        expect(onsets.right).toEqual([0, 1]);
+        expect(onsets.left).toEqual([0, 1]);
+    });
+});
+
+describe("otherHandAt", () => {
+    it("finds what the other hand strikes at each moment, and nothing when it rests", () => {
+        const struck = otherHandAt([0, 1, 2], {
+            positions: [[48, 55], [43], [36]],
+            onsets: [0, 0, 3],
+        });
+        expect(struck).toEqual([[48, 55, 43], [], []]);
+    });
+
+    it("hears a triplet's third beat as the beat", () => {
+        const third = 1 / 3;
+        expect(otherHandAt([third + third + third], { positions: [[40]], onsets: [1] })).toEqual([
+            [40],
+        ]);
+    });
+});
+
+describe("a staff that writes more than one hand can span", () => {
+    // Mozart K.331, Variation 4, in miniature: the right staff alternates E4 with its own
+    // thirds plus the crossing thirds an octave up. Whether the left hand is free to take
+    // them decides what the variation costs.
+    const crossing = (bass: string) =>
+        `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">` +
+        `<attributes><divisions>1</divisions><staves>2</staves></attributes>` +
+        [0, 1, 2, 3]
+            .map(
+                () =>
+                    note("E", 4, 1) +
+                    note("A", 4, 1) +
+                    note("C", 5, 1, true) +
+                    note("A", 5, 1, true) +
+                    note("C", 6, 1, true),
+            )
+            .join("")
+            .replaceAll("<duration>2</duration>", "<duration>1</duration>") +
+        `<backup><duration>8</duration></backup>${bass}</measure></part></score-partwise>`;
+    // The same four bass notes either way, two beats each: on the beats with E4, or pushed
+    // a beat later onto the wide positions. Nothing but the coincidence differs.
+    const bass = [0, 1, 2, 3].map(() => note("A", 2, 2)).join("");
+    const withE = bass;
+    const withChords = `<forward><duration>1</duration></forward>${bass}`;
+
+    it("costs less when the left hand is free to take the crossing notes", () => {
+        expect(rawDifficulty(domXmlCodec, crossing(withE))).toBeLessThan(
+            rawDifficulty(domXmlCodec, crossing(withChords)),
+        );
+    });
+});
+
 describe("the difficulty terms a fingering cost cannot see", () => {
     it("charges a wider key signature more", () => {
         const inKey = (fifths: number) =>
@@ -533,6 +619,7 @@ describe("the difficulty terms a fingering cost cannot see", () => {
             right: Array.from({ length: count }, () => [60]),
             left: [],
             gaps: { right: [], left: [] },
+            onsets: { right: [], left: [] },
         });
         // Nothing for a score at or under the beginner floor.
         expect(readLength(hands(64))).toBe(0);
