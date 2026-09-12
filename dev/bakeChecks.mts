@@ -11,6 +11,7 @@
 // catalogue, and grades derived from stale ones are wrong in a way nothing downstream sees.
 
 import { readFile } from "node:fs/promises";
+import { staffCount } from "../core/accompaniment.ts";
 import { encodeIncipit, readIncipit } from "../core/incipit.ts";
 import { rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
@@ -61,8 +62,7 @@ const SONG_PROBES = 24;
 // "1,2" for a song over its piano, "1,1" for a piano written as two parts. Read off the
 // text, since parsing every score in the catalogue to choose a handful of probes would
 // cost what the probes exist to save. It mirrors stavesPerPart in core/accompaniment.ts,
-// which the test holds it to; it only chooses which songs to probe, so a misreading
-// could make the spread less varied but never a verdict wrong.
+// which the test holds it to.
 export function layoutOf(xml: string): string {
     // A score written measure by measure nests its parts inside each measure, where the
     // model reads no part at all.
@@ -74,22 +74,17 @@ export function layoutOf(xml: string): string {
     for (let found = opening.exec(xml); found !== null; found = opening.exec(xml)) {
         const end = xml.indexOf("</part>", found.index);
         const body = xml.slice(found.index, end === -1 ? undefined : end);
-        const stated = /<staves>\s*(\d+)\s*<\/staves>/.exec(body)?.[1];
-        const count = stated === undefined ? Number.NaN : Number.parseInt(stated, 10);
-        counts.push(Number.isInteger(count) && count > 0 ? count : 1);
+        counts.push(staffCount(/<staves>\s*(\d+)\s*<\/staves>/.exec(body)?.[1]));
         opening.lastIndex = end === -1 ? xml.length : end;
     }
     return counts.join(",");
 }
 
 // Which rows to re-derive, by index, given each row's part layout: a spread across the
-// catalogue, and then the first row of every layout the spread did not reach.
-//
-// A spread alone assumes a model change moves essentially every row. Many do; some are
-// confined to one way of writing a score. Reading two single-staff parts as both hands
-// moved about one row in a hundred, which a spread of two dozen misses three times in
-// four — and the manifest stayed stale for days behind a green check. Each layout the
-// catalogue holds is somewhere a change can be confined to, so each gets a probe.
+// catalogue, and then the first row of every layout the spread did not reach. A model
+// change can be confined to one way of writing a score, so each layout the catalogue holds
+// gets a probe beside the spread. The layouts only choose which rows are probed, so a
+// misread one can make the spread less varied but never a verdict wrong.
 export function probeIndices(layouts: readonly string[]): number[] {
     const chosen = new Set<number>();
     const step = Math.max(1, Math.floor(layouts.length / SONG_PROBES));
@@ -134,27 +129,30 @@ export function currentMeasure(xml: string): { cost: number; incipit: string | u
 // Re-derives the probed songs and names the first whose stored values no longer match.
 // Null when the manifest is current. Every score is read, to learn its layout, so a row
 // naming a score that is not shipped or cannot be read is named wherever it stands: a row
-// the app cannot open is a problem, not a probe to skip.
+// the app cannot open is a problem, not a probe to skip. Only its layout is kept from that
+// pass, and a probed score is read again to be measured, so the check holds one score at a
+// time rather than the whole catalogue's text.
 export async function staleSong(
     songs: ProbeSong[],
     read: (song: ProbeSong) => Promise<ShippedScore> = shippedScore,
     measure: (xml: string) => { cost: number; incipit: string | undefined } = currentMeasure,
 ): Promise<string | null> {
-    const scores: string[] = [];
+    const layouts: string[] = [];
     for (const song of songs) {
         const score = await read(song);
-        const named = song.title ?? song.id;
         if ("problem" in score) {
-            return score.problem === "missing"
-                ? `${named} (${song.id}) has no .mxl under public/songs — the manifest names a score that is not shipped`
-                : `${named} (${song.id}) has an .mxl that cannot be read`;
+            return unopenable(song, score.problem);
         }
-        scores.push(score.xml);
+        layouts.push(layoutOf(score.xml));
     }
-    for (const index of probeIndices(scores.map(layoutOf))) {
+    for (const index of probeIndices(layouts)) {
         const song = songs[index]!;
+        const score = await read(song);
+        if ("problem" in score) {
+            return unopenable(song, score.problem);
+        }
         const named = song.title ?? song.id;
-        const fresh = measure(scores[index]!);
+        const fresh = measure(score.xml);
         if (fresh.cost !== song.cost) {
             return `${named} is stored at cost ${song.cost} but measures ${fresh.cost} — run \`npm run songs:cost\``;
         }
@@ -164,4 +162,11 @@ export async function staleSong(
         }
     }
     return null;
+}
+
+function unopenable(song: ProbeSong, problem: "missing" | "unreadable"): string {
+    const named = song.title ?? song.id;
+    return problem === "missing"
+        ? `${named} (${song.id}) has no .mxl under public/songs — the manifest names a score that is not shipped`
+        : `${named} (${song.id}) has an .mxl that cannot be read`;
 }

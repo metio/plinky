@@ -20,9 +20,13 @@ export function stavesPerPart(doc: Document): number[] {
     return partElements(doc).map(stavesOf);
 }
 
-// How many staves one <part> is written on: its declared count, or one.
+// How many staves one <part> is written on.
 export function stavesOf(part: Element): number {
-    const stated = part.querySelector("attributes > staves")?.textContent?.trim();
+    return staffCount(part.querySelector("attributes > staves")?.textContent?.trim());
+}
+
+// A part's staff count from the text of its <staves>: the declared count, or one.
+export function staffCount(stated: string | undefined): number {
     const count = stated === undefined ? Number.NaN : Number.parseInt(stated, 10);
     return Number.isInteger(count) && count > 0 ? count : 1;
 }
