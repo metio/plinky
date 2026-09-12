@@ -239,6 +239,57 @@ describe("readGlissandos", () => {
         ]);
     });
 
+    // A chord that ends one sweep on one of its notes and sets off on the next from another:
+    // up from C5 to the G5 of a G5-E5 chord, then from that chord's E5 on up to A5.
+    it("passes a chain from one note of a chord to another, in either file order", () => {
+        for (const number of [undefined, "1"]) {
+            const landing = marked(0.25, 79, stop(number));
+            const leaving = marked(0.25, 76, start(number));
+            for (const chord of [
+                [landing, leaving],
+                [leaving, landing],
+            ]) {
+                expect(
+                    readGlissandos([
+                        marked(0, 72, start(number)),
+                        ...chord,
+                        marked(0.5, 81, stop(number)),
+                    ]),
+                ).toEqual([
+                    { from: 0, to: 0.5, arrivesAt: 79, pitch: 72 },
+                    { from: 0.25, to: 0.75, arrivesAt: 81, pitch: 76 },
+                ]);
+            }
+        }
+    });
+
+    it("keeps a chord's two numbered sweeps apart, in either file order", () => {
+        const landing = marked(0.25, 79, stop("1"));
+        const leaving = marked(0.25, 76, start("2"));
+        for (const chord of [
+            [landing, leaving],
+            [leaving, landing],
+        ]) {
+            expect(
+                readGlissandos([marked(0, 72, start("1")), ...chord, marked(0.5, 81, stop("2"))]),
+            ).toEqual([
+                { from: 0, to: 0.5, arrivesAt: 79, pitch: 72 },
+                { from: 0.25, to: 0.75, arrivesAt: 81, pitch: 76 },
+            ]);
+        }
+    });
+
+    it("never closes a sweep at the onset another note of it starts from", () => {
+        // The stop on the chord's other note reaches the chord before anything is open.
+        expect(
+            readGlissandos([
+                marked(0, 72, stop()),
+                marked(0, 76, start()),
+                marked(0.25, 79, stop()),
+            ]),
+        ).toEqual([{ from: 0, to: 0.5, arrivesAt: 79, pitch: 76 }]);
+    });
+
     it("never closes a sweep on the note it starts from", () => {
         // Nothing is open when the first note is reached, so its stop closes nothing and its
         // start opens the one sweep the file has.

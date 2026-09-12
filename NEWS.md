@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 12 September 2026 — night
+
+**A slide that lands on a chord goes on from it.** Where a slide arrives on one note
+of a chord and the next sets off from another note of the same chord, Listen could
+drop the second slide and simply strike its notes. Both slides now sound, one
+arriving and the next leaving, whichever way round the chord is written.
+
 ## 12 September 2026 — evening
 
 **Two slides at once each land on their own note.** Where both hands glide across

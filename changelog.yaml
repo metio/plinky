@@ -2,6 +2,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-09-12
+  label: night
+  entries:
+    - |-
+      **A slide that lands on a chord goes on from it.** Where a slide arrives on one note
+      of a chord and the next sets off from another note of the same chord, Listen could
+      drop the second slide and simply strike its notes. Both slides now sound, one
+      arriving and the next leaving, whichever way round the chord is written.
+
+- date: 2026-09-12
   label: evening
   entries:
     - |-

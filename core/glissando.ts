@@ -106,37 +106,57 @@ export function readGlissandos(
         // gliding together — so a stop closes the sweep of its own number. Absent, it is
         // "1", as the format defaults it. Staff is no key: a sweep may cross the staves.
         //
-        // A note in a chained sweep carries a stop and a start: its stops are taken first,
-        // whatever order the file writes them in, so the line arriving here closes before
-        // the next one sets off from the same note. Taken the other way round, a start of
-        // the same number would wait behind the sweep still open and the chain would read
-        // as one line from its first note to its last.
+        // A position in a chained sweep carries a stop and a start, on one note or on two
+        // notes of a chord: every stop at an onset is taken before any start there, whatever
+        // order the file writes the notes and their marks in, so the line arriving closes
+        // before the next one sets off — from the same note or from another in the chord.
+        // Taken the other way round, a start of the same number would wait behind the sweep
+        // still open and the chain would read as one line from its first note to its last.
         marks: { glissandos: readonly { type: "start" | "stop"; number?: string }[] };
     }[],
 ): GlissandoSpan[] {
     const spans: GlissandoSpan[] = [];
     const open = new Map<string, { whole: number; pitch: number }>();
-    for (const note of notes) {
-        const midi = note.midi;
-        if (midi === null) {
-            continue;
+    const keyOf = (mark: { number?: string }, part: string | undefined) =>
+        `${mark.number ?? "1"}:${part ?? ""}`;
+    // The notes arrive in onset order, as the timeline gives them, so one onset's notes are
+    // a run of neighbours.
+    for (let first = 0; first < notes.length; ) {
+        let end = first;
+        while (end < notes.length && notes[end]?.whole === notes[first]?.whole) {
+            end++;
         }
-        const keyOf = (mark: { number?: string }) => `${mark.number ?? "1"}:${note.part ?? ""}`;
-        for (const mark of note.marks.glissandos) {
-            const opened = open.get(keyOf(mark));
-            if (mark.type === "stop" && opened && note.whole > opened.whole) {
-                spans.push({
-                    from: opened.whole,
-                    to: note.whole + note.wholes,
-                    arrivesAt: midi,
-                    pitch: opened.pitch,
-                });
-                open.delete(keyOf(mark));
+        const onset = notes.slice(first, end);
+        first = end;
+        for (const note of onset) {
+            const midi = note.midi;
+            if (midi === null) {
+                continue;
+            }
+            for (const mark of note.marks.glissandos) {
+                const key = keyOf(mark, note.part);
+                const opened = open.get(key);
+                if (mark.type === "stop" && opened && note.whole > opened.whole) {
+                    spans.push({
+                        from: opened.whole,
+                        to: note.whole + note.wholes,
+                        arrivesAt: midi,
+                        pitch: opened.pitch,
+                    });
+                    open.delete(key);
+                }
             }
         }
-        for (const mark of note.marks.glissandos) {
-            if (mark.type === "start" && !open.has(keyOf(mark))) {
-                open.set(keyOf(mark), { whole: note.whole, pitch: midi });
+        for (const note of onset) {
+            const midi = note.midi;
+            if (midi === null) {
+                continue;
+            }
+            for (const mark of note.marks.glissandos) {
+                const key = keyOf(mark, note.part);
+                if (mark.type === "start" && !open.has(key)) {
+                    open.set(key, { whole: note.whole, pitch: midi });
+                }
             }
         }
     }
