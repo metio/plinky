@@ -76,6 +76,7 @@ import { useTempoControls } from "../../hooks/useTempoControls";
 import { cursorOrdinal, cursorWhole, seekToBar, seekToOrdinal } from "../../lib/scoreCursor";
 import { foundColor } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
+import { followRedraw } from "./followRedraw";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
 import { TEMPO_MIN } from "../../../core/playback";
@@ -428,15 +429,8 @@ function usePlaySessionValue({
                 }
             }
         },
-        // The in-place fingering redraw rebuilt the noteheads mid-run: re-apply the ear-mode
-        // conceal so a hidden run's blanked answers aren't exposed by the fresh render, and
-        // hand the transports their lit notes' fresh noteheads.
-        onFingeringRedraw: (remap) => {
-            hidden.reconceal();
-            vanishing.rearm();
-            listenPlayback.retarget(remap);
-            keepUp.retarget(remap);
-        },
+        onFingeringRedraw: (remap) =>
+            followRedraw({ hidden, vanishing, listenPlayback, keepUp }, remap),
     });
     const {
         getOsmd,
