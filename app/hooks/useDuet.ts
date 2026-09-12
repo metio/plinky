@@ -55,6 +55,9 @@ export function useDuet({
     // Every note the duet strikes goes out under this, so its stop can take back exactly
     // the other hand's notes and never the ones the player is sounding.
     const [owner] = useState<StrikeOwner>(() => Symbol("duet"));
+    // Through its members, not the object: stop is what the unmount effect runs, and a
+    // synth rebuilt around a new preference must not read as the surface leaving.
+    const { playNote, silenceStrikes } = synth;
     // Read live inside the callbacks so a mid-render toggle or hand change takes
     // effect on the next primed run without re-creating them.
     const enabledRef = useLatest(enabled);
@@ -73,8 +76,8 @@ export function useDuet({
     // and the notes already sounding have to go.
     const stop = useCallback(() => {
         cancel();
-        synth.silenceStrikes(owner);
-    }, [cancel, synth, owner]);
+        silenceStrikes(owner);
+    }, [cancel, silenceStrikes, owner]);
 
     const prime = useCallback(() => {
         stop();
@@ -118,7 +121,7 @@ export function useDuet({
             cancel();
             for (const voice of accompanimentForGap(gapsRef.current[index] ?? [], from, bpm)) {
                 const strike = () =>
-                    synth.playNote(voice.pitch, { duration: voice.durationSec, owner });
+                    playNote(voice.pitch, { duration: voice.durationSec, owner });
                 if (voice.delayMs <= 0) {
                     strike();
                     continue;
@@ -126,7 +129,7 @@ export function useDuet({
                 pendingRef.current.push(scheduler.after(voice.delayMs, strike));
             }
         },
-        [cancel, synth, owner, scheduler],
+        [cancel, playNote, owner, scheduler],
     );
 
     // Turning the duet off, or leaving the surface, stops it like any other interruption.

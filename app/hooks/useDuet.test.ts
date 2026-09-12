@@ -224,6 +224,18 @@ describe("stopping the duet", () => {
         expect(silenceStrikes).toHaveBeenCalledWith(owner);
     });
 
+    it("plays on through a re-render with a rebuilt synth", () => {
+        // setup() hands the hook a fresh synth object on every render, as a surface does
+        // when a preference rebuilds it: only the surface leaving is a stop.
+        const { result, silenceStrikes, pendingCount, rerender } = setup();
+        result.current.prime();
+        result.current.onCleared(0, 120);
+        silenceStrikes.mockClear();
+        rerender();
+        expect(pendingCount()).toBe(1);
+        expect(silenceStrikes).not.toHaveBeenCalled();
+    });
+
     it("stops like any other interruption when it is turned off mid-run", () => {
         const playNote = vi.fn();
         const silenceStrikes = vi.fn();
