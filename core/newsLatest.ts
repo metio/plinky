@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "night",
         entries: [
             {
+                body: "**A chord written for both hands is graded the way you play it.** Where one staff\nholds more notes than a hand can span, like the crossing thirds in Mozart's A major\nsonata or the tenor and bass of a hymn written on one line, the grade read them as a\nsingle impossible stretch. When your other hand is free to take those notes, the grade\nnow counts them as shared between your hands. Seventy-nine pieces sit a grade or two\neasier for it, and none became harder.",
+                twip: true,
+            },
+            {
                 body: "**A slide that lands on a chord goes on from it.** Where a slide arrives on one note\nof a chord and the next sets off from another note of the same chord, Listen could\ndrop the second slide and simply strike its notes. Both slides now sound, one\narriving and the next leaving, whichever way round the chord is written.",
                 twip: true,
             },
