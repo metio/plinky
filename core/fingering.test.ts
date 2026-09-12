@@ -13,6 +13,36 @@ import {
     MOVE_URGENT_SECONDS,
 } from "./fingering";
 
+describe("a chord written top-down", () => {
+    it("puts the right thumb on the bottom note, whatever order the chord was written in", () => {
+        // C-E-G stored as G, E, C: the fingers come back aligned to the written order.
+        const [written] = fingerPositions([[67, 64, 60]], "right");
+        const [ascending] = fingerPositions([[60, 64, 67]], "right");
+        expect(written).toEqual([...ascending!].reverse());
+        expect(written?.[2]).toBe(1);
+    });
+
+    it("puts the left thumb on the top note, whatever order the chord was written in", () => {
+        // G, C, E as written; C, E, G read bottom-up.
+        const [written] = fingerPositions([[55, 48, 52]], "left");
+        const [ascending] = fingerPositions([[48, 52, 55]], "left");
+        expect(written).toEqual([ascending![2], ascending![0], ascending![1]]);
+        expect(written?.[0]).toBe(1);
+    });
+
+    it("costs a chord the same whichever way up it was written", () => {
+        expect(positionsCost([[67, 64, 60]], [[5, 3, 1]], "right")).toBe(
+            positionsCost([[60, 64, 67]], [[1, 3, 5]], "right"),
+        );
+        // The movement between positions is led by the top note, wherever it is written.
+        const down = [[67, 64, 60], [72]];
+        const up = [[60, 64, 67], [72]];
+        expect(positionsCost(down, fingerPositions(down, "right"), "right")).toBe(
+            positionsCost(up, fingerPositions(up, "right"), "right"),
+        );
+    });
+});
+
 describe("fingerPositions", () => {
     it("matches the single-line chooser when every position is one note", () => {
         const line = [60, 62, 64, 65, 67];

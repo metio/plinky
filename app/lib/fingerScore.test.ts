@@ -63,6 +63,25 @@ describe("annotateFingerings", () => {
         expect(doc.querySelectorAll("part#P fingering")).toHaveLength(2);
     });
 
+    it("prints each finger on its own note in a chord written top-down", () => {
+        // MusicXML does not require a chord's notes to run bottom-up. Written G, E, C, the
+        // thumb still belongs on the C.
+        const chord = (steps: string[]) =>
+            steps
+                .map((step, at) =>
+                    note(step, 4).replace("<note>", at === 0 ? "<note>" : "<note><chord/>"),
+                )
+                .join("");
+        const down = fingerings(
+            annotateFingerings(domXmlCodec, score(chord(["G", "E", "C"])), noSpan),
+        );
+        const up = fingerings(
+            annotateFingerings(domXmlCodec, score(chord(["C", "E", "G"])), noSpan),
+        );
+        expect(down).toEqual([...up].reverse());
+        expect(down[2]).toBe("1");
+    });
+
     it("skips rests and leaves malformed XML untouched", () => {
         const withRest = score(`${note("C", 4)}<note><rest/><duration>2</duration></note>`);
         expect(fingerings(annotateFingerings(domXmlCodec, withRest, noSpan))).toHaveLength(1);

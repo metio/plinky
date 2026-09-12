@@ -282,8 +282,40 @@ function moveCost(
     return transitionCost(from[a]!, fromFingers[a]!, to[b]!, toFingers[b]!, hand, spread, leap);
 }
 
+// Where each note of a position sits once it is read bottom-up: `order[k]` is the index,
+// as written, of its k-th lowest pitch. Null when it already runs bottom-up, which is how
+// nearly every score writes its chords, so the common case copies nothing.
+//
+// MusicXML does not require a chord's notes to run bottom-up, and the order they arrive
+// in is no fact about the hand. Everything below reads a position ascending — the finger
+// tuples, the spread between neighbours, the leading voice — so the two exported entry
+// points put each position in that order on the way in, and the fingers they hand back
+// are aligned to the pitches as the caller wrote them.
+function ascendingOrder(pitches: readonly number[]): number[] | null {
+    if (pitches.every((pitch, at) => at === 0 || pitch >= pitches[at - 1]!)) {
+        return null;
+    }
+    return pitches.map((_, at) => at).sort((a, b) => pitches[a]! - pitches[b]! || a - b);
+}
+
+const reorder = <T>(values: readonly T[], order: readonly number[] | null): T[] =>
+    order === null ? [...values] : order.map((at) => values[at]!);
+
+// The inverse of reorder: values read bottom-up, put back where they were written.
+function restore<T>(values: readonly T[], order: readonly number[] | null): T[] {
+    if (order === null) {
+        return [...values];
+    }
+    const written: T[] = new Array(values.length);
+    order.forEach((at, k) => {
+        written[at] = values[k]!;
+    });
+    return written;
+}
+
 // The comfort cost of fingering a whole sequence of positions a given way — chord
-// shapes plus the movement of the leading voice between them.
+// shapes plus the movement of the leading voice between them. Each position's fingers
+// are aligned to its pitches as written, in whatever order that is.
 export function positionsCost(
     positions: number[][],
     fingers: number[][],
@@ -297,6 +329,23 @@ export function positionsCost(
     if (positions.length === 0) {
         return 0;
     }
+    const orders = positions.map(ascendingOrder);
+    return ascendingCost(
+        positions.map((pitches, at) => reorder(pitches, orders[at]!)),
+        fingers.map((shape, at) => reorder(shape, orders[at] ?? null)),
+        hand,
+        span,
+        gaps,
+    );
+}
+
+function ascendingCost(
+    positions: number[][],
+    fingers: number[][],
+    hand: Hand,
+    span?: number,
+    gaps?: number[],
+): number {
     const { spread, leap } = handModel(span);
     let cost = chordCost(positions[0]!, fingers[0]!, spread);
     for (let i = 1; i < positions.length; i++) {
@@ -316,7 +365,8 @@ export function positionsCost(
 }
 
 // The most comfortable fingering for a sequence of positions, via the same search as
-// the single line but with chord shapes as the per-position states.
+// the single line but with chord shapes as the per-position states. Each position's
+// fingers come back aligned to its pitches as written.
 export function fingerPositions(
     positions: number[][],
     hand: Hand,
@@ -326,6 +376,21 @@ export function fingerPositions(
     if (positions.length === 0) {
         return [];
     }
+    const orders = positions.map(ascendingOrder);
+    return ascendingFingers(
+        positions.map((pitches, at) => reorder(pitches, orders[at]!)),
+        hand,
+        span,
+        gaps,
+    ).map((shape, at) => restore(shape, orders[at]!));
+}
+
+function ascendingFingers(
+    positions: number[][],
+    hand: Hand,
+    span?: number,
+    gaps?: number[],
+): number[][] {
     const { spread, leap } = handModel(span);
     let shapes = fingerSets(positions[0]!.length, hand);
     let costs = shapes.map((fingers) => chordCost(positions[0]!, fingers, spread));

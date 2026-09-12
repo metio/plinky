@@ -88,6 +88,24 @@ describe("rawDifficulty", () => {
     });
 });
 
+describe("rawDifficulty of a chord written top-down", () => {
+    it("costs it the same as the chord written bottom-up", () => {
+        const down = score(
+            note("G", 4) +
+                note("E", 4, undefined, true) +
+                note("C", 4, undefined, true) +
+                note("D", 5),
+        );
+        const up = score(
+            note("C", 4) +
+                note("E", 4, undefined, true) +
+                note("G", 4, undefined, true) +
+                note("D", 5),
+        );
+        expect(rawDifficulty(domXmlCodec, down)).toBe(rawDifficulty(domXmlCodec, up));
+    });
+});
+
 describe("categoryOf", () => {
     it("reads the category from the catalogue id", () => {
         expect(categoryOf("scale-c-major")).toBe("scale");

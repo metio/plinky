@@ -41,6 +41,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Find your level reads every note.** With Thin the texture set in Settings, the\nplacement test was thinned too: the melody alone, or just the melody and bass. You\ncould climb past drills you couldn't yet read as written, and the level it saved came\nout too high. The test now always sets each drill in full.",
                 twip: true,
             },
+            {
+                body: "**Finger numbers sit the right way up on every chord.** Some scores write a chord's\nnotes from the top down, and on those the suggested fingering came out upside down:\nthe thumb printed on the top note of a right-hand chord and the little finger on the\nbottom, in the score and in the finger-position editor. Such a piece was also graded\na touch harder than it is. A chord is now fingered by its pitches, whichever order\nthey were written in.",
+                twip: true,
+            },
         ],
     },
     {
