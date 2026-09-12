@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 12 September 2026 — evening
 
+**Listen shakes both hands' tremolos.** Where both hands write a tremolo on the same
+beat, as a piano reduction of an orchestra often does, Listen shook the right hand and
+struck the left once. Both now shimmer together, each at the speed its own slashes
+ask for.
+
 **Switching a reading aid while a piece plays leaves no stray highlight.** Turning
 note colours or finger numbers on or off during Listen, or while a take replayed,
 left the note sounding at that moment lit as if it still were, long after the music

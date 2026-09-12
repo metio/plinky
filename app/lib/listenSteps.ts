@@ -12,9 +12,9 @@ import {
     shapedByContour,
     spellOutGlissando,
     spellOutOrnament,
-    spellOutTremolo,
-    tremoloAt,
+    spellOutTremolos,
     tremoloCarrier,
+    tremolosAt,
 } from "../../core/listenPerformance";
 import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import { pedalledAt, ringUntil, softAt } from "../../core/pedal";
@@ -65,10 +65,8 @@ export function collectListenSteps(
     const parts = readParts(osmd);
     cursor.reset();
     const steps: ListenStep[] = [];
-    const rocking: { span: TremoloSpan | null; carrier: ListenNote | null } = {
-        span: null,
-        carrier: null,
-    };
+    // The note carrying each sounding tremolo's mark, found where its span opens.
+    let rocking = new Map<TremoloSpan, ListenNote | null>();
     // Walked first, then read: how long a position lasts is the distance to the next one,
     // which the cursor only knows once it has moved on.
     const positions: ScorePosition[] = [];
@@ -174,17 +172,20 @@ export function collectListenSteps(
             // run still asks for the written notes. Taken in this order because a note can
             // carry only one of them, and the tremolo's span is what decides whether this
             // position opens one.
-            const tremolo = tremoloAt(marks.tremolos, whole);
+            const tremolos = tremolosAt(marks.tremolos, whole);
             const gliss = openingGlissando(marks.glissandos, whole);
-            if (tremolo) {
+            if (tremolos.length > 0) {
                 // The note carrying the mark is struck where the span opens and holds
                 // through the positions inside it, so the figure at each of those is
                 // modelled on the one found at the opening.
-                const carrier =
-                    rocking.span === tremolo ? rocking.carrier : tremoloCarrier(step, tremolo);
-                rocking.span = tremolo;
-                rocking.carrier = carrier;
-                steps.push(...spellOutTremolo(step, tremolo, carrier));
+                const rocks = tremolos.map((span) => ({
+                    span,
+                    carrier: rocking.has(span)
+                        ? (rocking.get(span) ?? null)
+                        : tremoloCarrier(step, span),
+                }));
+                rocking = new Map(rocks.map((rock) => [rock.span, rock.carrier]));
+                steps.push(...spellOutTremolos(step, rocks));
             } else if (gliss) {
                 steps.push(...spellOutGlissando(step, gliss, fifthsAt(keys, whole)));
             } else if (ornament && ornamented) {

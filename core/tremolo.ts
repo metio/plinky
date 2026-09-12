@@ -130,24 +130,29 @@ export function readTremolos(
                     one.voice === voice,
             )
             .map((one) => one.midi as number);
-    // A tremolo opened and waiting for the note it rocks against. Held rather than paired by
-    // position, because every note of a chord carries the mark and only one figure is meant.
-    let open: {
-        at: number;
-        wholes: number;
-        beams: number;
-        staffId?: number;
-        voice?: string;
-    } | null = null;
+    // Each staff and voice shakes on its own: both hands of a grand staff in tremolo at once
+    // are two figures, and so are a violin's and the piano's written at the same onset.
+    const line = (note: { staffId?: number; voice?: string }) => `${note.staffId}:${note.voice}`;
+    // The positions that have already given a line its figure. Every note of a chord carries
+    // the mark, and only one figure is meant.
+    const figured = new Set<string>();
+    // The tremolos opened on each line and waiting for the note they rock against.
+    const opened = new Map<
+        string,
+        { at: number; wholes: number; beams: number; staffId?: number; voice?: string }
+    >();
     for (const note of notes) {
         const mark = note.marks.tremolo;
         if (!mark || note.midi === null) {
             continue;
         }
-        if (spans.some((span) => span.from === note.whole)) {
+        const key = line(note);
+        if (figured.has(`${key}@${note.whole}`)) {
             continue;
         }
+        const open = opened.get(key);
         if (mark.part === "single") {
+            figured.add(`${key}@${note.whole}`);
             spans.push({
                 from: note.whole,
                 to: note.whole + note.wholes,
@@ -156,14 +161,16 @@ export function readTremolos(
                 pair: null,
             });
         } else if (mark.part === "start") {
-            open ??= {
-                at: note.whole,
-                wholes: note.wholes,
-                beams: mark.beams,
-                staffId: note.staffId,
-                voice: note.voice,
-            };
-        } else if (open !== null && note.whole > open.at) {
+            if (open === undefined) {
+                opened.set(key, {
+                    at: note.whole,
+                    wholes: note.wholes,
+                    beams: mark.beams,
+                    staffId: note.staffId,
+                    voice: note.voice,
+                });
+            }
+        } else if (open !== undefined && note.whole > open.at) {
             const start = { at: open.at, pitches: chordAt(open.at, open.staffId, open.voice) };
             const stop = { at: note.whole, pitches: chordAt(note.whole, note.staffId, note.voice) };
             const pair = [start, stop];
@@ -183,7 +190,8 @@ export function readTremolos(
                 pitches: stop.pitches,
                 pair,
             });
-            open = null;
+            figured.add(`${key}@${open.at}`).add(`${key}@${note.whole}`);
+            opened.delete(key);
         }
     }
     return spans;

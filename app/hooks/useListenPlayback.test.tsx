@@ -305,6 +305,50 @@ describe("collectListenSteps", () => {
         ).toBe(true);
     });
 
+    it("shakes both hands when each writes a tremolo at the same onset", () => {
+        // A grand staff with both hands in tremolo, the texture of an orchestral reduction:
+        // the left hand's figure rocks too rather than sounding once under the right's.
+        let position = 0;
+        const cursor = {
+            reset: vi.fn(() => {
+                position = 0;
+            }),
+            show: vi.fn(),
+            hide: vi.fn(),
+            next: vi.fn(() => {
+                position++;
+            }),
+            iterator: {
+                get EndReached() {
+                    return position >= 1;
+                },
+                get CurrentMeasureIndex() {
+                    return 0;
+                },
+                get currentTimeStamp() {
+                    return { RealValue: 0 };
+                },
+            },
+            NotesUnderCursor: () => [
+                { Length: { RealValue: 0.5 }, isRest: () => false, halfTone: 24 },
+                { Length: { RealValue: 0.5 }, isRest: () => false, halfTone: 64 },
+            ],
+        };
+        const osmd = { cursor, Sheet: { SourceMeasures: [] } } as unknown as OpenSheetMusicDisplay;
+        const steps = collectListenSteps(osmd, {
+            ...NO_SCORE_MARKS,
+            tremolos: [
+                { from: 0, to: 0.5, beams: 2, pitches: [76], pair: null },
+                { from: 0, to: 0.5, beams: 2, pitches: [36], pair: null },
+            ],
+        });
+        const struck = (pitch: number) =>
+            steps.filter((step) => step.notes.some((note) => note.pitch === pitch)).length;
+        expect(struck(76)).toBe(8);
+        expect(struck(36)).toBe(8);
+        expect(steps.reduce((sum, step) => sum + Math.min(...step.lengths), 0)).toBeCloseTo(2);
+    });
+
     it("fits a grace note into the beat it decorates, so the bar keeps its length", () => {
         // A written-eighth grace before a quarter: the position still advances one quarter
         // in all. Dwelling the grace for its written length and then the beat for its own

@@ -169,6 +169,44 @@ describe("readTremolos", () => {
         expect(spans).toHaveLength(1);
     });
 
+    it("gives each hand of a grand staff its own figure at the same onset", () => {
+        const spans = readTremolos([
+            note(0, 72, { beams: 3, part: "single" }, 1, 0, "1"),
+            note(0, 36, { beams: 3, part: "single" }, 1, 1, "5"),
+        ]);
+        expect(spans.map((span) => span.pitches)).toEqual([[72], [36]]);
+    });
+
+    it("rocks both hands' alternating pairs when they open together", () => {
+        const spans = readTremolos([
+            note(0, 72, { beams: 2, part: "start" }, 0.5, 0, "1"),
+            note(0, 36, { beams: 2, part: "start" }, 0.5, 1, "5"),
+            note(0.5, 79, { beams: 2, part: "stop" }, 0.5, 0, "1"),
+            note(0.5, 43, { beams: 2, part: "stop" }, 0.5, 1, "5"),
+        ]);
+        expect(spans.map((span) => span.pair?.map((chord) => chord.pitches))).toEqual([
+            [[72], [79]],
+            [[72], [79]],
+            [[36], [43]],
+            [[36], [43]],
+        ]);
+    });
+
+    it("keeps one figure per staff when a second staff's pair shares the onset", () => {
+        // A single-note tremolo on the right hand over a pair opening in the left: neither
+        // swallows the other.
+        const spans = readTremolos([
+            note(0, 72, { beams: 3, part: "single" }, 1, 0, "1"),
+            note(0, 36, { beams: 2, part: "start" }, 0.5, 1, "5"),
+            note(0.5, 43, { beams: 2, part: "stop" }, 0.5, 1, "5"),
+        ]);
+        expect(spans.map((span) => [span.from, span.pitches])).toEqual([
+            [0, [72]],
+            [0, [36]],
+            [0.5, [43]],
+        ]);
+    });
+
     it("ignores a tremolo the file opens and never closes", () => {
         expect(readTremolos([note(0, 48, { beams: 2, part: "start" })])).toEqual([]);
     });

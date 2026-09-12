@@ -18,7 +18,8 @@ import {
     spellOutGlissando,
     spellOutOrnament,
     spellOutTremolo,
-    tremoloAt,
+    spellOutTremolos,
+    tremolosAt,
 } from "./listenPerformance";
 import { SOFT_SCALE } from "./pedal";
 import { listenStepMs, MIN_STEP_MS, subStepsOf } from "./playback";
@@ -179,6 +180,56 @@ describe("spellOutTremolo", () => {
     });
 });
 
+describe("spellOutTremolos", () => {
+    const hands = step([36, 72], { lengths: [2, 2] });
+    const [left, right] = hands.notes;
+    const rock = (pitches: number[], beams: number, carrier = left ?? null) => ({
+        span: { from: 0, to: 0.125, beams, pitches, pair: null },
+        carrier,
+    });
+
+    it("shakes both hands of a grand staff together at the same rate", () => {
+        const figure = spellOutTremolos(hands, [rock([72], 2, right), rock([36], 2)]);
+        expect(figure).toHaveLength(8);
+        expect(figure.every((one) => one.notes.map((note) => note.pitch).join() === "72,36")).toBe(
+            true,
+        );
+        expect(figure.reduce((sum, one) => sum + (one.lengths[0] ?? 0), 0)).toBe(2);
+        expect(figure.map((one) => one.advancesCursor)).toEqual([...Array(7).fill(false), true]);
+    });
+
+    it("cuts the position wherever either hand strikes when the rates differ", () => {
+        // Semiquavers against demisemiquavers over a minim: the faster hand strikes on
+        // every cut, the slower on every other, and each note lasts its own repetition.
+        const figure = spellOutTremolos(hands, [rock([72], 3, right), rock([36], 2)]);
+        expect(figure).toHaveLength(16);
+        expect(figure.map((one) => one.notes.some((note) => note.pitch === 36))).toEqual(
+            Array.from({ length: 16 }, (_, index) => index % 2 === 0),
+        );
+        expect(figure.every((one) => one.notes.some((note) => note.pitch === 72))).toBe(true);
+        expect(figure[0]?.notes.find((note) => note.pitch === 36)?.soundQuarters).toBe(0.25);
+        expect(figure[0]?.notes.find((note) => note.pitch === 72)?.soundQuarters).toBe(0.125);
+        expect(figure.map((one) => one.lengths[0])).toEqual(Array(16).fill(0.125));
+    });
+
+    it("lets a note neither hand shakes sound once, at the first cut", () => {
+        const three = step([36, 60, 72], { lengths: [0.5, 0.5, 0.5] });
+        const figure = spellOutTremolos(three, [rock([72], 2, right), rock([36], 2)]);
+        expect(figure.flatMap((one) => one.notes).filter((note) => note.pitch === 60)).toHaveLength(
+            1,
+        );
+        expect(figure[0]?.notes.some((note) => note.pitch === 60)).toBe(true);
+    });
+
+    it("spells one tremolo exactly as the single spelling does", () => {
+        const span = { ...SINGLE, pitches: [36] };
+        const one = step([36, 76], { lengths: [2, 0.5] });
+        expect(spellOutTremolos(one, [{ span, carrier: one.notes[0] ?? null }])).toEqual(
+            spellOutTremolo(one, span),
+        );
+    });
+});
+
 describe("spellOutGlissando", () => {
     it("sweeps upward and stops short of the note it arrives on", () => {
         const figure = spellOutGlissando(
@@ -310,12 +361,12 @@ describe("a position spelled out into sub-steps", () => {
 describe("the opening span at a position", () => {
     it("finds the span that starts here and nothing else", () => {
         const tremolos = [{ from: 0.5, to: 1, beams: 2, pitches: [60], pair: null }];
-        expect(tremoloAt(tremolos, 0.5)).toBe(tremolos[0]);
+        expect(tremolosAt(tremolos, 0.5)).toEqual([tremolos[0]]);
         // A position inside the span is under the same shake: the note carrying the mark
         // holds through it.
-        expect(tremoloAt(tremolos, 0.75)).toBe(tremolos[0]);
-        expect(tremoloAt(tremolos, 0.25)).toBeNull();
-        expect(tremoloAt(tremolos, 1)).toBeNull();
+        expect(tremolosAt(tremolos, 0.75)).toEqual([tremolos[0]]);
+        expect(tremolosAt(tremolos, 0.25)).toEqual([]);
+        expect(tremolosAt(tremolos, 1)).toEqual([]);
         const glissandos = [{ from: 0.25, to: 0.5, arrivesAt: 72 }];
         expect(openingGlissando(glissandos, 0.25)).toBe(glissandos[0]);
         expect(openingGlissando(glissandos, 0)).toBeNull();

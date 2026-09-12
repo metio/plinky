@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**Listen shakes both hands' tremolos.** Where both hands write a tremolo on the same\nbeat, as a piano reduction of an orchestra often does, Listen shook the right hand and\nstruck the left once. Both now shimmer together, each at the speed its own slashes\nask for.",
+                twip: true,
+            },
+            {
                 body: "**Switching a reading aid while a piece plays leaves no stray highlight.** Turning\nnote colours or finger numbers on or off during Listen, or while a take replayed,\nleft the note sounding at that moment lit as if it still were, long after the music\nhad moved on. The highlight now carries on with the music and the trail stays\nunbroken.",
                 twip: true,
             },

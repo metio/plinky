@@ -11,7 +11,7 @@ import { SOFT_SCALE } from "./pedal";
 import { effectiveTempo, subStepAdvanceMs, subStepsOf } from "./playback";
 import { fingeringOfHands } from "./scorePerformance";
 import { noteDelayMs, rubatoStretch, touchVelocity } from "./touch";
-import { type TremoloSpan, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
+import { type TremoloNote, type TremoloSpan, tremoloNotes, tremoloUnitQuarters } from "./tremolo";
 
 // The listening performance: the model Listen sounds a score from, and everything that
 // turns it into notes with times and touches on them.
@@ -162,14 +162,15 @@ export function spellOutOrnament(
     }));
 }
 
-// The tremolo sounding at this position, if any: the one it opens, or the one it falls
-// inside — the note carrying the mark holds through, so the shake carries on under
-// whatever the other hand plays there.
-export function tremoloAt(spans: readonly TremoloSpan[], whole: number): TremoloSpan | null {
-    return (
-        spans.find((span) => near(span.from, whole)) ??
-        spans.find((span) => span.from < whole && whole < span.to && !near(span.to, whole)) ??
-        null
+// The tremolos sounding at this position: the ones it opens, and the ones it falls inside —
+// the note carrying the mark holds through, so the shake carries on under whatever the
+// other hand plays there. More than one when two staves shake at once, as both hands of a
+// grand staff often do.
+export function tremolosAt(spans: readonly TremoloSpan[], whole: number): TremoloSpan[] {
+    return spans.filter(
+        (span) =>
+            near(span.from, whole) ||
+            (span.from < whole && whole < span.to && !near(span.to, whole)),
     );
 }
 
@@ -204,37 +205,82 @@ export function spellOutTremolo(
     span: TremoloSpan,
     carrier: ListenNote | null = tremoloCarrier(step, span),
 ): ListenStep[] {
-    const model = carrier ?? step.notes[0];
-    if (!model) {
-        return [step];
-    }
-    const own = new Set(
-        span.pitches.length > 0 ? span.pitches : step.notes.map((note) => note.pitch),
-    );
-    const others = step.notes.filter((note) => !own.has(note.pitch));
+    return spellOutTremolos(step, [{ span, carrier }]);
+}
+
+// Every tremolo sounding at one position, spelled out together. Each figure fills the same
+// advance, so they start and end together; where their rates differ — a semiquaver shake in
+// one hand against a demisemiquaver one in the other — the position is cut wherever either
+// figure strikes, and each note sounds for its own figure's repetition.
+export function spellOutTremolos(
+    step: ListenStep,
+    rocks: readonly { span: TremoloSpan; carrier: ListenNote | null }[],
+): ListenStep[] {
     const quarters =
-        step.lengths.length > 0 ? Math.min(...step.lengths) : (span.to - span.from) * 4;
-    // The pair's own pitches, already MIDI numbers read off the file. Both written notes
-    // spell the same alternation in the same order, so the two halves run together into
-    // one unbroken rock — and a stretch resumed inside a span picks up the chord it had
-    // reached.
-    const chords = span.pair?.map((chord) => chord.pitches);
-    const first = chords?.[0] ?? [...own];
-    const phase = Math.round(((step.whole - span.from) * 4) / tremoloUnitQuarters(span.beams));
-    const figure = tremoloNotes(first, chords?.[1] ?? null, quarters, span.beams, phase);
-    if (figure.length < 2) {
+        step.lengths.length > 0
+            ? Math.min(...step.lengths)
+            : Math.min(...rocks.map(({ span }) => (span.to - span.from) * 4));
+    const own = new Set<number>();
+    const figures: { model: ListenNote; notes: TremoloNote[] }[] = [];
+    for (const { span, carrier } of rocks) {
+        const model = carrier ?? step.notes[0];
+        if (!model) {
+            continue;
+        }
+        const pitches = new Set(
+            span.pitches.length > 0 ? span.pitches : step.notes.map((note) => note.pitch),
+        );
+        // The pair's own pitches, already MIDI numbers read off the file. Both written notes
+        // spell the same alternation in the same order, so the two halves run together into
+        // one unbroken rock — and a stretch resumed inside a span picks up the chord it had
+        // reached.
+        const chords = span.pair?.map((chord) => chord.pitches);
+        const first = chords?.[0] ?? [...pitches];
+        const phase = Math.round(((step.whole - span.from) * 4) / tremoloUnitQuarters(span.beams));
+        const notes = tremoloNotes(first, chords?.[1] ?? null, quarters, span.beams, phase);
+        if (notes.length >= 2) {
+            figures.push({ model, notes });
+            for (const pitch of pitches) {
+                own.add(pitch);
+            }
+        }
+    }
+    if (figures.length === 0) {
         return [step];
     }
-    return figure.map((one, index) => ({
+    const others = step.notes.filter((note) => !own.has(note.pitch));
+    // A grid every figure's notes fall on exactly: a figure of n notes strikes every
+    // grid / n points. Whole numbers, so two figures striking together are seen to.
+    const grid = figures.reduce(
+        (lcm, { notes }) => (lcm * notes.length) / gcd(lcm, notes.length),
+        1,
+    );
+    const strikes = [
+        ...new Set(
+            figures.flatMap(({ notes }) => notes.map((_, index) => (index * grid) / notes.length)),
+        ),
+    ].sort((one, other) => one - other);
+    return strikes.map((at, index) => ({
         ...step,
         notes: [
-            ...one.pitches.map((pitch) => ({ ...model, pitch, soundQuarters: one.quarters })),
+            ...figures.flatMap(({ model, notes }) => {
+                const one = notes[(at * notes.length) / grid];
+                return (at * notes.length) % grid !== 0 || !one
+                    ? []
+                    : one.pitches.map((pitch) => ({
+                          ...model,
+                          pitch,
+                          soundQuarters: one.quarters,
+                      }));
+            }),
             ...(index === 0 ? others : []),
         ],
-        lengths: [one.quarters],
-        advancesCursor: index === figure.length - 1 && step.advancesCursor,
+        lengths: [(((strikes[index + 1] ?? grid) - at) * quarters) / grid],
+        advancesCursor: index === strikes.length - 1 && step.advancesCursor,
     }));
 }
+
+const gcd = (one: number, other: number): number => (other === 0 ? one : gcd(other, one % other));
 
 // The note at a position that carries the tremolo mark, or the first note there when the
 // span names none of them.
