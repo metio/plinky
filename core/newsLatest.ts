@@ -37,6 +37,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**The notes you take longest to find are timed honestly after Keep going.** When\nyou couldn't find a note and played the next one to move on, that next note was\nfiled as found in no time at all, so the notes you stumble around most looked like\nyour quickest. It now counts the whole time you spent getting there.",
                 twip: true,
             },
+            {
+                body: "**Find your level reads every note.** With Thin the texture set in Settings, the\nplacement test was thinned too: the melody alone, or just the melody and bass. You\ncould climb past drills you couldn't yet read as written, and the level it saved came\nout too high. The test now always sets each drill in full.",
+                twip: true,
+            },
         ],
     },
     {

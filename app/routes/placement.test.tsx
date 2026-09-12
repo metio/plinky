@@ -98,4 +98,14 @@ describe("Placement", () => {
         expect(prefs.hiddenNotes).toBe(false);
         expect(prefs.keyLights).toBe(false);
     });
+
+    it.each(["melody", "outlined"])("sets every note of the drill with %s chosen", (reduction) => {
+        // The other hand resting, or each chord cut to one note, would let a player clear
+        // rungs they could not read as written, and the grade saved would say so.
+        seenPrefs.mockClear();
+        mount({ "plinky:prefs": JSON.stringify({ reduction }) });
+        fireEvent.click(screen.getByRole("button", { name: m.placement_start() }));
+
+        expect(seenPrefs.mock.calls.at(-1)?.[0].reduction).toBe("");
+    });
 });

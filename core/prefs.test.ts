@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
 import { unaidedPrefs, DEFAULT_PREFS, parsePrefs, type Prefs } from "./prefs";
+import { REDUCTIONS } from "./reduction";
 
 const BASE: Prefs = {
     sound: true,
@@ -291,6 +292,12 @@ describe("unaidedPrefs", () => {
         expect(strict.keyLights).toBe(false);
         expect(strict.raceGhost).toBe(false);
         expect(strict.beams).toBe("on");
+    });
+
+    it.each(REDUCTIONS)("puts every note back when the player reads %s", (reduction) => {
+        // A reduction changes which notes are on the page, so a drill read through one is
+        // not the drill that was set.
+        expect(unaidedPrefs({ ...DEFAULT_PREFS, reduction }).reduction).toBe("");
     });
 
     it("leaves the player's own instrument alone", () => {

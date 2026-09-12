@@ -37,6 +37,11 @@
       you couldn't find a note and played the next one to move on, that next note was
       filed as found in no time at all, so the notes you stumble around most looked like
       your quickest. It now counts the whole time you spent getting there.
+    - |-
+      **Find your level reads every note.** With Thin the texture set in Settings, the
+      placement test was thinned too: the melody alone, or just the melody and bass. You
+      could climb past drills you couldn't yet read as written, and the level it saved came
+      out too high. The test now always sets each drill in full.
 
 - date: 2026-09-12
   entries:

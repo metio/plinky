@@ -478,5 +478,8 @@ export function unaidedPrefs(base: Prefs): Prefs {
         // Printed music beams its quavers; reading them one flag at a time is the aid.
         beams: "on",
         barNumbers: true,
+        // A reduction takes notes off the page, so a drill read through one is not the
+        // drill that was set: the other hand resting, or each chord cut to one note.
+        reduction: "",
     };
 }

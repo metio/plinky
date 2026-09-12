@@ -13,7 +13,9 @@ import {
     type Prefs,
     REVEAL_TRIES,
     REVIEW_CAPS,
+    unaidedPrefs,
 } from "./prefs";
+import { REDUCTIONS } from "./reduction";
 
 // parsePrefs is the only gate between a device's stored string and the whole app's
 // settings, so it must total: every input — truncated JSON, a stale schema, a
@@ -151,5 +153,51 @@ describe("parsePrefs properties", () => {
 
     it("nothing stored yields the same Prefs as an empty object", () => {
         expect(parsePrefs(null)).toEqual(parsePrefs("{}"));
+    });
+});
+
+describe("unaidedPrefs properties", () => {
+    const stored = fc.record(
+        {
+            reduction: fc.constantFrom("", ...REDUCTIONS),
+            colorNotes: fc.boolean(),
+            chordSymbols: fc.boolean(),
+            highway: fc.boolean(),
+            hiddenNotes: fc.boolean(),
+            noteLabels: fc.constantFrom(...NOTE_LABELS),
+            noteHints: fc.constantFrom(...NOTE_HINTS),
+            volume: fc.integer({ min: 0, max: 100 }),
+        },
+        { requiredKeys: [] },
+    );
+
+    it("reads every note as written, whatever the player had set", () => {
+        fc.assert(
+            fc.property(stored, (value) => {
+                const strict = unaidedPrefs(parsePrefs(JSON.stringify(value)));
+                expect(strict.reduction).toBe("");
+                expect(strict.chordSymbols).toBe(false);
+                expect(strict.colorNotes).toBe(false);
+                expectValid(strict);
+            }),
+        );
+    });
+
+    it("is already unaided once applied", () => {
+        fc.assert(
+            fc.property(stored, (value) => {
+                const once = unaidedPrefs(parsePrefs(JSON.stringify(value)));
+                expect(unaidedPrefs(once)).toEqual(once);
+            }),
+        );
+    });
+
+    it("keeps the player's volume", () => {
+        fc.assert(
+            fc.property(stored, (value) => {
+                const mine = parsePrefs(JSON.stringify(value));
+                expect(unaidedPrefs(mine).volume).toBe(mine.volume);
+            }),
+        );
     });
 });
