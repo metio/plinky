@@ -33,6 +33,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Stop means stop in a play-along too.** Pressing Stop while keeping up with the\nbeat left the guide notes and the other hand ringing for their whole length, so a\nslow chord could carry on over the next count-in. They now fade the moment you stop,\nwhile a run you play to its end still lets its last notes ring.",
                 twip: true,
             },
+            {
+                body: "**The notes you take longest to find are timed honestly after Keep going.** When\nyou couldn't find a note and played the next one to move on, that next note was\nfiled as found in no time at all, so the notes you stumble around most looked like\nyour quickest. It now counts the whole time you spent getting there.",
+                twip: true,
+            },
         ],
     },
     {

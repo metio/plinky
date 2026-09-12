@@ -67,6 +67,33 @@ describe("foldRun", () => {
         expect(stats["62"]?.totalMs).toBe(0);
     });
 
+    it("times the note after a skip from the last note struck", () => {
+        // C4 at 0, E4 never found, G4 struck at 4000 and the skip carrying its moment.
+        const stats = foldRun({}, [
+            note([60], 0),
+            { ...note([], 4000, 1), skipped: true },
+            note([67], 4000),
+        ]);
+
+        expect(stats["67"]).toEqual({ plays: 1, wrongs: 0, totalMs: 4000, timed: 1 });
+        // The inverse: with nothing marked, the same moments read as an instant find.
+        const unmarked = foldRun({}, [note([60], 0), note([], 4000, 1), note([67], 4000)]);
+        expect(unmarked["67"]?.totalMs).toBe(0);
+    });
+
+    it("gives a skipped position its plays and wrong keys but no time", () => {
+        // Half a chord was hit before the player moved on: those keys were read, but the
+        // moment they carry is the next note's.
+        const stats = foldRun({}, [
+            note([60], 0),
+            { ...note([64], 3000, 2), skipped: true },
+            note([67], 3000),
+        ]);
+
+        expect(stats["64"]).toEqual({ plays: 1, wrongs: 2, totalMs: 0, timed: 0 });
+        expect(stats["67"]).toEqual({ plays: 1, wrongs: 0, totalMs: 3000, timed: 1 });
+    });
+
     it("counts wrong keys even on a note whose time cannot be measured", () => {
         // The very first note of a run still tells us it was fumbled.
         const stats = foldRun({}, [note([60], 0, 2)]);

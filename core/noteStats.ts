@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { struckGaps } from "./rhythm";
 import { median } from "./stats";
 
 // Which notes you are slow to find.
@@ -33,11 +34,13 @@ export type NoteStat = {
 export type NoteStats = Record<string, NoteStat>;
 
 // What one cleared note contributes: which pitches sounded, when it landed, and how
-// many wrong keys preceded it.
+// many wrong keys preceded it. `skipped` marks a position the forgiving advance moved
+// past: its `playedMs` is the next note's moment, so it carries no reading time.
 export type StatNote = {
     pitches: number[];
     playedMs: number;
     wrongBefore: number;
+    skipped?: boolean;
 };
 
 // A gap longer than this is not reading time — it is a phone call, a cup of tea, or
@@ -49,12 +52,17 @@ const EMPTY: NoteStat = { plays: 0, wrongs: 0, totalMs: 0, timed: 0 };
 
 // Fold a run's notes into the running totals. The first note of a run has no gap
 // before it — nothing says when the player started reading — so it contributes its
-// wrong keys but no time.
+// wrong keys but no time. Nor does a skipped position, and the note after one is
+// timed from the last note struck (see struckGaps): timed from the skip, it would
+// read as found in no time at all.
 export function foldRun(stats: NoteStats, notes: StatNote[]): NoteStats {
     const next: NoteStats = { ...stats };
+    // Only the played gap is read here, so the notated onset is left at zero.
+    const gaps = struckGaps(
+        notes.map((note) => ({ targetMs: 0, playedMs: note.playedMs, skipped: note.skipped })),
+    );
     notes.forEach((note, index) => {
-        const previous = notes[index - 1];
-        const gap = previous ? note.playedMs - previous.playedMs : null;
+        const gap = gaps[index]?.played ?? null;
         const countable = gap !== null && gap >= 0 && gap <= MAX_READ_MS;
         for (const pitch of note.pitches) {
             const key = String(pitch);

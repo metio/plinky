@@ -38,6 +38,11 @@ beat left the guide notes and the other hand ringing for their whole length, so 
 slow chord could carry on over the next count-in. They now fade the moment you stop,
 while a run you play to its end still lets its last notes ring.
 
+**The notes you take longest to find are timed honestly after Keep going.** When
+you couldn't find a note and played the next one to move on, that next note was
+filed as found in no time at all, so the notes you stumble around most looked like
+your quickest. It now counts the whole time you spent getting there.
+
 ## 12 September 2026
 
 **Ear training answers from your number keys.** On a scale-degree question, typing 3

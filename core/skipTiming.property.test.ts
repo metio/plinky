@@ -5,6 +5,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { fluentNotes } from "./flow";
 import { type MatchStep, matchNote, startMatch } from "./matcher";
+import { foldRun } from "./noteStats";
 import { performanceNotes } from "./performance";
 import { tempoScale, timingDeltas } from "./rhythm";
 import { deriveRunOutcome } from "./runOutcome";
@@ -170,6 +171,51 @@ describe("timing across a forgiving skip", () => {
                     const [withoutSkips] = computeSegments(struck, 1);
                     expect(withSkips!.speed).toBeCloseTo(withoutSkips!.speed, 9);
                     expect(withSkips!.timing).toBeCloseTo(withoutSkips!.timing, 9);
+                },
+            ),
+        );
+    });
+
+    it("never files a read time shorter than the real gap, whatever was skipped", () => {
+        fc.assert(
+            fc.property(
+                fc.integer({ min: 3, max: 16 }),
+                fc.integer({ min: 250, max: 1000 }),
+                fc.double({ min: 0.5, max: 2, noNaN: true }),
+                fc.array(fc.boolean(), { minLength: 16, maxLength: 16 }),
+                (count, gapMs, pace, marks) => {
+                    const skipped = new Set<number>();
+                    for (let at = 0; at < count - 1; at++) {
+                        if (marks[at] && !skipped.has(at - 1)) {
+                            skipped.add(at);
+                        }
+                    }
+                    const { notes } = playSteady(count, gapMs, pace, skipped);
+                    const stats = foldRun({}, notes);
+                    // Every struck note but the first is timed, and each from the last
+                    // note struck: one step's gap, or two across a skip.
+                    const expected: Record<string, number> = {};
+                    let last: number | undefined;
+                    for (const [at, played] of notes.entries()) {
+                        if (skipped.has(at)) {
+                            continue;
+                        }
+                        if (last !== undefined) {
+                            const key = String(played.pitches[0]);
+                            expected[key] = (expected[key] ?? 0) + (at - last) * gapMs * pace;
+                        }
+                        last = at;
+                    }
+                    const timed = Object.values(stats).reduce((sum, stat) => sum + stat.timed, 0);
+                    expect(timed).toBe(count - skipped.size - 1);
+                    for (const [key, stat] of Object.entries(stats)) {
+                        expect(stat.totalMs).toBeCloseTo(expected[key] ?? 0, 6);
+                        if (stat.timed > 0) {
+                            expect(stat.totalMs / stat.timed).toBeGreaterThanOrEqual(
+                                gapMs * pace - 1e-6,
+                            );
+                        }
+                    }
                 },
             ),
         );
