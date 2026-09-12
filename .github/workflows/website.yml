@@ -54,7 +54,7 @@ jobs:
       locales: ${{ steps.list.outputs.locales }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - id: list
         run: echo "locales=$(nix develop --command node -p "JSON.stringify(require('./project.inlang/settings.json').locales)")" >> "$GITHUB_OUTPUT"
 
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - run: nix develop --command npm ci
       - name: Build root
         # Supplies "/" (a runtime language-detect redirect, so it can't be pinned
@@ -94,7 +94,7 @@ jobs:
         locale: ${{ fromJSON(needs.setup.outputs.locales) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - run: nix develop --command npm ci
       - name: Build ${{ matrix.locale }}
         # Tree-shaken to this one language; prerenders only its /<locale>/ pages.
@@ -121,7 +121,7 @@ jobs:
           # the one the live site was built from to work out which addresses changed. A
           # shallow clone has neither commit's tree to compare.
           fetch-depth: 0
-      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: artifacts
