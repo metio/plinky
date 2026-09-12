@@ -357,23 +357,24 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
     const reportUrl = issueUrl(REPO_ISSUES, report, where, userAgent);
 
+    // The boundary renders in the layout, above the locale route, so no route hands it a
+    // language. It needs none: every m.*() reads getLocale(), which reads the address on
+    // the client and is pinned to the document's own address during prerender — and an
+    // in-language miss keeps its /<locale>/ prefix. The issue it files stays English,
+    // being read by whoever fixes it.
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <h1 className="font-display text-3xl font-semibold tracking-tight">
-                {notFound ? "We couldn't find that" : "Something went wrong"}
+                {notFound ? m.error_missing_title() : m.error_crash_title()}
             </h1>
-            <p className="text-muted">
-                {notFound
-                    ? "That page or exercise doesn't exist — it may have been removed, or the link is slightly off."
-                    : "This is a bug on our side, not anything you did. Your scores are safe on this device — try heading back or reloading."}
-            </p>
+            <p className="text-muted">{notFound ? m.error_missing_body() : m.error_crash_body()}</p>
 
             <div className="flex flex-wrap gap-2">
                 <Link
                     to="/"
                     className="rounded-md bg-accent-solid px-4 py-2 text-sm font-medium text-white"
                 >
-                    Back to exercises
+                    {m.error_home()}
                 </Link>
                 {!notFound && (
                     <button
@@ -381,7 +382,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                         onClick={() => window.location.reload()}
                         className="rounded-md border border-line-strong px-4 py-2 text-sm font-medium text-body"
                     >
-                        Reload the page
+                        {m.error_reload()}
                     </button>
                 )}
                 <a
@@ -390,12 +391,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                     rel="noreferrer"
                     className="rounded-md border border-line-strong px-4 py-2 text-sm font-medium text-body"
                 >
-                    Report it on GitHub
+                    {m.action_report_problem()}
                 </a>
             </div>
 
             <details className="text-sm text-muted">
-                <summary className="cursor-pointer">Technical details</summary>
+                <summary className="cursor-pointer">{m.error_details()}</summary>
                 <pre className="mt-2 overflow-x-auto rounded-md bg-sunken p-3 text-xs">
                     <code>{technical}</code>
                 </pre>

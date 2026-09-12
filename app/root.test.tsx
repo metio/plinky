@@ -6,6 +6,8 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { createRoutesStub, MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import type { Route } from "./+types/root";
+import { NotFoundError } from "./lib/errorReport";
+import { m } from "./paraglide/messages.js";
 import { locales, overwriteGetLocale } from "./paraglide/runtime.js";
 import { ErrorBoundary, Layout, links } from "./root";
 import { THEME_STORAGE_KEY } from "./stores/themeStore";
@@ -150,19 +152,60 @@ describe("ErrorBoundary", () => {
 
     it("shows the gentle missing-page variant for a 404, with no reload button", () => {
         renderBoundary({ status: 404, statusText: "Not Found", internal: false, data: null });
-        expect(screen.getByRole("heading").textContent).toBe("We couldn't find that");
-        expect(screen.queryByRole("button", { name: "Reload the page" })).toBeNull();
-        const report = screen.getByRole("link", { name: "Report it on GitHub" });
+        expect(screen.getByRole("heading").textContent).toBe(m.error_missing_title());
+        expect(screen.getByText(m.error_missing_body())).toBeTruthy();
+        expect(screen.queryByRole("button", { name: m.error_reload() })).toBeNull();
+        expect(screen.getByRole("link", { name: m.error_home() })).toBeTruthy();
+        const report = screen.getByRole("link", { name: m.action_report_problem() });
         expect(report.getAttribute("href")).toContain(encodeURIComponent("Page not found"));
     });
 
     it("shows the crash variant for a thrown Error, with reload and technical detail", () => {
         renderBoundary(new Error("boom"));
-        expect(screen.getByRole("heading").textContent).toBe("Something went wrong");
-        expect(screen.getByRole("button", { name: "Reload the page" })).toBeTruthy();
+        expect(screen.getByRole("heading").textContent).toBe(m.error_crash_title());
+        expect(screen.getByText(m.error_crash_body())).toBeTruthy();
+        expect(screen.getByRole("button", { name: m.error_reload() })).toBeTruthy();
+        expect(screen.getByText(m.error_details())).toBeTruthy();
         expect(screen.getByText(/boom/)).toBeTruthy();
-        const report = screen.getByRole("link", { name: "Report it on GitHub" });
+        const report = screen.getByRole("link", { name: m.action_report_problem() });
         expect(report.getAttribute("href")).toContain(encodeURIComponent("Error: boom"));
+    });
+
+    // The page every in-language miss reaches: the catch-all raises NotFoundError for an
+    // address that names a language and matches nothing, and the header above it is
+    // already in that language.
+    it("speaks the page's language on a German not-found page", () => {
+        overwriteGetLocale(() => "de");
+        renderBoundary(new NotFoundError("/de/lernen/"));
+        const heading = screen.getByRole("heading").textContent;
+        expect(heading).toBe(m.error_missing_title({}, { locale: "de" }));
+        expect(heading).not.toBe(m.error_missing_title({}, { locale: "en" }));
+        expect(screen.getByRole("link", { name: m.error_home({}, { locale: "de" }) })).toBeTruthy();
+        expect(
+            screen.getByRole("link", { name: m.action_report_problem({}, { locale: "de" }) }),
+        ).toBeTruthy();
+        // The issue a maintainer reads stays English whatever the page spoke.
+        const report = screen.getByRole("link", { name: m.action_report_problem() });
+        expect(report.getAttribute("href")).toContain(encodeURIComponent("Page not found"));
+    });
+
+    it("speaks the page's language when a route throws", () => {
+        overwriteGetLocale(() => "fr");
+        renderBoundary(new Error("boom"));
+        expect(screen.getByRole("heading").textContent).toBe(
+            m.error_crash_title({}, { locale: "fr" }),
+        );
+        expect(
+            screen.getByRole("button", { name: m.error_reload({}, { locale: "fr" }) }),
+        ).toBeTruthy();
+        expect(screen.getByText(m.error_details({}, { locale: "fr" }))).toBeTruthy();
+    });
+
+    it("sends the way home to the home page in the page's language", () => {
+        overwriteGetLocale(() => "de");
+        renderBoundary(new NotFoundError("/de/lernen/"));
+        const home = screen.getByRole("link", { name: m.error_home() });
+        expect(home.getAttribute("href")).toBe("/de/");
     });
 
     it("stringifies a thrown non-Error value", () => {

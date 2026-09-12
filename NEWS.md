@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 12 September 2026 — evening
 
+**A missing page speaks your language.** Following a stale or mistyped link, or
+landing on a page that stopped working, used to show a page in English whatever
+language the rest of the site was in. It now speaks yours, with a way home and the
+same way to report the problem.
+
 **Slurs in songs land on the right hand again.** In a song for voice and piano, the
 singer's line is left off the page, and every slur the piano's music carries was
 moving one staff down: the tune under a slur played detached, while a staccato bass
