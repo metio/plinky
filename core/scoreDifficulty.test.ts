@@ -544,6 +544,24 @@ describe("parsePositions reads where each position sits in time", () => {
     });
 });
 
+describe("parsePositions keeps both staves in the same bar", () => {
+    it("after a lower voice that stops short of the barline", () => {
+        // divisions=1: note() lasts two beats. Bar 1 holds a whole note over a bass half note
+        // and nothing after it; bar 2 strikes both staves together on beat 4.
+        const whole = (step: string, octave: number, staff: number) =>
+            `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>4</duration><staff>${staff}</staff></note>`;
+        const xml =
+            `<?xml version="1.0"?><score-partwise><part id="P1">` +
+            `<measure number="1"><attributes><divisions>1</divisions><staves>2</staves></attributes>` +
+            `${whole("C", 5, 1)}<backup><duration>4</duration></backup>${note("C", 3, 2)}</measure>` +
+            `<measure number="2">${whole("D", 5, 1)}<backup><duration>4</duration></backup>${whole("D", 3, 2)}</measure>` +
+            `</part></score-partwise>`;
+        const { onsets } = parsePositions(domXmlCodec, xml);
+        expect(onsets.right).toEqual([0, 4]);
+        expect(onsets.left).toEqual([0, 4]);
+    });
+});
+
 describe("otherHandAt", () => {
     it("finds what the other hand strikes at each moment, and nothing when it rests", () => {
         const struck = otherHandAt([0, 1, 2], {
