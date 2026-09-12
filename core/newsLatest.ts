@@ -29,6 +29,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Stopping a duet stops the other hand.** While Plinky played the other hand for\nyou, pressing Stop, leaving full screen or starting Listen left the notes it had\nlined up still playing, one after another, on a page where nothing was running,\nand under Listen they came out of step with it. Stopping now silences the other\nhand at once. Play a run to its end and the other hand still finishes the piece.",
                 twip: true,
             },
+            {
+                body: "**Stop means stop in a play-along too.** Pressing Stop while keeping up with the\nbeat left the guide notes and the other hand ringing for their whole length, so a\nslow chord could carry on over the next count-in. They now fade the moment you stop,\nwhile a run you play to its end still lets its last notes ring.",
+                twip: true,
+            },
         ],
     },
     {

@@ -205,7 +205,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote: () => {} },
+                synth: { playNote: () => {}, silenceStrikes: () => {} },
                 tempo: () => 240,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -236,7 +236,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote: () => {} },
+                synth: { playNote: () => {}, silenceStrikes: () => {} },
                 tempo: () => 240,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -275,7 +275,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote: () => {} },
+                synth: { playNote: () => {}, silenceStrikes: () => {} },
                 tempo: () => 160,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -301,7 +301,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote: () => {} },
+                synth: { playNote: () => {}, silenceStrikes: () => {} },
                 tempo: () => 240,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -332,7 +332,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote: () => {} },
+                synth: { playNote: () => {}, silenceStrikes: () => {} },
                 tempo: () => 240,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -373,7 +373,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote: () => {} },
+                synth: { playNote: () => {}, silenceStrikes: () => {} },
                 tempo: () => 160,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -408,7 +408,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote },
+                synth: { playNote, silenceStrikes: () => {} },
                 tempo: () => 240,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -434,7 +434,7 @@ describe("useKeepUp", () => {
         const { result } = renderHook(() =>
             useKeepUp({
                 getOsmd: () => osmd,
-                synth: { playNote: (note) => played.push(note) },
+                synth: { playNote: (note) => played.push(note), silenceStrikes: () => {} },
                 tempo: () => 240,
                 beatsPerBar: 1,
                 centerCursor: () => {},
@@ -453,11 +453,101 @@ describe("useKeepUp", () => {
         result.current.stop();
     });
 
+    describe("stopping", () => {
+        // A right-hand run over a two-hand position: C4 yours, C3 the duet's, both long
+        // enough to still be ringing when the stop comes.
+        const duetOsmd = () =>
+            fakeOsmd([
+                [
+                    { midi: 60, staff: 0, quarters: 4 },
+                    { midi: 48, staff: 1, quarters: 4 },
+                ],
+                [{ midi: 62, staff: 0, quarters: 4 }],
+            ]);
+        const mountRun = (osmd = duetOsmd()) => {
+            const playNote = vi.fn();
+            const silenceStrikes = vi.fn();
+            const onFinish = vi.fn();
+            const view = renderHook(() =>
+                useKeepUp({
+                    getOsmd: () => osmd,
+                    synth: { playNote, silenceStrikes },
+                    tempo: () => 240,
+                    beatsPerBar: 1,
+                    centerCursor: () => {},
+                    markPainted: () => {},
+                    onFinish,
+                }),
+            );
+            return { playNote, silenceStrikes, onFinish, ...view };
+        };
+        const ownersOf = (playNote: ReturnType<typeof vi.fn>) =>
+            playNote.mock.calls.map(([, options]) => (options as { owner?: symbol }).owner);
+
+        it("strikes the guide and the duet under one owner of its own", () => {
+            const { result, playNote } = mountRun();
+            act(() => result.current.start({ hand: "right", guideNotes: true, accompany: true }));
+            act(() => vi.advanceTimersByTime(300));
+            expect(playNote.mock.calls.map(([note]) => note).sort()).toEqual([48, 60]);
+            const owners = new Set(ownersOf(playNote));
+            expect(owners.size).toBe(1);
+            expect(typeof [...owners][0]).toBe("symbol");
+            act(() => result.current.stop());
+        });
+
+        it("takes back the notes it struck when the run is stopped", () => {
+            const { result, playNote, silenceStrikes } = mountRun();
+            act(() => result.current.start({ hand: "right", guideNotes: true, accompany: true }));
+            act(() => vi.advanceTimersByTime(300));
+            const [owner] = ownersOf(playNote);
+            act(() => result.current.stop());
+            expect(silenceStrikes).toHaveBeenCalledWith(owner);
+        });
+
+        it("lets its last notes ring when the run plays to its end", () => {
+            const { result, silenceStrikes, onFinish } = mountRun();
+            act(() => result.current.start({ hand: "right", guideNotes: true, accompany: true }));
+            act(() => vi.advanceTimersByTime(10_000));
+            expect(onFinish).toHaveBeenCalled();
+            // Leaving the stage after the result stops the run again, which is not a request
+            // for silence: the run was already over.
+            act(() => result.current.stop());
+            expect(silenceStrikes).not.toHaveBeenCalled();
+        });
+
+        it("echoes the player's own strike under no owner, so a stop leaves it", () => {
+            const { result, playNote } = mountRun();
+            act(() => result.current.start({ hand: "right", guideNotes: false, accompany: false }));
+            act(() => vi.advanceTimersByTime(300));
+            act(() => result.current.registerNote(60, performance.now()));
+            expect(playNote).toHaveBeenCalledWith(60, { device: undefined });
+            act(() => result.current.stop());
+        });
+
+        it("gives each run its own owner, so one's stop leaves the other's notes", () => {
+            const first = mountRun();
+            const second = mountRun();
+            for (const run of [first, second]) {
+                act(() =>
+                    run.result.current.start({ hand: "right", guideNotes: true, accompany: true }),
+                );
+            }
+            act(() => vi.advanceTimersByTime(300));
+            const [firstOwner] = ownersOf(first.playNote);
+            const [secondOwner] = ownersOf(second.playNote);
+            expect(firstOwner).not.toBe(secondOwner);
+            act(() => first.result.current.stop());
+            expect(first.silenceStrikes).toHaveBeenCalledWith(firstOwner);
+            expect(second.silenceStrikes).not.toHaveBeenCalled();
+            act(() => second.result.current.stop());
+        });
+    });
+
     it("hands back the same object across a render that changes nothing", () => {
         const osmd = fakeOsmd([[{ midi: 60, staff: 0 }]]);
         const options = {
             getOsmd: () => osmd,
-            synth: { playNote: () => {} },
+            synth: { playNote: () => {}, silenceStrikes: () => {} },
             tempo: () => 240,
             beatsPerBar: 1,
             centerCursor: () => {},

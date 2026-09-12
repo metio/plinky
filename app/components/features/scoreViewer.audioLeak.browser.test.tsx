@@ -275,6 +275,23 @@ describe("the duet's other hand", () => {
     });
 });
 
+describe("a play-along's notes", () => {
+    it("are taken back when the player stops it on stage", async () => {
+        // Keep up's Stop leaves the stage open, so nothing but the stop itself reaches the
+        // engine — and each guide note is a strike scheduled whole on the audio clock.
+        const { audio } = mount({ xml: LONG_SCORE, prefs: { keepUp: true, guideNotes: true } });
+        await startPractice();
+        await expect.poll(() => audio.strikes.length, { timeout: 30000 }).toBeGreaterThan(0);
+        const owner = audio.strikes[0]?.owner;
+        expect(typeof owner).toBe("symbol");
+        const before = audio.strikesSilenced.length;
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        await expect
+            .poll(() => audio.strikesSilenced.slice(before), { timeout: 30000 })
+            .toContain(owner);
+    });
+});
+
 describe("the instrument a run commits to", () => {
     it("keeps the next run's instrument when Practice takes over from Listen", async () => {
         // The two runs hand over in one handler, so "performing" never reads false between

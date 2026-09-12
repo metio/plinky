@@ -33,6 +33,11 @@ lined up still playing, one after another, on a page where nothing was running,
 and under Listen they came out of step with it. Stopping now silences the other
 hand at once. Play a run to its end and the other hand still finishes the piece.
 
+**Stop means stop in a play-along too.** Pressing Stop while keeping up with the
+beat left the guide notes and the other hand ringing for their whole length, so a
+slow chord could carry on over the next count-in. They now fade the moment you stop,
+while a run you play to its end still lets its last notes ring.
+
 ## 12 September 2026
 
 **Ear training answers from your number keys.** On a scale-degree question, typing 3

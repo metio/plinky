@@ -16,6 +16,7 @@ import {
     strikeKeepUp,
 } from "../../core/keepUp";
 import { useScheduler } from "../contexts/services";
+import type { StrikeOwner } from "../ports/audioEngine";
 import type { Hand } from "../../core/matcher";
 import { NOMINAL_BPM, positionAdvances } from "../../core/elapsed";
 import { readParts, readStartTempo } from "../lib/scoreExpression";
@@ -31,9 +32,13 @@ import { NO_SCORE_MARKS } from "../../core/musicxmlMarks";
 import { jumpsBack } from "../../core/matcher";
 
 // A note sink for the guide and the player's own strikes — the slice of the
-// synth the play-along needs.
+// synth the play-along needs, and a stop that takes back what the run struck.
 type NoteSink = {
-    playNote(note: number, options?: { duration?: number; device?: string }): void;
+    playNote(
+        note: number,
+        options?: { duration?: number; device?: string; owner?: StrikeOwner },
+    ): void;
+    silenceStrikes(owner: StrikeOwner): void;
 };
 
 // Walk the engraved score once and lift the play-along timeline into the pure
@@ -169,6 +174,9 @@ export function useKeepUp({
 }) {
     const chain = useTimerChain();
     const scheduler = useScheduler();
+    // The guide and the duet strike under this, so a stop takes back exactly the notes the
+    // run sounded. The player's own strikes go out without it: they are the player's notes.
+    const [owner] = useState<StrikeOwner>(() => Symbol("keep up"));
     // Live during a play-along run, then the result once it finishes.
     const [running, setRunning] = useState(false);
     const [progress, setProgress] = useState({ inTime: 0, done: 0 });
@@ -196,7 +204,15 @@ export function useKeepUp({
     const active = () => activeRef.current;
 
     // Stop a run early — the timers and the cursor wind down; no result is scored.
+    //
+    // A guide note is a strike scheduled whole, so a run stopped mid-beat would leave its
+    // notes sounding for their full written length, over the next count-in. Only a run still
+    // going is cut: stopping one that already played to its end — as leaving the stage for
+    // the result does — lets its last notes ring, as Listen's do.
     const stop = () => {
+        if (activeRef.current) {
+            synth.silenceStrikes(owner);
+        }
         chain.clear();
         activeRef.current = false;
         stateRef.current = startKeepUp();
@@ -297,13 +313,13 @@ export function useKeepUp({
                 quarters * (60 / localTempo(current)) * current.stretch;
             if (guideNotes) {
                 for (const entry of current.play) {
-                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters) });
+                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters), owner });
                 }
             }
             // The duet: sound the other hand at each beat, so the app plays alongside you.
             if (accompany) {
                 for (const entry of current.accompany) {
-                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters) });
+                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters), owner });
                 }
             }
             stateRef.current = openKeepUpStep(stateRef.current, pitches, {
