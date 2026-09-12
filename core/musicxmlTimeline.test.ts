@@ -305,3 +305,19 @@ describe("key signatures on the timeline", () => {
         expect(readTimeline(doc).keys).toEqual([{ whole: 0, fifths: -2 }]);
     });
 });
+
+describe("a score of more than one part", () => {
+    it("stamps every note and direction with the part it is written in", () => {
+        const doc = parse(`<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1"><part-list><score-part id="Voice"><part-name>V</part-name></score-part><score-part id="Piano"><part-name>P</part-name></score-part></part-list>
+<part id="Voice"><measure number="1">${ATTR}<direction><direction-type><dynamics><pp/></dynamics></direction-type></direction>${note("G", 4, 16)}</measure></part>
+<part id="Piano"><measure number="1">${ATTR.replace("</attributes>", "<staves>2</staves></attributes>")}${note("C", 5, 16)}<backup><duration>16</duration></backup><note><pitch><step>C</step><octave>3</octave></pitch><duration>16</duration><voice>5</voice><staff>2</staff></note></measure></part></score-partwise>`);
+        const { notes, directions } = readTimeline(doc);
+        expect(notes.map((one) => [one.part, one.staff, one.staffId, one.midi])).toEqual([
+            ["Voice", 1, 0, 67],
+            ["Piano", 1, 1, 72],
+            ["Piano", 2, 2, 48],
+        ]);
+        expect(directions.map((one) => one.part)).toEqual(["Voice"]);
+    });
+});

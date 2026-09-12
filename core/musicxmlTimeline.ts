@@ -32,10 +32,13 @@ export type XmlNote = {
     // Sounding pitch as MIDI, or null for a rest.
     midi: number | null;
     voice: string;
-    // 1-based, as the file writes it.
+    // The id of the `<part>` it is written in.
+    part: string;
+    // 1-based within its part, as the file writes it.
     staff: number;
-    // 0-based across every part, counted in part order — the same numbering the engraver
-    // gives its staves, so a span read from the file can be matched to an engraved note.
+    // 0-based across every part read, counted in part order — the numbering the engraver
+    // gives its staves when it draws every one of those parts. A page drawn with fewer
+    // parts numbers them differently; core/markScope maps a staff onto the page drawn.
     staffId: number;
     // Sounds together with the note before it rather than after it.
     chord: boolean;
@@ -173,7 +176,8 @@ export type XmlTimeline = {
     // no time — and doing it twice means two implementations that can disagree. If they
     // did, every dynamic in the piece would sit at a different moment from the notes it
     // belongs to, which is a wrongness nothing would report.
-    directions: { element: Element; whole: number }[];
+    // Each carries the id of the `<part>` it is written in.
+    directions: XmlDirection[];
     // How far the music runs, for a marking the engraving opens and never closes.
     end: number;
     // Each printed bar: where it starts and what metre it is in. What a note's place in
@@ -188,6 +192,8 @@ export type XmlTimeline = {
 };
 
 export type XmlKeyPoint = { whole: number; fifths: number };
+
+export type XmlDirection = { element: Element; whole: number; part: string };
 
 export type XmlBar = {
     from: number;
@@ -237,7 +243,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
     const root = doc.documentElement;
     const notes: XmlNote[] = [];
     const measureStarts: number[] = [];
-    const directions: { element: Element; whole: number }[] = [];
+    const directions: XmlDirection[] = [];
     const bars: XmlBar[] = [];
     const keys: XmlKeyPoint[] = [];
     let end = 0;
@@ -252,6 +258,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
         const staves = Math.max(1, numberOf(stavesDeclared, 1));
         const partStaffOffset = staffOffset;
         staffOffset += staves;
+        const partId = part.getAttribute("id") ?? "";
         // Divisions are ticks per crotchet, declared in the first measure and changeable
         // later; a file that never declares them is broken, and one tick per crotchet at
         // least keeps the arithmetic finite.
@@ -333,6 +340,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     directions.push({
                         element,
                         whole: (measureStarts[index] as number) + atTicks / perWhole,
+                        part: partId,
                     });
                     continue;
                 }
@@ -352,6 +360,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     wholes: durationTicks / perWhole,
                     midi: rest ? null : midiOf(element),
                     voice: text(child(element, "voice")) || "1",
+                    part: partId,
                     staff: Math.max(1, numberOf(child(element, "staff"), 1)),
                     staffId:
                         partStaffOffset + Math.max(1, numberOf(child(element, "staff"), 1)) - 1,

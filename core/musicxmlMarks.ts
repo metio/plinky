@@ -14,6 +14,7 @@ import { child, text } from "./musicxmlDom";
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
 import { type GlissandoSpan, readGlissandos } from "./glissando";
+import { type MarkScope, markScope } from "./markScope";
 import { keyShift } from "./transpose";
 import type { PedalSpan, SoftSpan } from "./pedal";
 import { readTremolos, type TremoloSpan } from "./tremolo";
@@ -424,24 +425,48 @@ export const NO_SCORE_MARKS: ScoreMarks = {
     keys: [],
 };
 
-export function readScoreMarks(doc: Document | null): ScoreMarks {
+export type ScoreMarksOptions = {
+    // Whether the page draws the parts besides the played instrument's. A caller that
+    // engraves the file as it is draws them all, which is what leaving this out means.
+    accompaniment?: boolean;
+};
+
+export function readScoreMarks(
+    doc: Document | null,
+    { accompaniment = true }: ScoreMarksOptions = {},
+): ScoreMarks {
     if (!doc) {
         return NO_SCORE_MARKS;
     }
     const timeline = readTimeline(doc);
     const directions = readDirections(timeline);
+    const onPage = notesOnPage(timeline.notes, markScope(doc, accompaniment));
     return {
-        slurs: slurSpans(timeline.notes),
+        slurs: slurSpans(onPage),
         pedals: directions.pedals,
         dynamics: directions.dynamics,
         tempi: readTempoPoints(timeline),
         softs: directions.softs,
-        tremolos: readTremolos(timeline.notes),
-        glissandos: readGlissandos(timeline.notes),
+        tremolos: readTremolos(onPage),
+        glissandos: readGlissandos(onPage),
         bars: timeline.bars,
         fifths: readFifths(doc),
         keys: timeline.keys,
     };
+}
+
+// The notes the page draws, each numbered by the staff the engraver draws it on — what
+// every mark hung on a staff is read from. A note of a part the page leaves off is dropped,
+// so nothing written over it can reach the notes that are drawn.
+function notesOnPage(notes: readonly XmlNote[], scope: MarkScope): XmlNote[] {
+    const drawn: XmlNote[] = [];
+    for (const note of notes) {
+        const staffId = scope.engraved(note.part, note.staff);
+        if (staffId !== null) {
+            drawn.push(staffId === note.staffId ? note : { ...note, staffId });
+        }
+    }
+    return drawn;
 }
 
 // The marks of a score read from its file, moved to wherever a transposition put the music.
