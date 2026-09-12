@@ -53,8 +53,8 @@ export type UseSynthResult = {
     setPedal: (pedal: PedalKind, down: boolean) => void;
     // Silence every live voice and drop the held keys — the panic a play surface calls on
     // teardown so a guide voice can never ring on past the run. The pedals stay where the
-    // player's foot has them; see AudioEngine.allNotesOff.
-    silenceAll: () => void;
+    // player's foot has them; see AudioEngine.allNotesOff, and its `letStrikesRing`.
+    silenceAll: (options?: { letStrikesRing?: boolean }) => void;
     // Cut short the fixed-length notes one playback struck under its owner — its stop, where
     // silenceAll would also take the notes out from under the player's own hands.
     silenceStrikes: (owner: StrikeOwner) => void;
@@ -158,7 +158,10 @@ export function useSynth(): UseSynthResult {
     );
     // Reaches the engine regardless of the volume preference — it clears the voices and
     // held keys, which must happen even for a muted session that opened none.
-    const silenceAll = useCallback(() => audio.allNotesOff(), [audio]);
+    const silenceAll = useCallback(
+        (options?: { letStrikesRing?: boolean }) => audio.allNotesOff(options),
+        [audio],
+    );
     // Also regardless of the volume preference: a note struck before the player muted is
     // still ringing.
     const silenceStrikes = useCallback(

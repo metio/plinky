@@ -66,6 +66,10 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
+                body: "**Finishing a piece plays its little flourish again.** The short chime for reaching\nthe end of a piece waits a moment before it sounds, and leaving full screen at the end\nof a run cut it off before it began. It now plays over your grade, and the last\nnotes of the piece ring out with it.",
+                twip: true,
+            },
+            {
                 body: "**The notes you take longest to find are timed honestly after Keep going.** When\nyou couldn't find a note and played the next one to move on, that next note was\nfiled as found in no time at all, so the notes you stumble around most looked like\nyour quickest. It now counts the whole time you spent getting there.",
                 twip: true,
             },

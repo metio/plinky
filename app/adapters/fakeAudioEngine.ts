@@ -5,6 +5,9 @@ import type { PedalKind } from "../../core/pedals";
 import { ROOM_WET } from "../../core/room";
 import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
 
+// Recorded in strikesSilenced where a panic cut every strike, whoever struck it.
+export const EVERY_STRIKE: unique symbol = Symbol("every strike");
+
 // An AudioEngine for tests: strikes and clicks are recorded instead of played,
 // so a test hands a component this fake through the services provider and
 // asserts on what would have sounded — no Web Audio globals to stub.
@@ -30,7 +33,8 @@ export type FakeAudioEngine = AudioEngine & {
     // How many times the panic (allNotesOff) fired — a test asserts a play surface
     // silences everything on teardown.
     silenced: number;
-    // Every owner whose strikes were cut short, in order.
+    // Every owner whose strikes were cut short, in order, with EVERY_STRIKE where a panic
+    // cut them all — so "was this strike taken back" has one answer in a test.
     strikesSilenced: symbol[];
     // The wet level the room was last set to.
     room: number;
@@ -79,8 +83,11 @@ export function fakeAudioEngine(): FakeAudioEngine {
         setPedal(pedal, down) {
             engine.pedals.push({ pedal, down });
         },
-        allNotesOff() {
+        allNotesOff(options) {
             engine.silenced += 1;
+            if (!options?.letStrikesRing) {
+                engine.strikesSilenced.push(EVERY_STRIKE);
+            }
         },
         silenceStrikes(owner) {
             engine.strikesSilenced.push(owner);

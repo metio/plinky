@@ -239,6 +239,15 @@ describe("the echo window of a strike cut short", () => {
         expect(engine.recentlyStruck?.(60, 300)).toBe(false);
         expect(engine.recentlyStruck?.(67, 300)).toBe(false);
     });
+
+    it("stays open for a strike a panic lets ring", async () => {
+        const advance = clock();
+        const engine = await engineWith(fakeAudioContext(), silentPack);
+        engine.strike({ note: 60, gain: 0.3, velocity: 90, duration: 4, delay: 0 });
+        engine.allNotesOff({ letStrikesRing: true });
+        advance(2_000);
+        expect(engine.recentlyStruck?.(60, 300)).toBe(true);
+    });
 });
 
 describe("sympathetic resonance", () => {

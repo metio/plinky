@@ -87,7 +87,11 @@ export interface AudioEngine {
     // ending does not move, and a MIDI piano sends a pedal only when it changes, so a pedal
     // dropped here would stay dropped under a foot still holding it. Idempotent; safe with
     // no audio context.
-    allNotesOff(): void;
+    //
+    // `letStrikesRing` leaves the fixed-length strikes alone and silences only the voices:
+    // for a surface that closes on a piece played to its end, where what is still sounding
+    // is the piece's last notes. A strike ends by itself, so it cannot stick; a voice can.
+    allNotesOff(options?: { letStrikesRing?: boolean }): void;
     // Cut short every fixed-length strike made under `owner` — ringing, or still waiting on
     // its delay — with a short fade. A strike is scheduled whole, so a transport that stops
     // would otherwise leave the notes it already struck sounding for their full written

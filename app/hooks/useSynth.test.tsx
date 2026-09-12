@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { KEYBOARD_DEVICE, MIC_DEVICE, ON_SCREEN_DEVICE } from "../../core/midi";
 import type { Prefs } from "../../core/prefs";
 import { ROOM_WET } from "../../core/room";
-import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
+import { EVERY_STRIKE, fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { memoryStore } from "../adapters/memoryStore";
 import { ServicesProvider } from "../contexts/services";
 import { createPrefsStore } from "../stores/prefsStore";
@@ -88,6 +88,14 @@ describe("useSynth", () => {
         const { audio, synth } = harness({ sound: false });
         synth.silenceAll();
         expect(audio.silenced).toBe(1);
+        expect(audio.strikesSilenced).toEqual([EVERY_STRIKE]);
+    });
+
+    it("can leave the strikes ringing while it panics the voices", () => {
+        const { audio, synth } = harness();
+        synth.silenceAll({ letStrikesRing: true });
+        expect(audio.silenced).toBe(1);
+        expect(audio.strikesSilenced).toEqual([]);
     });
 
     it("tags a strike with the playback that struck it, and none when nobody asked", () => {

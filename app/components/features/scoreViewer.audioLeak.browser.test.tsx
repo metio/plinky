@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildScore } from "../../../core/musicxmlBuild";
 import type { PlayOptions } from "../../../core/playOptions";
 import { DEFAULT_PREFS, type Prefs } from "../../../core/prefs";
-import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
+import { EVERY_STRIKE, fakeAudioEngine } from "../../adapters/fakeAudioEngine";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { memoryStore } from "../../adapters/memoryStore";
 import { createPrefsStore } from "../../stores/prefsStore";
@@ -271,7 +271,31 @@ describe("the duet's other hand", () => {
         await expect.poll(() => duetStrikes(audio).length, { timeout: 30000 }).toBe(2);
         const [first] = duetStrikes(audio);
         expect(typeof first?.owner).toBe("symbol");
+        // Neither by the duet's own stop nor by the stage closing around it: the note that
+        // was sounding as the key came up rings on under the one that followed it.
         expect(audio.strikesSilenced.slice(before)).not.toContain(first?.owner);
+        expect(audio.strikesSilenced.slice(before)).not.toContain(EVERY_STRIKE);
+    });
+
+    it("takes everything back when the player leaves the stage mid-run", async () => {
+        const { audio } = mount({
+            xml: DUET_SCORE,
+            prefs: { duet: true },
+            options: { hands: "right" },
+        });
+        await startPractice();
+        const e4 = await screen.findByLabelText("E 4");
+        fireEvent.pointerDown(e4);
+        fireEvent.pointerUp(e4);
+        await expect.poll(() => duetStrikes(audio).length, { timeout: 30000 }).toBe(1);
+        const before = audio.strikesSilenced.length;
+        fireEvent.click(screen.getByRole("button", { name: m.action_exit_fullscreen() }));
+        await settle(3000);
+        expect(duetStrikes(audio)).toHaveLength(1);
+        const owner = duetStrikes(audio)[0]?.owner;
+        expect(audio.strikesSilenced.slice(before)).toEqual(
+            expect.arrayContaining([owner, EVERY_STRIKE]),
+        );
     });
 });
 
@@ -289,6 +313,22 @@ describe("a play-along's notes", () => {
         await expect
             .poll(() => audio.strikesSilenced.slice(before), { timeout: 30000 })
             .toContain(owner);
+    });
+
+    it("ring on when the run plays to its end and the stage closes", async () => {
+        // One position: the run finishes a beat after it opens and drops out of full screen
+        // by itself, with its last guide note still sounding.
+        const { audio } = mount({ prefs: { keepUp: true, guideNotes: true } });
+        await startPractice();
+        await expect.poll(() => audio.strikes.length, { timeout: 30000 }).toBeGreaterThan(0);
+        const owner = audio.strikes[0]?.owner;
+        expect(typeof owner).toBe("symbol");
+        const before = audio.strikesSilenced.length;
+        const panics = audio.silenced;
+        // The stage closing is what runs the panic.
+        await expect.poll(() => audio.silenced, { timeout: 30000 }).toBeGreaterThan(panics);
+        expect(audio.strikesSilenced.slice(before)).not.toContain(owner);
+        expect(audio.strikesSilenced.slice(before)).not.toContain(EVERY_STRIKE);
     });
 });
 

@@ -726,9 +726,12 @@ function usePlaySessionValue({
     // Stop the self-paced run, and the duet with it. The duet schedules the other hand
     // across the whole gap up to your next note on timers of its own, so stopping the
     // matcher alone would leave those notes arriving one by one after the run has ended,
-    // and under Listen when Listen is what took over.
-    const stopSelfPaced = () => {
-        accompaniment.stop();
+    // and under Listen when Listen is what took over. A run that reached its end rings
+    // out instead: the other hand's closing notes are the end of the piece.
+    const stopSelfPaced = ({ ringOut = false }: { ringOut?: boolean } = {}) => {
+        if (!ringOut) {
+            accompaniment.stop();
+        }
         matcher.stop();
     };
 
@@ -978,19 +981,12 @@ function usePlaySessionValue({
     // which also silences the module-singleton audio engine on unmount.
     useEndRun({
         active: fullscreen,
+        stillPlaying: () => listenPlayback.active() || keepUp.active() || matcher.practicing,
         stopListen: listenPlayback.stop,
         gradeOwedRun: grading.gradeIfOwed,
         saveOwedTake: takes.saveIfOwed,
         stopKeepUp: keepUp.stop,
-        stopMatcher: () => {
-            // A run that reached its end closes the stage by itself once the last key comes
-            // up, and the other hand's closing notes are the end of the piece: they play out,
-            // the way Listen's last notes ring. Left before its end, the run takes them back.
-            if (!matcher.complete) {
-                accompaniment.stop();
-            }
-            matcher.stop();
-        },
+        stopSelfPaced,
         cancelPendingStart: () => {
             startPress.cancel();
             sightRead.cancel();
@@ -999,8 +995,8 @@ function usePlaySessionValue({
             hidden.restore();
             vanishing.restore();
         },
-        silence: () => {
-            synth.silenceAll();
+        silence: ({ ringOut }) => {
+            synth.silenceAll({ letStrikesRing: ringOut });
             silenceEcho();
             // Everything else going out stops here, and a lit key is going out too —
             // left alone it would still be glowing on an instrument nobody is playing.

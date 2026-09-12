@@ -955,7 +955,7 @@ export const webAudioEngine: AudioEngine = {
             }
         }
     },
-    allNotesOff() {
+    allNotesOff(options) {
         const ctx = context();
         if (ctx) {
             // Ring each voice out fast so the panic is a clean stop, not a click, then
@@ -965,7 +965,9 @@ export const webAudioEngine: AudioEngine = {
             }
             // A fixed-length strike opens no voice, so silence the scheduled/ringing ones
             // too — otherwise a note scheduled ahead would sound on past the panic.
-            silenceStrikes(ctx);
+            if (!options?.letStrikesRing) {
+                silenceStrikes(ctx);
+            }
             for (const note of voices.keys()) {
                 closeEchoWindow(note);
             }

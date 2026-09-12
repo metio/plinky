@@ -21,11 +21,21 @@ import { useEffect, useRef } from "react";
 //     surface the player had left, start the run, and go on ticking on screen.
 //
 // The rest is tidying that has no order of its own — put the score back the way a
-// resting page expects it, and let nothing keep sounding.
+// resting page expects it, and let nothing keep sounding that was cut off.
+//
+// What was cut off depends on whether anything was still playing. A stage closed on a
+// run, a play-along or Listen still under way interrupts them, and everything they struck
+// goes. A stage that closes because the run played to its end has nothing left to
+// interrupt: the notes still sounding are the piece's last, the other hand's closing bars
+// and the finishing flourish among them, and they ring out the way Listen's last notes do.
+// Leaving the page is always an interruption.
 
 export type EndRunOptions = {
     // True while the surface is live. The run ends on the edge down to false.
     active: boolean;
+    // Whether a run, a play-along or Listen was still under way. Read before anything
+    // below stops them, which is what makes it false.
+    stillPlaying: () => boolean;
     stopListen: () => void;
     // Take the recording if one is still owed. Runs before stopMatcher.
     // Grade a finished run that is still waiting for the player to let go. Without it, a
@@ -33,13 +43,15 @@ export type EndRunOptions = {
     gradeOwedRun: () => void;
     saveOwedTake: () => void;
     stopKeepUp: () => void;
-    stopMatcher: () => void;
+    // `ringOut` when the run reached its end: its other hand's last notes are the piece.
+    stopSelfPaced: (options: { ringOut: boolean }) => void;
     // Drop any claim to start a run, and stop whatever is counting down toward one.
     cancelPendingStart: () => void;
     // Put back whatever the run hid: blanked noteheads, vanished bars.
     restoreScore: () => void;
-    // Silence the guide voices and anything still lit on a connected instrument.
-    silence: () => void;
+    // Silence the guide voices and anything still lit on a connected instrument, and,
+    // unless `ringOut`, every note still sounding.
+    silence: (options: { ringOut: boolean }) => void;
 };
 
 export function useEndRun(options: EndRunOptions): void {
@@ -51,20 +63,21 @@ export function useEndRun(options: EndRunOptions): void {
             return;
         }
         const o = latest.current;
+        const ringOut = !o.stillPlaying();
         o.stopListen();
         // Before the take: a run left with a key still down has not been graded yet, and
         // the take reads the grade at save time.
         o.gradeOwedRun();
         o.saveOwedTake();
         o.stopKeepUp();
-        o.stopMatcher();
+        o.stopSelfPaced({ ringOut });
         o.cancelPendingStart();
         o.restoreScore();
-        o.silence();
+        o.silence({ ringOut });
     }, [options.active]);
 
     // The audio engine's voices outlive this component — it is a module singleton — so
     // navigating away from the play route has to silence them too. The effect above
     // only fires on the surface going quiet, never on unmount.
-    useEffect(() => () => latest.current.silence(), []);
+    useEffect(() => () => latest.current.silence({ ringOut: false }), []);
 }
