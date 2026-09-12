@@ -80,8 +80,25 @@ describe("Layout", () => {
 
     it("renders the header and the routed page", () => {
         renderLayout();
-        expect(screen.getByLabelText("Plinky home")).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.header_home_label() })).toBeTruthy();
         expect(screen.getByTestId("page")).toBeTruthy();
+    });
+
+    // The mark is decorative, so this label is the whole accessible name of the first
+    // link on every page — heard first, and in the page's language.
+    it("names the home link in the page's language", () => {
+        for (const locale of ["fr", "ja"] as const) {
+            overwriteGetLocale(() => locale);
+            renderLayout();
+            const home = screen.getByRole("link", {
+                name: m.header_home_label({}, { locale }),
+            });
+            expect(home.getAttribute("href")).toBe(`/${locale}/`);
+            expect(home.getAttribute("aria-label")).not.toBe(
+                m.header_home_label({}, { locale: "en" }),
+            );
+            cleanup();
+        }
     });
 
     it("stamps the document language from the active locale", () => {

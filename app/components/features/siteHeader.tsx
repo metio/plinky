@@ -47,7 +47,7 @@ export function SiteHeader({ badge = <GradeBadge /> }: { badge?: ReactNode }) {
                         accent. Decorative only — the link carries the accessible name. */}
                     <Link
                         to="/"
-                        aria-label="Plinky home"
+                        aria-label={m.header_home_label()}
                         className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         {/* The wordless form of the mark: the tile, the keys and the falling

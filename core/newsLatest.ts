@@ -18,6 +18,10 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
+                body: "**The first link on every page is named in your language.** A screen reader\nannounced the logo's link home in English on every page, in the middle of a\nFrench or Japanese one. It now reads in the language of the page.",
+                twip: true,
+            },
+            {
                 body: "**Slurs in songs land on the right hand again.** In a song for voice and piano, the\nsinger's line is left off the page, and every slur the piano's music carries was\nmoving one staff down: the tune under a slur played detached, while a staccato bass\nunder it was held long, in Listen and in what a run asked of you. Each slur now\nstays on the staff it is drawn on, with the singer on the page or off it.",
                 twip: true,
             },

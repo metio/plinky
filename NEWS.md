@@ -15,6 +15,10 @@ landing on a page that stopped working, used to show a page in English whatever
 language the rest of the site was in. It now speaks yours, with a way home and the
 same way to report the problem.
 
+**The first link on every page is named in your language.** A screen reader
+announced the logo's link home in English on every page, in the middle of a
+French or Japanese one. It now reads in the language of the page.
+
 **Slurs in songs land on the right hand again.** In a song for voice and piano, the
 singer's line is left off the page, and every slur the piano's music carries was
 moving one staff down: the tune under a slur played detached, while a staccato bass
