@@ -50,46 +50,111 @@ export function crowdedGrade(exercises: { kind: string; grade: number }[]): stri
     return null;
 }
 
-// How many songs to re-derive as a check that what the manifest stores still comes from
-// the current models — the difficulty model for cost, the encoder for the incipit.
-//
-// A change to either moves essentially every row, so a handful spread across the catalogue
-// detects one with certainty, in a second rather than the half-hour re-deriving three
-// thousand scores takes. The exercises are re-derived outright because they are few; the
-// songs only have to be caught.
+// How many songs to re-derive, spread across the catalogue, as a check that what the
+// manifest stores still comes from the current models — the difficulty model for cost, the
+// encoder for the incipit. The exercises are re-derived outright because they are few; the
+// songs only have to be caught, in seconds rather than the half-hour re-deriving three
+// thousand scores takes.
 const SONG_PROBES = 24;
 
-// Re-derives a spread of songs and names the first whose stored values no longer match.
-// Null when the manifest is current, or when no score could be read to judge by.
-export async function staleSong(songs: ProbeSong[]): Promise<string | null> {
-    if (songs.length === 0) {
-        return null;
+// The staves each part of a score is written on, in score order — "2" for a grand staff,
+// "1,2" for a song over its piano, "1,1" for a piano written as two parts. Read off the
+// text, since parsing every score in the catalogue to choose a handful of probes would
+// cost what the probes exist to save. It mirrors stavesPerPart in core/accompaniment.ts,
+// which the test holds it to; it only chooses which songs to probe, so a misreading
+// could make the spread less varied but never a verdict wrong.
+export function layoutOf(xml: string): string {
+    const counts: number[] = [];
+    const opening = /<part[\s>]/g;
+    for (let found = opening.exec(xml); found !== null; found = opening.exec(xml)) {
+        const end = xml.indexOf("</part>", found.index);
+        const body = xml.slice(found.index, end === -1 ? undefined : end);
+        const stated = /<staves>\s*(\d+)\s*<\/staves>/.exec(body)?.[1];
+        const count = stated === undefined ? Number.NaN : Number.parseInt(stated, 10);
+        counts.push(Number.isInteger(count) && count > 0 ? count : 1);
+        opening.lastIndex = end === -1 ? xml.length : end;
     }
+    return counts.join(",");
+}
+
+// Which rows to re-derive, by index, given each row's part layout: a spread across the
+// catalogue, and then the first row of every layout the spread did not reach.
+//
+// A spread alone assumes a model change moves essentially every row. Many do; some are
+// confined to one way of writing a score. Reading two single-staff parts as both hands
+// moved about one row in a hundred, which a spread of two dozen misses three times in
+// four — and the manifest stayed stale for days behind a green check. Each layout the
+// catalogue holds is somewhere a change can be confined to, so each gets a probe.
+export function probeIndices(layouts: readonly string[]): number[] {
+    const chosen = new Set<number>();
+    const step = Math.max(1, Math.floor(layouts.length / SONG_PROBES));
+    for (let i = 0; i < layouts.length; i += step) {
+        chosen.add(i);
+    }
+    const reached = new Set([...chosen].map((index) => layouts[index]));
+    for (const [index, layout] of layouts.entries()) {
+        if (!reached.has(layout)) {
+            reached.add(layout);
+            chosen.add(index);
+        }
+    }
+    return [...chosen].sort((a, b) => a - b);
+}
+
+// A song's shipped score, or what stands in the way of reading it.
+export type ShippedScore = { xml: string } | { problem: "missing" | "unreadable" };
+
+export async function shippedScore(song: ProbeSong): Promise<ShippedScore> {
     const { decompressMxl } = await import("../core/musicxmlFile.ts");
-    const step = Math.max(1, Math.floor(songs.length / SONG_PROBES));
-    for (let i = 0; i < songs.length; i += step) {
-        const song = songs[i]!;
-        const path = scorePath(song.id, song.license);
-        const bytes = path === null ? null : await readFile(path).catch(() => null);
+    const path = scorePath(song.id, song.license);
+    const bytes = path === null ? null : await readFile(path).catch(() => null);
+    if (!bytes) {
+        return { problem: "missing" };
+    }
+    const xml = decompressMxl(new Uint8Array(bytes));
+    return xml ? { xml } : { problem: "unreadable" };
+}
+
+// What the models in the tree make of a score: the cost the manifest stores, rounded as
+// it is stored, and the incipit. A score whose opening cannot be read has no incipit,
+// legitimately.
+export function currentMeasure(xml: string): { cost: number; incipit: string | undefined } {
+    const opening = readIncipit(linkedomXmlCodec, xml);
+    return {
+        cost: Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3)),
+        incipit: opening === null ? undefined : encodeIncipit(opening),
+    };
+}
+
+// Re-derives the probed songs and names the first whose stored values no longer match.
+// Null when the manifest is current. Every score is read, to learn its layout, so a row
+// naming a score that is not shipped or cannot be read is named wherever it stands: a row
+// the app cannot open is a problem, not a probe to skip.
+export async function staleSong(
+    songs: ProbeSong[],
+    read: (song: ProbeSong) => Promise<ShippedScore> = shippedScore,
+    measure: (xml: string) => { cost: number; incipit: string | undefined } = currentMeasure,
+): Promise<string | null> {
+    const scores: string[] = [];
+    for (const song of songs) {
+        const score = await read(song);
         const named = song.title ?? song.id;
-        // A row whose score cannot be read is a row the app cannot open: a problem to
-        // name, not a probe to skip.
-        if (!bytes) {
-            return `${named} (${song.id}) has no .mxl under public/songs — the manifest names a score that is not shipped`;
+        if ("problem" in score) {
+            return score.problem === "missing"
+                ? `${named} (${song.id}) has no .mxl under public/songs — the manifest names a score that is not shipped`
+                : `${named} (${song.id}) has an .mxl that cannot be read`;
         }
-        const xml = decompressMxl(new Uint8Array(bytes));
-        if (!xml) {
-            return `${named} (${song.id}) has an .mxl that cannot be read`;
+        scores.push(score.xml);
+    }
+    for (const index of probeIndices(scores.map(layoutOf))) {
+        const song = songs[index]!;
+        const named = song.title ?? song.id;
+        const fresh = measure(scores[index]!);
+        if (fresh.cost !== song.cost) {
+            return `${named} is stored at cost ${song.cost} but measures ${fresh.cost} — run \`npm run songs:cost\``;
         }
-        const fresh = Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3));
-        if (fresh !== song.cost) {
-            return `${named} is stored at cost ${song.cost} but measures ${fresh} — run \`npm run songs:cost\``;
-        }
-        // A score whose opening cannot be read has no incipit, legitimately, so absence is
-        // only wrong when the encoder does produce one.
-        const opening = readIncipit(linkedomXmlCodec, xml);
-        const incipit = opening === null ? undefined : encodeIncipit(opening);
-        if (incipit !== song.incipit) {
+        // Absence is only wrong when the encoder does produce an incipit.
+        if (fresh.incipit !== song.incipit) {
             return `${named} carries an incipit the encoder no longer produces — run \`npm run songs:incipits\``;
         }
     }
