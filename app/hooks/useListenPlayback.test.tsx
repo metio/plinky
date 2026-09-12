@@ -498,6 +498,38 @@ describe("collectListenSteps", () => {
         }
     });
 
+    it("sweeps on from another note of the chord one glissando lands on", () => {
+        // C5 up to the G5 of a G5-E5 chord, then from that chord's E5 on up to A5, read off
+        // the file: the landing note and the leaving one written in either order.
+        for (const landingFirst of [true, false]) {
+            const note = (step: string, notations = "", chord = false) =>
+                `<note>${chord ? "<chord/>" : ""}<pitch><step>${step}</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type>${
+                    notations ? `<notations>${notations}</notations>` : ""
+                }</note>`;
+            const landing = (chord: boolean) => note("G", '<glissando type="stop"/>', chord);
+            const leaving = (chord: boolean) => note("E", '<glissando type="start"/>', chord);
+            const onChord = landingFirst
+                ? landing(false) + leaving(true)
+                : leaving(false) + landing(true);
+            const doc = new DOMParser().parseFromString(
+                `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>${note("C", '<glissando type="start"/>')}${onChord}${note("A", '<glissando type="stop"/>')}${note("F")}</measure></part></score-partwise>`,
+                "application/xml",
+            );
+            const steps = collectListenSteps(lineOsmd([60, [67, 64], 69, 65]), readScoreMarks(doc));
+            expect(steps.map((step) => step.notes.map((one) => one.pitch))).toEqual([
+                [72],
+                [74],
+                [76],
+                [77],
+                [79, 76],
+                [77],
+                [79],
+                [81],
+                [77],
+            ]);
+        }
+    });
+
     it("gentles a passage under the soft pedal", () => {
         const softly = collectListenSteps(fakeOsmd(1), {
             ...NO_SCORE_MARKS,
