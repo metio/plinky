@@ -64,6 +64,11 @@ const SONG_PROBES = 24;
 // which the test holds it to; it only chooses which songs to probe, so a misreading
 // could make the spread less varied but never a verdict wrong.
 export function layoutOf(xml: string): string {
+    // A score written measure by measure nests its parts inside each measure, where the
+    // model reads no part at all.
+    if (xml.includes("<score-timewise")) {
+        return "";
+    }
     const counts: number[] = [];
     const opening = /<part[\s>]/g;
     for (let found = opening.exec(xml); found !== null; found = opening.exec(xml)) {

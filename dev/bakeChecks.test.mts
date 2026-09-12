@@ -85,6 +85,17 @@ describe("layoutOf", () => {
     it("reads a score with no parts as no layout", () => {
         expect(layoutOf("<score-partwise/>")).toBe("");
     });
+
+    it("reads a score written measure by measure as the model does, as no parts", () => {
+        const part = (id: string, staves: number) =>
+            `<part id="${id}"><attributes><staves>${staves}</staves></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></part>`;
+        const measure = (number: number) =>
+            `<measure number="${number}">${part("P1", 1)}${part("P2", 2)}</measure>`;
+        const xml = `<?xml version="1.0"?><score-timewise version="4.0"><part-list><score-part id="P1"><part-name>x</part-name></score-part><score-part id="P2"><part-name>x</part-name></score-part></part-list>${measure(1)}${measure(2)}${measure(3)}</score-timewise>`;
+        const doc = linkedomXmlCodec.parse(xml);
+        expect(doc).not.toBeNull();
+        expect(layoutOf(xml)).toBe(stavesPerPart(doc!).join(","));
+    });
 });
 
 describe("probeIndices", () => {
