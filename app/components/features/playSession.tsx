@@ -342,9 +342,16 @@ function usePlaySessionValue({
     //
     // From the untransposed document, because that is what the file says; every key and
     // every pitch a mark carries is then moved to wherever the transposition put the music.
+    // Numbered for the page the engraver draws, which leaves the other parts off unless the
+    // player asks for them — on an art song that makes the piano's right hand staff 0.
+    const showAccompaniment = reading.showAccompaniment;
     const marks = useMemo(
-        () => transposeScoreMarks(readScoreMarks(xmlCodec.parse(xml)), transpose),
-        [xml, transpose, xmlCodec],
+        () =>
+            transposeScoreMarks(
+                readScoreMarks(xmlCodec.parse(xml), { accompaniment: showAccompaniment }),
+                transpose,
+            ),
+        [xml, transpose, xmlCodec, showAccompaniment],
     );
 
     // Which hand to practice — the hands-separate selector only appears for the

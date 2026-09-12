@@ -337,3 +337,84 @@ describe("transposeScoreMarks", () => {
         expect(moved.glissandos).toEqual([{ from: 0, to: 1, arrivesAt: 55 }]);
     });
 });
+
+// A score written for more than one part: an art song [voice, piano on two staves], a piano
+// written as two single-staff parts, and two singers above a piano.
+const ONE_STAFF = `<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>`;
+const TWO_STAVES = `<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>`;
+
+// A crotchet on a staff and voice, with whatever notations it carries.
+const quarter = (step: string, octave: number, staff = 1, voice = "1", notations = "") =>
+    `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>4</duration><voice>${voice}</voice><type>quarter</type><staff>${staff}</staff>${
+        notations ? `<notations>${notations}</notations>` : ""
+    }</note>`;
+
+const BACK = "<backup><duration>16</duration></backup>";
+
+const partwise = (parts: { id: string; body: string }[]) =>
+    parse(`<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1"><part-list>${parts
+        .map((one) => `<score-part id="${one.id}"><part-name>${one.id}</part-name></score-part>`)
+        .join("")}</part-list>${parts
+        .map((one) => `<part id="${one.id}"><measure number="1">${one.body}</measure></part>`)
+        .join("")}</score-partwise>`);
+
+// The singer: four plain crotchets, unslurred.
+const SINGER = `${ONE_STAFF}${quarter("G", 4)}${quarter("A", 4)}${quarter("B", 4)}${quarter("D", 4)}`;
+// The piano: a right-hand arch over three notes, and a staccato left hand under it.
+const SLURRED_PIANO = `${TWO_STAVES}${quarter("C", 5, 1, "1", '<slur number="1" type="start"/>')}${quarter("D", 5)}${quarter("E", 5, 1, "1", '<slur number="1" type="stop"/>')}${quarter("F", 5)}${BACK}${["C", "G", "G", "C"].map((step) => quarter(step, 3, 2, "5", "<articulations><staccato/></articulations>")).join("")}`;
+
+describe("a score written for more than one part", () => {
+    it("numbers an art song's arches the way the page without the singer numbers its staves", () => {
+        const doc = partwise([
+            { id: "P1", body: SINGER },
+            { id: "P2", body: SLURRED_PIANO },
+        ]);
+        // With the singer taken off the page the piano's right hand is staff 0.
+        const spans = readScoreMarks(doc, { accompaniment: false }).slurs;
+        expect(spans).toEqual([{ from: 0, to: 0.5, staff: 0 }]);
+        expect(slurredOnwardAt(spans, 0.25, 0)).toBe(true);
+        expect(slurredOnwardAt(spans, 0.25, 1)).toBe(false);
+    });
+
+    it("numbers them across the whole score where the singer is drawn too", () => {
+        const doc = partwise([
+            { id: "P1", body: SINGER },
+            { id: "P2", body: SLURRED_PIANO },
+        ]);
+        expect(readScoreMarks(doc, { accompaniment: true }).slurs).toEqual([
+            { from: 0, to: 0.5, staff: 1 },
+        ]);
+        // What a caller that engraves the file as it is gets without asking.
+        expect(readScoreMarks(doc).slurs).toEqual([{ from: 0, to: 0.5, staff: 1 }]);
+    });
+
+    it("numbers them past two singers, drawn or not", () => {
+        const doc = partwise([
+            { id: "S", body: SINGER },
+            { id: "A", body: SINGER },
+            { id: "P", body: SLURRED_PIANO },
+        ]);
+        expect(readScoreMarks(doc, { accompaniment: false }).slurs).toEqual([
+            { from: 0, to: 0.5, staff: 0 },
+        ]);
+        expect(readScoreMarks(doc, { accompaniment: true }).slurs).toEqual([
+            { from: 0, to: 0.5, staff: 2 },
+        ]);
+    });
+
+    it("keeps a singer's arch off the page it is not drawn on", () => {
+        const slurredSinger = `${ONE_STAFF}${quarter("G", 4, 1, "1", '<slur number="1" type="start"/>')}${quarter("A", 4, 1, "1", '<slur number="1" type="stop"/>')}${quarter("B", 4)}${quarter("C", 5)}`;
+        const doc = partwise([
+            { id: "P1", body: slurredSinger },
+            {
+                id: "P2",
+                body: `${TWO_STAVES}${quarter("C", 5)}${quarter("D", 5)}${quarter("E", 5)}${quarter("F", 5)}`,
+            },
+        ]);
+        expect(readScoreMarks(doc, { accompaniment: false }).slurs).toEqual([]);
+        expect(readScoreMarks(doc, { accompaniment: true }).slurs).toEqual([
+            { from: 0, to: 0.25, staff: 0 },
+        ]);
+    });
+});

@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 12 September 2026 — evening
+
+**Slurs in songs land on the right hand again.** In a song for voice and piano, the
+singer's line is left off the page, and every slur the piano's music carries was
+moving one staff down: the tune under a slur played detached, while a staccato bass
+under it was held long, in Listen and in what a run asked of you. Each slur now
+stays on the staff it is drawn on, with the singer on the page or off it.
+
 ## 12 September 2026
 
 **Ear training answers from your number keys.** On a scale-degree question, typing 3
