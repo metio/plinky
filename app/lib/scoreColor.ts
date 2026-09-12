@@ -566,30 +566,21 @@ export function trailNotes(painted: PaintedNote[], color: string): void {
     litHalos(painted.map(({ element, prior }) => ({ element, color: prior ?? color })));
 }
 
-// Each pitched note's halo colour (or null for none) in cursor-walk order — the run's
-// whole paint captured independently of the SVG. A fingering toggle re-renders the score,
-// which drops every halo; snapshotting before the render and re-applying after restores the
-// green cleared notes, the blue Listen trail, a red miss and any revealed hidden note in one
-// pass. The fresh noteheads walk in the same order because a fingering change adds no notes.
-export function snapshotNotePaint(osmd: OpenSheetMusicDisplay): (string | null)[] {
-    return noteheadsInWalk(osmd).map((element) => (element ? haloColor(element) : null));
-}
-
-// Re-applies a snapshot to the freshly-rendered noteheads, walking them in the same order.
-// Returns whether any note wore a mark, so the caller can keep the score's painted flag.
-export function restoreNotePaint(osmd: OpenSheetMusicDisplay, colors: (string | null)[]): boolean {
-    return paintInWalk(noteheadsInWalk(osmd), colors);
-}
-
 // Where a notehead drawn before a re-render is drawn after it, or undefined for one the
 // fresh render does not have.
 export type NoteRemap = (element: SVGElement) => SVGElement | undefined;
 
 // Re-renders through `render`, carrying the score's paint across, and says where each
-// notehead went. The paint alone is not enough: a transport holding the noteheads it lit
-// "now sounding" holds elements the render discarded, and lifting or trailing them paints
-// into an SVG nobody sees, while the fresh notehead keeps the highlight it was restored
-// with for good. The remap lets such a holder follow its notes to the fresh render.
+// notehead went. A fingering toggle re-renders the score, which drops every halo: the
+// green cleared notes, the blue Listen trail, a red miss and any revealed hidden note are
+// read off in cursor-walk order before the render and put back on the fresh noteheads,
+// which walk in the same order because a fingering change adds no notes. `painted` says
+// whether any note wore a mark, so the caller can keep the score's painted flag.
+//
+// The paint alone is not enough: a transport holding the noteheads it lit "now sounding"
+// holds elements the render discarded, and lifting or trailing them paints into an SVG
+// nobody sees, while the fresh notehead keeps the highlight it was restored with for good.
+// The remap lets such a holder follow its notes to the fresh render.
 export function redrawKeepingPaint(
     osmd: OpenSheetMusicDisplay,
     render: () => void,
@@ -609,13 +600,17 @@ export function redrawKeepingPaint(
     return { painted, remap: (element) => moved.get(element) };
 }
 
+// Noteheads followed to a fresh render. A note the fresh render does not draw is dropped:
+// there is nothing left to paint.
+export function followNotes(elements: readonly SVGElement[], remap: NoteRemap): SVGElement[] {
+    return elements.flatMap((element) => remap(element) ?? []);
+}
+
 // Lit notes followed to a fresh render, each keeping the halo it wore before it was lit.
-// A note the fresh render does not draw is dropped: there is nothing left to lift.
 export function retargetPainted(painted: readonly PaintedNote[], remap: NoteRemap): PaintedNote[] {
-    return painted.flatMap(({ element, prior }) => {
-        const fresh = remap(element);
-        return fresh ? [{ element: fresh, prior }] : [];
-    });
+    return painted.flatMap(({ element, prior }) =>
+        followNotes([element], remap).map((fresh) => ({ element: fresh, prior })),
+    );
 }
 
 // Every pitched notehead in cursor-walk order, null where one has no rendered element, so

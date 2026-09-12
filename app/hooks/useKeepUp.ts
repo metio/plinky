@@ -23,7 +23,7 @@ import { readParts, readStartTempo } from "../lib/scoreExpression";
 import { effectiveTempo, subStepAdvanceMs } from "../../core/playback";
 import { fitGraces } from "../../core/listenPerformance";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
-import { highlightCursorNotes, litHalos, type NoteRemap } from "../lib/scoreColor";
+import { followNotes, highlightCursorNotes, litHalos, type NoteRemap } from "../lib/scoreColor";
 import { useLatest } from "./useLatest";
 import { useTimerChain } from "./useTimerChain";
 import { shortestAt } from "../lib/listenSteps";
@@ -432,10 +432,8 @@ export function useKeepUp({
     // render, or its verdict would colour the discarded ones and leave the fresh ones lit
     // "play now" for good.
     const retarget = useCallback((remap: NoteRemap) => {
-        const follow = (elements: SVGElement[]) =>
-            elements.flatMap((element) => remap(element) ?? []);
-        notesRef.current = follow(notesRef.current);
-        closingNotesRef.current = follow(closingNotesRef.current);
+        notesRef.current = followNotes(notesRef.current, remap);
+        closingNotesRef.current = followNotes(closingNotesRef.current, remap);
     }, []);
     return useMemo(
         () => ({

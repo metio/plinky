@@ -5,11 +5,10 @@ import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import {
+    haloColor,
     highlightCursorNotes,
     redrawKeepingPaint,
-    restoreNotePaint,
     retargetPainted,
-    snapshotNotePaint,
     trailNotes,
 } from "./scoreColor";
 
@@ -39,61 +38,65 @@ afterEach(() => {
     host = null;
 });
 
-// Proves the fix against a real OSMD: the walk order the snapshot relies on, the actual
-// SVG noteheads, and litHalos' real geometry — the fakes in the node suite can't.
-describe("note-paint snapshot across an OSMD re-render", () => {
-    it("survives the render a fingering toggle forces, restoring the halo it dropped", async () => {
-        host = document.createElement("div");
-        host.style.width = "800px";
-        document.body.appendChild(host);
-        const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
-        await osmd.load(score(true));
-        osmd.render();
+async function fingeredScore(): Promise<OpenSheetMusicDisplay> {
+    host = document.createElement("div");
+    host.style.width = "800px";
+    document.body.appendChild(host);
+    const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
+    await osmd.load(score(true));
+    osmd.render();
+    return osmd;
+}
 
-        // Paint the first position's notes (the run's trail), then capture it.
-        osmd.cursor.show();
-        osmd.cursor.reset();
-        highlightCursorNotes(osmd, WINDOW_COLOR);
-        const before = snapshotNotePaint(osmd);
-        expect(before.filter((color) => color === WINDOW_COLOR).length).toBeGreaterThan(0);
-
-        // The redraw a mid-run fingering toggle triggers: a fresh render drops every halo.
+// The redraw a mid-run fingering toggle triggers, as drawNow does it.
+function hideFingerings(osmd: OpenSheetMusicDisplay) {
+    return redrawKeepingPaint(osmd, () => {
         (osmd as unknown as { rules: { RenderFingerings: boolean } }).rules.RenderFingerings =
             false;
         osmd.updateGraphic();
         osmd.render();
-        expect(snapshotNotePaint(osmd).every((color) => color === null)).toBe(true);
+    });
+}
 
-        // Re-applying the snapshot puts the score back exactly as it was painted.
-        expect(restoreNotePaint(osmd, before)).toBe(true);
-        expect(snapshotNotePaint(osmd)).toEqual(before);
+const lit = (color: string) =>
+    [...host!.querySelectorAll("rect.plinky-note-halo")].filter(
+        (halo) => halo.isConnected && halo.getAttribute("fill") === color,
+    ).length;
+
+// Proves the carry against a real OSMD: the walk order it relies on, the actual SVG
+// noteheads, and litHalos' real geometry — the fakes in the node suite can't.
+describe("note paint across an OSMD re-render", () => {
+    it("survives the render a fingering toggle forces, restoring the halo it dropped", async () => {
+        const osmd = await fingeredScore();
+
+        // Paint the first position's notes, the run's trail.
+        osmd.cursor.show();
+        osmd.cursor.reset();
+        const painted = highlightCursorNotes(osmd, WINDOW_COLOR);
+        expect(painted.length).toBeGreaterThan(0);
+
+        const redrawn = hideFingerings(osmd);
+        expect(redrawn.painted).toBe(true);
+        // The render discarded the painted noteheads; each fresh one wears the halo back.
+        for (const { element } of painted) {
+            expect(host!.contains(element)).toBe(false);
+            const fresh = redrawn.remap(element);
+            expect(fresh && host!.contains(fresh)).toBe(true);
+            expect(haloColor(fresh!)).toBe(WINDOW_COLOR);
+        }
+        expect(lit(WINDOW_COLOR)).toBe(painted.length);
     });
 
     it("leaves one note 'now sounding' when playback moves on after the redraw", async () => {
-        host = document.createElement("div");
-        host.style.width = "800px";
-        document.body.appendChild(host);
-        const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
-        await osmd.load(score(true));
-        osmd.render();
-        const lit = (color: string) =>
-            [...host!.querySelectorAll("rect.plinky-note-halo")].filter(
-                (halo) => halo.isConnected && halo.getAttribute("fill") === color,
-            ).length;
+        const osmd = await fingeredScore();
 
         // Listen lights the first position and holds its noteheads, to lift on the next tick.
         osmd.cursor.show();
         osmd.cursor.reset();
         const sounding = highlightCursorNotes(osmd, WINDOW_COLOR);
 
-        // The redraw a mid-playback toggle triggers, as drawNow does it, and the transport
-        // following its lit notes to the fresh noteheads.
-        const { painted, remap } = redrawKeepingPaint(osmd, () => {
-            (osmd as unknown as { rules: { RenderFingerings: boolean } }).rules.RenderFingerings =
-                false;
-            osmd.updateGraphic();
-            osmd.render();
-        });
+        // The transport follows its lit notes to the fresh noteheads.
+        const { painted, remap } = hideFingerings(osmd);
         expect(painted).toBe(true);
         expect(lit(WINDOW_COLOR)).toBe(1);
         const followed = retargetPainted(sounding, remap);

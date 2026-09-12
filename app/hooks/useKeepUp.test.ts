@@ -14,9 +14,10 @@ import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
 // The painting reaches into OSMD's rendered SVG, which only exists in a real
 // browser; stub the colour helpers so the hook's paint-tracking is observable in
 // jsdom. highlightCursorNotes returns one painted part so a step counts as painted.
-vi.mock("../lib/scoreColor", () => ({
+vi.mock("../lib/scoreColor", async (importOriginal) => ({
     highlightCursorNotes: () => [{ element: {}, prior: null }],
     litHalos: vi.fn(),
+    followNotes: (await importOriginal<typeof import("../lib/scoreColor")>()).followNotes,
 }));
 
 // One voice at a position: a MIDI pitch on a staff (0 = right, 1 = left) with a
