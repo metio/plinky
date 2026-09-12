@@ -425,3 +425,120 @@ function ascendingFingers(
     }
     return readBack(costs, from).map((state, i) => chosen[i]![state]!);
 }
+
+// --- Positions wider than one hand -------------------------------------------
+// A staff is not a hand. A choral reduction puts tenor and bass on one staff, and a
+// crossing variation writes the other hand's thirds on the staff of the hand it crosses
+// over. Fingered as one hand chord, such a position pays its whole width as stretch and
+// then leads the next move from a note the hand never held.
+
+// The widest position one hand holds at once: an octave.
+export const HAND_REACH = 12;
+
+// One way of holding a position: the notes the hand keeps (a run of the position, read
+// bottom-up), the fingers on them, and what the position costs in place — the shape of
+// what is kept plus the price of whatever is left for somebody else.
+type Hold = { kept: number[]; fingers: number[]; own: number };
+
+const width = (pitches: readonly number[]): number =>
+    pitches.length === 0 ? 0 : Math.max(...pitches) - Math.min(...pitches);
+
+// Whether the other hand can take the notes this one hands over: it strikes nothing at that
+// moment, or what it strikes and what it is given fit in one hand. An unknown other hand
+// cannot.
+function canTake(given: readonly number[], other: readonly number[] | undefined): boolean {
+    return other !== undefined && width([...other, ...given]) <= HAND_REACH;
+}
+
+// Every way the hand can hold one ascending position. Within reach that is every finger
+// tuple over the whole of it, exactly as fingerPositions reads it.
+//
+// Beyond reach the hand can still take the whole of it, priced exactly as fingerPositions
+// prices it: that is a chord both hands are too busy to share, stretched, rolled or broken
+// however the player manages it. Where the other hand can take what this one cannot reach,
+// the hand may instead keep any run of neighbouring notes it spans and hand the rest over.
+// Any run, not only the longest: in a crossing the hand keeps its own thirds and hands over
+// the pair an octave above, although a third note would have fitted under it.
+//
+// A hand-over costs one leap, and time does not ease it. It is the two hands arranging
+// themselves around one position rather than one of them travelling, and eased by time it
+// would make a slow chord shared between the hands nearly free: a Gymnopédie would then
+// grade below a first-year study.
+function holdsOf(
+    pitches: number[],
+    hand: Hand,
+    other: readonly number[] | undefined,
+    spread: Record<number, number>,
+    leap: number,
+): Hold[] {
+    const holds = (kept: number[], handedOver: number): Hold[] =>
+        fingerSets(kept.length, hand).map((fingers) => ({
+            kept,
+            fingers,
+            own: chordCost(kept, fingers, spread) + handedOver,
+        }));
+    const whole = holds(pitches, 0);
+    if (width(pitches) <= HAND_REACH) {
+        return whole;
+    }
+    const shared: Hold[] = [];
+    for (let lo = 0; lo < pitches.length; lo++) {
+        for (let hi = lo; hi < pitches.length && pitches[hi]! - pitches[lo]! <= HAND_REACH; hi++) {
+            const kept = pitches.slice(lo, hi + 1);
+            const given = pitches.filter((pitch) => pitch < kept[0]! || pitch > kept.at(-1)!);
+            if (canTake(given, other)) {
+                shared.push(...holds(kept, leap));
+            }
+        }
+    }
+    return [...whole, ...shared];
+}
+
+// The least a hand spends on a sequence of positions: the same search and the same prices
+// as fingerPositions and positionsCost, where a position one hand cannot span may instead
+// be shared with the other hand as above. The move into and out of a shared position is led
+// by the notes the hand kept. A sequence whose every position is within reach, or whose
+// other hand is not known, costs exactly what positionsCost says of fingerPositions' choice.
+//
+// `others[i]`, where known, is what the other hand strikes at the moment position i
+// sounds — empty when it strikes nothing. This is the grader's price for a hand; the
+// fingering trainer suggests fingers for what is written and keeps its own one-hand search.
+export function reachingCost(
+    positions: number[][],
+    hand: Hand,
+    gaps?: number[],
+    others?: readonly (readonly number[] | undefined)[],
+): number {
+    if (positions.length === 0) {
+        return 0;
+    }
+    const { spread, leap } = handModel();
+    const easeAt = (at: number): number => (gaps === undefined ? 1 : moveEase(gaps[at] ?? 0));
+    const holdAt = (at: number): Hold[] => {
+        const pitches = positions[at]!;
+        return holdsOf(reorder(pitches, ascendingOrder(pitches)), hand, others?.[at], spread, leap);
+    };
+    let holds = holdAt(0);
+    let costs = holds.map((hold) => hold.own);
+    for (let i = 1; i < positions.length; i++) {
+        const ease = easeAt(i);
+        const previous = holds;
+        const previousCosts = costs;
+        holds = holdAt(i);
+        costs = holds.map((hold) => {
+            let best = Number.POSITIVE_INFINITY;
+            previous.forEach((from, at) => {
+                const cost =
+                    previousCosts[at]! +
+                    hold.own +
+                    moveCost(from.kept, from.fingers, hold.kept, hold.fingers, hand, spread, leap) *
+                        ease;
+                if (cost < best) {
+                    best = cost;
+                }
+            });
+            return best;
+        });
+    }
+    return Math.min(...costs);
+}

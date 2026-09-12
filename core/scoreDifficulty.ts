@@ -4,9 +4,9 @@
 import { type Incipit, incipitOf } from "./incipit";
 import { pitchMidiOf } from "./notes";
 import { stavesPerPart } from "./accompaniment";
-import { fingerPositions, positionsCost } from "./fingering";
+import { reachingCost } from "./fingering";
 import { partsOf } from "./parts";
-import { gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
+import { beatCursor, CURSOR_NODES, gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
 import type { XmlCodec } from "./xml";
 
 // How hard a score is to *play*, derived from the fingering cost model — the same
@@ -28,7 +28,17 @@ export type Hands = {
     right: number[][];
     left: number[][];
     gaps: { right: number[]; left: number[] };
+    // The beat each position sounds on, counted from the start of its part: what tells
+    // whether the other hand is striking at the same moment.
+    onsets: { right: number[]; left: number[] };
 };
+
+const noHands = (): Hands => ({
+    right: [],
+    left: [],
+    gaps: { right: [], left: [] },
+    onsets: { right: [], left: [] },
+});
 
 // Split a score's notes into the two hands' position sequences (a position is a
 // chord, or a single note). A note with <chord/> joins the hand's current position
@@ -43,17 +53,15 @@ export type Hands = {
 // never wired to it.
 export function parsePositions(codec: XmlCodec, xml: string): Hands {
     const doc = codec.parse(xml);
-    return doc ? positionsOf(doc) : { right: [], left: [], gaps: { right: [], left: [] } };
+    return doc ? positionsOf(doc) : noHands();
 }
 
 // The same, off a document already open — what measureScore reads, so grade, cost and
 // incipit come off one parse of a score rather than one each.
 export function positionsOf(doc: Document): Hands {
-    const right: number[][] = [];
-    const left: number[][] = [];
-    // Seconds from each position's onset to the one before it — how long the player has
-    // to get the hand there. gaps[0] is unused: nothing precedes the first position.
-    const gaps = { right: [] as number[], left: [] as number[] };
+    const { right, left, gaps, onsets } = noHands();
+    // gaps: seconds from each position's onset to the one before it — how long the player
+    // has to get the hand there. gaps[0] is unused: nothing precedes the first position.
     const counts = stavesPerPart(doc);
     const parts = partsOf(counts);
     const written = Array.from(
@@ -64,10 +72,10 @@ export function positionsOf(doc: Document): Hands {
     const scanned: { nodes: Iterable<Element>; staves: number }[] =
         written.length > 0
             ? written.map((part, index) => ({
-                  nodes: part.querySelectorAll(TIMED_NODES),
+                  nodes: part.querySelectorAll(CURSOR_NODES),
                   staves: counts[index] ?? 1,
               }))
-            : [{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 2 }];
+            : [{ nodes: doc.querySelectorAll(CURSOR_NODES), staves: 2 }];
 
     // <staff> counts from 1 within its own part; partsOf names staves across the whole
     // score. The running offset of the part a note sits in is what turns one into the
@@ -76,7 +84,13 @@ export function positionsOf(doc: Document): Hands {
     const clock = scoreClock();
     const timing = { right: gapTracker(), left: gapTracker() };
     for (const part of scanned) {
+        // Every part keeps its own time, and they all start together.
+        const cursor = beatCursor();
         for (const node of part.nodes) {
+            const beat = cursor.read(node);
+            if (node.tagName === "backup" || node.tagName === "forward") {
+                continue;
+            }
             const seconds = clock.read(node);
             if (node.tagName !== "note") {
                 continue;
@@ -107,6 +121,7 @@ export function positionsOf(doc: Document): Hands {
                 continue;
             }
             gaps[side].push(timing[side].start(seconds));
+            onsets[side].push(beat);
             hand.push([midi]);
         }
         offset += part.staves;
@@ -120,42 +135,91 @@ export function positionsOf(doc: Document): Hands {
     if (right.length === 0 && left.length === 0) {
         const fallbackClock = scoreClock();
         const fallbackTiming = { right: gapTracker(), left: gapTracker() };
-        for (const node of doc.querySelectorAll(TIMED_NODES)) {
-            const seconds = fallbackClock.read(node);
-            if (node.tagName !== "note") {
-                continue;
+        // Part by part, so each part's time starts where the others' does. The walk is the
+        // same document order either way, and the clock runs across the parts as before.
+        const groups: ParentNode[] = written.length > 0 ? written : [doc];
+        for (const group of groups) {
+            const cursor = beatCursor();
+            for (const node of group.querySelectorAll(CURSOR_NODES)) {
+                const beat = cursor.read(node);
+                if (node.tagName === "backup" || node.tagName === "forward") {
+                    continue;
+                }
+                const seconds = fallbackClock.read(node);
+                if (node.tagName !== "note") {
+                    continue;
+                }
+                const note = node;
+                const side =
+                    note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right";
+                const hand = side === "left" ? left : right;
+                const midi = midiOf(note);
+                if (midi === null) {
+                    fallbackTiming[side].skip(seconds);
+                    continue;
+                }
+                if (note.querySelector("chord") && hand.length > 0) {
+                    hand[hand.length - 1]!.push(midi);
+                    continue;
+                }
+                gaps[side].push(fallbackTiming[side].start(seconds));
+                onsets[side].push(beat);
+                hand.push([midi]);
             }
-            const note = node;
-            const side =
-                note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right";
-            const hand = side === "left" ? left : right;
-            const midi = midiOf(note);
-            if (midi === null) {
-                fallbackTiming[side].skip(seconds);
-                continue;
-            }
-            if (note.querySelector("chord") && hand.length > 0) {
-                hand[hand.length - 1]!.push(midi);
-                continue;
-            }
-            gaps[side].push(fallbackTiming[side].start(seconds));
-            hand.push([midi]);
         }
     }
-    return { right, left, gaps };
+    return { right, left, gaps, onsets };
 }
 
-export function handEffort(positions: number[][], hand: "left" | "right", gaps?: number[]): number {
+// Beats this close together are one moment. A triplet's thirds and a quintuplet's fifths
+// sum to a whole beat only approximately, and a hand striking on "the same" beat by a
+// different road must still count as striking with the other.
+const SAME_MOMENT = 1e-6;
+
+// What the other hand strikes at the moment each of this hand's positions sounds: every
+// pitch of every one of its positions on that beat, and nothing when it strikes nothing.
+// Two voices on the other staff that land together both count.
+export function otherHandAt(
+    mine: readonly number[],
+    theirs: { positions: readonly number[][]; onsets: readonly number[] },
+): number[][] {
+    const order = theirs.onsets
+        .map((_, at) => at)
+        .sort((a, b) => theirs.onsets[a]! - theirs.onsets[b]!);
+    const sorted = order.map((at) => theirs.onsets[at]!);
+    return mine.map((beat) => {
+        // The first of theirs at or after this moment, less the tolerance.
+        let lo = 0;
+        let hi = sorted.length;
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1;
+            if (sorted[mid]! < beat - SAME_MOMENT) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        const struck: number[] = [];
+        for (let k = lo; k < sorted.length && sorted[k]! <= beat + SAME_MOMENT; k++) {
+            struck.push(...theirs.positions[order[k]!]!);
+        }
+        return struck;
+    });
+}
+
+// One hand's effort over its positions. A position that hand cannot span is shared with
+// the other hand where the other is free for it (core/fingering's reachingCost), which is
+// why the other hand's strikes come in beside this one's positions.
+export function handEffort(
+    positions: number[][],
+    hand: "left" | "right",
+    gaps?: number[],
+    others?: readonly (readonly number[] | undefined)[],
+): number {
     if (positions.length === 0) {
         return 0;
     }
-    return positionsCost(
-        positions,
-        fingerPositions(positions, hand, undefined, gaps),
-        hand,
-        undefined,
-        gaps,
-    );
+    return reachingCost(positions, hand, gaps, others);
 }
 
 // The playing effort of already-parsed hands: total fingering cost across both,
@@ -168,9 +232,17 @@ function effortOf(hands: Hands): number {
     if (notes === 0) {
         return 0;
     }
+    const withLeft = otherHandAt(hands.onsets.right, {
+        positions: hands.left,
+        onsets: hands.onsets.left,
+    });
+    const withRight = otherHandAt(hands.onsets.left, {
+        positions: hands.right,
+        onsets: hands.onsets.right,
+    });
     return (
-        (handEffort(hands.right, "right", hands.gaps.right) +
-            handEffort(hands.left, "left", hands.gaps.left)) /
+        (handEffort(hands.right, "right", hands.gaps.right, withLeft) +
+            handEffort(hands.left, "left", hands.gaps.left, withRight)) /
         notes
     );
 }
@@ -450,7 +522,7 @@ export function measureScore(codec: XmlCodec, id: string, xml: string): ScoreMea
         return cached;
     }
     const doc = codec.parse(xml);
-    const hands = doc ? positionsOf(doc) : { right: [], left: [], gaps: { right: [], left: [] } };
+    const hands = doc ? positionsOf(doc) : noHands();
     const notes = hands.right.length + hands.left.length;
     // No fingerable notes means an empty or unreadable score, not the gentlest piece — a
     // real in-hand line also costs ~0. Grade it at the top so it can't pad the beginner
