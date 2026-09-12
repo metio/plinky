@@ -42,7 +42,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**Finger numbers sit the right way up on every chord.** Some scores write a chord's\nnotes from the top down, and on those the suggested fingering came out upside down:\nthe thumb printed on the top note of a right-hand chord and the little finger on the\nbottom, in the score and in the finger-position editor. Such a piece was also graded\na touch harder than it is. A chord is now fingered by its pitches, whichever order\nthey were written in.",
+                body: "**Finger numbers sit the right way up on every chord.** Some scores write a chord's\nnotes from the top down, and on those the suggested fingering came out upside down:\nthe thumb printed on the top note of a right-hand chord and the little finger on the\nbottom, in the score and in the finger-position editor. A chord is now fingered by its\npitches, whichever order they were written in. About a hundred pieces sit at a new\ngrade because of it — most by one step — along with pieces printed as a separate line\nfor each hand, which are now graded on both hands rather than one.",
                 twip: true,
             },
         ],
