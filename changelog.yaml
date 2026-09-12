@@ -21,6 +21,12 @@
       quieter or louder than the piano, or had a crescendo the piano didn't, Listen
       played the piano at the singer's level, and a run asked you for it too. The piano
       now keeps to the dynamics and pedalling written for it.
+    - |-
+      **Stopping a duet stops the other hand.** While Plinky played the other hand for
+      you, pressing Stop, leaving full screen or starting Listen left the notes it had
+      lined up still playing, one after another, on a page where nothing was running,
+      and under Listen they came out of step with it. Stopping now silences the other
+      hand at once. Play a run to its end and the other hand still finishes the piece.
 
 - date: 2026-09-12
   entries:

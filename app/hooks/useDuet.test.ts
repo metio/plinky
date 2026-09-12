@@ -64,12 +64,23 @@ const osmd = {} as OpenSheetMusicDisplay;
 
 function setup(enabled = true, hand: Hand = "right") {
     const playNote = vi.fn();
+    const silenceStrikes = vi.fn();
     const { scheduler, pendingCount, fire } = fakeScheduler();
     const view = renderHook(() =>
-        useDuet({ getOsmd: () => osmd, playNote, scheduler, enabled, hand }),
+        useDuet({
+            getOsmd: () => osmd,
+            synth: { playNote, silenceStrikes },
+            scheduler,
+            enabled,
+            hand,
+        }),
     );
-    return { playNote, scheduler, pendingCount, fire, ...view };
+    return { playNote, silenceStrikes, scheduler, pendingCount, fire, ...view };
 }
+
+// Every owner the duet struck a note under.
+const ownersOf = (playNote: ReturnType<typeof vi.fn>) =>
+    new Set(playNote.mock.calls.map(([, options]) => (options as { owner?: symbol }).owner));
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -129,5 +140,82 @@ describe("useDuet", () => {
         result.current.prime();
         result.current.onCleared(9, 120);
         expect(playNote).not.toHaveBeenCalled();
+    });
+});
+
+describe("stopping the duet", () => {
+    it("strikes every note of the other hand under one owner of its own", () => {
+        const { result, playNote, fire } = setup();
+        result.current.prime();
+        result.current.onCleared(0, 120);
+        fire();
+        const owners = ownersOf(playNote);
+        expect(playNote).toHaveBeenCalledTimes(2);
+        expect(owners.size).toBe(1);
+        expect(typeof [...owners][0]).toBe("symbol");
+    });
+
+    it("plays nothing it had scheduled once the run is stopped", () => {
+        const { result, playNote, pendingCount, fire } = setup();
+        result.current.prime();
+        result.current.onCleared(0, 120);
+        expect(pendingCount()).toBe(1);
+        result.current.stop();
+        expect(pendingCount()).toBe(0);
+        fire();
+        // Only the note that sounded with yours, before the stop.
+        expect(playNote).toHaveBeenCalledTimes(1);
+    });
+
+    it("takes back the note already sounding, under the owner it was struck with", () => {
+        const { result, playNote, silenceStrikes } = setup();
+        result.current.prime();
+        result.current.onCleared(0, 120);
+        const [owner] = ownersOf(playNote);
+        result.current.stop();
+        expect(silenceStrikes).toHaveBeenCalledWith(owner);
+    });
+
+    it("takes back the last run's notes when the next one is primed", () => {
+        const { result, playNote, silenceStrikes, pendingCount } = setup();
+        result.current.prime();
+        result.current.onCleared(0, 120);
+        const [owner] = ownersOf(playNote);
+        result.current.prime();
+        expect(pendingCount()).toBe(0);
+        expect(silenceStrikes).toHaveBeenCalledWith(owner);
+    });
+
+    it("leaves the notes alone while the run goes on", () => {
+        const { result, silenceStrikes } = setup();
+        result.current.prime();
+        // Priming takes back whatever a previous run left; the run starts from here.
+        silenceStrikes.mockClear();
+        result.current.onCleared(0, 120);
+        // Your next note re-locks the gap: the pending notes are rescheduled, but the one
+        // still ringing is the music, not something to take back.
+        result.current.onCleared(1, 120);
+        expect(silenceStrikes).not.toHaveBeenCalled();
+    });
+
+    it("gives each duet its own owner, so one's stop leaves the other's notes", () => {
+        const first = setup();
+        const second = setup();
+        first.result.current.prime();
+        first.result.current.onCleared(0, 120);
+        second.result.current.prime();
+        second.result.current.onCleared(0, 120);
+        const [firstOwner] = ownersOf(first.playNote);
+        const [secondOwner] = ownersOf(second.playNote);
+        expect(firstOwner).not.toBe(secondOwner);
+        second.silenceStrikes.mockClear();
+        first.result.current.stop();
+        expect(second.silenceStrikes).not.toHaveBeenCalled();
+    });
+
+    it("is safe to stop before anything was scheduled", () => {
+        const { result, silenceStrikes } = setup();
+        expect(() => result.current.stop()).not.toThrow();
+        expect(silenceStrikes).toHaveBeenCalledTimes(1);
     });
 });

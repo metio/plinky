@@ -3,17 +3,24 @@
 
 import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { type AccompanyVoice, accompanimentForGap, gapsForRun } from "../../core/duet";
 import type { Hand } from "../../core/matcher";
+import type { StrikeOwner } from "../ports/audioEngine";
 import type { Scheduler, SchedulerHandle } from "../ports/scheduler";
-import type { PlayNoteOptions } from "./useSynth";
 import { collectMatchSteps } from "./useScoreMatcher";
 
 // The hand the app plays when you practise the other one.
 const OTHER: Record<Exclude<Hand, "both">, Exclude<Hand, "both">> = {
     right: "left",
     left: "right",
+};
+
+// The synth slice the duet needs: a fixed-length note for the other hand, and a stop that
+// takes back what it struck.
+type NoteSink = {
+    playNote(note: number, options?: { duration?: number; owner?: StrikeOwner }): void;
+    silenceStrikes(owner: StrikeOwner): void;
 };
 
 // Sounds the sitting-out hand during self-paced single-hand practice. `prime` reads
@@ -27,13 +34,13 @@ const OTHER: Record<Exclude<Hand, "both">, Exclude<Hand, "both">> = {
 // the injected scheduler.
 export function useDuet({
     getOsmd,
-    playNote,
+    synth,
     scheduler,
     enabled,
     hand,
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
-    playNote: (note: number, options?: PlayNoteOptions) => void;
+    synth: NoteSink;
     scheduler: Scheduler;
     enabled: boolean;
     hand: Hand;
@@ -45,6 +52,9 @@ export function useDuet({
     // gap — see gapsForRun.
     const gapsRef = useRef<AccompanyVoice[][]>([]);
     const pendingRef = useRef<SchedulerHandle[]>([]);
+    // Every note the duet strikes goes out under this, so its stop can take back exactly
+    // the other hand's notes and never the ones the player is sounding.
+    const [owner] = useState<StrikeOwner>(() => Symbol("duet"));
     // Read live inside the callbacks so a mid-render toggle or hand change takes
     // effect on the next primed run without re-creating them.
     const enabledRef = useLatest(enabled);
@@ -57,8 +67,17 @@ export function useDuet({
         pendingRef.current = [];
     }, [scheduler]);
 
-    const prime = useCallback(() => {
+    // The run is over before its end: the player stopped it, or another transport took
+    // the surface. A gap is scheduled whole — a rest in your hand can queue bars of the
+    // other — and each note is a strike that rings its full length, so both the timers
+    // and the notes already sounding have to go.
+    const stop = useCallback(() => {
         cancel();
+        synth.silenceStrikes(owner);
+    }, [cancel, synth, owner]);
+
+    const prime = useCallback(() => {
+        stop();
         onsetsRef.current = [];
         gapsRef.current = [];
         const osmd = getOsmd();
@@ -83,7 +102,7 @@ export function useDuet({
                 })),
             ),
         );
-    }, [getOsmd, cancel]);
+    }, [getOsmd, stop]);
 
     // Clear the gap opened by your note at whole-piece index `index`, playing the
     // accompanying hand across it at `bpm` (your live, adaptive pace).
@@ -98,18 +117,16 @@ export function useDuet({
             }
             cancel();
             for (const voice of accompanimentForGap(gapsRef.current[index] ?? [], from, bpm)) {
+                const strike = () =>
+                    synth.playNote(voice.pitch, { duration: voice.durationSec, owner });
                 if (voice.delayMs <= 0) {
-                    playNote(voice.pitch, { duration: voice.durationSec });
+                    strike();
                     continue;
                 }
-                pendingRef.current.push(
-                    scheduler.after(voice.delayMs, () =>
-                        playNote(voice.pitch, { duration: voice.durationSec }),
-                    ),
-                );
+                pendingRef.current.push(scheduler.after(voice.delayMs, strike));
             }
         },
-        [cancel, playNote, scheduler],
+        [cancel, synth, owner, scheduler],
     );
 
     // Turning the duet off — or leaving the surface — must not leave a scheduled
@@ -121,5 +138,5 @@ export function useDuet({
     }, [enabled, cancel]);
     useEffect(() => cancel, [cancel]);
 
-    return { prime, onCleared, cancel };
+    return { prime, onCleared, stop };
 }

@@ -398,7 +398,7 @@ function usePlaySessionValue({
         onReload: () => {
             listenPlayback.stop();
             keepUp.stop();
-            matcher.stop();
+            stopSelfPaced();
             // The engraving the lookahead was read from is gone.
             matcher.resetPreview();
             // A run already on its way — a sight-read counting down before it begins —
@@ -605,7 +605,7 @@ function usePlaySessionValue({
     // where the tempo-locked run plays the other hand on its own clock instead.
     const accompaniment = useDuet({
         getOsmd,
-        playNote: synth.playNote,
+        synth,
         scheduler,
         enabled: duet && !enforceTempo && staffCount >= 2 && activeHand !== "both",
         hand: activeHand,
@@ -720,6 +720,15 @@ function usePlaySessionValue({
             markPainted();
         },
     });
+    // Stop the self-paced run, and the duet with it. The duet schedules the other hand
+    // across the whole gap up to your next note on timers of its own, so stopping the
+    // matcher alone would leave those notes arriving one by one after the run has ended,
+    // and under Listen when Listen is what took over.
+    const stopSelfPaced = () => {
+        accompaniment.stop();
+        matcher.stop();
+    };
+
     // Keys the player is holding down right now. A finished run defers leaving full
     // screen while any of these ring, so the last note plays out for as long as it is
     // held instead of being cut off the instant the run completes.
@@ -970,7 +979,15 @@ function usePlaySessionValue({
         gradeOwedRun: grading.gradeIfOwed,
         saveOwedTake: takes.saveIfOwed,
         stopKeepUp: keepUp.stop,
-        stopMatcher: matcher.stop,
+        stopMatcher: () => {
+            // A run that reached its end closes the stage by itself once the last key comes
+            // up, and the other hand's closing notes are the end of the piece: they play out,
+            // the way Listen's last notes ring. Left before its end, the run takes them back.
+            if (!matcher.complete) {
+                accompaniment.stop();
+            }
+            matcher.stop();
+        },
         cancelPendingStart: () => {
             startPress.cancel();
             sightRead.cancel();
@@ -1049,7 +1066,7 @@ function usePlaySessionValue({
             endFinishedRun();
             enterPlayFullscreen();
         }
-        matcher.stop();
+        stopSelfPaced();
         // Before Listen touches the cursor: collecting the lookahead walks it, and a walk
         // afterwards would drag Listen's own position back to the top of the piece.
         matcher.preview(from);
@@ -1101,7 +1118,7 @@ function usePlaySessionValue({
         listenPlayback.stop();
         endFinishedRun();
         enterPlayFullscreen();
-        matcher.stop();
+        stopSelfPaced();
         // Before the play-along takes the cursor over: collecting the lookahead walks it,
         // and a walk afterwards would drag the run's own position back to the top.
         matcher.preview(0);
@@ -1124,7 +1141,7 @@ function usePlaySessionValue({
     // Replay a saved take: any Listen in progress hands the transport over, and the
     // self-paced matcher stops so the replay owns the cursor.
     const replayTake = (take: Take) => {
-        matcher.stop();
+        stopSelfPaced();
         synth.commitVoice();
         listenPlayback.replay(take);
     };
@@ -1493,6 +1510,7 @@ function usePlaySessionValue({
         listen,
         restartListen,
         practice,
+        stopPractice: stopSelfPaced,
         playAlong,
         saveCurrentTake,
         replayTake,

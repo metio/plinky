@@ -25,6 +25,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**The piano follows its own dynamics in a song.** Where the singer was marked\nquieter or louder than the piano, or had a crescendo the piano didn't, Listen\nplayed the piano at the singer's level, and a run asked you for it too. The piano\nnow keeps to the dynamics and pedalling written for it.",
                 twip: true,
             },
+            {
+                body: "**Stopping a duet stops the other hand.** While Plinky played the other hand for\nyou, pressing Stop, leaving full screen or starting Listen left the notes it had\nlined up still playing, one after another, on a page where nothing was running,\nand under Listen they came out of step with it. Stopping now silences the other\nhand at once. Play a run to its end and the other hand still finishes the piece.",
+                twip: true,
+            },
         ],
     },
     {

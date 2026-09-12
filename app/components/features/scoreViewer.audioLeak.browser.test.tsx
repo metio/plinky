@@ -6,8 +6,12 @@ import { useState } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildScore } from "../../../core/musicxmlBuild";
+import type { PlayOptions } from "../../../core/playOptions";
+import { DEFAULT_PREFS, type Prefs } from "../../../core/prefs";
 import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
 import { fakeMidi } from "../../adapters/fakeMidi";
+import { memoryStore } from "../../adapters/memoryStore";
+import { createPrefsStore } from "../../stores/prefsStore";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
@@ -42,9 +46,42 @@ const LONG_SCORE = buildScore({
     })),
 });
 
+// A grand staff for the duet: the right hand holds two minims while the left walks
+// crotchets under them, so clearing the right hand's first note leaves the left hand's
+// second crotchet waiting on a timer across the gap. All four pitches sit inside the
+// keyboard's window.
+const DUET_SCORE = buildScore({
+    title: "Duet",
+    fifths: 0,
+    beatsPerBar: 4,
+    treble: [
+        { pitch: { step: "E", octave: 4, alter: 0 }, value: "half" },
+        { pitch: { step: "F", octave: 4, alter: 0 }, value: "half" },
+    ],
+    bass: [
+        { pitch: { step: "C", octave: 4, alter: 0 }, value: "quarter" },
+        { pitch: { step: "D", octave: 4, alter: 0 }, value: "quarter" },
+        { pitch: { step: "C", octave: 4, alter: 0 }, value: "quarter" },
+        { pitch: { step: "D", octave: 4, alter: 0 }, value: "quarter" },
+    ],
+});
+
+// The same shape cut to one right-hand note, so clearing it ends the run with the left
+// hand's second crotchet still to come.
+const DUET_ENDING_SCORE = buildScore({
+    title: "Duet ending",
+    fifths: 0,
+    beatsPerBar: 2,
+    treble: [{ pitch: { step: "E", octave: 4, alter: 0 }, value: "half" }],
+    bass: [
+        { pitch: { step: "C", octave: 4, alter: 0 }, value: "quarter" },
+        { pitch: { step: "D", octave: 4, alter: 0 }, value: "quarter" },
+    ],
+});
+
 // The Runs tab belongs to the route's mode bar; this stand-in button plays that part, so a
 // kept take can be replayed the way the page replays it.
-function Surface({ xml = CHORD_SCORE }: { xml?: string }) {
+function Surface({ xml = CHORD_SCORE, options }: { xml?: string; options?: PlayOptions }) {
     const [runsView, setRunsView] = useState(false);
     return (
         <>
@@ -57,19 +94,34 @@ function Surface({ xml = CHORD_SCORE }: { xml?: string }) {
                 title="Chord"
                 runsView={runsView}
                 onShowScore={() => setRunsView(false)}
+                {...(options ? { options } : {})}
             />
         </>
     );
 }
 
-function mount({ surface = true, xml = CHORD_SCORE } = {}) {
+function mount({
+    surface = true,
+    xml = CHORD_SCORE,
+    prefs = {},
+    options,
+}: {
+    surface?: boolean;
+    xml?: string;
+    prefs?: Partial<Prefs>;
+    options?: PlayOptions;
+} = {}) {
     // Inject a fake MIDI seam (the browser grants real Web MIDI otherwise) and a
     // recording audio engine so the test can assert what would have sounded.
     const audio = fakeAudioEngine();
+    const store = memoryStore();
+    createPrefsStore(store).save({ ...DEFAULT_PREFS, ...prefs });
     const tree = (shown: boolean) => (
         <MemoryRouter>
-            <ServicesProvider services={{ midi: fakeMidi(), audio }}>
-                <MidiProvider>{shown && <Surface xml={xml} />}</MidiProvider>
+            <ServicesProvider services={{ midi: fakeMidi(), audio, store }}>
+                <MidiProvider>
+                    {shown && <Surface xml={xml} {...(options ? { options } : {})} />}
+                </MidiProvider>
             </ServicesProvider>
         </MemoryRouter>
     );
@@ -167,6 +219,59 @@ describe("play-surface audio cleanup", () => {
         await expect
             .poll(() => audio.pedals, { timeout: 30000 })
             .toContainEqual({ pedal: "sustain", down: true });
+    });
+});
+
+describe("the duet's other hand", () => {
+    // A left-hand strike the duet made: a pitch the right hand never plays, under an owner.
+    const duetStrikes = (audio: ReturnType<typeof fakeAudioEngine>) =>
+        audio.strikes.filter((strike) => strike.note === 60 || strike.note === 62);
+    const settle = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    it("stops sounding across the gap when the player stops the run", async () => {
+        const { audio } = mount({
+            xml: DUET_SCORE,
+            prefs: { duet: true },
+            options: { hands: "right" },
+        });
+        await startPractice();
+        const e4 = await screen.findByLabelText("E 4");
+        fireEvent.pointerDown(e4);
+        fireEvent.pointerUp(e4);
+        // The left hand's first crotchet sounds with the cleared note; its second waits on a
+        // timer for a beat.
+        await expect.poll(() => duetStrikes(audio).length, { timeout: 30000 }).toBe(1);
+        // Starting the run already cleared the way for it; only what the stop does counts.
+        const before = audio.strikesSilenced.length;
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        // Longer than the gap at any tempo the page opens on: nothing it scheduled arrives.
+        await settle(3000);
+        expect(duetStrikes(audio)).toHaveLength(1);
+        // And the crotchet already sounding is taken back with it.
+        const owner = duetStrikes(audio)[0]?.owner;
+        expect(typeof owner).toBe("symbol");
+        expect(audio.strikesSilenced.slice(before)).toContain(owner);
+    });
+
+    it("plays the other hand's ending out when the run reaches its end", async () => {
+        const { audio } = mount({
+            xml: DUET_ENDING_SCORE,
+            prefs: { duet: true },
+            options: { hands: "right" },
+        });
+        await startPractice();
+        const e4 = await screen.findByLabelText("E 4");
+        // The only right-hand note: clearing it finishes the run, and letting go closes the
+        // stage with the left hand's last crotchet still a beat away.
+        fireEvent.pointerDown(e4);
+        await expect.poll(() => duetStrikes(audio).length, { timeout: 30000 }).toBe(1);
+        // Starting the run already cleared the way for it; only what the ending does counts.
+        const before = audio.strikesSilenced.length;
+        fireEvent.pointerUp(e4);
+        await expect.poll(() => duetStrikes(audio).length, { timeout: 30000 }).toBe(2);
+        const [first] = duetStrikes(audio);
+        expect(typeof first?.owner).toBe("symbol");
+        expect(audio.strikesSilenced.slice(before)).not.toContain(first?.owner);
     });
 });
 

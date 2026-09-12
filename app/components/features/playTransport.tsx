@@ -24,8 +24,16 @@ export function PlayTransport() {
     const { ready } = usePlayPiece();
     const { fingerStrip, leadAction, leavePlaySurface, setFingerStrip } = usePlayShell();
     const { enforceTempo, lockTempo, setTempo, sightRead, tempo } = usePlaySetup();
-    const { keepUp, listen, listenPlayback, matcher, playAlong, practice, restartListen } =
-        usePlayRun();
+    const {
+        keepUp,
+        listen,
+        listenPlayback,
+        matcher,
+        playAlong,
+        practice,
+        restartListen,
+        stopPractice,
+    } = usePlayRun();
 
     // Listen appears twice, and means slightly different things in the two places. In the
     // full-screen bar it is the transport control beside Practice. On the resting page it
@@ -66,7 +74,7 @@ export function PlayTransport() {
                 if (studying) {
                     sightRead.cancel();
                 } else if (matcher.practicing) {
-                    matcher.stop();
+                    stopPractice();
                 } else if (keepUp.running) {
                     keepUp.stop();
                 } else if (enforceTempo) {
