@@ -443,6 +443,32 @@ describe("collectListenSteps", () => {
         expect(swept.slice(0, 3)).toEqual([...swept.slice(0, 3)].sort((a, b) => a - b));
     });
 
+    it("sweeps both hands where both glide at once", () => {
+        // C5 and C3 struck together, each gliding to the note the next position lands on:
+        // the right hand up to C6, the left down to C2.
+        const steps = collectListenSteps(
+            lineOsmd([
+                [60, 36],
+                [72, 24],
+            ]),
+            {
+                ...NO_SCORE_MARKS,
+                glissandos: [
+                    { from: 0, to: 0.5, arrivesAt: 84, pitch: 72 },
+                    { from: 0, to: 0.5, arrivesAt: 36, pitch: 48 },
+                ],
+            },
+        );
+        const sounded = steps.slice(0, -1).flatMap((step) => step.notes.map((note) => note.pitch));
+        expect(sounded).toEqual(expect.arrayContaining([74, 83, 47, 38]));
+        expect(
+            steps
+                .at(-1)
+                ?.notes.map((note) => note.pitch)
+                .sort(),
+        ).toEqual([36, 84]);
+    });
+
     it("gentles a passage under the soft pedal", () => {
         const softly = collectListenSteps(fakeOsmd(1), {
             ...NO_SCORE_MARKS,

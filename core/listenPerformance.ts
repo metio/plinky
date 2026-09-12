@@ -174,14 +174,11 @@ export function tremolosAt(spans: readonly TremoloSpan[], whole: number): Tremol
     );
 }
 
-// The glissando this position OPENS, if any. A span is spelled out once, at its first
-// note; the notes inside it are swallowed, since the sweep already contains them.
-
-export function openingGlissando(
-    spans: readonly GlissandoSpan[],
-    whole: number,
-): GlissandoSpan | null {
-    return spans.find((span) => near(span.from, whole)) ?? null;
+// The glissandi this position OPENS — both hands may glide at once. A span is spelled out
+// once, at its first note; the notes inside it are swallowed, since the sweep already
+// contains them.
+export function openingGlissandos(spans: readonly GlissandoSpan[], whole: number): GlissandoSpan[] {
+    return spans.filter((span) => near(span.from, whole));
 }
 
 const NEAR = 1 / 1024;
@@ -294,11 +291,30 @@ export function spellOutGlissando(
     span: GlissandoSpan,
     fifths: number,
 ): ListenStep[] {
-    const from =
-        (span.pitch === undefined
-            ? undefined
-            : step.notes.find((one) => one.pitch === span.pitch)) ?? step.notes[0];
-    if (!from) {
+    return spellOutGlissandos(step, [span], fifths);
+}
+
+// Every glissando opening at one position, spelled out together — both hands sweeping at
+// once. Each sweep fills the same advance at its own pace; the position is cut wherever
+// either strikes a key, as spellOutTremolos cuts it for two shakes.
+export function spellOutGlissandos(
+    step: ListenStep,
+    spans: readonly GlissandoSpan[],
+    fifths: number,
+): ListenStep[] {
+    // The note carrying each mark. Two sweeps never glide from one note, so a span whose
+    // pitch is not here takes the first note no other sweep has.
+    const gliding: { from: ListenNote; span: GlissandoSpan }[] = [];
+    for (const span of spans) {
+        const free = step.notes.filter((one) => !gliding.some(({ from }) => from === one));
+        const from =
+            (span.pitch === undefined ? undefined : free.find((one) => one.pitch === span.pitch)) ??
+            free[0];
+        if (from) {
+            gliding.push({ from, span });
+        }
+    }
+    if (gliding.length === 0) {
         return [step];
     }
     // The sweep fills the note it is written FROM. The note it arrives on is a position of
@@ -306,26 +322,48 @@ export function spellOutGlissando(
     // the arrival is struck twice, once ending the gesture and once on its own.
     // The sweep takes the gliding note's own time, inside the position's advance — the
     // shortest length at it, whichever staff that is on.
-    const quarters = Math.min(from.soundQuarters, ...step.lengths);
-    // arrivesAt is a MIDI number read off the file, in the same space as the step's pitch.
-    const swept = glissandoNotes(from.pitch, span.arrivesAt, quarters, fifths).slice(0, -1);
-    if (swept.length < 2) {
+    const quarters = Math.min(...gliding.map(({ from }) => from.soundQuarters), ...step.lengths);
+    const figures = gliding
+        .map(({ from, span }) => ({
+            from,
+            // arrivesAt is a MIDI number read off the file, in the same space as the step's
+            // pitch.
+            swept: glissandoNotes(from.pitch, span.arrivesAt, quarters, fifths)
+                .slice(0, -1)
+                .map((one) => one.pitch),
+        }))
+        .filter(({ swept }) => swept.length >= 2);
+    if (figures.length === 0) {
         return [step];
     }
-    // Stretched back over the whole time, since dropping the arrival left a gap at the end.
-    const each = quarters / swept.length;
-    const figure = swept.map((one) => ({ ...one, quarters: each }));
     // Whatever else the position strikes — the other hand's chord under the sweep — is
-    // struck with the sweep's first note and rings on; the sweep alone is what moves.
-    const others = step.notes.filter((one) => one !== from);
-    return figure.map((one, index) => ({
+    // struck with the sweeps' first notes and rings on; the sweeps alone are what move.
+    const others = step.notes.filter((one) => !figures.some(({ from }) => from === one));
+    // A grid every sweep's keys fall on exactly: a sweep of n keys strikes every grid / n
+    // points. Stretched back over the whole time, since dropping the arrival left a gap at
+    // the end.
+    const grid = figures.reduce(
+        (lcm, { swept }) => (lcm * swept.length) / gcd(lcm, swept.length),
+        1,
+    );
+    const strikes = [
+        ...new Set(
+            figures.flatMap(({ swept }) => swept.map((_, index) => (index * grid) / swept.length)),
+        ),
+    ].sort((one, other) => one - other);
+    return strikes.map((at, index) => ({
         ...step,
         notes: [
             ...(index === 0 ? others : []),
-            { ...from, pitch: one.pitch, soundQuarters: one.quarters },
+            ...figures.flatMap(({ from, swept }) => {
+                const pitch = swept[(at * swept.length) / grid];
+                return (at * swept.length) % grid !== 0 || pitch === undefined
+                    ? []
+                    : [{ ...from, pitch, soundQuarters: quarters / swept.length }];
+            }),
         ],
-        lengths: [one.quarters],
-        advancesCursor: index === figure.length - 1 && step.advancesCursor,
+        lengths: [(((strikes[index + 1] ?? grid) - at) * quarters) / grid],
+        advancesCursor: index === strikes.length - 1 && step.advancesCursor,
     }));
 }
 

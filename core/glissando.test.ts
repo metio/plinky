@@ -117,4 +117,58 @@ describe("readGlissandos", () => {
             ]),
         ).toEqual([{ from: 0, to: 1, arrivesAt: 72, pitch: 60 }]);
     });
+
+    // Both hands of one piano part sweep at once: the right hand up from C5 to C6, the left
+    // down from C3 to C2. The left hand lands first, so the stops come in the opposite order
+    // to the starts.
+    const numbered = (
+        whole: number,
+        midi: number,
+        glissando: "start" | "stop",
+        glissandoNumber?: string,
+    ) => ({
+        ...note(whole, midi, glissando, 0.25),
+        part: "P1",
+        marks: { glissando, ...(glissandoNumber === undefined ? {} : { glissandoNumber }) },
+    });
+
+    it("lands each of two sweeps at once on its own note, paired by number", () => {
+        expect(
+            readGlissandos([
+                numbered(0, 72, "start", "1"),
+                numbered(0, 48, "start", "2"),
+                numbered(0.5, 36, "stop", "2"),
+                numbered(0.75, 84, "stop", "1"),
+            ]),
+        ).toEqual([
+            { from: 0, to: 0.75, arrivesAt: 36, pitch: 48 },
+            { from: 0, to: 1, arrivesAt: 84, pitch: 72 },
+        ]);
+    });
+
+    it("pairs unnumbered sweeps the way the format's default number does", () => {
+        // Without numbers every mark is number 1: the second start waits behind the first,
+        // and the first stop closes the sweep already open.
+        expect(
+            readGlissandos([
+                numbered(0, 72, "start"),
+                numbered(0, 48, "start"),
+                numbered(0.5, 36, "stop"),
+                numbered(0.75, 84, "stop"),
+            ]),
+        ).toEqual([{ from: 0, to: 0.75, arrivesAt: 36, pitch: 72 }]);
+        expect(readGlissandos([numbered(0, 72, "start", "1"), numbered(0.5, 84, "stop")])).toEqual([
+            { from: 0, to: 0.75, arrivesAt: 84, pitch: 72 },
+        ]);
+    });
+
+    it("keeps one number's sweeps in their own part", () => {
+        expect(
+            readGlissandos([
+                numbered(0, 72, "start", "1"),
+                { ...numbered(0.25, 67, "stop", "1"), part: "Voice" },
+                numbered(0.5, 84, "stop", "1"),
+            ]),
+        ).toEqual([{ from: 0, to: 0.75, arrivesAt: 84, pitch: 72 }]);
+    });
 });

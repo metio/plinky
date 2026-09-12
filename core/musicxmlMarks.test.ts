@@ -468,6 +468,35 @@ describe("a score written for more than one part", () => {
             { from: 0, to: 0.75, arrivesAt: 84, pitch: 72 },
         ]);
     });
+
+    // Both hands of one piano part sweep at once: the right hand up from C5 to C6 over the
+    // bar, the left down from C3 to C2 in half of it. The left hand lands first.
+    const bothHands = (mark: "glissando" | "slide", numbered: boolean) => {
+        const sweep = (type: string, number: string) =>
+            `<${mark} type="${type}"${numbered ? ` number="${number}"` : ""}/>`;
+        return partwise([
+            {
+                id: "P1",
+                body: `${TWO_STAVES}${quarter("C", 5, 1, "1", sweep("start", "1"))}${quarter("D", 5)}${quarter("E", 5)}${quarter("C", 6, 1, "1", sweep("stop", "1"))}${BACK}${quarter("C", 3, 2, "5", sweep("start", "2"))}${quarter("D", 3, 2, "5")}${quarter("C", 2, 2, "5", sweep("stop", "2"))}${quarter("F", 3, 2, "5")}`,
+            },
+        ]);
+    };
+
+    it("lands two glissandi at once in one part each on its own note", () => {
+        for (const mark of ["glissando", "slide"] as const) {
+            expect(readScoreMarks(bothHands(mark, true)).glissandos).toEqual([
+                { from: 0, to: 0.75, arrivesAt: 36, pitch: 48 },
+                { from: 0, to: 1, arrivesAt: 84, pitch: 72 },
+            ]);
+        }
+    });
+
+    it("pairs two unnumbered glissandi in one part as the format's default number does", () => {
+        // Unnumbered, both are number 1: the first stop closes the sweep already open.
+        expect(readScoreMarks(bothHands("glissando", false)).glissandos).toEqual([
+            { from: 0, to: 0.75, arrivesAt: 36, pitch: 72 },
+        ]);
+    });
     it("sets the loudness from the piano's dynamics, not the singer's", () => {
         const doc = partwise([
             {

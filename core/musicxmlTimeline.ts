@@ -70,6 +70,9 @@ export type XmlNoteMarks = {
     // Whether a glissando or a slide begins or ends on this note. The sweep between them is
     // what sounds; the two written notes are its ends.
     glissando: "start" | "stop" | null;
+    // The glissando's number, "1" where the file writes none, as the format defaults it.
+    // Two sweeps at once in one part — one per hand — are told apart by it alone.
+    glissandoNumber: string;
     // Slur numbers starting and stopping here. MusicXML numbers its slurs so two arches can
     // overlap — one per hand, or nested phrasing — and pairing by number is what keeps them
     // from closing each other.
@@ -86,6 +89,7 @@ const NO_MARKS: XmlNoteMarks = {
     arpeggiate: false,
     tremolo: null,
     glissando: null,
+    glissandoNumber: "1",
     slurStarts: [],
     slurStops: [],
 };
@@ -130,7 +134,7 @@ function marksOf(note: Element): XmlNoteMarks {
         ornament: ornamentTag ? (ORNAMENT_TAGS[ornamentTag] ?? null) : null,
         arpeggiate: has("arpeggiate"),
         tremolo: tremoloOf(note),
-        glissando: glissandoOf(note),
+        ...glissandoOf(note),
         slurStarts: slurs
             .filter((slur) => slur.getAttribute("type") === "start")
             .map((slur) => slur.getAttribute("number") ?? "1"),
@@ -157,11 +161,14 @@ function tremoloOf(note: Element): { beams: number; part: "single" | "start" | "
 
 // `<slide>` is the same gesture on a fretted or bowed instrument; on a piano both mean the
 // hand travelling across the keys.
-function glissandoOf(note: Element): "start" | "stop" | null {
+function glissandoOf(note: Element): Pick<XmlNoteMarks, "glissando" | "glissandoNumber"> {
     const element =
         note.getElementsByTagName("glissando")[0] ?? note.getElementsByTagName("slide")[0];
     const type = element?.getAttribute("type");
-    return type === "start" || type === "stop" ? type : null;
+    return {
+        glissando: type === "start" || type === "stop" ? type : null,
+        glissandoNumber: element?.getAttribute("number") ?? "1",
+    };
 }
 
 export type XmlTimeline = {

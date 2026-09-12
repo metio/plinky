@@ -9,13 +9,14 @@ import {
     type ListenNote,
     listenPerformanceOf,
     type ListenStep,
-    openingGlissando,
+    openingGlissandos,
     performListenNote,
     performListenStep,
     type PlayedNote,
     rollChord,
     shapedByContour,
     spellOutGlissando,
+    spellOutGlissandos,
     spellOutOrnament,
     spellOutTremolo,
     spellOutTremolos,
@@ -263,6 +264,40 @@ describe("spellOutGlissando with another hand under it", () => {
     });
 });
 
+describe("two glissandi at one position", () => {
+    // The right hand sweeps up from C5 toward C6 while the left sweeps down from C3 toward
+    // G2: seven keys against three in the same beat.
+    const up = { from: 0, to: 1, arrivesAt: 84, pitch: 72 };
+    const down = { from: 0, to: 0.75, arrivesAt: 43, pitch: 48 };
+
+    it("opens every sweep that starts here", () => {
+        const later = { from: 0.5, to: 1, arrivesAt: 60, pitch: 55 };
+        expect(openingGlissandos([up, later, down], 0)).toEqual([up, down]);
+        expect(openingGlissandos([up, later, down], 0.25)).toEqual([]);
+    });
+
+    it("sweeps each hand from its own note toward its own arrival, together", () => {
+        const figure = spellOutGlissandos(step([72, 48], { lengths: [1, 1] }), [up, down], 0);
+        const high = figure.flatMap((one) => one.notes.filter((note) => note.pitch >= 60));
+        const low = figure.flatMap((one) => one.notes.filter((note) => note.pitch < 60));
+        expect(high.map((note) => note.pitch)).toEqual([72, 74, 76, 77, 79, 81, 83]);
+        expect(low.map((note) => note.pitch)).toEqual([48, 47, 45]);
+        // Each keeps its own pace, and both fill the same beat.
+        expect(high.every((note) => Math.abs(note.soundQuarters - 1 / 7) < 1e-9)).toBe(true);
+        expect(low.every((note) => Math.abs(note.soundQuarters - 1 / 3) < 1e-9)).toBe(true);
+        expect(figure[0]?.notes.map((note) => note.pitch)).toEqual([72, 48]);
+        expect(figure.reduce((total, one) => total + (one.lengths[0] ?? 0), 0)).toBeCloseTo(1);
+        expect(figure.map((one) => one.advancesCursor)).toEqual(
+            figure.map((_, index) => index === figure.length - 1),
+        );
+    });
+
+    it("spells one sweep the way a single glissando is spelled", () => {
+        const one = step([36, 72], { lengths: [4, 4] });
+        expect(spellOutGlissandos(one, [up], 0)).toEqual(spellOutGlissando(one, up, 0));
+    });
+});
+
 describe("rollChord", () => {
     it("spreads the roll inside the position's own advance, the shortest length at it", () => {
         // A rolled minim over a quaver in the other hand: the clock moves on when the
@@ -368,8 +403,8 @@ describe("the opening span at a position", () => {
         expect(tremolosAt(tremolos, 0.25)).toEqual([]);
         expect(tremolosAt(tremolos, 1)).toEqual([]);
         const glissandos = [{ from: 0.25, to: 0.5, arrivesAt: 72 }];
-        expect(openingGlissando(glissandos, 0.25)).toBe(glissandos[0]);
-        expect(openingGlissando(glissandos, 0)).toBeNull();
+        expect(openingGlissandos(glissandos, 0.25)).toEqual([glissandos[0]]);
+        expect(openingGlissandos(glissandos, 0)).toEqual([]);
     });
 });
 

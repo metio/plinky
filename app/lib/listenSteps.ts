@@ -7,10 +7,10 @@ import {
     fitGraces,
     type ListenNote,
     type ListenStep,
-    openingGlissando,
+    openingGlissandos,
     rollChord,
     shapedByContour,
-    spellOutGlissando,
+    spellOutGlissandos,
     spellOutOrnament,
     spellOutTremolos,
     tremoloCarrier,
@@ -173,7 +173,7 @@ export function collectListenSteps(
             // carry only one of them, and the tremolo's span is what decides whether this
             // position opens one.
             const tremolos = tremolosAt(marks.tremolos, whole);
-            const gliss = openingGlissando(marks.glissandos, whole);
+            const glisses = openingGlissandos(marks.glissandos, whole);
             if (tremolos.length > 0) {
                 // The note carrying the mark is struck where the span opens and holds
                 // through the positions inside it, so the figure at each of those is
@@ -186,8 +186,8 @@ export function collectListenSteps(
                 }));
                 rocking = new Map(rocks.map((rock) => [rock.span, rock.carrier]));
                 steps.push(...spellOutTremolos(step, rocks));
-            } else if (gliss) {
-                steps.push(...spellOutGlissando(step, gliss, fifthsAt(keys, whole)));
+            } else if (glisses.length > 0) {
+                steps.push(...spellOutGlissandos(step, glisses, fifthsAt(keys, whole)));
             } else if (ornament && ornamented) {
                 steps.push(
                     ...spellOutOrnament(step, ornament, fifthsAt(keys, whole), {

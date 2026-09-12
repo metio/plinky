@@ -102,19 +102,23 @@ export function readGlissandos(
         // The part the note is written in. A sweep ends in the part it starts in, so a
         // singer's slide cannot close the piano's glissando, or open one the piano ends.
         part?: string;
-        marks: { glissando: "start" | "stop" | null };
+        // Within a part, the number is what tells two sweeps at once apart — both hands
+        // gliding together — so a stop closes the sweep of its own number. Absent, it is
+        // "1", as the format defaults it. Staff is no key: a sweep may cross the staves.
+        marks: { glissando: "start" | "stop" | null; glissandoNumber?: string };
     }[],
 ): GlissandoSpan[] {
     const spans: GlissandoSpan[] = [];
-    const open = new Map<string | undefined, { whole: number; pitch: number }>();
+    const open = new Map<string, { whole: number; pitch: number }>();
     for (const note of notes) {
         if (note.marks.glissando === null || note.midi === null) {
             continue;
         }
-        const opened = open.get(note.part);
+        const key = `${note.marks.glissandoNumber ?? "1"}:${note.part ?? ""}`;
+        const opened = open.get(key);
         if (note.marks.glissando === "start") {
             if (!opened) {
-                open.set(note.part, { whole: note.whole, pitch: note.midi });
+                open.set(key, { whole: note.whole, pitch: note.midi });
             }
         } else if (opened && note.whole > opened.whole) {
             spans.push({
@@ -123,7 +127,7 @@ export function readGlissandos(
                 arrivesAt: note.midi,
                 pitch: opened.pitch,
             });
-            open.delete(note.part);
+            open.delete(key);
         }
     }
     return spans;

@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**Two slides at once each land on their own note.** Where both hands glide across\nthe keys together, Listen swept only one of them, and could send it to the other\nhand's note instead, the right hand diving into the bass. Each slide now runs from\nits own note to the one it is written to reach, both hands together.",
+                twip: true,
+            },
+            {
                 body: "**Listen shakes both hands' tremolos.** Where both hands write a tremolo on the same\nbeat, as a piano reduction of an orchestra often does, Listen shook the right hand and\nstruck the left once. Both now shimmer together, each at the speed its own slashes\nask for.",
                 twip: true,
             },
