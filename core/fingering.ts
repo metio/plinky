@@ -284,7 +284,7 @@ function moveCost(
 
 // Where each note of a position sits once it is read bottom-up: `order[k]` is the index,
 // as written, of its k-th lowest pitch. Null when it already runs bottom-up, which is how
-// nearly every score writes its chords, so the common case copies nothing.
+// nearly every score writes its chords.
 //
 // MusicXML does not require a chord's notes to run bottom-up, and the order they arrive
 // in is no fact about the hand. Everything below reads a position ascending — the finger
@@ -331,7 +331,7 @@ export function positionsCost(
     }
     const orders = positions.map(ascendingOrder);
     return ascendingCost(
-        positions.map((pitches, at) => reorder(pitches, orders[at]!)),
+        positions.map((pitches, at) => reorder(pitches, orders[at] ?? null)),
         fingers.map((shape, at) => reorder(shape, orders[at] ?? null)),
         hand,
         span,
@@ -378,11 +378,11 @@ export function fingerPositions(
     }
     const orders = positions.map(ascendingOrder);
     return ascendingFingers(
-        positions.map((pitches, at) => reorder(pitches, orders[at]!)),
+        positions.map((pitches, at) => reorder(pitches, orders[at] ?? null)),
         hand,
         span,
         gaps,
-    ).map((shape, at) => restore(shape, orders[at]!));
+    ).map((shape, at) => restore(shape, orders[at] ?? null));
 }
 
 function ascendingFingers(
