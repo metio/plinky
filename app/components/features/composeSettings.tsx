@@ -64,6 +64,9 @@ type ComposeSettingsProps = {
     tempo: number;
     onTempo: (tempo: number) => void;
     beatsPerBar: number;
+    // The meter the take arrived in from a link or a file, kept on offer after another
+    // is picked. Absent for a take begun here.
+    loadedBeatsPerBar?: number;
     onBeatsPerBar: (beats: number) => void;
     quantizeOn: boolean;
     // Step entry writes exact lengths, so there is nothing to tidy and the switch is held.
@@ -84,6 +87,7 @@ export function ComposeSettings({
     tempo,
     onTempo,
     beatsPerBar,
+    loadedBeatsPerBar,
     onBeatsPerBar,
     quantizeOn,
     quantizeLocked = false,
@@ -113,7 +117,7 @@ export function ComposeSettings({
                     onChange={(event) => onBeatsPerBar(Number(event.target.value))}
                     className={fieldClasses}
                 >
-                    {meterChoices(beatsPerBar).map((beats) => (
+                    {meterChoices(beatsPerBar, loadedBeatsPerBar).map((beats) => (
                         <option key={beats} value={beats}>
                             {beats}/4
                         </option>

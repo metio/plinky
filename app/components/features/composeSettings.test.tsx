@@ -72,6 +72,13 @@ describe("ComposeSettings", () => {
         expect(field.value).toBe("120");
     });
 
+    it("keeps the meter the take was loaded in on offer once another is chosen", () => {
+        mount({ beatsPerBar: 2, loadedBeatsPerBar: 5 });
+        const time = screen.getByLabelText(m.compose_beats_label()) as HTMLSelectElement;
+        expect([...time.options].map((option) => option.value)).toEqual(["2", "3", "4", "5", "6"]);
+        expect(time.value).toBe("2");
+    });
+
     it("selects a meter as a number", () => {
         const onBeatsPerBar = vi.fn();
         mount({ onBeatsPerBar });

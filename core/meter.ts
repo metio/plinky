@@ -14,15 +14,17 @@ export const MAX_BEATS_PER_BAR = 32;
 // The meters Compose's time field offers a new take.
 export const COMPOSE_METERS: readonly number[] = [2, 3, 4, 6];
 
-// What the time field lists for a take in `current` beats to the bar: the usual meters,
-// and the take's own among them in order when it is none of those. A file or a link can
-// bring any whole meter up to MAX_BEATS_PER_BAR, and a select with no option for its
-// value shows its first one instead — the field would read 2/4 over a staff in 5/4, and
-// picking 2/4 would change nothing, because it already looks chosen.
-export function meterChoices(current: number): number[] {
-    return COMPOSE_METERS.includes(current)
-        ? [...COMPOSE_METERS]
-        : [...COMPOSE_METERS, current].sort((a, b) => a - b);
+// What the time field lists for a take in `current` beats to the bar that was `loaded` in
+// another: the usual meters, with either among them in order when it is none of those. A
+// file or a link can bring any whole meter up to MAX_BEATS_PER_BAR, and a select with no
+// option for its value shows its first one instead — the field would read 2/4 over a
+// staff in 5/4, and picking 2/4 would change nothing, because it already looks chosen.
+// The loaded meter stays listed once another is picked, so a misclick can be taken back.
+export function meterChoices(current: number, loaded?: number): number[] {
+    const extra = [current, loaded].filter(
+        (meter): meter is number => meter !== undefined && !COMPOSE_METERS.includes(meter),
+    );
+    return [...new Set([...COMPOSE_METERS, ...extra])].sort((a, b) => a - b);
 }
 
 // Whole beats in a musical range, or the caller's fallback. A file or a link may say

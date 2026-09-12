@@ -49,6 +49,7 @@ export default function Compose() {
     const [title, setTitle] = useState<string>(() => m.compose_default_title());
     const [tempo, setTempo] = useState(COMPOSE_DEFAULT_TEMPO);
     const [beatsPerBar, setBeatsPerBar] = useState(4);
+    const [loadedBeatsPerBar, setLoadedBeatsPerBar] = useState<number | undefined>(undefined);
     const [quantizeOn, setQuantizeOn] = useState(true);
     const [metronomeOn, setMetronomeOn] = useState(false);
 
@@ -144,6 +145,7 @@ export default function Compose() {
             recorder.load(loaded.notes);
             setTempo(composeTempo(loaded.tempo));
             setBeatsPerBar(loaded.beatsPerBar);
+            setLoadedBeatsPerBar(loaded.beatsPerBar);
         }
         // Only the initial code matters; later edits should not reload over the work.
     }, [searchParams, recorder.load]);
@@ -167,6 +169,7 @@ export default function Compose() {
             recorder.load(loaded.notes);
             setTempo(composeTempo(loaded.tempo));
             setBeatsPerBar(loaded.beatsPerBar);
+            setLoadedBeatsPerBar(loaded.beatsPerBar);
         },
         [transport.stop, recorder.load],
     );
@@ -269,6 +272,7 @@ export default function Compose() {
                 tempo={tempo}
                 onTempo={setTempo}
                 beatsPerBar={beatsPerBar}
+                {...(loadedBeatsPerBar === undefined ? {} : { loadedBeatsPerBar })}
                 onBeatsPerBar={setBeatsPerBar}
                 quantizeOn={quantizeOn}
                 onQuantize={setQuantizeOn}

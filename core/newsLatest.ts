@@ -26,7 +26,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**Compose shows the time a loaded piece is really in.** Opening a file with five,\nseven or twelve beats to the bar wrote its bars out that way, while the Time menu\nread 2/4 — and picking 2/4 from it did nothing. The menu now lists the piece's own\ntime beside the usual four, and choosing any of them changes it.",
+                body: "**Compose shows the time a loaded piece is really in.** Opening a file with five,\nseven or twelve beats to the bar wrote its bars out that way, while the Time menu\nread 2/4 — and picking 2/4 from it did nothing. The menu now lists the piece's own\ntime beside the usual four, and keeps it there after you pick another, so a wrong\npick can be put back.",
                 twip: true,
             },
             {

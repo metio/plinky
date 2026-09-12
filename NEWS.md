@@ -29,7 +29,8 @@ a chord or a rest, and leaves the cursor where it began.
 **Compose shows the time a loaded piece is really in.** Opening a file with five,
 seven or twelve beats to the bar wrote its bars out that way, while the Time menu
 read 2/4 — and picking 2/4 from it did nothing. The menu now lists the piece's own
-time beside the usual four, and choosing any of them changes it.
+time beside the usual four, and keeps it there after you pick another, so a wrong
+pick can be put back.
 
 **Grades line up with the teaching books.** Each grade is measured against
 well-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions

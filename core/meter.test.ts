@@ -18,11 +18,25 @@ describe("meterChoices", () => {
         expect(meterChoices(1)).toEqual([1, 2, 3, 4, 6]);
     });
 
-    it("always holds the take's meter and every usual one, each once, ascending", () => {
+    it("keeps the meter a take was loaded in on offer after another is picked", () => {
+        expect(meterChoices(2, 5)).toEqual([2, 3, 4, 5, 6]);
+        expect(meterChoices(7, 5)).toEqual([2, 3, 4, 5, 6, 7]);
+    });
+
+    it("lists a loaded meter once, whether or not the take is still in it", () => {
+        expect(meterChoices(5, 5)).toEqual([2, 3, 4, 5, 6]);
+        expect(meterChoices(3, 4)).toEqual([2, 3, 4, 6]);
+    });
+
+    it("always holds the take's meter, its loaded one and every usual one, each once, ascending", () => {
+        const meter = fc.integer({ min: 1, max: MAX_BEATS_PER_BAR });
         fc.assert(
-            fc.property(fc.integer({ min: 1, max: MAX_BEATS_PER_BAR }), (meter) => {
-                const choices = meterChoices(meter);
-                expect(choices).toContain(meter);
+            fc.property(meter, fc.option(meter, { nil: undefined }), (current, loaded) => {
+                const choices = meterChoices(current, loaded);
+                expect(choices).toContain(current);
+                if (loaded !== undefined) {
+                    expect(choices).toContain(loaded);
+                }
                 for (const usual of COMPOSE_METERS) {
                     expect(choices).toContain(usual);
                 }

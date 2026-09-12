@@ -149,6 +149,38 @@ describe("Compose", () => {
         });
     });
 
+    it("keeps a shared take's own time on offer after another is picked", async () => {
+        const { encodeComposition } = await import("../../core/composition");
+        const code = encodeComposition({
+            notes: [{ pitch: 60, startMs: 0, durationMs: 400, velocity: 90 }],
+            tempo: 120,
+            beatsPerBar: 5,
+        });
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        mounted.push(container);
+        render(
+            <MemoryRouter initialEntries={[`/compose?c=${code}`]}>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Compose />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+            { container },
+        );
+
+        expect(await screen.findByText("1 note")).toBeTruthy();
+        const time = screen.getByLabelText(m.compose_beats_label()) as HTMLSelectElement;
+        await waitFor(() => expect(time.value).toBe("5"));
+        // A misclick onto 2/4 has to be undoable from the same menu.
+        fireEvent.change(time, { target: { value: "2" } });
+        await waitFor(() => expect(time.value).toBe("2"));
+        expect([...time.options].map((option) => option.value)).toContain("5");
+        fireEvent.change(time, { target: { value: "5" } });
+        await waitFor(() => expect(time.value).toBe("5"));
+    });
+
     it("halves a shared take's tempo into what the tempo field offers", async () => {
         const { encodeComposition } = await import("../../core/composition");
         const code = encodeComposition({
