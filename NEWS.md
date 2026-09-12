@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 12 September 2026 — evening
 
+**Compose shows the time a loaded piece is really in.** Opening a file with five,
+seven or twelve beats to the bar wrote its bars out that way, while the Time menu
+read 2/4 — and picking 2/4 from it did nothing. The menu now lists the piece's own
+time beside the usual four, and choosing any of them changes it.
+
 **Grades line up with the teaching books again.** Each grade is measured against
 well-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions
 and more. Once chords were fingered the right way up, those books measured a little

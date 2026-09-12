@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**Compose shows the time a loaded piece is really in.** Opening a file with five,\nseven or twelve beats to the bar wrote its bars out that way, while the Time menu\nread 2/4 — and picking 2/4 from it did nothing. The menu now lists the piece's own\ntime beside the usual four, and choosing any of them changes it.",
+                twip: true,
+            },
+            {
                 body: "**Grades line up with the teaching books again.** Each grade is measured against\nwell-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions\nand more. Once chords were fingered the right way up, those books measured a little\ndifferently, so the grades were re-cut to match them. Around four hundred pieces move\nup a grade and a few move down; nothing about how you play them changes.",
                 twip: true,
             },

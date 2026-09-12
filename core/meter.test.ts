@@ -2,7 +2,36 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { cleanBeatsPerBar, MAX_BEATS_PER_BAR } from "./meter";
+import fc from "fast-check";
+import { cleanBeatsPerBar, COMPOSE_METERS, MAX_BEATS_PER_BAR, meterChoices } from "./meter";
+
+describe("meterChoices", () => {
+    it("offers the usual meters alone when the take is in one of them", () => {
+        for (const meter of COMPOSE_METERS) {
+            expect(meterChoices(meter)).toEqual([2, 3, 4, 6]);
+        }
+    });
+
+    it("lists a loaded meter among them, in order", () => {
+        expect(meterChoices(5)).toEqual([2, 3, 4, 5, 6]);
+        expect(meterChoices(12)).toEqual([2, 3, 4, 6, 12]);
+        expect(meterChoices(1)).toEqual([1, 2, 3, 4, 6]);
+    });
+
+    it("always holds the take's meter and every usual one, each once, ascending", () => {
+        fc.assert(
+            fc.property(fc.integer({ min: 1, max: MAX_BEATS_PER_BAR }), (meter) => {
+                const choices = meterChoices(meter);
+                expect(choices).toContain(meter);
+                for (const usual of COMPOSE_METERS) {
+                    expect(choices).toContain(usual);
+                }
+                expect(new Set(choices).size).toBe(choices.length);
+                expect([...choices].sort((a, b) => a - b)).toEqual(choices);
+            }),
+        );
+    });
+});
 
 describe("cleanBeatsPerBar", () => {
     it("keeps a meter the notation can spell", () => {

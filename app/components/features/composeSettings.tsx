@@ -7,6 +7,7 @@ import {
     COMPOSE_MAX_TEMPO as MAX_TEMPO,
     COMPOSE_MIN_TEMPO as MIN_TEMPO,
 } from "../../../core/composition";
+import { meterChoices } from "../../../core/meter";
 import { m } from "../../paraglide/messages.js";
 import { fieldClasses } from "../ui/classes";
 import { SwitchField } from "../ui/fields";
@@ -112,10 +113,11 @@ export function ComposeSettings({
                     onChange={(event) => onBeatsPerBar(Number(event.target.value))}
                     className={fieldClasses}
                 >
-                    <option value={2}>2/4</option>
-                    <option value={3}>3/4</option>
-                    <option value={4}>4/4</option>
-                    <option value={6}>6/4</option>
+                    {meterChoices(beatsPerBar).map((beats) => (
+                        <option key={beats} value={beats}>
+                            {beats}/4
+                        </option>
+                    ))}
                 </select>
             </label>
             <SwitchField

@@ -4,6 +4,10 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { buildMidiFile } from "../../../core/midiFile";
+import { parseMidiFile } from "../../../core/midiParse";
+import { parseMusicXml } from "../../../core/musicxmlParse";
+import { domXmlCodec } from "../../adapters/domXmlCodec";
 import { m } from "../../paraglide/messages.js";
 import { toggle } from "../../testing/controls";
 import { ComposeSettings } from "./composeSettings";
@@ -73,6 +77,44 @@ describe("ComposeSettings", () => {
         mount({ onBeatsPerBar });
         fireEvent.change(screen.getByLabelText("Time"), { target: { value: "3" } });
         expect(onBeatsPerBar).toHaveBeenCalledWith(3);
+    });
+
+    it("shows the meter of a 5/4 MIDI file it was loaded from", () => {
+        const loaded = parseMidiFile(
+            buildMidiFile([{ midi: 60, startQuarters: 0, durationQuarters: 1 }], {
+                beatsPerBar: 5,
+            }),
+        );
+        expect(loaded?.beatsPerBar).toBe(5);
+        mount({ beatsPerBar: loaded!.beatsPerBar });
+        const field = screen.getByLabelText("Time") as HTMLSelectElement;
+        expect(field.value).toBe("5");
+        expect(field.selectedOptions[0]?.textContent).toBe("5/4");
+    });
+
+    it("shows the meter of a 12/8 MusicXML file it was loaded from", () => {
+        const xml = `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><time><beats>12</beats><beat-type>8</beat-type></time></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
+        const loaded = parseMusicXml(domXmlCodec, xml);
+        expect(loaded?.beatsPerBar).toBe(12);
+        mount({ beatsPerBar: loaded!.beatsPerBar });
+        expect((screen.getByLabelText("Time") as HTMLSelectElement).value).toBe("12");
+    });
+
+    it("moves a loaded 5/4 take to 2/4 when 2/4 is picked", () => {
+        // With no option for 5 the field would already show the first one, 2/4, and
+        // picking it would change nothing.
+        const onBeatsPerBar = vi.fn();
+        mount({ beatsPerBar: 5, onBeatsPerBar });
+        const field = screen.getByLabelText("Time") as HTMLSelectElement;
+        expect(field.value).not.toBe("2");
+        fireEvent.change(field, { target: { value: "2" } });
+        expect(onBeatsPerBar).toHaveBeenCalledWith(2);
+    });
+
+    it("offers the four usual meters and nothing else for a usual one", () => {
+        mount({ beatsPerBar: 3 });
+        const field = screen.getByLabelText("Time") as HTMLSelectElement;
+        expect([...field.options].map((option) => option.value)).toEqual(["2", "3", "4", "6"]);
     });
 
     it("toggles quantize and metronome", () => {
