@@ -461,22 +461,25 @@ export function shellFor(shell, list, locale, path) {
                 `<meta property="og:locale:alternate" content="${list.strings[one]?.og ?? "en_US"}"/>`,
         )
         .join("");
+    // Every replacement is a function. A replacement string reads `$'`, `$&`, `$1` and
+    // `$$` as patterns, and the path is the request's own: the URL parser leaves `$`, `'`
+    // and `&` in it, so an address could splice copies of the shell into the page.
     return shell
-        .replace(/<html lang="[^"]*"/, `<html lang="${escapeHtml(locale)}"`)
+        .replace(/<html lang="[^"]*"/, () => `<html lang="${escapeHtml(locale)}"`)
         .replace(
             /<link rel="canonical" href="[^"]*"\/?>/,
-            `<link rel="canonical" href="${escapeHtml(pageUrl)}"/>`,
+            () => `<link rel="canonical" href="${escapeHtml(pageUrl)}"/>`,
         )
-        .replace(/(<link rel="alternate" hrefLang="[^"]*" href="[^"]*"\/?>)+/, cluster)
+        .replace(/(<link rel="alternate" hrefLang="[^"]*" href="[^"]*"\/?>)+/, () => cluster)
         .replace(
             /<meta property="og:url" content="[^"]*"\/?>/,
-            `<meta property="og:url" content="${escapeHtml(pageUrl)}"/>`,
+            () => `<meta property="og:url" content="${escapeHtml(pageUrl)}"/>`,
         )
         .replace(
             /<meta property="og:locale" content="[^"]*"\/?>/,
-            `<meta property="og:locale" content="${strings.og ?? "en_US"}"/>`,
+            () => `<meta property="og:locale" content="${strings.og ?? "en_US"}"/>`,
         )
-        .replace(/(<meta property="og:locale:alternate" content="[^"]*"\/?>)+/, alternates);
+        .replace(/(<meta property="og:locale:alternate" content="[^"]*"\/?>)+/, () => alternates);
 }
 
 // The path of the page an address names, with the trailing slash the documents are
@@ -547,24 +550,28 @@ export function documentFor(shell, list, page, about = null) {
             : page.kind === "person"
               ? `${origin}/og/person/${encodeURIComponent(page.id)}.png`
               : null;
+    // Function replacements, as in shellFor: a title is catalogue text, and a `$&` in one
+    // would be read as a pattern.
     const withCard =
         cardUrl !== null
             ? shell
                   .replace(
                       /<meta property="og:image" content="[^"]*"\/?>/,
-                      `<meta property="og:image" content="${escapeHtml(cardUrl)}"/>`,
+                      () => `<meta property="og:image" content="${escapeHtml(cardUrl)}"/>`,
                   )
                   .replace(
                       /<meta property="og:image:alt" content="[^"]*"\/?>/,
-                      `<meta property="og:image:alt" content="${escapeHtml(described.headline)}"/>`,
+                      () =>
+                          `<meta property="og:image:alt" content="${escapeHtml(described.headline)}"/>`,
                   )
                   .replace(
                       /<meta name="twitter:image" content="[^"]*"\/?>/,
-                      `<meta name="twitter:image" content="${escapeHtml(cardUrl)}"/>`,
+                      () => `<meta name="twitter:image" content="${escapeHtml(cardUrl)}"/>`,
                   )
                   .replace(
                       /<meta name="twitter:image:alt" content="[^"]*"\/?>/,
-                      `<meta name="twitter:image:alt" content="${escapeHtml(described.headline)}"/>`,
+                      () =>
+                          `<meta name="twitter:image:alt" content="${escapeHtml(described.headline)}"/>`,
                   )
             : shell;
     const addressed = shellFor(withCard, list, locale, described.path);

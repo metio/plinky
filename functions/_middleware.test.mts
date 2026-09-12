@@ -15,6 +15,7 @@ import {
     onRequest,
     parsePath,
     pickLocale,
+    shellFor,
 } from "./_middleware.js";
 
 // The catalogue as the build writes it beside the site, as the asset binding serves it.
@@ -805,5 +806,73 @@ describe("the catalogue's shelves", () => {
     it("keeps the 404 for a shelf the site does not have", async () => {
         const response = await onRequest(served("/en/music/grade/9/", 404, SHELL, SHELL_HEADERS));
         expect(response.status).toBe(404);
+    });
+});
+
+// String.prototype.replace reads `$'`, `$&`, `$1` and `$$` in a replacement string as
+// patterns, and an address can carry every one of them: the URL parser leaves `$`, `'`
+// and `&` in a path as they are.
+describe("an address carrying replacement patterns", () => {
+    const escaped = (text: string) =>
+        text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    const count = (html: string, needle: string) => html.split(needle).length - 1;
+
+    for (const pattern of ["$'", "$&", "$1", "$$", "$`"]) {
+        it(`serves the shell once, addressed to the page, for ${pattern}`, async () => {
+            const path = `/en/music/${pattern}/`;
+            const response = await onRequest(served(path, 404, SHELL, SHELL_HEADERS));
+            expect(response.status).toBe(200);
+            const html = await response.text();
+            const url = `https://plinky.fun${new URL(`https://plinky.fun${path}`).pathname}`;
+            expect(html).toContain(`<link rel="canonical" href="${escaped(url)}"/>`);
+            expect(html).toContain(`<meta property="og:url" content="${escaped(url)}"/>`);
+            expect(count(html, "<html")).toBe(1);
+            expect(count(html, "</html>")).toBe(1);
+            expect(count(html, '<link rel="canonical"')).toBe(1);
+            expect(count(html, '<meta property="og:url"')).toBe(1);
+        });
+    }
+
+    it("writes any path into the shell as text, leaving the shell whole", () => {
+        fc.assert(
+            fc.property(
+                fc.string({
+                    unit: fc.constantFrom("$", "'", "&", "`", "1", "0", "a", "/", '"', "<", ">"),
+                }),
+                (tail) => {
+                    const path = `/${tail}/`;
+                    const html = shellFor(SHELL, KNOWN, "en", path);
+                    const url = `https://plinky.fun/en${path}`;
+                    expect(html).toContain(`<link rel="canonical" href="${escaped(url)}"/>`);
+                    expect(html).toContain(`<meta property="og:url" content="${escaped(url)}"/>`);
+                    for (const one of KNOWN.locales) {
+                        expect(html).toContain(
+                            `<link rel="alternate" hrefLang="${one}" href="${escaped(`https://plinky.fun/${one}${path}`)}"/>`,
+                        );
+                    }
+                    // Everything outside the addressed tags is the shell's, once.
+                    expect(count(html, "<html")).toBe(1);
+                    expect(count(html, "</head>")).toBe(1);
+                    expect(count(html, '<div id="root"></div>')).toBe(1);
+                    expect(html.endsWith("</body></html>")).toBe(true);
+                },
+            ),
+        );
+    });
+
+    it("writes a title carrying replacement patterns into a piece's card as text", () => {
+        const list = {
+            ...KNOWN,
+            pieces: { ...KNOWN.pieces, dollars00000: { title: "Rag $' $& $1 $$", composer: "" } },
+        };
+        const html = documentFor(SHELL, list, { locale: "en", kind: "play", id: "dollars00000" }) ?? "";
+        expect(html).toContain('<meta property="og:image:alt" content="Rag $\' $&amp; $1 $$"/>');
+        expect(html).toContain('<meta name="twitter:image:alt" content="Rag $\' $&amp; $1 $$"/>');
+        expect(count(html, "<html")).toBe(1);
+        expect(count(html, "</html>")).toBe(1);
     });
 });
