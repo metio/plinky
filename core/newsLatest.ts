@@ -14,6 +14,10 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
+                body: "**Switching a reading aid while a piece plays leaves no stray highlight.** Turning\nnote colours or finger numbers on or off during Listen, or while a take replayed,\nleft the note sounding at that moment lit as if it still were, long after the music\nhad moved on. The highlight now carries on with the music and the trail stays\nunbroken.",
+                twip: true,
+            },
+            {
                 body: "**Back after a rest takes back only the rest.** Writing notes one at a time, a\nBack pressed after a rest also removed the note before it, and two rests in a row\nwent with the note too. Back now undoes exactly the last thing you entered, a note,\na chord or a rest, and leaves the cursor where it began.",
                 twip: true,
             },

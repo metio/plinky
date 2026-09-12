@@ -572,51 +572,79 @@ export function trailNotes(painted: PaintedNote[], color: string): void {
 // green cleared notes, the blue Listen trail, a red miss and any revealed hidden note in one
 // pass. The fresh noteheads walk in the same order because a fingering change adds no notes.
 export function snapshotNotePaint(osmd: OpenSheetMusicDisplay): (string | null)[] {
-    const colors: (string | null)[] = [];
-    osmd.cursor.show();
-    osmd.cursor.reset();
-    while (!osmd.cursor.iterator.EndReached) {
-        for (const gNote of osmd.cursor.GNotesUnderCursor()) {
-            const note = gNote.sourceNote;
-            if (!isPitched(note)) {
-                continue;
-            }
-            const element = svgOf(gNote);
-            colors.push(element ? haloColor(element) : null);
-        }
-        osmd.cursor.next();
-    }
-    osmd.cursor.reset();
-    osmd.cursor.hide();
-    return colors;
+    return noteheadsInWalk(osmd).map((element) => (element ? haloColor(element) : null));
 }
 
 // Re-applies a snapshot to the freshly-rendered noteheads, walking them in the same order.
 // Returns whether any note wore a mark, so the caller can keep the score's painted flag.
 export function restoreNotePaint(osmd: OpenSheetMusicDisplay, colors: (string | null)[]): boolean {
-    let index = 0;
-    const marks: HaloMark[] = [];
+    return paintInWalk(noteheadsInWalk(osmd), colors);
+}
+
+// Where a notehead drawn before a re-render is drawn after it, or undefined for one the
+// fresh render does not have.
+export type NoteRemap = (element: SVGElement) => SVGElement | undefined;
+
+// Re-renders through `render`, carrying the score's paint across, and says where each
+// notehead went. The paint alone is not enough: a transport holding the noteheads it lit
+// "now sounding" holds elements the render discarded, and lifting or trailing them paints
+// into an SVG nobody sees, while the fresh notehead keeps the highlight it was restored
+// with for good. The remap lets such a holder follow its notes to the fresh render.
+export function redrawKeepingPaint(
+    osmd: OpenSheetMusicDisplay,
+    render: () => void,
+): { painted: boolean; remap: NoteRemap } {
+    const before = noteheadsInWalk(osmd);
+    const colors = before.map((element) => (element ? haloColor(element) : null));
+    render();
+    const after = noteheadsInWalk(osmd);
+    const painted = paintInWalk(after, colors);
+    const moved = new Map<SVGElement, SVGElement>();
+    for (const [index, element] of before.entries()) {
+        const fresh = after[index];
+        if (element && fresh) {
+            moved.set(element, fresh);
+        }
+    }
+    return { painted, remap: (element) => moved.get(element) };
+}
+
+// Lit notes followed to a fresh render, each keeping the halo it wore before it was lit.
+// A note the fresh render does not draw is dropped: there is nothing left to lift.
+export function retargetPainted(painted: readonly PaintedNote[], remap: NoteRemap): PaintedNote[] {
+    return painted.flatMap(({ element, prior }) => {
+        const fresh = remap(element);
+        return fresh ? [{ element: fresh, prior }] : [];
+    });
+}
+
+// Every pitched notehead in cursor-walk order, null where one has no rendered element, so
+// a list taken before a render and one taken after line up index for index.
+function noteheadsInWalk(osmd: OpenSheetMusicDisplay): (SVGElement | null)[] {
+    const elements: (SVGElement | null)[] = [];
     osmd.cursor.show();
     osmd.cursor.reset();
     while (!osmd.cursor.iterator.EndReached) {
         for (const gNote of osmd.cursor.GNotesUnderCursor()) {
-            const note = gNote.sourceNote;
-            if (!isPitched(note)) {
-                continue;
-            }
-            const color = colors[index++];
-            if (color == null) {
-                continue;
-            }
-            const element = svgOf(gNote);
-            if (element) {
-                marks.push({ element, color });
+            if (isPitched(gNote.sourceNote)) {
+                elements.push(svgOf(gNote) ?? null);
             }
         }
         osmd.cursor.next();
     }
     osmd.cursor.reset();
     osmd.cursor.hide();
+    return elements;
+}
+
+function paintInWalk(elements: (SVGElement | null)[], colors: (string | null)[]): boolean {
+    const marks: HaloMark[] = [];
+    for (const [index, element] of elements.entries()) {
+        const color = colors[index];
+        if (element && color != null) {
+            marks.push({ element, color });
+        }
+    }
     litHalos(marks);
     return marks.length > 0;
 }

@@ -12,8 +12,10 @@ import {
     paintBarSelection,
     focusMeasures,
     paintPlayedNotes,
+    redrawKeepingPaint,
     restoreNotePaint,
     restoreNotes,
+    retargetPainted,
     snapshotNotePaint,
 } from "./scoreColor";
 import {
@@ -372,5 +374,57 @@ describe("snapshotNotePaint / restoreNotePaint", () => {
         const snapshot = snapshotNotePaint(walkingOsmd([[a]]));
         expect(snapshot).toEqual([null]);
         expect(restoreNotePaint(walkingOsmd([[a]]), snapshot)).toBe(false);
+    });
+});
+
+describe("redrawKeepingPaint", () => {
+    it("carries the paint across the render and says where each notehead went", () => {
+        const a = gNote(60);
+        const b = gNote(64);
+        const rest = gNote(72, true, true);
+        mount([a, b]);
+        paintPlayedNotes(fakeOsmd([a]), [60]);
+        const lit = highlightCursorNotes(fakeOsmd([b]), WINDOW_COLOR);
+        // The walk reads this list live, so the render swaps the drawn noteheads in place.
+        const positions = [[a], [rest], [b]];
+        const a2 = gNote(60);
+        const b2 = gNote(64);
+        const { painted, remap } = redrawKeepingPaint(walkingOsmd(positions), () => {
+            mount([a2, b2]);
+            positions.splice(0, positions.length, [a2], [rest], [b2]);
+        });
+        expect(painted).toBe(true);
+        expect(haloColor(a2.group)).toBe(PLAYED_COLOR);
+        expect(haloColor(b2.group)).toBe(WINDOW_COLOR);
+        expect(remap(a.group)).toBe(a2.group);
+        expect(remap(b.group)).toBe(b2.group);
+        expect(retargetPainted(lit, remap)).toEqual([{ element: b2.group, prior: null }]);
+    });
+
+    it("drops a lit note the fresh render does not draw", () => {
+        const a = gNote(60);
+        const offscreen = gNote(60, false);
+        mount([a]);
+        const lit = highlightCursorNotes(fakeOsmd([a]), WINDOW_COLOR);
+        const positions = [[a]];
+        const { remap } = redrawKeepingPaint(walkingOsmd(positions), () => {
+            positions.splice(0, positions.length, [offscreen]);
+        });
+        expect(remap(a.group)).toBeUndefined();
+        expect(retargetPainted(lit, remap)).toEqual([]);
+    });
+
+    it("reports no paint for an unmarked score, and still maps its noteheads", () => {
+        const a = gNote(60);
+        const a2 = gNote(60);
+        mount([a]);
+        const positions = [[a]];
+        const { painted, remap } = redrawKeepingPaint(walkingOsmd(positions), () => {
+            mount([a2]);
+            positions.splice(0, positions.length, [a2]);
+        });
+        expect(painted).toBe(false);
+        expect(haloColor(a2.group)).toBeNull();
+        expect(remap(a.group)).toBe(a2.group);
     });
 });

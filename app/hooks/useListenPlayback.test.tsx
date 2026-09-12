@@ -11,15 +11,17 @@ import type { Take } from "../../core/takes";
 import { listenPerformanceOf } from "../../core/listenPerformance";
 import { seekToOrdinal } from "../lib/scoreCursor";
 import { collectListenSteps } from "../lib/listenSteps";
-import { trailNotes } from "../lib/scoreColor";
+import { highlightCursorNotes, trailNotes } from "../lib/scoreColor";
 import { useListenPlayback } from "./useListenPlayback";
 
 // The colour helpers walk real OSMD graphics; stub them so the fake score
 // below only has to model the cursor walk itself.
-vi.mock("../lib/scoreColor", () => ({
+vi.mock("../lib/scoreColor", async (importOriginal) => ({
     highlightCursorNotes: vi.fn(() => []),
     restoreNotes: vi.fn(),
     trailNotes: vi.fn(),
+    // Pure bookkeeping over the notes it is handed, so the real one.
+    retargetPainted: (await importOriginal<typeof import("../lib/scoreColor")>()).retargetPainted,
 }));
 vi.mock("../lib/scoreCursor", () => ({
     seekToBar: vi.fn(),
@@ -916,6 +918,34 @@ describe("Listen over a written repeat", () => {
         // before the rewind, and none is laid between the rewind and the next tick.
         expect(trails.some((at) => at < rewoundAt)).toBe(true);
         expect(trails.filter((at) => at > rewoundAt)).toHaveLength(0);
+    });
+
+    it("trails the fresh notehead after an in-place redraw, not the discarded one", () => {
+        const SVG_NS = "http://www.w3.org/2000/svg";
+        const drawn = document.createElementNS(SVG_NS, "g");
+        const redrawn = document.createElementNS(SVG_NS, "g");
+        vi.mocked(highlightCursorNotes).mockReturnValueOnce([{ element: drawn, prior: null }]);
+        const osmd = fakeOsmd(4);
+        const { result } = renderHook(() =>
+            useListenPlayback({
+                getOsmd: () => osmd,
+                synth: { playNote, silenceStrikes },
+                tempo: () => 120,
+                loop: () => loopState,
+                onLap,
+                centerCursor: () => {},
+                markPainted: () => {},
+                isPracticing: () => false,
+            }),
+        );
+        act(() => result.current.start(0));
+        act(() => result.current.retarget((element) => (element === drawn ? redrawn : undefined)));
+        vi.mocked(trailNotes).mockClear();
+        act(() => result.current.stop());
+        expect(trailNotes).toHaveBeenCalledWith(
+            [{ element: redrawn, prior: null }],
+            expect.any(String),
+        );
     });
 
     it("stays quiet on a score that never repeats", () => {

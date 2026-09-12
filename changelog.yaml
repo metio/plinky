@@ -5,6 +5,12 @@
   label: evening
   entries:
     - |-
+      **Switching a reading aid while a piece plays leaves no stray highlight.** Turning
+      note colours or finger numbers on or off during Listen, or while a take replayed,
+      left the note sounding at that moment lit as if it still were, long after the music
+      had moved on. The highlight now carries on with the music and the trail stays
+      unbroken.
+    - |-
       **Back after a rest takes back only the rest.** Writing notes one at a time, a
       Back pressed after a rest also removed the note before it, and two rests in a row
       went with the note too. Back now undoes exactly the last thing you entered, a note,

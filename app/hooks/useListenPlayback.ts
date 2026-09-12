@@ -17,7 +17,9 @@ import { readStartTempo } from "../lib/scoreExpression";
 import {
     highlightCursorNotes,
     type PaintedNote,
+    type NoteRemap,
     restoreNotes,
+    retargetPainted,
     trailNotes,
 } from "../lib/scoreColor";
 import { seekToBar, seekToOrdinal, seekToWhole } from "../lib/scoreCursor";
@@ -369,6 +371,12 @@ export function useListenPlayback({
     const startAt = useCallback((from: number, at?: number) => api.current.start(from, at), []);
     const replayTake = useCallback((take: Take) => api.current.replay(take), []);
     const stopNow = useCallback(() => api.current.stop(), []);
+    // The score was redrawn in place under a playback: follow the lit notes to the fresh
+    // noteheads, which the redraw restored still lit. Holding the discarded ones would lift
+    // and trail nothing visible and leave a fresh note lit "now sounding" for good.
+    const retarget = useCallback((remap: NoteRemap) => {
+        highlightRef.current = retargetPainted(highlightRef.current, remap);
+    }, []);
     return useMemo(
         () => ({
             playing,
@@ -378,7 +386,8 @@ export function useListenPlayback({
             start: startAt,
             replay: replayTake,
             stop: stopNow,
+            retarget,
         }),
-        [playing, activeReplayId, sounding, activeNow, startAt, replayTake, stopNow],
+        [playing, activeReplayId, sounding, activeNow, startAt, replayTake, stopNow, retarget],
     );
 }

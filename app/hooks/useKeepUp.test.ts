@@ -7,6 +7,7 @@ import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
 import { listenStepMs } from "../../core/playback";
+import { PLAYED_COLOR } from "../../core/scoreCanvas";
 import { litHalos } from "../lib/scoreColor";
 import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
 
@@ -221,6 +222,30 @@ describe("useKeepUp", () => {
 
         expect(markPainted).toHaveBeenCalled();
         result.current.stop();
+    });
+
+    it("colours the fresh noteheads after an in-place redraw, not the discarded ones", () => {
+        const osmd = fakeOsmd([[{ midi: 60, staff: 0 }], [{ midi: 62, staff: 0 }]]);
+        const redrawn = {} as SVGElement;
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote: () => {}, silenceStrikes: () => {} },
+                tempo: () => 240,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                markPainted: () => {},
+                onFinish: () => {},
+            }),
+        );
+        act(() => result.current.start({ hand: "both", guideNotes: false, accompany: false }));
+        // Past the count-in, the first beat is open and lit.
+        act(() => vi.advanceTimersByTime(300));
+        act(() => result.current.retarget(() => redrawn));
+        vi.mocked(litHalos).mockClear();
+        act(() => result.current.registerNote(60, performance.now()));
+        expect(litHalos).toHaveBeenCalledWith([{ element: redrawn, color: PLAYED_COLOR }]);
+        act(() => result.current.stop());
     });
 
     it("settles the section's last beat before a repeat wipes the section", () => {

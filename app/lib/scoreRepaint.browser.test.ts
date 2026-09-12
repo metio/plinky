@@ -3,8 +3,15 @@
 
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
-import { WINDOW_COLOR } from "../../core/scoreCanvas";
-import { highlightCursorNotes, restoreNotePaint, snapshotNotePaint } from "./scoreColor";
+import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
+import {
+    highlightCursorNotes,
+    redrawKeepingPaint,
+    restoreNotePaint,
+    retargetPainted,
+    snapshotNotePaint,
+    trailNotes,
+} from "./scoreColor";
 
 // A four-note bar, optionally carrying fingerings — toggling them is what forces the
 // re-render the repaint has to survive.
@@ -60,5 +67,47 @@ describe("note-paint snapshot across an OSMD re-render", () => {
         // Re-applying the snapshot puts the score back exactly as it was painted.
         expect(restoreNotePaint(osmd, before)).toBe(true);
         expect(snapshotNotePaint(osmd)).toEqual(before);
+    });
+
+    it("leaves one note 'now sounding' when playback moves on after the redraw", async () => {
+        host = document.createElement("div");
+        host.style.width = "800px";
+        document.body.appendChild(host);
+        const osmd = new OpenSheetMusicDisplay(host, { drawingParameters: "compact" });
+        await osmd.load(score(true));
+        osmd.render();
+        const lit = (color: string) =>
+            [...host!.querySelectorAll("rect.plinky-note-halo")].filter(
+                (halo) => halo.isConnected && halo.getAttribute("fill") === color,
+            ).length;
+
+        // Listen lights the first position and holds its noteheads, to lift on the next tick.
+        osmd.cursor.show();
+        osmd.cursor.reset();
+        const sounding = highlightCursorNotes(osmd, WINDOW_COLOR);
+
+        // The redraw a mid-playback toggle triggers, as drawNow does it, and the transport
+        // following its lit notes to the fresh noteheads.
+        const { painted, remap } = redrawKeepingPaint(osmd, () => {
+            (osmd as unknown as { rules: { RenderFingerings: boolean } }).rules.RenderFingerings =
+                false;
+            osmd.updateGraphic();
+            osmd.render();
+        });
+        expect(painted).toBe(true);
+        expect(lit(WINDOW_COLOR)).toBe(1);
+        const followed = retargetPainted(sounding, remap);
+        expect(followed).toHaveLength(sounding.length);
+        expect(followed.every(({ element }) => host!.contains(element))).toBe(true);
+
+        // The next tick: the note just heard joins the blue trail, the next one lights.
+        trailNotes(followed, LISTENED_COLOR);
+        osmd.cursor.show();
+        osmd.cursor.reset();
+        osmd.cursor.next();
+        highlightCursorNotes(osmd, WINDOW_COLOR);
+
+        expect(lit(WINDOW_COLOR)).toBe(1);
+        expect(lit(LISTENED_COLOR)).toBe(1);
     });
 });

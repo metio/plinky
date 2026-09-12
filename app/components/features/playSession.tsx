@@ -438,10 +438,13 @@ function usePlaySessionValue({
             }
         },
         // The in-place fingering redraw rebuilt the noteheads mid-run: re-apply the ear-mode
-        // conceal so a hidden run's blanked answers aren't exposed by the fresh render.
-        onFingeringRedraw: () => {
+        // conceal so a hidden run's blanked answers aren't exposed by the fresh render, and
+        // hand the transports their lit notes' fresh noteheads.
+        onFingeringRedraw: (remap) => {
             hidden.reconceal();
             vanishing.rearm();
+            listenPlayback.retarget(remap);
+            keepUp.retarget(remap);
         },
     });
     const {

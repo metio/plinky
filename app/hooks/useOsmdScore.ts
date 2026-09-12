@@ -14,9 +14,9 @@ import {
     clearHalosWithin,
     collectMeasureBoxes,
     type RepeatSpan,
-    restoreNotePaint,
+    type NoteRemap,
+    redrawKeepingPaint,
     scoreSvg,
-    snapshotNotePaint,
 } from "../lib/scoreColor";
 import { cursorOrdinal, seekToOrdinal } from "../lib/scoreCursor";
 import type { FingerMap } from "../stores/fingeringStore";
@@ -160,8 +160,9 @@ export function useOsmdScore(
         onRendered: (info: { bars: number; freshPiece: boolean }) => void;
         // After the in-place fingering redraw rebuilds the noteheads (mid-run, no reload),
         // so the caller can re-apply any SVG-injected run paint the fresh render dropped —
-        // the ear-mode conceal above all, whose blanks would otherwise expose the answers.
-        onFingeringRedraw: () => void;
+        // the ear-mode conceal above all, whose blanks would otherwise expose the answers —
+        // and where each notehead now is, for a transport holding the ones it lit.
+        onFingeringRedraw: (remap: NoteRemap) => void;
     },
 ): OsmdScore {
     const xmlCodec = useXmlCodec();
@@ -478,19 +479,20 @@ export function useOsmdScore(
             // a repeated piece, and a run on the second pass must come back to it.
             cursor.hide();
             const at = cursorOrdinal(cursor);
-            // Capture the run's paint before the render drops every halo, to re-apply after —
-            // the green cleared notes and the blue Listen trail record how far the piece has
-            // been played, and would otherwise vanish on a mid-run toggle.
-            const paint = snapshotNotePaint(osmd);
-            osmd.updateGraphic();
-            osmd.render();
+            // Carry the run's paint across the render, which drops every halo — the green
+            // cleared notes and the blue Listen trail record how far the piece has been
+            // played, and would otherwise vanish on a mid-run toggle.
+            const { painted, remap } = redrawKeepingPaint(osmd, () => {
+                osmd.updateGraphic();
+                osmd.render();
+            });
             // A fresh render carries no measure boxes or overlay: re-measure the bars for the
             // loop selection and click-to-select. The render-version bump lets the caller
             // repaint the loop overlay the fresh SVG dropped.
             const svg = scoreSvg(containerRef.current);
             measureBoxesRef.current = svg ? collectMeasureBoxes(osmd, svg) : [];
-            paintedRef.current = restoreNotePaint(osmd, paint);
-            onFingeringRedrawRef.current();
+            paintedRef.current = painted;
+            onFingeringRedrawRef.current(remap);
             // Step the reset cursor back to where it stood — OSMD has no direct seek — and
             // show it again where a run or Listen was using it, re-centring the treadmill.
             if (wasVisible) {
