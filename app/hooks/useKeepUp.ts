@@ -16,7 +16,7 @@ import {
     strikeKeepUp,
 } from "../../core/keepUp";
 import { useScheduler } from "../contexts/services";
-import type { StrikeOwner } from "../ports/audioEngine";
+import { type StrikeSink, useOwnedStrikes } from "./useOwnedStrikes";
 import type { Hand } from "../../core/matcher";
 import { NOMINAL_BPM, positionAdvances } from "../../core/elapsed";
 import { readParts, readStartTempo } from "../lib/scoreExpression";
@@ -30,16 +30,6 @@ import { shortestAt } from "../lib/listenSteps";
 import { readPosition, type ScorePosition } from "../lib/scorePosition";
 import { NO_SCORE_MARKS } from "../../core/musicxmlMarks";
 import { jumpsBack } from "../../core/matcher";
-
-// A note sink for the guide and the player's own strikes — the slice of the
-// synth the play-along needs, and a stop that takes back what the run struck.
-type NoteSink = {
-    playNote(
-        note: number,
-        options?: { duration?: number; device?: string; owner?: StrikeOwner },
-    ): void;
-    silenceStrikes(owner: StrikeOwner): void;
-};
 
 // Walk the engraved score once and lift the play-along timeline into the pure
 // step model: every cursor position in order, each carrying the practised hand's
@@ -150,7 +140,7 @@ export function useKeepUp({
     onFinish,
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
-    synth: NoteSink;
+    synth: StrikeSink;
     // The live practice tempo, read at each tick so the run follows the dial.
     tempo: () => number;
     beatsPerBar: number;
@@ -174,9 +164,10 @@ export function useKeepUp({
 }) {
     const chain = useTimerChain();
     const scheduler = useScheduler();
-    // The guide and the duet strike under this, so a stop takes back exactly the notes the
-    // run sounded. The player's own strikes go out without it: they are the player's notes.
-    const [owner] = useState<StrikeOwner>(() => Symbol("keep up"));
+    // The guide and the duet strike through this, so a stop takes back exactly the notes the
+    // run sounded. The player's own strikes go out on the synth itself: they are the
+    // player's notes.
+    const strikes = useOwnedStrikes(synth, "keep up");
     // Live during a play-along run, then the result once it finishes.
     const [running, setRunning] = useState(false);
     const [progress, setProgress] = useState({ inTime: 0, done: 0 });
@@ -211,7 +202,7 @@ export function useKeepUp({
     // the result does — lets its last notes ring, as Listen's do.
     const stop = () => {
         if (activeRef.current) {
-            synth.silenceStrikes(owner);
+            strikes.silence();
         }
         chain.clear();
         activeRef.current = false;
@@ -313,13 +304,13 @@ export function useKeepUp({
                 quarters * (60 / localTempo(current)) * current.stretch;
             if (guideNotes) {
                 for (const entry of current.play) {
-                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters), owner });
+                    strikes.playNote(entry.pitch, { duration: seconds(entry.quarters) });
                 }
             }
             // The duet: sound the other hand at each beat, so the app plays alongside you.
             if (accompany) {
                 for (const entry of current.accompany) {
-                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters), owner });
+                    strikes.playNote(entry.pitch, { duration: seconds(entry.quarters) });
                 }
             }
             stateRef.current = openKeepUpStep(stateRef.current, pitches, {

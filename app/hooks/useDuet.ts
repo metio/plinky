@@ -3,10 +3,10 @@
 
 import { useLatest } from "./useLatest";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { type AccompanyVoice, accompanimentForGap, gapsForRun } from "../../core/duet";
 import type { Hand } from "../../core/matcher";
-import type { StrikeOwner } from "../ports/audioEngine";
+import { type StrikeSink, useOwnedStrikes } from "./useOwnedStrikes";
 import type { Scheduler, SchedulerHandle } from "../ports/scheduler";
 import { collectMatchSteps } from "./useScoreMatcher";
 
@@ -14,13 +14,6 @@ import { collectMatchSteps } from "./useScoreMatcher";
 const OTHER: Record<Exclude<Hand, "both">, Exclude<Hand, "both">> = {
     right: "left",
     left: "right",
-};
-
-// The synth slice the duet needs: a fixed-length note for the other hand, and a stop that
-// takes back what it struck.
-type NoteSink = {
-    playNote(note: number, options?: { duration?: number; owner?: StrikeOwner }): void;
-    silenceStrikes(owner: StrikeOwner): void;
 };
 
 // Sounds the sitting-out hand during self-paced single-hand practice. `prime` reads
@@ -40,7 +33,7 @@ export function useDuet({
     hand,
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
-    synth: NoteSink;
+    synth: StrikeSink;
     scheduler: Scheduler;
     enabled: boolean;
     hand: Hand;
@@ -52,12 +45,9 @@ export function useDuet({
     // gap — see gapsForRun.
     const gapsRef = useRef<AccompanyVoice[][]>([]);
     const pendingRef = useRef<SchedulerHandle[]>([]);
-    // Every note the duet strikes goes out under this, so its stop can take back exactly
+    // Every note the duet strikes goes out through this, so its stop can take back exactly
     // the other hand's notes and never the ones the player is sounding.
-    const [owner] = useState<StrikeOwner>(() => Symbol("duet"));
-    // Through its members, not the object: stop is what the unmount effect runs, and a
-    // synth rebuilt around a new preference must not read as the surface leaving.
-    const { playNote, silenceStrikes } = synth;
+    const { playNote, silence } = useOwnedStrikes(synth, "duet");
     // Read live inside the callbacks so a mid-render toggle or hand change takes
     // effect on the next primed run without re-creating them.
     const enabledRef = useLatest(enabled);
@@ -76,8 +66,8 @@ export function useDuet({
     // and the notes already sounding have to go.
     const stop = useCallback(() => {
         cancel();
-        silenceStrikes(owner);
-    }, [cancel, silenceStrikes, owner]);
+        silence();
+    }, [cancel, silence]);
 
     const prime = useCallback(() => {
         stop();
@@ -120,8 +110,7 @@ export function useDuet({
             }
             cancel();
             for (const voice of accompanimentForGap(gapsRef.current[index] ?? [], from, bpm)) {
-                const strike = () =>
-                    playNote(voice.pitch, { duration: voice.durationSec, owner });
+                const strike = () => playNote(voice.pitch, { duration: voice.durationSec });
                 if (voice.delayMs <= 0) {
                     strike();
                     continue;
@@ -129,7 +118,7 @@ export function useDuet({
                 pendingRef.current.push(scheduler.after(voice.delayMs, strike));
             }
         },
-        [cancel, playNote, owner, scheduler],
+        [cancel, playNote, scheduler],
     );
 
     // Turning the duet off, or leaving the surface, stops it like any other interruption.

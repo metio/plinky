@@ -23,24 +23,8 @@ import {
     trailNotes,
 } from "../lib/scoreColor";
 import { seekToBar, seekToOrdinal, seekToWhole } from "../lib/scoreCursor";
-import type { StrikeOwner } from "../ports/audioEngine";
+import { type StrikeSink, useOwnedStrikes } from "./useOwnedStrikes";
 import { useTimerChain } from "./useTimerChain";
-
-// The synth slice playback needs: Listen scales sustain by tempo, a replay
-// replays the recorded velocity and hold, and a stop takes back what was struck.
-type NoteSink = {
-    playNote(
-        note: number,
-        options?: {
-            duration?: number;
-            velocity?: number;
-            pedalled?: boolean;
-            delay?: number;
-            owner?: StrikeOwner;
-        },
-    ): void;
-    silenceStrikes(owner: StrikeOwner): void;
-};
 
 // One shared empty map rather than a fresh one per silent position: the keyboard re-renders
 // on identity, and a new empty map every beat would repaint it for nothing.
@@ -72,7 +56,7 @@ export function useListenPlayback({
     shaped = () => true,
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
-    synth: NoteSink;
+    synth: StrikeSink;
     // The live practice tempo, read at each tick so playback follows the dial.
     tempo: () => number;
     // The live section-loop range, read at each tick so the loop reacts to its
@@ -112,7 +96,7 @@ export function useListenPlayback({
     const chain = useTimerChain();
     // Every note this transport strikes goes out under this, so a stop can silence exactly
     // what playback started and nothing the player is sounding themselves.
-    const [owner] = useState<StrikeOwner>(() => Symbol("listen"));
+    const strikes = useOwnedStrikes(synth, "listen");
     // Through a ref: the walk is set up inside a callback that must not be rebuilt every
     // time a new marks object arrives, and what it needs is whatever is current when a
     // playback actually starts.
@@ -169,7 +153,7 @@ export function useListenPlayback({
     // the pedal lift, a rolled chord's later notes still waiting on their delay — would
     // otherwise sound on after the cursor stopped, and under the next pass.
     const stop = () => {
-        synth.silenceStrikes(owner);
+        strikes.silence();
         finish();
     };
 
@@ -293,12 +277,11 @@ export function useListenPlayback({
                 shaped(),
             );
             for (const { note, delayMs, durationSeconds, velocity, voiced } of played) {
-                synth.playNote(note.pitch, {
+                strikes.playNote(note.pitch, {
                     duration: durationSeconds,
                     velocity: voiced,
                     pedalled: note.pedalled,
                     delay: delayMs / 1000,
-                    owner,
                 });
                 // …and light the same note on a connected instrument, so the piece
                 // can be watched as well as heard. Inert unless asked for.
@@ -342,10 +325,9 @@ export function useListenPlayback({
             highlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
             const event = events[step]!;
             for (const note of event.notes) {
-                synth.playNote(note.pitch, {
+                strikes.playNote(note.pitch, {
                     velocity: note.velocity,
                     duration: note.durationMs / 1000,
-                    owner,
                 });
                 echoNote(note.pitch, note.velocity, note.durationMs);
             }

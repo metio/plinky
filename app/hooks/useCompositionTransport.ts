@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RecordedNote } from "../../core/composition";
 import { tailMs } from "../../core/recording";
 import { useAudioEngine, useScheduler } from "../contexts/services";
-import type { StrikeOwner } from "../ports/audioEngine";
+import { useOwnedStrikes } from "./useOwnedStrikes";
 import { useSynth } from "./useSynth";
 
 type TransportOptions = {
@@ -30,11 +30,10 @@ export function useCompositionTransport({
     beatsPerBar,
     onDownbeat,
 }: TransportOptions) {
-    const { playNote, silenceStrikes } = useSynth();
-    // The take's notes are struck under this, so stopping takes back what playback struck —
+    // The take's notes are struck through this, so stopping takes back what playback struck —
     // a note held for seconds in the take would otherwise ring on after Stop — and never a
     // note the player is sounding on the keys.
-    const [owner] = useState<StrikeOwner>(() => Symbol("compose playback"));
+    const { playNote, silence } = useOwnedStrikes(useSynth(), "compose playback");
     const scheduler = useScheduler();
     const audio = useAudioEngine();
     const [playing, setPlaying] = useState(false);
@@ -48,14 +47,14 @@ export function useCompositionTransport({
 
     const stop = useCallback(() => {
         timers.clear();
-        silenceStrikes(owner);
+        silence();
         setPlaying(false);
         setCountingIn(false);
-    }, [timers, silenceStrikes, owner]);
+    }, [timers, silence]);
 
     // Leaving the page is a stop too. The timers go with useTimerChain; the notes already
     // struck are on the audio clock, which outlives the page.
-    useEffect(() => () => silenceStrikes(owner), [silenceStrikes, owner]);
+    useEffect(() => silence, [silence]);
 
     const play = useCallback(() => {
         stop();
@@ -68,12 +67,11 @@ export function useCompositionTransport({
                 playNote(note.pitch, {
                     velocity: note.velocity,
                     duration: Math.max(0.05, note.durationMs / 1000),
-                    owner,
                 });
             }, note.startMs);
         }
         timers.push(() => setPlaying(false), tailMs(notes) + 200);
-    }, [notes, playNote, stop, timers, owner]);
+    }, [notes, playNote, stop, timers]);
 
     // Click one bar of lead-in, then hand the downbeat to the recorder so what's
     // played next sits on the grid, appending after any existing tail.
