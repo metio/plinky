@@ -60,9 +60,9 @@ export function pianoParts(doc: Document): Element[] {
 
 // Removes every part but the played instrument's, along with its entry in the part list
 // so the score's header no longer names a musician who is not there. Returns the input
-// unchanged when the score has one part, when nothing is well-formed, or when the layout
-// resolves to no single part — a no-op stays cheap and malformed input is a normal
-// condition rather than a throw.
+// unchanged when the score has one part, when nothing is well-formed, or when every part
+// is the piano's — a no-op stays cheap and malformed input is a normal condition rather
+// than a throw.
 export function stripAccompaniment(codec: XmlCodec, xml: string): string {
     const doc = codec.parse(xml);
     if (!doc) {
@@ -72,8 +72,9 @@ export function stripAccompaniment(codec: XmlCodec, xml: string): string {
     if (parts.length < 2) {
         return xml;
     }
+    // Never empty: every layout of one part or more has a part holding the right hand.
     const kept = pianoParts(doc);
-    if (kept.length === 0 || kept.length === parts.length) {
+    if (kept.length === parts.length) {
         return xml;
     }
     const keptIds = new Set(kept.map((part) => part.getAttribute("id")));

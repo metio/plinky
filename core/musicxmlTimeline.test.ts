@@ -320,4 +320,17 @@ describe("a score of more than one part", () => {
         ]);
         expect(directions.map((one) => one.part)).toEqual(["Voice"]);
     });
+
+    it("numbers the staves of only the parts it is asked for, from 0", () => {
+        // The piano's page without the singer: its right hand is the page's first staff.
+        const doc = parse(`<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1"><part-list><score-part id="Voice"><part-name>V</part-name></score-part><score-part id="Piano"><part-name>P</part-name></score-part></part-list>
+<part id="Voice"><measure number="1">${ATTR}${note("G", 4, 16)}</measure></part>
+<part id="Piano"><measure number="1">${ATTR.replace("</attributes>", "<staves>2</staves></attributes>")}${note("C", 5, 16)}<backup><duration>16</duration></backup><note><pitch><step>C</step><octave>3</octave></pitch><duration>16</duration><voice>5</voice><staff>2</staff></note></measure></part></score-partwise>`);
+        const { notes } = readTimeline(doc, (part) => part === "Piano");
+        expect(notes.map((one) => [one.part, one.staff, one.staffId])).toEqual([
+            ["Piano", 1, 0],
+            ["Piano", 2, 1],
+        ]);
+    });
 });

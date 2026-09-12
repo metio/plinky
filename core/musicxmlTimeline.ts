@@ -37,8 +37,8 @@ export type XmlNote = {
     // 1-based within its part, as the file writes it.
     staff: number;
     // 0-based across every part read, counted in part order — the numbering the engraver
-    // gives its staves when it draws every one of those parts. A page drawn with fewer
-    // parts numbers them differently; core/markScope maps a staff onto the page drawn.
+    // gives its staves when it draws every one of those parts — so a timeline read for the
+    // parts a page draws numbers its staves the way that page does.
     staffId: number;
     // Sounds together with the note before it rather than after it.
     chord: boolean;

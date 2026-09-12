@@ -9,12 +9,12 @@
 // single letters. Here they come off the document, where they are four instances of one
 // idea: something written at a position, standing until something else ends it.
 
+import { pianoParts } from "./accompaniment";
 import { rampAt } from "./ramp";
 import { child, text } from "./musicxmlDom";
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
 import { type GlissandoSpan, readGlissandos } from "./glissando";
-import { type MarkScope, markScope } from "./markScope";
 import { keyShift } from "./transpose";
 import type { PedalSpan, SoftSpan } from "./pedal";
 import { readTremolos, type TremoloSpan } from "./tremolo";
@@ -439,15 +439,23 @@ export function readScoreMarks(
         return NO_SCORE_MARKS;
     }
     const timeline = readTimeline(doc);
-    const scope = markScope(doc, accompaniment);
-    // The dynamics and the pedalling are read from the played instrument's parts alone. The
-    // tempo is read from every part: a score shares one pulse, and an art song writes it
-    // over the top staff, which is the singer's.
+    const piano = new Set(pianoParts(doc).map((part) => part.getAttribute("id") ?? ""));
+    const played = (part: string) => piano.has(part);
+    // The dynamics and the pedalling are read from the played instrument's parts alone: a
+    // singer marked pianissimo over a forte accompaniment is asking the singer to be quiet,
+    // not the piano. The tempo is read from every part: a score shares one pulse, and an
+    // art song writes it over the top staff, which is the singer's.
     const directions = readDirections({
         ...timeline,
-        directions: timeline.directions.filter((one) => scope.played(one.part)),
+        directions: timeline.directions.filter((one) => played(one.part)),
     });
-    const onPage = notesOnPage(timeline.notes, scope);
+    // Every mark hung on a staff — an arch, a tremolo, a glissando — is read from the notes
+    // of the page the engraver draws, numbered the way it numbers its staves: every part,
+    // or without the accompaniment the piano's parts alone, which is what
+    // stripAccompaniment keeps. On an art song with the singer taken off the page, the
+    // piano's right hand is the file's second staff and the page's first, and a part the
+    // page leaves off has no notes here for a mark to be laid over.
+    const onPage = accompaniment ? timeline.notes : readTimeline(doc, played).notes;
     return {
         slurs: slurSpans(onPage),
         pedals: directions.pedals,
@@ -460,20 +468,6 @@ export function readScoreMarks(
         fifths: readFifths(doc),
         keys: timeline.keys,
     };
-}
-
-// The notes the page draws, each numbered by the staff the engraver draws it on — what
-// every mark hung on a staff is read from. A note of a part the page leaves off is dropped,
-// so nothing written over it can reach the notes that are drawn.
-function notesOnPage(notes: readonly XmlNote[], scope: MarkScope): XmlNote[] {
-    const drawn: XmlNote[] = [];
-    for (const note of notes) {
-        const staffId = scope.engraved(note.part, note.staff);
-        if (staffId !== null) {
-            drawn.push(staffId === note.staffId ? note : { ...note, staffId });
-        }
-    }
-    return drawn;
 }
 
 // The marks of a score read from its file, moved to wherever a transposition put the music.

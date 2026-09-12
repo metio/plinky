@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { pianoParts, stavesOf, stavesPerPart } from "./accompaniment";
+import { pianoParts, stavesOf } from "./accompaniment";
 import { spellChordPitch } from "./chordSpelling";
 import { type ChordSpan, readHarmony } from "./harmony";
 import { readTimeline } from "./musicxmlTimeline";
-import { partsOf } from "./parts";
 import { chordPitches, pitchClassOf } from "./theory";
 import type { XmlCodec } from "./xml";
 
@@ -37,8 +36,6 @@ export function blockChords(codec: XmlCodec, xml: string): string {
         return xml;
     }
     const parts = pianoParts(doc);
-    const counts = stavesPerPart(doc);
-    const { left } = partsOf(counts);
     // The left hand is its own part, or the second staff of a two-staff part. A piano
     // written on one staff has no left hand to block. The piano is asked for its own staff
     // count: on an art song it is not the score's first part.
@@ -54,7 +51,11 @@ export function blockChords(codec: XmlCodec, xml: string): string {
     // else: a pickup the right hand plays alone, or a bar the left hand rests through,
     // stays silent rather than gaining a chord read off the tune.
     const leftNotes = timeline.notes.filter(
-        (note) => note.staffId === left && note.midi !== null && note.wholes > 0,
+        (note) =>
+            note.part === leftPart.getAttribute("id") &&
+            note.staff === (staffNumber ?? 1) &&
+            note.midi !== null &&
+            note.wholes > 0,
     );
     const sounding = merged(
         leftNotes.map((note) => ({ from: note.whole, to: note.whole + note.wholes })),
