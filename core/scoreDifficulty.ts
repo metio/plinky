@@ -88,7 +88,11 @@ export function positionsOf(doc: Document): Hands {
         const cursor = beatCursor();
         for (const node of part.nodes) {
             const beat = cursor.read(node);
-            if (node.tagName === "backup" || node.tagName === "forward") {
+            if (
+                node.tagName === "measure" ||
+                node.tagName === "backup" ||
+                node.tagName === "forward"
+            ) {
                 continue;
             }
             const seconds = clock.read(node);
@@ -142,7 +146,11 @@ export function positionsOf(doc: Document): Hands {
             const cursor = beatCursor();
             for (const node of group.querySelectorAll(CURSOR_NODES)) {
                 const beat = cursor.read(node);
-                if (node.tagName === "backup" || node.tagName === "forward") {
+                if (
+                    node.tagName === "measure" ||
+                    node.tagName === "backup" ||
+                    node.tagName === "forward"
+                ) {
                     continue;
                 }
                 const seconds = fallbackClock.read(node);
