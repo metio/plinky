@@ -497,6 +497,69 @@ describe("a score written for more than one part", () => {
             { from: 0, to: 0.75, arrivesAt: 36, pitch: 72 },
         ]);
     });
+
+    // A chained sweep: up from C5 to G5, then from that G5 straight back down to C5. The G
+    // carries the end of the first line and the start of the second, in either order.
+    const sweepMark = (mark: string, type: string, number: string | undefined) =>
+        `<${mark} type="${type}"${number === undefined ? "" : ` number="${number}"`}/>`;
+    const chained = (
+        mark: "glissando" | "slide",
+        first: string | undefined,
+        second: string | undefined,
+        stopFirst: boolean,
+    ) => {
+        const onG = [sweepMark(mark, "stop", first), sweepMark(mark, "start", second)];
+        return partwise([
+            {
+                id: "P1",
+                body: `${ONE_STAFF}${quarter("C", 5, 1, "1", sweepMark(mark, "start", first))}${quarter("G", 5, 1, "1", (stopFirst ? onG : onG.reverse()).join(""))}${quarter("C", 5, 1, "1", sweepMark(mark, "stop", second))}${quarter("F", 5)}`,
+            },
+        ]);
+    };
+    const numberings: [string | undefined, string | undefined][] = [
+        [undefined, undefined],
+        ["1", "1"],
+        ["1", "2"],
+        ["2", "1"],
+    ];
+
+    it("reads every glissando mark a note carries", () => {
+        const notes = readTimeline(chained("glissando", "1", "2", false)).notes;
+        expect(notes[1]?.marks.glissandos).toEqual([
+            { type: "start", number: "2" },
+            { type: "stop", number: "1" },
+        ]);
+        expect(notes[3]?.marks.glissandos).toEqual([]);
+    });
+
+    it("sweeps on from the note one glissando lands on and the next starts from", () => {
+        for (const mark of ["glissando", "slide"] as const) {
+            for (const [first, second] of numberings) {
+                for (const stopFirst of [true, false]) {
+                    expect(
+                        readScoreMarks(chained(mark, first, second, stopFirst)).glissandos,
+                    ).toEqual([
+                        { from: 0, to: 0.5, arrivesAt: 79, pitch: 72 },
+                        { from: 0.25, to: 0.75, arrivesAt: 72, pitch: 79 },
+                    ]);
+                }
+            }
+        }
+    });
+
+    it("follows a chain of three glissandi", () => {
+        const doc = partwise([
+            {
+                id: "P1",
+                body: `${ONE_STAFF}${quarter("C", 5, 1, "1", sweepMark("glissando", "start", undefined))}${quarter("G", 5, 1, "1", sweepMark("glissando", "start", undefined) + sweepMark("glissando", "stop", undefined))}${quarter("C", 5, 1, "1", sweepMark("glissando", "stop", undefined) + sweepMark("glissando", "start", undefined))}${quarter("G", 5, 1, "1", sweepMark("glissando", "stop", undefined))}`,
+            },
+        ]);
+        expect(readScoreMarks(doc).glissandos).toEqual([
+            { from: 0, to: 0.5, arrivesAt: 79, pitch: 72 },
+            { from: 0.25, to: 0.75, arrivesAt: 72, pitch: 79 },
+            { from: 0.5, to: 1, arrivesAt: 79, pitch: 72 },
+        ]);
+    });
     it("sets the loudness from the piano's dynamics, not the singer's", () => {
         const doc = partwise([
             {

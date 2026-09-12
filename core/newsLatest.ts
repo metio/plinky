@@ -14,7 +14,7 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
-                body: "**Two slides at once each land on their own note.** Where both hands glide across\nthe keys together, Listen swept only one of them, and could send it to the other\nhand's note instead, the right hand diving into the bass. Each slide now runs from\nits own note to the one it is written to reach, both hands together.",
+                body: "**Two slides at once each land on their own note.** Where both hands glide across\nthe keys together, Listen swept only one of them, and could send it to the other\nhand's note instead, the right hand diving into the bass. Each slide now runs from\nits own note to the one it is written to reach, both hands together. A slide that\nlands on a note and sets straight off again from it, up and back down, now plays\nboth halves too, where it used to drop one.",
                 twip: true,
             },
             {

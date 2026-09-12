@@ -81,7 +81,7 @@ const note = (
     whole,
     wholes,
     midi,
-    marks: { glissando },
+    marks: { glissandos: glissando === null ? [] : [{ type: glissando }] },
 });
 
 describe("readGlissandos", () => {
@@ -129,7 +129,14 @@ describe("readGlissandos", () => {
     ) => ({
         ...note(whole, midi, glissando, 0.25),
         part: "P1",
-        marks: { glissando, ...(glissandoNumber === undefined ? {} : { glissandoNumber }) },
+        marks: {
+            glissandos: [
+                {
+                    type: glissando,
+                    ...(glissandoNumber === undefined ? {} : { number: glissandoNumber }),
+                },
+            ],
+        },
     });
 
     it("lands each of two sweeps at once on its own note, paired by number", () => {
@@ -170,5 +177,73 @@ describe("readGlissandos", () => {
                 numbered(0.5, 84, "stop", "1"),
             ]),
         ).toEqual([{ from: 0, to: 0.75, arrivesAt: 84, pitch: 72 }]);
+    });
+
+    // A note that ends one sweep and starts the next: up from C5 to G5, then from that G5
+    // straight back down to C5.
+    type Mark = { type: "start" | "stop"; number?: string };
+    const start = (number?: string): Mark => ({
+        type: "start",
+        ...(number === undefined ? {} : { number }),
+    });
+    const stop = (number?: string): Mark => ({
+        type: "stop",
+        ...(number === undefined ? {} : { number }),
+    });
+    const marked = (whole: number, midi: number, ...glissandos: Mark[]) => ({
+        whole,
+        wholes: 0.25,
+        midi,
+        part: "P1",
+        marks: { glissandos },
+    });
+
+    it("closes one sweep and opens the next on the note they share, in either order", () => {
+        const numberings: [string | undefined, string | undefined][] = [
+            [undefined, undefined],
+            ["1", "1"],
+            ["1", "2"],
+            ["2", "1"],
+        ];
+        for (const [first, second] of numberings) {
+            for (const onG of [
+                [stop(first), start(second)],
+                [start(second), stop(first)],
+            ]) {
+                expect(
+                    readGlissandos([
+                        marked(0, 72, start(first)),
+                        marked(0.25, 79, ...onG),
+                        marked(0.5, 72, stop(second)),
+                    ]),
+                ).toEqual([
+                    { from: 0, to: 0.5, arrivesAt: 79, pitch: 72 },
+                    { from: 0.25, to: 0.75, arrivesAt: 72, pitch: 79 },
+                ]);
+            }
+        }
+    });
+
+    it("follows a chain of three sweeps", () => {
+        expect(
+            readGlissandos([
+                marked(0, 72, start()),
+                marked(0.25, 79, start("2"), stop()),
+                marked(0.5, 72, start(), stop("2")),
+                marked(0.75, 79, stop()),
+            ]),
+        ).toEqual([
+            { from: 0, to: 0.5, arrivesAt: 79, pitch: 72 },
+            { from: 0.25, to: 0.75, arrivesAt: 72, pitch: 79 },
+            { from: 0.5, to: 1, arrivesAt: 79, pitch: 72 },
+        ]);
+    });
+
+    it("never closes a sweep on the note it starts from", () => {
+        // Nothing is open when the first note is reached, so its stop closes nothing and its
+        // start opens the one sweep the file has.
+        expect(readGlissandos([marked(0, 72, start(), stop()), marked(0.25, 79, stop())])).toEqual([
+            { from: 0, to: 0.5, arrivesAt: 79, pitch: 72 },
+        ]);
     });
 });

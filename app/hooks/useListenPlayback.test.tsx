@@ -6,7 +6,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
-import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
+import { NO_SCORE_MARKS, readScoreMarks, type ScoreMarks } from "../../core/musicxmlMarks";
 import type { Take } from "../../core/takes";
 import { listenPerformanceOf } from "../../core/listenPerformance";
 import { seekToOrdinal } from "../lib/scoreCursor";
@@ -467,6 +467,35 @@ describe("collectListenSteps", () => {
                 ?.notes.map((note) => note.pitch)
                 .sort(),
         ).toEqual([36, 84]);
+    });
+
+    it("sweeps on from the note one glissando lands on and the next starts from", () => {
+        // C5 up to G5, then from that G5 straight back down to C5, read off the file: the G
+        // carries the end of the first line and the start of the second, in either order.
+        for (const stopFirst of [true, false]) {
+            const onG = ['<glissando type="stop"/>', '<glissando type="start"/>'];
+            const note = (step: string, notations = "") =>
+                `<note><pitch><step>${step}</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type>${
+                    notations ? `<notations>${notations}</notations>` : ""
+                }</note>`;
+            const doc = new DOMParser().parseFromString(
+                `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>${note("C", '<glissando type="start"/>')}${note("G", (stopFirst ? onG : onG.reverse()).join(""))}${note("C", '<glissando type="stop"/>')}${note("F")}</measure></part></score-partwise>`,
+                "application/xml",
+            );
+            const steps = collectListenSteps(lineOsmd([60, 67, 60, 65]), readScoreMarks(doc));
+            expect(steps.map((step) => step.notes.map((one) => one.pitch))).toEqual([
+                [72],
+                [74],
+                [76],
+                [77],
+                [79],
+                [77],
+                [76],
+                [74],
+                [72],
+                [77],
+            ]);
+        }
     });
 
     it("gentles a passage under the soft pedal", () => {

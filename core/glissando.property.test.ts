@@ -47,7 +47,7 @@ describe("readGlissandos over numbered sweeps", () => {
                         wholes: 1 / 16,
                         midi: mark.midi,
                         part: "P1",
-                        marks: { glissando: mark.type, glissandoNumber: String(mark.number) },
+                        marks: { glissandos: [{ type: mark.type, number: String(mark.number) }] },
                     }));
                 const spans = readGlissandos(notes);
                 expect(spans).toHaveLength(numbers.length);
@@ -61,6 +61,82 @@ describe("readGlissandos over numbered sweeps", () => {
                         pitch: 40 + index,
                     });
                 }
+            }),
+        );
+    });
+});
+
+// Chained sweeps: a line of notes, each gliding on to the next, so every note inside the
+// chain ends one sweep and starts another. Each chain owns two numbers and each link takes
+// either, so a chained note's stop and start share a number or differ. Note `link` of chain
+// `index` is pitch 20 + 10 * index + link, which names the chain and the link a span came
+// from.
+const chains = fc.array(
+    fc
+        .uniqueArray(fc.integer({ min: 0, max: 31 }), { minLength: 2, maxLength: 6 })
+        .chain((positions) =>
+            fc.record({
+                positions: fc.constant([...positions].sort((one, other) => one - other)),
+                numbers: fc.array(fc.boolean(), {
+                    minLength: positions.length - 1,
+                    maxLength: positions.length - 1,
+                }),
+                stopFirst: fc.array(fc.boolean(), {
+                    minLength: positions.length,
+                    maxLength: positions.length,
+                }),
+                tie: fc.array(fc.double({ min: 0, max: 1, noNaN: true }), {
+                    minLength: positions.length,
+                    maxLength: positions.length,
+                }),
+            }),
+        ),
+    { minLength: 1, maxLength: 4 },
+);
+
+describe("readGlissandos over chained sweeps", () => {
+    it("pairs every link of every chain, whatever order a note's marks are in", () => {
+        fc.assert(
+            fc.property(chains, (drawn) => {
+                const numberOf = (index: number, link: number) =>
+                    String(2 * index + ((drawn[index]?.numbers[link] ?? false) ? 2 : 1));
+                const notes = drawn
+                    .flatMap(({ positions, stopFirst, tie }, index) =>
+                        positions.map((position, link) => {
+                            const stop =
+                                link > 0
+                                    ? [{ type: "stop" as const, number: numberOf(index, link - 1) }]
+                                    : [];
+                            const start =
+                                link < positions.length - 1
+                                    ? [{ type: "start" as const, number: numberOf(index, link) }]
+                                    : [];
+                            return {
+                                whole: position / 16,
+                                wholes: 1 / 16,
+                                midi: 20 + 10 * index + link,
+                                part: "P1",
+                                marks: {
+                                    glissandos: stopFirst[link]
+                                        ? [...stop, ...start]
+                                        : [...start, ...stop],
+                                },
+                                tie: tie[link] as number,
+                            };
+                        }),
+                    )
+                    .sort((one, other) => one.whole - other.whole || one.tie - other.tie);
+                const expected = drawn.flatMap(({ positions }, index) =>
+                    positions.slice(1).map((position, link) => ({
+                        from: (positions[link] as number) / 16,
+                        to: position / 16 + 1 / 16,
+                        arrivesAt: 20 + 10 * index + link + 1,
+                        pitch: 20 + 10 * index + link,
+                    })),
+                );
+                const byPitch = (one: { pitch?: number }, other: { pitch?: number }) =>
+                    (one.pitch ?? 0) - (other.pitch ?? 0);
+                expect(readGlissandos(notes).sort(byPitch)).toEqual(expected.sort(byPitch));
             }),
         );
     });

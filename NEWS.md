@@ -13,7 +13,9 @@ it's ready. This is what's changed, newest first, in plain terms.
 **Two slides at once each land on their own note.** Where both hands glide across
 the keys together, Listen swept only one of them, and could send it to the other
 hand's note instead, the right hand diving into the bass. Each slide now runs from
-its own note to the one it is written to reach, both hands together.
+its own note to the one it is written to reach, both hands together. A slide that
+lands on a note and sets straight off again from it, up and back down, now plays
+both halves too, where it used to drop one.
 
 **Listen shakes both hands' tremolos.** Where both hands write a tremolo on the same
 beat, as a piano reduction of an orchestra often does, Listen shook the right hand and

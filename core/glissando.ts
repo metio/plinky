@@ -105,29 +105,39 @@ export function readGlissandos(
         // Within a part, the number is what tells two sweeps at once apart — both hands
         // gliding together — so a stop closes the sweep of its own number. Absent, it is
         // "1", as the format defaults it. Staff is no key: a sweep may cross the staves.
-        marks: { glissando: "start" | "stop" | null; glissandoNumber?: string };
+        //
+        // A note in a chained sweep carries a stop and a start: its stops are taken first,
+        // whatever order the file writes them in, so the line arriving here closes before
+        // the next one sets off from the same note. Taken the other way round, a start of
+        // the same number would wait behind the sweep still open and the chain would read
+        // as one line from its first note to its last.
+        marks: { glissandos: readonly { type: "start" | "stop"; number?: string }[] };
     }[],
 ): GlissandoSpan[] {
     const spans: GlissandoSpan[] = [];
     const open = new Map<string, { whole: number; pitch: number }>();
     for (const note of notes) {
-        if (note.marks.glissando === null || note.midi === null) {
+        const midi = note.midi;
+        if (midi === null) {
             continue;
         }
-        const key = `${note.marks.glissandoNumber ?? "1"}:${note.part ?? ""}`;
-        const opened = open.get(key);
-        if (note.marks.glissando === "start") {
-            if (!opened) {
-                open.set(key, { whole: note.whole, pitch: note.midi });
+        const keyOf = (mark: { number?: string }) => `${mark.number ?? "1"}:${note.part ?? ""}`;
+        for (const mark of note.marks.glissandos) {
+            const opened = open.get(keyOf(mark));
+            if (mark.type === "stop" && opened && note.whole > opened.whole) {
+                spans.push({
+                    from: opened.whole,
+                    to: note.whole + note.wholes,
+                    arrivesAt: midi,
+                    pitch: opened.pitch,
+                });
+                open.delete(keyOf(mark));
             }
-        } else if (opened && note.whole > opened.whole) {
-            spans.push({
-                from: opened.whole,
-                to: note.whole + note.wholes,
-                arrivesAt: note.midi,
-                pitch: opened.pitch,
-            });
-            open.delete(key);
+        }
+        for (const mark of note.marks.glissandos) {
+            if (mark.type === "start" && !open.has(keyOf(mark))) {
+                open.set(keyOf(mark), { whole: note.whole, pitch: midi });
+            }
         }
     }
     return spans;
