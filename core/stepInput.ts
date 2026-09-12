@@ -60,9 +60,16 @@ export type StepState = {
     // How long the step in progress is, so releasing advances by what was placed rather
     // than by whatever value happens to be selected when the key comes up.
     stepMs: number;
+    // Where each entry began, a step or a rest, and how many notes were written before it,
+    // newest last: what Back returns to. A rest writes no note, so the notes alone cannot
+    // say that the last thing entered was one. A take picked up from existing notes starts
+    // with none, since nothing records how those were entered.
+    entries: readonly StepEntry[];
 };
 
-export const EMPTY_STEP: StepState = { notes: [], atMs: 0, holding: 0, stepMs: 0 };
+type StepEntry = { atMs: number; notes: number };
+
+export const EMPTY_STEP: StepState = { notes: [], atMs: 0, holding: 0, stepMs: 0, entries: [] };
 
 // Begin or extend a step. The first key down fixes how far this step will advance; the
 // rest join it as a chord.
@@ -71,7 +78,8 @@ export function stepDown(
     note: { pitch: number; velocity: number },
     durationMs: number,
 ): StepState {
-    const stepMs = state.holding === 0 ? durationMs : state.stepMs;
+    const beginning = state.holding === 0;
+    const stepMs = beginning ? durationMs : state.stepMs;
     return {
         notes: [
             ...state.notes,
@@ -85,6 +93,9 @@ export function stepDown(
         atMs: state.atMs,
         holding: state.holding + 1,
         stepMs,
+        entries: beginning
+            ? [...state.entries, { atMs: state.atMs, notes: state.notes.length }]
+            : state.entries,
     };
 }
 
@@ -99,17 +110,39 @@ export function stepUp(state: StepState): StepState {
 // Silence of the chosen length. Refused mid-chord, where it would leave the keys still
 // down writing into the bar after the gap.
 export function stepRest(state: StepState, durationMs: number): StepState {
-    return state.holding > 0 ? state : { ...state, atMs: state.atMs + durationMs };
+    if (state.holding > 0) {
+        return state;
+    }
+    return {
+        ...state,
+        atMs: state.atMs + durationMs,
+        entries: [...state.entries, { atMs: state.atMs, notes: state.notes.length }],
+    };
 }
 
-// Take back the last step — every note of it, chord and all — and stand where it began.
+// Take back the last entry — a rest, or a step with every note of it, chord and all — and
+// stand where it began.
 export function stepBack(state: StepState): StepState {
-    if (state.holding > 0 || state.notes.length === 0) {
+    if (state.holding > 0) {
+        return state;
+    }
+    const last = state.entries.at(-1);
+    if (last !== undefined) {
+        return {
+            notes: state.notes.slice(0, last.notes),
+            atMs: last.atMs,
+            holding: 0,
+            stepMs: 0,
+            entries: state.entries.slice(0, -1),
+        };
+    }
+    // Notes picked up from an existing take: the latest onset, and every note on it.
+    if (state.notes.length === 0) {
         return state;
     }
     const lastStart = Math.max(...state.notes.map((note) => note.startMs));
     const kept = state.notes.filter((note) => note.startMs < lastStart);
-    return { notes: kept, atMs: lastStart, holding: 0, stepMs: 0 };
+    return { notes: kept, atMs: lastStart, holding: 0, stepMs: 0, entries: [] };
 }
 
 // Pick the entry up from an existing take — a loaded file, a shared link, or a passage
@@ -121,5 +154,5 @@ export function stepFrom(notes: readonly RecordedNote[]): StepState {
         return EMPTY_STEP;
     }
     const end = Math.max(...notes.map((note) => note.startMs + note.durationMs));
-    return { notes, atMs: end, holding: 0, stepMs: 0 };
+    return { notes, atMs: end, holding: 0, stepMs: 0, entries: [] };
 }

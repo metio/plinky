@@ -82,6 +82,41 @@ describe("step entry, driven any which way", () => {
         );
     });
 
+    it("takes back exactly the last entry, note, chord or rest", () => {
+        // An entry is what one Back undoes: a key or chord pressed and released, or a rest.
+        type Entry = { kind: "keys"; pitches: number[]; ms: number } | { kind: "rest"; ms: number };
+        const ms = value.map((v) => stepDurationMs(v, 120));
+        const entry: fc.Arbitrary<Entry> = fc.oneof(
+            fc.record({
+                kind: fc.constant("keys" as const),
+                pitches: fc.array(pitch, { minLength: 1, maxLength: 4 }),
+                ms,
+            }),
+            fc.record({ kind: fc.constant("rest" as const), ms }),
+        );
+        const enter = (entries: readonly Entry[]): StepState => {
+            let state = EMPTY_STEP;
+            for (const one of entries) {
+                if (one.kind === "rest") {
+                    state = stepRest(state, one.ms);
+                    continue;
+                }
+                for (const key of one.pitches) {
+                    state = stepDown(state, { pitch: key, velocity: 80 }, one.ms);
+                }
+                for (const _ of one.pitches) {
+                    state = stepUp(state);
+                }
+            }
+            return state;
+        };
+        fc.assert(
+            fc.property(fc.array(entry, { minLength: 1, maxLength: 20 }), (entries) => {
+                expect(stepBack(enter(entries))).toEqual(enter(entries.slice(0, -1)));
+            }),
+        );
+    });
+
     it("puts a completed step back exactly as it was before it", () => {
         fc.assert(
             fc.property(

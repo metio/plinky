@@ -116,6 +116,57 @@ describe("taking a step back", () => {
         expect(stepBack(state).atMs).toBe(500);
     });
 
+    it("takes back a rest on its own, keeping the note before it", () => {
+        const back = stepBack(stepRest(step(EMPTY_STEP, 60), QUARTER));
+        expect(back.notes.map((n) => n.pitch)).toEqual([60]);
+        expect(back.atMs).toBe(500);
+    });
+
+    it("takes back only the rest after C, D, E", () => {
+        // The player left a gap, then wanted a half rest rather than a quarter.
+        const entered = stepRest(step(step(step(EMPTY_STEP, 60), 62), 64), QUARTER);
+        const back = stepBack(entered);
+        expect(back.notes.map((n) => n.pitch)).toEqual([60, 62, 64]);
+        expect(back.atMs).toBe(1500);
+    });
+
+    it("takes back two rests one at a time, then the note", () => {
+        const entered = stepRest(stepRest(step(EMPTY_STEP, 60), QUARTER), QUARTER);
+        const once = stepBack(entered);
+        expect(once.notes.map((n) => n.pitch)).toEqual([60]);
+        expect(once.atMs).toBe(1000);
+        const twice = stepBack(once);
+        expect(twice.notes.map((n) => n.pitch)).toEqual([60]);
+        expect(twice.atMs).toBe(500);
+        expect(stepBack(twice)).toEqual(EMPTY_STEP);
+    });
+
+    it("takes back a note after a rest, and leaves the rest standing", () => {
+        const entered = step(stepRest(step(EMPTY_STEP, 60), QUARTER), 62);
+        const back = stepBack(entered);
+        expect(back.notes.map((n) => n.pitch)).toEqual([60]);
+        expect(back.atMs).toBe(1000);
+    });
+
+    it("takes back a rest opening the take", () => {
+        expect(stepBack(stepRest(EMPTY_STEP, QUARTER))).toEqual(EMPTY_STEP);
+    });
+
+    it("takes back a rest added to a loaded take, then the loaded notes", () => {
+        const played = [
+            { pitch: 60, startMs: 0, durationMs: 500, velocity: 80 },
+            { pitch: 62, startMs: 500, durationMs: 500, velocity: 80 },
+        ];
+        const back = stepBack(stepRest(stepFrom(played), QUARTER));
+        expect(back.notes).toEqual(played);
+        expect(back.atMs).toBe(1000);
+        // Nothing records how the loaded notes were entered, so they come back as
+        // before: the latest onset, and every note sounding with it.
+        const further = stepBack(back);
+        expect(further.notes).toEqual([played[0]]);
+        expect(further.atMs).toBe(500);
+    });
+
     it("does nothing on an empty take, or mid-chord", () => {
         expect(stepBack(EMPTY_STEP)).toEqual(EMPTY_STEP);
         const holding = stepDown(EMPTY_STEP, key(60), QUARTER);
