@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { PAGE_NAMES, unlocalizedPath } from "./pageNames";
+import { unlocalizedPath } from "./unlocalizedPath";
 
 describe("unlocalizedPath", () => {
     it("keeps a page's sub-path whole when the sub-path is itself a page name", () => {
@@ -19,7 +19,7 @@ describe("unlocalizedPath", () => {
     });
 
     it("keeps a lone segment, page or not, with or without its slash", () => {
-        for (const path of ["/music", "/music/", "/piano/", "/zz", "/zz/"]) {
+        for (const path of ["/music", "/music/", "/piano/", "/zz", "/zz/", "/de"]) {
             expect(unlocalizedPath(path)).toBe(path);
         }
     });
@@ -28,17 +28,21 @@ describe("unlocalizedPath", () => {
         expect(unlocalizedPath("/zz/play/abc")).toBe("/play/abc");
         expect(unlocalizedPath("/zz/play/abc/")).toBe("/play/abc/");
         expect(unlocalizedPath("/zz/piano/")).toBe("/piano/");
-        expect(unlocalizedPath("/english/glossary/piano/")).toBe("/glossary/piano/");
+        expect(unlocalizedPath("/zz/glossary/piano/")).toBe("/glossary/piano/");
     });
 
-    it("reads a page name only as a whole segment", () => {
-        expect(unlocalizedPath("/pianos/compose/")).toBe("/compose/");
-        expect(unlocalizedPath("/Music/piano/")).toBe("/piano/");
+    it("drops a language written with a region, a script or capitals", () => {
+        expect(unlocalizedPath("/DE/music/")).toBe("/music/");
+        expect(unlocalizedPath("/en-US/music/")).toBe("/music/");
+        expect(unlocalizedPath("/pt_BR/play/abc")).toBe("/play/abc");
+        expect(unlocalizedPath("/sr-Latn/theory/")).toBe("/theory/");
     });
 
-    it("names no language as a page", () => {
-        for (const locale of ["en", "de", "fr", "ja", "zh"]) {
-            expect(PAGE_NAMES.has(locale)).toBe(false);
-        }
+    it("keeps a first segment that is not written like a language", () => {
+        expect(unlocalizedPath("/english/glossary/piano/")).toBe("/english/glossary/piano/");
+        expect(unlocalizedPath("/pianos/compose/")).toBe("/pianos/compose/");
+        expect(unlocalizedPath("/Music/piano/")).toBe("/Music/piano/");
+        expect(unlocalizedPath("/e/piano/")).toBe("/e/piano/");
+        expect(unlocalizedPath("/en-/piano/")).toBe("/en-/piano/");
     });
 });

@@ -3,7 +3,7 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { PAGE_NAMES } from "../core/pageNames.ts";
+import { LANGUAGE_SHAPED } from "../core/unlocalizedPath.ts";
 import { assertPages, noindexPaths, readPages, staticPaths } from "./pages.mjs";
 
 // The page list is derived by reading app/routes.ts as text, because the Lighthouse config
@@ -28,16 +28,22 @@ describe("the derived page list", () => {
         expect(paths).toContain("/collect");
     });
 
-    it("names every page's first segment in core's page names, and nothing else", () => {
-        // The client tells an address with no language from a mistyped language by these
-        // names, and cannot read the route table itself. A page missing here would have
-        // its language-less address stripped of its first segment.
-        const firsts = new Set(
-            readPages()
-                .filter((page: { path: string }) => page.path !== "/")
-                .map((page: { path: string }) => page.path.split("/")[1]),
-        );
-        expect([...PAGE_NAMES].sort()).toEqual([...firsts].sort());
+    it("starts no page with a segment written like a language", () => {
+        // The client tells an address with no language from a mistyped language by the
+        // first segment's shape. A page named like one would have its language-less
+        // address stripped of that segment.
+        const firsts = readPages()
+            .filter((page: { path: string }) => page.path !== "/")
+            .map((page: { path: string }) => page.path.split("/")[1] ?? "");
+        expect(firsts.filter((first: string) => LANGUAGE_SHAPED.test(first))).toEqual([]);
+    });
+
+    it("writes every locale the app ships in the shape read as a language", () => {
+        // A locale outside the shape would reach the layout as a mistyped language and
+        // have its address kept whole instead of recovered.
+        const { locales } = JSON.parse(readFileSync("project.inlang/settings.json", "utf8"));
+        expect(locales.length).toBeGreaterThan(20);
+        expect(locales.filter((locale: string) => !LANGUAGE_SHAPED.test(locale))).toEqual([]);
     });
 
     it("leaves parameterised routes out of the static list", () => {

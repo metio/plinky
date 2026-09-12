@@ -7,7 +7,7 @@ import { BottomNav } from "../components/ui/navBar";
 import { SiteFooter } from "../components/ui/siteFooter";
 import { isLocale } from "../paraglide/runtime.js";
 import { localizedHref } from "../components/ui/href";
-import { unlocalizedPath } from "../../core/pageNames";
+import { unlocalizedPath } from "../../core/unlocalizedPath";
 
 // The parent of every localized page. The active locale comes from the URL
 // prefix (the `url` strategy reads it directly), so this validates the segment
@@ -26,7 +26,8 @@ export default function LocaleLayout() {
     // A first segment that is not a language is either a mistyped one — "/zz/play/abc",
     // whose page survives the bad segment being dropped — or a page name that arrived with
     // no language in front of it — "/music/", "/glossary/piano/" — which is kept whole.
-    // unlocalizedPath makes that call from the page names the route table declares.
+    // unlocalizedPath makes that call from the segment's shape: every language is two
+    // letters, and no page's first segment is.
     //
     // localizedHref picks the language the way the bare "/" does — the one last chosen,
     // else the browser's, else English. During prerender there is no navigator to resolve
