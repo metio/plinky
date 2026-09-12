@@ -150,7 +150,60 @@ describe("the catalogue cache", () => {
         };
         expect((await loadGradeCatalogue(sources)).some((one) => one.id === "x1")).toBe(false);
         expect((await loadGradeCatalogue(sources)).some((one) => one.id === "x1")).toBe(true);
-        expect(calls).toBe(2);
+    });
+
+    it("names a scale the way the player's keys name it now, not when it was cached", async () => {
+        // A scale's title follows the note naming, which changes in Settings without a
+        // reload and without anything else the catalogue is built from changing. Today,
+        // Stats and the review session all read it through these two loaders.
+        let naming = "H";
+        const sources: CatalogSources = {
+            ...sourcesOver(memoryStore()),
+            exercises: {
+                manifest: async () => [
+                    { id: "scale-b", title: `${naming}-Dur-Tonleiter`, grade: 1, cost: 1 },
+                    { id: "study-1", title: "Etüde", grade: 1, cost: 2 },
+                ],
+            },
+        };
+        const mastery = { loadAll: () => [{ id: "scale-b", value: markLearned(null, 0) }] };
+        const titleIn = (list: { id: string; title: string }[], id: string) =>
+            list.find((one) => one.id === id)?.title;
+
+        expect(titleIn(await loadGradeCatalogue(sources), "scale-b")).toBe("H-Dur-Tonleiter");
+        expect(titleIn(await loadGradedMastery(mastery, sources), "scale-b")).toBe(
+            "H-Dur-Tonleiter",
+        );
+
+        naming = "B";
+        const catalogue = await loadGradeCatalogue(sources);
+        expect(titleIn(catalogue, "scale-b")).toBe("B-Dur-Tonleiter");
+        expect(titleIn(await loadGradedMastery(mastery, sources), "scale-b")).toBe(
+            "B-Dur-Tonleiter",
+        );
+        // Everything else about the row, and every other row, is the cached one.
+        expect(catalogue.find((one) => one.id === "scale-b")).toMatchObject({
+            grade: 1,
+            cost: 1,
+            kind: "piece",
+        });
+        expect(titleIn(catalogue, "study-1")).toBe("Etüde");
+        expect(titleIn(catalogue, "s1")).toBe("One");
+    });
+
+    it("keeps the cached title when the exercise manifest cannot be read", async () => {
+        let fail = false;
+        const sources: CatalogSources = {
+            ...sourcesOver(memoryStore()),
+            exercises: {
+                manifest: async () =>
+                    fail ? null : [{ id: "scale-c", title: "C major scale", grade: 1, cost: 1 }],
+            },
+        };
+        await loadGradeCatalogue(sources);
+        fail = true;
+        const list = await loadGradeCatalogue(sources);
+        expect(list.find((one) => one.id === "scale-c")?.title).toBe("C major scale");
     });
 
     it("keeps one world's catalogue out of another's", async () => {

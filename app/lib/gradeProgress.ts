@@ -337,8 +337,24 @@ async function assembleCatalogue(
     return { index, complete };
 }
 
+// A scale's title follows the player's note naming, which Settings changes without a
+// reload and without touching anything the cached index is validated against. So the
+// index keeps each row as it was built, and the exercise titles are read from the source
+// again whenever items are handed out: the source names each scale on every call, from a
+// manifest it has already fetched. A manifest that cannot be read leaves the built titles.
+async function exerciseTitles(sources: CatalogSources): Promise<ReadonlyMap<string, string>> {
+    const list = await sources.exercises.manifest();
+    return new Map((list ?? []).map((exercise) => [exercise.id, exercise.title]));
+}
+
+function retitled(item: GradeCatalogItem, titles: ReadonlyMap<string, string>): GradeCatalogItem {
+    const title = titles.get(item.id);
+    return title === undefined || title === item.title ? item : { ...item, title };
+}
+
 export async function loadGradeCatalogue(sources: CatalogSources): Promise<GradeCatalogItem[]> {
-    return [...(await buildCatalogue(sources)).values()];
+    const [index, titles] = await Promise.all([buildCatalogue(sources), exerciseTitles(sources)]);
+    return [...index.values()].map((item) => retitled(item, titles));
 }
 
 // Where the per-piece mastery entries come from — structurally the mastery store's
@@ -355,12 +371,12 @@ export async function loadGradedMastery(
     if (mastery.length === 0) {
         return [];
     }
-    const index = await buildCatalogue(sources);
+    const [index, titles] = await Promise.all([buildCatalogue(sources), exerciseTitles(sources)]);
     const out: GradedMastery[] = [];
     for (const { id, value: state } of mastery) {
         const meta = index.get(id);
         if (meta) {
-            out.push({ ...meta, mastery: state });
+            out.push({ ...retitled(meta, titles), mastery: state });
         }
     }
     return out;

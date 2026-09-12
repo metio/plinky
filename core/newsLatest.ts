@@ -26,6 +26,10 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
+                body: "**Scale names follow your note names everywhere.** Switching how notes are named\nin Settings, H or B, do re mi or letters, renamed the scales on the keys and in\nMusic, while Today, Stats and the review session kept the old names until you\nreloaded. They now change with the rest.",
+                twip: true,
+            },
+            {
                 body: "**Slurs in songs land on the right hand again.** In a song for voice and piano, the\nsinger's line is left off the page, and every slur the piano's music carries was\nmoving one staff down: the tune under a slur played detached, while a staccato bass\nunder it was held long, in Listen and in what a run asked of you. Each slur now\nstays on the staff it is drawn on, with the singer on the page or off it.",
                 twip: true,
             },

@@ -24,6 +24,11 @@ plinky.fun/glossary/piano/, typed by hand or copied without its language, opened
 the free-play keyboard instead of the entry for the piano mark. It now opens the
 entry, in your language.
 
+**Scale names follow your note names everywhere.** Switching how notes are named
+in Settings, H or B, do re mi or letters, renamed the scales on the keys and in
+Music, while Today, Stats and the review session kept the old names until you
+reloaded. They now change with the rest.
+
 **Slurs in songs land on the right hand again.** In a song for voice and piano, the
 singer's line is left off the page, and every slur the piano's music carries was
 moving one staff down: the tune under a slur played detached, while a staccato bass
