@@ -5,17 +5,20 @@
 // the command that runs them so they can be tested without baking the catalogue.
 //
 // Both answer the same question from opposite ends: does what the manifests store still
-// come from the models that are in the tree? Cost comes from the difficulty model, the
-// incipit from its encoder, and the scale and arpeggio grades from boundaries that do not
+// come from the models that are in the tree? Cost comes from the difficulty model, and so
+// does what each easier reduction of a piece costs; the incipit comes from its encoder,
+// and the scale and arpeggio grades from boundaries that do not
 // follow either. Every one of them is a number somebody could change without touching the
 // catalogue, and grades derived from stale ones are wrong in a way nothing downstream sees.
 
 import { readFile } from "node:fs/promises";
 import { staffCount } from "../core/accompaniment.ts";
 import { encodeIncipit, readIncipit } from "../core/incipit.ts";
+import type { ReductionCosts } from "../core/reach.ts";
 import { rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { scorePath } from "./manifest.mts";
+import { reductionCosts } from "./measureReach.mts";
 
 const _SONGS = "public/songs";
 
@@ -25,6 +28,8 @@ export type ProbeSong = {
     license?: string;
     title?: string;
     incipit?: string;
+    scoreKind?: string;
+    reachCost?: ReductionCosts;
 };
 
 // The share of one category's tiles that may sit in a single grade before the boundaries
@@ -80,11 +85,109 @@ export function layoutOf(xml: string): string {
     return counts.join(",");
 }
 
-// Which rows to re-derive, by index, given each row's part layout: a spread across the
-// catalogue, and then the first row of every layout the spread did not reach. A model
-// change can be confined to one way of writing a score, so each layout the catalogue holds
-// gets a probe beside the spread. The layouts only choose which rows are probed, so a
-// misread one can make the spread less varied but never a verdict wrong.
+// How a score's bars are filled, read off the text like its layout, as flags joined by "+":
+//
+// - `backup`: some bar writes a second voice, rewinding to write it.
+// - `short`: some bar's last voice stops before the point it rewound from, so the bar's end
+//   is set by an earlier voice.
+// - `overrun`: some bar's content runs past what its time signature holds.
+// - `timewise`: the score is written measure by measure, parts inside each measure.
+//
+// A model change can be confined to one of these ways of writing inside one layout — a
+// bar cursor that drifted after short voices once did, in 7% of the catalogue, while every
+// probe was a score without one.
+export function shapeOf(xml: string): string {
+    if (xml.includes("<score-timewise")) {
+        return "timewise";
+    }
+    const flags = new Set<string>();
+    let divisions = 1;
+    let beats = Number.NaN;
+    let beatType = Number.NaN;
+    let cursor = 0;
+    let furthest = 0;
+    let rewoundFrom: number | null = null;
+    const token =
+        /<(note|backup|forward)(?=[\s>])[^>]*>([\s\S]*?)<\/\1>|<divisions>\s*(\d+)\s*<\/divisions>|<beats>\s*([^<]*?)\s*<\/beats>|<beat-type>\s*(\d+)\s*<\/beat-type>|<\/measure>/g;
+    for (let found = token.exec(xml); found !== null; found = token.exec(xml)) {
+        const [whole, kind, body = "", division, beatCount, beatUnit] = found;
+        if (division !== undefined) {
+            divisions = Number(division);
+        } else if (beatCount !== undefined) {
+            beats = Number(beatCount);
+        } else if (beatUnit !== undefined) {
+            beatType = Number(beatUnit);
+        } else if (whole === "</measure>") {
+            if (rewoundFrom !== null && cursor < rewoundFrom) {
+                flags.add("short");
+            }
+            if (furthest > (divisions * beats * 4) / beatType) {
+                flags.add("overrun");
+            }
+            cursor = 0;
+            furthest = 0;
+            rewoundFrom = null;
+        } else {
+            const duration = Number(/<duration>\s*(\d+)/.exec(body)?.[1] ?? 0);
+            if (kind === "backup") {
+                flags.add("backup");
+                rewoundFrom = cursor;
+                cursor = Math.max(0, cursor - duration);
+            } else if (kind === "forward" || !/<(chord|grace)\b/.test(body)) {
+                cursor += duration;
+                furthest = Math.max(furthest, cursor);
+            }
+        }
+    }
+    return [...flags].sort().join("+");
+}
+
+// What a row is probed as one of: its layout and the shape of its bars.
+export const probeKey = (xml: string): string => `${layoutOf(xml)}|${shapeOf(xml)}`;
+
+// Pieces always probed, whatever the spread lands on: each is one a fix to the difficulty
+// model was measured on, so it shows a way of writing the spread may never reach. The check
+// fails when one leaves the manifest, so the list cannot rot into probing nothing.
+export const SENTINELS: readonly { id: string; why: string }[] = [
+    {
+        id: "vzfT922I6Vrm",
+        why: "Mozart K. 331, Var. 4: the left hand's crossing thirds written on the treble staff",
+    },
+    {
+        id: "68lEifITMAeN",
+        why: "Giovannelli, Jesu sole serenior: a voice stopping short of the barline, two voices wider than a hand on one staff",
+    },
+    {
+        id: "gzlIQOu192mh",
+        why: "Anerio, Iesu decus angelicum: a voice stopping short of the barline, two voices wider than a hand on one staff",
+    },
+    {
+        id: "P427uVDpAkpc",
+        why: "Sermisy, J'attends secours: two voices wider than a hand on one staff while the other rests",
+    },
+    {
+        id: "pTzDUQYLzd1A",
+        why: "Liszt, Consolation No. 1: a piano written as two parts, one per hand, whose bars must stay together",
+    },
+];
+
+// The first sentinel the manifest no longer holds, described; null when all are there.
+export function missingSentinel(
+    songs: readonly { id: string }[],
+    sentinels: readonly { id: string; why: string }[] = SENTINELS,
+): string | null {
+    const held = new Set(songs.map((song) => song.id));
+    const gone = sentinels.find((sentinel) => !held.has(sentinel.id));
+    return gone === undefined
+        ? null
+        : `the probed sentinel ${gone.id} (${gone.why}) is no longer in the manifest — replace it in SENTINELS (dev/bakeChecks.mts) with a piece that shows the same thing`;
+}
+
+// Which rows to re-derive, by index, given each row's probe key: a spread across the
+// catalogue, and then the first row of every key the spread did not reach. A model change
+// can be confined to one way of writing a score, so each layout and shape of bar the
+// catalogue holds gets a probe beside the spread. The keys only choose which rows are
+// probed, so a misread one can make the spread less varied but never a verdict wrong.
 export function probeIndices(layouts: readonly string[]): number[] {
     const chosen = new Set<number>();
     const step = Math.max(1, Math.floor(layouts.length / SONG_PROBES));
@@ -116,13 +219,20 @@ export async function shippedScore(song: ProbeSong): Promise<ShippedScore> {
 }
 
 // What the models in the tree make of a score: the cost the manifest stores, rounded as
-// it is stored, and the incipit. A score whose opening cannot be read has no incipit,
-// legitimately.
-export function currentMeasure(xml: string): { cost: number; incipit: string | undefined } {
+// it is stored, the incipit, and for solo piano what each easier reduction costs. A score
+// whose opening cannot be read has no incipit, legitimately.
+export type Measured = { cost: number; incipit: string | undefined; reachCost?: ReductionCosts };
+
+export function currentMeasure(xml: string, song?: ProbeSong): Measured {
     const opening = readIncipit(linkedomXmlCodec, xml);
+    const cost = Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3));
     return {
-        cost: Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3)),
+        cost,
         incipit: opening === null ? undefined : encodeIncipit(opening),
+        reachCost:
+            song?.scoreKind === "solo-piano"
+                ? reductionCosts(linkedomXmlCodec, song.id, xml, cost)
+                : {},
     };
 }
 
@@ -135,26 +245,33 @@ export function currentMeasure(xml: string): { cost: number; incipit: string | u
 export async function staleSong(
     songs: ProbeSong[],
     read: (song: ProbeSong) => Promise<ShippedScore> = shippedScore,
-    measure: (xml: string) => { cost: number; incipit: string | undefined } = currentMeasure,
+    measure: (xml: string, song: ProbeSong) => Measured = currentMeasure,
+    always: readonly string[] = [],
 ): Promise<string | null> {
-    const layouts: string[] = [];
+    const keys: string[] = [];
     for (const song of songs) {
         const score = await read(song);
         if ("problem" in score) {
             return unopenable(song, score.problem);
         }
-        layouts.push(layoutOf(score.xml));
+        keys.push(probeKey(score.xml));
     }
-    for (const index of probeIndices(layouts)) {
+    const pinned = songs.flatMap((song, index) => (always.includes(song.id) ? [index] : []));
+    const probes = [...new Set([...probeIndices(keys), ...pinned])].sort((a, b) => a - b);
+    for (const index of probes) {
         const song = songs[index]!;
         const score = await read(song);
         if ("problem" in score) {
             return unopenable(song, score.problem);
         }
         const named = song.title ?? song.id;
-        const fresh = measure(score.xml);
+        const fresh = measure(score.xml, song);
         if (fresh.cost !== song.cost) {
             return `${named} is stored at cost ${song.cost} but measures ${fresh.cost} — run \`npm run songs:cost\``;
+        }
+        // The ways in are graded off these, so a stale one is a stale way-in grade.
+        if (JSON.stringify(fresh.reachCost ?? {}) !== JSON.stringify(song.reachCost ?? {})) {
+            return `${named} stores what its easier reductions cost as ${JSON.stringify(song.reachCost ?? {})} but they measure ${JSON.stringify(fresh.reachCost ?? {})} — run \`npm run songs:cost\``;
         }
         // Absence is only wrong when the encoder does produce an incipit.
         if (fresh.incipit !== song.incipit) {
