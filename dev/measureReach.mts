@@ -8,11 +8,14 @@
 // them needs the code that produced it. Keeping it here also keeps the difficulty model off
 // the path of everything that merely wants to thin a score.
 
-import type { ReductionCosts } from "../core/reach.ts";
-import { THINNINGS } from "../core/reduction.ts";
+import { type Reduction, THINNINGS } from "../core/reduction.ts";
 import { categoryOf, measureScore } from "../core/scoreDifficulty.ts";
 import { simplify } from "../core/simplify.ts";
 import type { XmlCodec } from "../core/xml.ts";
+
+// What each easier reduction of a piece costs, by reduction: the numbers its `reach` grades are
+// read off, as a piece's grade is read off its cost. Only the bake needs them.
+export type ReductionCosts = Partial<Record<Reduction, number>>;
 
 // What each reduction of a piece costs, rounded as the manifest stores a cost: the number a
 // way-in grade is read off, the way a piece's own grade is read off its `cost`.

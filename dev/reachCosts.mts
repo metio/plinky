@@ -10,7 +10,7 @@
 // fifteenth of a file every browsing visitor downloads.
 
 import { readFile, writeFile } from "node:fs/promises";
-import type { ReductionCosts } from "../core/reach.ts";
+import type { ReductionCosts } from "./measureReach.mts";
 
 export const REACH_COSTS = "dev/catalog-reach-costs.json";
 

@@ -14,11 +14,10 @@
 import { readFile } from "node:fs/promises";
 import { staffCount } from "../core/accompaniment.ts";
 import { encodeIncipit, readIncipit } from "../core/incipit.ts";
-import type { ReductionCosts } from "../core/reach.ts";
 import { rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { scorePath } from "./manifest.mts";
-import { reductionCosts } from "./measureReach.mts";
+import { type ReductionCosts, reductionCosts } from "./measureReach.mts";
 
 const _SONGS = "public/songs";
 

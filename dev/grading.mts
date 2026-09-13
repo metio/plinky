@@ -10,10 +10,11 @@
 // not a cut of whatever has been harvested: a grade has to mean the same thing before and
 // after an import, or every import re-grades pieces a player has already worked on.
 
-import type { Reach, ReductionCosts } from "../core/reach.ts";
+import type { Reach } from "../core/reach.ts";
 import { THINNINGS } from "../core/reduction.ts";
 import { MAX_GRADE, parsePositions, pieceBoundaries } from "../core/scoreDifficulty.ts";
 import type { XmlCodec } from "../core/xml.ts";
+import type { ReductionCosts } from "./measureReach.mts";
 
 export { pieceBoundaries };
 
