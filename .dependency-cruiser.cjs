@@ -213,9 +213,9 @@ module.exports = {
         },
         exclude: {
             // Vite query-suffixed and generated modules are unresolvable to a static
-            // analyzer; the .woff2?url font import and the paraglide output are not edges
-            // the architecture cares about.
-            path: ["\\?(url|raw|worker)$", "\\.react-router/", "^app/paraglide/"],
+            // analyzer; the .woff2?url font import, the header's symbol?no-inline and the
+            // paraglide output are not edges the architecture cares about.
+            path: ["\\?(url|raw|worker|no-inline)$", "\\.react-router/", "^app/paraglide/"],
         },
         reporterOptions: {
             dot: { collapsePattern: "node_modules/(?:@[^/]+/[^/]+|[^/]+)" },
