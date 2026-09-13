@@ -18,6 +18,8 @@ import { DOMAIN, TITTLE, WORDMARK_PARTS } from "../../../core/wordmark";
 // the baseline at the ı's left edge, and the dot hangs off it. Anchoring to the text's own box
 // instead would rest on the face's ascent, which the browser rounds and reports differently,
 // and the tracking added after each letter would widen that box and pull the dot off the stem.
+// The anchor is an inline block, which a line may break beside, so the name is set nowrap:
+// otherwise a tight header row splits it into "Pl" over "ınky".
 //
 // Decorative by default: every caller so far sits it inside a link that carries the
 // accessible name. A caller that needs it announced passes `label`, and the label is what is
@@ -38,7 +40,7 @@ export function Wordmark({
     return (
         <span
             {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": "true" })}
-            className={`font-display font-semibold tracking-normal text-brand-ink dark:tracking-[0.05em] ${className}`}
+            className={`font-display font-semibold tracking-normal whitespace-nowrap text-brand-ink dark:tracking-[0.05em] ${className}`}
         >
             {WORDMARK_PARTS.before}
             <span className="relative inline-block h-0 w-0 align-baseline">

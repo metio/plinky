@@ -28,6 +28,13 @@ describe("Wordmark", () => {
         expect(container.querySelectorAll(".bg-brand-dot")).toHaveLength(1);
     });
 
+    it("is one unbreakable run, so a tight row cannot split it at the dot", () => {
+        // The dot hangs from an inline block between "Pl" and "ınky", and a line may break
+        // beside an inline block.
+        const { container } = render(<Wordmark />);
+        expect(container.firstElementChild?.className).toContain("whitespace-nowrap");
+    });
+
     it("carries the domain as its own tail when asked", () => {
         const { container } = render(<Wordmark domain />);
         expect(container.textContent).toBe("Plınky.fun");

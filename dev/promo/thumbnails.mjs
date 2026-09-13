@@ -100,7 +100,8 @@ const browser = await chromium.launch();
 
 // The round pink dot over the name's i, placed from the baseline as the app header places it:
 // a zero-size inline block before the dotless ı sits on the baseline at its left edge, and
-// the dot hangs off it by core/wordmark's measurements.
+// the dot hangs off it by core/wordmark's measurements. A line may break beside an inline
+// block, so the lockup is set nowrap.
 const DOT_ANCHOR = `<span style="position:relative;display:inline-block;width:0;height:0;vertical-align:baseline"><span style="position:absolute;left:${TITTLE.stemCentre}em;bottom:${TITTLE.baseAbove}em;width:${TITTLE.size}em;height:${TITTLE.size}em;transform:translateX(-50%);border-radius:50%;background:${DOT}"></span></span>`;
 
 function card(piece, cut) {
@@ -119,7 +120,7 @@ function card(piece, cut) {
                 wrote the name twice on a card that has room to say it once — so the domain
                 is the wordmark's own tail, in the same face, and the address and the name
                 are the same object. -->
-           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1">${WORDMARK_PARTS.before}${DOT_ANCHOR}${WORDMARK_PARTS.stem}${WORDMARK_PARTS.after}${DOMAIN}</div>
+           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1;white-space:nowrap">${WORDMARK_PARTS.before}${DOT_ANCHOR}${WORDMARK_PARTS.stem}${WORDMARK_PARTS.after}${DOMAIN}</div>
          </div>`;
 }
 
