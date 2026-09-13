@@ -47,6 +47,36 @@ const NONE: ReadonlySet<number> = new Set();
 const NO_SOUNDING: ReadonlyMap<number, "left" | "right"> = new Map();
 const NO_HOLDS: ReadonlyMap<number, number> = new Map();
 
+// What a caller can print on a white key besides its name: a small drawing, a word, and the
+// panel the key opens. The front page's keys carry the ways to practise this way; every other
+// keyboard leaves it off and is the plain instrument.
+export type KeyDressing = {
+    // The word printed on the key, where the key is wide enough to hold it.
+    label: string;
+    // What the key opens, said after the word in the key's accessible name.
+    name: string;
+    picture: ReactNode;
+    // The id of the panel the key opens, and whether it is the one open now.
+    controls: string;
+    open: boolean;
+};
+
+// A drawing on a resting key is inked for the key, which stays light in every mode, rather
+// than for the page around it. On a key lit by a state the fill changes under it, so the
+// drawing takes the ink that state gives the key's name and drops its grounds.
+const KEY_ART_REST = {
+    "--art-stroke": "var(--color-key-art)",
+    "--art-fill": "var(--color-key-art-ground)",
+    "--art-accent": "var(--color-key-art-soft)",
+    "--art-paper": "var(--color-key-white)",
+} as React.CSSProperties;
+const KEY_ART_LIT = {
+    "--art-stroke": "currentColor",
+    "--art-fill": "transparent",
+    "--art-accent": "currentColor",
+    "--art-paper": "transparent",
+} as React.CSSProperties;
+
 // The shrinking fill that shows how long a just-played note is meant to be held:
 // a translucent indigo bar rising the key's height, draining from full at the
 // strike to empty at the note's written release. Pinned behind the label so the
@@ -84,6 +114,9 @@ export function Keyboard({
     theme = DEFAULT_THEME,
     finish = finishFor(),
     badge,
+    dressing,
+    bed = "h-36",
+    maxKeyPx,
     onPress,
     onRelease,
 }: {
@@ -129,6 +162,12 @@ export function Keyboard({
     // slot rather than a built-in so the bare Keyboard stays free of the MIDI context
     // (and rendarable in isolation); the wrappers that have the context pass it in.
     badge?: ReactNode;
+    // Words and drawings on individual white keys, keyed by note (see KeyDressing).
+    dressing?: ReadonlyMap<number, KeyDressing>;
+    // The keybed's height. A dressed keyboard needs room under the black keys for them.
+    bed?: string;
+    // How wide a white key may grow before the keybed stops widening with its container.
+    maxKeyPx?: number;
     // A press carries an optional velocity (from tap position); omitted lets the funnel
     // fall back to its default loudness for keyboard/AT activations.
     onPress?: (note: number, velocity?: number) => void;
@@ -162,7 +201,7 @@ export function Keyboard({
     // Cap the keyboard so keys can't stretch past a tall proportion, then centre it. The
     // black keys are positioned as a percentage of this same container, so capping the
     // container (rather than the white keys alone) keeps white and black keys aligned.
-    const maxWidth = whites.length ? keybedMaxWidthPx(from, to) : undefined;
+    const maxWidth = whites.length ? keybedMaxWidthPx(from, to, maxKeyPx) : undefined;
 
     // What a note is called here: the system the caller hands in — the player's own
     // naming, which every other surface also reads — or, for a keyboard shown with no
@@ -461,17 +500,32 @@ export function Keyboard({
     const onKeyKeyUp = (event: React.KeyboardEvent<HTMLButtonElement>) =>
         keyUp(noteOf(event))(event);
     const onKeyBlur = (event: React.FocusEvent<HTMLButtonElement>) => blur(noteOf(event))();
-    const keyProps = (note: number) => ({
-        type: "button" as const,
-        "aria-label": sayKey(note),
-        "aria-pressed": lit.has(note),
-        tabIndex: note === roved ? 0 : -1,
-        "data-note": note,
-        onClick: onKeyClick,
-        onKeyDown: onKeyKeyDown,
-        onKeyUp: onKeyKeyUp,
-        onBlur: onKeyBlur,
-    });
+    //
+    // A dressed key is called by the word printed on it first, so a voice command that reads
+    // the key aloud finds it, then by what it opens, then by its pitch.
+    const keyProps = (note: number) => {
+        const dressed = dressing?.get(note);
+        return {
+            type: "button" as const,
+            "aria-label": dressed
+                ? m.keyboard_key_method({
+                      label: dressed.label,
+                      name: dressed.name,
+                      key: sayKey(note),
+                  })
+                : sayKey(note),
+            "aria-pressed": lit.has(note),
+            ...(dressed
+                ? { "aria-controls": dressed.controls, "aria-expanded": dressed.open }
+                : {}),
+            tabIndex: note === roved ? 0 : -1,
+            "data-note": note,
+            onClick: onKeyClick,
+            onKeyDown: onKeyKeyDown,
+            onKeyUp: onKeyKeyUp,
+            onBlur: onKeyBlur,
+        };
+    };
     // How many white keys sit left of each black one: one pass over both sorted lists,
     // rather than a filter over every white key for every black one on every frame.
     const whitesBefore = useMemo(() => {
@@ -514,7 +568,7 @@ export function Keyboard({
                 ref={keysRef}
                 role="group"
                 aria-label={m.keyboard_label()}
-                className="relative mx-auto h-36 w-full touch-none select-none"
+                className={`relative mx-auto ${bed} w-full touch-none select-none`}
                 style={{ maxWidth }}
                 onPointerDown={down}
                 onPointerMove={move}
@@ -525,17 +579,36 @@ export function Keyboard({
                 {badge}
                 <div className="flex h-full w-full gap-px">
                     {whites.map((note, index) => {
-                        const face = faces.white[stateOf(note)];
+                        const state = stateOf(note);
+                        const face = faces.white[state];
+                        const dressed = dressing?.get(note);
+                        // The key whose panel is open wears the soft tint while it rests, so
+                        // the keyboard shows which key the panel below belongs to.
+                        const fill = dressed?.open && state === "rest" ? "bg-key-hover" : face.fill;
                         return (
                             <button
                                 key={note}
                                 {...keyProps(note)}
                                 style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
-                                className={`${finish.whiteKey} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${face.fill}`}
+                                className={`${finish.whiteKey} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${fill}`}
                             >
                                 {keyTop(
                                     note,
                                     `pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium ${face.label}`,
+                                )}
+                                {dressed && (
+                                    <span
+                                        aria-hidden="true"
+                                        className={`pointer-events-none absolute inset-x-0.5 bottom-5 flex flex-col items-center gap-1 ${face.label}`}
+                                        style={state === "rest" ? KEY_ART_REST : KEY_ART_LIT}
+                                    >
+                                        {dressed.picture}
+                                        {/* The word needs a key wider than a phone gives it; the
+                                            drawing stays, and the panel below names the method. */}
+                                        <span className="hidden text-center text-[11px] font-medium leading-tight [overflow-wrap:anywhere] sm:block">
+                                            {dressed.label}
+                                        </span>
+                                    </span>
                                 )}
                             </button>
                         );

@@ -5,128 +5,134 @@
 import { cleanup, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { METHODS } from "../../../core/practiceMethods";
+import { type MethodId, METHODS, type PracticeMethod } from "../../../core/practiceMethods";
 import type { AppServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
-import { PracticeMethods } from "./practiceMethods";
+import { METHOD_NAME, MethodLeaf } from "./practiceMethods";
 
-const mount = () =>
-    renderWithServices(
-        <MemoryRouter>
-            <PracticeMethods />
-        </MemoryRouter>,
-    );
+const method = (id: MethodId): PracticeMethod => {
+    const found = METHODS.find((candidate) => candidate.id === id);
+    if (!found) {
+        throw new Error(`no method ${id}`);
+    }
+    return found;
+};
+
+const leaf = (id: MethodId) => (
+    <MemoryRouter>
+        <MethodLeaf id="leaf" method={method(id)} />
+    </MemoryRouter>
+);
+
+const hrefs = () => screen.getAllByRole("link").map((link) => link.getAttribute("href") ?? "");
 
 afterEach(cleanup);
 
-describe("PracticeMethods", () => {
-    it("assembles the catalogue once for every button that opens a piece", async () => {
-        // Each button picks from the same catalogue; a hook per button would parse every
-        // held score and map three thousand rows once per method on every home visit.
-        const songs = { manifest: vi.fn(() => Promise.resolve([])) };
-        const exercises = { manifest: vi.fn(() => Promise.resolve([])) };
-        renderWithServices(
-            <MemoryRouter>
-                <PracticeMethods />
-            </MemoryRouter>,
-            {
-                songs: songs as unknown as AppServices["songs"],
-                exercises: exercises as unknown as AppServices["exercises"],
-            },
-        );
-        await waitFor(() => {
-            expect(screen.getAllByRole("link").length).toBeGreaterThanOrEqual(2);
-        });
-        expect(songs.manifest).toHaveBeenCalledTimes(1);
-        expect(exercises.manifest).toHaveBeenCalledTimes(1);
-    });
-
-    it("names every method with its dose", () => {
-        mount();
-        expect(screen.getByRole("heading", { name: m.methods_title() })).toBeTruthy();
-        expect(screen.getAllByRole("listitem")).toHaveLength(METHODS.length);
-        expect(screen.getByText(m.method_chunking_name())).toBeTruthy();
+describe("MethodLeaf", () => {
+    it("is a region named by its method, saying how long a go at it takes", () => {
+        renderWithServices(leaf("interleaving"));
+        const region = screen.getByRole("region", { name: m.method_interleaving_name() });
+        expect(region.id).toBe("leaf");
         expect(screen.getByText(m.methods_dose({ count: 15 }))).toBeTruthy();
     });
 
     it("leads with the reason and follows with what Plinky gives you", () => {
-        mount();
+        renderWithServices(leaf("chunking"));
         // Somebody who does not know why looping two bars beats replaying the piece will
         // not reach for the loop, so the reason comes first and is not labelled.
         expect(screen.getByText(m.method_chunking_why())).toBeTruthy();
-        expect(screen.getAllByText(`${m.methods_in_plinky()}:`).length).toBe(METHODS.length);
+        expect(screen.getByText(`${m.methods_in_plinky()}:`)).toBeTruthy();
     });
 
-    it("localises every link it builds, so a static host has a document to serve", async () => {
+    it("assembles the catalogue once, and not again when another method opens", async () => {
+        const songs = { manifest: vi.fn(() => Promise.resolve([])) };
+        const exercises = { manifest: vi.fn(() => Promise.resolve([])) };
+        const view = renderWithServices(leaf("chunking"), {
+            songs: songs as unknown as AppServices["songs"],
+            exercises: exercises as unknown as AppServices["exercises"],
+        });
+        await waitFor(() => expect(screen.getAllByRole("link").length).toBeGreaterThan(0));
+        view.rerender(leaf("slow"));
+        await screen.findByRole("region", { name: m.method_slow_name() });
+        expect(songs.manifest).toHaveBeenCalledTimes(1);
+        expect(exercises.manifest).toHaveBeenCalledTimes(1);
+    });
+
+    it("localises the link it builds, so a static host has a document to serve", async () => {
         // A bare /play/<id> has no prerendered document: it resolves under `serve -s`,
         // which falls back to the shell, and 404s on the host that actually ships. Every
         // link here goes through localizedHref for the locale prefix AND the trailing
         // slash that matches <path>/index.html.
-        mount();
-        await waitFor(() => {
-            const hrefs = screen.getAllByRole("link").map((l) => l.getAttribute("href") ?? "");
-            expect(hrefs.length).toBeGreaterThan(0);
-            for (const href of hrefs) {
+        for (const { id } of METHODS) {
+            renderWithServices(leaf(id));
+            await waitFor(() => expect(hrefs().length).toBeGreaterThan(0));
+            for (const href of hrefs()) {
                 expect(href).toMatch(/^\/en\//);
                 expect(href.split("?")[0]).toMatch(/\/$/);
             }
-        });
+            cleanup();
+        }
     });
 
     it("opens the chord set straight away, needing no grade and no catalogue", async () => {
-        renderWithServices(
-            <MemoryRouter>
-                <PracticeMethods />
-            </MemoryRouter>,
-        );
+        renderWithServices(leaf("chords"));
         const link = await screen.findByRole("link", { name: m.methods_chords_open() });
         expect(link.getAttribute("href")).toContain("/play/chords-c-major");
     });
 
     it("sends the two methods that are not about one piece to the review queue", async () => {
-        mount();
-        await waitFor(() => {
-            const review = screen.getAllByRole("link", { name: m.methods_review() });
-            expect(review).toHaveLength(2);
-            for (const link of review) {
-                expect(link.getAttribute("href")).toContain("/review");
-            }
-        });
+        for (const id of ["interleaving", "spacing"] as const) {
+            renderWithServices(leaf(id));
+            const link = await screen.findByRole("link", { name: m.methods_review() });
+            expect(link.getAttribute("href")).toContain("/review");
+            cleanup();
+        }
     });
 
     it("opens a piece with the method already set up on it", async () => {
-        mount();
-        // The four methods that are about one piece each offer a piece, and the address
-        // carries the method: the button IS the control, not a signpost to it.
-        await waitFor(() => {
-            const hrefs = screen
-                .getAllByRole("link")
-                .map((link) => link.getAttribute("href") ?? "")
-                .filter((href) => href.includes("/play/") && !href.includes("/play/chords-"));
-            expect(hrefs).toHaveLength(4);
-            expect(hrefs.some((href) => href.includes("speed=0.6"))).toBe(true);
-            expect(hrefs.some((href) => href.includes("hands=left"))).toBe(true);
-            expect(hrefs.some((href) => href.includes("loop=1-4"))).toBe(true);
-            // Hearing it first needs no set-up in the address — the switch is on the
-            // surface the link opens.
-            expect(hrefs.some((href) => !href.includes("?"))).toBe(true);
-        });
+        // The button IS the control, not a signpost to it: the address carries the method.
+        // Hearing it first needs nothing in the address — the switch is on the surface.
+        const expected: [MethodId, (href: string) => boolean][] = [
+            ["chunking", (href) => href.includes("loop=1-4")],
+            ["slow", (href) => href.includes("speed=0.6")],
+            ["handsApart", (href) => href.includes("hands=left")],
+            ["hearingFirst", (href) => !href.includes("?")],
+        ];
+        for (const [id, carries] of expected) {
+            renderWithServices(leaf(id));
+            const link = await screen.findByRole("link", { name: m.methods_try({ grade: 1 }) });
+            const href = link.getAttribute("href") ?? "";
+            expect(href).toContain("/play/");
+            expect(carries(href)).toBe(true);
+            cleanup();
+        }
     });
 
     it("offers each piece-opening method its own piece rather than the same one every time", async () => {
-        mount();
+        // Seeded by method id, so which piece each one offers is stable but they are not all
+        // the same piece — on a shelf with only the bundled demos on it, at least two of the
+        // four differ.
+        const ids: MethodId[] = ["chunking", "slow", "handsApart", "hearingFirst"];
+        renderWithServices(
+            <MemoryRouter>
+                {ids.map((id) => (
+                    <MethodLeaf key={id} id={`leaf-${id}`} method={method(id)} />
+                ))}
+            </MemoryRouter>,
+        );
         await waitFor(() => {
-            const pieces = screen
-                .getAllByRole("link")
-                .map((link) => link.getAttribute("href") ?? "")
-                .filter((href) => href.includes("/play/") && !href.includes("/play/chords-"))
+            const pieces = hrefs()
+                .filter((href) => href.includes("/play/"))
                 .map((href) => href.split("?")[0]);
             expect(pieces).toHaveLength(4);
-            // Seeded by method id, so which piece each one offers is stable but they are
-            // not all the same piece — on a shelf with only the bundled demos on it, at
-            // least two of the four differ.
             expect(new Set(pieces).size).toBeGreaterThan(1);
         });
+    });
+
+    it("names every method from the catalogue of messages", () => {
+        for (const { id } of METHODS) {
+            expect(METHOD_NAME[id]().length).toBeGreaterThan(0);
+        }
     });
 });

@@ -142,6 +142,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-spent: var(--color-gray-400); /* a key the round is done with */
     --color-key-spent-ink: var(--color-gray-200);
     --color-key-hover: #e3eafc;
+    /* A drawing printed on a key (the front page's keys carry the ways to practise). The
+       key face does not invert, so these hold their light values in both modes, and they
+       follow the palette: the palette's own indigo, its soft accent and its tint. */
+    --color-key-art: #3a0fa8;
+    --color-key-art-soft: #6784dd;
+    --color-key-art-ground: #d7e3fb;
     --color-key-held: var(--color-green-500); /* a key you are holding down */
     /* What the score asks of a key — which one comes next, and the hold bar
        draining down it for as long as the note is written to last. */
@@ -321,6 +327,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-spent: var(--color-gray-700);
     --color-key-spent-ink: var(--color-gray-500);
     --color-key-hover: #d7e3fb;
+    --color-key-art: #3a0fa8;
+    --color-key-art-soft: #6784dd;
+    --color-key-art-ground: #d7e3fb;
     --color-key-held: var(--color-green-500);
     --color-key-next: var(--color-indigo-400);
     --color-key-label: var(--color-gray-700);
@@ -414,6 +423,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-paper-line: #c7bce8;
     --color-paper-ink: #8c88b4;
     --color-key-hover: #f0eafe;
+    --color-key-art: #4915d2;
+    --color-key-art-soft: #9b7cf0;
+    --color-key-art-ground: #e2d7fd;
 
     /* Gold against violet: the pedals, the hinges, the gilt on a fallboard. It is the
        only warm colour the chrome is allowed, and it goes on things you earned. It stays
@@ -473,6 +485,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-paper-line: #c7bce8;
     --color-paper-ink: #8c88b4;
     --color-key-hover: #e2d7fd;
+    --color-key-art: #4915d2;
+    --color-key-art-soft: #9b7cf0;
+    --color-key-art-ground: #e2d7fd;
 
     --color-spark: #e0b25c;
     --color-spark-strong: #d9aa52;
