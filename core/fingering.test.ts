@@ -122,6 +122,38 @@ describe("a chord written top-down", () => {
     });
 });
 
+// Two voices meeting on one note write it twice in one chord. It is still one key under
+// one finger.
+describe("a unison written in two voices", () => {
+    it("gives both copies of the note the finger its key takes", () => {
+        const [written] = fingerPositions([[60, 64, 60]], "right");
+        const [once] = fingerPositions([[60, 64]], "right");
+        expect(written).toEqual([once![0], once![1], once![0]]);
+    });
+
+    it("costs the chord as the keys it presses", () => {
+        for (const hand of ["right", "left"] as const) {
+            expect(reachingCost([[60, 60, 64]], hand)).toBe(reachingCost([[60, 64]], hand));
+            expect(positionsCost([[60, 60, 64]], fingerPositions([[60, 60, 64]], hand), hand)).toBe(
+                positionsCost([[60, 64]], fingerPositions([[60, 64]], hand), hand),
+            );
+        }
+    });
+
+    it("keeps an octave with its top note doubled as the octave it is", () => {
+        // The widest a hand holds, whole; two fingers on one C5 would cramp it.
+        expect(reachingCost([[60, 72, 72]], "right")).toBe(reachingCost([[60, 72]], "right"));
+        expect(fingerPositions([[72, 60, 72]], "right")).toEqual([[5, 1, 5]]);
+    });
+
+    it("hands over what lies beyond the unison, whichever copy is written first", () => {
+        // C2 goes to a free left hand; the right keeps the octave C4–C5 with C5 written twice.
+        const once = reachingCost([[36, 60, 72]], "right", undefined, [[]]);
+        expect(reachingCost([[36, 60, 72, 72]], "right", undefined, [[]])).toBe(once);
+        expect(reachingCost([[72, 36, 72, 60]], "right", undefined, [[]])).toBe(once);
+    });
+});
+
 describe("fingerPositions", () => {
     it("matches the single-line chooser when every position is one note", () => {
         const line = [60, 62, 64, 65, 67];

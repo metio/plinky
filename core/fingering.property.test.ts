@@ -103,6 +103,79 @@ describe("fingering a chord in any written order", () => {
     });
 });
 
+// Two voices meeting on one note write it twice in one chord, and it is still one key. A
+// piece with one pitch of one position written twice, anywhere in the chord, beside the
+// same piece with every pitch written once.
+const arbUnison = fc
+    .array(fc.uniqueArray(fc.integer({ min: 24, max: 108 }), { minLength: 1, maxLength: 5 }), {
+        minLength: 1,
+        maxLength: 6,
+    })
+    .chain((positions) =>
+        fc
+            .integer({ min: 0, max: positions.length - 1 })
+            .chain((at) =>
+                fc.tuple(
+                    fc.constant(at),
+                    fc.integer({ min: 0, max: positions[at]!.length - 1 }),
+                    fc.integer({ min: 0, max: positions[at]!.length }),
+                ),
+            )
+            .map(([at, copied, into]) => {
+                const chord = [...positions[at]!];
+                chord.splice(into, 0, chord[copied]!);
+                return {
+                    once: positions,
+                    twice: positions.map((pitches, k) => (k === at ? chord : pitches)),
+                };
+            }),
+    );
+
+describe("a unison written in two voices", () => {
+    const arbSides = (length: number) =>
+        fc.array(
+            fc.option(fc.uniqueArray(fc.integer({ min: 24, max: 108 }), { maxLength: 4 }), {
+                nil: undefined,
+            }),
+            { minLength: length, maxLength: length },
+        );
+
+    it("costs a hand what the chord's keys cost, whoever shares it", () => {
+        fc.assert(
+            fc.property(
+                arbUnison.chain((piece) =>
+                    fc.tuple(fc.constant(piece), arbSides(piece.once.length)),
+                ),
+                arbHand,
+                ([piece, others], hand) => {
+                    expect(reachingCost(piece.twice, hand, undefined, others)).toBe(
+                        reachingCost(piece.once, hand, undefined, others),
+                    );
+                },
+            ),
+        );
+    });
+
+    it("fingers both copies alike, as the chord written once", () => {
+        fc.assert(
+            fc.property(arbUnison, arbHand, arbSpan, (piece, hand, span) => {
+                const twice = fingerPositions(piece.twice, hand, span);
+                expect(byPitch(piece.twice, twice)).toEqual(
+                    byPitch(piece.once, fingerPositions(piece.once, hand, span)),
+                );
+                for (const [at, pitches] of piece.twice.entries()) {
+                    for (const [n, pitch] of pitches.entries()) {
+                        expect(twice[at]![n]).toBe(twice[at]![pitches.indexOf(pitch)]);
+                    }
+                }
+                expect(positionsCost(piece.twice, twice, hand, span)).toBe(
+                    positionsCost(piece.once, fingerPositions(piece.once, hand, span), hand, span),
+                );
+            }),
+        );
+    });
+});
+
 // A position one hand cannot span is priced as held in part, the rest given away. These
 // pin what that pricing may and may not do to a sequence.
 describe("pricing a position wider than one hand", () => {
