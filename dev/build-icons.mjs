@@ -1,46 +1,50 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Renders every icon the app ships from brand/plinky-mark.png — the launcher icons, the
-// favicon, the README banner and the social card. Run `npm run icons` after changing the
-// mark, which itself comes out of `npm run mark` (dev/key-mark.mjs keys the background off
-// the artwork we are given and writes the master).
+// Renders every icon the app ships from the vector mark in brand/mark — the launcher icons,
+// Apple's touch icon, the maskable icons, the favicon, the README banner and the social
+// card. Run `npm run icons` after `npm run mark` changes the mark.
 //
 // These used to be made by hand, which meant the sources and the images beside them could
 // disagree and nothing would say so. One source, one command.
-//
-// The mark is a full lockup: the tile, the keys, the falling plink, and the name set in
-// its own letterforms. Nothing here sets the word "Plinky" beside it — that would print
-// the name twice — so the only type on this page is the tagline.
 
-import { readFile, unlink, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
 import { tokenValue } from "./brandTokens.mjs";
 
-// Two forms of one mark, each used where it can be read. The lockup carries the name and
-// goes on the banner and the social card, which have room for it. The icon is the same
-// artwork with the name taken out and the keys recentred, and goes wherever the mark is
-// worn small — the tab, the launcher, the header — where the name would be a smudge and
-// the keys need the space it was taking. Both come from `npm run mark`.
-const MARK = "brand/plinky-mark.png";
-const ICON = "brand/plinky-icon.png";
-// The keys with no tile under them, for setting on something already violet.
-const KEYS = "brand/plinky-keys.png";
-// The palette is the app's, read off its tokens: the banner and the social card paint
-// on the same paper, in the same ink, as the brand kit and the pages themselves.
+// Carried into the page as data URIs rather than file:// URLs, so the render does not depend
+// on where the browser thinks its document lives.
+const mark = async (name) =>
+    `data:image/svg+xml;base64,${(await readFile(`brand/mark/${name}`)).toString("base64")}`;
+// The rounded tile, for anything that shows an icon as it is: a tab, a launcher that does
+// not mask, a bookmark.
+const TILE = await mark("tile.svg");
+// Full bleed, for anything that rounds the corners itself.
+const SQUARE = await mark("square.svg");
+// Full bleed with the drawing inside the safe zone, for launchers that crop to a shape.
+const MASKABLE = await mark("maskable.svg");
+const LOCKUP_LIGHT = await mark("lockup-light.svg");
+const LOCKUP_INDIGO = await mark("lockup-indigo.svg");
+// The lockups' own proportions, so a height is all a layout has to choose.
+const aspect = async (name) => {
+    const [, width, height] =
+        (await readFile(`brand/mark/${name}`, "utf8")).match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/) ??
+        [];
+    return Number(width) / Number(height);
+};
+const LOCKUP_LIGHT_ASPECT = await aspect("lockup-light.svg");
+const LOCKUP_INDIGO_ASPECT = await aspect("lockup-indigo.svg");
+
+// The palette is the app's, read off its tokens: the banner and the social card paint on the
+// same paper, in the same ink, as the brand kit and the pages themselves.
 const css = await readFile("app/app.css", "utf8");
 const PAPER = tokenValue(css, "", "--color-surface");
 const INK = tokenValue(css, "", "--color-ink");
 const ACCENT = tokenValue(css, "", "--color-accent-solid");
 
-// Carried into the page as a data URI rather than a file:// URL, so the render does not
-// depend on where the browser thinks its document lives.
-const mark = `data:image/png;base64,${(await readFile(MARK)).toString("base64")}`;
-const icon = `data:image/png;base64,${(await readFile(ICON)).toString("base64")}`;
-const keys = `data:image/png;base64,${(await readFile(KEYS)).toString("base64")}`;
 // The tagline is set in the app's own display face, so the render has to carry the font
-// with it — a headless browser has no Fredoka installed, and the fallback would not be
-// the face the app ships. Latin only: nothing rendered here is ever translated.
+// with it — a headless browser has no Fredoka installed, and the fallback would not be the
+// face the app ships. Latin only: nothing rendered here is ever translated.
 const fredoka = await readFile(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
 );
@@ -53,75 +57,81 @@ async function shoot(html, { width, height, path }) {
     const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
     await page.setContent(
         `<style>${FACE}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}
-         img{display:block;width:100%;height:100%}</style>${html}`,
+         img{display:block}</style>${html}`,
     );
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(120);
     const png = await page.screenshot({ omitBackground: true });
-    await writeFile(path, png);
+    if (path) {
+        await writeFile(path, png);
+    }
     await page.close();
     return png;
 }
 
-// The launcher sizes, from the wordless icon. 180 is Apple's touch icon, 192 and 512 are
-// the manifest's. It carries its own rounded silhouette in its alpha, so it is scaled and
-// never clipped: a radius applied here is a guess at the artwork's own curve, and one
-// slightly tight leaves a sliver of ground showing all the way round.
-const tile = (size) => `<img src="${icon}" alt="" width="${size}" height="${size}">`;
-for (const size of [512, 192, 180, 32]) {
-    await shoot(tile(size), { width: size, height: size, path: `public/icon-${size}.png` });
+const picture = (src, size) =>
+    `<img src="${src}" alt="" width="${size}" height="${size}" style="width:${size}px;height:${size}px">`;
+
+// The manifest's icons, from the tile. It carries its rounded silhouette in its alpha, which
+// is right wherever nothing masks it.
+for (const size of [512, 192]) {
+    await shoot(picture(TILE, size), {
+        width: size,
+        height: size,
+        path: `public/icon-${size}.png`,
+    });
 }
 
-// The maskable form, which is a different picture rather than the same one re-cropped.
-//
-// A launcher that masks does not letterbox: it crops the icon to its own shape — a circle
-// on some Android launchers, a squircle on others — and paints its own ground behind
-// whatever is transparent. The tiles above carry their rounded silhouette in their alpha,
-// which is right where nothing masks them and wrong where something does: installed through
-// Chrome, the transparent corners came back as white and the tile floated in the middle of a
-// white circle with ground showing on all four sides.
-//
-// So the violet reaches every edge here, and the artwork is the keys WITHOUT their tile —
-// a tile on a ground of its own colour has no edge to show and would only read as a smudge.
-// At 0.76 the keys sit inside the circle a mask may cut to, which is the guarantee the
-// format asks for: everything outside the middle 80% is the platform's to take.
-const MASK_SAFE = 0.76;
-const maskable = (size) =>
-    `<div style="width:${size}px;height:${size}px;background:${ACCENT};display:flex;align-items:center;justify-content:center">
-       <img src="${keys}" alt="" style="width:${Math.round(size * MASK_SAFE)}px;height:${Math.round(size * MASK_SAFE)}px;flex:none">
-     </div>`;
+// Apple's touch icon, from the full-bleed square. iOS rounds the corners itself and paints
+// black into anything transparent, so the tile's own transparent corners would come back as
+// dark wedges.
+await shoot(picture(SQUARE, 180), { width: 180, height: 180, path: "public/icon-180.png" });
+
+// The maskable form. A launcher that masks does not letterbox: it crops the icon to its own
+// shape — a circle on some Android launchers, a squircle on others — and paints its own
+// ground behind whatever is transparent. So the ground reaches every edge here and the
+// drawing sits inside the middle 80%, which is the part the format promises to leave alone.
 for (const size of [512, 192]) {
-    await shoot(maskable(size), {
+    await shoot(picture(MASKABLE, size), {
         width: size,
         height: size,
         path: `public/icon-maskable-${size}.png`,
     });
 }
 
-// The favicon: an ICO wrapping the 32px render. The format allows a PNG payload outright,
-// so there is no bitmap to encode — a six-byte directory, a sixteen-byte entry, the image.
-const png32 = await readFile("public/icon-32.png");
-const ico = Buffer.alloc(22 + png32.length);
-ico.writeUInt16LE(0, 0); // reserved
-ico.writeUInt16LE(1, 2); // type: icon
-ico.writeUInt16LE(1, 4); // one image
-ico.writeUInt8(32, 6); // width
-ico.writeUInt8(32, 7); // height
-ico.writeUInt8(0, 8); // palette: none
-ico.writeUInt8(0, 9); // reserved
-ico.writeUInt16LE(1, 10); // colour planes
-ico.writeUInt16LE(32, 12); // bits per pixel
-ico.writeUInt32LE(png32.length, 14);
-ico.writeUInt32LE(22, 18); // offset of the image data
-png32.copy(ico, 22);
-await writeFile("public/favicon.ico", ico);
+// The favicon: an ICO holding the tile at 16, 32 and 48, so a browser picks the size it
+// draws at rather than scaling one down. The format allows PNG payloads outright, so there
+// is no bitmap to encode — a six-byte directory, sixteen bytes per entry, then the images.
+const FAVICON_SIZES = [16, 32, 48];
+const images = [];
+for (const size of FAVICON_SIZES) {
+    images.push(await shoot(picture(TILE, size), { width: size, height: size }));
+}
+const header = Buffer.alloc(6 + 16 * images.length);
+header.writeUInt16LE(0, 0); // reserved
+header.writeUInt16LE(1, 2); // type: icon
+header.writeUInt16LE(images.length, 4);
+let offset = header.length;
+images.forEach((png, index) => {
+    const entry = 6 + 16 * index;
+    header.writeUInt8(FAVICON_SIZES[index], entry); // width
+    header.writeUInt8(FAVICON_SIZES[index], entry + 1); // height
+    header.writeUInt8(0, entry + 2); // palette: none
+    header.writeUInt8(0, entry + 3); // reserved
+    header.writeUInt16LE(1, entry + 4); // colour planes
+    header.writeUInt16LE(32, entry + 6); // bits per pixel
+    header.writeUInt32LE(png.length, entry + 8);
+    header.writeUInt32LE(offset, entry + 12);
+    offset += png.length;
+});
+await writeFile("public/favicon.ico", Buffer.concat([header, ...images]));
 
-// The README banner: the lockup on paper, with room around it so it does not sit tight
-// against whatever follows it in the file.
+// The README banner: the lockup on paper beside the tagline, with room around it so it does
+// not sit tight against whatever follows it in the file.
 await shoot(
-    `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:22px;padding:0 28px">
-       <img src="${mark}" alt="" style="width:120px;height:120px;flex:none">
-       <div style="${DISPLAY};font-size:34px;color:${INK};line-height:1.15;letter-spacing:-0.01em">Practise piano in your browser</div>
+    `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:24px;padding:0 24px">
+       <img src="${LOCKUP_LIGHT}" alt="" style="height:64px;width:${Math.round(64 * LOCKUP_LIGHT_ASPECT)}px;flex:none">
+       <div style="${DISPLAY};font-size:28px;color:${INK};line-height:1.15">Practise piano in your browser</div>
      </div>`,
     { width: 512, height: 160, path: "public/icon-banner-512.png" },
 );
@@ -134,22 +144,20 @@ if (!siteUrl) {
     throw new Error("could not find SITE_URL in core/site.ts");
 }
 await shoot(
-    `<div style="width:1200px;height:630px;background:${ACCENT};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;text-align:center;padding:64px">
-       <img src="${mark}" alt="" style="width:300px;height:300px;flex:none">
-       <div style="${DISPLAY};font-size:58px;color:${PAPER};line-height:1.15;letter-spacing:-0.01em">Practise piano in your browser</div>
-       <div style="font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:26px;color:${PAPER};opacity:.8">${new URL(siteUrl).host} · free, no account, nothing to install</div>
+    `<div style="width:1200px;height:630px;background:${ACCENT};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;text-align:center;padding:64px">
+       <img src="${LOCKUP_INDIGO}" alt="" style="height:150px;width:${Math.round(150 * LOCKUP_INDIGO_ASPECT)}px;flex:none">
+       <div>
+         <div style="${DISPLAY};font-size:58px;color:${PAPER};line-height:1.15">Practise piano in your browser</div>
+         <div style="font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:26px;color:${PAPER};opacity:.8;margin-top:18px">${new URL(siteUrl).host} · free, no account, nothing to install</div>
+       </div>
      </div>`,
     { width: 1200, height: 630, path: "public/og.png" },
 );
 
 await browser.close();
 
-// The 32px render only existed to become the ICO; drop it so the directory holds exactly
-// what the app references.
-await unlink("public/icon-32.png");
-
 console.log(
-    "public/: icon-512, icon-192, icon-180 and favicon.ico from brand/plinky-icon.png; " +
-        "icon-maskable-512 and icon-maskable-192 from brand/plinky-keys.png on the accent; " +
-        "icon-banner-512 and og.png from brand/plinky-mark.png",
+    "public/: icon-512, icon-192 and favicon.ico (16, 32, 48) from brand/mark/tile.svg; " +
+        "icon-180 from square.svg; icon-maskable-512 and -192 from maskable.svg; " +
+        "icon-banner-512 from lockup-light.svg; og.png from lockup-indigo.svg",
 );
