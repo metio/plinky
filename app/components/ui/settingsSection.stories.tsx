@@ -29,9 +29,9 @@ export const Quiet: Story = {
     ),
 };
 
-// With an icon it becomes a card: the icon in a soft chip, the title and hint
+// With an icon it becomes a Folio row: the icon in the margin, the title and hint
 // beside it, the controls below.
-export const Card: Story = {
+export const WithIcon: Story = {
     render: () => (
         <SettingsSection
             title="Your keyboard"
