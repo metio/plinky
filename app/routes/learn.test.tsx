@@ -21,8 +21,7 @@ const show = (overrides = {}) =>
         overrides,
     );
 
-const hrefFor = (label: string) =>
-    screen.getByText(`${label} →`).closest("a")?.getAttribute("href");
+const hrefFor = (label: string) => screen.getByText(label).closest("a")?.getAttribute("href");
 
 describe("the Learn page", () => {
     it("gathers the whole schoolroom, each entry saying what it is", () => {
@@ -35,7 +34,7 @@ describe("the Learn page", () => {
             m.tools_title(),
             m.placement_title(),
         ]) {
-            expect(screen.getByText(`${label} →`)).toBeTruthy();
+            expect(screen.getByText(label)).toBeTruthy();
         }
         // The entry carries the page's own opening line, so the two always agree.
         expect(screen.getByText(m.theory_intro({ count: LESSONS.length }))).toBeTruthy();

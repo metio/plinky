@@ -25,7 +25,7 @@ export function HubList({ entries }: { entries: HubEntry[] }) {
                     key={entry.to}
                     to={entry.to}
                     margin={<entry.Icon className={folioIconClasses} />}
-                    name={`${entry.label} →`}
+                    name={entry.label}
                     line={entry.blurb}
                 />
             ))}
