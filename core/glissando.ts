@@ -126,21 +126,21 @@ export function readGlissandos(
         while (end < notes.length && notes[end]?.whole === notes[first]?.whole) {
             end++;
         }
-        const onset = notes.slice(first, end);
+        const onset = notes
+            .slice(first, end)
+            .flatMap((note) => (note.midi === null ? [] : [{ ...note, midi: note.midi }]));
         first = end;
+        // Every stop at this onset is taken before any start, so whatever a stop finds open
+        // set off from an earlier onset, and no sweep closes where it began.
         for (const note of onset) {
-            const midi = note.midi;
-            if (midi === null) {
-                continue;
-            }
             for (const mark of note.marks.glissandos) {
                 const key = keyOf(mark, note.part);
                 const opened = open.get(key);
-                if (mark.type === "stop" && opened && note.whole > opened.whole) {
+                if (mark.type === "stop" && opened) {
                     spans.push({
                         from: opened.whole,
                         to: note.whole + note.wholes,
-                        arrivesAt: midi,
+                        arrivesAt: note.midi,
                         pitch: opened.pitch,
                     });
                     open.delete(key);
@@ -148,14 +148,10 @@ export function readGlissandos(
             }
         }
         for (const note of onset) {
-            const midi = note.midi;
-            if (midi === null) {
-                continue;
-            }
             for (const mark of note.marks.glissandos) {
                 const key = keyOf(mark, note.part);
                 if (mark.type === "start" && !open.has(key)) {
-                    open.set(key, { whole: note.whole, pitch: midi });
+                    open.set(key, { whole: note.whole, pitch: note.midi });
                 }
             }
         }
