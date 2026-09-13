@@ -12,6 +12,7 @@ import { m } from "../../paraglide/messages.js";
 import { type KeyDressing, Keyboard } from "../ui/keyboard";
 import { ChordReadout } from "./chordReadout";
 import { MidiBadge } from "./midiBadge";
+import { Drawing } from "../ui/drawings/drawing";
 import { METHOD_DRAWING, METHOD_LABEL, METHOD_NAME, MethodLeaf } from "./practiceMethods";
 
 // The landing page's signature, and its menu of ways to practise: a real keyboard you play
@@ -60,13 +61,17 @@ export function HeroKeyboard({ children }: { children?: ReactNode }) {
         () =>
             new Map<number, KeyDressing>(
                 METHODS.map((method) => {
-                    const Picture = METHOD_DRAWING[method.id];
                     return [
                         method.key,
                         {
                             label: METHOD_LABEL[method.id](),
                             name: METHOD_NAME[method.id](),
-                            picture: <Picture className="h-auto w-7 sm:w-9" />,
+                            picture: (
+                                <Drawing
+                                    name={METHOD_DRAWING[method.id]}
+                                    className="h-auto w-7 sm:w-9"
+                                />
+                            ),
                             controls: leafId,
                             open: method.key === openKey,
                         },

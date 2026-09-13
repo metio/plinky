@@ -8,14 +8,7 @@ import { playOptionsQuery } from "../../../core/playOptions";
 import type { MethodId, PracticeMethod } from "../../../core/practiceMethods";
 import { useMusicItems } from "../../hooks/useMusicItems";
 import { useServices } from "../../contexts/services";
-import { CalendarDrawing } from "../ui/drawings/calendarDrawing";
-import type { DrawingProps } from "../ui/drawings/drawing";
-import { HalfKeyboardDrawing } from "../ui/drawings/halfKeyboardDrawing";
-import { HeadphonesDrawing } from "../ui/drawings/headphonesDrawing";
-import { LoopDrawing } from "../ui/drawings/loopDrawing";
-import { MetronomeDrawing } from "../ui/drawings/metronomeDrawing";
-import { ShuffledPagesDrawing } from "../ui/drawings/shuffledPagesDrawing";
-import { TriadDrawing } from "../ui/drawings/triadDrawing";
+import { Drawing, type DrawingName } from "../ui/drawings/drawing";
 import { localizedHref } from "../ui/href";
 import { m } from "../../paraglide/messages.js";
 
@@ -62,14 +55,14 @@ const WHY: Record<MethodId, () => string> = {
 
 // One drawing per method, each of something a pianist already owns: the loop over two bars,
 // the metronome, half a keyboard, headphones, two pages swapped, a calendar, a triad.
-export const METHOD_DRAWING: Record<MethodId, (props: DrawingProps) => React.JSX.Element> = {
-    chunking: LoopDrawing,
-    slow: MetronomeDrawing,
-    handsApart: HalfKeyboardDrawing,
-    hearingFirst: HeadphonesDrawing,
-    interleaving: ShuffledPagesDrawing,
-    spacing: CalendarDrawing,
-    chords: TriadDrawing,
+export const METHOD_DRAWING: Record<MethodId, DrawingName> = {
+    chunking: "loop",
+    slow: "metronome",
+    handsApart: "halfKeyboard",
+    hearingFirst: "headphones",
+    interleaving: "shuffledPages",
+    spacing: "calendar",
+    chords: "triad",
 };
 
 // One method's own button. It opens a piece at the player's grade with the method already
@@ -146,7 +139,6 @@ export function MethodLeaf({ id, method }: { id: string; method: PracticeMethod 
     // The catalogue behind a button that opens a piece. Assembling it parses every score held
     // on the device and maps three thousand manifest rows, so it is read once, here.
     const { items } = useMusicItems();
-    const Picture = METHOD_DRAWING[method.id];
     const heading = `${id}-name`;
     return (
         <section
@@ -154,7 +146,7 @@ export function MethodLeaf({ id, method }: { id: string; method: PracticeMethod 
             aria-labelledby={heading}
             className="grid items-start gap-4 border-t border-line pt-6 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-6"
         >
-            <Picture className="h-auto w-[84px] sm:w-24" />
+            <Drawing name={METHOD_DRAWING[method.id]} className="h-auto w-[84px] sm:w-24" />
             <div className="min-w-0 max-w-prose space-y-2.5">
                 <h4 id={heading} className="font-display text-xl font-medium text-ink">
                     {METHOD_NAME[method.id]()}

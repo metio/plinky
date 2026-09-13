@@ -1,0 +1,191 @@
+<!--
+SPDX-FileCopyrightText: The Plinky Authors
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<!--
+Every drawing in Plinky, one symbol each, fetched once and cached. The hand is one: a 72×56
+grid, one 2.2 stroke with round ends and joins, a soft ground behind the object and one
+accent, with staff lines drawn thinner and fainter (1.3, .75) than the objects on them.
+
+A symbol is drawn through <use>, whose copy of it sits in a shadow tree the page's class
+selectors cannot reach, so nothing here names a class. Colour arrives through custom
+properties, which do inherit into the copy. Each symbol names its four inks once, as the
+properties s, g, a and p, taking the art property a surface sets around it (a piano key
+does) and the art token otherwise, so a drawing follows the palette and the mode by itself:
+
+  s  the object's outline, noteheads, dots
+  g  the soft ground shape behind the object
+  a  the one accent
+  p  a sheet of paper or a body, outlined like the object
+
+drawings.test.ts holds every symbol to the grid, the stroke weights and the four inks.
+-->
+<svg xmlns="http://www.w3.org/2000/svg">
+<!-- Two bars of notes with an arrow curling back over them: the bar that keeps going wrong,
+     played round again. -->
+<symbol id="loop" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="33" rx="31" ry="19"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M12 30h48M12 36h48M12 42h48"/>
+<path style="stroke:var(--s)" d="M36 27v18"/>
+<g style="fill:var(--s)"><circle cx="21" cy="36" r="3"/><circle cx="29" cy="30" r="3"/><circle cx="45" cy="39" r="3"/><circle cx="53" cy="33" r="3"/></g>
+<path style="stroke:var(--a)" d="M58 20c0-9-10-13-22-13S15 11 14 18M10 14l4 5 5-3"/>
+</symbol>
+<!-- A metronome with its weight slid up the arm: the slow end of the dial. -->
+<symbol id="metronome" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="28" ry="21"/>
+<path style="fill:var(--p);stroke:var(--s)" d="M25 50 32 8h8l7 42z"/>
+<path style="stroke:var(--s)" d="M22 50h28M36 44 49 17"/>
+<rect style="fill:var(--a)" x="41" y="24" width="8" height="6" rx="1.5" transform="rotate(25 45 27)"/>
+<path style="stroke:var(--s);opacity:.35" d="M30 38h12"/>
+</symbol>
+<!-- A keyboard split down the middle, one half of it lit: one hand at a time. -->
+<symbol id="halfKeyboard" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="30" rx="31" ry="20"/>
+<rect style="fill:var(--p);stroke:var(--s)" x="8" y="22" width="56" height="24" rx="3"/>
+<path style="stroke:var(--s)" d="M16 22v24M24 22v24M32 22v24M40 22v24M48 22v24M56 22v24"/>
+<rect style="fill:var(--a);opacity:.55" x="40.8" y="23" width="22" height="22" rx="1"/>
+<path style="stroke:var(--s);stroke-dasharray:2 4" d="M36 12v42"/>
+<circle style="fill:var(--s)" cx="52" cy="14" r="3"/>
+</symbol>
+<!-- Headphones with the sound arriving in them: hear it before you play it. -->
+<symbol id="headphones" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="33" rx="30" ry="20"/>
+<path style="stroke:var(--s)" d="M18 38v-8a18 18 0 0 1 36 0v8"/>
+<g style="fill:var(--p);stroke:var(--s)"><rect x="13" y="34" width="10" height="15" rx="4"/><rect x="49" y="34" width="10" height="15" rx="4"/></g>
+<path style="stroke:var(--a)" d="M30 20c3 2 3 6 0 8M36 17c5 4 5 10 0 14"/>
+</symbol>
+<!-- Two pages of music tilted apart, with an arrow swapping them: mix them up. -->
+<symbol id="shuffledPages" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<g transform="rotate(-9 23 29)"><rect style="fill:var(--p);stroke:var(--s)" x="12" y="14" width="22" height="30" rx="2"/><path style="stroke:var(--s)" d="M17 22h11M17 28h11M17 34h7"/></g>
+<g transform="rotate(9 49 29)"><rect style="fill:var(--p);stroke:var(--s)" x="38" y="14" width="22" height="30" rx="2"/><path style="stroke:var(--s)" d="M43 22h11M43 28h11M43 34h7"/></g>
+<path style="stroke:var(--a)" d="M22 50c6-6 22-6 28 0M46 46l4 4-5 2"/>
+</symbol>
+<!-- A calendar page with one day marked and an arrow coming round to it: come back later. -->
+<symbol id="calendar" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="30" ry="20"/>
+<rect style="fill:var(--p);stroke:var(--s)" x="16" y="14" width="34" height="32" rx="3"/>
+<path style="stroke:var(--s)" d="M16 22h34M24 10v7M42 10v7"/>
+<g style="fill:var(--s)"><circle cx="24" cy="30" r="2.2"/><circle cx="33" cy="30" r="2.2"/><circle cx="24" cy="38" r="2.2"/></g>
+<circle style="fill:var(--a)" cx="42" cy="38" r="3.4"/>
+<path style="stroke:var(--a)" d="M54 44c6-6 5-16-2-21M52 18l0 5 5 1"/>
+</symbol>
+<!-- Two stacked triads on a staff, the second in the accent: three notes as one shape. -->
+<symbol id="triad" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M8 20h56M8 26h56M8 32h56M8 38h56M8 44h56"/>
+<g style="fill:var(--s)"><ellipse cx="30" cy="41" rx="4.6" ry="3.4" transform="rotate(-20 30 41)"/><ellipse cx="30" cy="35" rx="4.6" ry="3.4" transform="rotate(-20 30 35)"/><ellipse cx="30" cy="29" rx="4.6" ry="3.4" transform="rotate(-20 30 29)"/></g>
+<path style="stroke:var(--s);stroke-width:1.8" d="M34.4 40V18"/>
+<g style="fill:var(--a)"><ellipse cx="48" cy="38" rx="4.6" ry="3.4" transform="rotate(-20 48 38)"/><ellipse cx="48" cy="32" rx="4.6" ry="3.4" transform="rotate(-20 48 32)"/><ellipse cx="48" cy="26" rx="4.6" ry="3.4" transform="rotate(-20 48 26)"/></g>
+</symbol>
+<!-- A treble clef and one note on the staff: how the music is written down. -->
+<symbol id="staff" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M10 20h52M10 26h52M10 32h52M10 38h52M10 44h52"/>
+<path style="stroke:var(--s)" d="M20 48c-6-2-6-11 1-12 5-1 7 5 3 8-4 3-9-1-8-6l6-26c1-4 5-3 4 1-1 6-9 10-9 17"/>
+<ellipse style="fill:var(--a)" cx="44" cy="35" rx="4.6" ry="3.4" transform="rotate(-20 44 35)"/>
+<path style="stroke:var(--a)" d="M48.4 34V18"/>
+</symbol>
+<!-- An accent and a fermata: the marks a score carries besides its notes. -->
+<symbol id="marks" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<path style="stroke:var(--s)" d="M14 40l20-6-20-6M42 40c4-5 12-5 16 0"/>
+<circle style="fill:var(--s)" cx="46" cy="28" r="3"/>
+<circle style="fill:var(--a)" cx="50" cy="42" r="2.4"/>
+</symbol>
+<!-- Five white keys and their three black ones, with C found: meet the keyboard. -->
+<symbol id="keys" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<rect style="fill:var(--p);stroke:var(--s)" x="10" y="16" width="52" height="30" rx="3"/>
+<path style="stroke:var(--s)" d="M20.4 16v30M30.8 16v30M41.2 16v30M51.6 16v30"/>
+<g style="fill:var(--s)"><rect x="17.4" y="16" width="6" height="17" rx="1"/><rect x="27.8" y="16" width="6" height="17" rx="1"/><rect x="48.6" y="16" width="6" height="17" rx="1"/></g>
+<circle style="fill:var(--a)" cx="15.2" cy="40" r="3.2"/>
+</symbol>
+<!-- Three graded books, each taller than the last, the middle one picked out: find your
+     level. -->
+<symbol id="books" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="30" ry="20"/>
+<g style="fill:var(--p);stroke:var(--s)"><rect x="16" y="26" width="11" height="22" rx="1.5"/><rect x="45" y="12" width="11" height="36" rx="1.5"/></g>
+<rect style="fill:var(--a);stroke:var(--s)" x="30.5" y="19" width="11" height="29" rx="1.5"/>
+<path style="stroke:var(--s)" d="M10 48h52M19 32h5M33.5 25h5M48 18h5M48 23h5"/>
+</symbol>
+<!-- A tuning fork, ringing: train the ear. -->
+<symbol id="tuningFork" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="33" rx="30" ry="20"/>
+<path style="stroke:var(--s)" d="M30 9v21a6 6 0 0 0 12 0V9M36 36v11"/>
+<circle style="fill:var(--s)" cx="36" cy="49" r="2.6"/>
+<path style="stroke:var(--a)" d="M23 15c-3 4-3 10 0 14M49 15c3 4 3 10 0 14M17 12c-5 6-5 14 0 20M55 12c5 6 5 14 0 20"/>
+</symbol>
+<!-- A bar of rhythm on one line, a tap under every note: no notes to find, only when. -->
+<symbol id="rhythm" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="19"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M8 36h56"/>
+<g style="fill:var(--s)"><ellipse cx="16" cy="36" rx="4.6" ry="3.4" transform="rotate(-20 16 36)"/><ellipse cx="30" cy="36" rx="4.6" ry="3.4" transform="rotate(-20 30 36)"/><ellipse cx="42" cy="36" rx="4.6" ry="3.4" transform="rotate(-20 42 36)"/><ellipse cx="56" cy="36" rx="4.6" ry="3.4" transform="rotate(-20 56 36)"/><rect x="33.3" y="14" width="14.2" height="3.6" rx="1"/></g>
+<path style="stroke:var(--s);stroke-width:1.8" d="M20.4 35V16M34.4 35V16M46.4 35V16M60.4 35V16"/>
+<g style="fill:var(--a)"><circle cx="16" cy="46" r="2.2"/><circle cx="30" cy="46" r="2.2"/><circle cx="42" cy="46" r="2.2"/><circle cx="56" cy="46" r="2.2"/></g>
+</symbol>
+<!-- A pencil, the one every score on a stand has beside it: little tools. -->
+<symbol id="pencil" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M8 40h22M8 46h22"/>
+<g transform="rotate(-38 38 28)">
+<rect style="fill:var(--p);stroke:var(--s)" x="26" y="24" width="30" height="8" rx="1.5"/>
+<path style="fill:var(--p);stroke:var(--s)" d="M26 24 15 28l11 4z"/>
+<path style="fill:var(--s)" d="M18.6 26.7 15 28l3.6 1.3z"/>
+<rect style="fill:var(--a);stroke:var(--s)" x="56" y="24" width="7" height="8" rx="2"/>
+</g>
+</symbol>
+<!-- A clipboard with a list, two of its three done: a set of pieces to work through. -->
+<symbol id="setList" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="30" ry="20"/>
+<g style="fill:var(--p);stroke:var(--s)"><rect x="18" y="9" width="36" height="41" rx="3"/><rect x="29" y="5" width="14" height="7" rx="2"/></g>
+<path style="stroke:var(--s)" d="M36 20.5h11M36 30.5h11M36 40.5h7"/>
+<g style="stroke:var(--s)"><rect x="24" y="17.5" width="6" height="6" rx="1"/><rect x="24" y="27.5" width="6" height="6" rx="1"/><rect x="24" y="37.5" width="6" height="6" rx="1"/></g>
+<path style="stroke:var(--a)" d="M24.5 20.5l2 2.2 4.5-5.5M24.5 30.5l2 2.2 4.5-5.5"/>
+</symbol>
+<!-- A sealed envelope arriving: the codes that come back. -->
+<symbol id="envelope" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="38" cy="32" rx="30" ry="20"/>
+<rect style="fill:var(--p);stroke:var(--s)" x="18" y="17" width="40" height="28" rx="3"/>
+<path style="stroke:var(--s)" d="M18.5 18.5 38 33l19.5-14.5"/>
+<circle style="fill:var(--a);stroke:var(--s)" cx="38" cy="33" r="4.2"/>
+<path style="stroke:var(--a)" d="M5 25h7M3 31h9M5 37h7"/>
+</symbol>
+<!-- The circle of fifths: two rings, a key at every hour, the top one lit. -->
+<symbol id="circle" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<circle style="fill:var(--p)" cx="36" cy="28" r="20"/>
+<path style="fill:var(--a)" d="M30.82 8.68A20 20 0 0 1 41.18 8.68L38.85 17.38A11 11 0 0 0 33.15 17.38Z"/>
+<g style="stroke:var(--s)"><circle cx="36" cy="28" r="20"/><circle cx="36" cy="28" r="11"/></g>
+<g style="fill:var(--s)"><circle cx="36" cy="12.5" r="1.4"/><circle cx="43.75" cy="14.58" r="1.4"/><circle cx="49.42" cy="20.25" r="1.4"/><circle cx="51.5" cy="28" r="1.4"/><circle cx="49.42" cy="35.75" r="1.4"/><circle cx="43.75" cy="41.42" r="1.4"/><circle cx="36" cy="43.5" r="1.4"/><circle cx="28.25" cy="41.42" r="1.4"/><circle cx="22.58" cy="35.75" r="1.4"/><circle cx="20.5" cy="28" r="1.4"/><circle cx="22.58" cy="20.25" r="1.4"/><circle cx="28.25" cy="14.58" r="1.4"/></g>
+</symbol>
+<!-- Notes climbing a step at a time, the last one arrived: a scale. -->
+<symbol id="scale" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M8 20h56M8 26h56M8 32h56M8 38h56M8 44h56"/>
+<g style="fill:var(--s)"><ellipse cx="14" cy="44" rx="4.6" ry="3.4" transform="rotate(-20 14 44)"/><ellipse cx="24.5" cy="41" rx="4.6" ry="3.4" transform="rotate(-20 24.5 41)"/><ellipse cx="35" cy="38" rx="4.6" ry="3.4" transform="rotate(-20 35 38)"/><ellipse cx="45.5" cy="35" rx="4.6" ry="3.4" transform="rotate(-20 45.5 35)"/></g>
+<ellipse style="fill:var(--a)" cx="56" cy="32" rx="4.6" ry="3.4" transform="rotate(-20 56 32)"/>
+</symbol>
+<!-- Three chords on a staff with the way from each to the next: chord changes. -->
+<symbol id="changes" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M8 20h56M8 26h56M8 32h56M8 38h56M8 44h56"/>
+<g style="fill:var(--s)"><ellipse cx="16" cy="41" rx="4.6" ry="3.4" transform="rotate(-20 16 41)"/><ellipse cx="16" cy="35" rx="4.6" ry="3.4" transform="rotate(-20 16 35)"/><ellipse cx="16" cy="29" rx="4.6" ry="3.4" transform="rotate(-20 16 29)"/><ellipse cx="36" cy="38" rx="4.6" ry="3.4" transform="rotate(-20 36 38)"/><ellipse cx="36" cy="32" rx="4.6" ry="3.4" transform="rotate(-20 36 32)"/><ellipse cx="36" cy="26" rx="4.6" ry="3.4" transform="rotate(-20 36 26)"/><ellipse cx="56" cy="35" rx="4.6" ry="3.4" transform="rotate(-20 56 35)"/><ellipse cx="56" cy="29" rx="4.6" ry="3.4" transform="rotate(-20 56 29)"/><ellipse cx="56" cy="23" rx="4.6" ry="3.4" transform="rotate(-20 56 23)"/></g>
+<path style="stroke:var(--a)" d="M18 14c4-5 12-5 16 0M38 11c4-5 12-5 16 0M30 11l4 3-4 2M50 8l4 3-4 2"/>
+</symbol>
+<!-- Two notes and the bracket that measures the distance between them: an interval. -->
+<symbol id="interval" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="32" rx="31" ry="20"/>
+<path style="stroke:var(--s);stroke-width:1.3;opacity:.75" d="M8 20h56M8 26h56M8 32h56M8 38h56M8 44h56"/>
+<g style="fill:var(--s)"><ellipse cx="22" cy="41" rx="4.6" ry="3.4" transform="rotate(-20 22 41)"/><ellipse cx="38" cy="26" rx="4.6" ry="3.4" transform="rotate(-20 38 26)"/></g>
+<path style="stroke:var(--a)" d="M50 26h6v15h-6"/>
+</symbol>
+<!-- A stopwatch that has just been started: a tempo read off your own tapping. -->
+<symbol id="stopwatch" viewBox="0 0 72 56" style="--s:var(--art-stroke,var(--color-art-stroke));--g:var(--art-fill,var(--color-art-ground));--a:var(--art-accent,var(--color-art-accent));--p:var(--art-paper,var(--color-art-paper));fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">
+<ellipse style="fill:var(--g)" cx="36" cy="33" rx="30" ry="20"/>
+<circle style="fill:var(--p);stroke:var(--s)" cx="36" cy="32" r="15"/>
+<path style="fill:var(--a)" d="M36 32V20A12 12 0 0 1 44.49 23.51Z"/>
+<path style="stroke:var(--s)" d="M36 17v-5M31 11h10M47.5 20.5l3-3M36 32l8.49-8.49"/>
+<circle style="fill:var(--s)" cx="36" cy="32" r="2"/>
+</symbol>
+</svg>
