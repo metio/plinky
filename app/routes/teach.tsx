@@ -5,7 +5,6 @@ import { ListIcon, UploadIcon } from "../components/ui/icons";
 import { HubList } from "../components/ui/hubList";
 import { PageHeader } from "../components/ui/pageHeader";
 import { routeMeta, webPageData } from "../../core/site";
-import { useSynth } from "../hooks/useSynth";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/teach";
@@ -36,21 +35,16 @@ const ENTRIES = [
         label: m.home_assignments,
         blurb: m.home_assignments_blurb,
         Icon: ListIcon,
-        note: 72,
     },
     {
         to: "/collect",
         label: m.collect_title,
         blurb: m.collect_intro,
         Icon: UploadIcon,
-        note: 74,
     },
 ];
 
 export default function TeachRoute() {
-    const synth = useSynth();
-    const play = (note: number) =>
-        synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true });
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.teach_title()} hint={m.teach_intro()} />
@@ -61,7 +55,6 @@ export default function TeachRoute() {
                     label: entry.label(),
                     blurb: entry.blurb(),
                 }))}
-                onEnter={play}
             />
         </main>
     );
