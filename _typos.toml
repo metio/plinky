@@ -98,8 +98,13 @@ objekt = "objekt"
 # dev/promo/pieces.mjs is the same shape: a hand-kept list pairing those ids with the piece
 # titles and composer names the corpora use, so it carries both the letter runs
 # ("xrKmwOtUbwed") and real-world names in several languages.
+#
+# dev/help-shots.json is the help pictures' ledger: one content hash per language, rewritten
+# by every `npm run help:shots`. Its hex runs read as misspellings ("5aadd…" as "add"), and
+# each re-shoot draws new ones, so it would fail the gate at random.
 [files]
 extend-exclude = [
+    "dev/help-shots.json",
     "dev/catalog-curation.json",
     "dev/catalog-excluded.json",
     "dev/catalog-duplicates.json",
