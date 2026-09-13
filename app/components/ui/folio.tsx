@@ -43,7 +43,12 @@ export function Folio({
     children: ReactNode;
 }) {
     return (
-        <ul aria-label={label} className={`grid ${LIST_COLUMNS} ${GUTTER} ${className}`}>
+        // content-start, here and on each row: a list set beside something taller (the
+        // lesson index) must not stretch its rows and spread their contents apart.
+        <ul
+            aria-label={label}
+            className={`grid content-start ${LIST_COLUMNS} ${GUTTER} ${className}`}
+        >
             <InList.Provider value={true}>{children}</InList.Provider>
         </ul>
     );
@@ -105,7 +110,7 @@ export function FolioRow({
     const columns = inList ? "col-span-2 grid-cols-subgrid" : OWN_COLUMNS;
     const rule = "border-t border-line last:border-b";
     const bare = name === undefined && line === undefined && trailing === undefined;
-    const grid = `grid ${columns} ${GUTTER} ${PAD[size]} ${children && !bare ? "sm:py-6" : ""}`;
+    const grid = `grid content-start ${columns} ${GUTTER} ${PAD[size]} ${children && !bare ? "sm:py-6" : ""}`;
     const Name = heading ?? "span";
     // Inside a link a paragraph is not allowed to stand, so the line is a span there.
     const Line = to ? "span" : "p";
