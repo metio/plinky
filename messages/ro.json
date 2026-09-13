@@ -1534,6 +1534,7 @@
     "practice_longest_day": "Cea mai lungă zi: {date}, {time}.",
     "practice_of_which_by_hand": "{count} dintre acestea le-ai notat tu.",
     "practice_empty": "Încă nimic pentru perioada asta. Cântă ceva sau adaugă timpul petrecut la pian.",
+    "practice_untimed": "Notele sunt numărate, dar pentru perioada asta nu e înregistrat niciun timp. Adaugă timpul petrecut la pian, dacă vrei să-l vezi aici.",
     "practice_sessions": "Ședințe recente",
     "practice_session_measured": "măsurat",
     "practice_session_by_hand": "notat manual",

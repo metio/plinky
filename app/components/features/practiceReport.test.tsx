@@ -38,6 +38,12 @@ describe("PracticeReport", () => {
         expect(screen.getByText(m.practice_empty())).toBeTruthy();
     });
 
+    it("says the time is missing, not that nothing happened, when notes were counted", () => {
+        renderWithServices(<PracticeReport days={30} played />);
+        expect(screen.queryByText(m.practice_empty())).toBeNull();
+        expect(screen.getByText(m.practice_untimed())).toBeTruthy();
+    });
+
     it("reports the time a run contributed", () => {
         mount((store) => store.record({ at: Date.now(), activeMs: 25 * MINUTE, notes: 120 }));
         expect(screen.getAllByText(m.practice_m({ minutes: 25 })).length).toBeGreaterThan(0);

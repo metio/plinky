@@ -1508,6 +1508,7 @@
     "practice_longest_day": "Pisin päivä: {date}, {time}.",
     "practice_of_which_by_hand": "Näistä {count} kirjasit itse.",
     "practice_empty": "Tältä jaksolta ei ole vielä mitään. Soita jotain, tai lisää pianon ääressä viettämääsi aikaa.",
+    "practice_untimed": "Nuotit on laskettu, mutta tältä jaksolta ei ole kirjattu aikaa. Lisää pianon ääressä viettämäsi aika, jos haluat sen näkyvän tässä.",
     "practice_sessions": "Viimeisimmät harjoituskerrat",
     "practice_session_measured": "mitattu",
     "practice_session_by_hand": "itse kirjattu",

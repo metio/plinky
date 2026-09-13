@@ -1518,6 +1518,7 @@
     "practice_longest_day": "Longest day: {date}, {time}.",
     "practice_of_which_by_hand": "{count} of these you logged by hand.",
     "practice_empty": "Nothing here yet for this period. Play something, or add time you spent at the piano.",
+    "practice_untimed": "The notes are counted, but no time was logged for this period. Add the time you spent at the piano if you want it here.",
     "practice_sessions": "Recent sittings",
     "practice_session_measured": "measured",
     "practice_session_by_hand": "logged by hand",

@@ -1507,6 +1507,7 @@
     "practice_longest_day": "En uzun gün: {date}, {time}.",
     "practice_of_which_by_hand": "Bunların {count} kadarını kendin girdin.",
     "practice_empty": "Bu dönem için henüz bir şey yok. Bir şeyler çal ya da piyano başında geçirdiğin süreyi kendin ekle.",
+    "practice_untimed": "Notalar sayıldı ama bu dönem için süre kaydedilmedi. Burada görmek istersen piyano başında geçirdiğin süreyi ekle.",
     "practice_sessions": "Son oturuşlar",
     "practice_session_measured": "ölçüldü",
     "practice_session_by_hand": "elle girildi",

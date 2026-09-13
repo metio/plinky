@@ -1480,6 +1480,7 @@
     "practice_longest_day": "いちばん長かった日：{date}、{time}。",
     "practice_of_which_by_hand": "そのうち {count} は自分で記録した分です。",
     "practice_empty": "この期間はまだ何もありません。何か弾いてみるか、ピアノに向かった時間を書き足せます。",
+    "practice_untimed": "音符は数えられていますが、この期間の時間は記録されていません。よければ、ピアノに向かった時間をここに書き足せます。",
     "practice_sessions": "最近の練習",
     "practice_session_measured": "計測",
     "practice_session_by_hand": "手入力",

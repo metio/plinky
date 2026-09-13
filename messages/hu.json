@@ -1507,6 +1507,7 @@
     "practice_longest_day": "Leghosszabb nap: {date}, {time}.",
     "practice_of_which_by_hand": "Ebből {count} kézzel került be.",
     "practice_empty": "Ebben az időszakban még nincs semmi. Játssz valamit, vagy add hozzá a zongoránál töltött időt.",
+    "practice_untimed": "A hangok megvannak, de erre az időszakra nincs rögzített idő. Add hozzá a zongoránál töltött időt, ha itt szeretnéd látni.",
     "practice_sessions": "Legutóbbi alkalmak",
     "practice_session_measured": "mérve",
     "practice_session_by_hand": "kézzel felírva",

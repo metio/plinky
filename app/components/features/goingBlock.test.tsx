@@ -114,6 +114,21 @@ describe("the block behind the period dial", () => {
         expect(screen.queryAllByText(m.practice_m({ minutes: 40 }))).toHaveLength(0);
     });
 
+    it("says no time was logged, not that nothing happened, when the period has notes", () => {
+        // The notes and the sittings are two records: a removed sitting, or notes played
+        // before the diary existed, leave notes counted with no time beside them.
+        mount();
+        expect(screen.getByText("1,040")).toBeTruthy();
+        expect(screen.queryByText(m.practice_empty())).toBeNull();
+        expect(screen.getByText(m.practice_untimed())).toBeTruthy();
+    });
+
+    it("says the period is empty when nothing was played in it", () => {
+        mount({ "2025-06-02": 500 });
+        expect(screen.getByText(m.practice_empty())).toBeTruthy();
+        expect(screen.queryByText(m.practice_untimed())).toBeNull();
+    });
+
     it("draws no heading of its own — the question above it is the heading", () => {
         // Two headings for one thing is what made the page read as a stack of sections
         // rather than a set of answers.

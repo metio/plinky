@@ -1508,6 +1508,7 @@
     "practice_longest_day": "Længste dag: {date}, {time}.",
     "practice_of_which_by_hand": "{count} af dem har du selv skrevet ind.",
     "practice_empty": "Der er ikke noget her endnu i denne periode. Spil noget, eller skriv den tid ind, du har siddet ved klaveret.",
+    "practice_untimed": "Tonerne er talt med, men der er ikke skrevet nogen tid ind for denne periode. Skriv den tid ind, du har siddet ved klaveret, hvis du vil have den med her.",
     "practice_sessions": "Seneste øvegange",
     "practice_session_measured": "målt",
     "practice_session_by_hand": "skrevet ind",

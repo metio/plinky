@@ -245,7 +245,13 @@ export function PracticeReport({
     now = new Date(),
     days,
     headed = true,
+    played = false,
 }: {
+    // Whether notes were counted over the same period. The note tally and this diary are
+    // two records: a sitting the player removed, or notes played before the diary existed,
+    // leave notes with no time beside them. An empty diary then says the time is missing
+    // rather than that nothing happened, which the figures beside it would contradict.
+    played?: boolean;
     // How many days to report on, counting today. Passed by the You page, whose scope dial
     // governs every figure on it — the report then draws no range control of its own,
     // because two controls for one question is the mess the page had.
@@ -306,7 +312,9 @@ export function PracticeReport({
             )}
 
             {report.sessions === 0 ? (
-                <p className="text-sm text-muted">{m.practice_empty()}</p>
+                <p className="text-sm text-muted">
+                    {played ? m.practice_untimed() : m.practice_empty()}
+                </p>
             ) : (
                 <>
                     <Totals report={report} />
