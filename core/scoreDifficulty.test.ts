@@ -619,6 +619,57 @@ describe("otherHandAt", () => {
     });
 });
 
+describe("a note the other hand is still holding", () => {
+    it("keeps that hand busy until it is released", () => {
+        const bass = { positions: [[36]], onsets: [0], ends: [4] };
+        expect(otherHandAt([0, 2, 4], bass)).toEqual([[36], [36], []]);
+    });
+
+    it("holds a chord until its longest note is released", () => {
+        // divisions=1. The treble holds C5 for two beats with E5 over it for four; the bass
+        // holds a whole note under both.
+        const xml =
+            `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">` +
+            `<attributes><divisions>1</divisions><staves>2</staves></attributes>` +
+            `<note><pitch><step>C</step><octave>5</octave></pitch><duration>2</duration><staff>1</staff></note>` +
+            `<note><chord/><pitch><step>E</step><octave>5</octave></pitch><duration>4</duration><staff>1</staff></note>` +
+            `<backup><duration>2</duration></backup>` +
+            `<note><pitch><step>C</step><octave>3</octave></pitch><duration>4</duration><staff>2</staff></note>` +
+            `</measure></part></score-partwise>`;
+        const { ends } = parsePositions(domXmlCodec, xml);
+        expect(ends.right).toEqual([4]);
+        expect(ends.left).toEqual([4]);
+    });
+
+    it("finds the bass hand busy under a wide treble chord while it holds a note", () => {
+        // The treble strikes C4 and E5 together on beat 2, wider than a hand. The bass struck
+        // C2 on beat 0: held for the bar, it is still under that hand; released after two
+        // beats, the hand is free.
+        const bar = (bass: string) =>
+            `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">` +
+            `<attributes><divisions>1</divisions><staves>2</staves></attributes>` +
+            `<note><rest/><duration>2</duration><staff>1</staff></note>` +
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><staff>1</staff></note>` +
+            `<note><chord/><pitch><step>E</step><octave>5</octave></pitch><duration>2</duration><staff>1</staff></note>` +
+            `<backup><duration>4</duration></backup>${bass}` +
+            `</measure></part></score-partwise>`;
+        const c2 = (beats: number) =>
+            `<note><pitch><step>C</step><octave>2</octave></pitch><duration>${beats}</duration><staff>2</staff></note>`;
+        const underTreble = (xml: string) => {
+            const hands = parsePositions(domXmlCodec, xml);
+            return otherHandAt(hands.onsets.right, {
+                positions: hands.left,
+                onsets: hands.onsets.left,
+                ends: hands.ends.left,
+            });
+        };
+        expect(underTreble(bar(c2(4)))).toEqual([[36]]);
+        expect(
+            underTreble(bar(`${c2(2)}<note><rest/><duration>2</duration><staff>2</staff></note>`)),
+        ).toEqual([[]]);
+    });
+});
+
 describe("a staff that writes more than one hand can span", () => {
     // Mozart K.331, Variation 4, in miniature: the right staff alternates E4 with its own
     // thirds plus the crossing thirds an octave up. Whether the left hand is free to take
@@ -638,9 +689,16 @@ describe("a staff that writes more than one hand can span", () => {
             .join("")
             .replaceAll("<duration>2</duration>", "<duration>1</duration>") +
         `<backup><duration>8</duration></backup>${bass}</measure></part></score-partwise>`;
-    // The same four bass notes either way, two beats each: on the beats with E4, or pushed
-    // a beat later onto the wide positions. Nothing but the coincidence differs.
-    const bass = [0, 1, 2, 3].map(() => note("A", 2, 2)).join("");
+    // The same four bass notes either way, a beat each with a beat's rest after: on the beats
+    // with E4 and released before the wide positions, or pushed a beat later onto them.
+    // Nothing but the coincidence differs.
+    const bass = [0, 1, 2, 3]
+        .map(
+            () =>
+                `<note><pitch><step>A</step><octave>2</octave></pitch><duration>1</duration><staff>2</staff></note>` +
+                `<note><rest/><duration>1</duration><staff>2</staff></note>`,
+        )
+        .join("");
     const withE = bass;
     const withChords = `<forward><duration>1</duration></forward>${bass}`;
 
@@ -678,6 +736,7 @@ describe("the difficulty terms a fingering cost cannot see", () => {
             left: [],
             gaps: { right: [], left: [] },
             onsets: { right: [], left: [] },
+            ends: { right: [], left: [] },
         });
         // Nothing for a score at or under the beginner floor.
         expect(readLength(hands(64))).toBe(0);

@@ -33,6 +33,9 @@ export type Hands = {
     // tells whether the other hand is striking at the same moment. NaN where the timeline
     // places nothing, which is every note of a score written measure by measure.
     onsets: { right: number[]; left: number[] };
+    // Where each position stops sounding, on the same count: when its longest note is
+    // released. A hand still holding a note is not free to take another.
+    ends: { right: number[]; left: number[] };
 };
 
 const noHands = (): Hands => ({
@@ -40,6 +43,7 @@ const noHands = (): Hands => ({
     left: [],
     gaps: { right: [], left: [] },
     onsets: { right: [], left: [] },
+    ends: { right: [], left: [] },
 });
 
 // Split a score's notes into the two hands' position sequences (a position is a
@@ -63,11 +67,15 @@ export function parsePositions(codec: XmlCodec, xml: string): Hands {
 export function positionsOf(doc: Document): Hands {
     const counts = stavesPerPart(doc);
     const parts = partsOf(counts);
-    // Where each note sounds is read off the timeline Listen and Play walk rather than worked
-    // out again here. It starts every part's bar where the first part to reach that bar
-    // starts it, and carries the music on past a bar by its metre alone, so two parts that
-    // disagree about a short bar or an overlong rest still strike together.
-    const onsetOf = new Map(readTimeline(doc).notes.map((note) => [note.element, note.whole * 4]));
+    // Where each note sounds, and until when, is read off the timeline Listen and Play walk
+    // rather than worked out again here. It starts every part's bar where the first part to
+    // reach that bar starts it, and carries the music on past a bar by its metre alone, so
+    // two parts that disagree about a short bar or an overlong rest still strike together.
+    const spanOf = new Map(
+        readTimeline(doc).notes.map(
+            (note) => [note.element, [note.whole * 4, (note.whole + note.wholes) * 4]] as const,
+        ),
+    );
     const written = Array.from(
         doc.querySelectorAll("score-partwise > part, score-timewise > part"),
     );
@@ -81,7 +89,7 @@ export function positionsOf(doc: Document): Hands {
               }))
             : [{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 2 }];
 
-    const hands = collect(scanned, onsetOf, (note, offset) => {
+    const hands = collect(scanned, spanOf, (note, offset) => {
         const within = Number.parseInt(note.querySelector("staff")?.textContent?.trim() ?? "1", 10);
         const staff = offset + (Number.isInteger(within) && within > 0 ? within - 1 : 0);
         if (staff === parts.left) {
@@ -100,7 +108,7 @@ export function positionsOf(doc: Document): Hands {
     // the piece as the easiest thing in the catalogue and put it in front of a beginner,
     // so fall back to reading every staff, which is what this did before it knew about
     // parts and can never be worse than that.
-    return collect([{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 0 }], onsetOf, (note) =>
+    return collect([{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 0 }], spanOf, (note) =>
         note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right",
     );
 }
@@ -111,7 +119,7 @@ export function positionsOf(doc: Document): Hands {
 // staves across the whole score, so that running offset is what turns one into the other.
 function collect(
     groups: readonly { nodes: Iterable<Element>; staves: number }[],
-    onsetOf: ReadonlyMap<Element, number>,
+    spanOf: ReadonlyMap<Element, readonly [number, number]>,
     sideOf: (note: Element, offset: number) => "left" | "right" | null,
 ): Hands {
     const hands = noHands();
@@ -140,12 +148,17 @@ function collect(
                 timing[side].skip(seconds);
                 continue;
             }
+            const [onset, end] = spanOf.get(node) ?? [Number.NaN, Number.NaN];
             if (node.querySelector("chord") && hand.length > 0) {
                 hand[hand.length - 1]!.push(midi);
+                // A chord sounds until its longest note is released.
+                const ends = hands.ends[side];
+                ends[ends.length - 1] = Math.max(ends[ends.length - 1]!, end);
                 continue;
             }
             hands.gaps[side].push(timing[side].start(seconds));
-            hands.onsets[side].push(onsetOf.get(node) ?? Number.NaN);
+            hands.onsets[side].push(onset);
+            hands.ends[side].push(end);
             hand.push([midi]);
         }
         offset += group.staves;
@@ -158,39 +171,50 @@ function collect(
 // different road must still count as striking with the other.
 const SAME_MOMENT = 1e-6;
 
-// What the other hand strikes at the moment each of this hand's positions sounds: every
-// pitch of every one of its positions on that beat, and nothing when it strikes nothing.
-// Two voices on the other staff that land together both count. Where a position's moment
-// is unknown (NaN) so is the other hand, which reachingCost prices as one hand alone.
+// What the other hand is playing at the moment each of this hand's positions sounds: every
+// pitch of every one of its positions sounding then, struck on that beat or struck earlier
+// and still held, and nothing when it is silent. Two voices on the other staff both count.
+// A position given no end sounds at its own moment only. Where a position's moment is
+// unknown (NaN) so is the other hand, which reachingCost prices as one hand alone.
 export function otherHandAt(
     mine: readonly number[],
-    theirs: { positions: readonly number[][]; onsets: readonly number[] },
+    theirs: { positions: readonly number[][]; onsets: readonly number[]; ends?: readonly number[] },
 ): (number[] | undefined)[] {
     const order = theirs.onsets
         .map((_, at) => at)
         .filter((at) => !Number.isNaN(theirs.onsets[at]))
         .sort((a, b) => theirs.onsets[a]! - theirs.onsets[b]!);
     const sorted = order.map((at) => theirs.onsets[at]!);
+    const endOf = (at: number): number => {
+        const end = theirs.ends?.[at];
+        return end === undefined || Number.isNaN(end) ? theirs.onsets[at]! : end;
+    };
+    // How long before a moment a position still sounding in it can have been struck.
+    const longest = order.reduce((most, at) => Math.max(most, endOf(at) - theirs.onsets[at]!), 0);
     return mine.map((beat) => {
         if (Number.isNaN(beat)) {
             return undefined;
         }
-        // The first of theirs at or after this moment, less the tolerance.
+        // The first of theirs that can still be sounding at this moment, less the tolerance.
         let lo = 0;
         let hi = sorted.length;
         while (lo < hi) {
             const mid = (lo + hi) >> 1;
-            if (sorted[mid]! < beat - SAME_MOMENT) {
+            if (sorted[mid]! < beat - longest - SAME_MOMENT) {
                 lo = mid + 1;
             } else {
                 hi = mid;
             }
         }
-        const struck: number[] = [];
+        const playing: number[] = [];
         for (let k = lo; k < sorted.length && sorted[k]! <= beat + SAME_MOMENT; k++) {
-            struck.push(...theirs.positions[order[k]!]!);
+            const at = order[k]!;
+            // Struck at this moment, or struck before it and not yet released.
+            if (sorted[k]! >= beat - SAME_MOMENT || endOf(at) > beat + SAME_MOMENT) {
+                playing.push(...theirs.positions[at]!);
+            }
         }
-        return struck;
+        return playing;
     });
 }
 
@@ -202,7 +226,7 @@ export function otherHandAt(
 //
 // A position one hand cannot span is shared with the other hand where the other is free
 // for it (core/fingering's reachingCost), which is why each hand is priced beside what the
-// other strikes.
+// other is playing.
 function effortOf(hands: Hands): number {
     const notes = hands.right.length + hands.left.length;
     if (notes === 0) {
@@ -211,10 +235,12 @@ function effortOf(hands: Hands): number {
     const withLeft = otherHandAt(hands.onsets.right, {
         positions: hands.left,
         onsets: hands.onsets.left,
+        ends: hands.ends.left,
     });
     const withRight = otherHandAt(hands.onsets.left, {
         positions: hands.right,
         onsets: hands.onsets.right,
+        ends: hands.ends.right,
     });
     return (
         (reachingCost(hands.right, "right", hands.gaps.right, withLeft) +
