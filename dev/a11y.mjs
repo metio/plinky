@@ -2,10 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Accessibility gate. Serves the built site, drives Chromium with the theme
-// forced to A11Y_MODE (light or dark), and runs the full axe-core ruleset against
-// each prerendered page. Lighthouse only audits light mode, so running both modes
-// here is the only way dark-mode issues (contrast especially) get caught. Exits
-// non-zero on any violation.
+// forced to A11Y_MODE (light, dark or black), and runs the full axe-core ruleset
+// against each prerendered page. Lighthouse only audits light mode, so running the
+// dark modes here is the only way dark-mode issues (contrast especially) get caught.
+// Exits non-zero on any violation.
+//
+// A11Y_PALETTE sweeps a palette other than the default (core/theme.ts), e.g.
+// `A11Y_PALETTE=violet A11Y_MODE=light node dev/a11y.mjs` over an existing build. CI
+// sweeps the default palette; dev/tokenContrast.test.mts measures every palette and the
+// black mode at the token level.
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import lighthouserc from "../lighthouserc.js";
@@ -21,7 +26,11 @@ requireSingleLocaleBuild("the a11y gate");
 
 const ROOT = "build/client";
 const PORT = Number(process.env.PORT) || 8099;
-const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
+const MODE = ["light", "black"].includes(process.env.A11Y_MODE) ? process.env.A11Y_MODE : "dark";
+const PALETTE = process.env.A11Y_PALETTE || null;
+// The theme as the app stores it; an unset palette leaves the app to its default.
+const THEME = PALETTE === null ? { mode: MODE } : { palette: PALETTE, mode: MODE };
+const LABEL = PALETTE === null ? MODE : `${PALETTE} ${MODE}`;
 // One canonical page list, shared with the Lighthouse gate (lighthouserc.json), so the
 // two audits always cover exactly the same set and can't drift — add a page in one
 // place and both pick it up. Strip the host to get each prerendered path; the URLs are
@@ -45,24 +54,33 @@ const browser = await chromium.launch({
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
 });
 let total = 0;
-console.log(`axe (${MODE} mode):`);
+console.log(`axe (${LABEL} mode):`);
 for (const path of PAGES) {
     // Reduced motion, so axe measures each page at rest. The landing keyboard fades its keys
     // in one after another over most of a second, and a key caught half-faded fails contrast
     // or passes it depending on how fast the page loaded — a sweep that measures a frame
     // rather than the page. Every animation here already stands down under this preference.
-    const ctx = await browser.newContext({ colorScheme: MODE, reducedMotion: "reduce" });
+    const ctx = await browser.newContext({
+        colorScheme: MODE === "light" ? "light" : "dark",
+        reducedMotion: "reduce",
+    });
     const page = await ctx.newPage();
-    await page.addInitScript((mode) => {
+    await page.addInitScript((theme) => {
         try {
-            localStorage.setItem("plinky:theme", JSON.stringify(mode));
+            localStorage.setItem("plinky:theme", JSON.stringify(theme));
         } catch {}
-    }, MODE);
+    }, THEME);
     await page.goto(`http://localhost:${PORT}${path}`, { waitUntil: "networkidle" });
     await page
         .waitForFunction(
-            (dark) => document.documentElement.classList.contains("dark") === dark,
-            MODE === "dark",
+            (mode) => {
+                const classes = document.documentElement.classList;
+                return (
+                    classes.contains("dark") === (mode !== "light") &&
+                    classes.contains("black") === (mode === "black")
+                );
+            },
+            MODE,
             { timeout: 4000 },
         )
         .catch(() => {});
@@ -83,7 +101,7 @@ for (const path of PAGES) {
 }
 await browser.close();
 server.close();
-console.log(`TOTAL (${MODE}): ${total}`);
+console.log(`TOTAL (${LABEL}): ${total}`);
 // Pages the shell stood in for, because they were never built.
 const unbuilt = neverBuilt(PAGES, fellBack);
 if (unbuilt.length > 0) {
