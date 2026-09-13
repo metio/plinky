@@ -34,6 +34,12 @@ its left edge, its name, and a line about it, with a thin rule between one row a
 the next, like the contents page of a music book. On the Stats page every number
 sits at the start of its row, so the figures line up down the page.
 
+**Small drawings beside what you can learn.** Everything under Learn and Teach, and
+each of the little tools, now starts with a drawing of a thing a pianist keeps
+nearby: a stave, a tuning fork, a pencil, a stopwatch, a stack of graded books. They
+are drawn in the same hand as the ones on the front page's keys, and take on your
+colours, light or dark.
+
 ## 13 September 2026
 
 **A chord written for both hands is graded the way you play it.** Where one staff
