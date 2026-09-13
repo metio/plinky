@@ -1,16 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { HubList } from "../components/ui/hubList";
-import {
-    ArrowUpIcon,
-    BookIcon,
-    ClockIcon,
-    EarIcon,
-    KeysIcon,
-    ListIcon,
-    SlidersIcon,
-} from "../components/ui/icons";
+import { type HubEntry, HubList } from "../components/ui/hubList";
 import { routeMeta, webPageData } from "../../core/site";
 import { LESSONS } from "../../core/theoryCourse";
 import { m } from "../paraglide/messages.js";
@@ -45,19 +36,19 @@ export function meta(_args: Route.MetaArgs) {
 // Read the keyboard, then the music, then the marks — and only then find where you stand,
 // because the level a drill puts you at means little before you can read what it shows.
 // The extras follow.
-const ENTRIES = [
-    { to: "/basics", label: m.basics_title, blurb: m.basics_intro, Icon: KeysIcon },
+const ENTRIES: HubEntry[] = [
+    { to: "/basics", label: m.basics_title, blurb: m.basics_intro, drawing: "keys" },
     {
         to: "/theory",
         label: m.theory_title,
         blurb: () => m.theory_intro({ count: LESSONS.length }),
-        Icon: BookIcon,
+        drawing: "staff",
     },
-    { to: "/glossary", label: m.glossary_title, blurb: m.glossary_intro, Icon: ListIcon },
-    { to: "/placement", label: m.placement_title, blurb: m.placement_intro, Icon: ArrowUpIcon },
-    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon },
-    { to: "/rhythm", label: m.rhythm_title, blurb: m.rhythm_intro, Icon: ClockIcon },
-    { to: "/tools", label: m.tools_title, blurb: m.tools_intro, Icon: SlidersIcon },
+    { to: "/glossary", label: m.glossary_title, blurb: m.glossary_intro, drawing: "marks" },
+    { to: "/placement", label: m.placement_title, blurb: m.placement_intro, drawing: "books" },
+    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, drawing: "tuningFork" },
+    { to: "/rhythm", label: m.rhythm_title, blurb: m.rhythm_intro, drawing: "rhythm" },
+    { to: "/tools", label: m.tools_title, blurb: m.tools_intro, drawing: "pencil" },
 ];
 
 export default function Learn() {
@@ -65,13 +56,7 @@ export default function Learn() {
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.nav_learn()} hint={m.learn_intro()} />
 
-            <HubList
-                entries={ENTRIES.map((entry) => ({
-                    ...entry,
-                    label: entry.label(),
-                    blurb: entry.blurb(),
-                }))}
-            />
+            <HubList entries={ENTRIES} />
         </main>
     );
 }
