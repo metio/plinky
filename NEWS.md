@@ -28,6 +28,12 @@ to practise opens underneath, with why it works and a piece to try it on. A MIDI
 piano or your computer keys open them too. The long list of them further down the
 page is gone, and nothing plays a note any more when your mouse passes over a list.
 
+**Lists without boxes.** Lessons, tools, settings, your stats and the result of a run
+are no longer drawn as cards. Each is a row with an icon, a picture or a number at
+its left edge, its name, and a line about it, with a thin rule between one row and
+the next, like the contents page of a music book. On the Stats page every number
+sits at the start of its row, so the figures line up down the page.
+
 ## 13 September 2026
 
 **A chord written for both hands is graded the way you play it.** Where one staff

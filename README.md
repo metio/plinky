@@ -72,7 +72,7 @@ so every reading aid and layout choice is a tap away mid-piece without a row of 
 crowding the music.
 
 That setup panel — before a run and behind the full-screen **Set up** button alike —
-reads like the Settings page: each theme in its own titled card that explains itself.
+reads like the Settings page: each theme in its own titled row that explains itself.
 **Skill level** leads, one choice that sets the reading aids below to match you (tweak
 any and it reads Custom); then **how you play** (which hand, keep-up, the metronome),
 the **reading aids** (colour, the notes highway, hidden notes, finger numbers), the
