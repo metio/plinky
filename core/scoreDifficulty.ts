@@ -61,9 +61,6 @@ export function parsePositions(codec: XmlCodec, xml: string): Hands {
 // The same, off a document already open — what measureScore reads, so grade, cost and
 // incipit come off one parse of a score rather than one each.
 export function positionsOf(doc: Document): Hands {
-    const { right, left, gaps, onsets } = noHands();
-    // gaps: seconds from each position's onset to the one before it — how long the player
-    // has to get the hand there. gaps[0] is unused: nothing precedes the first position.
     const counts = stavesPerPart(doc);
     const parts = partsOf(counts);
     // Where each note sounds is read off the timeline Listen and Play walk rather than worked
@@ -84,48 +81,18 @@ export function positionsOf(doc: Document): Hands {
               }))
             : [{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 2 }];
 
-    // <staff> counts from 1 within its own part; partsOf names staves across the whole
-    // score. The running offset of the part a note sits in is what turns one into the
-    // other.
-    let offset = 0;
-    const clock = scoreClock();
-    const timing = { right: gapTracker(), left: gapTracker() };
-    for (const part of scanned) {
-        for (const node of part.nodes) {
-            const seconds = clock.read(node);
-            if (node.tagName !== "note") {
-                continue;
-            }
-            const note = node;
-            const within = Number.parseInt(
-                note.querySelector("staff")?.textContent?.trim() ?? "1",
-                10,
-            );
-            const staff = offset + (Number.isInteger(within) && within > 0 ? within - 1 : 0);
-            if (staff !== parts.right && staff !== parts.left) {
-                // Another instrument's line, or a singer's. Not the player's to read, so
-                // not part of how hard this is to play — but it still takes time off the
-                // clock, which is shared with the staves that are.
-                continue;
-            }
-            const side = staff === parts.left ? "left" : "right";
-            const hand = side === "left" ? left : right;
-            const midi = midiOf(note);
-            if (midi === null) {
-                // A rest, or something unpitched: no position, but the clock still runs
-                // and the hand is free to travel.
-                timing[side].skip(seconds);
-                continue;
-            }
-            if (note.querySelector("chord") && hand.length > 0) {
-                hand[hand.length - 1]!.push(midi);
-                continue;
-            }
-            gaps[side].push(timing[side].start(seconds));
-            onsets[side].push(onsetOf.get(note) ?? Number.NaN);
-            hand.push([midi]);
+    const hands = collect(scanned, onsetOf, (note, offset) => {
+        const within = Number.parseInt(note.querySelector("staff")?.textContent?.trim() ?? "1", 10);
+        const staff = offset + (Number.isInteger(within) && within > 0 ? within - 1 : 0);
+        if (staff === parts.left) {
+            return "left";
         }
-        offset += part.staves;
+        // Another instrument's line, or a singer's, is not the player's to read, so not
+        // part of how hard this is to play.
+        return staff === parts.right ? "right" : null;
+    });
+    if (hands.right.length > 0 || hands.left.length > 0) {
+        return hands;
     }
     // Nothing on the staves the model chose. Either it chose wrong — a six-staff
     // orchestral reduction filed as one "Piano" part, where the top two carry nothing —
@@ -133,33 +100,57 @@ export function positionsOf(doc: Document): Hands {
     // the piece as the easiest thing in the catalogue and put it in front of a beginner,
     // so fall back to reading every staff, which is what this did before it knew about
     // parts and can never be worse than that.
-    if (right.length === 0 && left.length === 0) {
-        const fallbackClock = scoreClock();
-        const fallbackTiming = { right: gapTracker(), left: gapTracker() };
-        for (const node of doc.querySelectorAll(TIMED_NODES)) {
-            const seconds = fallbackClock.read(node);
+    return collect([{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 0 }], onsetOf, (note) =>
+        note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right",
+    );
+}
+
+// One walk of a score's notes into the two hands. `sideOf` names the hand a note is for,
+// given where its part's first staff sits in the score-wide numbering, or null for a staff
+// that is not the player's. <staff> counts from 1 within its own part and partsOf names
+// staves across the whole score, so that running offset is what turns one into the other.
+function collect(
+    groups: readonly { nodes: Iterable<Element>; staves: number }[],
+    onsetOf: ReadonlyMap<Element, number>,
+    sideOf: (note: Element, offset: number) => "left" | "right" | null,
+): Hands {
+    const hands = noHands();
+    // gaps: seconds from each position's onset to the one before it — how long the player
+    // has to get the hand there. gaps[0] is unused: nothing precedes the first position.
+    const clock = scoreClock();
+    const timing = { right: gapTracker(), left: gapTracker() };
+    let offset = 0;
+    for (const group of groups) {
+        for (const node of group.nodes) {
+            // Every note takes time off the clock, a staff that is not the player's too,
+            // since the clock is shared with the staves that are.
+            const seconds = clock.read(node);
             if (node.tagName !== "note") {
                 continue;
             }
-            const note = node;
-            const side =
-                note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right";
-            const hand = side === "left" ? left : right;
-            const midi = midiOf(note);
-            if (midi === null) {
-                fallbackTiming[side].skip(seconds);
+            const side = sideOf(node, offset);
+            if (side === null) {
                 continue;
             }
-            if (note.querySelector("chord") && hand.length > 0) {
+            const hand = hands[side];
+            const midi = midiOf(node);
+            if (midi === null) {
+                // A rest, or something unpitched: no position, but the clock still runs
+                // and the hand is free to travel.
+                timing[side].skip(seconds);
+                continue;
+            }
+            if (node.querySelector("chord") && hand.length > 0) {
                 hand[hand.length - 1]!.push(midi);
                 continue;
             }
-            gaps[side].push(fallbackTiming[side].start(seconds));
-            onsets[side].push(onsetOf.get(note) ?? Number.NaN);
+            hands.gaps[side].push(timing[side].start(seconds));
+            hands.onsets[side].push(onsetOf.get(node) ?? Number.NaN);
             hand.push([midi]);
         }
+        offset += group.staves;
     }
-    return { right, left, gaps, onsets };
+    return hands;
 }
 
 // Beats this close together are one moment. A triplet's thirds and a quintuplet's fifths
@@ -203,26 +194,15 @@ export function otherHandAt(
     });
 }
 
-// One hand's effort over its positions. A position that hand cannot span is shared with
-// the other hand where the other is free for it (core/fingering's reachingCost), which is
-// why the other hand's strikes come in beside this one's positions.
-export function handEffort(
-    positions: number[][],
-    hand: "left" | "right",
-    gaps?: number[],
-    others?: readonly (readonly number[] | undefined)[],
-): number {
-    if (positions.length === 0) {
-        return 0;
-    }
-    return reachingCost(positions, hand, gaps, others);
-}
-
 // The playing effort of already-parsed hands: total fingering cost across both,
 // averaged over every note — so length doesn't inflate it and a short hard piece
 // outranks a long easy one. Returns 0 for no notes, which callers must read as
 // "nothing to measure" rather than "easiest", since a gentle in-hand line also
 // costs ~0.
+//
+// A position one hand cannot span is shared with the other hand where the other is free
+// for it (core/fingering's reachingCost), which is why each hand is priced beside what the
+// other strikes.
 function effortOf(hands: Hands): number {
     const notes = hands.right.length + hands.left.length;
     if (notes === 0) {
@@ -237,8 +217,8 @@ function effortOf(hands: Hands): number {
         onsets: hands.onsets.right,
     });
     return (
-        (handEffort(hands.right, "right", hands.gaps.right, withLeft) +
-            handEffort(hands.left, "left", hands.gaps.left, withRight)) /
+        (reachingCost(hands.right, "right", hands.gaps.right, withLeft) +
+            reachingCost(hands.left, "left", hands.gaps.left, withRight)) /
         notes
     );
 }
