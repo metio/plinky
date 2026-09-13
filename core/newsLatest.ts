@@ -21,6 +21,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A new logo.** Three keys on an indigo circle, with a note falling down the middle\none to strike it. It sits beside the name at the top of every page and is the icon in\nyour browser tab, and it keeps its own colours whichever ones you pick.",
                 twip: true,
             },
+            {
+                body: "**The keyboard on the front page is a way into practising.** Each of its seven white\nkeys carries one of the ways a teacher would suggest, with a small drawing on it:\nloop the hard bar, go slowly, one hand at a time, hear it first, mix pieces up, come\nback later, and learn the chords. A key still sounds when you press it, and its way\nto practise opens underneath, with why it works and a piece to try it on. A MIDI\npiano or your computer keys open them too. The long list of them further down the\npage is gone, and nothing plays a note any more when your mouse passes over a list.",
+                twip: true,
+            },
         ],
     },
     {
