@@ -376,54 +376,19 @@ export function fingerPositions(
     if (positions.length === 0) {
         return [];
     }
-    const orders = positions.map(ascendingOrder);
-    return ascendingFingers(
-        positions.map((pitches, at) => reorder(pitches, orders[at] ?? null)),
-        hand,
-        span,
-        gaps,
-    ).map((shape, at) => restore(shape, orders[at] ?? null));
-}
-
-function ascendingFingers(
-    positions: number[][],
-    hand: Hand,
-    span?: number,
-    gaps?: number[],
-): number[][] {
     const { spread, leap } = handModel(span);
-    let shapes = fingerSets(positions[0]!.length, hand);
-    let costs = shapes.map((fingers) => chordCost(positions[0]!, fingers, spread));
-    const chosen: number[][][] = [shapes];
-    const from: number[][] = [];
-    for (let i = 1; i < positions.length; i++) {
-        const pos = positions[i]!;
-        const prevPos = positions[i - 1]!;
-        const ease = gaps === undefined ? 1 : moveEase(gaps[i] ?? 0);
-        const previousShapes = shapes;
-        const previousCosts = costs;
-        const back: number[] = [];
-        shapes = fingerSets(pos.length, hand);
-        costs = shapes.map((fingers, at) => {
-            let best = Number.POSITIVE_INFINITY;
-            back[at] = 0;
-            previousCosts.forEach((previous, index) => {
-                const cost =
-                    previous +
-                    chordCost(pos, fingers, spread) +
-                    moveCost(prevPos, previousShapes[index]!, pos, fingers, hand, spread, leap) *
-                        ease;
-                if (cost < best) {
-                    best = cost;
-                    back[at] = index;
-                }
-            });
-            return best;
-        });
-        chosen.push(shapes);
-        from.push(back);
-    }
-    return readBack(costs, from).map((state, i) => chosen[i]![state]!);
+    const orders = positions.map(ascendingOrder);
+    // No other hand is known here, so each position offers only this hand's own fingerings.
+    const { path } = cheapestHolds(
+        positions.map((pitches, at) =>
+            holdsOf(reorder(pitches, orders[at] ?? null), hand, undefined, spread, leap),
+        ),
+        hand,
+        spread,
+        leap,
+        gaps,
+    );
+    return path.map((hold, at) => restore(hold.fingers, orders[at] ?? null));
 }
 
 // --- Positions wider than one hand -------------------------------------------
@@ -513,32 +478,63 @@ export function reachingCost(
         return 0;
     }
     const { spread, leap } = handModel();
-    const easeAt = (at: number): number => (gaps === undefined ? 1 : moveEase(gaps[at] ?? 0));
-    const holdAt = (at: number): Hold[] => {
-        const pitches = positions[at]!;
-        return holdsOf(reorder(pitches, ascendingOrder(pitches)), hand, others?.[at], spread, leap);
-    };
-    let holds = holdAt(0);
-    let costs = holds.map((hold) => hold.own);
-    for (let i = 1; i < positions.length; i++) {
-        const ease = easeAt(i);
-        const previous = holds;
+    return cheapestHolds(
+        positions.map((pitches, at) =>
+            holdsOf(reorder(pitches, ascendingOrder(pitches)), hand, others?.[at], spread, leap),
+        ),
+        hand,
+        spread,
+        leap,
+        gaps,
+    ).cost;
+}
+
+// The cheapest way through each position's holds, and what it costs: the one search both
+// fingerPositions and reachingCost run. A tie goes to the earlier hold, and a position's
+// whole-hand fingerings come first in fingerSets' order, so the trainer's suggestion breaks
+// ties toward the earlier finger.
+function cheapestHolds(
+    holds: readonly Hold[][],
+    hand: Hand,
+    spread: Record<number, number>,
+    leap: number,
+    gaps?: number[],
+): { path: Hold[]; cost: number } {
+    let costs = holds[0]!.map((hold) => hold.own);
+    const from: number[][] = [];
+    for (let i = 1; i < holds.length; i++) {
+        const ease = gaps === undefined ? 1 : moveEase(gaps[i] ?? 0);
+        const previous = holds[i - 1]!;
         const previousCosts = costs;
-        holds = holdAt(i);
-        costs = holds.map((hold) => {
+        const back: number[] = [];
+        costs = holds[i]!.map((hold, at) => {
             let best = Number.POSITIVE_INFINITY;
-            previous.forEach((from, at) => {
+            back[at] = 0;
+            previous.forEach((prior, index) => {
                 const cost =
-                    previousCosts[at]! +
+                    previousCosts[index]! +
                     hold.own +
-                    moveCost(from.kept, from.fingers, hold.kept, hold.fingers, hand, spread, leap) *
+                    moveCost(
+                        prior.kept,
+                        prior.fingers,
+                        hold.kept,
+                        hold.fingers,
+                        hand,
+                        spread,
+                        leap,
+                    ) *
                         ease;
                 if (cost < best) {
                     best = cost;
+                    back[at] = index;
                 }
             });
             return best;
         });
+        from.push(back);
     }
-    return Math.min(...costs);
+    return {
+        path: readBack(costs, from).map((state, i) => holds[i]![state]!),
+        cost: Math.min(...costs),
+    };
 }
