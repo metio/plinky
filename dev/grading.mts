@@ -10,6 +10,8 @@
 // not a cut of whatever has been harvested: a grade has to mean the same thing before and
 // after an import, or every import re-grades pieces a player has already worked on.
 
+import type { Reach, ReductionCosts } from "../core/reach.ts";
+import { THINNINGS } from "../core/reduction.ts";
 import { MAX_GRADE, parsePositions, pieceBoundaries } from "../core/scoreDifficulty.ts";
 import type { XmlCodec } from "../core/xml.ts";
 
@@ -43,4 +45,32 @@ export function gradeForCost(cost: number, boundaries: number[]): number {
         grade += 1;
     }
     return grade;
+}
+
+// The ways into a piece that is above where somebody is: each reduction that grades easier
+// than the piece as written, mildest first, read off the costs dev/measureReach stores.
+//
+// This is the whole reason a reduction is worth showing rather than hiding behind a toggle.
+// A piece two grades out of reach reads as "not yet" and nothing more, when the truth is
+// usually that the tune is well within reach and the filling is not. Measuring says so
+// exactly — "Grade 5 as written, Grade 2 with the inner notes out" — in the same numbers
+// the rest of the app grades in, because it is the same model and the same boundaries.
+//
+// Where two reductions land on the same grade only the milder is offered: they get you to
+// the same place, and the one that takes less out is closer to the piece.
+export function reachOf(costs: ReductionCosts, written: number, boundaries: number[]): Reach {
+    const reach: Reach = {};
+    const seen = new Set<number>();
+    for (const level of THINNINGS) {
+        const cost = costs[level];
+        if (cost === undefined) {
+            continue;
+        }
+        const grade = gradeForCost(cost, boundaries);
+        if (grade < written && !seen.has(grade)) {
+            seen.add(grade);
+            reach[level] = grade;
+        }
+    }
+    return reach;
 }

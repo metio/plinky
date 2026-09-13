@@ -4,7 +4,16 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { stavesPerPart } from "../core/accompaniment.ts";
-import { crowdedGrade, layoutOf, probeIndices, staleSong } from "./bakeChecks.mts";
+import {
+    crowdedGrade,
+    layoutOf,
+    missingSentinel,
+    probeIndices,
+    probeKey,
+    SENTINELS,
+    shapeOf,
+    staleSong,
+} from "./bakeChecks.mts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 
 const tile = (grade: number) => ({ kind: "scale-arpeggio", grade });
@@ -187,5 +196,134 @@ describe("staleSong", () => {
 
     it("says nothing about an empty catalogue", async () => {
         expect(await staleSong([], async () => ({ problem: "missing" }), measure)).toBeNull();
+    });
+
+    it("catches a stored reduction cost the model no longer produces", async () => {
+        const { songs, read } = catalogue(9);
+        const withWays = songs.map((song) =>
+            song.id === "song0" ? { ...song, reachCost: { melody: 4 } } : song,
+        );
+        const remeasured = (xml: string, song: { id: string }) => ({
+            ...measure(xml),
+            ...(song.id === "song0" ? { reachCost: { melody: 3 } } : {}),
+        });
+        expect(await staleSong(withWays, read, remeasured)).toMatch(
+            /Song 0 stores what its easier reductions cost .* run `npm run songs:cost`/,
+        );
+        const current = (xml: string, song: { id: string }) => ({
+            ...measure(xml),
+            ...(song.id === "song0" ? { reachCost: { melody: 4 } } : {}),
+        });
+        expect(await staleSong(withWays, read, current)).toBeNull();
+    });
+
+    it("always probes a pinned row the spread steps over", async () => {
+        const { songs, read } = catalogue(9);
+        const stale = songs.map((song) => (song.id === "song40" ? { ...song, cost: 6 } : song));
+        expect(await staleSong(stale, read, measure)).toBeNull();
+        expect(await staleSong(stale, read, measure, ["song40"])).toContain(
+            "Song 40 is stored at cost 6 but measures 5",
+        );
+    });
+
+    it("catches a change confined to one shape of bar the spread steps over", async () => {
+        // Every score a grand staff; one alone has a second voice that stops short.
+        const songs = Array.from({ length: 60 }, (_, index) => ({
+            id: `song${index}`,
+            cost: 5,
+            title: `Song ${index}`,
+        }));
+        songs[37] = { id: "short", cost: 5, title: "Short voice" };
+        const read = async (song: { id: string }) => ({
+            xml: grandStaff(
+                song.id === "short" ? SHORT_VOICE : FULL_VOICE,
+                song.id === "short" ? "9" : "5",
+            ),
+        });
+        expect(await staleSong(songs, read, measure)).toContain(
+            "Short voice is stored at cost 5 but measures 9",
+        );
+    });
+});
+
+// A one-part grand staff in 4/4 with the given bars, its part named `mark`.
+function grandStaff(bars: readonly string[], mark = "x"): string {
+    const measures = bars.map(
+        (body, index) =>
+            `<measure number="${index + 1}">${index === 0 ? "<attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves></attributes>" : ""}${body}</measure>`,
+    );
+    return `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>${mark}</part-name></score-part></part-list><part id="P1">${measures.join("")}</part></score-partwise>`;
+}
+
+const n = (duration: number, extra = "") =>
+    `<note>${extra}<pitch><step>C</step><octave>4</octave></pitch><duration>${duration}</duration></note>`;
+const back = (duration: number) => `<backup><duration>${duration}</duration></backup>`;
+const FULL_VOICE = [n(4) + back(4) + n(4), n(4) + back(4) + n(4)];
+const SHORT_VOICE = [n(4) + back(4) + n(2), n(4) + back(4) + n(4)];
+
+describe("shapeOf", () => {
+    it.each([
+        ["one voice", [n(4), n(2) + n(2)], ""],
+        ["a second voice that fills the bar", FULL_VOICE, "backup"],
+        ["a second voice that stops short", SHORT_VOICE, "backup+short"],
+        ["a bar written past its metre", [n(4) + n(1)], "overrun"],
+        [
+            "a second voice padded to the barline with a forward",
+            [`${n(4)}${back(4)}<forward><duration>2</duration></forward>${n(2)}`],
+            "backup",
+        ],
+        [
+            "chord members and grace notes, which take no time",
+            [n(4) + n(4, "<chord/>") + n(1, "<grace/>")],
+            "",
+        ],
+        ["a pickup bar, short on purpose", [n(1), n(4)], ""],
+    ])("reads %s by its shape", (_, bars, shape) => {
+        expect(shapeOf(grandStaff(bars))).toBe(shape);
+    });
+
+    it("does not take a note-size for a note", () => {
+        const xml = grandStaff([n(4)]).replace(
+            "<part-list>",
+            '<defaults><appearance><note-size type="cue">60</note-size></appearance></defaults><part-list>',
+        );
+        expect(shapeOf(xml)).toBe("");
+    });
+
+    it("reads a score written measure by measure as its own shape", () => {
+        expect(shapeOf('<?xml version="1.0"?><score-timewise version="4.0"/>')).toBe("timewise");
+    });
+
+    it("keys a row by its layout and its shape, so each is probed", () => {
+        expect(probeKey(grandStaff(SHORT_VOICE))).toBe("2|backup+short");
+        expect(probeKey(grandStaff(FULL_VOICE))).toBe("2|backup");
+        const keys = [
+            ...Array.from({ length: 100 }, () => probeKey(grandStaff(FULL_VOICE))),
+            probeKey(grandStaff(SHORT_VOICE)),
+        ];
+        expect(probeIndices(keys)).toContain(100);
+    });
+});
+
+describe("missingSentinel", () => {
+    const sentinels = [
+        { id: "a", why: "first" },
+        { id: "b", why: "second" },
+    ];
+
+    it("passes a manifest holding every sentinel", () => {
+        expect(missingSentinel([{ id: "b" }, { id: "a" }, { id: "c" }], sentinels)).toBeNull();
+    });
+
+    it("names a sentinel that has left the manifest, and why it was probed", () => {
+        expect(missingSentinel([{ id: "a" }], sentinels)).toContain("b (second)");
+    });
+
+    it("names only ids the list gives a reason for", () => {
+        expect(SENTINELS.length).toBeGreaterThan(0);
+        for (const sentinel of SENTINELS) {
+            expect(sentinel.why.length).toBeGreaterThan(0);
+        }
+        expect(new Set(SENTINELS.map((sentinel) => sentinel.id)).size).toBe(SENTINELS.length);
     });
 });
