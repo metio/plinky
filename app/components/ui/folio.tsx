@@ -57,6 +57,11 @@ export function Folio({
 type Size = "normal" | "compact";
 
 const PAD: Record<Size, string> = { normal: "py-4", compact: "py-2.5" };
+// A row with a body beneath its line: a normal row opens up on a wide screen, and a compact
+// one keeps its padding and sets the body close under the line, so a list of them (the
+// grade ladder, a take's exports) stays a list rather than a stack of panels.
+const BODY_PAD: Record<Size, string> = { normal: "sm:py-6", compact: "" };
+const BODY_GAP: Record<Size, string> = { normal: "mt-3", compact: "mt-1.5" };
 const NAME: Record<Size, string> = {
     normal: "text-lg sm:text-xl",
     compact: "text-base",
@@ -110,7 +115,7 @@ export function FolioRow({
     const columns = inList ? "col-span-2 grid-cols-subgrid" : OWN_COLUMNS;
     const rule = "border-t border-line last:border-b";
     const bare = name === undefined && line === undefined && trailing === undefined;
-    const grid = `grid content-start ${columns} ${GUTTER} ${PAD[size]} ${children && !bare ? "sm:py-6" : ""}`;
+    const grid = `grid content-start ${columns} ${GUTTER} ${PAD[size]} ${children && !bare ? BODY_PAD[size] : ""}`;
     const Name = heading ?? "span";
     // Inside a link a paragraph is not allowed to stand, so the line is a span there.
     const Line = to ? "span" : "p";
@@ -161,7 +166,7 @@ export function FolioRow({
 
     const body = bare
         ? `row-start-1 self-center ${beside}`
-        : `row-start-2 mt-3 ${margin === undefined ? "col-span-2" : "col-span-2 sm:col-span-1 sm:col-start-2"}`;
+        : `row-start-2 ${BODY_GAP[size]} ${margin === undefined ? "col-span-2" : "col-span-2 sm:col-span-1 sm:col-start-2"}`;
     return (
         <As id={id} aria-current={current || undefined} className={`${grid} ${rule} ${className}`}>
             {head}

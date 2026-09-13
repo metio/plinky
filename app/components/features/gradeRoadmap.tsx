@@ -65,20 +65,21 @@ export function GradeRoadmap({
                 return (
                     <FolioRow
                         key={grade}
+                        size="compact"
                         current={grade === level}
                         margin={
                             tier !== "none" ? (
                                 <span
                                     role="img"
                                     aria-label={STAR_LABEL[tier]()}
-                                    className="text-3xl leading-none"
+                                    className="text-2xl leading-none"
                                 >
                                     {STAR[tier]}
                                 </span>
                             ) : (
                                 <span
                                     aria-hidden="true"
-                                    className="text-3xl leading-none text-faint"
+                                    className="text-2xl leading-none text-faint"
                                 >
                                     ☆
                                 </span>
