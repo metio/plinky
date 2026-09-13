@@ -24,6 +24,12 @@ of a chord and the next sets off from another note of the same chord, Listen cou
 drop the second slide and simply strike its notes. Both slides now sound, one
 arriving and the next leaving, whichever way round the chord is written.
 
+**A note written twice in a chord takes one finger.** Where two voices share a note,
+as they often do in hymns and part-songs, the suggested fingering counted it as two
+keys and could stretch your hand for a key it had already taken: an octave with its
+top note doubled came out as 3-1-4. Both copies now share one finger, and the rest of
+the chord is fingered the way your hand actually plays it.
+
 ## 12 September 2026 — evening
 
 **Two slides at once each land on their own note.** Where both hands glide across

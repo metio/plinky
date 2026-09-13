@@ -21,6 +21,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**A slide that lands on a chord goes on from it.** Where a slide arrives on one note\nof a chord and the next sets off from another note of the same chord, Listen could\ndrop the second slide and simply strike its notes. Both slides now sound, one\narriving and the next leaving, whichever way round the chord is written.",
                 twip: true,
             },
+            {
+                body: "**A note written twice in a chord takes one finger.** Where two voices share a note,\nas they often do in hymns and part-songs, the suggested fingering counted it as two\nkeys and could stretch your hand for a key it had already taken: an octave with its\ntop note doubled came out as 3-1-4. Both copies now share one finger, and the rest of\nthe chord is fingered the way your hand actually plays it.",
+                twip: true,
+            },
         ],
     },
     {
