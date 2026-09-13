@@ -418,7 +418,8 @@ an hour:
 
 - **Warm up** — the day's challenge across the top, with your next rung of the
   sight-reading arcade (labelled with the key it will ask for), a fresh drill and a round
-  of ear training in a row beneath it.
+  of ear training in a row beneath it. Under them sits a one-octave keyboard to put your
+  hands on, whose white keys carry the ways to practise (below).
 - **Work on** — your open assignment's next step ("Continue *First steps* — step 2 of
   5"), which goes straight into that piece, whatever is fading and wants a refresh, or
   the gentlest piece you haven't learned yet. A **Surprise me** button picks one for you.
@@ -658,13 +659,17 @@ learning, settling in, polishing, or just keeping it. The stage comes from the r
 schedule rather than from anything you set. Give a piece a date you're working toward
 — an exam, a recital, a lesson — and it moves to the top with the days counted down.
 
-**[Ways to practise](https://plinky.fun/en/methods/)** names six things a teacher
-would suggest, says why each one works, and hands you straight to the Plinky control
-that does it: looping the two bars that keep going wrong, dropping the tempo until
-the notes land, taking one hand at a time, hearing a phrase before playing it, mixing
-pieces up in a review session, and letting a piece go quiet before coming back to it.
-Each one carries a button that opens a piece at your own grade with the method already
-set up — slowed down, one hand, or looping the opening phrase.
+**Ways to practise** live on the front page's keyboard, one octave from middle C. Each
+of its seven white keys carries one thing a teacher would suggest, with a small drawing
+on the key: looping the two bars that keep going wrong, dropping the tempo until the
+notes land, taking one hand at a time, hearing a phrase before playing it, mixing pieces
+up in a review session, letting a piece go quiet before coming back to it, and learning
+the chords of a key as blocks. Pressing a key sounds it and opens that method underneath:
+why it works, the Plinky control that does it, how long a go takes, and a button that
+opens a piece at your own grade with the method already set up — slowed down, one hand,
+or looping the opening phrase. A MIDI piano or the computer keys open them the same way,
+and the black keys simply play. Nothing in Plinky sounds a note when a pointer passes
+over it; only a key you press does.
 
 A piece can also be opened that way by hand, which is useful for a teacher: adding
 `?speed=0.6&hands=left&loop=5-8` to a `/play/` address opens it at sixty per cent of
