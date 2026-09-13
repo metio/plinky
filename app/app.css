@@ -233,6 +233,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        player picks. dev/build-mark.mjs reads the light value for the outlined lockups. */
     --color-brand-ink: #1c1640;
 
+    /* The round dot over the name's i: the plink's own pink, as the dot always was. It
+       belongs to the mark, so it is the same in every palette and mode; core/wordmark's DOT
+       holds the same value for the canvas and the generated files. */
+    --color-brand-dot: #aa36fc;
+
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-600);
     /* The notes highway tints the two hands apart. */
@@ -368,6 +373,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
     --color-plink: #c56bff;
     --color-brand-ink: #ffffff;
+    --color-brand-dot: #aa36fc;
     --color-bloom-sun: #f0b73a;
     --color-bloom-flame: #f58c4a;
     --color-bloom-leaf: #6cb52f;

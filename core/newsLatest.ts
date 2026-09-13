@@ -18,7 +18,7 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**A new logo.** Three keys on an indigo circle, with a note falling down the middle\none to strike it. It sits beside the name at the top of every page and is the icon in\nyour browser tab, and it keeps its own colours whichever ones you pick.",
+                body: "**A new logo.** Three keys on an indigo circle, with a note falling down the middle\none to strike it. It sits beside the name at the top of every page and is the icon in\nyour browser tab, and it keeps its own colours whichever ones you pick. The name keeps\nits pink dot over the i, now perfectly round.",
                 twip: true,
             },
             {

@@ -18,7 +18,8 @@ set of colours. The pictures on the help page show the new look, in your languag
 
 **A new logo.** Three keys on an indigo circle, with a note falling down the middle
 one to strike it. It sits beside the name at the top of every page and is the icon in
-your browser tab, and it keeps its own colours whichever ones you pick.
+your browser tab, and it keeps its own colours whichever ones you pick. The name keeps
+its pink dot over the i, now perfectly round.
 
 **The keyboard on the front page is a way into practising.** Each of its seven white
 keys carries one of the ways a teacher would suggest, with a small drawing on it:
