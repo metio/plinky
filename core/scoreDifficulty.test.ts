@@ -560,6 +560,46 @@ describe("parsePositions keeps both staves in the same bar", () => {
         expect(onsets.right).toEqual([0, 4]);
         expect(onsets.left).toEqual([0, 4]);
     });
+
+    // A piano written as two parts, one per hand, as some editors export it.
+    const twoParts = (right: string[], left: string[], attributes = "") => {
+        const part = (id: string, bars: string[]) =>
+            `<part id="${id}">${bars
+                .map(
+                    (body, at) =>
+                        `<measure number="${at + 1}">${at === 0 ? `<attributes><divisions>1</divisions>${attributes}</attributes>` : ""}${body}</measure>`,
+                )
+                .join("")}</part>`;
+        return `<?xml version="1.0"?><score-partwise>${part("P1", right)}${part("P2", left)}</score-partwise>`;
+    };
+    const lasting = (step: string, octave: number, beats: number) =>
+        `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>${beats}</duration></note>`;
+
+    it("after a part whose bar stops short of the other part's", () => {
+        // The bass part's first bar holds a half note and nothing after it, under the treble's
+        // whole note. Its second bar still starts with the treble's, on beat 4.
+        const xml = twoParts(
+            [lasting("C", 5, 4), lasting("D", 5, 4)],
+            [lasting("C", 3, 2), lasting("D", 3, 4)],
+        );
+        const { onsets } = parsePositions(domXmlCodec, xml);
+        expect(onsets.right).toEqual([0, 4]);
+        expect(onsets.left).toEqual([0, 4]);
+    });
+
+    it("after a part whose whole-bar rest is written longer than the bar", () => {
+        // Three-four, and the bass part rests its first bar with a four-beat rest, as
+        // engravings write a whole-bar rest whatever the metre. Its next note still sounds
+        // with the treble's second bar, on beat 3.
+        const xml = twoParts(
+            [lasting("C", 5, 3), lasting("D", 5, 3)],
+            [`<note><rest measure="yes"/><duration>4</duration></note>`, lasting("D", 3, 3)],
+            "<time><beats>3</beats><beat-type>4</beat-type></time>",
+        );
+        const { onsets } = parsePositions(domXmlCodec, xml);
+        expect(onsets.right).toEqual([0, 3]);
+        expect(onsets.left).toEqual([3]);
+    });
 });
 
 describe("otherHandAt", () => {

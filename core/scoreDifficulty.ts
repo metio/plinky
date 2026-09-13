@@ -6,7 +6,8 @@ import { pitchMidiOf } from "./notes";
 import { stavesPerPart } from "./accompaniment";
 import { reachingCost } from "./fingering";
 import { partsOf } from "./parts";
-import { beatCursor, CURSOR_NODES, gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
+import { readTimeline } from "./musicxmlTimeline";
+import { gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
 import type { XmlCodec } from "./xml";
 
 // How hard a score is to *play*, derived from the fingering cost model — the same
@@ -28,8 +29,9 @@ export type Hands = {
     right: number[][];
     left: number[][];
     gaps: { right: number[]; left: number[] };
-    // The beat each position sounds on, counted from the start of its part: what tells
-    // whether the other hand is striking at the same moment.
+    // The beat each position sounds on, in quarter notes from the top of the score: what
+    // tells whether the other hand is striking at the same moment. NaN where the timeline
+    // places nothing, which is every note of a score written measure by measure.
     onsets: { right: number[]; left: number[] };
 };
 
@@ -64,6 +66,11 @@ export function positionsOf(doc: Document): Hands {
     // has to get the hand there. gaps[0] is unused: nothing precedes the first position.
     const counts = stavesPerPart(doc);
     const parts = partsOf(counts);
+    // Where each note sounds is read off the timeline Listen and Play walk rather than worked
+    // out again here. It starts every part's bar where the first part to reach that bar
+    // starts it, and carries the music on past a bar by its metre alone, so two parts that
+    // disagree about a short bar or an overlong rest still strike together.
+    const onsetOf = new Map(readTimeline(doc).notes.map((note) => [note.element, note.whole * 4]));
     const written = Array.from(
         doc.querySelectorAll("score-partwise > part, score-timewise > part"),
     );
@@ -72,10 +79,10 @@ export function positionsOf(doc: Document): Hands {
     const scanned: { nodes: Iterable<Element>; staves: number }[] =
         written.length > 0
             ? written.map((part, index) => ({
-                  nodes: part.querySelectorAll(CURSOR_NODES),
+                  nodes: part.querySelectorAll(TIMED_NODES),
                   staves: counts[index] ?? 1,
               }))
-            : [{ nodes: doc.querySelectorAll(CURSOR_NODES), staves: 2 }];
+            : [{ nodes: doc.querySelectorAll(TIMED_NODES), staves: 2 }];
 
     // <staff> counts from 1 within its own part; partsOf names staves across the whole
     // score. The running offset of the part a note sits in is what turns one into the
@@ -84,17 +91,7 @@ export function positionsOf(doc: Document): Hands {
     const clock = scoreClock();
     const timing = { right: gapTracker(), left: gapTracker() };
     for (const part of scanned) {
-        // Every part keeps its own time, and they all start together.
-        const cursor = beatCursor();
         for (const node of part.nodes) {
-            const beat = cursor.read(node);
-            if (
-                node.tagName === "measure" ||
-                node.tagName === "backup" ||
-                node.tagName === "forward"
-            ) {
-                continue;
-            }
             const seconds = clock.read(node);
             if (node.tagName !== "note") {
                 continue;
@@ -125,7 +122,7 @@ export function positionsOf(doc: Document): Hands {
                 continue;
             }
             gaps[side].push(timing[side].start(seconds));
-            onsets[side].push(beat);
+            onsets[side].push(onsetOf.get(note) ?? Number.NaN);
             hand.push([midi]);
         }
         offset += part.staves;
@@ -139,41 +136,27 @@ export function positionsOf(doc: Document): Hands {
     if (right.length === 0 && left.length === 0) {
         const fallbackClock = scoreClock();
         const fallbackTiming = { right: gapTracker(), left: gapTracker() };
-        // Part by part, so each part's time starts where the others' does. The walk is the
-        // same document order either way, and the clock runs across the parts as before.
-        const groups: ParentNode[] = written.length > 0 ? written : [doc];
-        for (const group of groups) {
-            const cursor = beatCursor();
-            for (const node of group.querySelectorAll(CURSOR_NODES)) {
-                const beat = cursor.read(node);
-                if (
-                    node.tagName === "measure" ||
-                    node.tagName === "backup" ||
-                    node.tagName === "forward"
-                ) {
-                    continue;
-                }
-                const seconds = fallbackClock.read(node);
-                if (node.tagName !== "note") {
-                    continue;
-                }
-                const note = node;
-                const side =
-                    note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right";
-                const hand = side === "left" ? left : right;
-                const midi = midiOf(note);
-                if (midi === null) {
-                    fallbackTiming[side].skip(seconds);
-                    continue;
-                }
-                if (note.querySelector("chord") && hand.length > 0) {
-                    hand[hand.length - 1]!.push(midi);
-                    continue;
-                }
-                gaps[side].push(fallbackTiming[side].start(seconds));
-                onsets[side].push(beat);
-                hand.push([midi]);
+        for (const node of doc.querySelectorAll(TIMED_NODES)) {
+            const seconds = fallbackClock.read(node);
+            if (node.tagName !== "note") {
+                continue;
             }
+            const note = node;
+            const side =
+                note.querySelector("staff")?.textContent?.trim() === "2" ? "left" : "right";
+            const hand = side === "left" ? left : right;
+            const midi = midiOf(note);
+            if (midi === null) {
+                fallbackTiming[side].skip(seconds);
+                continue;
+            }
+            if (note.querySelector("chord") && hand.length > 0) {
+                hand[hand.length - 1]!.push(midi);
+                continue;
+            }
+            gaps[side].push(fallbackTiming[side].start(seconds));
+            onsets[side].push(onsetOf.get(note) ?? Number.NaN);
+            hand.push([midi]);
         }
     }
     return { right, left, gaps, onsets };
@@ -186,16 +169,21 @@ const SAME_MOMENT = 1e-6;
 
 // What the other hand strikes at the moment each of this hand's positions sounds: every
 // pitch of every one of its positions on that beat, and nothing when it strikes nothing.
-// Two voices on the other staff that land together both count.
+// Two voices on the other staff that land together both count. Where a position's moment
+// is unknown (NaN) so is the other hand, which reachingCost prices as one hand alone.
 export function otherHandAt(
     mine: readonly number[],
     theirs: { positions: readonly number[][]; onsets: readonly number[] },
-): number[][] {
+): (number[] | undefined)[] {
     const order = theirs.onsets
         .map((_, at) => at)
+        .filter((at) => !Number.isNaN(theirs.onsets[at]))
         .sort((a, b) => theirs.onsets[a]! - theirs.onsets[b]!);
     const sorted = order.map((at) => theirs.onsets[at]!);
     return mine.map((beat) => {
+        if (Number.isNaN(beat)) {
+            return undefined;
+        }
         // The first of theirs at or after this moment, less the tolerance.
         let lo = 0;
         let hi = sorted.length;
