@@ -20,6 +20,14 @@ set of colours.
 one to strike it. It sits beside the name at the top of every page and is the icon in
 your browser tab, and it keeps its own colours whichever ones you pick.
 
+**The keyboard on the front page is a way into practising.** Each of its seven white
+keys carries one of the ways a teacher would suggest, with a small drawing on it:
+loop the hard bar, go slowly, one hand at a time, hear it first, mix pieces up, come
+back later, and learn the chords. A key still sounds when you press it, and its way
+to practise opens underneath, with why it works and a piece to try it on. A MIDI
+piano or your computer keys open them too. The long list of them further down the
+page is gone, and nothing plays a note any more when your mouse passes over a list.
+
 ## 13 September 2026
 
 **A chord written for both hands is graded the way you play it.** Where one staff
