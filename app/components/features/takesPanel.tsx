@@ -12,6 +12,7 @@ import { formatAgo } from "../../lib/relativeTime";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
+import { Folio, FolioFigure, FolioRow } from "../ui/folio";
 import { PlayIcon, StopIcon, TrashIcon } from "../ui/icons";
 import { ExportAudioButton } from "./exportAudioButton";
 import { ExportVideoButton } from "./exportVideoButton";
@@ -61,24 +62,36 @@ export function TakesPanel({
             {takes.length === 0 ? (
                 <p className="text-sm text-muted">{m.takes_empty_hint()}</p>
             ) : (
-                <ul className="space-y-2">
+                <Folio>
                     {takes.map((take) => {
                         const replaying = activeReplayId === take.id;
                         return (
-                            // A run is a small card of three fixed zones so no width can
-                            // scramble it: a header line that never wraps (identity left,
-                            // replay/delete pinned right), the metrics as their own quiet
-                            // line, and a footer strip of ghost-styled export actions
-                            // behind a hairline — wrapping inside the strip reads as a
-                            // toolbar, not as overflow.
-                            <li key={take.id} className="rounded-md border border-line text-sm">
-                                <div className="flex items-center gap-2 px-2 pt-1">
-                                    <span className="font-semibold">{take.letter || "—"}</span>
-                                    <span className="truncate text-muted">
-                                        {formatAgo(take.createdAt, now, getLocale())}
-                                        {!take.complete && ` · ${m.takes_partial()}`}
-                                    </span>
-                                    <span className="ml-auto flex shrink-0 items-center gap-1">
+                            // A take is a Folio row: its letter in the margin, when it was
+                            // played as its name with replay and delete at the end of the
+                            // line, the readings as the line under it, and the exports
+                            // beneath — wrapping inside that strip reads as a toolbar, not
+                            // as overflow. The readings are the same list the panel at the
+                            // end of a run shows, so a take shows every reading it stored.
+                            <FolioRow
+                                key={take.id}
+                                size="compact"
+                                margin={<FolioFigure value={take.letter || "—"} tone="ink" />}
+                                name={`${formatAgo(take.createdAt, now, getLocale())}${
+                                    take.complete ? "" : ` · ${m.takes_partial()}`
+                                }`}
+                                line={
+                                    take.metrics ? (
+                                        <span className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted tabular-nums">
+                                            {scoreReadings(take.metrics).map(({ id, value }) => (
+                                                <span key={id}>
+                                                    {readingLabel[id]()} {value}%
+                                                </span>
+                                            ))}
+                                        </span>
+                                    ) : undefined
+                                }
+                                trailing={
+                                    <span className="flex items-center gap-1">
                                         <IconButton
                                             label={replaying ? m.takes_stop() : m.takes_replay()}
                                             onClick={() => (replaying ? onStop() : onReplay(take))}
@@ -94,21 +107,9 @@ export function TakesPanel({
                                             <TrashIcon />
                                         </IconButton>
                                     </span>
-                                </div>
-                                {/* The same readings the panel at the end of a run shows,
-                                from the same list — this used to name three of them by
-                                hand and silently drop the dynamics and expression the very
-                                same take had stored. */}
-                                {take.metrics && (
-                                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 px-2 pb-2 text-xs text-muted tabular-nums">
-                                        {scoreReadings(take.metrics).map(({ id, value }) => (
-                                            <span key={id}>
-                                                {readingLabel[id]()} {value}%
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-                                <div className="flex flex-wrap items-center gap-x-1 border-t border-line px-1 py-1">
+                                }
+                            >
+                                <div className="flex flex-wrap items-center gap-x-1">
                                     <ShareGhostButton
                                         id={id}
                                         title={title}
@@ -153,10 +154,10 @@ export function TakesPanel({
                                         original={original}
                                     />
                                 </div>
-                            </li>
+                            </FolioRow>
                         );
                     })}
-                </ul>
+                </Folio>
             )}
         </div>
     );
