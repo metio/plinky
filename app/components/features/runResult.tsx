@@ -9,6 +9,7 @@ import { laggingHand, type RunNote } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
 import { Disclosure } from "../ui/disclosure";
 import { Button } from "../ui/button";
+import { FolioRow } from "../ui/folio";
 import { GradeLetter } from "../ui/gradeLetter";
 import { PerformanceStrip } from "../ui/performanceStrip";
 import { TempoGraph } from "../ui/tempoGraph";
@@ -70,9 +71,9 @@ export function RunResult({
                         </Button>
                     </div>
                 ))}
-            <div className="flex items-center gap-4 rounded-md border border-line p-3">
-                <GradeLetter letter={grade.letter} />
-                <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
+            {/* A Folio row with the letter in the margin and its readings beside it. */}
+            <FolioRow margin={<GradeLetter letter={grade.letter} />}>
+                <dl className="grid w-fit grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
                     {scoreReadings(grade).map(({ id, value }) => (
                         <Fragment key={id}>
                             <dt className={isOptionalReading(id) ? "text-faint" : "text-muted"}>
@@ -88,7 +89,7 @@ export function RunResult({
                         </Fragment>
                     ))}
                 </dl>
-            </div>
+            </FolioRow>
             {/* The numbers are meaningless until somebody says what they measure, and a
                 player who has just finished a run is exactly who wants to know. Folded away
                 because it is read once and then known — the readouts themselves are what
