@@ -54,8 +54,11 @@ export function AchievementGallery({
     // two frames deep for one idea. Elsewhere it keeps its own frame.
     framed?: boolean;
 }) {
+    // Two columns of rows from a tablet's width up, each with its own margin, filled left to
+    // right; one column on a phone. The last row of the left column closes with a rule too,
+    // when the shelf ends on the right.
     const grid = (
-        <Folio>
+        <Folio className="md:grid-cols-[minmax(5.25rem,auto)_minmax(0,1fr)_minmax(5.25rem,auto)_minmax(0,1fr)] md:[&>li:nth-last-child(2):nth-child(odd)]:border-b">
             {achievements.map((badge) => {
                 const { emoji, label } = badgeFace(badge);
                 // A greyed glyph under a padlock is the vocabulary of something locked,

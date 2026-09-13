@@ -14,7 +14,7 @@ import {
 import { m } from "../../paraglide/messages.js";
 import { Show } from "./conditional";
 import { LocalizedLink as Link } from "../ui/localizedLink";
-import { Folio, FolioFigure, FolioRow } from "../ui/folio";
+import { Folio, FolioRow } from "../ui/folio";
 
 type EarnedTier = Exclude<StarTier, "none">;
 const STAR: Record<EarnedTier, string> = { bronze: "🥉", silver: "🥈", gold: "🥇" };
@@ -59,17 +59,30 @@ export function GradeRoadmap({
                 const tier = starTier(mastered);
                 const next = nextStar(mastered);
                 const { due } = gradeFreshness(items, grade, mode, now);
-                // The grade's number in the margin, lit for the grade you are at and quiet
-                // for the rest, so the ladder reads down its left edge.
+                // The star a grade has earned in the margin, or an empty one while it has
+                // none, so the ladder reads down its left edge by what you have done in it.
+                // The grade you are at has its name lit.
                 return (
                     <FolioRow
                         key={grade}
                         current={grade === level}
                         margin={
-                            <FolioFigure
-                                value={grade}
-                                tone={grade === level ? "accent" : "muted"}
-                            />
+                            tier !== "none" ? (
+                                <span
+                                    role="img"
+                                    aria-label={STAR_LABEL[tier]()}
+                                    className="text-3xl leading-none"
+                                >
+                                    {STAR[tier]}
+                                </span>
+                            ) : (
+                                <span
+                                    aria-hidden="true"
+                                    className="text-3xl leading-none text-faint"
+                                >
+                                    ☆
+                                </span>
+                            )
                         }
                         name={
                             // The grade opens its pieces. A ladder of eight rows that cannot
@@ -78,14 +91,11 @@ export function GradeRoadmap({
                             // may play, says what no sentence can.
                             <Link
                                 to={`/music?grade=${grade}`}
-                                className="inline-flex items-center gap-2 hover:text-accent-strong hover:underline"
+                                className={`hover:text-accent-strong hover:underline ${
+                                    grade === level ? "text-accent-strong" : ""
+                                }`}
                             >
-                                <span>{m.grades_grade({ grade })}</span>
-                                {tier !== "none" && (
-                                    <span role="img" aria-label={STAR_LABEL[tier]()}>
-                                        {STAR[tier]}
-                                    </span>
-                                )}
+                                {m.grades_grade({ grade })}
                             </Link>
                         }
                         line={
