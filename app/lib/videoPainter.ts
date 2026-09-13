@@ -27,7 +27,7 @@ import {
     stepCenterAt,
     wrapTitle,
 } from "../../core/videoScene";
-import { tittleCircle, WORDMARK, wordmarkText } from "../../core/wordmark";
+import { TRACKING, wordmarkText } from "../../core/wordmark";
 
 // Paints one frame of the exported video: a dark stage headed by the piece's title with
 // the composer under it and the wordmark opposite, then the notation (when a snapshot was
@@ -153,6 +153,9 @@ type Context2D = Pick<
     textBaseline: CanvasTextBaseline;
     textAlign: CanvasTextAlign;
     globalAlpha: number;
+    // Optional because not every browser's canvas has it, and a stand-in context in a test
+    // need not either: without it the name is set solid (see withTracking).
+    letterSpacing?: string;
 };
 
 // Trim text to fit `room` in the context's current font, ending in an ellipsis
@@ -178,33 +181,37 @@ const WORDMARK_SCALE = 0.029;
 // frame is unchanged and only a long one moves anything.
 const TITLE_ROW = 0.072;
 
-// The lockup, right-aligned on `rightX` and sitting on `baselineY`.
+// Runs `draw` with the name's letter-spacing set, and puts the context's own back after.
 //
-// The same mark the header and the thumbnails set, from the same geometry: the name in the
-// display face with a dotless stem, and the plink drawn where the face's own tittle would
-// be. Canvas has no inline boxes to anchor against, so it asks core/wordmark for the
-// circle directly — which is why that module describes the dot from both ends.
+// The stage is always dark, so the name takes the tracking the mark gives light type on a
+// dark ground (core/wordmark). Where a canvas has no letterSpacing the name is set solid, a
+// hair narrower, and the layout measures it through this same function so the two agree.
+function withTracking<T>(context: Context2D, unit: number, draw: () => T): T {
+    if (context.letterSpacing === undefined) {
+        return draw();
+    }
+    const previous = context.letterSpacing;
+    context.letterSpacing = `${(Math.round(unit * WORDMARK_SCALE) * TRACKING.dark).toFixed(2)}px`;
+    try {
+        return draw();
+    } finally {
+        context.letterSpacing = previous;
+    }
+}
+
+// The name, right-aligned on `rightX` and sitting on `baselineY`: the same letterforms the
+// header and the thumbnails set, in the display face at the mark's weight.
 function paintWordmark(context: Context2D, rightX: number, baselineY: number, unit: number): void {
-    const size = Math.round(unit * WORDMARK_SCALE);
     context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
     const text = wordmarkText(true);
-    // Placed from the left so the stem can be found by measuring the run before it; drawing
-    // right-aligned would leave nothing to measure against.
-    const left = rightX - context.measureText(text).width;
-    context.textAlign = "left";
     context.textBaseline = "alphabetic";
     context.fillStyle = INK;
-    context.fillText(text, left, baselineY);
-
-    const stemLeft = left + context.measureText(WORDMARK.before).width;
-    const stemCenter = stemLeft + context.measureText(WORDMARK.stem).width / 2;
-    const dot = tittleCircle(stemCenter, baselineY, size);
-    context.fillStyle = ACCENT;
-    context.beginPath();
-    // A square with a radius of half its side is a circle, which keeps the stage's one
-    // round shape on the same primitive as everything else drawn here.
-    context.roundRect(dot.cx - dot.r, dot.cy - dot.r, dot.r * 2, dot.r * 2, dot.r);
-    context.fill();
+    withTracking(context, unit, () => {
+        // Placed from the left at the measured width: a right-aligned run would count the
+        // spacing after its last letter and stand that far in from the margin.
+        context.textAlign = "left";
+        context.fillText(text, rightX - context.measureText(text).width, baselineY);
+    });
 }
 
 // The stage furniture shared by every format: the piece's title, the wordmark,
@@ -241,7 +248,9 @@ function paintChrome(context: Context2D, cfg: ChromeConfig): void {
     // Smaller than the title on purpose, and smaller than it used to be: on a clip the
     // piece is what a viewer is deciding about, and the mark only has to be legible.
     context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
-    const wordmarkWidth = showWordmark ? context.measureText(wordmarkText(true)).width : 0;
+    const wordmarkWidth = showWordmark
+        ? withTracking(context, unit, () => context.measureText(wordmarkText(true)).width)
+        : 0;
     const textRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
     const fullRoom = width - margin * 2;
     // Where the composer starts, which depends on how many rows the title took.

@@ -206,13 +206,18 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-bloom-sky: #1e86d6;
     --color-bloom-rose: #e0359a;
 
-    /* The plink: one note, played. It is the dot on the i, and the dot in the app icon,
-       and nothing else — the brand's whole spark, spent in one place.
+    /* The plink: one note, played. It is the note the loader drops and a petal of the
+       header's bouquet, and nothing else — the brand's whole spark, spent in one place.
 
-       It had been borrowing the ghost's fuchsia, so the wordmark and the "race your own
+       It had been borrowing the ghost's fuchsia, so the brand and the "race your own
        recording" colour were one variable: moving either moved the other, and they mean
        entirely different things. */
     --color-plink: #aa36fc;
+
+    /* The name beside the mark: the designer's ink on a light ground, white on a dark one.
+       It belongs to the mark rather than the palette, so it is the same whichever colours a
+       player picks. dev/build-mark.mjs reads the light value for the outlined lockups. */
+    --color-brand-ink: #1c1640;
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-600);
@@ -343,6 +348,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-deep: var(--color-indigo-300);
 
     --color-plink: #c56bff;
+    --color-brand-ink: #ffffff;
     --color-bloom-sun: #f0b73a;
     --color-bloom-flame: #f58c4a;
     --color-bloom-leaf: #6cb52f;
