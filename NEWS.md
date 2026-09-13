@@ -16,6 +16,10 @@ reads more clearly. If you liked the violet, Settings brings it back under Colou
 The theme can also be Black: a true-black page for phone screens at night, in either
 set of colours.
 
+**A new logo.** Three keys on an indigo circle, with a note falling down the middle
+one to strike it. It sits beside the name at the top of every page and is the icon in
+your browser tab, and it keeps its own colours whichever ones you pick.
+
 ## 13 September 2026
 
 **A chord written for both hands is graded the way you play it.** Where one staff

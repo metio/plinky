@@ -828,10 +828,11 @@ play — the same engine behind every mode.
 
 `brand/` holds the mark, the palette with each colour's role, a type specimen and
 ready-made social images — everything somebody needs to make something *about* Plinky. It
-is generated: `npm run brand` rebuilds it from `app/app.css` and `brand/plinky-mark.png`, so a
-poster cannot end up in a palette the app has moved on from. `brand/README.md` carries the
-rules, including the three colours that mean something and must never be borrowed for
-decoration.
+is generated: `npm run mark` writes the mark as vector, `brand/mark/*.svg`, with the name
+outlined from the Fredoka the app ships, and `npm run brand` renders the rest of the kit from
+those files and `app/app.css`, so a poster cannot end up in a palette the app has moved on
+from. `brand/README.md` carries the rules, including the three colours that mean something
+and must never be borrowed for decoration.
 
 Plinky's components are also published as a design system, so a design tool builds with
 the real parts rather than generic ones: every storied component compiles into a bundle
