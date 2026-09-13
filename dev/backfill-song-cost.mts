@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Adds the per-song fingering `cost` and `reachCost` to the shipped song manifest by
-// recomputing both from each shipped .mxl with the same engine the import uses. The grades
-// both are read into, `grade` and `reach`, are `npm run songs:bake`'s, so run it after.
+// Writes the per-song fingering `cost` into the shipped song manifest, and what each easier
+// reduction costs into dev/catalog-reach-costs.json, recomputing both from each shipped .mxl
+// with the same engine the import uses. The grades both are read into, `grade` and `reach`,
+// are `npm run songs:bake`'s, so run it after.
 //
-// `reachCost` is what the piece costs with its inner notes taken out (core/simplify), which
+// A reduction cost is what the piece costs with its inner notes taken out (core/simplify), which
 // the bake reads as a way-in grade: a Grade 5 that is Grade 2 with the melody alone. It is measured here rather than in the
 // browser because the answer is wanted while somebody is BROWSING — a list row saying a
 // hard piece has a way in is the whole point, and there is no score loaded to measure at
@@ -23,6 +24,7 @@ import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { readFile } from "node:fs/promises";
 import type { SongMeta } from "../core/catalogMeta.ts";
 import { readSongs, scorePath as shippedScorePath, writeSongs } from "./manifest.mts";
+import { type ReachCosts, writeReachCosts } from "./reachCosts.mts";
 
 const { decompressMxl } = await import("../core/musicxmlFile.ts");
 
@@ -68,6 +70,8 @@ if (sample > 0) {
 }
 
 const enriched: SongMeta[] = [];
+// Rewritten whole, so a piece that has left the catalogue leaves this file too.
+const reachCosts: ReachCosts = {};
 let done = 0;
 for (const song of manifest) {
     const bytes = await readFile(scorePath(song.id));
@@ -75,26 +79,26 @@ for (const song of manifest) {
     const cost = xml ? Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3)) : 0;
     // Only where a reduction means anything. Thinning a singer's line is not an easier song
     // but a different one, and the ladder only ever offers solo piano anyway.
-    const reachCost =
+    const reductions =
         xml && song.scoreKind === "solo-piano"
             ? reductionCosts(linkedomXmlCodec, song.id, xml, cost)
             : {};
+    // A piece nothing can be taken out of carries nothing, rather than an empty object.
+    if (Object.keys(reductions).length > 0) {
+        reachCosts[song.id] = reductions;
+    }
     // Spread, not a field list. Listing them kept the import's field order and silently
     // dropped everything the list did not know about: running this erased the baked
     // incipit from all 2,952 pieces that had one, and would now take `source`, `kind` and
     // `credit` with it. A script that rewrites every row must carry what it does not
-    // understand — the only fields it has any business changing are the ones it computes.
+    // understand — the only field it has any business changing is the one it computes.
     // The grades, `grade` and `reach` alike, are the bake's to read off these costs.
-    // A piece nothing can be taken out of carries nothing, rather than an empty object in
-    // three thousand rows of a file every visitor to the library downloads.
-    const { reachCost: _previous, ...rest } = song;
-    enriched.push(
-        Object.keys(reachCost).length > 0 ? { ...rest, cost, reachCost } : { ...rest, cost },
-    );
+    enriched.push({ ...song, cost });
     if (++done % 500 === 0) {
         console.log(`  ${done}/${manifest.length}`);
     }
 }
 
 await writeSongs(enriched);
+await writeReachCosts(reachCosts);
 console.log(`Backfilled cost for ${enriched.length} songs.`);

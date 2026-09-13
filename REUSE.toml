@@ -90,6 +90,7 @@ path = [
     "dev/catalog-duplicates.json",
     "dev/catalog-excluded.json",
     "dev/catalog-people-distinct.json",
+    "dev/catalog-reach-costs.json",
     "dev/grade-anchors.json",
     "dev/builtin-assignments.json",
     "dev/retired-routes.json",

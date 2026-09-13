@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ExerciseConfig } from "./exerciseGen";
-import type { Reach, ReductionCosts } from "./reach";
+import type { Reach } from "./reach";
 import type { ScoreKind } from "./scoreKind";
 
 // The rows of the two shipped manifests — public/songs/manifest.json and
@@ -41,14 +41,11 @@ export type SongMeta = {
     // lets the ladder ask for piano writing while the library keeps everything.
     scoreKind?: ScoreKind;
     // The grades this piece comes out at with its inner notes taken away — graded by
-    // npm run songs:bake from `reachCost`, absent where nothing can be taken out. A piece two
-    // grades above somebody reads as "not yet" and nothing more, when the truth is usually
-    // that the tune is within reach and the filling is not; this is what lets a list say so.
+    // npm run songs:bake from what each reduction costs (dev/catalog-reach-costs.json, which
+    // no visitor downloads), absent where nothing can be taken out. A piece two grades above
+    // somebody reads as "not yet" and nothing more, when the truth is usually that the tune
+    // is within reach and the filling is not; this is what lets a list say so.
     reach?: Reach;
-    // What each reduction cheaper than the piece as written costs, measured by
-    // npm run songs:cost. `reach` is read off these against the grade boundaries, as `grade`
-    // is read off `cost`, so moving a boundary moves both.
-    reachCost?: ReductionCosts;
     // The four-chord loop the piece keeps coming back to, as numerals joined by spaces
     // ("I V vi IV"), read off the notes at bake time by core/harmony. Absent where the
     // piece never settles into one. What lets a shelf answer "other pieces built on this".

@@ -396,9 +396,10 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   and is why it is a probe rather than a full pass. `npm run exercises` needs the PDMX
   corpus for its Hanon sourcing and so cannot be the thing that keeps costs current.
   The way-in grades (`reach`) follow the same rule: `songs:cost` stores what each easier
-  reduction costs (`reachCost`), `songs:bake` grades those against the boundaries exactly
-  as it grades `cost`, and the probes remeasure them, so a boundary move re-grades the ways
-  in along with the pieces.
+  reduction costs in `dev/catalog-reach-costs.json`, `songs:bake` grades those against the
+  boundaries exactly as it grades `cost`, and the probes remeasure them, so a boundary move
+  re-grades the ways in along with the pieces. The costs stay out of the manifest because
+  only the bake reads them, and every browsing visitor downloads the manifest.
 
   Scale and arpeggio tiles are graded on their own scales, since fingering a scale costs
   more than fingering a stepwise tune. Those boundaries have no outside repertoire to

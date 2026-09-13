@@ -39,6 +39,7 @@ import { exerciseMeasure } from "./exerciseCosts.mts";
 import { progressionOf } from "./progressionOf.mts";
 import { gradeForCost, pieceBoundaries, reachOf } from "./grading.mts";
 import { readExercises, readSongs, writeExercises, writeSongs } from "./manifest.mts";
+import { readReachCosts } from "./reachCosts.mts";
 
 const MAX_GRADE = 8;
 const _SONGS = "public/songs";
@@ -81,6 +82,7 @@ async function main() {
     }
 
     const boundaries = [...pieceBoundaries];
+    const reachCosts = await readReachCosts();
 
     // The freshly-graded catalogue these boundaries imply. Re-grading can move a piece
     // across a grade boundary, so re-establish the shipped order both manifests are
@@ -96,7 +98,7 @@ async function main() {
                 const grade = gradeForCost(song.cost, boundaries);
                 // The ways in are graded off their stored costs against the same boundaries
                 // as the piece, so moving a boundary can never leave them behind.
-                const reach = reachOf(song.reachCost ?? {}, grade, boundaries);
+                const reach = reachOf(reachCosts[song.id] ?? {}, grade, boundaries);
                 return {
                     ...rest,
                     grade,
@@ -132,7 +134,7 @@ async function main() {
     const drifted =
         missingSentinel(songs) ??
         (await staleSong(
-            songs,
+            songs.map((song) => ({ ...song, reachCost: reachCosts[song.id] })),
             undefined,
             undefined,
             SENTINELS.map((sentinel) => sentinel.id),
