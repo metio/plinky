@@ -66,10 +66,11 @@ import { SiteHeader } from "./components/features/siteHeader";
 // toggle writes through the injected store and applies the class itself.
 const themeStore = createThemeStore(browserStore);
 
-// Runs before first paint to set the dark class from the saved (or OS) theme.
-// Applying the theme only in the layout's effect would let the prerendered,
-// class-free HTML paint light first and flash for dark-mode users. It mutates
-// the class outside React, which React's hydration leaves untouched.
+// Runs before first paint to stamp the saved (or OS) mode and the saved palette.
+// Applying the theme only in the layout's effect would let the prerendered HTML,
+// which carries neither and so paints the default palette in light, flash for
+// anyone who chose otherwise. It mutates the root outside React, which React's
+// hydration leaves untouched.
 const THEME_INIT_SCRIPT = themeBootstrapScript();
 // Stamps a device that has played before, so Today opens on the practice rather than
 // on the introduction. Runs before paint for the same reason the theme does.
