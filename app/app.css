@@ -227,8 +227,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-600);
-    --color-ghost-surface: var(--color-fuchsia-50);
-    --color-ghost-line: var(--color-fuchsia-200);
     /* The notes highway tints the two hands apart. */
     --color-hand-right: var(--color-indigo-500);
     --color-hand-right-soft: var(--color-indigo-300);
@@ -366,8 +364,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-400);
-    --color-ghost-surface: var(--color-fuchsia-950);
-    --color-ghost-line: var(--color-fuchsia-900);
 
     --color-hand-right: var(--color-indigo-300);
     --color-hand-right-soft: var(--color-indigo-500);
