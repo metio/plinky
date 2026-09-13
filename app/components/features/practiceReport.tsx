@@ -27,7 +27,7 @@ import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
 import { compactFieldClasses, sectionHeadingClasses } from "../ui/classes";
-import { StatTile } from "../ui/statTile";
+import { Folio, FolioFigure, FolioRow } from "../ui/folio";
 
 // The practice diary, rolled up. How long, on which days, and what it felt like —
 // the retrospective a player keeps for themselves and the summary a teacher asks
@@ -124,24 +124,21 @@ function SessionRow({
     pieceTitle: (id: string) => string;
 }) {
     const store = usePracticeLogStore();
+    // The sitting's length is its figure, in the margin; its day is its name, and how it
+    // was counted and how it felt are the line under it.
     return (
-        <li className="space-y-2 rounded-lg border border-line bg-surface p-3">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="font-medium text-body">{duration(session.activeMs)}</span>
-                <span className="text-sm text-muted">
-                    {todayKey(new Date(session.start))}
-                    {" · "}
-                    {session.manual ? m.practice_session_by_hand() : m.practice_session_measured()}
-                    {session.mood && ` · ${MOOD_LABEL[session.mood]()}`}
-                </span>
-                <Button
-                    variant="ghost"
-                    className="ml-auto"
-                    onClick={() => store.remove(session.start)}
-                >
+        <FolioRow
+            margin={<FolioFigure value={duration(session.activeMs)} tone="ink" />}
+            name={todayKey(new Date(session.start))}
+            line={`${session.manual ? m.practice_session_by_hand() : m.practice_session_measured()}${
+                session.mood ? ` · ${MOOD_LABEL[session.mood]()}` : ""
+            }`}
+            trailing={
+                <Button variant="ghost" onClick={() => store.remove(session.start)}>
                     {m.practice_remove()}
                 </Button>
-            </div>
+            }
+        >
             {session.label !== "" && (
                 <p className="text-sm whitespace-pre-line text-body">{session.label}</p>
             )}
@@ -154,7 +151,7 @@ function SessionRow({
             <Disclosure summary={m.practice_mood()}>
                 <MoodPicker session={session} />
             </Disclosure>
-        </li>
+        </FolioRow>
     );
 }
 
@@ -217,12 +214,24 @@ function BackLogForm({ now }: { now: Date }) {
 
 function Totals({ report }: { report: PracticeReportData }) {
     return (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatTile label={m.practice_total_time()} value={duration(report.activeMs)} />
-            <StatTile label={m.practice_days_practised()} value={report.activeDays} />
-            <StatTile label={m.practice_typical_session()} value={duration(report.averageMs)} />
-            <StatTile label={m.practice_notes_played()} value={report.notes} />
-        </div>
+        <Folio>
+            <FolioRow
+                margin={<FolioFigure value={duration(report.activeMs)} />}
+                name={m.practice_total_time()}
+            />
+            <FolioRow
+                margin={<FolioFigure value={report.activeDays} />}
+                name={m.practice_days_practised()}
+            />
+            <FolioRow
+                margin={<FolioFigure value={duration(report.averageMs)} />}
+                name={m.practice_typical_session()}
+            />
+            <FolioRow
+                margin={<FolioFigure value={report.notes} />}
+                name={m.practice_notes_played()}
+            />
+        </Folio>
     );
 }
 
@@ -323,7 +332,7 @@ export function PracticeReport({
 
                     <div className="space-y-2">
                         <h3 className="text-sm font-medium text-body">{m.practice_sessions()}</h3>
-                        <ul className="space-y-2">
+                        <Folio>
                             {recent.map((session) => (
                                 <SessionRow
                                     key={session.start}
@@ -331,7 +340,7 @@ export function PracticeReport({
                                     pieceTitle={pieceTitle}
                                 />
                             ))}
-                        </ul>
+                        </Folio>
                     </div>
                 </>
             )}
