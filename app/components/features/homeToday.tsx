@@ -51,6 +51,7 @@ import { getLocale } from "../../paraglide/runtime.js";
 import { BakedIncipit } from "../ui/incipit";
 import { linkClasses } from "../ui/classes";
 import { SettingsSection } from "../ui/settingsSection";
+import { Folio, FolioRow } from "../ui/folio";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
 import { Show, useMidiConnected } from "./conditional";
@@ -251,39 +252,37 @@ function Row({
     // The reading aid that colours noteheads in a score colours this opening bar too.
     const { prefs } = usePrefs();
     return (
-        <Link
+        <FolioRow
             to={to}
-            className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition hover:bg-subtle"
-        >
-            {mark ? (
-                <BakedIncipit
-                    mark={mark}
-                    label={label}
-                    colored={prefs.colorNotes}
-                    className="shrink-0 text-faint"
-                />
-            ) : (
-                <span aria-hidden="true" className="text-xl">
-                    {icon}
+            margin={
+                mark ? (
+                    <BakedIncipit
+                        mark={mark}
+                        label={label}
+                        colored={prefs.colorNotes}
+                        className="shrink-0 text-faint"
+                    />
+                ) : (
+                    <span aria-hidden="true" className="text-2xl">
+                        {icon}
+                    </span>
+                )
+            }
+            name={label}
+            line={hint}
+            trailing={
+                <span
+                    aria-hidden="true"
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        primary
+                            ? "bg-accent-solid text-white"
+                            : "border border-line-strong text-accent-strong group-hover:border-accent-line-strong"
+                    }`}
+                >
+                    {action ?? "→"}
                 </span>
-            )}
-            <span className="min-w-0 space-y-0.5">
-                <span className="block font-medium text-ink group-hover:text-accent-strong">
-                    {label}
-                </span>
-                {hint && <span className="block text-sm leading-snug text-muted">{hint}</span>}
-            </span>
-            <span
-                aria-hidden="true"
-                className={`ml-auto shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                    primary
-                        ? "bg-accent-solid text-white"
-                        : "border border-line-strong text-accent-strong group-hover:border-accent-line-strong"
-                }`}
-            >
-                {action ?? "→"}
-            </span>
-        </Link>
+            }
+        />
     );
 }
 
@@ -616,7 +615,7 @@ export function HomeToday() {
                 hint={handSet ? undefined : m.grades_start_hand()}
                 hintTo={handSet ? undefined : "/settings#hand"}
             >
-                <ul className="space-y-2">
+                <Folio>
                     {work.map((task, index) => {
                         const { label, hint } = rowFor(
                             task,
@@ -626,24 +625,23 @@ export function HomeToday() {
                         );
                         const id = "id" in task ? task.id : undefined;
                         return (
-                            <li key={task.key}>
-                                <Row
-                                    to={task.to}
-                                    icon={ICON[task.key]}
-                                    label={label}
-                                    hint={hint}
-                                    mark={id ? session.marks.get(id) : undefined}
-                                    action={
-                                        task.key === "assignment" || task.key === "learn"
-                                            ? m.action_practice()
-                                            : undefined
-                                    }
-                                    primary={index === 0}
-                                />
-                            </li>
+                            <Row
+                                key={task.key}
+                                to={task.to}
+                                icon={ICON[task.key]}
+                                label={label}
+                                hint={hint}
+                                mark={id ? session.marks.get(id) : undefined}
+                                action={
+                                    task.key === "assignment" || task.key === "learn"
+                                        ? m.action_practice()
+                                        : undefined
+                                }
+                                primary={index === 0}
+                            />
                         );
                     })}
-                </ul>
+                </Folio>
                 <SurpriseButton
                     onClick={() => {
                         // A fresh seed per press. It used to be a counter starting at
