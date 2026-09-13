@@ -17,6 +17,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with\nsoft forget-me-not blue where it used lilac and gold, and cooler greys so the page\nreads more clearly. If you liked the violet, Settings brings it back under Colours.\nThe theme can also be Black: a true-black page for phone screens at night, in either\nset of colours.",
                 twip: true,
             },
+            {
+                body: "**A new logo.** Three keys on an indigo circle, with a note falling down the middle\none to strike it. It sits beside the name at the top of every page and is the icon in\nyour browser tab, and it keeps its own colours whichever ones you pick.",
+                twip: true,
+            },
         ],
     },
     {
