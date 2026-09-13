@@ -21,6 +21,10 @@ export type Reachable = {
 // easier, so a piece nothing can be taken out of carries nothing.
 export type Reach = Partial<Record<Reduction, number>>;
 
+// What each of those reductions costs, as the catalogue measures it: the numbers `reach` is
+// graded from, as a piece's grade is graded from its cost.
+export type ReductionCosts = Partial<Record<Reduction, number>>;
+
 // The easiest way into a piece, and how far down it goes. What a list row shows: one number
 // a reader can compare against the grade beside it.
 //

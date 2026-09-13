@@ -10,6 +10,20 @@ import type { Release } from "./changelog";
 
 export const LATEST_RELEASES: Release[] = [
     {
+        date: "2026-09-13",
+        label: null,
+        entries: [
+            {
+                body: "**A chord written for both hands is graded the way you play it.** Where one staff\nholds more notes than a hand can span, like the crossing thirds in Mozart's A major\nsonata or the tenor and bass of a hymn written on one line, the grade read them as a\nsingle impossible stretch. When your other hand is free to take those notes, the grade\nnow counts them as shared between your hands. Seventy-nine pieces sit a grade or two\neasier for it, and no piece's own grade went up. The easier ways into a piece, like\nthe melody alone, are measured afresh too, so a few pieces now start a grade higher\nor lower, and none offers a way in that is no easier than the piece itself.",
+                twip: true,
+            },
+            {
+                body: "**A slide that lands on a chord goes on from it.** Where a slide arrives on one note\nof a chord and the next sets off from another note of the same chord, Listen could\ndrop the second slide and simply strike its notes. Both slides now sound, one\narriving and the next leaving, whichever way round the chord is written.",
+                twip: true,
+            },
+        ],
+    },
+    {
         date: "2026-09-12",
         label: "evening",
         entries: [
@@ -87,20 +101,6 @@ export const LATEST_RELEASES: Release[] = [
             },
             {
                 body: "**Finger numbers sit the right way up on every chord.** Some scores write a chord's\nnotes from the top down, and on those the suggested fingering came out upside down:\nthe thumb printed on the top note of a right-hand chord and the little finger on the\nbottom, in the score and in the finger-position editor. A chord is now fingered by its\npitches, whichever order they were written in.",
-                twip: true,
-            },
-        ],
-    },
-    {
-        date: "2026-09-12",
-        label: null,
-        entries: [
-            {
-                body: "**Ear training answers from your number keys.** On a scale-degree question, typing 3\nanswers \"3\" just as clicking it does, and in melodic dictation each number you type\nfills the next note. Chord progressions take the number of the chord's degree, so 4\nis IV and 5 is V; with a keyboard to press them on, each chord button shows its\nnumber in the corner. A number the\nquestion doesn't offer is left alone. The number pad works too, and so does the\nnumber row on a French keyboard, with or without Shift. With a screen reader, you\nhear each note or chord as you fill it in, and which of the slots it went into.",
-                twip: true,
-            },
-            {
-                body: "**Ear training fits a small phone again.** A long melody or a chord progression\ndrew more listening dots than a narrow screen holds in a row, and five answer boxes\nwere wider than it too, so the page zoomed out and the undo button was cut off at\nthe edge. The dots now wrap onto a second row, and the boxes narrow to fit.",
                 twip: true,
             },
         ],

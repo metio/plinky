@@ -8,6 +8,22 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 13 September 2026
+
+**A chord written for both hands is graded the way you play it.** Where one staff
+holds more notes than a hand can span, like the crossing thirds in Mozart's A major
+sonata or the tenor and bass of a hymn written on one line, the grade read them as a
+single impossible stretch. When your other hand is free to take those notes, the grade
+now counts them as shared between your hands. Seventy-nine pieces sit a grade or two
+easier for it, and no piece's own grade went up. The easier ways into a piece, like
+the melody alone, are measured afresh too, so a few pieces now start a grade higher
+or lower, and none offers a way in that is no easier than the piece itself.
+
+**A slide that lands on a chord goes on from it.** Where a slide arrives on one note
+of a chord and the next sets off from another note of the same chord, Listen could
+drop the second slide and simply strike its notes. Both slides now sound, one
+arriving and the next leaving, whichever way round the chord is written.
+
 ## 12 September 2026 — evening
 
 **Two slides at once each land on their own note.** Where both hands glide across

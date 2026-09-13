@@ -141,3 +141,92 @@ describe("readGlissandos over chained sweeps", () => {
         );
     });
 });
+
+// The same chains, with a chained position free to be a chord: the sweep arriving lands on
+// one note and the next sets off from another at the same onset, the two in either order
+// and shuffled among every other note there. A split link's leaving note is pitch
+// 100 + 10 * index + link, so a span still names the note it really started from.
+const splitChains = chains.chain((drawn) =>
+    fc.tuple(
+        fc.constant(drawn),
+        fc.array(fc.array(fc.boolean(), { minLength: 6, maxLength: 6 }), {
+            minLength: drawn.length,
+            maxLength: drawn.length,
+        }),
+        fc.array(
+            fc.array(fc.double({ min: 0, max: 1, noNaN: true }), { minLength: 12, maxLength: 12 }),
+            {
+                minLength: drawn.length,
+                maxLength: drawn.length,
+            },
+        ),
+    ),
+);
+
+describe("readGlissandos over chains passing between the notes of a chord", () => {
+    it("pairs every link, whichever note of the chord each mark is on", () => {
+        fc.assert(
+            fc.property(splitChains, ([drawn, splits, ties]) => {
+                const numberOf = (index: number, link: number) =>
+                    String(2 * index + ((drawn[index]?.numbers[link] ?? false) ? 2 : 1));
+                const split = (index: number, link: number) =>
+                    link > 0 &&
+                    link < (drawn[index]?.positions.length ?? 0) - 1 &&
+                    (splits[index]?.[link] ?? false);
+                const leavingPitch = (index: number, link: number) =>
+                    (split(index, link) ? 100 : 20) + 10 * index + link;
+                const notes = drawn
+                    .flatMap(({ positions, stopFirst }, index) =>
+                        positions.flatMap((position, link) => {
+                            const stop =
+                                link > 0
+                                    ? [{ type: "stop" as const, number: numberOf(index, link - 1) }]
+                                    : [];
+                            const start =
+                                link < positions.length - 1
+                                    ? [{ type: "start" as const, number: numberOf(index, link) }]
+                                    : [];
+                            const at = (
+                                midi: number,
+                                glissandos: readonly { type: "start" | "stop"; number: string }[],
+                                slot: number,
+                            ) => ({
+                                whole: position / 16,
+                                wholes: 1 / 16,
+                                midi,
+                                part: "P1",
+                                marks: { glissandos },
+                                tie: ties[index]?.[2 * link + slot] as number,
+                            });
+                            const landsOn = 20 + 10 * index + link;
+                            if (split(index, link)) {
+                                return [
+                                    at(landsOn, stop, 0),
+                                    at(leavingPitch(index, link), start, 1),
+                                ];
+                            }
+                            return [
+                                at(
+                                    landsOn,
+                                    stopFirst[link] ? [...stop, ...start] : [...start, ...stop],
+                                    0,
+                                ),
+                            ];
+                        }),
+                    )
+                    .sort((one, other) => one.whole - other.whole || one.tie - other.tie);
+                const expected = drawn.flatMap(({ positions }, index) =>
+                    positions.slice(1).map((position, link) => ({
+                        from: (positions[link] as number) / 16,
+                        to: position / 16 + 1 / 16,
+                        arrivesAt: 20 + 10 * index + link + 1,
+                        pitch: leavingPitch(index, link),
+                    })),
+                );
+                const byPitch = (one: { pitch?: number }, other: { pitch?: number }) =>
+                    (one.pitch ?? 0) - (other.pitch ?? 0);
+                expect(readGlissandos(notes).sort(byPitch)).toEqual(expected.sort(byPitch));
+            }),
+        );
+    });
+});

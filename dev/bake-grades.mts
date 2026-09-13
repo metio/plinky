@@ -34,10 +34,10 @@ import { bakePeopleIndex } from "./bake-people.mts";
 import { bakeShards } from "./bake-shards.mts";
 import { curate, loadCuration, unapplied } from "./curation.mts";
 import { tidied, tidyCredit, tidyTitle } from "./titles.mts";
-import { crowdedGrade, staleSong } from "./bakeChecks.mts";
+import { crowdedGrade, missingSentinel, SENTINELS, staleSong } from "./bakeChecks.mts";
 import { exerciseMeasure } from "./exerciseCosts.mts";
 import { progressionOf } from "./progressionOf.mts";
-import { gradeForCost, pieceBoundaries } from "./grading.mts";
+import { gradeForCost, pieceBoundaries, reachOf } from "./grading.mts";
 import { readExercises, readSongs, writeExercises, writeSongs } from "./manifest.mts";
 
 const MAX_GRADE = 8;
@@ -91,11 +91,16 @@ async function main() {
     const bakedSongs = (
         await Promise.all(
             correctedSongs.pieces.map(async (song) => {
-                const { progression: _stale, ...rest } = song;
+                const { progression: _stale, reach: _staleReach, ...rest } = song;
                 const progression = await progressionOf(song);
+                const grade = gradeForCost(song.cost, boundaries);
+                // The ways in are graded off their stored costs against the same boundaries
+                // as the piece, so moving a boundary can never leave them behind.
+                const reach = reachOf(song.reachCost ?? {}, grade, boundaries);
                 return {
                     ...rest,
-                    grade: gradeForCost(song.cost, boundaries),
+                    grade,
+                    ...(Object.keys(reach).length === 0 ? {} : { reach }),
                     ...(progression === null ? {} : { progression }),
                 };
             }),
@@ -124,7 +129,14 @@ async function main() {
     // models that are in the tree. Grades baked from costs measured under a previous model
     // are wrong in a way nothing downstream can see, and a stale incipit draws the wrong
     // opening under the right title.
-    const drifted = await staleSong(songs);
+    const drifted =
+        missingSentinel(songs) ??
+        (await staleSong(
+            songs,
+            undefined,
+            undefined,
+            SENTINELS.map((sentinel) => sentinel.id),
+        ));
     if (drifted !== null) {
         console.error("The song manifest was not derived from the current models:");
         console.error(`  • ${drifted}`);

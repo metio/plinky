@@ -4,7 +4,99 @@
 
 import { describe, expect, it } from "vitest";
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
-import { DEFAULT_TEMPO, gapTracker, scoreClock, TIMED_NODES } from "./scoreTiming";
+import {
+    beatCursor,
+    CURSOR_NODES,
+    DEFAULT_TEMPO,
+    gapTracker,
+    scoreClock,
+    TIMED_NODES,
+} from "./scoreTiming";
+
+// The beat each note of one part sounds on, in document order.
+const beatsOf = (body: string): number[] => {
+    const doc = domXmlCodec.parse(
+        `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">${body}</measure></part></score-partwise>`,
+    );
+    const cursor = beatCursor();
+    return Array.from(doc!.querySelectorAll(CURSOR_NODES))
+        .map((node) => cursor.read(node))
+        .filter((beat) => !Number.isNaN(beat));
+};
+
+describe("beatCursor", () => {
+    const n = (ticks: number, extra = "") =>
+        `<note>${extra}<pitch><step>C</step><octave>4</octave></pitch><duration>${ticks}</duration></note>`;
+    const divisions = (value: number) => `<attributes><divisions>${value}</divisions></attributes>`;
+
+    it("places each note after the ones before it, in beats", () => {
+        expect(beatsOf(`${divisions(2)}${n(2)}${n(4)}${n(1)}`)).toEqual([0, 1, 3]);
+    });
+
+    it("sounds a chord member with the note it joins", () => {
+        expect(beatsOf(`${divisions(2)}${n(2)}${n(2, "<chord/>")}${n(2)}`)).toEqual([0, 0, 1]);
+    });
+
+    it("rewinds for a second voice, so both voices start together", () => {
+        expect(
+            beatsOf(`${divisions(1)}${n(1)}${n(1)}<backup><duration>2</duration></backup>${n(2)}`),
+        ).toEqual([0, 1, 0]);
+    });
+
+    it("skips ahead over a forward, as over a rest", () => {
+        expect(beatsOf(`${divisions(1)}<forward><duration>3</duration></forward>${n(1)}`)).toEqual([
+            3,
+        ]);
+    });
+
+    it("takes no time for a grace note", () => {
+        expect(
+            beatsOf(
+                `${divisions(1)}<note><grace/><pitch><step>D</step><octave>4</octave></pitch></note>${n(1)}`,
+            ),
+        ).toEqual([0, 0]);
+    });
+
+    it("never rewinds before the start of the part", () => {
+        expect(beatsOf(`${divisions(1)}<backup><duration>4</duration></backup>${n(1)}`)).toEqual([
+            0,
+        ]);
+    });
+
+    it("follows a divisions change partway through", () => {
+        expect(beatsOf(`${divisions(1)}${n(1)}${divisions(4)}${n(4)}${n(4)}`)).toEqual([0, 1, 2]);
+    });
+
+    // A part of several bars, each bar's body as written.
+    const barsOf = (...bars: string[]): number[] => {
+        const doc = domXmlCodec.parse(
+            `<?xml version="1.0"?><score-partwise><part id="P1">${bars
+                .map((body, at) => `<measure number="${at + 1}">${body}</measure>`)
+                .join("")}</part></score-partwise>`,
+        );
+        const cursor = beatCursor();
+        return Array.from(doc!.querySelectorAll(CURSOR_NODES))
+            .map((node) => cursor.read(node))
+            .filter((beat) => !Number.isNaN(beat));
+    };
+
+    it("starts a bar where the bar before it reached, after a voice that stops short", () => {
+        // Bar 1: a whole note, then a second voice of one half note and nothing after it.
+        // Bar 2 still begins on beat 4, not on beat 2 where the short voice stopped.
+        expect(
+            barsOf(
+                `${divisions(1)}${n(4)}<backup><duration>4</duration></backup>${n(2)}`,
+                `${n(4)}`,
+            ),
+        ).toEqual([0, 0, 4]);
+    });
+
+    it("never rewinds before the start of its bar", () => {
+        expect(
+            barsOf(`${divisions(1)}${n(4)}`, `<backup><duration>8</duration></backup>${n(1)}`),
+        ).toEqual([0, 4]);
+    });
+});
 
 const walk = (body: string): Element[] => {
     const doc = domXmlCodec.parse(

@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { MAX_GRADE, rawDifficulty } from "../core/scoreDifficulty.ts";
-import { gradeForCost, gradeForScore, pieceBoundaries } from "./grading.mts";
+import { gradeForCost, gradeForScore, pieceBoundaries, reachOf } from "./grading.mts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 
 const score = (measure: string) => `<?xml version="1.0" encoding="UTF-8"?>
@@ -28,5 +28,38 @@ describe("the grade a bake gives a score in hand", () => {
         expect(gradeForScore(linkedomXmlCodec, xml, cost, [...pieceBoundaries])).toBe(
             gradeForCost(cost, [...pieceBoundaries]),
         );
+    });
+});
+
+describe("the ways into a piece a bake reads off their costs", () => {
+    const boundaries = [5, 10, 15];
+
+    it("grades each reduction easier than the piece against the boundaries", () => {
+        expect(reachOf({ thinned: 12, outlined: 7, melody: 3 }, 4, boundaries)).toEqual({
+            thinned: 3,
+            outlined: 2,
+            melody: 1,
+        });
+    });
+
+    it("offers no reduction that grades where the piece already does", () => {
+        expect(reachOf({ thinned: 9 }, 2, boundaries)).toEqual({});
+    });
+
+    it("offers only the milder of two reductions that land on one grade", () => {
+        expect(reachOf({ thinned: 6, outlined: 8, melody: 2 }, 3, boundaries)).toEqual({
+            thinned: 2,
+            melody: 1,
+        });
+    });
+
+    it("moves with the boundaries, as the piece's own grade does", () => {
+        const costs = { melody: 4 };
+        expect(reachOf(costs, 3, boundaries)).toEqual({ melody: 1 });
+        expect(reachOf(costs, 3, [3, 10, 15])).toEqual({ melody: 2 });
+    });
+
+    it("says nothing about a piece nothing can be taken out of", () => {
+        expect(reachOf({}, 8, boundaries)).toEqual({});
     });
 });

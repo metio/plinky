@@ -3,7 +3,7 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { fingerPositions, positionsCost } from "./fingering";
+import { fingerPositions, HAND_REACH, positionsCost, reachingCost } from "./fingering";
 
 // MusicXML lets a chord's notes arrive in any order, so the order a chord was written in
 // is no fact about how to play it. These pin that the fingering model reads a chord as
@@ -99,6 +99,183 @@ describe("fingering a chord in any written order", () => {
                     expect(rising).toBe(true);
                 }
             }),
+        );
+    });
+});
+
+// A position one hand cannot span is priced as held in part, the rest given away. These
+// pin what that pricing may and may not do to a sequence.
+describe("pricing a position wider than one hand", () => {
+    const arbGaps = (length: number) =>
+        fc.array(fc.double({ min: 0, max: 4, noNaN: true }), {
+            minLength: length,
+            maxLength: length,
+        });
+    // What the other hand strikes at each position: nothing, some notes, or not known.
+    const arbOthers = (length: number) =>
+        fc.array(
+            fc.option(fc.uniqueArray(fc.integer({ min: 24, max: 108 }), { maxLength: 4 }), {
+                nil: undefined,
+            }),
+            {
+                minLength: length,
+                maxLength: length,
+            },
+        );
+    // Chords from anywhere on the keyboard, so plenty of them are wider than an octave.
+    const arbWideChord = fc.uniqueArray(fc.integer({ min: 24, max: 108 }), {
+        minLength: 1,
+        maxLength: 5,
+    });
+    const arbWidePiece = fc.array(arbWideChord, { minLength: 1, maxLength: 6 });
+    const isWide = (pitches: number[]) =>
+        pitches.length > 1 && Math.max(...pitches) - Math.min(...pitches) > HAND_REACH;
+
+    it("prices exactly as the one-hand search does while the other hand is unknown", () => {
+        fc.assert(
+            fc.property(
+                arbWidePiece.chain((positions) =>
+                    fc.tuple(fc.constant(positions), arbGaps(positions.length)),
+                ),
+                arbHand,
+                ([positions, gaps], hand) => {
+                    expect(reachingCost(positions, hand, gaps)).toBe(
+                        positionsCost(
+                            positions,
+                            fingerPositions(positions, hand, undefined, gaps),
+                            hand,
+                            undefined,
+                            gaps,
+                        ),
+                    );
+                },
+            ),
+        );
+    });
+
+    it("prices a sequence within reach exactly as the one-hand search does", () => {
+        // Every chord fits in an octave above its lowest note.
+        const arbNarrow = fc
+            .tuple(
+                fc.integer({ min: 36, max: 84 }),
+                fc.uniqueArray(fc.integer({ min: 0, max: HAND_REACH }), {
+                    minLength: 1,
+                    maxLength: 5,
+                }),
+            )
+            .map(([base, offsets]) => offsets.map((offset) => base + offset));
+        fc.assert(
+            fc.property(
+                fc
+                    .array(arbNarrow, { minLength: 1, maxLength: 8 })
+                    .chain((positions) =>
+                        fc.tuple(fc.constant(positions), arbGaps(positions.length)),
+                    ),
+                arbHand,
+                ([positions, gaps], hand) => {
+                    expect(reachingCost(positions, hand, gaps)).toBe(
+                        positionsCost(
+                            positions,
+                            fingerPositions(positions, hand, undefined, gaps),
+                            hand,
+                            undefined,
+                            gaps,
+                        ),
+                    );
+                },
+            ),
+        );
+    });
+
+    it("does not depend on the order a chord was written in", () => {
+        fc.assert(
+            fc.property(
+                arbPiece.chain((piece) =>
+                    fc.tuple(
+                        fc.constant(piece),
+                        arbGaps(piece.written.length),
+                        arbOthers(piece.written.length),
+                    ),
+                ),
+                arbHand,
+                ([piece, gaps, others], hand) => {
+                    expect(reachingCost(piece.written, hand, gaps, others)).toBe(
+                        reachingCost(piece.ascending, hand, gaps, others),
+                    );
+                },
+            ),
+        );
+    });
+
+    it("never costs less than keeping the position whole or holding the easier part alone", () => {
+        fc.assert(
+            fc.property(
+                arbWidePiece.chain((positions) =>
+                    fc.tuple(
+                        fc.constant(positions),
+                        arbGaps(positions.length),
+                        arbOthers(positions.length),
+                    ),
+                ),
+                arbHand,
+                ([positions, gaps, others], hand) => {
+                    const at = positions.findIndex(isWide);
+                    if (at < 0) {
+                        return;
+                    }
+                    const ascending = [...positions[at]!].sort((a, b) => a - b);
+                    // Every run of the position one hand spans, standing in for all of it.
+                    const parts: number[][] = [];
+                    for (let lo = 0; lo < ascending.length; lo++) {
+                        for (let hi = lo; hi < ascending.length; hi++) {
+                            if (ascending[hi]! - ascending[lo]! <= HAND_REACH) {
+                                parts.push(ascending.slice(lo, hi + 1));
+                            }
+                        }
+                    }
+                    // Kept whole: with nobody known to share it, only the whole chord is left.
+                    const whole = reachingCost(
+                        positions,
+                        hand,
+                        gaps,
+                        others.map((struck, k) => (k === at ? undefined : struck)),
+                    );
+                    const easiest = Math.min(
+                        whole,
+                        ...parts.map((part) =>
+                            reachingCost(
+                                positions.map((pitches, k) => (k === at ? part : pitches)),
+                                hand,
+                                gaps,
+                                others,
+                            ),
+                        ),
+                    );
+                    expect(reachingCost(positions, hand, gaps, others)).toBeGreaterThanOrEqual(
+                        easiest - 1e-9,
+                    );
+                },
+            ),
+        );
+    });
+
+    it("never costs more when the other hand is free than when it is busy", () => {
+        fc.assert(
+            fc.property(
+                arbWidePiece.chain((positions) =>
+                    fc.tuple(fc.constant(positions), arbGaps(positions.length)),
+                ),
+                arbHand,
+                ([positions, gaps], hand) => {
+                    const free = reachingCost(
+                        positions,
+                        hand,
+                        gaps,
+                        positions.map(() => []),
+                    );
+                    expect(free).toBeLessThanOrEqual(reachingCost(positions, hand, gaps));
+                },
+            ),
         );
     });
 });
