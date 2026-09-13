@@ -25,6 +25,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**The keyboard on the front page is a way into practising.** Each of its seven white\nkeys carries one of the ways a teacher would suggest, with a small drawing on it:\nloop the hard bar, go slowly, one hand at a time, hear it first, mix pieces up, come\nback later, and learn the chords. A key still sounds when you press it, and its way\nto practise opens underneath, with why it works and a piece to try it on. A MIDI\npiano or your computer keys open them too. The long list of them further down the\npage is gone, and nothing plays a note any more when your mouse passes over a list.",
                 twip: true,
             },
+            {
+                body: "**Lists without boxes.** Lessons, tools, settings, your stats and the result of a run\nare no longer drawn as cards. Each is a row with an icon, a picture or a number at\nits left edge, its name, and a line about it, with a thin rule between one row and\nthe next, like the contents page of a music book. On the Stats page every number\nsits at the start of its row, so the figures line up down the page.",
+                twip: true,
+            },
         ],
     },
     {
