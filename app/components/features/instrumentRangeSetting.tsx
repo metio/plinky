@@ -12,6 +12,7 @@ import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { SettingsSection } from "../ui/settingsSection";
+import { FolioRow } from "../ui/folio";
 
 // How many keys the instrument in the room has, measured by playing its two ends.
 //
@@ -81,18 +82,23 @@ export function InstrumentRangeSetting() {
             hint={m.settings_instrument_range_hint()}
             level={3}
         >
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line px-3 py-2">
-                <span className="text-sm">
-                    <span className="font-medium">
+            <FolioRow
+                size="compact"
+                name={
+                    <>
                         {keysIn(range) >= 88
                             ? m.instrument_range_all_keys()
                             : m.instrument_range_keys({ count: keysIn(range) })}
-                    </span>
-                    {prefs.instrumentRange === null && named && (
-                        <span className="text-muted"> · {m.instrument_range_from_name()}</span>
-                    )}
-                </span>
-                <span className="flex shrink-0 flex-wrap gap-2">
+                        {prefs.instrumentRange === null && named && (
+                            <span className="font-sans text-sm font-normal text-muted">
+                                {" "}
+                                · {m.instrument_range_from_name()}
+                            </span>
+                        )}
+                    </>
+                }
+            >
+                <span className="flex flex-wrap gap-2">
                     <Button
                         variant="secondary"
                         disabled={devices.length === 0 || measuring}
@@ -113,7 +119,7 @@ export function InstrumentRangeSetting() {
                         </Button>
                     )}
                 </span>
-            </div>
+            </FolioRow>
 
             {devices.length === 0 && (
                 <p className="text-xs text-muted">{m.instrument_range_no_device()}</p>

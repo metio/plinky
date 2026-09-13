@@ -11,6 +11,7 @@ import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { SettingsSection } from "../ui/settingsSection";
+import { FolioRow } from "../ui/folio";
 import { PianoKeyboard } from "./pianoKeyboard";
 
 type Side = "left" | "right";
@@ -80,39 +81,37 @@ export function HandSize() {
             hint={m.settings_hand_size_hint()}
             level={3}
         >
-            <div className="space-y-2">
+            {/* A Folio row per hand, with no margin of their own: they sit inside a group
+                of settings whose margin already carries its icon. */}
+            <div>
                 {SIDES.map((side) => {
                     const span = spans[side];
                     return (
-                        <div
+                        <FolioRow
                             key={side}
-                            className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2"
-                        >
-                            <span className="text-sm">
-                                <span className="font-medium">{sideLabel[side]}</span>{" "}
-                                {span !== null ? (
-                                    <span className="text-muted">
-                                        {m.semitones_count({ count: span })}
-                                        {spanName(span) ? ` · ${spanName(span)}` : ""}
-                                    </span>
-                                ) : (
-                                    <span className="text-muted">{m.hand_size_not_set()}</span>
-                                )}
-                            </span>
-                            <span className="flex shrink-0 gap-2">
-                                <Button variant="secondary" onClick={() => begin(side)}>
-                                    {span !== null ? m.hand_size_edit() : m.hand_size_set()}
-                                </Button>
-                                {span !== null && (
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => persist({ ...spans, [side]: null })}
-                                    >
-                                        {m.action_remove()}
+                            size="compact"
+                            name={sideLabel[side]}
+                            line={
+                                span !== null
+                                    ? `${m.semitones_count({ count: span })}${spanName(span) ? ` · ${spanName(span)}` : ""}`
+                                    : m.hand_size_not_set()
+                            }
+                            trailing={
+                                <span className="flex gap-2">
+                                    <Button variant="secondary" onClick={() => begin(side)}>
+                                        {span !== null ? m.hand_size_edit() : m.hand_size_set()}
                                     </Button>
-                                )}
-                            </span>
-                        </div>
+                                    {span !== null && (
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => persist({ ...spans, [side]: null })}
+                                        >
+                                            {m.action_remove()}
+                                        </Button>
+                                    )}
+                                </span>
+                            }
+                        />
                     );
                 })}
             </div>

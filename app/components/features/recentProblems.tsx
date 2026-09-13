@@ -10,6 +10,7 @@ import { buttonClasses } from "../ui/button";
 import { ConfirmButton } from "../ui/confirmButton";
 import { QuestionIcon } from "../ui/icons";
 import { SettingsSection } from "../ui/settingsSection";
+import { Folio, FolioRow } from "../ui/folio";
 
 // The faults this device has hit that no boundary caught.
 //
@@ -35,11 +36,11 @@ export function RecentProblems() {
             icon={<QuestionIcon />}
             tone="danger"
         >
-            <ul className="space-y-3">
+            <Folio>
                 {faults.map((fault) => (
                     <Fault key={`${fault.where}:${fault.message}`} fault={fault} />
                 ))}
-            </ul>
+            </Folio>
             <ConfirmButton
                 variant="secondary"
                 confirmLabel={m.problems_clear_confirm()}
@@ -63,12 +64,11 @@ function Fault({ fault }: { fault: LoggedError }) {
         timeStyle: "short",
     });
     return (
-        <li className="space-y-1 rounded-md border border-line p-3">
-            <p className="text-xs text-muted">
-                {when} · {fault.where}
-                {fault.count > 1 ? ` · ×${fault.count}` : ""}
-            </p>
-            <p className="break-words font-mono text-xs text-ink">{fault.message}</p>
+        <FolioRow
+            size="compact"
+            name={`${when} · ${fault.where}${fault.count > 1 ? ` · ×${fault.count}` : ""}`}
+            line={<span className="break-words font-mono text-xs text-ink">{fault.message}</span>}
+        >
             <a
                 href={issueUrl(
                     REPO_ISSUES,
@@ -82,6 +82,6 @@ function Fault({ fault }: { fault: LoggedError }) {
             >
                 {m.action_report_problem()}
             </a>
-        </li>
+        </FolioRow>
     );
 }
