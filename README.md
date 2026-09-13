@@ -348,6 +348,14 @@ one-tap **review session** walks you through everything that's fading, and you c
   seen by somebody deciding whether to open Plinky at all, while the app opens for somebody
   who has already arrived and may never have played before.
 
+- **How Plinky looks** — two more questions in Settings, under Appearance. **Theme** follows
+  your device, or stays light, dark or **black**: a true-black page with neutral greys and no
+  tint at the edges, which a phone's OLED screen shows as light switched off. **Colours**
+  picks the palette, in any theme: *indigo*, deep indigo on paper white with soft
+  forget-me-not blue, which is what a new player gets, or *violet*, a brighter violet on warm
+  paper with gold for what you earned. Both are in place before the page first paints, so it
+  never flashes the wrong colours on the way in.
+
 - **Handing an assignment back** — the loop used to run one way: a teacher shares a
   list, and never learns what happened, because progress lives on the student's
   device. Now each assignment offers **Hand your results back**: type a name and the
