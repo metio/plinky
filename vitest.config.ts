@@ -101,7 +101,10 @@ export default defineConfig({
                     ...LIMITS,
                     name: "browser",
                     include: ["app/**/*.browser.test.{ts,tsx}", "core/**/*.browser.test.{ts,tsx}"],
-                    exclude: ["app/contexts/midi.browser.test.tsx"],
+                    exclude: [
+                        "app/contexts/midi.browser.test.tsx",
+                        "app/components/features/heroKeyboard.midi.browser.test.tsx",
+                    ],
                     setupFiles: ["./app/test-setup.ts"],
                     browser: {
                         enabled: true,
@@ -122,7 +125,10 @@ export default defineConfig({
                 test: {
                     ...LIMITS,
                     name: "browser-midi",
-                    include: ["app/contexts/midi.browser.test.tsx"],
+                    include: [
+                        "app/contexts/midi.browser.test.tsx",
+                        "app/components/features/heroKeyboard.midi.browser.test.tsx",
+                    ],
                     setupFiles: ["./app/test-setup.ts"],
                     browser: {
                         enabled: true,

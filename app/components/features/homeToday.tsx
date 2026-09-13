@@ -185,19 +185,45 @@ function Moment({
 }
 
 // What each moment takes up once it has arrived, measured off the settled page at a
-// desktop width — the warm-up carries a keyboard, the work a row per piece, and the
-// lesson a single line. Reserving it keeps the page still while the manifests land. A
-// narrow screen wraps more and will still grow a little; the alternative is a page that
-// jumps by two thirds of a screen, which is what this replaced.
-const WAITING = [
-    // The warm-up's placeholders stand in for a lead button and three ways in beneath it,
-    // so they are centred in the same column: reserving the height but not the alignment
-    // would still slide the row sideways the moment the words arrive, which is the shift
-    // this exists to prevent.
-    { label: m.today_moment_warmup, chips: 4, height: 216, centered: true },
+// desktop width — the warm-up's row of ways in, the work a row per piece, and the lesson a
+// single line. Reserving it keeps the page still while the manifests land. A narrow screen
+// wraps more and will still grow a little; the alternative is a page that jumps by two
+// thirds of a screen, which is what this replaced. The keyboard under the warm-up's row is
+// real from the start, so it reserves nothing.
+type Waiting = { label: () => string; chips: number; height: number; centered: boolean };
+
+// The warm-up's placeholders stand in for a lead button and three ways in beneath it, so
+// they are centred in the same column: reserving the height but not the alignment would
+// still slide the row sideways the moment the words arrive, which is the shift this exists
+// to prevent.
+const WARMUP_WAITING: Waiting = {
+    label: m.today_moment_warmup,
+    chips: 4,
+    height: 136,
+    centered: true,
+};
+const WAITING: Waiting[] = [
     { label: m.today_moment_work, chips: 2, height: 112, centered: false },
     { label: m.today_moment_learn, chips: 1, height: 40, centered: false },
 ];
+
+function Placeholder({ label, chips, height, centered }: Waiting) {
+    return (
+        <div
+            className={`flex flex-wrap content-start gap-2 ${centered ? "justify-center" : ""}`}
+            style={{ minHeight: `${height}px` }}
+            aria-hidden="true"
+        >
+            {Array.from({ length: chips }, (_, chip) => (
+                <span
+                    // biome-ignore lint/suspicious/noArrayIndexKey: a placeholder has no identity but its place in the row
+                    key={`${label()}-${chip}`}
+                    className="h-8 w-32 animate-pulse rounded-full bg-sunken motion-reduce:animate-none"
+                />
+            ))}
+        </div>
+    );
+}
 
 function Row({
     to,
@@ -500,35 +526,59 @@ export function HomeToday() {
         </header>
     );
 
-    // The day's three moments, in their places, before the manifests they are built from
-    // have arrived. Without this the page was a header for a moment and then eight hundred
-    // pixels taller, which shoves everything below it — the ways to practise, at the foot
-    // of the page — down as you read. The shape is the real one; only the words are
-    // waiting.
+    // Somewhere to put your hands before anything is asked of them, and the ways to practise
+    // on its keys. It is the same instrument the practice surfaces use, so a warm-up here and
+    // a run on a piece feel like one keyboard.
+    //
+    // Drawn before the day has arrived as well as after: it needs nothing the session reads,
+    // and the methods on it belong in the document a first visit and a crawler receive. Both
+    // branches below put it at the same place in the same tree, so React keeps the one
+    // keyboard across the change — its rise plays once, and a method opened while the page
+    // is still arriving stays open.
+    const keyboard = (
+        <div className="pt-1">
+            <HeroKeyboard>
+                {/* The getting-started card used to ask for a piano in a list of three
+                    chores at the foot of the page. It belongs here, under the keys it is
+                    about, and only while there is no instrument — taken, the offer
+                    disappears rather than ticking itself off. */}
+                <Show when={!midiReady}>
+                    {/* Straight to the setting rather than to the page it is on: Settings is
+                        long, and a reader sent for one thing should land on it. */}
+                    <p className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-center text-sm text-muted">
+                        <Link to="/settings#midi" className={linkClasses}>
+                            {m.settings_connect_midi()}
+                        </Link>
+                        <span aria-hidden="true">·</span>
+                        <Link to="/settings#keys" className={linkClasses}>
+                            {m.discover_keys()}
+                        </Link>
+                    </p>
+                </Show>
+            </HeroKeyboard>
+        </div>
+    );
+
+    // The day's moments, in their places, before the manifests they are built from have
+    // arrived. Without this the page was a header for a moment and then eight hundred pixels
+    // taller, which shoves everything below it down as you read. The shape is the real one;
+    // only the words are waiting.
     if (session === null) {
         return (
-            <div className="space-y-8" aria-busy="true">
+            <div className="space-y-8">
                 {header}
-                {WAITING.map(({ label, chips, height, centered }) => (
-                    <Moment key={label()} label={label()}>
-                        <div
-                            className={`flex flex-wrap content-start gap-2 ${
-                                centered ? "justify-center" : ""
-                            }`}
-                            style={{ minHeight: `${height}px` }}
-                            aria-hidden="true"
-                        >
-                            {Array.from({ length: chips }, (_, chip) => (
-                                <span
-                                    // biome-ignore lint/suspicious/noArrayIndexKey: a placeholder has no identity but its place in the row
-                                    key={`${label()}-${chip}`}
-                                    className="h-8 w-32 animate-pulse rounded-full bg-sunken motion-reduce:animate-none"
-                                />
-                            ))}
-                        </div>
-                    </Moment>
-                ))}
-                <p className="h-4" aria-hidden="true" />
+                <Moment label={m.today_moment_warmup()}>
+                    <Placeholder {...WARMUP_WAITING} />
+                    {keyboard}
+                </Moment>
+                <div className="space-y-8" aria-busy="true">
+                    {WAITING.map((moment) => (
+                        <Moment key={moment.label()} label={moment.label()}>
+                            <Placeholder {...moment} />
+                        </Moment>
+                    ))}
+                    <p className="h-4" aria-hidden="true" />
+                </div>
             </div>
         );
     }
@@ -555,31 +605,7 @@ export function HomeToday() {
                     arcadeTo={`/play/${arcadeId}`}
                     arcadeKey={noteSymbol(arcadeConfig(session.arcadeLevel).key, naming)}
                 />
-                {/* Somewhere to put your hands before anything is asked of them. It is
-                    the same instrument the practice surfaces use, so a warm-up here and
-                    a run on a piece feel like one keyboard. */}
-                <div className="space-y-1.5 pt-1">
-                    <HeroKeyboard />
-                    <p className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-center text-sm text-muted">
-                        <span>{m.home_keyboard_hint()}</span>
-                        {/* The getting-started card used to ask for a piano in a list of
-                            three chores at the foot of the page. It belongs here, under
-                            the keys it is about, and only while there is no instrument —
-                            taken, the offer disappears rather than ticking itself off. */}
-                        <Show when={!midiReady}>
-                            {/* Straight to the setting rather than to the page it is on:
-                                Settings is long, and a reader sent for one thing should
-                                land on it. */}
-                            <Link to="/settings#midi" className={linkClasses}>
-                                {m.settings_connect_midi()}
-                            </Link>
-                            <span aria-hidden="true">·</span>
-                            <Link to="/settings#keys" className={linkClasses}>
-                                {m.discover_keys()}
-                            </Link>
-                        </Show>
-                    </p>
-                </div>
+                {keyboard}
             </Moment>
 
             <Moment

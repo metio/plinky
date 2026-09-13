@@ -27,8 +27,8 @@ export function isWhite(note: number): boolean {
 
 // The keybed's capped pixel width for the range — what both the keyboard and an
 // aligned overlay set as their max width so their lanes line up.
-export function keybedMaxWidthPx(from: number, to: number): number {
-    return whiteKeys(from, to).length * MAX_WHITE_KEY_PX;
+export function keybedMaxWidthPx(from: number, to: number, maxKeyPx = MAX_WHITE_KEY_PX): number {
+    return whiteKeys(from, to).length * maxKeyPx;
 }
 
 // The white keys in [from, to], in ascending order.

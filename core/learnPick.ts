@@ -8,6 +8,8 @@
 // Deterministic — the pick comes from the day's number rather than a die, so it holds
 // still while you look at it and moves on tomorrow.
 
+import { METHODS_ANCHOR } from "./practiceMethods";
+
 export type LearnPickId = "basics" | "placement" | "theory" | "glossary" | "methods" | "tools";
 
 // The four that rotate once the two one-off steps are behind you. Order is the order
@@ -54,6 +56,7 @@ export const LEARN_PICK_HREF: Record<LearnPickId, string> = {
     placement: "/placement",
     theory: "/theory",
     glossary: "/glossary",
-    methods: "/methods",
+    // The methods live on the front page's keyboard, so the pick sends you to it.
+    methods: `/#${METHODS_ANCHOR}`,
     tools: "/tools",
 };

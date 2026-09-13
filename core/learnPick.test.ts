@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "./learnPick";
+import { METHODS_ANCHOR } from "./practiceMethods";
 
 const settled = { keyboardMet: true, placementTaken: true, courseDone: false };
 
@@ -56,8 +57,12 @@ describe("learnPick", () => {
             "methods",
             "tools",
         ];
-        for (const id of ids) {
+        for (const id of ids.filter((id) => id !== "methods")) {
             expect(LEARN_PICK_HREF[id]).toMatch(/^\/[a-z]+$/);
         }
+    });
+
+    it("sends the methods pick to the keyboard on the front page, where they live", () => {
+        expect(LEARN_PICK_HREF.methods).toBe(`/#${METHODS_ANCHOR}`);
     });
 });
