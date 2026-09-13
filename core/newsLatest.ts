@@ -14,7 +14,7 @@ export const LATEST_RELEASES: Release[] = [
         label: "evening",
         entries: [
             {
-                body: "**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with\nsoft forget-me-not blue where it used lilac and gold, and cooler greys so the page\nreads more clearly. If you liked the violet, Settings brings it back under Colours.\nThe theme can also be Black: a true-black page for phone screens at night, in either\nset of colours.",
+                body: "**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with\nsoft forget-me-not blue where it used lilac and gold, and cooler greys so the page\nreads more clearly. If you liked the violet, Settings brings it back under Colours.\nThe theme can also be Black: a true-black page for phone screens at night, in either\nset of colours. The pictures on the help page show the new look, in your language.",
                 twip: true,
             },
             {
@@ -26,11 +26,15 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**Lists without boxes.** Lessons, tools, settings, your stats and the result of a run\nare no longer drawn as cards. Each is a row with an icon, a picture or a number at\nits left edge, its name, and a line about it, with a thin rule between one row and\nthe next, like the contents page of a music book. On the Stats page every number\nsits at the start of its row, so the figures line up down the page.",
+                body: "**Lists without boxes.** Lessons, tools, settings, your stats and the result of a run\nare no longer drawn as cards. Each is a row with an icon, a drawing or a number at\nits left edge, its name, and a line about it, with a thin rule between one row and\nthe next, like the contents page of a music book. On the Stats page every number\nsits at the start of its row, so the figures line up down the page, and the eight\ngrades of the ladder fit in a shorter list.",
                 twip: true,
             },
             {
                 body: "**Small drawings beside what you can learn.** Everything under Learn and Teach, and\neach of the little tools, now starts with a drawing of a thing a pianist keeps\nnearby: a stave, a tuning fork, a pencil, a stopwatch, a stack of graded books. They\nare drawn in the same hand as the ones on the front page's keys, and take on your\ncolours, light or dark.",
+                twip: true,
+            },
+            {
+                body: "**Stats says what is missing when it has counted your notes.** When a period has\nnotes played but no time logged, as after you remove a sitting, the practice diary\nsays the notes are counted and no time was logged. It used to say there was nothing\nhere yet, right under the notes it had just counted.",
                 twip: true,
             },
         ],

@@ -298,7 +298,7 @@ one-tap **review session** walks you through everything that's fading, and you c
   right order (or use the arrow buttons), and give each an optional target tempo
   and note, plus a free-form description for the whole set. The page splits into
   two tabs — your assignments, and the one you're creating or editing. Give the set a
-  **date you're working toward** — a lesson, an exam, a recital — and its card counts
+  **date you're working toward** — a lesson, an exam, a recital — and its row counts
   down beside how many pieces are still to learn; the date travels with a shared set,
   so handing one out hands out its date too. Save it,
   **edit it later**, share it by link, or pass it around as a file; each piece
@@ -391,7 +391,7 @@ grade boundaries are set against teaching collections whose level is settled, fr
 Burgmüller's easy studies through the two-part inventions to the Chopin études. So a piece
 keeps its grade as the catalogue grows, and grade 3 means the same thing next month.
 
-- **You** — your one progress page: the grade you're at on the eight-grade ladder and
+- **Stats** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
