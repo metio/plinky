@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { MetronomeDrawing } from "./drawings/metronomeDrawing";
-import { LoopDrawing } from "./drawings/loopDrawing";
-import { TriadDrawing } from "./drawings/triadDrawing";
+import { Drawing } from "./drawings/drawing";
 import { SwitchField } from "./fields";
 import { Folio, FolioFigure, FolioRow, folioDrawingClasses, folioIconClasses } from "./folio";
 import { BookIcon, EarIcon, SpeakerIcon } from "./icons";
@@ -19,17 +17,17 @@ export const Drawings: Story = {
     render: () => (
         <Folio>
             <FolioRow
-                margin={<LoopDrawing className={folioDrawingClasses} />}
+                margin={<Drawing name="staff" className={folioDrawingClasses} />}
                 name="One small piece at a time"
                 line="Loop the bar that keeps going wrong."
             />
             <FolioRow
-                margin={<MetronomeDrawing className={folioDrawingClasses} />}
+                margin={<Drawing name="marks" className={folioDrawingClasses} />}
                 name="Slow enough to get it right"
                 line="Slow is the speed where you still choose."
             />
             <FolioRow
-                margin={<TriadDrawing className={folioDrawingClasses} />}
+                margin={<Drawing name="triad" className={folioDrawingClasses} />}
                 name="Learn the chords, not the notes"
                 line="Three notes become one shape."
             />

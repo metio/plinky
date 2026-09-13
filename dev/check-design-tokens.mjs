@@ -127,7 +127,9 @@ function walk(dir) {
         if (SKIP.has(entry.name)) continue;
         const path = join(dir, entry.name);
         if (entry.isDirectory()) out.push(...walk(path));
-        else if (/\.(ts|tsx)$/.test(entry.name)) out.push(path);
+        // The drawings sprite names the art tokens in its symbols' styles, which is the only
+        // place anything uses them; it has no class lists to check.
+        else if (/\.(ts|tsx|svg)$/.test(entry.name)) out.push(path);
     }
     return out;
 }
@@ -162,7 +164,7 @@ for (const file of [...walk(join(root, "app")), ...walk(join(root, "core"))]) {
     for (const name of light.keys()) {
         if (new RegExp(`[-:]${name}(?![\\w-])`).test(src)) used.add(name);
     }
-    for (const { text, offset } of classLists(src)) {
+    for (const { text, offset } of rel.endsWith(".svg") ? [] : classLists(src)) {
         const classes = text.split(/\s+/).filter(Boolean);
         for (const token of classes) {
             const state = STATE_UTILITY.exec(token);

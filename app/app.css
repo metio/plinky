@@ -148,6 +148,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-art: #3a0fa8;
     --color-key-art-soft: #6784dd;
     --color-key-art-ground: #d7e3fb;
+    /* A drawing on the page (drawings.svg): its outline, the soft ground behind it, its
+       one accent and a sheet of paper in it. Outline, ground and paper are the page's own
+       roles; the accent has its own value, because the dark soft accent is a fill for a
+       bar and too deep to read as a mark on the drawing's ground. */
+    --color-art-stroke: var(--color-accent);
+    --color-art-ground: var(--color-accent-fill);
+    --color-art-accent: var(--color-accent-soft);
+    --color-art-paper: var(--color-raised);
     --color-key-held: var(--color-green-500); /* a key you are holding down */
     /* What the score asks of a key — which one comes next, and the hold bar
        draining down it for as long as the note is written to last. */
@@ -328,6 +336,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-art: #3a0fa8;
     --color-key-art-soft: #6784dd;
     --color-key-art-ground: #d7e3fb;
+    --color-art-stroke: var(--color-accent);
+    --color-art-ground: var(--color-accent-fill);
+    --color-art-accent: #869eec;
+    --color-art-paper: var(--color-raised);
     --color-key-held: var(--color-green-500);
     --color-key-next: var(--color-indigo-400);
     --color-key-label: var(--color-gray-700);
@@ -419,6 +431,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-paper-line: #c7bce8;
     --color-paper-ink: #8c88b4;
     --color-key-hover: #f0eafe;
+    --color-art-accent: var(--color-accent-soft);
     --color-key-art: #4915d2;
     --color-key-art-soft: #9b7cf0;
     --color-key-art-ground: #e2d7fd;
@@ -481,6 +494,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-paper-line: #c7bce8;
     --color-paper-ink: #8c88b4;
     --color-key-hover: #e2d7fd;
+    --color-art-accent: #a98cf3;
     --color-key-art: #4915d2;
     --color-key-art-soft: #9b7cf0;
     --color-key-art-ground: #e2d7fd;
