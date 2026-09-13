@@ -3,15 +3,18 @@
 
 import type { ReactNode } from "react";
 import { sectionHeadingClasses } from "./classes";
+import { FolioRow } from "./folio";
 
-const CHIP: Record<"accent" | "danger", string> = {
-    accent: "bg-accent-surface text-accent",
-    danger: "bg-danger-surface text-danger",
+// The icon's ink. Sized here rather than by each caller, so every margin holds the same
+// size of icon whatever the caller drew it at.
+const MARGIN: Record<"accent" | "danger", string> = {
+    accent: "text-accent [&>svg]:h-8 [&>svg]:w-8",
+    danger: "text-danger [&>svg]:h-8 [&>svg]:w-8",
 };
 
-// A titled block of related things. With an `icon` it renders as a card — the icon in a
-// soft chip, a plain-language title and hint, the controls below — so each group of
-// settings reads as one friendly, self-explaining unit.
+// A titled block of related things. With an `icon` it is a Folio row — the icon in the
+// margin, a plain-language title and hint beside it, the controls below — so each group of
+// settings reads as one self-explaining entry, ruled off from the next.
 //
 // Without an icon it is the quiet variant: a small brass label over a hairline, which is
 // how every labelled group in the app announces itself — the day's three moments, the
@@ -59,23 +62,20 @@ export function SettingsSection({
     }
 
     return (
-        <section
+        <FolioRow
+            as="section"
             id={anchor}
-            className="scroll-mt-24 space-y-4 rounded-2xl border border-line bg-raised p-5 shadow-sm"
-        >
-            <div className="flex items-start gap-3">
-                <span
-                    aria-hidden="true"
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${CHIP[tone]}`}
-                >
+            className="scroll-mt-24"
+            heading={Heading}
+            margin={
+                <span aria-hidden="true" className={MARGIN[tone]}>
                     {icon}
                 </span>
-                <div>
-                    <Heading className="text-base font-semibold text-ink">{title}</Heading>
-                    {hint !== undefined && <p className="text-sm text-muted">{hint}</p>}
-                </div>
-            </div>
+            }
+            name={title}
+            line={hint}
+        >
             {children}
-        </section>
+        </FolioRow>
     );
 }
