@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ListIcon, UploadIcon } from "../components/ui/icons";
-import { HubList } from "../components/ui/hubList";
+import { type HubEntry, HubList } from "../components/ui/hubList";
 import { PageHeader } from "../components/ui/pageHeader";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -29,18 +28,18 @@ export function meta(_args: Route.MetaArgs) {
 // back. A set is also something plenty of players build for themselves, so nothing here is
 // gated behind being a teacher — the page simply gathers the making and the reading in one
 // place instead of leaving them at the foot of somewhere else.
-const ENTRIES = [
+const ENTRIES: HubEntry[] = [
     {
         to: "/assignments",
         label: m.home_assignments,
         blurb: m.home_assignments_blurb,
-        Icon: ListIcon,
+        drawing: "setList",
     },
     {
         to: "/collect",
         label: m.collect_title,
         blurb: m.collect_intro,
-        Icon: UploadIcon,
+        drawing: "envelope",
     },
 ];
 
@@ -49,13 +48,7 @@ export default function TeachRoute() {
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.teach_title()} hint={m.teach_intro()} />
 
-            <HubList
-                entries={ENTRIES.map((entry) => ({
-                    ...entry,
-                    label: entry.label(),
-                    blurb: entry.blurb(),
-                }))}
-            />
+            <HubList entries={ENTRIES} />
         </main>
     );
 }
