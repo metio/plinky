@@ -10,6 +10,7 @@ import type { trackSteps } from "../../../core/tracks";
 import { deadlineText } from "../../lib/deadlineText";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { FolioFigure, FolioRow } from "../ui/folio";
 import { CheckIcon } from "../ui/icons";
 import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
@@ -137,14 +138,23 @@ export function AssignmentCard({
     // side by side; a set with no date reports neither and reads exactly as before.
     const due = assignment.dueOn ? deadlineFor(assignment.dueOn, todayKey(new Date())) : null;
     return (
-        <li className="space-y-2 rounded-md border border-line px-3 py-2 text-sm">
+        // A Folio row: how far through the set you are in the margin, its name, when it
+        // is due, and the actions and steps beneath.
+        <FolioRow
+            as="li"
+            margin={<FolioFigure value={`${doneCount}/${steps.length}`} tone="ink" />}
+            name={assignment.name}
+            line={
+                due
+                    ? `${deadlineText(due)}${
+                          doneCount < steps.length
+                              ? ` · ${m.assignments_left({ count: steps.length - doneCount })}`
+                              : ""
+                      }`
+                    : undefined
+            }
+        >
             <div className="flex flex-wrap items-center gap-2">
-                <span className="flex-1">
-                    <span className="font-medium">{assignment.name}</span>{" "}
-                    <span className="tabular-nums text-muted">
-                        {doneCount}/{steps.length}
-                    </span>
-                </span>
                 {actionsBefore}
                 <Button variant="secondary" onClick={() => onShare(assignment, assignment.id)}>
                     {copiedShare === assignment.id ? m.share_copied() : m.assignments_share()}
@@ -154,13 +164,6 @@ export function AssignmentCard({
                 </Button>
                 {actionsAfter}
             </div>
-            {due && (
-                <p className="text-xs text-muted">
-                    {deadlineText(due)}
-                    {doneCount < steps.length &&
-                        ` · ${m.assignments_left({ count: steps.length - doneCount })}`}
-                </p>
-            )}
             {/* Descriptions are real instructions, often several sentences with
                 line breaks — give them their space instead of clamping. */}
             {description && (
@@ -169,6 +172,6 @@ export function AssignmentCard({
                 </p>
             )}
             {foldSteps ? <FoldedSteps count={steps.length}>{children}</FoldedSteps> : children}
-        </li>
+        </FolioRow>
     );
 }

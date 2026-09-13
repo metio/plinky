@@ -6,6 +6,7 @@ import { usePrefs } from "../hooks/usePrefs";
 import { useParams } from "react-router";
 import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../core/person";
 import { BakedIncipit } from "../components/ui/incipit";
+import { Folio, FolioRow } from "../components/ui/folio";
 import { Show } from "../components/features/conditional";
 import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, imageMeta, personData, personImage, routeMeta } from "../../core/site";
@@ -249,44 +250,41 @@ export default function PersonPage() {
             </Show>
 
             {person ? (
-                <ul className="space-y-1.5">
+                // A catalogue of one composer's works is exactly where an opening bar earns
+                // its place: the titles rhyme with each other, and the music does not. So
+                // the bars are each row's margin, and the titles start in one column right
+                // after them, since a list is read down its left edge.
+                <Folio>
                     {person.pieces.map((piece) => (
-                        <li key={piece.id}>
-                            <Link
-                                to={`/play/${piece.id}`}
-                                className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30"
-                            >
-                                {/* A catalogue of one composer's works is exactly where
-                                    an opening bar earns its place: the titles rhyme with
-                                    each other, and the music does not. */}
+                        <FolioRow
+                            key={piece.id}
+                            to={`/play/${piece.id}`}
+                            size="compact"
+                            margin={
                                 <BakedIncipit
                                     mark={piece.incipit}
                                     label={piece.title}
                                     colored={prefs.colorNotes}
                                     className="shrink-0 text-faint"
                                 />
-                                {/* flex-1, so the titles start in one column right after
-                                    the marks: justify-between alone floats each one
-                                    somewhere different, and a list is read down its left
-                                    edge. */}
-                                <span className="min-w-0 flex-1 truncate font-medium">
-                                    {piece.title}
-                                </span>
-                                {/* The grade as the app draws it everywhere else, and the
-                                    licence only where there is room: on a phone the title
-                                    is what a reader is scanning for, and a licence code on
-                                    every row of sixty takes the width the titles need. It
-                                    is on the piece's own page in full. */}
-                                <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
+                            }
+                            name={piece.title}
+                            // The grade as the app draws it everywhere else, and the licence
+                            // only where there is room: on a phone the title is what a
+                            // reader is scanning for, and a licence code on every row of
+                            // sixty takes the width the titles need. It is on the piece's
+                            // own page in full.
+                            trailing={
+                                <span className="flex items-center gap-2 text-xs text-muted">
                                     {piece.grade !== undefined && <GradeChip grade={piece.grade} />}
                                     {piece.license && (
                                         <span className="hidden sm:inline">{piece.license}</span>
                                     )}
                                 </span>
-                            </Link>
-                        </li>
+                            }
+                        />
                     ))}
-                </ul>
+                </Folio>
             ) : (
                 !loading && (
                     <p className="text-sm text-muted">

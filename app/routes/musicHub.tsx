@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useParams } from "react-router";
 import { BakedIncipit } from "../components/ui/incipit";
+import { Folio, FolioRow } from "../components/ui/folio";
 import { GradeChip } from "../components/features/scoreGrade";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { PageHeader } from "../components/ui/pageHeader";
@@ -256,26 +257,27 @@ export default function MusicHubRoute() {
                     <p className="text-sm text-muted">
                         {m.person_pieces({ count: pieces.length })}
                     </p>
-                    <ul className="space-y-1.5">
+                    {/* A compact Folio row per piece, one link each: the opening bars in the
+                        margin, the title, and at the end of the line the composer, because
+                        a shelf gathers many of them — which is the difference between this
+                        list and a composer's own. */}
+                    <Folio>
                         {pieces.map((piece) => (
-                            <li key={piece.id}>
-                                <Link
-                                    to={`/play/${piece.id}`}
-                                    className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30"
-                                >
+                            <FolioRow
+                                key={piece.id}
+                                to={`/play/${piece.id}`}
+                                size="compact"
+                                margin={
                                     <BakedIncipit
                                         mark={piece.incipit}
                                         label={piece.title}
                                         colored={prefs.colorNotes}
                                         className="shrink-0 text-faint"
                                     />
-                                    <span className="min-w-0 flex-1 truncate font-medium">
-                                        {piece.title}
-                                    </span>
-                                    {/* The composer, because a shelf gathers many of them
-                                        — which is the difference between this list and a
-                                        composer's own. */}
-                                    <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
+                                }
+                                name={piece.title}
+                                trailing={
+                                    <span className="flex items-center gap-2 text-xs text-muted">
                                         <span className="hidden max-w-40 truncate sm:inline">
                                             {piece.composer}
                                         </span>
@@ -283,10 +285,10 @@ export default function MusicHubRoute() {
                                             <GradeChip grade={piece.grade} />
                                         )}
                                     </span>
-                                </Link>
-                            </li>
+                                }
+                            />
                         ))}
-                    </ul>
+                    </Folio>
                 </>
             ) : (
                 pieces !== null && <p className="text-sm text-muted">{m.hub_empty()}</p>
