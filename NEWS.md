@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 13 September 2026 — evening
+
+**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with
+soft forget-me-not blue where it used lilac and gold, and cooler greys so the page
+reads more clearly. If you liked the violet, Settings brings it back under Colours.
+The theme can also be Black: a true-black page for phone screens at night, in either
+set of colours.
+
 ## 13 September 2026
 
 **A chord written for both hands is graded the way you play it.** Where one staff
