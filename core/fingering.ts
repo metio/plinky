@@ -208,8 +208,8 @@ export function fingerSteps(steps: { pitches: number[] }[], hand: Hand, span?: n
 }
 
 // --- Chord-aware fingering ---------------------------------------------------
-// A "position" is the set of pitches sounding together (one note, or a chord),
-// sorted ascending. Each gets one finger per note. The line API above is the
+// A "position" is the pitches sounding together (one note, or a chord), in any
+// written order. Each key in it gets one finger. The line API above is the
 // single-note special case; this handles simultaneous notes the trainer needs.
 
 // The candidate finger tuples for a k-note chord, aligned to ascending pitch:
@@ -282,36 +282,32 @@ function moveCost(
     return transitionCost(from[a]!, fromFingers[a]!, to[b]!, toFingers[b]!, hand, spread, leap);
 }
 
-// Where each note of a position sits once it is read bottom-up: `order[k]` is the index,
-// as written, of its k-th lowest pitch. Null when it already runs bottom-up, which is how
-// nearly every score writes its chords.
+// A position read as the keys it presses: its distinct pitches bottom-up, and for each note
+// as written, which of those keys it sits on.
 //
-// MusicXML does not require a chord's notes to run bottom-up, and the order they arrive
-// in is no fact about the hand. Everything below reads a position ascending — the finger
-// tuples, the spread between neighbours, the leading voice — so the two exported entry
-// points put each position in that order on the way in, and the fingers they hand back
-// are aligned to the pitches as the caller wrote them.
-function ascendingOrder(pitches: readonly number[]): number[] | null {
-    if (pitches.every((pitch, at) => at === 0 || pitch >= pitches[at - 1]!)) {
-        return null;
-    }
-    return pitches.map((_, at) => at).sort((a, b) => pitches[a]! - pitches[b]! || a - b);
+// MusicXML does not require a chord's notes to run bottom-up, and the order they arrive in
+// is no fact about the hand. Nor is a pitch written twice: two voices meeting on one note
+// write it in both, and it is still one key under one finger. Everything below reads a
+// position as its keys — the finger tuples, the spread between neighbours, the leading
+// voice, what one hand keeps of a chord it cannot span — so the exported entry points read
+// each position that way on the way in, and the fingers they hand back are aligned to the
+// notes as the caller wrote them, both copies of a unison carrying their key's finger. The
+// callers keep every written note because each one is a notehead that carries a finger.
+type Keys = { keys: number[]; on: number[] };
+
+function keysOf(pitches: readonly number[]): Keys {
+    const keys = [...new Set(pitches)].sort((a, b) => a - b);
+    return { keys, on: pitches.map((pitch) => keys.indexOf(pitch)) };
 }
 
-const reorder = <T>(values: readonly T[], order: readonly number[] | null): T[] =>
-    order === null ? [...values] : order.map((at) => values[at]!);
+// Fingers read per key, put back on every note as written.
+const onNotes = (fingers: readonly number[], { on }: Keys): number[] =>
+    on.map((key) => fingers[key]!);
 
-// The inverse of reorder: values read bottom-up, put back where they were written.
-function restore<T>(values: readonly T[], order: readonly number[] | null): T[] {
-    if (order === null) {
-        return [...values];
-    }
-    const written: T[] = new Array(values.length);
-    order.forEach((at, k) => {
-        written[at] = values[k]!;
-    });
-    return written;
-}
+// Fingers given per written note, read per key. A player who puts two fingers on one key
+// is read by the first of them, since only one of them can press it.
+const onKeys = (fingers: readonly number[], { keys, on }: Keys): number[] =>
+    keys.map((_, key) => fingers[on.indexOf(key)]!);
 
 // The comfort cost of fingering a whole sequence of positions a given way — chord
 // shapes plus the movement of the leading voice between them. Each position's fingers
@@ -329,10 +325,10 @@ export function positionsCost(
     if (positions.length === 0) {
         return 0;
     }
-    const orders = positions.map(ascendingOrder);
+    const read = positions.map(keysOf);
     return ascendingCost(
-        positions.map((pitches, at) => reorder(pitches, orders[at] ?? null)),
-        fingers.map((shape, at) => reorder(shape, orders[at] ?? null)),
+        read.map(({ keys }) => keys),
+        read.map((keys, at) => onKeys(fingers[at]!, keys)),
         hand,
         span,
         gaps,
@@ -377,18 +373,16 @@ export function fingerPositions(
         return [];
     }
     const { spread, leap } = handModel(span);
-    const orders = positions.map(ascendingOrder);
+    const read = positions.map(keysOf);
     // No other hand is known here, so each position offers only this hand's own fingerings.
     const { path } = cheapestHolds(
-        positions.map((pitches, at) =>
-            holdsOf(reorder(pitches, orders[at] ?? null), hand, undefined, spread, leap),
-        ),
+        read.map(({ keys }) => holdsOf(keys, hand, undefined, spread, leap)),
         hand,
         spread,
         leap,
         gaps,
     );
-    return path.map((hold, at) => restore(hold.fingers, orders[at] ?? null));
+    return path.map((hold, at) => onNotes(hold.fingers, read[at]!));
 }
 
 // --- Positions wider than one hand -------------------------------------------
@@ -415,15 +409,17 @@ function canTake(given: readonly number[], other: readonly number[] | undefined)
     return other !== undefined && width([...other, ...given]) <= HAND_REACH;
 }
 
-// Every way the hand can hold one ascending position. Within reach that is every finger
-// tuple over the whole of it, exactly as fingerPositions reads it.
+// Every way the hand can hold one position, read as its keys. Within reach that is every
+// finger tuple over the whole of it, exactly as fingerPositions reads it.
 //
 // Beyond reach the hand can still take the whole of it, priced exactly as fingerPositions
 // prices it: that is a chord both hands are too busy to share, stretched, rolled or broken
 // however the player manages it. Where the other hand can take what this one cannot reach,
-// the hand may instead keep any run of neighbouring notes it spans and hand the rest over.
-// Any run, not only the longest: in a crossing the hand keeps its own thirds and hands over
-// the pair an octave above, although a third note would have fitted under it.
+// the hand may instead keep a run of neighbouring keys it spans from either end and hand the
+// rest over. A run from the middle is never offered: what it hands over holds both ends, as
+// wide as the whole position, which no other hand spans either. Any run from an end, not
+// only the longest: in a crossing the hand keeps its own thirds and hands over the pair an
+// octave above, although a third note would have fitted under it.
 //
 // A hand-over costs one leap, and time does not ease it. It is the two hands arranging
 // themselves around one position rather than one of them travelling, and eased by time it
@@ -447,13 +443,18 @@ function holdsOf(
         return whole;
     }
     const shared: Hold[] = [];
-    for (let lo = 0; lo < pitches.length; lo++) {
-        for (let hi = lo; hi < pitches.length && pitches[hi]! - pitches[lo]! <= HAND_REACH; hi++) {
-            const kept = pitches.slice(lo, hi + 1);
-            const given = pitches.filter((pitch) => pitch < kept[0]! || pitch > kept.at(-1)!);
-            if (canTake(given, other)) {
-                shared.push(...holds(kept, leap));
-            }
+    const offer = (kept: number[], given: number[]) => {
+        if (canTake(given, other)) {
+            shared.push(...holds(kept, leap));
+        }
+    };
+    const top = pitches.length - 1;
+    for (let end = 1; pitches[end - 1]! - pitches[0]! <= HAND_REACH; end++) {
+        offer(pitches.slice(0, end), pitches.slice(end));
+    }
+    for (let start = 1; start <= top; start++) {
+        if (pitches[top]! - pitches[start]! <= HAND_REACH) {
+            offer(pitches.slice(start), pitches.slice(0, start));
         }
     }
     return [...whole, ...shared];
@@ -480,7 +481,7 @@ export function reachingCost(
     const { spread, leap } = handModel();
     return cheapestHolds(
         positions.map((pitches, at) =>
-            holdsOf(reorder(pitches, ascendingOrder(pitches)), hand, others?.[at], spread, leap),
+            holdsOf(keysOf(pitches).keys, hand, others?.[at], spread, leap),
         ),
         hand,
         spread,
