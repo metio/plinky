@@ -10,11 +10,11 @@ import type { Release } from "./changelog";
 
 export const LATEST_RELEASES: Release[] = [
     {
-        date: "2026-09-12",
-        label: "night",
+        date: "2026-09-13",
+        label: null,
         entries: [
             {
-                body: "**A chord written for both hands is graded the way you play it.** Where one staff\nholds more notes than a hand can span, like the crossing thirds in Mozart's A major\nsonata or the tenor and bass of a hymn written on one line, the grade read them as a\nsingle impossible stretch. When your other hand is free to take those notes, the grade\nnow counts them as shared between your hands. Seventy-nine pieces sit a grade or two\neasier for it, and none became harder.",
+                body: "**A chord written for both hands is graded the way you play it.** Where one staff\nholds more notes than a hand can span, like the crossing thirds in Mozart's A major\nsonata or the tenor and bass of a hymn written on one line, the grade read them as a\nsingle impossible stretch. When your other hand is free to take those notes, the grade\nnow counts them as shared between your hands. Seventy-nine pieces sit a grade or two\neasier for it, and no piece's own grade went up. The easier ways into a piece, like\nthe melody alone, are measured afresh too, so a few pieces now start a grade higher\nor lower, and none offers a way in that is no easier than the piece itself.",
                 twip: true,
             },
             {
