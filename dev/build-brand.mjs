@@ -329,13 +329,13 @@ await shoot(img("symbol", 150), {
 // to the code. 1280×640 is what GitHub asks for, and it is shown large and never cropped to
 // a circle, so the lockup can carry the name at a size that reads.
 //
-// The ground is ink, which the symbol's indigo circle stands clear of without a ring. The
-// tagline sits under it saying what the name does not. Everything stays inside the middle
-// three quarters: an unfurl is re-cropped by whoever is doing the unfurling, and a preview
-// designed edge to edge loses its ends.
+// The ground is the indigo every other social image stands on, with the ringed lockup the
+// designer drew for it. The tagline sits under it saying what the name does not. Everything
+// stays inside the middle three quarters: an unfurl is re-cropped by whoever is doing the
+// unfurling, and a preview designed edge to edge loses its ends.
 await shoot(
-    `<div style="width:1280px;height:640px;background:${colour.ink};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;padding:0 120px">
-       ${img("lockup-dark", 150)}
+    `<div style="width:1280px;height:640px;background:${colour.indigo};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;padding:0 120px">
+       ${img("lockup-indigo", 150)}
        <div style="${DISPLAY};font-size:60px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
      </div>`,
     { width: 1280, height: 640, path: `${OUT}/social/github-social-1280x640.png` },
