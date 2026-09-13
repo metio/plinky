@@ -66,6 +66,7 @@ export function FolioRow({
     to,
     as,
     id,
+    current,
     size = "normal",
     className = "",
     children,
@@ -74,7 +75,10 @@ export function FolioRow({
     // edge — only for a list nested inside another row's body, whose margin is already
     // the page's.
     margin?: ReactNode;
-    name: ReactNode;
+    // What the row is called. Left off only where the margin says it all and the body
+    // is the reading of it — a run's letter beside its scores — and then the body sits
+    // beside the margin rather than beneath a name.
+    name?: ReactNode;
     // The heading level the name is, where the row heads a section of the page.
     heading?: "h2" | "h3" | "h4";
     // The one line under the name.
@@ -87,6 +91,8 @@ export function FolioRow({
     // The element the row is. A list item inside a Folio, otherwise a div.
     as?: "li" | "div" | "section" | "article";
     id?: string;
+    // The row that says "you are here" in a list of places, such as the grade you are at.
+    current?: boolean;
     size?: Size;
     className?: string;
     // What the row holds beneath its line: the controls of a group of settings, a
@@ -98,33 +104,39 @@ export function FolioRow({
     const As = as ?? (inList ? "li" : "div");
     const columns = inList ? "col-span-2 grid-cols-subgrid" : OWN_COLUMNS;
     const rule = "border-t border-line last:border-b";
-    const grid = `grid ${columns} ${GUTTER} ${PAD[size]} ${children ? "sm:py-6" : ""}`;
+    const bare = name === undefined && line === undefined && trailing === undefined;
+    const grid = `grid ${columns} ${GUTTER} ${PAD[size]} ${children && !bare ? "sm:py-6" : ""}`;
     const Name = heading ?? "span";
     // Inside a link a paragraph is not allowed to stand, so the line is a span there.
     const Line = to ? "span" : "p";
+    const beside = margin === undefined ? "col-span-2" : "col-start-2";
 
     const head = (
         <>
             {margin !== undefined && (
-                <span className="col-start-1 row-start-1 flex items-center justify-center self-center">
+                <div className="col-start-1 row-start-1 flex items-center justify-center self-center">
                     {margin}
-                </span>
+                </div>
             )}
-            <span
-                className={`${margin === undefined ? "col-span-2" : "col-start-2"} row-start-1 flex min-w-0 items-center gap-3`}
-            >
-                <span className="min-w-0 flex-1">
-                    <Name
-                        className={`block font-display font-medium leading-tight break-words text-ink ${NAME[size]} ${to ? "group-hover:text-accent-strong" : ""}`}
-                    >
-                        {name}
-                    </Name>
-                    {line !== undefined && (
-                        <Line className="mt-0.5 block text-sm leading-snug text-body">{line}</Line>
-                    )}
-                </span>
-                {trailing !== undefined && <span className="shrink-0">{trailing}</span>}
-            </span>
+            {!bare && (
+                <div className={`${beside} row-start-1 flex min-w-0 items-center gap-3`}>
+                    <div className="min-w-0 flex-1">
+                        {name !== undefined && (
+                            <Name
+                                className={`block font-display font-medium leading-tight break-words text-ink ${NAME[size]} ${to ? "group-hover:text-accent-strong" : ""}`}
+                            >
+                                {name}
+                            </Name>
+                        )}
+                        {line !== undefined && (
+                            <Line className="mt-0.5 block text-sm leading-snug text-body">
+                                {line}
+                            </Line>
+                        )}
+                    </div>
+                    {trailing !== undefined && <div className="shrink-0">{trailing}</div>}
+                </div>
+            )}
         </>
     );
 
@@ -132,6 +144,7 @@ export function FolioRow({
         return (
             <As
                 id={id}
+                aria-current={current || undefined}
                 className={`${inList ? "col-span-2 grid grid-cols-subgrid" : ""} ${rule} ${className}`}
             >
                 <Link to={to} className={`group ${grid}`}>
@@ -141,15 +154,14 @@ export function FolioRow({
         );
     }
 
+    const body = bare
+        ? `row-start-1 self-center ${beside}`
+        : `row-start-2 mt-3 ${margin === undefined ? "col-span-2" : "col-span-2 sm:col-span-1 sm:col-start-2"}`;
     return (
-        <As id={id} className={`${grid} ${rule} ${className}`}>
+        <As id={id} aria-current={current || undefined} className={`${grid} ${rule} ${className}`}>
             {head}
             {children !== undefined && (
-                <div
-                    className={`row-start-2 mt-3 min-w-0 space-y-3 ${margin === undefined ? "col-span-2" : "col-span-2 sm:col-span-1 sm:col-start-2"}`}
-                >
-                    {children}
-                </div>
+                <div className={`min-w-0 space-y-3 ${body}`}>{children}</div>
             )}
         </As>
     );

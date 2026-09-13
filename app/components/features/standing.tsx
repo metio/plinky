@@ -3,10 +3,13 @@
 
 import { m } from "../../paraglide/messages.js";
 import { Show } from "./conditional";
-import { StatTile } from "../ui/statTile";
+import { Folio, FolioFigure, FolioRow, folioIconClasses } from "../ui/folio";
+import { GradCapIcon } from "../ui/icons";
 
-// The headline card: which grade you're at, the skill rating beside it, and the
-// crossed-swords badge when the opt-in competitive decay is on.
+// The headline: which grade you're at and the skill rating, each a Folio row, and the
+// crossed-swords badge when the opt-in competitive decay is on. The grade is named in
+// words ("Grade 3") with the cap in the margin, since a figure beside its own number would
+// say it twice; the rating is a bare number, so it takes the margin.
 export function Standing({
     level,
     skill,
@@ -17,24 +20,23 @@ export function Standing({
     competitive: boolean;
 }) {
     return (
-        <div className="flex items-center justify-between gap-3 rounded-md border border-line p-4">
-            <span className="flex items-center gap-3">
-                <span aria-hidden="true" className="text-4xl">
-                    🎓
-                </span>
-                <span className="text-2xl font-bold">
-                    {level === 0 ? m.grades_not_started() : m.grades_current({ level })}
-                </span>
-            </span>
-            <span className="flex flex-col items-end gap-0.5 text-right text-sm text-muted">
-                <span>{m.grades_skill({ rating: skill })}</span>
-                <Show when={competitive}>
-                    <span title={m.grades_competitive_help()} className="font-medium text-warn">
-                        ⚔️ {m.grades_competitive()}
-                    </span>
-                </Show>
-            </span>
-        </div>
+        <Folio>
+            <FolioRow
+                margin={<GradCapIcon className={folioIconClasses} />}
+                name={level === 0 ? m.grades_not_started() : m.grades_current({ level })}
+                trailing={
+                    <Show when={competitive}>
+                        <span
+                            title={m.grades_competitive_help()}
+                            className="text-sm font-medium text-warn"
+                        >
+                            ⚔️ {m.grades_competitive()}
+                        </span>
+                    </Show>
+                }
+            />
+            <FolioRow margin={<FolioFigure value={skill} />} name={m.stats_skill_label()} />
+        </Folio>
     );
 }
 
@@ -58,7 +60,7 @@ export function StandingKey() {
     );
 }
 
-// The two lifetime activity tiles under the standing card.
+// The two lifetime activity figures, each in the margin of its own row.
 export function ActivityStats({
     daysPracticed,
     totalNotes,
@@ -67,9 +69,15 @@ export function ActivityStats({
     totalNotes: number;
 }) {
     return (
-        <div className="grid grid-cols-2 gap-4">
-            <StatTile label={m.progress_days_practiced()} value={daysPracticed} />
-            <StatTile label={m.progress_notes_played()} value={totalNotes} />
-        </div>
+        <Folio>
+            <FolioRow
+                margin={<FolioFigure value={daysPracticed} />}
+                name={m.progress_days_practiced()}
+            />
+            <FolioRow
+                margin={<FolioFigure value={totalNotes} />}
+                name={m.progress_notes_played()}
+            />
+        </Folio>
     );
 }

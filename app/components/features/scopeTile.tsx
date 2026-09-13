@@ -6,7 +6,7 @@ import type { Scope, ScopeSummary } from "../../../core/statsScope";
 import { ShareButtons } from "./shareButtons";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
-import { StatTile } from "../ui/statTile";
+import { Folio, FolioFigure, FolioRow } from "../ui/folio";
 
 // What the window is called, in the reader's own language. A calendar scope has a name —
 // August 2026, 2026 — where a rolling one could only be described, which is half the reason
@@ -55,27 +55,25 @@ export function ScopeTile({
         month: name,
     });
     return (
-        <section className="space-y-4 rounded-xl border border-accent-line bg-gradient-to-br from-accent-surface to-ghost-surface p-5 dark:to-ghost-surface/40">
-            <h3 className="font-semibold text-accent-ink text-lg">{name}</h3>
-            <div className="flex gap-8">
-                <StatTile
-                    value={summary.totalNotes}
-                    label={m.progress_notes_played()}
-                    framed={false}
-                    tone="accent"
+        <section className="space-y-4">
+            <h3 className="font-display text-xl font-medium text-ink">{name}</h3>
+            {/* The figures in the margin, what they count beside them. The best day is a
+                line under the notes because it is a count of notes too. */}
+            <Folio>
+                <FolioRow
+                    margin={<FolioFigure value={summary.totalNotes} />}
+                    name={m.progress_notes_played()}
+                    line={
+                        summary.bestDay
+                            ? m.recap_best_day({ count: summary.bestDay.notes })
+                            : undefined
+                    }
                 />
-                <StatTile
-                    value={summary.daysPracticed}
-                    label={m.progress_days_practiced()}
-                    framed={false}
-                    tone="accent"
+                <FolioRow
+                    margin={<FolioFigure value={summary.daysPracticed} />}
+                    name={m.progress_days_practiced()}
                 />
-            </div>
-            {summary.bestDay && (
-                <p className="text-muted text-sm">
-                    {m.recap_best_day({ count: summary.bestDay.notes })}
-                </p>
-            )}
+            </Folio>
             <ShareButtons
                 text={boast}
                 imageSvg={svgMilestone({

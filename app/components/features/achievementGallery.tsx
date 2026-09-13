@@ -4,6 +4,7 @@
 import type { Achievement, EarBadge } from "../../../core/achievements";
 import { m } from "../../paraglide/messages.js";
 import { SettingsSection } from "../ui/settingsSection";
+import { Folio, FolioRow } from "../ui/folio";
 
 const STAR_EMOJI: Record<string, string> = { bronze: "🥉", silver: "🥈", gold: "🥇" };
 const STAR_LABEL: Record<string, () => string> = {
@@ -54,44 +55,37 @@ export function AchievementGallery({
     framed?: boolean;
 }) {
     const grid = (
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Folio>
             {achievements.map((badge) => {
                 const { emoji, label } = badgeFace(badge);
+                // A greyed glyph under a padlock is the vocabulary of something locked,
+                // and nothing here is — these are simply the ones that have not happened
+                // yet. So an unearned badge keeps its row and only its emoji is quieter:
+                // fading the label too would sink it below the contrast floor.
                 return (
-                    <li
+                    <FolioRow
                         key={badge.id}
-                        // A dashed outline and a greyed glyph is the vocabulary of a
-                        // padlock, and nothing here is locked — these are simply the
-                        // ones that have not happened yet. Same frame as an earned
-                        // badge, quieter ground.
-                        className={`flex flex-col items-center gap-1 rounded-xl border border-line p-3 text-center ${
-                            badge.earned
-                                ? "border-accent-line bg-accent-surface/60 dark:bg-accent-surface/40"
-                                : ""
-                        }`}
-                    >
-                        {/* Only the decorative emoji dims for a locked badge — fading
-                                the label too would sink it below the contrast floor. */}
-                        <span
-                            aria-hidden="true"
-                            className={`text-2xl ${badge.earned ? "" : "opacity-50"}`}
-                        >
-                            {emoji}
-                        </span>
-                        <span
-                            className={`text-xs font-medium ${
-                                badge.earned ? "text-body" : "text-muted"
-                            }`}
-                        >
-                            {label}
-                        </span>
-                        <span className="sr-only">
-                            {badge.earned ? m.achievement_earned() : m.achievement_locked()}
-                        </span>
-                    </li>
+                        size="compact"
+                        margin={
+                            <span
+                                aria-hidden="true"
+                                className={`text-2xl ${badge.earned ? "" : "opacity-50"}`}
+                            >
+                                {emoji}
+                            </span>
+                        }
+                        name={
+                            <>
+                                <span className={badge.earned ? "" : "text-muted"}>{label}</span>
+                                <span className="sr-only">
+                                    {badge.earned ? m.achievement_earned() : m.achievement_locked()}
+                                </span>
+                            </>
+                        }
+                    />
                 );
             })}
-        </ul>
+        </Folio>
     );
     return framed ? (
         <SettingsSection title={m.achievements_heading()} hint={m.achievements_hint()}>

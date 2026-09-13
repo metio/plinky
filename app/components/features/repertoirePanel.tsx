@@ -12,6 +12,7 @@ import { deadlineText } from "../../lib/deadlineText";
 import { m } from "../../paraglide/messages.js";
 import { compactFieldClasses, linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
+import { Folio, FolioRow } from "../ui/folio";
 
 // What is on the music stand: the pieces being worked on, where each one has got to,
 // and any date it is being worked toward. The grade roadmap answers "what can I
@@ -67,23 +68,35 @@ export function RepertoirePanel({
                 {headed && <h2 className={sectionHeadingClasses}>{m.repertoire_title()}</h2>}
                 <p className="text-xs text-muted">{m.repertoire_intro()}</p>
             </div>
-            <ul className="space-y-2">
+            {/* No margin: this list is the answer inside a question the page has already
+                headed, and the page's own margin is the one the names line up against. */}
+            <Folio>
                 {repertoire.map(({ item, stage, deadline, slipping }) => (
-                    <li
+                    <FolioRow
                         key={item.id}
-                        className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-lg border border-line bg-surface p-3"
+                        size="compact"
+                        name={
+                            <Link className={linkClasses} to={practiceHref(item)}>
+                                {item.title}
+                            </Link>
+                        }
+                        line={
+                            <span className="flex flex-wrap gap-x-3 gap-y-1">
+                                <span className="text-xs text-muted">{STAGE_LABEL[stage]()}</span>
+                                {slipping && (
+                                    <span className="text-xs text-warn-ink">
+                                        {m.repertoire_slipping()}
+                                    </span>
+                                )}
+                                {deadline && (
+                                    <span className="text-xs text-muted">
+                                        {deadlineText(deadline)}
+                                    </span>
+                                )}
+                            </span>
+                        }
                     >
-                        <Link className={linkClasses} to={practiceHref(item)}>
-                            {item.title}
-                        </Link>
-                        <span className="text-xs text-muted">{STAGE_LABEL[stage]()}</span>
-                        {slipping && (
-                            <span className="text-xs text-warn-ink">{m.repertoire_slipping()}</span>
-                        )}
-                        {deadline && (
-                            <span className="text-xs text-muted">{deadlineText(deadline)}</span>
-                        )}
-                        <label className="ml-auto flex items-center gap-2 text-xs text-muted">
+                        <label className="flex items-center gap-2 text-xs text-muted">
                             <span>{m.repertoire_deadline()}</span>
                             <input
                                 type="date"
@@ -101,9 +114,9 @@ export function RepertoirePanel({
                                 className={compactFieldClasses}
                             />
                         </label>
-                    </li>
+                    </FolioRow>
                 ))}
-            </ul>
+            </Folio>
         </section>
     );
 }
