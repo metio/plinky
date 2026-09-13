@@ -2,17 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Builds brand/ — the kit anybody making something *about* Plinky works from: the mark at
-// every size, the mark on both grounds, the palette with each colour's role, a type
+// every size, the lockups on both grounds, the palette with each colour's role, a type
 // specimen, and social images at the sizes the places we post want.
 //
-// Everything is derived. The colours are read out of app/app.css and the mark out of
-// brand/plinky-mark.png, so a poster made from this kit cannot be in last month's palette:
-// the kit is regenerated (`npm run brand`) and the values come from the app itself. Nothing
-// here is hand-kept, which is the only way a brand kit stays true a year from now.
-//
-// The mark is a full lockup: the violet tile, the keys, the falling plink, and the name set
-// in its own letterforms. Nothing here sets the word "Plinky" beside it — that would print
-// the name twice — so the only type on these sheets is the tagline and the specimen.
+// Everything is derived. The colours are read out of app/app.css and the mark out of the
+// vector files in brand/mark (npm run mark), so a poster made from this kit cannot be in
+// last month's palette: the kit is regenerated (`npm run brand`) and the values come from
+// the app itself. Nothing here is hand-kept, which is the only way a brand kit stays true a
+// year from now.
 
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
@@ -20,12 +17,6 @@ import { tokenValue } from "./brandTokens.mjs";
 
 const OUT = "brand";
 const CSS = "app/app.css";
-const MARK = "brand/plinky-mark.png";
-// The same mark with its wordmark removed. A profile picture is cropped to a CIRCLE by
-// every platform that asks for one, and it is read at 56px in a comment thread — two facts
-// that rule the lockup out: the circle cuts through the name, and at that size the name is
-// a smear over the keys it is stealing room from. See core/iconMark.ts.
-const ICON = "brand/plinky-icon.png";
 
 // The colours worth handing to somebody outside the codebase, with what each one MEANS —
 // a hex without its role is how a brand ends up with red used for decoration.
@@ -34,9 +25,22 @@ const PALETTE = [
     ["ink", "--color-ink", "Type, staff lines, anything printed."],
     ["pencil", "--color-muted", "The teacher's annotation: hints, captions, asides."],
     ["rule", "--color-line", "Hairlines and dividers."],
-    ["brass", "--color-spark", "Anything earned — stars, grades, the day's own thing."],
-    ["violet", "--color-accent", "Anything you can press. Links, buttons, the cursor."],
-    ["plink", "--color-plink", "The falling note in the mark. Nowhere else."],
+    ["indigo", "--color-accent", "Anything you can press. Links, buttons, the cursor."],
+    [
+        "forget-me-not",
+        "--color-spark",
+        "Anything earned — grades, section marks, the day's own thing.",
+    ],
+    [
+        "name",
+        "--color-brand-ink",
+        "The name beside the mark on a light ground. White on a dark one.",
+    ],
+    [
+        "plink",
+        "--color-plink",
+        "The falling note: the loader, and a petal of the header's bouquet.",
+    ],
 ];
 
 // Colours that carry meaning inside the app and must never be borrowed for decoration.
@@ -50,15 +54,6 @@ const SPOKEN_FOR = [
 // resolve to Tailwind's own palette, which only exists once the stylesheet is built — so
 // those are read out of the build, where they are already resolved.
 const css = await readFile(CSS, "utf8");
-// Carried into the page as a data URI rather than a file:// URL, so the render does not
-// depend on where the browser thinks its document lives.
-const mark = `data:image/png;base64,${(await readFile(MARK)).toString("base64")}`;
-const icon = `data:image/png;base64,${(await readFile(ICON)).toString("base64")}`;
-// The mark carries its own rounded silhouette in its alpha, so it is scaled and never
-// clipped: a border-radius applied here is a guess at the artwork's own curve, and one
-// slightly tight leaves a sliver of ground showing all the way round.
-const tile = (size, style = "") =>
-    `<img src="${mark}" alt="" style="width:${size}px;height:${size}px;flex:none;display:block;${style}">`;
 // The built stylesheet, for the palette values Tailwind resolves. Any build will do —
 // these are theme constants, not per-page output.
 const assets = await readdir("build/client/assets").catch(() => []);
@@ -71,6 +66,29 @@ const built = await readFile(`build/client/assets/${builtName}`, "utf8");
 const colour = Object.fromEntries(
     [...PALETTE, ...SPOKEN_FOR].map(([name, token]) => [name, tokenValue(css, built, token)]),
 );
+
+// The mark, carried into each page as a data URI rather than a file:// URL, so the render
+// does not depend on where the browser thinks its document lives.
+const MARK = {};
+const ASPECT = {};
+for (const name of [
+    "tile",
+    "square",
+    "symbol",
+    "badge",
+    "badge-ringed",
+    "lockup-light",
+    "lockup-indigo",
+    "lockup-dark",
+]) {
+    const svg = await readFile(`brand/mark/${name}.svg`);
+    MARK[name] = `data:image/svg+xml;base64,${svg.toString("base64")}`;
+    const [, width, height] = svg.toString().match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/) ?? [];
+    ASPECT[name] = Number(width) / Number(height);
+}
+// One form of the mark at a given height; the width follows from its own proportions.
+const img = (name, height, style = "") =>
+    `<img src="${MARK[name]}" alt="" style="height:${height}px;width:${Math.round(height * ASPECT[name])}px;flex:none;display:block;${style}">`;
 
 await mkdir(`${OUT}/icon`, { recursive: true });
 await mkdir(`${OUT}/social`, { recursive: true });
@@ -93,50 +111,6 @@ const UI = "font-family:Inter,system-ui,sans-serif";
 
 const browser = await chromium.launch();
 
-// How far the artwork has to be scaled up for its own edges to fall outside the frame.
-//
-// A profile picture must carry NO ground. Any colour behind the tile shows as a ring the
-// moment a platform crops it to a circle — ink showed as a dark one, and the tile's own
-// violet sampled a few pixels in showed as a lighter one, because the artwork is drawn with
-// a vignette and so has no single edge colour to match. There is nothing to match it to.
-//
-// So the artwork is bled past the frame instead and the background is left transparent.
-// Every pixel inside the circle is then artwork, and the frame's corners — the only place
-// transparency survives — are outside the circle every platform crops to.
-//
-// The factor is measured rather than fixed: the transparent margin is a property of the
-// artwork, so a constant here would need revisiting every time the artwork is redrawn.
-async function bleedOf(dataUrl) {
-    const page = await browser.newPage();
-    const scale = await page.evaluate(async (src) => {
-        const img = new Image();
-        img.src = src;
-        await img.decode();
-        const n = img.naturalWidth;
-        const canvas = document.createElement("canvas");
-        canvas.width = n;
-        canvas.height = n;
-        const context = canvas.getContext("2d");
-        context.drawImage(img, 0, 0);
-        // Along the middle row, which crosses the tile's flat left and right sides rather
-        // than its rounded corners: how far in before the artwork is solid?
-        const row = context.getImageData(0, Math.round(n / 2), n, 1).data;
-        let inset = 0;
-        while (inset < n / 4 && row[inset * 4 + 3] < 250) inset++;
-        // Scale so those insets land outside the frame, plus a pixel of slack for the
-        // rounding either side.
-        return (n + 2) / Math.max(1, n - 2 * (inset + 1));
-    }, dataUrl);
-    await page.close();
-    return scale;
-}
-
-// A picture whose every visible pixel is artwork: bled past its frame, nothing behind it.
-const bled = (art, size, scale) =>
-    `<div style="width:${size}px;height:${size}px;overflow:hidden;display:flex;align-items:center;justify-content:center">
-       <img src="${art}" alt="" style="width:${Math.round(size * scale)}px;height:${Math.round(size * scale)}px;flex:none;display:block">
-     </div>`;
-
 async function shoot(html, { width, height, path, scale = 1, full = false, transparent = false }) {
     const page = await browser.newPage({
         viewport: { width, height },
@@ -150,15 +124,15 @@ async function shoot(html, { width, height, path, scale = 1, full = false, trans
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(150);
     // Without omitBackground a screenshot paints white wherever nothing is drawn, which is
-    // how the profile picture ended up with white corners under a circular crop.
+    // how the profile picture once ended up with white corners under a circular crop.
     await writeFile(path, await page.screenshot({ fullPage: full, omitBackground: transparent }));
     await page.close();
 }
 
-// The mark, at the sizes a store, a tab and a favourites bar ask for. Transparent outside
-// its own silhouette, which is how it arrives.
+// The app icon, at the sizes a store, a tab and a favourites bar ask for. Transparent
+// outside the tile's own rounded silhouette, which is how it arrives.
 for (const size of [1024, 512, 192, 180, 64, 32]) {
-    await shoot(tile(size), {
+    await shoot(img("tile", size), {
         width: size,
         height: size,
         path: `${OUT}/icon/plinky-${size}.png`,
@@ -166,31 +140,31 @@ for (const size of [1024, 512, 192, 180, 64, 32]) {
     });
 }
 
-// The mark on a ground it would otherwise vanish into. Its own tile is violet, so on a
-// violet sheet it disappears; a paper plate behind it gives it its edge back. The radius
-// is the plate's own, not a crop of the artwork.
-const plated = (size) =>
-    `<div style="background:${colour.paper};border-radius:26%;padding:${Math.round(size / 11)}px;flex:none">
-       ${tile(size)}
-     </div>`;
+// The name inside the circle, for places that show the mark without a caption.
+await shoot(img("badge", 512), {
+    width: 512,
+    height: 512,
+    path: `${OUT}/icon/badge-512.png`,
+    transparent: true,
+});
 
-// The lockup: the mark beside the tagline, on paper and on violet. The mark already carries
-// the name, so the type here says the one thing it does not.
-const lockup = (ground, ink, badge) => `
-<div style="width:960px;height:320px;background:${ground};display:flex;align-items:center;justify-content:center;gap:32px;padding:0 48px">
-  ${badge}
-  <div style="${DISPLAY};font-size:52px;letter-spacing:-0.01em;color:${ink};line-height:1.12">Practise piano in your browser</div>
+// The lockup above the tagline, on paper and on indigo. On indigo the symbol wears the thin
+// light ring the designer gave it for her own ground, and the name opens up a little.
+const lockupSheet = (ground, ink, form) => `
+<div style="width:960px;height:320px;background:${ground};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px">
+  ${img(form, 112)}
+  <div style="${DISPLAY};font-size:40px;color:${ink};line-height:1.12">Practise piano in your browser</div>
 </div>`;
-await shoot(lockup(colour.paper, colour.ink, tile(180)), {
+await shoot(lockupSheet(colour.paper, colour.ink, "lockup-light"), {
     width: 960,
     height: 320,
     path: `${OUT}/icon/lockup-paper.png`,
     scale: 2,
 });
-await shoot(lockup(colour.violet, colour.paper, plated(150)), {
+await shoot(lockupSheet(colour.indigo, colour.paper, "lockup-indigo"), {
     width: 960,
     height: 320,
-    path: `${OUT}/icon/lockup-violet.png`,
+    path: `${OUT}/icon/lockup-indigo.png`,
     scale: 2,
 });
 
@@ -207,7 +181,7 @@ const swatch = ([name, , why]) => `
 await shoot(
     `<div style="width:1200px;background:${colour.paper};padding:48px;${UI}">
        <div style="${DISPLAY};font-size:40px;color:${colour.ink}">Plinky — the palette</div>
-       <div style="font-size:15px;color:${colour.pencil};margin:8px 0 32px">Every colour is named for its role. The violet carries anything you can press; the grading colours are spoken for and never decorate.</div>
+       <div style="font-size:15px;color:${colour.pencil};margin:8px 0 32px">Every colour is named for its role. The indigo carries anything you can press; the grading colours are spoken for and never decorate.</div>
        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">${PALETTE.map(swatch).join("")}</div>
        <div style="${DISPLAY};font-size:26px;color:${colour.ink};margin:44px 0 6px">Spoken for</div>
        <div style="font-size:15px;color:${colour.pencil};margin-bottom:24px">These three carry meaning on the one screen where colour is information. Never borrow them for decoration.</div>
@@ -219,11 +193,11 @@ await shoot(
 // The type, set the way the app sets it.
 await shoot(
     `<div style="width:1200px;height:700px;background:${colour.paper};padding:56px;${UI};color:${colour.ink}">
-       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour.brass}">Display — Fredoka</div>
+       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour["forget-me-not"]}">Display — Fredoka</div>
        <div style="${DISPLAY};font-size:72px;letter-spacing:-0.015em;margin:12px 0 8px">Practise piano in your browser</div>
        <div style="${DISPLAY};font-size:40px;color:${colour.ink}">Tuesday morning</div>
        <div style="height:1px;background:${colour.rule};margin:40px 0"></div>
-       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour.brass}">Interface — Inter</div>
+       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour["forget-me-not"]}">Interface — Inter</div>
        <div style="font-size:19px;margin:12px 0 6px">Play it as slowly as you like — the notes wait for you.</div>
        <div style="font-size:15px;color:${colour.pencil}">Grade 3 · skill 214 · nine pieces on the stand</div>
        <div style="font-size:15px;font-variant-numeric:tabular-nums;margin-top:16px">♩ = 72 · bar 17 · 94%</div>
@@ -231,13 +205,23 @@ await shoot(
     { width: 1200, height: 700, path: `${OUT}/type.png`, scale: 2 },
 );
 
-// The places we post, at the sizes they want.
-const social = (width, height, titleSize) => `
-<div style="width:${width}px;height:${height}px;background:${colour.violet};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${Math.round(height / 16)}px;text-align:center;padding:${Math.round(width / 12)}px">
-  ${plated(Math.round(height / 4.4))}
-  <div style="${DISPLAY};font-size:${titleSize}px;color:${colour.paper};line-height:1.1;letter-spacing:-0.01em">Practise piano in your browser</div>
-  <div style="${UI};font-size:${Math.round(titleSize / 2.6)}px;color:${colour.paper};opacity:.82">Free · no account · nothing to install</div>
+// The places we post, at the sizes they want. A wide picture gets the symbol beside the
+// name; a square or a tall one gets the name inside the circle, which fills a centred space
+// the way a wide lockup cannot.
+const social = (width, height, titleSize) => {
+    const wide = width / height > 1.3;
+    const mark = wide
+        ? img("lockup-indigo", Math.round(height / 4.6))
+        : img("badge-ringed", Math.round(Math.min(width, height) / 2.6));
+    return `
+<div style="width:${width}px;height:${height}px;background:${colour.indigo};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${Math.round(height / 14)}px;text-align:center;padding:${Math.round(width / 12)}px">
+  ${mark}
+  <div>
+    <div style="${DISPLAY};font-size:${titleSize}px;color:${colour.paper};line-height:1.1;letter-spacing:-0.01em">Practise piano in your browser</div>
+    <div style="${UI};font-size:${Math.round(titleSize / 2.6)}px;color:${colour.paper};opacity:.82;margin-top:${Math.round(titleSize / 3)}px">Free · no account · nothing to install</div>
+  </div>
 </div>`;
+};
 await shoot(social(1200, 630, 62), {
     width: 1200,
     height: 630,
@@ -261,30 +245,21 @@ await shoot(social(1080, 1350, 78), {
     path: `${OUT}/social/instagram-portrait-1080x1350.png`,
 });
 
-// The profile picture. Every platform crops one to a circle — Reddit, Facebook, Instagram,
-// YouTube — so this is a full-bleed square of ground with the mark well inside the
-// inscribed circle, and the crop is left to them.
+// The profile picture: the symbol alone, the designer's own recommendation for an avatar.
+// Every platform crops one to a circle — Reddit, Facebook, Instagram, YouTube — and shows
+// it at about 56px beside a comment, where a name would be a smear.
 //
-// Drawing the circle here instead put white in the corners (a screenshot paints white
-// where nothing is drawn) and YouTube's crop is a hair wider than the circle, so the
-// corners showed as pale arcs along the top. A square has no edge to reveal.
-//
-// The profile picture, from the WORDLESS icon: every platform crops this one to a circle,
-// which cuts straight through a wordmark set under the keys, and shows it at about 56px
-// beside a comment, where that word is a smear. The keys and the falling note are centred,
-// so a circle takes only the tile's corners — nothing that carries meaning.
-//
-// No ground behind it, and the artwork bled past the frame — see bleedOf above for why a
-// ground of any colour cannot work here.
+// It is the full-bleed square rather than the circle. Drawing the circle here would leave
+// its corners transparent or white, and YouTube's crop is a hair wider than the circle, so
+// those corners showed as pale arcs along the top. Inside any circular crop the square is
+// exactly the symbol, and past its edge there is only the same indigo ground to reveal.
 //
 // 800 is what YouTube asks for; 512 covers Facebook and Instagram; 256 is Reddit's.
-const iconBleed = await bleedOf(icon);
 for (const size of [256, 512, 800]) {
-    await shoot(bled(icon, size, iconBleed), {
+    await shoot(img("square", size), {
         width: size,
         height: size,
         path: `${OUT}/social/profile-square-${size}.png`,
-        transparent: true,
     });
 }
 
@@ -294,11 +269,11 @@ for (const size of [256, 512, 800]) {
 // That box is a sixth of the picture: a banner designed edge to edge loses its ends on
 // three devices out of four.
 await shoot(
-    `<div style="width:2048px;height:1152px;background:${colour.violet};display:flex;align-items:center;justify-content:center">
-       <div style="width:1235px;height:338px;display:flex;align-items:center;justify-content:center;gap:40px;text-align:left">
-         ${plated(240)}
+    `<div style="width:2048px;height:1152px;background:${colour.indigo};display:flex;align-items:center;justify-content:center">
+       <div style="width:1235px;height:338px;display:flex;align-items:center;justify-content:center;gap:48px;text-align:left">
+         ${img("lockup-indigo", 112)}
          <div>
-           <div style="${DISPLAY};font-size:58px;color:${colour.paper};line-height:1.12;letter-spacing:-0.01em">Practise piano in your browser</div>
+           <div style="${DISPLAY};font-size:54px;color:${colour.paper};line-height:1.12;letter-spacing:-0.01em">Practise piano in your browser</div>
            <div style="${UI};font-size:26px;color:${colour.paper};opacity:.75;margin-top:14px">Free · no account · nothing to install</div>
          </div>
        </div>
@@ -312,22 +287,22 @@ await shoot(
 // but ground. Rendered at twice the size it is shown, which is what keeps it crisp on the
 // screens people actually have.
 await shoot(
-    `<div style="width:1640px;height:624px;background:${colour.violet};display:flex;align-items:center;justify-content:center;gap:48px;padding:0 18%">
-       ${plated(300)}
-       <div style="${DISPLAY};font-size:64px;color:${colour.paper};line-height:1.12;letter-spacing:-0.01em">Practise piano in your browser</div>
+    `<div style="width:1640px;height:624px;background:${colour.indigo};display:flex;align-items:center;justify-content:center;gap:56px;padding:0 16%">
+       ${img("lockup-indigo", 132)}
+       <div style="${DISPLAY};font-size:60px;color:${colour.paper};line-height:1.12;letter-spacing:-0.01em">Practise piano in your browser</div>
      </div>`,
     { width: 1640, height: 624, path: `${OUT}/social/facebook-cover-1640x624.png` },
 );
 
 // The banner strip. Reddit lays the community icon and name over the left of it on a wide
-// screen, so nothing goes there — the mark and the tagline sit right of that, where no
+// screen, so nothing goes there — the lockup and the tagline sit right of that, where no
 // overlay reaches and no crop takes them.
 const banner = (width) => `
-<div style="width:${width}px;height:128px;background:${colour.violet};display:flex;align-items:center;justify-content:flex-start;gap:20px;padding-left:${Math.round(width * 0.3)}px">
-  ${plated(84)}
+<div style="width:${width}px;height:128px;background:${colour.indigo};display:flex;align-items:center;justify-content:flex-start;gap:28px;padding-left:${Math.round(width * 0.3)}px">
+  ${img("lockup-indigo", 56)}
   <div>
-    <div style="${DISPLAY};font-size:34px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
-    <div style="${UI};font-size:18px;color:${colour.paper};opacity:.8;line-height:1.3;margin-top:4px">Free · no account · nothing to install</div>
+    <div style="${DISPLAY};font-size:30px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
+    <div style="${UI};font-size:17px;color:${colour.paper};opacity:.8;line-height:1.3;margin-top:4px">Free · no account · nothing to install</div>
   </div>
 </div>`;
 await shoot(banner(1072), {
@@ -341,9 +316,9 @@ await shoot(banner(1080), {
     path: `${OUT}/social/reddit-banner-mobile-1080x128.png`,
 });
 
-// The watermark YouTube overlays on a playing video. Transparent, so it is the mark and
-// nothing else.
-await shoot(tile(150), {
+// The watermark YouTube overlays on a playing video. Transparent, so it is the symbol on
+// its circle and nothing else.
+await shoot(img("symbol", 150), {
     width: 150,
     height: 150,
     path: `${OUT}/social/youtube-watermark-150.png`,
@@ -351,20 +326,17 @@ await shoot(tile(150), {
 });
 
 // A repository's social preview — what GitHub, Slack and a chat client unfurl for a link
-// to the code. 1280×640 is what GitHub asks for, and it is shown large and never cropped
-// to a circle, so this is the one place the name belongs INSIDE the picture: the tile can
-// carry it without competing with type set beside it.
+// to the code. 1280×640 is what GitHub asks for, and it is shown large and never cropped to
+// a circle, so the lockup can carry the name at a size that reads.
 //
-// The ground is ink, which the mark's own violet tile stands clear of. Unlike the profile
-// picture this one is never cropped to a circle, so the tile keeps its silhouette and the
-// ground has an edge to give it. The tagline sits beside it saying what the name does not.
-//
-// Everything stays inside the middle three quarters: an unfurl is re-cropped by whoever is
-// doing the unfurling, and a preview designed edge to edge loses its ends.
+// The ground is ink, which the symbol's indigo circle stands clear of without a ring. The
+// tagline sits under it saying what the name does not. Everything stays inside the middle
+// three quarters: an unfurl is re-cropped by whoever is doing the unfurling, and a preview
+// designed edge to edge loses its ends.
 await shoot(
-    `<div style="width:1280px;height:640px;background:${colour.ink};display:flex;align-items:center;justify-content:center;gap:56px;padding:0 120px;box-sizing:border-box">
-       <img src="${mark}" alt="" style="width:340px;height:340px;flex:none;display:block">
-       <div style="${DISPLAY};font-size:64px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
+    `<div style="width:1280px;height:640px;background:${colour.ink};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;padding:0 120px">
+       ${img("lockup-dark", 150)}
+       <div style="${DISPLAY};font-size:60px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
      </div>`,
     { width: 1280, height: 640, path: `${OUT}/social/github-social-1280x640.png` },
 );
@@ -389,4 +361,4 @@ await writeFile(
     )}\n`,
 );
 
-console.log(`brand/ rebuilt from ${CSS} and ${MARK}`);
+console.log(`brand/ rebuilt from ${CSS} and brand/mark`);

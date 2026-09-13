@@ -102,7 +102,8 @@ async function main() {
     const host = new URL(
         readFileSync("core/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1] ?? "",
     ).host;
-    const mark = `data:image/png;base64,${readFileSync("brand/plinky-icon.png").toString("base64")}`;
+    // The symbol on its circle, from the vector mark (npm run mark).
+    const mark = `data:image/svg+xml;base64,${readFileSync("brand/mark/symbol.svg").toString("base64")}`;
     // The faces travel with the page: a headless browser has neither installed. Latin
     // only, as the site's own card — a title in another script falls to the system face.
     const font = (path: string) =>

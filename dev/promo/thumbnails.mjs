@@ -25,7 +25,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { readFile as read } from "node:fs/promises";
 import { chromium } from "playwright";
 import { folderFor, PIECES } from "./pieces.mjs";
-import { DOMAIN, TITTLE as TITTLE_EM, tittleFromBoxBottom, WORDMARK } from "../../core/wordmark.ts";
+import { DOMAIN, TRACKING, WORDMARK } from "../../core/wordmark.ts";
 
 const OUT = argValue("--out") ?? "promo";
 const ONLY = argValue("--only");
@@ -42,16 +42,12 @@ function argValue(flag) {
 const STAGE = "#000000";
 const GLOW = "#180a2e";
 const PAPER = "#f9f8fc";
-const PLINK = "#aa36fc";
-// The dot, anchored to the inline box's bottom — the end CSS gives us here. The numbers are
-// core/wordmark's, the same ones the app header and an exported video's canvas draw from.
-const TITTLE = `bottom:${tittleFromBoxBottom()}em;width:${TITTLE_EM.size}em;height:${TITTLE_EM.size}em`;
 
-// The keys alone — no tile, no lockup. A tile would need an edge to read as a tile, and on
-// this ground it has none, so it becomes a smudge behind the keys; the white keys carry
-// their own edge against the dark. The card sets the name itself, which is why the lockup
-// does not belong here either.
-const keys = `data:image/png;base64,${(await read("brand/plinky-keys.png")).toString("base64")}`;
+// The symbol on its circle, from the vector mark (npm run mark). On this near-black stage the
+// circle's own indigo is its edge, so it needs no ring — the designer's lockup on black has
+// none. The card sets the name itself, with the domain as its tail, which is why the lockup
+// does not belong here.
+const symbol = `data:image/svg+xml;base64,${(await read("brand/mark/symbol.svg")).toString("base64")}`;
 
 const fredoka = await read(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
@@ -81,7 +77,8 @@ const CUTS = [
         scale: 1,
         padding: "72px 88px",
         titleWidth: 820,
-        keys: "right:36px;bottom:-40px;width:440px;height:440px",
+        // Right of the longest title's column and centred on the card's height.
+        symbol: "right:80px;top:50%;transform:translateY(-50%);width:300px;height:300px",
     },
     {
         file: "thumb-short.png",
@@ -94,7 +91,7 @@ const CUTS = [
         // leave rather than on the floor — dropped to the bottom it opens a dead band
         // across the middle of the card, which is most of a portrait tile. A portrait tile
         // has width to spare, and the shape is what survives the shrink to a grid tile.
-        keys: "left:50%;transform:translateX(-50%);bottom:400px;width:740px;height:740px",
+        symbol: "left:50%;transform:translateX(-50%);bottom:440px;width:600px;height:600px",
     },
 ];
 
@@ -104,11 +101,11 @@ const browser = await chromium.launch();
 function card(piece, cut) {
     return `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
          <div style="position:relative;overflow:hidden;width:${cut.width}px;height:${cut.height}px;background:radial-gradient(120% 140% at 18% 8%, ${GLOW} 0%, ${STAGE} 72%);display:flex;flex-direction:column;justify-content:space-between;padding:${cut.padding};font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif">
-           <!-- The keys. A thumbnail is picked out of a grid of a dozen others at a fifth of
+           <!-- The symbol. A thumbnail is picked out of a grid of a dozen others at a fifth of
                 this size, where a title is a grey smear and the only thing still legible is
                 a shape and a colour — so the shape is the app's own, big enough to survive
                 the shrink, and set where the longest title still clears it. -->
-           <img src="${keys}" alt="" style="position:absolute;${cut.keys}">
+           <img src="${symbol}" alt="" style="position:absolute;${cut.symbol}">
            <div style="position:relative;max-width:${cut.titleWidth}px">
              <div style="font-size:${titleSize(piece.title, cut.scale)}px;font-weight:600;color:${PAPER};line-height:1.08;letter-spacing:-0.015em;text-wrap:balance">${piece.title}</div>
              <div style="font-family:Inter,system-ui,sans-serif;font-size:${Math.round(36 * cut.scale)}px;color:${PAPER};opacity:.72;margin-top:${Math.round(20 * cut.scale)}px">${piece.composer}</div>
@@ -117,9 +114,7 @@ function card(piece, cut) {
                 wrote the name twice on a card that has room to say it once — so the domain
                 is the wordmark's own tail, in the same face, and the address and the name
                 are the same object. -->
-           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:-0.01em;color:${PAPER};line-height:1">
-             ${WORDMARK.before}<span style="position:relative">${WORDMARK.stem}<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>${WORDMARK.after}${DOMAIN}
-           </div>
+           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1">${WORDMARK}${DOMAIN}</div>
          </div>`;
 }
 
