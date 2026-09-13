@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
-import { HubCard } from "./hubCard";
-import { LocalizedLink as Link } from "./localizedLink";
+import { Folio, FolioRow, folioIconClasses } from "./folio";
 
 export type HubEntry = {
     to: string;
@@ -13,25 +12,23 @@ export type HubEntry = {
 };
 
 // A list of destinations, each with room to say what it actually is. The two hubs
-// use it — Music for the shelves either side of the catalogue, Learn for the whole
-// schoolroom — so a place that gathers things looks the same wherever you meet it.
+// use it — Learn for the whole schoolroom, Teach for the making and the reading of sets —
+// so a place that gathers things looks the same wherever you meet it. Each entry is a
+// Folio row that is one link, icon and all.
+//
+// Silent: only a key that is pressed makes a note in Plinky, never a pointer passing over.
 export function HubList({ entries }: { entries: HubEntry[] }) {
     return (
-        <ul className="space-y-3">
+        <Folio>
             {entries.map((entry) => (
-                <li key={entry.to}>
-                    <HubCard as={Link} to={entry.to} Icon={entry.Icon}>
-                        <span className="space-y-1">
-                            <span className="block text-lg font-medium text-ink group-hover:text-accent-strong">
-                                {entry.label} →
-                            </span>
-                            <span className="block text-sm leading-relaxed text-muted">
-                                {entry.blurb}
-                            </span>
-                        </span>
-                    </HubCard>
-                </li>
+                <FolioRow
+                    key={entry.to}
+                    to={entry.to}
+                    margin={<entry.Icon className={folioIconClasses} />}
+                    name={`${entry.label} →`}
+                    line={entry.blurb}
+                />
             ))}
-        </ul>
+        </Folio>
     );
 }

@@ -44,7 +44,16 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/tools";
 import { PageHeader } from "../components/ui/pageHeader";
-import { Card } from "../components/ui/card";
+import { FolioRow, folioIconClasses } from "../components/ui/folio";
+import {
+    ArrowUpIcon,
+    ClockIcon,
+    KeysIcon,
+    ListIcon,
+    MetronomeIcon,
+    NotesIcon,
+    RotateIcon,
+} from "../components/ui/icons";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -67,23 +76,28 @@ const ROOT = DEMO_FROM;
 
 const NOTE_SECONDS = 0.45;
 
+// One tool: a Folio row headed by its name, its icon in the margin, the tool beneath.
 function Panel({
     title,
     hint,
+    Icon,
     children,
 }: {
     title: string;
     hint: string;
+    Icon: (props: { className?: string }) => React.ReactNode;
     children: React.ReactNode;
 }) {
     return (
-        <Card className="space-y-3">
-            <div className="space-y-1">
-                <h2 className="text-base font-semibold text-ink">{title}</h2>
-                <p className="text-sm text-muted">{hint}</p>
-            </div>
+        <FolioRow
+            as="section"
+            heading="h2"
+            margin={<Icon className={folioIconClasses} />}
+            name={title}
+            line={hint}
+        >
             {children}
-        </Card>
+        </FolioRow>
     );
 }
 
@@ -106,7 +120,7 @@ function CircleOfFifths() {
         }
     };
     return (
-        <Panel title={m.tools_circle_title()} hint={m.tools_circle_hint()}>
+        <Panel title={m.tools_circle_title()} hint={m.tools_circle_hint()} Icon={RotateIcon}>
             {/* Picking one of twelve is the same gesture as picking one of thirteen
                 scales two panels down, so it is the same control — a filled primary
                 Button meant "the thing to press", which a key you have not chosen is
@@ -184,7 +198,7 @@ function ScaleExplorer() {
     const naming = useNoteNaming();
     const pitches = scalePitches(ROOT + Number(tonic), scale);
     return (
-        <Panel title={m.tools_scales_title()} hint={m.tools_scales_hint()}>
+        <Panel title={m.tools_scales_title()} hint={m.tools_scales_hint()} Icon={KeysIcon}>
             <SegmentedControl
                 label={m.tools_root()}
                 value={tonic}
@@ -228,7 +242,7 @@ function ChordExplorer() {
     // the top of two octaves and would lose its top note off the keyboard and the picture.
     const top = Math.max(ROOT + 24, ...pitches);
     return (
-        <Panel title={m.tools_chords_title()} hint={m.tools_chords_hint()}>
+        <Panel title={m.tools_chords_title()} hint={m.tools_chords_hint()} Icon={NotesIcon}>
             <SegmentedControl
                 label={m.tools_root()}
                 value={root}
@@ -266,7 +280,7 @@ function IntervalFinder() {
     const from = ROOT + Number(root);
     const to = from + semitonesOf(interval);
     return (
-        <Panel title={m.tools_interval_title()} hint={m.tools_interval_hint()}>
+        <Panel title={m.tools_interval_title()} hint={m.tools_interval_hint()} Icon={ArrowUpIcon}>
             <SegmentedControl
                 label={m.tools_root()}
                 value={root}
@@ -314,7 +328,7 @@ function Metronome({ bpm, onBpm }: { bpm: number; onBpm: (bpm: number) => void }
     const [beats, setBeats] = useState("4");
     useMetronome(on, bpm, Number(beats));
     return (
-        <Panel title={m.tools_metro_title()} hint={m.tools_metro_hint()}>
+        <Panel title={m.tools_metro_title()} hint={m.tools_metro_hint()} Icon={MetronomeIcon}>
             <div className="flex flex-wrap items-center gap-3 text-sm text-body">
                 <label className="flex flex-1 items-center gap-3">
                     <span className="text-muted">{m.tools_metro_tempo()}</span>
@@ -351,7 +365,7 @@ function TapTempo({ onFound }: { onFound: (bpm: number) => void }) {
     const [state, setState] = useState<TapState>(NO_TAPS);
     const bpm = bpmOf(state);
     return (
-        <Panel title={m.tools_tap_title()} hint={m.tools_tap_hint()}>
+        <Panel title={m.tools_tap_title()} hint={m.tools_tap_hint()} Icon={ClockIcon}>
             <div className="flex flex-wrap items-center gap-3">
                 <Button
                     variant="primary"
@@ -390,33 +404,41 @@ export default function ToolsRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.tools_title()} hint={m.tools_intro()} />
-            {/* A boundary per tool. Each one is a self-contained thing a player looks up
+            {/* No gap between the tools: each is a Folio row carrying its own padding and
+                hairline. */}
+            <div>
+                {/* A boundary per tool. Each one is a self-contained thing a player looks up
                 mid-practice, reading nothing the others read — so a stumble in the chord
                 arithmetic has no business taking the metronome away from somebody who
                 came for the metronome. The tap tempo and the metronome share a number and
                 so share a boundary: split, a crash in one would leave the other holding a
                 tempo whose source had vanished. */}
-            <FeatureBoundary feature="CircleOfFifths">
-                <CircleOfFifths />
-            </FeatureBoundary>
-            <FeatureBoundary feature="ScaleExplorer">
-                <ScaleExplorer />
-            </FeatureBoundary>
-            <FeatureBoundary feature="ChordExplorer">
-                <ChordExplorer />
-            </FeatureBoundary>
-            <FeatureBoundary feature="ChordChanges">
-                <Panel title={m.tools_changes_title()} hint={m.tools_changes_hint()}>
-                    <ChordChanges root={ROOT} />
-                </Panel>
-            </FeatureBoundary>
-            <FeatureBoundary feature="IntervalFinder">
-                <IntervalFinder />
-            </FeatureBoundary>
-            <FeatureBoundary feature="TapTempoAndMetronome">
-                <TapTempo onFound={setBpm} />
-                <Metronome bpm={bpm} onBpm={setBpm} />
-            </FeatureBoundary>
+                <FeatureBoundary feature="CircleOfFifths">
+                    <CircleOfFifths />
+                </FeatureBoundary>
+                <FeatureBoundary feature="ScaleExplorer">
+                    <ScaleExplorer />
+                </FeatureBoundary>
+                <FeatureBoundary feature="ChordExplorer">
+                    <ChordExplorer />
+                </FeatureBoundary>
+                <FeatureBoundary feature="ChordChanges">
+                    <Panel
+                        title={m.tools_changes_title()}
+                        hint={m.tools_changes_hint()}
+                        Icon={ListIcon}
+                    >
+                        <ChordChanges root={ROOT} />
+                    </Panel>
+                </FeatureBoundary>
+                <FeatureBoundary feature="IntervalFinder">
+                    <IntervalFinder />
+                </FeatureBoundary>
+                <FeatureBoundary feature="TapTempoAndMetronome">
+                    <TapTempo onFound={setBpm} />
+                    <Metronome bpm={bpm} onBpm={setBpm} />
+                </FeatureBoundary>
+            </div>
         </main>
     );
 }
