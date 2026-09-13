@@ -12,7 +12,6 @@ import {
     SlidersIcon,
 } from "../components/ui/icons";
 import { routeMeta, webPageData } from "../../core/site";
-import { useSynth } from "../hooks/useSynth";
 import { LESSONS } from "../../core/theoryCourse";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -46,40 +45,22 @@ export function meta(_args: Route.MetaArgs) {
 // Read the keyboard, then the music, then the marks — and only then find where you stand,
 // because the level a drill puts you at means little before you can read what it shows.
 // The extras follow.
-//
-// The notes climb an octave, so running a mouse down the list plays a scale.
 const ENTRIES = [
-    { to: "/basics", label: m.basics_title, blurb: m.basics_intro, Icon: KeysIcon, note: 60 },
+    { to: "/basics", label: m.basics_title, blurb: m.basics_intro, Icon: KeysIcon },
     {
         to: "/theory",
         label: m.theory_title,
         blurb: () => m.theory_intro({ count: LESSONS.length }),
         Icon: BookIcon,
-        note: 62,
     },
-    {
-        to: "/glossary",
-        label: m.glossary_title,
-        blurb: m.glossary_intro,
-        Icon: ListIcon,
-        note: 64,
-    },
-    {
-        to: "/placement",
-        label: m.placement_title,
-        blurb: m.placement_intro,
-        Icon: ArrowUpIcon,
-        note: 65,
-    },
-    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon, note: 67 },
-    { to: "/rhythm", label: m.rhythm_title, blurb: m.rhythm_intro, Icon: ClockIcon, note: 68 },
-    { to: "/tools", label: m.tools_title, blurb: m.tools_intro, Icon: SlidersIcon, note: 69 },
+    { to: "/glossary", label: m.glossary_title, blurb: m.glossary_intro, Icon: ListIcon },
+    { to: "/placement", label: m.placement_title, blurb: m.placement_intro, Icon: ArrowUpIcon },
+    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon },
+    { to: "/rhythm", label: m.rhythm_title, blurb: m.rhythm_intro, Icon: ClockIcon },
+    { to: "/tools", label: m.tools_title, blurb: m.tools_intro, Icon: SlidersIcon },
 ];
 
 export default function Learn() {
-    const synth = useSynth();
-    const play = (note: number) =>
-        synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true });
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.nav_learn()} hint={m.learn_intro()} />
@@ -90,7 +71,6 @@ export default function Learn() {
                     label: entry.label(),
                     blurb: entry.blurb(),
                 }))}
-                onEnter={play}
             />
         </main>
     );
