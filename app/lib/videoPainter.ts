@@ -27,7 +27,7 @@ import {
     stepCenterAt,
     wrapTitle,
 } from "../../core/videoScene";
-import { TRACKING, wordmarkText } from "../../core/wordmark";
+import { DOT, drawnWordmark, TRACKING, tittleCircle, WORDMARK_PARTS } from "../../core/wordmark";
 
 // Paints one frame of the exported video: a dark stage headed by the piece's title with
 // the composer under it and the wordmark opposite, then the notation (when a snapshot was
@@ -200,17 +200,29 @@ function withTracking<T>(context: Context2D, unit: number, draw: () => T): T {
 }
 
 // The name, right-aligned on `rightX` and sitting on `baselineY`: the same letterforms the
-// header and the thumbnails set, in the display face at the mark's weight.
+// header and the thumbnails set, in the display face at the mark's weight, with the dotless
+// stem and the round pink dot core/wordmark places over it.
 function paintWordmark(context: Context2D, rightX: number, baselineY: number, unit: number): void {
+    const size = Math.round(unit * WORDMARK_SCALE);
     context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
-    const text = wordmarkText(true);
+    const text = drawnWordmark(true);
     context.textBaseline = "alphabetic";
-    context.fillStyle = INK;
     withTracking(context, unit, () => {
         // Placed from the left at the measured width: a right-aligned run would count the
         // spacing after its last letter and stand that far in from the margin.
         context.textAlign = "left";
-        context.fillText(text, rightX - context.measureText(text).width, baselineY);
+        const left = rightX - context.measureText(text).width;
+        context.fillStyle = INK;
+        context.fillText(text, left, baselineY);
+        // The stem begins where the letters before it end, their spacing included.
+        const stemLeft = left + context.measureText(WORDMARK_PARTS.before).width;
+        const dot = tittleCircle(stemLeft, baselineY, size);
+        context.fillStyle = DOT;
+        context.beginPath();
+        // A square with a radius of half its side is a circle, which keeps the stage's one
+        // round shape on the same primitive as everything else drawn here.
+        context.roundRect(dot.cx - dot.r, dot.cy - dot.r, dot.r * 2, dot.r * 2, dot.r);
+        context.fill();
     });
 }
 
@@ -249,7 +261,7 @@ function paintChrome(context: Context2D, cfg: ChromeConfig): void {
     // piece is what a viewer is deciding about, and the mark only has to be legible.
     context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
     const wordmarkWidth = showWordmark
-        ? withTracking(context, unit, () => context.measureText(wordmarkText(true)).width)
+        ? withTracking(context, unit, () => context.measureText(drawnWordmark(true)).width)
         : 0;
     const textRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
     const fullRoom = width - margin * 2;

@@ -27,7 +27,14 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import * as fontkit from "fontkit";
 import { decompress } from "wawoff2";
-import { TRACKING, WORDMARK } from "../core/wordmark.ts";
+import {
+    DOT,
+    drawnWordmark,
+    TITTLE,
+    TRACKING,
+    tittleCircle,
+    WORDMARK_PARTS,
+} from "../core/wordmark.ts";
 import { tokenValue } from "./brandTokens.mjs";
 
 const OUT = "brand/mark";
@@ -90,14 +97,54 @@ const EM = face.unitsPerEm;
 // Two decimals of a unit is far below a pixel at any size these files are drawn.
 const num = (value) => String(Math.round(value * 100) / 100);
 
+// The dot is drawn rather than set, so it has to sit where the face puts its own: measured
+// here off Fredoka 600's i on every run, and held to core/wordmark's TITTLE, which the header,
+// the thumbnails and the video set it from. A face update that moves the tittle fails here
+// rather than leaving four surfaces with the dot a little off.
+{
+    const contours = (glyph) => {
+        const boxes = [];
+        for (const { command, args } of glyph.path.commands) {
+            if (command === "moveTo") boxes.push({ x: [], y: [] });
+            for (let k = 0; k + 1 < args.length; k += 2) {
+                boxes.at(-1)?.x.push(args[k]);
+                boxes.at(-1)?.y.push(args[k + 1]);
+            }
+        }
+        return boxes.map(({ x, y }) => ({
+            minX: Math.min(...x),
+            maxX: Math.max(...x),
+            minY: Math.min(...y),
+        }));
+    };
+    const [tittle] = contours(face.layout("i").glyphs[0]).sort((a, b) => b.minY - a.minY);
+    const [stem] = contours(face.layout(WORDMARK_PARTS.stem).glyphs[0]);
+    const measured = {
+        size: (tittle.maxX - tittle.minX) / EM,
+        baseAbove: tittle.minY / EM,
+        stemCentre: (stem.minX + stem.maxX) / 2 / EM,
+    };
+    for (const [key, value] of Object.entries(measured)) {
+        if (Math.abs(value - TITTLE[key]) > 0.002) {
+            console.error(
+                `Fredoka's tittle has moved: ${key} is ${value.toFixed(4)}em, core/wordmark says ${TITTLE[key]}.`,
+            );
+            process.exit(1);
+        }
+    }
+}
+
 // The name's outlines starting at `x` on `baseline`, `size` units tall, with `spacing` units
-// after every letter but the last. Returns the path and the name's width.
+// after every letter but the last, set with the dotless stem. Returns the path, the name's
+// width and the dot over its i.
 function outline(x, baseline, size, spacing) {
     const scale = size / EM;
-    const run = face.layout(WORDMARK);
+    const run = face.layout(drawnWordmark(false));
     const parts = [];
     let pen = x;
+    let dot = null;
     run.glyphs.forEach((glyph, index) => {
+        if (index === WORDMARK_PARTS.before.length) dot = tittleCircle(pen, baseline, size);
         const at = (px, py) => `${num(pen + px * scale)} ${num(baseline - py * scale)}`;
         for (const { command, args } of glyph.path.commands) {
             if (command === "moveTo") parts.push(`M${at(args[0], args[1])}`);
@@ -113,8 +160,12 @@ function outline(x, baseline, size, spacing) {
         pen += run.positions[index].xAdvance * scale;
         if (index < run.glyphs.length - 1) pen += spacing;
     });
-    return { d: parts.join(""), width: pen - x };
+    return { d: parts.join(""), width: pen - x, dot };
 }
+
+// The dot over the i, in the mark's pink whatever the ground.
+const dotOf = ({ dot }, extra = "") =>
+    `<circle fill="${DOT}"${extra} cx="${num(dot.cx)}" cy="${num(dot.cy)}" r="${num(dot.r)}"/>`;
 
 // Where CSS puts the baseline in a line box as tall as the type (line-height 1): the face's
 // ascent and descent centred in the box, which is how the lockups were set on her board.
@@ -142,7 +193,8 @@ function badge(ring) {
         100,
         100,
         `${defs(17)}${circle}<g transform="translate(9.35 -3.4) scale(.813)">${art()}</g>` +
-            `<path fill="#fff" filter="url(#${ID}s)" d="${name.d}"/>${ring ? RING : ""}`,
+            `<path fill="#fff" filter="url(#${ID}s)" d="${name.d}"/>` +
+            `${dotOf(name, ` filter="url(#${ID}s)"`)}${ring ? RING : ""}`,
     );
 }
 
@@ -157,7 +209,7 @@ function lockup({ ring, ink, tracking }) {
         SYMBOL + GAP + name.width,
         SYMBOL,
         `<g transform="scale(${SYMBOL / 100})">${defs()}${circle}${art()}${ring ? RING : ""}</g>` +
-            `<path fill="${ink}" d="${name.d}"/>`,
+            `<path fill="${ink}" d="${name.d}"/>${dotOf(name)}`,
     );
 }
 

@@ -25,7 +25,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { readFile as read } from "node:fs/promises";
 import { chromium } from "playwright";
 import { folderFor, PIECES } from "./pieces.mjs";
-import { DOMAIN, TRACKING, WORDMARK } from "../../core/wordmark.ts";
+import { DOMAIN, DOT, TITTLE, TRACKING, WORDMARK_PARTS } from "../../core/wordmark.ts";
 
 const OUT = argValue("--out") ?? "promo";
 const ONLY = argValue("--only");
@@ -98,6 +98,11 @@ const CUTS = [
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
 
+// The round pink dot over the name's i, placed from the baseline as the app header places it:
+// a zero-size inline block before the dotless ı sits on the baseline at its left edge, and
+// the dot hangs off it by core/wordmark's measurements.
+const DOT_ANCHOR = `<span style="position:relative;display:inline-block;width:0;height:0;vertical-align:baseline"><span style="position:absolute;left:${TITTLE.stemCentre}em;bottom:${TITTLE.baseAbove}em;width:${TITTLE.size}em;height:${TITTLE.size}em;transform:translateX(-50%);border-radius:50%;background:${DOT}"></span></span>`;
+
 function card(piece, cut) {
     return `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
          <div style="position:relative;overflow:hidden;width:${cut.width}px;height:${cut.height}px;background:radial-gradient(120% 140% at 18% 8%, ${GLOW} 0%, ${STAGE} 72%);display:flex;flex-direction:column;justify-content:space-between;padding:${cut.padding};font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif">
@@ -114,7 +119,7 @@ function card(piece, cut) {
                 wrote the name twice on a card that has room to say it once — so the domain
                 is the wordmark's own tail, in the same face, and the address and the name
                 are the same object. -->
-           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1">${WORDMARK}${DOMAIN}</div>
+           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1">${WORDMARK_PARTS.before}${DOT_ANCHOR}${WORDMARK_PARTS.stem}${WORDMARK_PARTS.after}${DOMAIN}</div>
          </div>`;
 }
 
