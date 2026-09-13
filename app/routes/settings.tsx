@@ -38,7 +38,7 @@ import { LanguageSwitcher } from "../components/ui/languageSwitcher";
 import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
 import { KeyLightsSettings } from "../components/features/keyLightsSettings";
-import { ThemeToggle } from "../components/features/themeToggle";
+import { ThemePicker } from "../components/features/themePicker";
 import { useMidiConnection } from "../contexts/midi";
 import { usePrefs } from "../hooks/usePrefs";
 import { useSynth } from "../hooks/useSynth";
@@ -551,12 +551,9 @@ export default function Settings() {
                         hint={m.settings_appearance_hint()}
                         icon={<SlidersIcon className={ICON} />}
                     >
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-body">{m.settings_theme()}</span>
-                            <FeatureBoundary feature="ThemeToggle">
-                                <ThemeToggle />
-                            </FeatureBoundary>
-                        </div>
+                        <FeatureBoundary feature="ThemePicker">
+                            <ThemePicker />
+                        </FeatureBoundary>
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-body">{m.settings_language()}</span>
                             <FeatureBoundary feature="LanguageSwitcher">
