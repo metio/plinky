@@ -29,6 +29,10 @@ export const LATEST_RELEASES: Release[] = [
                 body: "**Lists without boxes.** Lessons, tools, settings, your stats and the result of a run\nare no longer drawn as cards. Each is a row with an icon, a picture or a number at\nits left edge, its name, and a line about it, with a thin rule between one row and\nthe next, like the contents page of a music book. On the Stats page every number\nsits at the start of its row, so the figures line up down the page.",
                 twip: true,
             },
+            {
+                body: "**Small drawings beside what you can learn.** Everything under Learn and Teach, and\neach of the little tools, now starts with a drawing of a thing a pianist keeps\nnearby: a stave, a tuning fork, a pencil, a stopwatch, a stack of graded books. They\nare drawn in the same hand as the ones on the front page's keys, and take on your\ncolours, light or dark.",
+                twip: true,
+            },
         ],
     },
     {
