@@ -70,7 +70,7 @@
         "widths": "node dev/check-widths.mjs",
         "songs:prune": "tsx dev/prune-songs.mts",
         "songs:repair": "tsx dev/repair-songs.mts",
-        "mark": "tsx dev/key-mark.mjs",
+        "mark": "tsx dev/build-mark.mjs",
         "promo:texts": "node dev/promo/texts.mjs",
         "promo:composers": "tsx dev/promo/composers.mjs",
         "promo:shorts": "node dev/promo-videos.mjs --shorts",
@@ -122,6 +122,7 @@
         "csv-parse": "^7.0.0",
         "dependency-cruiser": "^18.0.0",
         "fast-check": "^4.8.0",
+        "fontkit": "^2.0.4",
         "jsdom": "^30.0.0",
         "knip": "^6.0.0",
         "linkedom": "^0.18.12",
@@ -133,6 +134,7 @@
         "typescript": "^6.0.3",
         "vite": "^8.0.16",
         "vitest": "^4.1.9",
+        "wawoff2": "^2.0.1",
         "yaml": "2.9.0"
     }
 }
