@@ -1480,6 +1480,7 @@
     "practice_longest_day": "가장 길었던 날: {date}, {time}.",
     "practice_of_which_by_hand": "그중 {count}은 직접 적어 넣은 시간이에요.",
     "practice_empty": "이 기간에는 아직 아무것도 없어요. 무언가 연주하거나, 피아노 앞에서 보낸 시간을 적어 넣어도 좋아요.",
+    "practice_untimed": "음표는 세어졌지만, 이 기간에 기록된 시간은 없어요. 피아노 앞에서 보낸 시간을 여기에 적어 넣어도 좋아요.",
     "practice_sessions": "최근 연습",
     "practice_session_measured": "측정됨",
     "practice_session_by_hand": "직접 입력",

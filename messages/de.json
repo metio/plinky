@@ -1508,6 +1508,7 @@
     "practice_longest_day": "Längster Tag: {date}, {time}.",
     "practice_of_which_by_hand": "{count} davon hast du selbst eingetragen.",
     "practice_empty": "Für diesen Zeitraum ist hier noch nichts. Spiel etwas, oder trag die Zeit ein, die du am Klavier verbracht hast.",
+    "practice_untimed": "Die Noten sind gezählt, aber für diesen Zeitraum ist keine Zeit eingetragen. Trag die Zeit ein, die du am Klavier verbracht hast, wenn du sie hier sehen möchtest.",
     "practice_sessions": "Letzte Sitzungen",
     "practice_session_measured": "gemessen",
     "practice_session_by_hand": "selbst eingetragen",

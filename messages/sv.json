@@ -1508,6 +1508,7 @@
     "practice_longest_day": "Längsta dagen: {date}, {time}.",
     "practice_of_which_by_hand": "{count} av dem har du fört in för hand.",
     "practice_empty": "Inget här ännu för den här perioden. Spela något, eller lägg till tid du suttit vid pianot.",
+    "practice_untimed": "Tonerna är räknade, men ingen tid är inlagd för den här perioden. Lägg till tid du suttit vid pianot om du vill se den här.",
     "practice_sessions": "Senaste passen",
     "practice_session_measured": "uppmätt",
     "practice_session_by_hand": "infört för hand",

@@ -1561,6 +1561,7 @@
     "practice_longest_day": "Najdlhší deň: {date}, {time}.",
     "practice_of_which_by_hand": "{count} z toho je zapísaných ručne.",
     "practice_empty": "V tomto období tu zatiaľ nič nie je. Zahraj si niečo, alebo pridaj čas strávený pri klavíri.",
+    "practice_untimed": "Noty sa počítajú, ale v tomto období sa nezaznamenal žiadny čas. Pridaj čas strávený pri klavíri, ak ho tu chceš mať.",
     "practice_sessions": "Posledné sedenia",
     "practice_session_measured": "zmerané",
     "practice_session_by_hand": "zapísané ručne",

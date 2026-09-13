@@ -1507,6 +1507,7 @@
     "practice_longest_day": "Dita më e gjatë: {date}, {time}.",
     "practice_of_which_by_hand": "{count} prej tyre i ke shënuar vetë.",
     "practice_empty": "Këtu s'ka ende asgjë për këtë periudhë. Luaj diçka, ose shto kohën që kalove te pianoja.",
+    "practice_untimed": "Notat janë numëruar, por për këtë periudhë nuk është shënuar kohë. Shto kohën që kalove te pianoja, nëse do ta shohësh këtu.",
     "practice_sessions": "Seancat e fundit",
     "practice_session_measured": "e matur",
     "practice_session_by_hand": "e shënuar me dorë",

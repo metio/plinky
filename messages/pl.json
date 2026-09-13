@@ -1562,6 +1562,7 @@
     "practice_longest_day": "Najdłuższy dzień: {date}, {time}.",
     "practice_of_which_by_hand": "{count} z tego dodano ręcznie.",
     "practice_empty": "Na razie nic w tym okresie. Zagraj coś albo dodaj czas spędzony przy pianinie.",
+    "practice_untimed": "Nuty są policzone, ale w tym okresie nie zapisano czasu. Dodaj czas spędzony przy pianinie, jeśli chcesz go tu widzieć.",
     "practice_sessions": "Ostatnie sesje",
     "practice_session_measured": "zmierzone",
     "practice_session_by_hand": "wpisane ręcznie",

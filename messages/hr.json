@@ -1535,6 +1535,7 @@
     "practice_longest_day": "Najdulji dan: {date}, {time}.",
     "practice_of_which_by_hand": "Od toga si {count} upisao ručno.",
     "practice_empty": "Za ovo razdoblje ovdje još nema ničega. Odsviraj nešto ili dodaj vrijeme koje si proveo za klavirom.",
+    "practice_untimed": "Note su prebrojane, ali za ovo razdoblje nije upisano vrijeme. Dodaj vrijeme koje si proveo za klavirom ako ga želiš vidjeti ovdje.",
     "practice_sessions": "Nedavna vježbanja",
     "practice_session_measured": "izmjereno",
     "practice_session_by_hand": "upisano ručno",

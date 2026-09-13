@@ -1535,6 +1535,7 @@
     "practice_longest_day": "Giorno più lungo: {date}, {time}.",
     "practice_of_which_by_hand": "{count} li hai annotati tu a mano.",
     "practice_empty": "Qui non c’è ancora nulla per questo periodo. Suona qualcosa, o aggiungi il tempo passato al pianoforte.",
+    "practice_untimed": "Le note sono contate, ma per questo periodo non è registrato alcun tempo. Aggiungi il tempo passato al pianoforte, se vuoi vederlo qui.",
     "practice_sessions": "Sessioni recenti",
     "practice_session_measured": "misurata",
     "practice_session_by_hand": "annotata a mano",

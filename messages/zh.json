@@ -1481,6 +1481,7 @@
     "practice_longest_day": "最长的一天：{date}，{time}。",
     "practice_of_which_by_hand": "其中 {count} 是你自己记下的。",
     "practice_empty": "这个时段还没有记录。弹点什么，或者把你在钢琴前的时间添进来。",
+    "practice_untimed": "音符已经计入，但这个时段没有记录时间。想让它出现在这里，就把你在钢琴前的时间添进来。",
     "practice_sessions": "最近的练习",
     "practice_session_measured": "自动计时",
     "practice_session_by_hand": "手动记录",

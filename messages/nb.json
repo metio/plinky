@@ -1508,6 +1508,7 @@
     "practice_longest_day": "Lengste dag: {date}, {time}.",
     "practice_of_which_by_hand": "{count} av dette førte du inn selv.",
     "practice_empty": "Ingenting her ennå for denne perioden. Spill noe, eller før inn tid du satt ved pianoet.",
+    "practice_untimed": "Notene er telt, men det er ikke ført inn noen tid for denne perioden. Før inn tiden du satt ved pianoet, om du vil ha den med her.",
     "practice_sessions": "Siste økter",
     "practice_session_measured": "målt",
     "practice_session_by_hand": "ført inn selv",

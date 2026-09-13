@@ -1508,6 +1508,7 @@
     "practice_longest_day": "Langste dag: {date}, {time}.",
     "practice_of_which_by_hand": "{count} daarvan heb je zelf ingevoerd.",
     "practice_empty": "Voor deze periode staat hier nog niets. Speel iets, of voeg tijd toe die je aan de piano zat.",
+    "practice_untimed": "De noten zijn geteld, maar voor deze periode is geen tijd bijgehouden. Voeg de tijd toe die je aan de piano zat als je die hier wilt zien.",
     "practice_sessions": "Recente sessies",
     "practice_session_measured": "gemeten",
     "practice_session_by_hand": "zelf ingevoerd",
