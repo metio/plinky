@@ -5,25 +5,14 @@ import { Link } from "react-router";
 import type { MusicItem } from "../../../core/music";
 import { pickForGrade } from "../../../core/pickForGrade";
 import { playOptionsQuery } from "../../../core/playOptions";
-import { type MethodId, METHODS, type PracticeMethod } from "../../../core/practiceMethods";
+import type { MethodId, PracticeMethod } from "../../../core/practiceMethods";
 import { useMusicItems } from "../../hooks/useMusicItems";
 import { useServices } from "../../contexts/services";
-import { HubCard } from "../ui/hubCard";
-import {
-    CalendarIcon,
-    EarIcon,
-    HandIcon,
-    KeysIcon,
-    ListIcon,
-    MetronomeIcon,
-    RotateIcon,
-} from "../ui/icons";
-import { useSynth } from "../../hooks/useSynth";
+import { Drawing, type DrawingName } from "../ui/drawings/drawing";
 import { localizedHref } from "../ui/href";
-import { sectionHeadingClasses } from "../ui/classes";
 import { m } from "../../paraglide/messages.js";
 
-const NAME: Record<MethodId, () => string> = {
+export const METHOD_NAME: Record<MethodId, () => string> = {
     chunking: () => m.method_chunking_name(),
     slow: () => m.method_slow_name(),
     handsApart: () => m.method_hands_apart_name(),
@@ -31,6 +20,17 @@ const NAME: Record<MethodId, () => string> = {
     interleaving: () => m.method_interleaving_name(),
     spacing: () => m.method_spacing_name(),
     chords: () => m.method_chords_name(),
+};
+
+// The method in a word or two, for the key it sits on: a key is narrower than a name.
+export const METHOD_LABEL: Record<MethodId, () => string> = {
+    chunking: () => m.method_chunking_short(),
+    slow: () => m.method_slow_short(),
+    handsApart: () => m.method_hands_apart_short(),
+    hearingFirst: () => m.method_hearing_first_short(),
+    interleaving: () => m.method_interleaving_short(),
+    spacing: () => m.method_spacing_short(),
+    chords: () => m.method_chords_short(),
 };
 
 const HOW: Record<MethodId, () => string> = {
@@ -53,17 +53,16 @@ const WHY: Record<MethodId, () => string> = {
     chords: () => m.method_chords_why(),
 };
 
-// One icon per method, so six of these in a column read as six things at a glance rather
-// than as six paragraphs. Each is the nearest thing the icon set already has to what the
-// method DOES: a loop for looping, a metronome for slowing down, a hand for one hand.
-const ICONS: Record<MethodId, (props: { className?: string }) => React.JSX.Element> = {
-    chunking: RotateIcon,
-    slow: MetronomeIcon,
-    handsApart: HandIcon,
-    hearingFirst: EarIcon,
-    interleaving: ListIcon,
-    spacing: CalendarIcon,
-    chords: KeysIcon,
+// One drawing per method, each of something a pianist already owns: the loop over two bars,
+// the metronome, half a keyboard, headphones, two pages swapped, a calendar, a triad.
+export const METHOD_DRAWING: Record<MethodId, DrawingName> = {
+    chunking: "loop",
+    slow: "metronome",
+    handsApart: "halfKeyboard",
+    hearingFirst: "headphones",
+    interleaving: "shuffledPages",
+    spacing: "calendar",
+    chords: "triad",
 };
 
 // One method's own button. It opens a piece at the player's grade with the method already
@@ -121,63 +120,47 @@ function MethodAction({
     );
 }
 
-// Seven ways to practise: why each one works, what Plinky gives you to do it with, and a
-// button that opens a piece with it already set up.
+// One way to practise, opened: its drawing in the margin, then why it works, what Plinky
+// gives you to do it with, how long a go at it takes, and a button that opens a piece with
+// it already set up.
 //
 // The reason leads and the instruction follows, because somebody who does not yet know why
 // looping two bars beats playing the piece again will not reach for the loop. The button is
 // last: read, then do.
-export function PracticeMethods() {
+//
+// A region named by the method's own heading. The front page's keys point at it, and a press
+// fills it with that key's method; the leaf stays mounted as its method changes, so the
+// catalogue below is assembled once however many keys are pressed.
+export function MethodLeaf({ id, method }: { id: string; method: PracticeMethod }) {
     const services = useServices();
     // Read every render rather than memoised — a grade reached while the page is open
-    // should change what the buttons offer.
+    // should change what the button offers.
     const grade = Math.max(1, services.milestones.reachedGrade());
-    // One catalogue for the buttons that open a piece. Assembling it parses every score held on the
-    // device and maps three thousand manifest rows, so it is read here once and handed
-    // down rather than rebuilt by each method for itself.
+    // The catalogue behind a button that opens a piece. Assembling it parses every score held
+    // on the device and maps three thousand manifest rows, so it is read once, here.
     const { items } = useMusicItems();
-    // Each card sounds its note as a mouse crosses it, so running an eye down the six plays
-    // a scale. The Learn hub's own idea, reached through the card they now share.
-    const synth = useSynth();
-    const sound = (note: number) =>
-        synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true });
+    const heading = `${id}-name`;
     return (
-        <section className="space-y-4">
-            <h2 className={sectionHeadingClasses}>{m.methods_title()}</h2>
-            <p className="text-sm text-muted">{m.methods_intro()}</p>
-
-            <ul className="space-y-3">
-                {METHODS.map((method) => (
-                    <li key={method.id}>
-                        {/* The same card the Learn hub is built from — bordered, raised and
-                            lifting on hover — but not a link: this one carries its own
-                            action button, and a link around a link is not a thing. */}
-                        <HubCard Icon={ICONS[method.id]} note={method.note} onEnter={sound}>
-                            <div className="min-w-0 space-y-2">
-                                <div className="flex flex-wrap items-baseline gap-x-3">
-                                    <h3 className="text-base font-semibold text-ink">
-                                        {NAME[method.id]()}
-                                    </h3>
-                                    <span className="text-xs text-muted">
-                                        {m.methods_dose({ count: method.minutes })}
-                                    </span>
-                                </div>
-                                {/* The reason first: it is what makes the instruction worth
-                                    following, and it is the half a beginner has never been
-                                    told. */}
-                                <p className="text-sm text-body">{WHY[method.id]()}</p>
-                                <p className="text-sm text-muted">
-                                    <span className="font-semibold text-body">
-                                        {m.methods_in_plinky()}:
-                                    </span>{" "}
-                                    {HOW[method.id]()}
-                                </p>
-                                <MethodAction method={method} grade={grade} items={items} />
-                            </div>
-                        </HubCard>
-                    </li>
-                ))}
-            </ul>
+        <section
+            id={id}
+            aria-labelledby={heading}
+            className="grid items-start gap-4 pt-5 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-6"
+        >
+            <Drawing name={METHOD_DRAWING[method.id]} className="h-auto w-[84px] sm:w-24" />
+            <div className="min-w-0 max-w-prose space-y-2.5">
+                <h3 id={heading} className="font-display text-xl font-medium text-ink">
+                    {METHOD_NAME[method.id]()}
+                </h3>
+                <p className="leading-relaxed text-body">{WHY[method.id]()}</p>
+                <p className="leading-relaxed text-muted">
+                    <span className="font-semibold text-body">{m.methods_in_plinky()}:</span>{" "}
+                    {HOW[method.id]()}
+                </p>
+                <p className="text-sm text-muted first-letter:uppercase">
+                    {m.methods_dose({ count: method.minutes })}
+                </p>
+                <MethodAction method={method} grade={grade} items={items} />
+            </div>
         </section>
     );
 }

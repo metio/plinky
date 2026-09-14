@@ -101,6 +101,16 @@ describe("Layout", () => {
         }
     });
 
+    it("names the home link Plinky, not the dotless letters the mark draws", () => {
+        // The wordmark sets a dotless ı under its drawn dot; a screen reader must still hear
+        // the name, which the link's label carries and the mark leaves alone.
+        renderLayout();
+        const home = screen.getByRole("link", { name: m.header_home_label() });
+        expect(m.header_home_label()).toContain("Plinky");
+        expect(home.getAttribute("aria-label")).not.toContain("ı");
+        expect(screen.queryByRole("link", { name: /ı/ })).toBeNull();
+    });
+
     it("stamps the document language from the active locale", () => {
         overwriteGetLocale(() => "de");
         renderLayout();

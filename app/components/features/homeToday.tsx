@@ -14,6 +14,7 @@ import { type Letter, letterFor } from "../../../core/grade";
 import { summarizePractice } from "../../../core/history";
 import { type Standing, type StandingPart, standingParts } from "../../../core/standing";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
+import { METHODS_ANCHOR } from "../../../core/practiceMethods";
 import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
 import {
@@ -51,6 +52,7 @@ import { getLocale } from "../../paraglide/runtime.js";
 import { BakedIncipit } from "../ui/incipit";
 import { linkClasses } from "../ui/classes";
 import { SettingsSection } from "../ui/settingsSection";
+import { Folio, FolioRow } from "../ui/folio";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
 import { Show, useMidiConnected } from "./conditional";
@@ -158,17 +160,21 @@ function Moment({
     label,
     hint,
     hintTo,
+    anchor,
     children,
 }: {
     label: string;
     // A line under the moment's name. Where it is a thing to go and do, it links.
     hint?: string;
     hintTo?: string;
+    // An id somewhere else in the app links to.
+    anchor?: string;
     children: ReactNode;
 }) {
     return (
         <SettingsSection
             title={label}
+            anchor={anchor}
             hint={
                 hint && hintTo ? (
                     <Link to={hintTo} className={linkClasses}>
@@ -185,19 +191,45 @@ function Moment({
 }
 
 // What each moment takes up once it has arrived, measured off the settled page at a
-// desktop width — the warm-up carries a keyboard, the work a row per piece, and the
-// lesson a single line. Reserving it keeps the page still while the manifests land. A
-// narrow screen wraps more and will still grow a little; the alternative is a page that
-// jumps by two thirds of a screen, which is what this replaced.
-const WAITING = [
-    // The warm-up's placeholders stand in for a lead button and three ways in beneath it,
-    // so they are centred in the same column: reserving the height but not the alignment
-    // would still slide the row sideways the moment the words arrive, which is the shift
-    // this exists to prevent.
-    { label: m.today_moment_warmup, chips: 4, height: 216, centered: true },
+// desktop width — the warm-up's row of ways in, the work a row per piece, and the lesson a
+// single line. Reserving it keeps the page still while the manifests land. A narrow screen
+// wraps more and will still grow a little; the alternative is a page that jumps by two
+// thirds of a screen, which is what this replaced. The keyboard under the warm-up's row is
+// real from the start, so it reserves nothing.
+type Waiting = { label: () => string; chips: number; height: number; centered: boolean };
+
+// The warm-up's placeholders stand in for a lead button and three ways in beneath it, so
+// they are centred in the same column: reserving the height but not the alignment would
+// still slide the row sideways the moment the words arrive, which is the shift this exists
+// to prevent.
+const WARMUP_WAITING: Waiting = {
+    label: m.today_moment_warmup,
+    chips: 4,
+    height: 136,
+    centered: true,
+};
+const WAITING: Waiting[] = [
     { label: m.today_moment_work, chips: 2, height: 112, centered: false },
     { label: m.today_moment_learn, chips: 1, height: 40, centered: false },
 ];
+
+function Placeholder({ label, chips, height, centered }: Waiting) {
+    return (
+        <div
+            className={`flex flex-wrap content-start gap-2 ${centered ? "justify-center" : ""}`}
+            style={{ minHeight: `${height}px` }}
+            aria-hidden="true"
+        >
+            {Array.from({ length: chips }, (_, chip) => (
+                <span
+                    // biome-ignore lint/suspicious/noArrayIndexKey: a placeholder has no identity but its place in the row
+                    key={`${label()}-${chip}`}
+                    className="h-8 w-32 animate-pulse rounded-full bg-sunken motion-reduce:animate-none"
+                />
+            ))}
+        </div>
+    );
+}
 
 function Row({
     to,
@@ -225,39 +257,37 @@ function Row({
     // The reading aid that colours noteheads in a score colours this opening bar too.
     const { prefs } = usePrefs();
     return (
-        <Link
+        <FolioRow
             to={to}
-            className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition hover:bg-subtle"
-        >
-            {mark ? (
-                <BakedIncipit
-                    mark={mark}
-                    label={label}
-                    colored={prefs.colorNotes}
-                    className="shrink-0 text-faint"
-                />
-            ) : (
-                <span aria-hidden="true" className="text-xl">
-                    {icon}
+            margin={
+                mark ? (
+                    <BakedIncipit
+                        mark={mark}
+                        label={label}
+                        colored={prefs.colorNotes}
+                        className="shrink-0 text-faint"
+                    />
+                ) : (
+                    <span aria-hidden="true" className="text-2xl">
+                        {icon}
+                    </span>
+                )
+            }
+            name={label}
+            line={hint}
+            trailing={
+                <span
+                    aria-hidden="true"
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        primary
+                            ? "bg-accent-solid text-white"
+                            : "border border-line-strong text-accent-strong group-hover:border-accent-line-strong"
+                    }`}
+                >
+                    {action ?? "→"}
                 </span>
-            )}
-            <span className="min-w-0 space-y-0.5">
-                <span className="block font-medium text-ink group-hover:text-accent-strong">
-                    {label}
-                </span>
-                {hint && <span className="block text-sm leading-snug text-muted">{hint}</span>}
-            </span>
-            <span
-                aria-hidden="true"
-                className={`ml-auto shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                    primary
-                        ? "bg-accent-solid text-white"
-                        : "border border-line-strong text-accent-strong group-hover:border-accent-line-strong"
-                }`}
-            >
-                {action ?? "→"}
-            </span>
-        </Link>
+            }
+        />
     );
 }
 
@@ -500,35 +530,60 @@ export function HomeToday() {
         </header>
     );
 
-    // The day's three moments, in their places, before the manifests they are built from
-    // have arrived. Without this the page was a header for a moment and then eight hundred
-    // pixels taller, which shoves everything below it — the ways to practise, at the foot
-    // of the page — down as you read. The shape is the real one; only the words are
-    // waiting.
+    // The ways to practise, on the keys of a keyboard you can play right here. It is the same
+    // instrument the practice surfaces use, so a press here and a run on a piece feel like
+    // one keyboard. A section of the day in its own right, straight after the warm-up, and the
+    // place the "learn one thing" pick sends a reader to.
+    //
+    // Drawn before the day has arrived as well as after: it needs nothing the session reads,
+    // and the methods on it belong in the document a first visit and a crawler receive. Both
+    // branches below put it at the same place in the same tree, so React keeps the one
+    // keyboard across the change — its rise plays once, and a method opened while the page
+    // is still arriving stays open.
+    const ways = (
+        <Moment label={m.methods_title()} hint={m.methods_keys_hint()} anchor={METHODS_ANCHOR}>
+            <HeroKeyboard>
+                {/* The getting-started card used to ask for a piano in a list of three
+                    chores at the foot of the page. It belongs here, under the keys it is
+                    about, and only while there is no instrument — taken, the offer
+                    disappears rather than ticking itself off. */}
+                <Show when={!midiReady}>
+                    {/* Straight to the setting rather than to the page it is on: Settings is
+                        long, and a reader sent for one thing should land on it. */}
+                    <p className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-center text-sm text-muted">
+                        <Link to="/settings#midi" className={linkClasses}>
+                            {m.settings_connect_midi()}
+                        </Link>
+                        <span aria-hidden="true">·</span>
+                        <Link to="/settings#keys" className={linkClasses}>
+                            {m.discover_keys()}
+                        </Link>
+                    </p>
+                </Show>
+            </HeroKeyboard>
+        </Moment>
+    );
+
+    // The day's moments, in their places, before the manifests they are built from have
+    // arrived. Without this the page was a header for a moment and then eight hundred pixels
+    // taller, which shoves everything below it down as you read. The shape is the real one;
+    // only the words are waiting.
     if (session === null) {
         return (
-            <div className="space-y-8" aria-busy="true">
+            <div className="space-y-8">
                 {header}
-                {WAITING.map(({ label, chips, height, centered }) => (
-                    <Moment key={label()} label={label()}>
-                        <div
-                            className={`flex flex-wrap content-start gap-2 ${
-                                centered ? "justify-center" : ""
-                            }`}
-                            style={{ minHeight: `${height}px` }}
-                            aria-hidden="true"
-                        >
-                            {Array.from({ length: chips }, (_, chip) => (
-                                <span
-                                    // biome-ignore lint/suspicious/noArrayIndexKey: a placeholder has no identity but its place in the row
-                                    key={`${label()}-${chip}`}
-                                    className="h-8 w-32 animate-pulse rounded-full bg-sunken motion-reduce:animate-none"
-                                />
-                            ))}
-                        </div>
-                    </Moment>
-                ))}
-                <p className="h-4" aria-hidden="true" />
+                <Moment label={m.today_moment_warmup()}>
+                    <Placeholder {...WARMUP_WAITING} />
+                </Moment>
+                {ways}
+                <div className="space-y-8" aria-busy="true">
+                    {WAITING.map((moment) => (
+                        <Moment key={moment.label()} label={moment.label()}>
+                            <Placeholder {...moment} />
+                        </Moment>
+                    ))}
+                    <p className="h-4" aria-hidden="true" />
+                </div>
             </div>
         );
     }
@@ -555,32 +610,9 @@ export function HomeToday() {
                     arcadeTo={`/play/${arcadeId}`}
                     arcadeKey={noteSymbol(arcadeConfig(session.arcadeLevel).key, naming)}
                 />
-                {/* Somewhere to put your hands before anything is asked of them. It is
-                    the same instrument the practice surfaces use, so a warm-up here and
-                    a run on a piece feel like one keyboard. */}
-                <div className="space-y-1.5 pt-1">
-                    <HeroKeyboard />
-                    <p className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-center text-sm text-muted">
-                        <span>{m.home_keyboard_hint()}</span>
-                        {/* The getting-started card used to ask for a piano in a list of
-                            three chores at the foot of the page. It belongs here, under
-                            the keys it is about, and only while there is no instrument —
-                            taken, the offer disappears rather than ticking itself off. */}
-                        <Show when={!midiReady}>
-                            {/* Straight to the setting rather than to the page it is on:
-                                Settings is long, and a reader sent for one thing should
-                                land on it. */}
-                            <Link to="/settings#midi" className={linkClasses}>
-                                {m.settings_connect_midi()}
-                            </Link>
-                            <span aria-hidden="true">·</span>
-                            <Link to="/settings#keys" className={linkClasses}>
-                                {m.discover_keys()}
-                            </Link>
-                        </Show>
-                    </p>
-                </div>
             </Moment>
+
+            {ways}
 
             <Moment
                 label={m.today_moment_work()}
@@ -590,7 +622,7 @@ export function HomeToday() {
                 hint={handSet ? undefined : m.grades_start_hand()}
                 hintTo={handSet ? undefined : "/settings#hand"}
             >
-                <ul className="space-y-2">
+                <Folio>
                     {work.map((task, index) => {
                         const { label, hint } = rowFor(
                             task,
@@ -600,24 +632,23 @@ export function HomeToday() {
                         );
                         const id = "id" in task ? task.id : undefined;
                         return (
-                            <li key={task.key}>
-                                <Row
-                                    to={task.to}
-                                    icon={ICON[task.key]}
-                                    label={label}
-                                    hint={hint}
-                                    mark={id ? session.marks.get(id) : undefined}
-                                    action={
-                                        task.key === "assignment" || task.key === "learn"
-                                            ? m.action_practice()
-                                            : undefined
-                                    }
-                                    primary={index === 0}
-                                />
-                            </li>
+                            <Row
+                                key={task.key}
+                                to={task.to}
+                                icon={ICON[task.key]}
+                                label={label}
+                                hint={hint}
+                                mark={id ? session.marks.get(id) : undefined}
+                                action={
+                                    task.key === "assignment" || task.key === "learn"
+                                        ? m.action_practice()
+                                        : undefined
+                                }
+                                primary={index === 0}
+                            />
                         );
                     })}
-                </ul>
+                </Folio>
                 <SurpriseButton
                     onClick={() => {
                         // A fresh seed per press. It used to be a counter starting at
@@ -661,7 +692,7 @@ export function HomeToday() {
 
             {/* The way out, for somebody who fancies none of it. Quiet on purpose: the
                 page has already made its offers, and this is the shrug after them. */}
-            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-4 text-sm text-muted">
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm text-muted">
                 <span>{m.today_something_else()}</span>
                 <Link to="/music" className={linkClasses}>
                     {m.today_browse()}

@@ -7,6 +7,7 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/about";
 import { sectionHeadingClasses } from "../components/ui/classes";
+import { FolioRow } from "../components/ui/folio";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -87,7 +88,7 @@ export default function About() {
                     <p className="text-sm text-muted">{m.about_intro()}</p>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div>
                     {FOUNDERS.map((founder, index) => {
                         // Sol leads (index 0): her portrait sparks the peck — she blushes
                         // and a kiss drifts up; Sebastian's card leans in from beside her.
@@ -100,7 +101,7 @@ export default function About() {
                                 width={112}
                                 height={112}
                                 loading="lazy"
-                                className={`h-28 w-28 rounded-full bg-subtle object-cover ring-2 ring-accent-fill dark:ring-accent-fill/50 ${
+                                className={`h-15 w-15 rounded-full bg-subtle object-cover ring-2 ring-accent-fill sm:h-21 sm:w-21 dark:ring-accent-fill/50 ${
                                     kiss > 0
                                         ? lead
                                             ? "motion-safe:animate-smooch"
@@ -110,68 +111,71 @@ export default function About() {
                             />
                         );
                         return (
-                            <article
+                            // A Folio row per founder: the portrait in the margin, the name
+                            // and role beside it, the story beneath.
+                            <FolioRow
+                                as="article"
                                 key={founder.name}
-                                className="flex flex-col items-center gap-3 rounded-xl border border-line bg-raised p-6 text-center"
-                            >
-                                {lead ? (
-                                    <button
-                                        type="button"
-                                        onClick={() => setKiss((count) => count + 1)}
-                                        className="relative rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent-ring focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
-                                    >
-                                        {portrait}
-                                        {/* A rose blush blooms over her cheek. */}
-                                        <span
-                                            key={`blush-${kiss}`}
-                                            aria-hidden="true"
-                                            style={{
-                                                background:
-                                                    "radial-gradient(circle at 68% 62%, rgba(244,63,94,0.8), transparent 55%)",
-                                            }}
-                                            className={`pointer-events-none absolute inset-0 rounded-full opacity-0 mix-blend-multiply ${
-                                                kiss > 0 ? "motion-safe:animate-blush" : ""
-                                            }`}
-                                        />
-                                        {/* The peck, drifting up and away. */}
-                                        <span
-                                            key={`kiss-${kiss}`}
-                                            aria-hidden="true"
-                                            className={`pointer-events-none absolute right-3 top-6 text-xl opacity-0 ${
-                                                kiss > 0 ? "motion-safe:animate-kiss" : ""
-                                            }`}
-                                        >
-                                            💋
-                                        </span>
-                                    </button>
-                                ) : (
-                                    portrait
-                                )}
-                                <div className="space-y-1">
-                                    <h2 className="text-base font-semibold text-ink">
-                                        {founder.name}
-                                    </h2>
+                                heading="h2"
+                                name={founder.name}
+                                line={
                                     <span className="inline-block rounded-full bg-accent-surface px-3 py-0.5 text-xs font-medium text-accent-strong">
                                         {founder.role}
                                     </span>
-                                </div>
+                                }
+                                margin={
+                                    lead ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => setKiss((count) => count + 1)}
+                                            className="relative rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent-ring focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                                        >
+                                            {portrait}
+                                            {/* A rose blush blooms over her cheek. */}
+                                            <span
+                                                key={`blush-${kiss}`}
+                                                aria-hidden="true"
+                                                style={{
+                                                    background:
+                                                        "radial-gradient(circle at 68% 62%, rgba(244,63,94,0.8), transparent 55%)",
+                                                }}
+                                                className={`pointer-events-none absolute inset-0 rounded-full opacity-0 mix-blend-multiply ${
+                                                    kiss > 0 ? "motion-safe:animate-blush" : ""
+                                                }`}
+                                            />
+                                            {/* The peck, drifting up and away. */}
+                                            <span
+                                                key={`kiss-${kiss}`}
+                                                aria-hidden="true"
+                                                className={`pointer-events-none absolute right-3 top-6 text-xl opacity-0 ${
+                                                    kiss > 0 ? "motion-safe:animate-kiss" : ""
+                                                }`}
+                                            >
+                                                💋
+                                            </span>
+                                        </button>
+                                    ) : (
+                                        portrait
+                                    )
+                                }
+                            >
                                 <p className="text-sm leading-relaxed text-muted">
                                     {founder.bio()}
                                 </p>
-                            </article>
+                            </FolioRow>
                         );
                     })}
                 </div>
             </section>
 
-            <section className="space-y-3 border-t border-line pt-8">
+            <section className="space-y-3 pt-4">
                 <h2 className={sectionHeadingClasses}>{m.about_why_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_why_body()}
                 </p>
             </section>
 
-            <section className="space-y-3 border-t border-line pt-8">
+            <section className="space-y-3 pt-4">
                 <h2 className={sectionHeadingClasses}>{m.about_contact_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_contact_body()}

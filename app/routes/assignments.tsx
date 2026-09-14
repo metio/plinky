@@ -49,6 +49,7 @@ import type { Route } from "./+types/assignments";
 import { localizedHref } from "../components/ui/href";
 import { PageHeader } from "../components/ui/pageHeader";
 import { useSeededState } from "../hooks/useSeededState";
+import { Folio } from "../components/ui/folio";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.assignments_heading(), m.meta_assignments_description());
@@ -358,7 +359,7 @@ export default function AssignmentsRoute() {
                 {() => (
                     <section className="space-y-3">
                         <h2 className={sectionHeadingClasses}>{m.assignments_builtin_heading()}</h2>
-                        <ul className="space-y-2">
+                        <Folio>
                             {builtin.map((assignment, index) => {
                                 const list = stepsFor(assignment);
                                 return (
@@ -379,7 +380,7 @@ export default function AssignmentsRoute() {
                                     </AssignmentCard>
                                 );
                             })}
-                        </ul>
+                        </Folio>
                         <p className="text-sm text-muted">
                             {m.assignments_collect_hint()}{" "}
                             <LocalizedLink to="/collect" className={linkClasses}>
@@ -411,7 +412,7 @@ export default function AssignmentsRoute() {
                     {assignments.length === 0 ? (
                         <p className="text-sm text-muted">{m.assignments_yours_empty()}</p>
                     ) : (
-                        <ul className="space-y-2">
+                        <Folio>
                             {assignments.map((assignment) => {
                                 const list = stepsFor(assignment);
                                 const missing = missingIn(assignment);
@@ -492,7 +493,7 @@ export default function AssignmentsRoute() {
                                     </AssignmentCard>
                                 );
                             })}
-                        </ul>
+                        </Folio>
                     )}
                 </section>
             )}

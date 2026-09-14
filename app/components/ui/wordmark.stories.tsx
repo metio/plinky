@@ -4,13 +4,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Wordmark } from "./wordmark";
 
-// The mark on its own, at the sizes it is actually set at and one far larger.
+// The name on its own, at the sizes it is actually set at and one far larger.
 //
-// The large one is the point: the plink is placed from the face's metrics, and at the
-// header's own 20px an offset that is wrong by a hundredth of an em looks like nothing.
-// Blown up, it is obvious. The story this replaces claimed to do exactly that and did not —
-// it put `text-6xl` on a wrapper around a header that sets its own `text-xl`, so it drew
-// the same picture as the default and said otherwise.
+// The large one is the point: the letterforms and their spacing are the mark's, and at the
+// header's own 24px a face that fell back or a tracking that went astray is easy to miss.
+// Blown up, it is obvious.
 const meta: Meta<typeof Wordmark> = {
     title: "UI/Wordmark",
     component: Wordmark,
@@ -21,15 +19,15 @@ type Story = StoryObj<typeof Wordmark>;
 
 // The size the header wears.
 export const Header: Story = {
-    render: () => <Wordmark className="text-xl" />,
+    render: () => <Wordmark className="text-2xl" />,
 };
 
 // With the address as its own tail, the way a promo clip and a thumbnail set it.
 export const WithDomain: Story = {
-    render: () => <Wordmark domain className="text-xl" />,
+    render: () => <Wordmark domain className="text-2xl" />,
 };
 
-// Large enough that the tittle's placement can be judged by eye.
+// Large enough that the letterforms and the spacing can be judged by eye.
 export const Large: Story = {
     render: () => <Wordmark domain className="text-7xl" />,
 };

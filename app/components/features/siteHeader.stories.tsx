@@ -20,9 +20,8 @@ import { SiteHeader } from "./siteHeader";
 const BADGE = <GradeBadgeView level={3} skill={214} competitive={false} />;
 
 // The bar every page wears. It had no stories at all while it lived inside the root
-// layout, which meant the lockup's tittle, the bouquet's five colours and the slim sticky
-// bar were all going unchecked — and the tittle had in fact drifted from the one the promo
-// thumbnails set.
+// layout, which meant the lockup, the bouquet's five colours and the slim sticky bar were
+// all going unchecked between releases.
 //
 // An empty in-memory world, so nothing here depends on stored data.
 const meta: Meta<typeof SiteHeader> = {
@@ -86,6 +85,6 @@ export const Middling: Story = {
     ),
 };
 
-// The mark itself is storied in UI/Wordmark, where it can be set at a size that shows the
-// tittle. A story here claiming to do that could not: `text-6xl` on a wrapper cannot scale
-// a header that sets its own `text-xl`, so it drew the same picture as Default.
+// The name itself is storied in UI/Wordmark, where it can be set at a size that shows its
+// letterforms. A story here claiming to do that could not: `text-6xl` on a wrapper cannot
+// scale a header that sets its own `text-2xl`, so it would draw the same picture as Default.

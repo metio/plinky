@@ -45,6 +45,7 @@ export function GoingBlock({
     // promising insight it does not have. An empty WINDOW is different and keeps its zeros
     // — "no practice this week" is a real answer — so this asks about all of it.
     const everPlayed = scopeSummary(history, "all", now).totalNotes > 0;
+    const summary = scopeSummary(history, scope, now);
     return (
         <div className="space-y-6">
             <SegmentedControl
@@ -54,9 +55,7 @@ export function GoingBlock({
                 options={SCOPES.map((id) => ({ id, label: SCOPE_LABEL[id]() }))}
             />
 
-            {everPlayed && (
-                <ScopeTile scope={scope} summary={scopeSummary(history, scope, now)} now={now} />
-            )}
+            {everPlayed && <ScopeTile scope={scope} summary={summary} now={now} />}
 
             {/* The bars answer "which days this week", which is a question only the week
                 has. Over a month or a year the report's own grid says it better. They are
@@ -72,7 +71,13 @@ export function GoingBlock({
             <FeatureBoundary feature="PracticeReport">
                 {/* days is null only for all time, where the report opens on the first
                     session the player ever logged. */}
-                <PracticeReport pieceTitle={pieceTitle} now={now} days={days} headed={false} />
+                <PracticeReport
+                    pieceTitle={pieceTitle}
+                    now={now}
+                    days={days}
+                    headed={false}
+                    played={summary.totalNotes > 0}
+                />
             </FeatureBoundary>
         </div>
     );

@@ -30,7 +30,7 @@ import { linkClasses } from "../components/ui/classes";
 import { LinkedText, slot } from "../components/ui/linkedText";
 import { LocalizedLink } from "../components/ui/localizedLink";
 import { PageHeader } from "../components/ui/pageHeader";
-import { Card } from "../components/ui/card";
+import { Folio, FolioFigure, FolioRow } from "../components/ui/folio";
 
 export function meta({ params }: Route.MetaArgs) {
     const locale = getLocale();
@@ -158,38 +158,35 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
     return (
         // The id is what the day's practice points at when it offers the next lesson,
         // so the reader lands on the lesson rather than on the top of the course.
-        <li id={lesson.id} className="scroll-mt-20">
-            <Card className="space-y-3">
-                <div className="flex flex-wrap items-baseline gap-x-3">
-                    <span className="font-mono text-xs tabular-nums text-muted">{index}</span>
-                    {/* Level two, not three. The unit headings that used to sit between
-                        this and the page title are gone with the fourteen-lesson scroll,
-                        so a third level here skips one — which is what the axe sweep
-                        reports and what a screen reader's outline actually loses. */}
-                    <h2 className="text-base font-semibold text-ink">
-                        {LESSON_TITLE[lesson.id]?.()}
-                    </h2>
-                </div>
-                <p className="max-w-prose text-sm leading-relaxed text-body">
-                    {LESSON_BODY[lesson.id]?.()}
-                </p>
-                {/* Hearing the idea is what meeting the lesson means, so playing it is what
+        // Level two, not three: no unit heading sits between the lesson and the page title,
+        // so a third level would skip one — which is what the axe sweep reports and what a
+        // screen reader's outline actually loses. The lesson's number is its margin.
+        <FolioRow
+            id={lesson.id}
+            className="scroll-mt-20"
+            margin={<FolioFigure value={index} />}
+            heading="h2"
+            name={LESSON_TITLE[lesson.id]?.()}
+        >
+            <p className="max-w-prose text-sm leading-relaxed text-body">
+                {LESSON_BODY[lesson.id]?.()}
+            </p>
+            {/* Hearing the idea is what meeting the lesson means, so playing it is what
                 records it — there is nothing to tick, and the course never asks the
                 reader to mark their own homework. */}
-                {/* The engraver is the one part of a lesson that can fail on its own: it
+            {/* The engraver is the one part of a lesson that can fail on its own: it
                     parses a score and drives a renderer, where everything else here is
                     copy and a table. A lesson that cannot draw its example is still a
                     lesson worth reading, and the same boundary guards the same component
                     on the glossary page. */}
-                <FeatureBoundary feature="NotationExample">
-                    <NotationExample
-                        xml={buildSnippet(demoSnippet(lesson.demo))}
-                        label={LESSON_TITLE[lesson.id]?.() ?? ""}
-                    />
-                </FeatureBoundary>
-                <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
-            </Card>
-        </li>
+            <FeatureBoundary feature="NotationExample">
+                <NotationExample
+                    xml={buildSnippet(demoSnippet(lesson.demo))}
+                    label={LESSON_TITLE[lesson.id]?.() ?? ""}
+                />
+            </FeatureBoundary>
+            <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
+        </FolioRow>
     );
 }
 
@@ -225,16 +222,16 @@ export default function TheoryRoute() {
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
                 <TheoryIndex titles={LESSON_TITLE} numbers={LESSON_NUMBER} selected={lesson.id} />
-                <ul className="space-y-4">
-                    {/* A fresh card per lesson. Every lesson's address is this one route,
-                        so moving between two keeps the page mounted, and an unkeyed card
+                <Folio>
+                    {/* A fresh row per lesson. Every lesson's address is this one route,
+                        so moving between two keeps the page mounted, and an unkeyed row
                         would hand the next lesson the last one's engraver and demo. */}
                     <LessonCard
                         key={lesson.id}
                         lesson={lesson}
                         index={LESSON_NUMBER.get(lesson.id) ?? 1}
                     />
-                </ul>
+                </Folio>
             </div>
 
             <p className="text-sm text-muted">

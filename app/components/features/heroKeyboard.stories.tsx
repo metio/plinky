@@ -6,9 +6,10 @@ import { memoryStore } from "../../adapters/memoryStore";
 import { ServicesProvider } from "../../contexts/services";
 import { HeroKeyboard } from "./heroKeyboard";
 
-// The landing page's playable octave. Sound and key lighting happen only on a
-// press, so the resting render is static; an in-memory store keeps the note
-// labels at their default setting.
+// The front page's playable octave, with a way to practise on each white key and the first
+// key's method open below it, as the page arrives. Sound, lighting and opening another
+// method happen only on a press, so the resting render is static; an in-memory store keeps
+// the note labels at their default setting.
 const meta: Meta<typeof HeroKeyboard> = {
     title: "Features/HeroKeyboard",
     component: HeroKeyboard,
