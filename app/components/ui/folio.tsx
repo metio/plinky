@@ -9,10 +9,12 @@ import { LocalizedLink as Link } from "./localizedLink";
 // something at the end of the line and a body beneath it. A lesson, a tool, a group of
 // settings, a figure on the Stats page and a result at the end of a run are all this row.
 //
-// No box. A row has no border, no corner and no ground of its own; a hairline above it and
-// one under the last row are all that separate it from its neighbours, the way entries are
-// ruled off in a printed index. What holds a row apart is the margin: the column of
-// drawings, icons or figures down the left edge that the names line up against.
+// No box. A row has no border, no corner and no ground of its own; a hairline between it and
+// the row before it is all that separates the two, the way entries are ruled off in a
+// printed index. The rule falls only between rows: none above the first, none below the
+// last, so a single row stands clear of rules altogether and a list under a section heading
+// takes the heading's own rule as its top edge. What holds a row apart is the margin: the
+// column of drawings, icons or figures down the left edge that the names line up against.
 //
 // Rows inside a `Folio` share one margin, as wide as the widest thing in it, so a column
 // of figures stays right-aligned however many digits one of them has. A row standing on its
@@ -113,7 +115,9 @@ export function FolioRow({
     const inList = useContext(InList);
     const As = as ?? (inList ? "li" : "div");
     const columns = inList ? "col-span-2 grid-cols-subgrid" : OWN_COLUMNS;
-    const rule = "border-t border-line last:border-b";
+    // A rule over a row only where another row stands directly before it, inside a list or
+    // among standalone rows alike: the marker, not the element, is what names a row.
+    const rule = "border-line [[data-folio-row]+&]:border-t";
     const bare = name === undefined && line === undefined && trailing === undefined;
     const grid = `grid content-start ${columns} ${GUTTER} ${PAD[size]} ${children && !bare ? BODY_PAD[size] : ""}`;
     const Name = heading ?? "span";
@@ -154,6 +158,7 @@ export function FolioRow({
         return (
             <As
                 id={id}
+                data-folio-row=""
                 aria-current={current || undefined}
                 className={`${inList ? "col-span-2 grid grid-cols-subgrid" : ""} ${rule} ${className}`}
             >
@@ -168,7 +173,12 @@ export function FolioRow({
         ? `row-start-1 self-center ${beside}`
         : `row-start-2 ${BODY_GAP[size]} ${margin === undefined ? "col-span-2" : "col-span-2 sm:col-span-1 sm:col-start-2"}`;
     return (
-        <As id={id} aria-current={current || undefined} className={`${grid} ${rule} ${className}`}>
+        <As
+            id={id}
+            data-folio-row=""
+            aria-current={current || undefined}
+            className={`${grid} ${rule} ${className}`}
+        >
             {head}
             {children !== undefined && (
                 <div className={`min-w-0 space-y-3 ${body}`}>{children}</div>

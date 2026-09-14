@@ -62,8 +62,29 @@ describe("FolioRow", () => {
     it("is ruled off by a hairline and never drawn as a box", () => {
         render(<FolioRow as="section" name="Sound" />);
         const row = screen.getByText("Sound").closest("section") as HTMLElement;
-        expect(row.className).toContain("border-t");
+        expect(row.className).toContain("border-line");
         expect(row.className).not.toMatch(/\brounded|\bshadow|\bbg-/);
+    });
+
+    it("draws its rule only between rows, never above the first or below the last", () => {
+        render(
+            <Folio label="Lessons">
+                <FolioRow name="One" />
+                <FolioRow to="/theory" name="Two" />
+            </Folio>,
+            { wrapper: MemoryRouter },
+        );
+        for (const row of within(screen.getByRole("list", { name: "Lessons" })).getAllByRole(
+            "listitem",
+        )) {
+            const classes = row.className.split(/\s+/);
+            // The row names itself as a row, and its rule answers to a row standing directly
+            // before it; nothing rules it off unconditionally, above or below.
+            expect(row.hasAttribute("data-folio-row")).toBe(true);
+            expect(classes).toContain("[[data-folio-row]+&]:border-t");
+            expect(classes).not.toContain("border-t");
+            expect(row.className).not.toMatch(/\bborder-b\b|last:border/);
+        }
     });
 });
 
