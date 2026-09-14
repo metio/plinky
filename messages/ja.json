@@ -1533,7 +1533,7 @@
     "method_interleaving_short": "混ぜる",
     "method_spacing_short": "あとで",
     "method_chords_short": "和音",
-    "methods_press": "キーを押してみてください",
+    "methods_keys_hint": "キーを押すと音が鳴り、そのキーに描かれた練習のしかたが開きます。",
     "method_chunking_name": "小さく区切って",
     "method_chunking_how": "いつもつまずく二小節をタップするとループになり、そこが難所でなくなるまで何度でも回ります。",
     "method_chunking_why": "曲を頭から終わりまで通すと、難しい小節にも他と同じ数秒しか回ってきません。そこだけループにすれば、時間はまるごとその小節のものになります。",

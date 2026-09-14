@@ -14,6 +14,7 @@ import { type Letter, letterFor } from "../../../core/grade";
 import { summarizePractice } from "../../../core/history";
 import { type Standing, type StandingPart, standingParts } from "../../../core/standing";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
+import { METHODS_ANCHOR } from "../../../core/practiceMethods";
 import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
 import {
@@ -159,17 +160,21 @@ function Moment({
     label,
     hint,
     hintTo,
+    anchor,
     children,
 }: {
     label: string;
     // A line under the moment's name. Where it is a thing to go and do, it links.
     hint?: string;
     hintTo?: string;
+    // An id somewhere else in the app links to.
+    anchor?: string;
     children: ReactNode;
 }) {
     return (
         <SettingsSection
             title={label}
+            anchor={anchor}
             hint={
                 hint && hintTo ? (
                     <Link to={hintTo} className={linkClasses}>
@@ -525,17 +530,18 @@ export function HomeToday() {
         </header>
     );
 
-    // Somewhere to put your hands before anything is asked of them, and the ways to practise
-    // on its keys. It is the same instrument the practice surfaces use, so a warm-up here and
-    // a run on a piece feel like one keyboard.
+    // The ways to practise, on the keys of a keyboard you can play right here. It is the same
+    // instrument the practice surfaces use, so a press here and a run on a piece feel like
+    // one keyboard. A section of the day in its own right, straight after the warm-up, and the
+    // place the "learn one thing" pick sends a reader to.
     //
     // Drawn before the day has arrived as well as after: it needs nothing the session reads,
     // and the methods on it belong in the document a first visit and a crawler receive. Both
     // branches below put it at the same place in the same tree, so React keeps the one
     // keyboard across the change — its rise plays once, and a method opened while the page
     // is still arriving stays open.
-    const keyboard = (
-        <div className="pt-1">
+    const ways = (
+        <Moment label={m.methods_title()} hint={m.methods_keys_hint()} anchor={METHODS_ANCHOR}>
             <HeroKeyboard>
                 {/* The getting-started card used to ask for a piano in a list of three
                     chores at the foot of the page. It belongs here, under the keys it is
@@ -555,7 +561,7 @@ export function HomeToday() {
                     </p>
                 </Show>
             </HeroKeyboard>
-        </div>
+        </Moment>
     );
 
     // The day's moments, in their places, before the manifests they are built from have
@@ -568,8 +574,8 @@ export function HomeToday() {
                 {header}
                 <Moment label={m.today_moment_warmup()}>
                     <Placeholder {...WARMUP_WAITING} />
-                    {keyboard}
                 </Moment>
+                {ways}
                 <div className="space-y-8" aria-busy="true">
                     {WAITING.map((moment) => (
                         <Moment key={moment.label()} label={moment.label()}>
@@ -604,8 +610,9 @@ export function HomeToday() {
                     arcadeTo={`/play/${arcadeId}`}
                     arcadeKey={noteSymbol(arcadeConfig(session.arcadeLevel).key, naming)}
                 />
-                {keyboard}
             </Moment>
+
+            {ways}
 
             <Moment
                 label={m.today_moment_work()}

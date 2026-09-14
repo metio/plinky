@@ -1590,7 +1590,7 @@
     "method_interleaving_short": "Mistura",
     "method_spacing_short": "Mais tarde",
     "method_chords_short": "Acordes",
-    "methods_press": "Carrega numa tecla",
+    "methods_keys_hint": "Cada tecla toca a sua nota e abre a forma de praticar desenhada nela.",
     "method_chunking_name": "Um trecho pequeno de cada vez",
     "method_chunking_how": "Toca nos dois compassos que continuam a falhar e passam a ser um ciclo, que roda até deixarem de ser a parte difícil.",
     "method_chunking_why": "Tocar uma peça do início ao fim dá ao compasso difícil os mesmos poucos segundos que a todos os outros. Em ciclo, fica com todos eles.",

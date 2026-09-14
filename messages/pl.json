@@ -1618,7 +1618,7 @@
     "method_interleaving_short": "Mieszaj",
     "method_spacing_short": "Później",
     "method_chords_short": "Akordy",
-    "methods_press": "Naciśnij klawisz",
+    "methods_keys_hint": "Każdy klawisz gra swój dźwięk i otwiera narysowany na nim sposób ćwiczenia.",
     "method_chunking_name": "Po małym fragmencie naraz",
     "method_chunking_how": "Dotknij tych dwóch taktów, które ciągle się sypią, a staną się pętlą, która krąży, aż przestaną być trudnym miejscem.",
     "method_chunking_why": "Granie utworu od początku do końca daje trudnemu taktowi tyle samo sekund co każdemu innemu. W pętli dostaje je wszystkie.",

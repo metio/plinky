@@ -1562,7 +1562,7 @@
     "method_interleaving_short": "Blanda",
     "method_spacing_short": "Senare",
     "method_chords_short": "Ackord",
-    "methods_press": "Tryck på en tangent",
+    "methods_keys_hint": "Varje tangent spelar sin ton och öppnar sättet att öva som är ritat på den.",
     "method_chunking_name": "En liten bit i taget",
     "method_chunking_how": "Tryck på de två takter som ständigt spricker, så blir de en slinga som går runt tills de inte längre är det svåra stället.",
     "method_chunking_why": "Att spela ett stycke från början till slut ger den svåra takten lika få sekunder som alla andra. Som slinga får den alla.",
