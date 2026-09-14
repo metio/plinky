@@ -88,6 +88,11 @@ const circle = `<circle cx="50" cy="50" r="50" fill="${GROUND}"/><circle cx="50"
 // square avatar.
 const RING = `<circle cx="50" cy="50" r="48.6" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.2"/>`;
 
+// The rounded tile: the app icon, the favicon, and the symbol wherever it stands beside the
+// name. Its ring is the circle's, following the tile's corners at the same inset.
+const tile = `<rect width="100" height="100" rx="22" fill="${GROUND}"/><rect width="100" height="100" rx="22" fill="url(#${ID}g)"/>`;
+const TILE_RING = `<rect x="1.4" y="1.4" width="97.2" height="97.2" rx="20.6" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.2"/>`;
+
 // The name, as one path.
 const face = fontkit
     .create(Buffer.from(await decompress(await readFile(FONT))))
@@ -180,7 +185,7 @@ function file(width, height, body) {
     );
 }
 
-// The symbol on its circle: the header, the social avatar's crop, the unfurled cards.
+// The symbol on its circle: the social avatar's crop, the YouTube watermark, the thumbnails.
 const symbol = (ring) => file(100, 100, `${defs()}${circle}${art()}${ring ? RING : ""}`);
 
 // The name inside the circle, the symbol scaled to 0.813 and placed so its strike point lands
@@ -198,7 +203,8 @@ function badge(ring) {
     );
 }
 
-// The symbol beside the name: a 64-unit circle, a 14-unit gap, the name at 44 centred on it.
+// The symbol beside the name, as the app header sets it: a 64-unit tile, a 14-unit gap, the
+// name at 44 centred on it.
 function lockup({ ring, ink, tracking }) {
     const SYMBOL = 64;
     const GAP = 14;
@@ -208,7 +214,7 @@ function lockup({ ring, ink, tracking }) {
     return file(
         SYMBOL + GAP + name.width,
         SYMBOL,
-        `<g transform="scale(${SYMBOL / 100})">${defs()}${circle}${art()}${ring ? RING : ""}</g>` +
+        `<g transform="scale(${SYMBOL / 100})">${defs()}${tile}${art()}${ring ? TILE_RING : ""}</g>` +
             `<path fill="${ink}" d="${name.d}"/>${dotOf(name)}`,
     );
 }
@@ -234,11 +240,7 @@ const FILES = {
     // The same on an indigo ground, with her ring.
     "symbol-ringed.svg": symbol(true),
     // The app icon: the rounded tile a launcher or a tab shows as it is.
-    "tile.svg": file(
-        100,
-        100,
-        `${defs()}<rect width="100" height="100" rx="22" fill="${GROUND}"/><rect width="100" height="100" rx="22" fill="url(#${ID}g)"/>${art()}`,
-    ),
+    "tile.svg": file(100, 100, `${defs()}${tile}${art()}`),
     // Full bleed, for anything that rounds or circles the corners itself: Apple's touch
     // icon, and a profile picture every platform crops to a circle. Inside that circle it is
     // exactly the symbol.

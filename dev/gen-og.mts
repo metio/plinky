@@ -102,8 +102,9 @@ async function main() {
     const host = new URL(
         readFileSync("core/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1] ?? "",
     ).host;
-    // The symbol on its circle, from the vector mark (npm run mark).
-    const mark = `data:image/svg+xml;base64,${readFileSync("brand/mark/symbol.svg").toString("base64")}`;
+    // The symbol on its rounded tile, from the vector mark (npm run mark): it stands beside
+    // the site's name in the corner, the way the app header sets it.
+    const mark = `data:image/svg+xml;base64,${readFileSync("brand/mark/tile.svg").toString("base64")}`;
     // The faces travel with the page: a headless browser has neither installed. Latin
     // only, as the site's own card — a title in another script falls to the system face.
     const font = (path: string) =>
