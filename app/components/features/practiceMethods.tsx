@@ -144,7 +144,7 @@ export function MethodLeaf({ id, method }: { id: string; method: PracticeMethod 
         <section
             id={id}
             aria-labelledby={heading}
-            className="grid items-start gap-4 border-t border-line pt-6 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-6"
+            className="grid items-start gap-4 pt-5 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-6"
         >
             <Drawing name={METHOD_DRAWING[method.id]} className="h-auto w-[84px] sm:w-24" />
             <div className="min-w-0 max-w-prose space-y-2.5">

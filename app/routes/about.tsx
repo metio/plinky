@@ -168,14 +168,14 @@ export default function About() {
                 </div>
             </section>
 
-            <section className="space-y-3 border-t border-line pt-8">
+            <section className="space-y-3 pt-4">
                 <h2 className={sectionHeadingClasses}>{m.about_why_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_why_body()}
                 </p>
             </section>
 
-            <section className="space-y-3 border-t border-line pt-8">
+            <section className="space-y-3 pt-4">
                 <h2 className={sectionHeadingClasses}>{m.about_contact_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_contact_body()}

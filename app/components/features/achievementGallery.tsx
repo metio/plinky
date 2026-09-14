@@ -55,10 +55,10 @@ export function AchievementGallery({
     framed?: boolean;
 }) {
     // Two columns of rows from a tablet's width up, each with its own margin, filled left to
-    // right; one column on a phone. The last row of the left column closes with a rule too,
-    // when the shelf ends on the right.
+    // right; one column on a phone. Across two columns the second row opens the first line
+    // beside the first, so it takes no rule over it either: rules fall between lines only.
     const grid = (
-        <Folio className="md:grid-cols-[minmax(5.25rem,auto)_minmax(0,1fr)_minmax(5.25rem,auto)_minmax(0,1fr)] md:[&>li:nth-last-child(2):nth-child(odd)]:border-b">
+        <Folio className="md:grid-cols-[minmax(5.25rem,auto)_minmax(0,1fr)_minmax(5.25rem,auto)_minmax(0,1fr)] md:[&>li:nth-child(2)]:border-t-0">
             {achievements.map((badge) => {
                 const { emoji, label } = badgeFace(badge);
                 // A greyed glyph under a padlock is the vocabulary of something locked,
