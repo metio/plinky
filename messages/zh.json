@@ -1534,7 +1534,7 @@
     "method_interleaving_short": "穿插",
     "method_spacing_short": "稍后",
     "method_chords_short": "和弦",
-    "methods_press": "按一个琴键",
+    "methods_keys_hint": "每个琴键都会弹出自己的音，并打开画在上面的练琴方法。",
     "method_chunking_name": "一次只啃一小段",
     "method_chunking_how": "点一下老是出错的那两小节，它们就成了循环，一遍遍转下去，直到不再是难处。",
     "method_chunking_why": "一首曲子从头弹到尾，难的那一小节和其他小节一样只分到几秒钟。把它单独循环，这几分钟就全归它了。",

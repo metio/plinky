@@ -1589,7 +1589,7 @@
     "method_interleaving_short": "Amestecă",
     "method_spacing_short": "Mai târziu",
     "method_chords_short": "Acorduri",
-    "methods_press": "Apasă o clapă",
+    "methods_keys_hint": "Fiecare clapă își cântă nota și deschide felul de a exersa desenat pe ea.",
     "method_chunking_name": "Câte un fragment mic",
     "method_chunking_how": "Atinge cele două măsuri care tot ies prost și devin o buclă, care se învârte până când nu mai sunt partea grea.",
     "method_chunking_why": "Dacă joci o piesă de la cap la coadă, măsura grea primește tot atâtea secunde ca oricare alta. În buclă le primește pe toate.",

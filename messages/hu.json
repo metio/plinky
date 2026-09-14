@@ -1561,7 +1561,7 @@
     "method_interleaving_short": "Keverd",
     "method_spacing_short": "Később",
     "method_chords_short": "Akkordok",
-    "methods_press": "Nyomj le egy billentyűt",
+    "methods_keys_hint": "Minden billentyű megszólaltatja a hangját, és megnyitja a rárajzolt gyakorlási módot.",
     "method_chunking_name": "Egyszerre egy kis szakasz",
     "method_chunking_how": "Koppints arra a két ütemre, ami folyton félremegy, és hurokká válnak — körbejár, amíg meg nem szűnik a nehéz rész lenni.",
     "method_chunking_why": "Ha egy darabot elejétől a végéig játszol, a nehéz ütem ugyanannyi másodpercet kap, mint az összes többi. Hurokban az összeset megkapja.",

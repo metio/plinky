@@ -1590,7 +1590,7 @@
     "method_interleaving_short": "Mezcla",
     "method_spacing_short": "Después",
     "method_chords_short": "Acordes",
-    "methods_press": "Pulsa una tecla",
+    "methods_keys_hint": "Cada tecla toca su nota y abre la forma de practicar dibujada en ella.",
     "method_chunking_name": "Un trocito cada vez",
     "method_chunking_how": "Toca los dos compases que siempre fallan y se convierten en un bucle, que gira hasta que dejan de ser la parte difícil.",
     "method_chunking_why": "Tocar una pieza de principio a fin le da al compás difícil los mismos pocos segundos que a todos los demás. En bucle, se los queda todos.",

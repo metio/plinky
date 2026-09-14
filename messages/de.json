@@ -1562,7 +1562,7 @@
     "method_interleaving_short": "Mischen",
     "method_spacing_short": "Später",
     "method_chords_short": "Akkorde",
-    "methods_press": "Drück eine Taste",
+    "methods_keys_hint": "Jede Taste spielt ihren Ton und öffnet den Weg zum Üben, der auf ihr abgebildet ist.",
     "method_chunking_name": "Immer nur ein paar Takte",
     "method_chunking_how": "Tippe die zwei Takte an, die immer schiefgehen, und sie werden zur Schleife — sie läuft rundherum, bis sie nicht mehr die schwere Stelle sind.",
     "method_chunking_why": "Ein Stück von vorne bis hinten zu spielen gibt dem schweren Takt genauso wenige Sekunden wie jedem anderen. Als Schleife allein bekommt er sie alle.",

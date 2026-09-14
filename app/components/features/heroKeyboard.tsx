@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type ReactNode, useId, useMemo, useState } from "react";
-import { HOME_OCTAVE, METHODS, METHODS_ANCHOR, methodOnKey } from "../../../core/practiceMethods";
+import { HOME_OCTAVE, METHODS, methodOnKey } from "../../../core/practiceMethods";
 import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { useVoicedInput } from "../../hooks/useVoicedInput";
-import { m } from "../../paraglide/messages.js";
 import { type KeyDressing, Keyboard } from "../ui/keyboard";
 import { ChordReadout } from "./chordReadout";
 import { MidiBadge } from "./midiBadge";
@@ -26,6 +25,8 @@ import { METHOD_DRAWING, METHOD_LABEL, METHOD_NAME, MethodLeaf } from "./practic
 // Nothing sounds on hover. Only a key that is pressed makes a note.
 //
 // `children` sits between the keys and the leaf, for whatever the page says about the keys.
+// The heading that names the menu, and the anchor a link to it lands on, belong to the page
+// section that holds it.
 export function HeroKeyboard({ children }: { children?: ReactNode }) {
     const labels = useNoteLabels();
     const naming = useNoteNaming();
@@ -83,11 +84,7 @@ export function HeroKeyboard({ children }: { children?: ReactNode }) {
     const method = methodOnKey(openKey);
 
     return (
-        <div id={METHODS_ANCHOR} className="mx-auto w-full max-w-xl scroll-mt-24 space-y-3">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <h3 className="font-display text-lg font-medium text-ink">{m.methods_title()}</h3>
-                <p className="text-sm text-muted">{m.methods_press()}</p>
-            </div>
+        <div className="mx-auto w-full max-w-xl space-y-3">
             <Keyboard
                 finish={finish}
                 from={HOME_OCTAVE.from}

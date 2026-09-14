@@ -1572,7 +1572,7 @@
     "method_interleaving_short": "Mix",
     "method_spacing_short": "Later",
     "method_chords_short": "Chords",
-    "methods_press": "Press a key",
+    "methods_keys_hint": "Each key plays its note and opens the way to practise drawn on it.",
     "method_chunking_name": "One small piece at a time",
     "method_chunking_how": "Tap the two bars that keep going wrong and they become a loop, playing round and round until they stop being the hard part.",
     "method_chunking_why": "Playing a piece start to finish gives the hard bar the same few seconds as every other bar. Loop that bar on its own and it gets all of them.",

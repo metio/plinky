@@ -1590,7 +1590,7 @@
     "method_interleaving_short": "Miješaj",
     "method_spacing_short": "Kasnije",
     "method_chords_short": "Akordi",
-    "methods_press": "Pritisni tipku",
+    "methods_keys_hint": "Svaka tipka svira svoj ton i otvara način vježbanja nacrtan na njoj.",
     "method_chunking_name": "Jedan mali dio odjednom",
     "method_chunking_how": "Dodirni ona dva takta koja stalno idu krivo i postat će petlja koja se vrti dok više ne budu teško mjesto.",
     "method_chunking_why": "Kad skladbu odsviraš od početka do kraja, teški takt dobije jednako malo sekundi kao i svaki drugi. U petlji dobije ih sve.",

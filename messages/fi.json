@@ -1562,7 +1562,7 @@
     "method_interleaving_short": "Sekoita",
     "method_spacing_short": "Myöhemmin",
     "method_chords_short": "Soinnut",
-    "methods_press": "Paina kosketinta",
+    "methods_keys_hint": "Jokainen kosketin soittaa sävelensä ja avaa siihen piirretyn harjoittelutavan.",
     "method_chunking_name": "Pieni pala kerrallaan",
     "method_chunking_how": "Napauta niitä kahta tahtia, jotka menevät jatkuvasti pieleen, niin niistä tulee silmukka, joka pyörii kunnes ne eivät enää ole se vaikea kohta.",
     "method_chunking_why": "Kun soitat kappaleen alusta loppuun, vaikea tahti saa yhtä vähän sekunteja kuin kaikki muutkin. Silmukassa se saa ne kaikki.",

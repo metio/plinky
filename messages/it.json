@@ -1590,7 +1590,7 @@
     "method_interleaving_short": "Mescola",
     "method_spacing_short": "Più tardi",
     "method_chords_short": "Accordi",
-    "methods_press": "Premi un tasto",
+    "methods_keys_hint": "Ogni tasto suona la sua nota e apre il modo di esercitarsi disegnato sopra.",
     "method_chunking_name": "Un pezzetto alla volta",
     "method_chunking_how": "Tocca le due battute che continuano a sfuggirti e diventano un loop, che gira finché smettono di essere il punto difficile.",
     "method_chunking_why": "Suonare un brano dall'inizio alla fine dà alla battuta difficile gli stessi pochi secondi di tutte le altre. In loop, se li prende tutti.",

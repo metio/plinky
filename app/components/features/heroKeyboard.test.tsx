@@ -5,9 +5,7 @@
 import { cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { LEARN_PICK_HREF } from "../../../core/learnPick";
 import { type MethodId, METHODS, type PracticeMethod } from "../../../core/practiceMethods";
-import { localizedHref } from "../ui/href";
 import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider, useMidiConnection } from "../../contexts/midi";
@@ -144,17 +142,6 @@ describe("HeroKeyboard", () => {
         fireEvent.click(screen.getByText("funnel on"));
         expect(presses(audio)).toEqual([48]);
         expect(leafFor("chunking")).toBeTruthy();
-    });
-
-    it("is where the day's pick for the ways to practise lands", () => {
-        mount();
-        // The href the pick's row builds, followed to the element it names on the page.
-        const href = localizedHref(LEARN_PICK_HREF.methods);
-        const [path, anchor] = href.split("#");
-        expect(path).toBe(localizedHref("/"));
-        const target = document.getElementById(anchor ?? "");
-        expect(target?.contains(keybed())).toBe(true);
-        expect(target?.contains(leafFor("chunking"))).toBe(true);
     });
 
     it("lights a key while it is held", () => {

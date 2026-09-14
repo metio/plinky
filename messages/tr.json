@@ -1561,7 +1561,7 @@
     "method_interleaving_short": "Karıştır",
     "method_spacing_short": "Sonra",
     "method_chords_short": "Akorlar",
-    "methods_press": "Bir tuşa bas",
+    "methods_keys_hint": "Her tuş kendi notasını çalar ve üzerinde çizili çalışma yolunu açar.",
     "method_chunking_name": "Bir seferde küçük bir bölüm",
     "method_chunking_how": "Sürekli ters giden o iki ölçüye dokun, döngüye dönüşsünler; zor yer olmaktan çıkana kadar dönüp dururlar.",
     "method_chunking_why": "Bir parçayı baştan sona çalmak, zor ölçüye diğerleriyle aynı birkaç saniyeyi verir. Döngüye alınca hepsini alır.",

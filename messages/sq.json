@@ -1561,7 +1561,7 @@
     "method_interleaving_short": "Përziej",
     "method_spacing_short": "Më vonë",
     "method_chords_short": "Akorde",
-    "methods_press": "Shtyp një tast",
+    "methods_keys_hint": "Çdo tast luan notën e vet dhe hap mënyrën e ushtrimit të vizatuar mbi të.",
     "method_chunking_name": "Një copë e vogël në herë",
     "method_chunking_how": "Prek ato dy masa që të dalin gjithnjë keq dhe kthehen në një lak, që rrotullohet derisa të mos jenë më vendi i vështirë.",
     "method_chunking_why": "Kur e luan një pjesë nga fillimi në fund, masa e vështirë merr po aq pak sekonda sa çdo tjetër. Në lak i merr të gjitha.",

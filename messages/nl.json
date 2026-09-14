@@ -1562,7 +1562,7 @@
     "method_interleaving_short": "Mix",
     "method_spacing_short": "Later",
     "method_chords_short": "Akkoorden",
-    "methods_press": "Druk op een toets",
+    "methods_keys_hint": "Elke toets speelt zijn noot en opent de manier van oefenen die erop getekend staat.",
     "method_chunking_name": "Eén klein stukje tegelijk",
     "method_chunking_how": "Tik de twee maten aan die steeds misgaan en ze worden een lus, die rondgaat tot ze niet meer het lastige stuk zijn.",
     "method_chunking_why": "Een stuk van begin tot eind spelen geeft de lastige maat net zo weinig seconden als elke andere. Zet er een lus omheen en hij krijgt ze allemaal.",

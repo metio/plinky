@@ -1562,7 +1562,7 @@
     "method_interleaving_short": "Bland",
     "method_spacing_short": "Senere",
     "method_chords_short": "Akkorder",
-    "methods_press": "Tryk på en tangent",
+    "methods_keys_hint": "Hver tangent spiller sin tone og åbner den måde at øve på, der er tegnet på den.",
     "method_chunking_name": "Én lille bid ad gangen",
     "method_chunking_how": "Tryk på de to takter, der bliver ved med at glippe, så bliver de til en løkke, der kører rundt, indtil de ikke længere er det svære sted.",
     "method_chunking_why": "At spille et stykke fra ende til anden giver den svære takt lige så få sekunder som alle andre. Som løkke får den dem alle sammen.",

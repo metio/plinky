@@ -1533,7 +1533,7 @@
     "method_interleaving_short": "섞기",
     "method_spacing_short": "나중에",
     "method_chords_short": "화음",
-    "methods_press": "건반을 눌러 보세요",
+    "methods_keys_hint": "건반마다 제 음을 내고, 그 위에 그려진 연습 방법을 열어 줍니다.",
     "method_chunking_name": "한 번에 작은 한 조각",
     "method_chunking_how": "자꾸 어긋나는 두 마디를 누르면 반복 구간이 되어, 그곳이 더 이상 어려운 데가 아닐 때까지 계속 돕니다.",
     "method_chunking_why": "곡을 처음부터 끝까지 치면 어려운 마디에도 다른 마디와 똑같이 몇 초밖에 돌아오지 않습니다. 그 마디만 반복하면 시간이 전부 그쪽으로 갑니다.",

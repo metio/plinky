@@ -1617,7 +1617,7 @@
     "method_interleaving_short": "Striedať",
     "method_spacing_short": "Neskôr",
     "method_chords_short": "Akordy",
-    "methods_press": "Stlačte kláves",
+    "methods_keys_hint": "Každý kláves zahrá svoj tón a otvorí spôsob cvičenia, ktorý je na ňom nakreslený.",
     "method_chunking_name": "Vždy len malý úsek",
     "method_chunking_how": "Ťukni na tie dva takty, ktoré stále nevychádzajú, a stane sa z nich slučka, ktorá beží dokola, kým neprestanú byť tým ťažkým miestom.",
     "method_chunking_why": "Keď skladbu zahráš od začiatku do konca, ťažký takt dostane rovnako málo sekúnd ako každý iný. V slučke dostane všetky.",
