@@ -58,6 +58,10 @@ describe("Home", () => {
         expect(within(section).getByText(m.methods_keys_hint())).toBeTruthy();
         expect(within(section).getByRole("group", { name: m.keyboard_label() })).toBeTruthy();
         expect(within(section).getByRole("region")).toBeTruthy();
+        // The open method is named one level under the section, so the outline never skips
+        // a level between the section's heading and the leaf's.
+        const leaf = within(section).getByRole("region");
+        expect(within(leaf).getByRole("heading", { level: 3 })).toBeTruthy();
         const warmUp = screen
             .getByRole("heading", { level: 2, name: m.today_moment_warmup() })
             .closest("section");

@@ -148,9 +148,9 @@ export function MethodLeaf({ id, method }: { id: string; method: PracticeMethod 
         >
             <Drawing name={METHOD_DRAWING[method.id]} className="h-auto w-[84px] sm:w-24" />
             <div className="min-w-0 max-w-prose space-y-2.5">
-                <h4 id={heading} className="font-display text-xl font-medium text-ink">
+                <h3 id={heading} className="font-display text-xl font-medium text-ink">
                     {METHOD_NAME[method.id]()}
-                </h4>
+                </h3>
                 <p className="leading-relaxed text-body">{WHY[method.id]()}</p>
                 <p className="leading-relaxed text-muted">
                     <span className="font-semibold text-body">{m.methods_in_plinky()}:</span>{" "}
