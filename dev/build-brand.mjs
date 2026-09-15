@@ -13,6 +13,7 @@
 
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
+import { markGroup, markImage } from "./brandGroup.mjs";
 import { tokenValue } from "./brandTokens.mjs";
 
 const OUT = "brand";
@@ -70,25 +71,20 @@ const colour = Object.fromEntries(
 // The mark, carried into each page as a data URI rather than a file:// URL, so the render
 // does not depend on where the browser thinks its document lives.
 const MARK = {};
-const ASPECT = {};
 for (const name of [
     "tile",
+    "tile-framed",
     "square",
-    "symbol",
     "badge",
-    "badge-ringed",
     "lockup-light",
     "lockup-indigo",
-    "lockup-dark",
+    "name-white",
 ]) {
-    const svg = await readFile(`brand/mark/${name}.svg`);
-    MARK[name] = `data:image/svg+xml;base64,${svg.toString("base64")}`;
-    const [, width, height] = svg.toString().match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/) ?? [];
-    ASPECT[name] = Number(width) / Number(height);
+    MARK[name] = markImage(await readFile(`brand/mark/${name}.svg`));
 }
 // One form of the mark at a given height; the width follows from its own proportions.
-const img = (name, height, style = "") =>
-    `<img src="${MARK[name]}" alt="" style="height:${height}px;width:${Math.round(height * ASPECT[name])}px;flex:none;display:block;${style}">`;
+const img = (name, height) =>
+    `<img src="${MARK[name].src}" alt="" style="height:${height}px;width:${Math.round(height * MARK[name].aspect)}px;flex:none;display:block">`;
 
 await mkdir(`${OUT}/icon`, { recursive: true });
 await mkdir(`${OUT}/social`, { recursive: true });
@@ -148,25 +144,29 @@ await shoot(img("badge", 512), {
     transparent: true,
 });
 
-// The lockup above the tagline, on paper and on indigo. On indigo the symbol wears the thin
-// light ring the designer gave it for her own ground, and the name opens up a little.
-const lockupSheet = (ground, ink, form) => `
+// The lockup above the tagline, on paper and on indigo. On indigo the tile stands in its
+// white frame and the name opens up a little. The frame adds an eleventh of the tile on each
+// side, so the framed lockup is set that much taller to keep the tile itself the same size.
+const lockupSheet = (ground, ink, form, height) => `
 <div style="width:960px;height:320px;background:${ground};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px">
-  ${img(form, 112)}
+  ${img(form, height)}
   <div style="${DISPLAY};font-size:40px;color:${ink};line-height:1.12">Practise piano in your browser</div>
 </div>`;
-await shoot(lockupSheet(colour.paper, colour.ink, "lockup-light"), {
+await shoot(lockupSheet(colour.paper, colour.ink, "lockup-light", 112), {
     width: 960,
     height: 320,
     path: `${OUT}/icon/lockup-paper.png`,
     scale: 2,
 });
-await shoot(lockupSheet(colour.indigo, colour.paper, "lockup-indigo"), {
-    width: 960,
-    height: 320,
-    path: `${OUT}/icon/lockup-indigo.png`,
-    scale: 2,
-});
+await shoot(
+    lockupSheet(colour.indigo, colour.paper, "lockup-indigo", Math.round((112 * 13) / 11)),
+    {
+        width: 960,
+        height: 320,
+        path: `${OUT}/icon/lockup-indigo.png`,
+        scale: 2,
+    },
+);
 
 // The palette, as a sheet somebody can hold next to a design.
 const swatch = ([name, , why]) => `
@@ -205,41 +205,44 @@ await shoot(
     { width: 1200, height: 700, path: `${OUT}/type.png`, scale: 2 },
 );
 
-// The places we post, at the sizes they want. A wide picture gets the symbol beside the
-// name; a square or a tall one gets the name inside the circle, which fills a centred space
-// the way a wide lockup cannot.
-const social = (width, height, titleSize) => {
-    const wide = width / height > 1.3;
-    const mark = wide
-        ? img("lockup-indigo", Math.round(height / 4.6))
-        : img("badge-ringed", Math.round(Math.min(width, height) / 2.6));
-    return `
-<div style="width:${width}px;height:${height}px;background:${colour.indigo};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${Math.round(height / 14)}px;text-align:center;padding:${Math.round(width / 12)}px">
-  ${mark}
-  <div>
-    <div style="${DISPLAY};font-size:${titleSize}px;color:${colour.paper};line-height:1.1;letter-spacing:-0.01em">Practise piano in your browser</div>
-    <div style="${UI};font-size:${Math.round(titleSize / 2.6)}px;color:${colour.paper};opacity:.82;margin-top:${Math.round(titleSize / 3)}px">Free · no account · nothing to install</div>
-  </div>
+// The places we post, at the sizes they want. On indigo the tile stands in its white frame,
+// which gives it the edge a tile of nearly the ground's own colour does not have, and it is
+// set large: the mark is the first thing a picture shows, the name the second. A wide
+// picture sets the words beside the tile, a square or tall one under it.
+const group = (size, options) =>
+    markGroup({
+        tile: MARK["tile-framed"],
+        name: MARK["name-white"],
+        size,
+        ink: colour.paper,
+        display: DISPLAY,
+        ui: UI,
+        tagline: "Practise piano in your browser",
+        line: "Free · no account · nothing to install",
+        ...options,
+    });
+const social = (width, height, size, options = {}) => `
+<div style="width:${width}px;height:${height}px;background:${colour.indigo};display:flex;align-items:center;justify-content:center;padding:${Math.round(width / 12)}px">
+  ${group(size, { wide: width / height > 1.3, ...options })}
 </div>`;
-};
-await shoot(social(1200, 630, 62), {
+await shoot(social(1200, 630, 300, { measure: 440 }), {
     width: 1200,
     height: 630,
     path: `${OUT}/social/open-graph-1200x630.png`,
 });
-await shoot(social(1080, 1080, 74), {
+await shoot(social(1080, 1080, 330), {
     width: 1080,
     height: 1080,
     path: `${OUT}/social/square-1080.png`,
 });
-await shoot(social(1080, 1920, 86), {
+await shoot(social(1080, 1920, 440), {
     width: 1080,
     height: 1920,
     path: `${OUT}/social/story-1080x1920.png`,
 });
 // Instagram's tallest feed size. A square post is cropped from this without losing
 // anything; the reverse is not true, so a portrait is the one worth making.
-await shoot(social(1080, 1350, 78), {
+await shoot(social(1080, 1350, 380), {
     width: 1080,
     height: 1350,
     path: `${OUT}/social/instagram-portrait-1080x1350.png`,
@@ -270,12 +273,8 @@ for (const size of [256, 512, 800]) {
 // three devices out of four.
 await shoot(
     `<div style="width:2048px;height:1152px;background:${colour.indigo};display:flex;align-items:center;justify-content:center">
-       <div style="width:1235px;height:338px;display:flex;align-items:center;justify-content:center;gap:48px;text-align:left">
-         ${img("lockup-indigo", 112)}
-         <div>
-           <div style="${DISPLAY};font-size:54px;color:${colour.paper};line-height:1.12;letter-spacing:-0.01em">Practise piano in your browser</div>
-           <div style="${UI};font-size:26px;color:${colour.paper};opacity:.75;margin-top:14px">Free · no account · nothing to install</div>
-         </div>
+       <div style="width:1235px;height:338px;display:flex;align-items:center;justify-content:center">
+         ${group(284, { wide: true })}
        </div>
      </div>`,
     { width: 2048, height: 1152, path: `${OUT}/social/youtube-banner-2048x1152.png` },
@@ -287,23 +286,19 @@ await shoot(
 // but ground. Rendered at twice the size it is shown, which is what keeps it crisp on the
 // screens people actually have.
 await shoot(
-    `<div style="width:1640px;height:624px;background:${colour.indigo};display:flex;align-items:center;justify-content:center;gap:56px;padding:0 16%">
-       ${img("lockup-indigo", 132)}
-       <div style="${DISPLAY};font-size:60px;color:${colour.paper};line-height:1.12;letter-spacing:-0.01em">Practise piano in your browser</div>
+    `<div style="width:1640px;height:624px;background:${colour.indigo};display:flex;align-items:center;justify-content:center">
+       ${group(280, { wide: true, measure: 408 })}
      </div>`,
     { width: 1640, height: 624, path: `${OUT}/social/facebook-cover-1640x624.png` },
 );
 
 // The banner strip. Reddit lays the community icon and name over the left of it on a wide
-// screen, so nothing goes there — the lockup and the tagline sit right of that, where no
-// overlay reaches and no crop takes them.
+// screen, so nothing goes there — the group sits right of that, where no overlay reaches and
+// no crop takes it, and as tall as the strip allows. At this height the derived type would
+// be too small to read, so the tagline and its line are set at sizes of their own.
 const banner = (width) => `
-<div style="width:${width}px;height:128px;background:${colour.indigo};display:flex;align-items:center;justify-content:flex-start;gap:28px;padding-left:${Math.round(width * 0.3)}px">
-  ${img("lockup-indigo", 56)}
-  <div>
-    <div style="${DISPLAY};font-size:30px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
-    <div style="${UI};font-size:17px;color:${colour.paper};opacity:.8;line-height:1.3;margin-top:4px">Free · no account · nothing to install</div>
-  </div>
+<div style="width:${width}px;height:128px;background:${colour.indigo};display:flex;align-items:center;justify-content:flex-start;padding-left:${Math.round(width * 0.3)}px">
+  ${group(102, { wide: true, title: 26, small: 15 })}
 </div>`;
 await shoot(banner(1072), {
     width: 1072,
@@ -316,9 +311,10 @@ await shoot(banner(1080), {
     path: `${OUT}/social/reddit-banner-mobile-1080x128.png`,
 });
 
-// The watermark YouTube overlays on a playing video. Transparent, so it is the symbol on
-// its circle and nothing else.
-await shoot(img("symbol", 150), {
+// The watermark YouTube overlays on a playing video, over whatever the video shows.
+// Transparent, so it is the framed tile and nothing else: the frame is its edge on a dark
+// frame and on an indigo one alike.
+await shoot(img("tile-framed", 150), {
     width: 150,
     height: 150,
     path: `${OUT}/social/youtube-watermark-150.png`,
@@ -327,16 +323,15 @@ await shoot(img("symbol", 150), {
 
 // A repository's social preview — what GitHub, Slack and a chat client unfurl for a link
 // to the code. 1280×640 is what GitHub asks for, and it is shown large and never cropped to
-// a circle, so the lockup can carry the name at a size that reads.
+// a circle, so the name can be set at a size that reads.
 //
-// The ground is the indigo every other social image stands on, with the ringed lockup the
-// designer drew for it. The tagline sits under it saying what the name does not. Everything
+// The ground is the designer's navy, the name's own ink: a code host's page is mostly dark
+// chrome or white, and this one stands apart from the indigo every post wears. Everything
 // stays inside the middle three quarters: an unfurl is re-cropped by whoever is doing the
 // unfurling, and a preview designed edge to edge loses its ends.
 await shoot(
-    `<div style="width:1280px;height:640px;background:${colour.indigo};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;padding:0 120px">
-       ${img("lockup-indigo", 150)}
-       <div style="${DISPLAY};font-size:60px;letter-spacing:-0.01em;color:${colour.paper};line-height:1.1">Practise piano in your browser</div>
+    `<div style="width:1280px;height:640px;background:${colour.name};display:flex;align-items:center;justify-content:center;padding:0 120px">
+       ${group(300, { wide: true, measure: 440 })}
      </div>`,
     { width: 1280, height: 640, path: `${OUT}/social/github-social-1280x640.png` },
 );
