@@ -43,11 +43,11 @@ const STAGE = "#000000";
 const GLOW = "#180a2e";
 const PAPER = "#f9f8fc";
 
-// The symbol on its circle, from the vector mark (npm run mark). On this near-black stage the
-// circle's own indigo is its edge, so it needs no ring — the designer's lockup on black has
-// none. The card sets the name itself, with the domain as its tail, which is why the lockup
-// does not belong here.
-const symbol = `data:image/svg+xml;base64,${(await read("brand/mark/symbol.svg")).toString("base64")}`;
+// The keys alone, from the vector mark (npm run mark): no tile and no circle. On this
+// near-black stage a ground of the mark's indigo is a second colour competing with the title,
+// and the white keys carry their own edge against the dark. The card sets the name itself,
+// with the domain as its tail, which is why the lockup does not belong here either.
+const keys = `data:image/svg+xml;base64,${(await read("brand/mark/keys.svg")).toString("base64")}`;
 
 const fredoka = await read(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
@@ -77,8 +77,9 @@ const CUTS = [
         scale: 1,
         padding: "72px 88px",
         titleWidth: 820,
-        // Right of the longest title's column and centred on the card's height.
-        symbol: "right:80px;top:50%;transform:translateY(-50%);width:300px;height:300px",
+        // Right of the title's column, standing on the wordmark's line, so the longest title
+        // ends above the keys' tops.
+        keys: "right:96px;bottom:64px;height:420px",
     },
     {
         file: "thumb-short.png",
@@ -91,7 +92,7 @@ const CUTS = [
         // leave rather than on the floor — dropped to the bottom it opens a dead band
         // across the middle of the card, which is most of a portrait tile. A portrait tile
         // has width to spare, and the shape is what survives the shrink to a grid tile.
-        symbol: "left:50%;transform:translateX(-50%);bottom:440px;width:600px;height:600px",
+        keys: "left:50%;transform:translateX(-50%);bottom:420px;height:700px",
     },
 ];
 
@@ -107,11 +108,11 @@ const DOT_ANCHOR = `<span style="position:relative;display:inline-block;width:0;
 function card(piece, cut) {
     return `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
          <div style="position:relative;overflow:hidden;width:${cut.width}px;height:${cut.height}px;background:radial-gradient(120% 140% at 18% 8%, ${GLOW} 0%, ${STAGE} 72%);display:flex;flex-direction:column;justify-content:space-between;padding:${cut.padding};font-family:'Fredoka Variable',Fredoka,ui-rounded,system-ui,sans-serif">
-           <!-- The symbol. A thumbnail is picked out of a grid of a dozen others at a fifth of
+           <!-- The keys. A thumbnail is picked out of a grid of a dozen others at a fifth of
                 this size, where a title is a grey smear and the only thing still legible is
                 a shape and a colour — so the shape is the app's own, big enough to survive
                 the shrink, and set where the longest title still clears it. -->
-           <img src="${symbol}" alt="" style="position:absolute;${cut.symbol}">
+           <img src="${keys}" alt="" style="position:absolute;${cut.keys}">
            <div style="position:relative;max-width:${cut.titleWidth}px">
              <div style="font-size:${titleSize(piece.title, cut.scale)}px;font-weight:600;color:${PAPER};line-height:1.08;letter-spacing:-0.015em;text-wrap:balance">${piece.title}</div>
              <div style="font-family:Inter,system-ui,sans-serif;font-size:${Math.round(36 * cut.scale)}px;color:${PAPER};opacity:.72;margin-top:${Math.round(20 * cut.scale)}px">${piece.composer}</div>
