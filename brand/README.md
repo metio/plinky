@@ -14,15 +14,17 @@ has to exist first: `npm run build:single` (or `ci-build`), then `npm run brand`
 
 | File | What it is |
 | --- | --- |
-| `mark/symbol.svg` | The symbol on its circle. The app header wears it; the per-piece link cards carry it. |
-| `mark/symbol-ringed.svg` | The same with a thin light ring, for an indigo ground the circle would otherwise vanish into. |
-| `mark/tile.svg` | The symbol on a rounded tile: the app icon and the favicon. |
+| `mark/tile.svg` | The symbol on a rounded tile: the app icon, the favicon, the app header and the per-piece link cards. |
+| `mark/tile-framed.svg` | The tile in a thick white frame, for an indigo ground the tile would otherwise vanish into: every social image, the YouTube watermark. |
+| `mark/keys.svg` | The keys, the falling plink and its strike point with no ground at all, for a dark stage: the video thumbnails. |
+| `mark/symbol.svg` | The symbol on its circle, for a platform that shows a round profile picture and accepts a transparent one. Nothing else uses it. |
 | `mark/square.svg` | The symbol on a full-bleed square, for anything that rounds or circles the corners itself — Apple's touch icon, a profile picture. Inside a circle it is exactly the symbol. |
 | `mark/maskable.svg` | Full bleed with the drawing inside the middle 80%, for Android launchers that crop an icon to their own shape. |
-| `mark/badge.svg`, `mark/badge-ringed.svg` | The name inside the circle, under the symbol, for places that show the mark without a caption. The ringed one is for indigo grounds. |
-| `mark/lockup-light.svg` | The symbol beside the name, for a light ground. |
-| `mark/lockup-indigo.svg` | The same for an indigo ground: the ringed symbol, and the name in white with a little more spacing. |
-| `mark/lockup-dark.svg` | The same for any other dark ground, without the ring. |
+| `mark/badge.svg` | The name inside the circle, under the symbol, for places that show the mark without a caption. |
+| `mark/lockup-light.svg` | The tile beside the name, for a light ground. |
+| `mark/lockup-indigo.svg` | The same for an indigo ground: the framed tile, and the name in white with a little more spacing. |
+| `mark/lockup-dark.svg` | The same for any other dark ground, without the frame. |
+| `mark/name-white.svg` | The name alone in white, which the social images set beside or under the framed tile. |
 | `icon/plinky-*.png` | The tile at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
 | `icon/badge-512.png` | The badge, transparent outside its circle. |
 | `icon/lockup-paper.png` | The lockup over the tagline on paper, 960×320 at 2×, for light surfaces. |
@@ -39,7 +41,7 @@ has to exist first: `npm run build:single` (or `ci-build`), then `npm run brand`
 | `social/reddit-banner-*.png` | Reddit's community banner, desktop 1072×128 and mobile 1080×128. |
 | `social/github-social-1280x640.png` | A repository's social preview: what GitHub, Slack and a chat client unfurl for a link to the code. |
 | `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
-| `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the symbol on its circle and nothing else. |
+| `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the framed tile and nothing else. |
 
 ## Where each one goes
 
@@ -61,8 +63,10 @@ transparent or white, and YouTube's crop is a hair wider than the circle, so tho
 showed as pale arcs along the top edge. Inside any circular crop the square is exactly the
 symbol, and beyond its edge there is only more of the same indigo.
 
-The wide pictures carry the symbol beside the name; the square and tall ones carry the name
-inside the circle, which fills a centred space the way a wide lockup cannot. The covers
+Every picture on indigo sets the same group: the framed tile, large, then the name, then
+the tagline and its small line. The wide pictures set the words beside the tile; the square
+and tall ones set them under it. The GitHub preview sets the same group on the designer's
+navy rather than indigo. The covers
 differ because the crops do — Facebook takes a wide strip and narrows it on a phone, Reddit
 takes a thin one and lays the community's own icon and name over the left of it. Both keep
 everything that matters in the middle for that reason, and nothing but ground at the edges.
@@ -143,10 +147,14 @@ coordinate and hex in it was measured off her slide. It is drawn flat, with one 
 direction, and nothing is added to it for any of its forms: the tile, the square, the
 maskable icon, the badge and the lockups only place the same drawing.
 
-**On an indigo ground the circle wears a thin light ring.** Without it the circle has no
+**On an indigo ground the tile stands in a thick white frame.** Without it the tile has no
 edge against a ground of nearly its own colour, and the symbol reads as keys floating on
-indigo. The ringed forms are for that ground only; on paper, black or ink the circle is its
-own edge.
+indigo. The frame is an eleventh of the tile's width on every side, with its corners the
+tile's grown by that much, and it is for that ground only; on paper, black or ink the tile
+is its own edge. **On a dark stage the keys go alone**, with no tile or circle behind them:
+the video thumbnails set `keys.svg`, whose white keys carry their own edge against the
+dark. **The circle is for round profile pictures only**, and even there the kit hands out
+the full-bleed square, which every platform crops to the same circle.
 
 **The name is Fredoka at weight 600**, the face the app already ships, set with no extra
 spacing on a light ground and with 0.05em of letter-spacing on indigo or any dark ground,

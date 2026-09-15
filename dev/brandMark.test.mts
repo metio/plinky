@@ -28,6 +28,21 @@ describe("the vector mark", () => {
         expect(keys).not.toContain('<circle cx="50" cy="50"');
     });
 
+    it("frames the tile in white, an eleventh of its width all round", () => {
+        const framed = read("tile-framed.svg");
+        expect(framed).toContain('viewBox="0 0 118.18 118.18"');
+        expect(framed).toContain('<rect width="118.18" height="118.18" rx="31.09" fill="#fff"/>');
+        expect(framed).toContain(
+            `<g transform="translate(9.09 9.09)"><rect width="100" height="100" rx="22"`,
+        );
+        expect(framed).toContain(art);
+    });
+
+    it("sets the framed tile in the lockup for an indigo ground", () => {
+        expect(read("lockup-indigo.svg")).toContain('rx="31.09" fill="#fff"');
+        expect(read("lockup-light.svg")).not.toContain('fill="#fff"/><g');
+    });
+
     it("carries the licence in every file", () => {
         for (const name of readdirSync("brand/mark").filter((file) => file.endsWith(".svg"))) {
             expect(read(name), name).toMatch(

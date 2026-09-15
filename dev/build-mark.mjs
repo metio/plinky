@@ -7,8 +7,8 @@
 // black ones, the plink falling down the middle key onto its strike point. Every coordinate
 // and hex in art() and defs() was measured off her slide, so they are copied here as they
 // are and never adjusted by eye. The other forms only place that same drawing: on a circle,
-// on a rounded tile, on a full-bleed square, inside a launcher's safe zone, with no ground at
-// all, above the name, or beside it.
+// on a rounded tile, in a white frame round the tile, on a full-bleed square, inside a
+// launcher's safe zone, with no ground at all, above the name, or beside it.
 //
 // The name is Fredoka at weight 600, converted to outlines so no file here depends on a font
 // loading. The outlines come from the variable Fredoka the app ships
@@ -24,7 +24,7 @@
 //   npm run mark            write brand/mark/*.svg
 //   npm run mark -- --check fail if any file there is missing or differs
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import * as fontkit from "fontkit";
 import { decompress } from "wawoff2";
 import {
@@ -84,14 +84,20 @@ function defs(glowY = 23) {
 }
 
 const circle = `<circle cx="50" cy="50" r="50" fill="${GROUND}"/><circle cx="50" cy="50" r="50" fill="url(#${ID}g)"/>`;
-// On her own indigo the circle has no edge to show, so it wears the thin light ring from her
-// square avatar.
-const RING = `<circle cx="50" cy="50" r="48.6" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.2"/>`;
 
 // The rounded tile: the app icon, the favicon, and the symbol wherever it stands beside the
-// name. Its ring is the circle's, following the tile's corners at the same inset.
+// name.
 const tile = `<rect width="100" height="100" rx="22" fill="${GROUND}"/><rect width="100" height="100" rx="22" fill="url(#${ID}g)"/>`;
-const TILE_RING = `<rect x="1.4" y="1.4" width="97.2" height="97.2" rx="20.6" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.2"/>`;
+
+// On an indigo ground the tile has no edge of its own to show, so it stands in a thick white
+// frame: an eleventh of the tile's width all round, the weight the social images have always
+// given it. The frame's corners are the tile's, grown by the frame's width, so the white is
+// equally thick along the sides and across the corners.
+const FRAME = 100 / 11;
+const FRAMED = 100 + 2 * FRAME;
+const framedTile = () =>
+    `<rect width="${num(FRAMED)}" height="${num(FRAMED)}" rx="${num(22 + FRAME)}" fill="#fff"/>` +
+    `<g transform="translate(${num(FRAME)} ${num(FRAME)})">${tile}${art()}</g>`;
 
 // The keys alone, for a dark stage that needs no ground behind them: the white keys carry
 // their own edge there. The view is cut to the drawing — its halo at the top, the white keys'
@@ -190,12 +196,9 @@ function file(width, height, body) {
     );
 }
 
-// The symbol on its circle: the social avatar's crop, the YouTube watermark, the thumbnails.
-const symbol = (ring) => file(100, 100, `${defs()}${circle}${art()}${ring ? RING : ""}`);
-
 // The name inside the circle, the symbol scaled to 0.813 and placed so its strike point lands
 // on the circle's centre. Her letter-spacing here is 1.07 at 21.5, her 0.05em rounded.
-function badge(ring) {
+function badge() {
     const run = outline(0, 77.6, 21.5, 1.07);
     // Centred the way SVG's text-anchor centres: on the advance, trailing spacing included.
     const name = outline(50 - (run.width + 1.07) / 2, 77.6, 21.5, 1.07);
@@ -204,24 +207,35 @@ function badge(ring) {
         100,
         `${defs(17)}${circle}<g transform="translate(9.35 -3.4) scale(.813)">${art()}</g>` +
             `<path fill="#fff" filter="url(#${ID}s)" d="${name.d}"/>` +
-            `${dotOf(name, ` filter="url(#${ID}s)"`)}${ring ? RING : ""}`,
+            `${dotOf(name, ` filter="url(#${ID}s)"`)}`,
     );
 }
 
 // The symbol beside the name, as the app header sets it: a 64-unit tile, a 14-unit gap, the
-// name at 44 centred on it.
-function lockup({ ring, ink, tracking }) {
+// name at 44 centred on it. Framed, the tile keeps its 64 units and the frame is added round
+// it, so the name sits beside the same tile on every ground.
+function lockup({ framed, ink, tracking }) {
     const SYMBOL = 64;
     const GAP = 14;
     const SIZE = 44;
-    const top = (SYMBOL - SIZE) / 2;
-    const name = outline(SYMBOL + GAP, top + baselineIn(SIZE), SIZE, tracking * SIZE);
+    const scale = SYMBOL / 100;
+    const box = framed ? FRAMED * scale : SYMBOL;
+    const top = (box - SIZE) / 2;
+    const name = outline(box + GAP, top + baselineIn(SIZE), SIZE, tracking * SIZE);
     return file(
-        SYMBOL + GAP + name.width,
-        SYMBOL,
-        `<g transform="scale(${SYMBOL / 100})">${defs()}${tile}${art()}${ring ? TILE_RING : ""}</g>` +
+        box + GAP + name.width,
+        box,
+        `<g transform="scale(${scale})">${defs()}${framed ? framedTile() : `${tile}${art()}`}</g>` +
             `<path fill="${ink}" d="${name.d}"/>${dotOf(name)}`,
     );
+}
+
+// The name alone, in white for indigo and dark grounds, one line box tall. The social images
+// set it under or beside a framed tile far larger than a lockup's, so it travels on its own.
+function nameOnly() {
+    const SIZE = 44;
+    const name = outline(0, baselineIn(SIZE), SIZE, TRACKING.dark * SIZE);
+    return file(name.width, SIZE, `<path fill="#fff" d="${name.d}"/>${dotOf(name)}`);
 }
 
 // The launcher's safe zone. A launcher that masks crops to its own shape — a circle, a
@@ -240,12 +254,12 @@ const maskable = file(
 );
 
 const FILES = {
-    // The symbol on its circle.
-    "symbol.svg": symbol(false),
-    // The same on an indigo ground, with her ring.
-    "symbol-ringed.svg": symbol(true),
+    // The symbol on its circle, for a platform that shows a round profile picture.
+    "symbol.svg": file(100, 100, `${defs()}${circle}${art()}`),
     // The app icon: the rounded tile a launcher or a tab shows as it is.
     "tile.svg": file(100, 100, `${defs()}${tile}${art()}`),
+    // The tile in its white frame, for an indigo ground.
+    "tile-framed.svg": file(FRAMED, FRAMED, `${defs()}${framedTile()}`),
     // The keys, the plink and its strike point with nothing behind them, for a dark stage.
     "keys.svg": file(
         KEYS_VIEW.width,
@@ -262,12 +276,13 @@ const FILES = {
     ),
     "maskable.svg": maskable,
     // The name inside the circle, for places that show the mark without a caption.
-    "badge.svg": badge(false),
-    "badge-ringed.svg": badge(true),
+    "badge.svg": badge(),
     // The symbol beside the name: on a light ground, on indigo, on a dark ground.
-    "lockup-light.svg": lockup({ ring: false, ink: NAME_INK, tracking: TRACKING.light }),
-    "lockup-indigo.svg": lockup({ ring: true, ink: "#fff", tracking: TRACKING.dark }),
-    "lockup-dark.svg": lockup({ ring: false, ink: "#fff", tracking: TRACKING.dark }),
+    "lockup-light.svg": lockup({ framed: false, ink: NAME_INK, tracking: TRACKING.light }),
+    "lockup-indigo.svg": lockup({ framed: true, ink: "#fff", tracking: TRACKING.dark }),
+    "lockup-dark.svg": lockup({ framed: false, ink: "#fff", tracking: TRACKING.dark }),
+    // The name alone, white, for the social images to set beside the framed tile.
+    "name-white.svg": nameOnly(),
 };
 
 if (CHECK) {
@@ -275,6 +290,15 @@ if (CHECK) {
     for (const [name, content] of Object.entries(FILES)) {
         const current = await readFile(`${OUT}/${name}`, "utf8").catch(() => null);
         if (current !== content) stale.push(name);
+    }
+    // A form this script no longer writes would otherwise stay in the kit looking current.
+    const orphans = (await readdir(OUT)).filter(
+        (name) => name.endsWith(".svg") && !Object.hasOwn(FILES, name),
+    );
+    if (orphans.length > 0) {
+        console.error(`brand/mark holds files nothing writes: ${orphans.join(", ")}.`);
+        console.error("Delete them, or add them back to dev/build-mark.mjs.");
+        process.exit(1);
     }
     if (stale.length > 0) {
         console.error(`brand/mark is out of date: ${stale.join(", ")}.`);

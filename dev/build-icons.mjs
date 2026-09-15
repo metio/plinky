@@ -10,6 +10,7 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
+import { markGroup, markImage } from "./brandGroup.mjs";
 import { tokenValue } from "./brandTokens.mjs";
 
 // Carried into the page as data URIs rather than file:// URLs, so the render does not depend
@@ -23,17 +24,11 @@ const TILE = await mark("tile.svg");
 const SQUARE = await mark("square.svg");
 // Full bleed with the drawing inside the safe zone, for launchers that crop to a shape.
 const MASKABLE = await mark("maskable.svg");
-const LOCKUP_LIGHT = await mark("lockup-light.svg");
-const LOCKUP_INDIGO = await mark("lockup-indigo.svg");
-// The lockups' own proportions, so a height is all a layout has to choose.
-const aspect = async (name) => {
-    const [, width, height] =
-        (await readFile(`brand/mark/${name}`, "utf8")).match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/) ??
-        [];
-    return Number(width) / Number(height);
-};
-const LOCKUP_LIGHT_ASPECT = await aspect("lockup-light.svg");
-const LOCKUP_INDIGO_ASPECT = await aspect("lockup-indigo.svg");
+// The lockup and the social card's parts, with their own proportions, so a height is all a
+// layout has to choose.
+const LOCKUP_LIGHT = markImage(await readFile("brand/mark/lockup-light.svg"));
+const FRAMED_TILE = markImage(await readFile("brand/mark/tile-framed.svg"));
+const NAME_WHITE = markImage(await readFile("brand/mark/name-white.svg"));
 
 // The palette is the app's, read off its tokens: the banner and the social card paint on the
 // same paper, in the same ink, as the brand kit and the pages themselves.
@@ -130,7 +125,7 @@ await writeFile("public/favicon.ico", Buffer.concat([header, ...images]));
 // not sit tight against whatever follows it in the file.
 await shoot(
     `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:24px;padding:0 24px">
-       <img src="${LOCKUP_LIGHT}" alt="" style="height:64px;width:${Math.round(64 * LOCKUP_LIGHT_ASPECT)}px;flex:none">
+       <img src="${LOCKUP_LIGHT.src}" alt="" style="height:64px;width:${Math.round(64 * LOCKUP_LIGHT.aspect)}px;flex:none">
        <div style="${DISPLAY};font-size:28px;color:${INK};line-height:1.15">Practise piano in your browser</div>
      </div>`,
     { width: 512, height: 160, path: "public/icon-banner-512.png" },
@@ -138,18 +133,26 @@ await shoot(
 
 // The social card every link to Plinky unfurls as. It is made here, from the same mark as
 // the launcher icons, because it was made by hand once and then sat two identities out of
-// date while every gate stayed green.
+// date while every gate stayed green. It sets the same group as the brand kit's open-graph
+// image, with the address in its small line.
 const siteUrl = (await readFile("core/site.ts", "utf8")).match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1];
 if (!siteUrl) {
     throw new Error("could not find SITE_URL in core/site.ts");
 }
 await shoot(
-    `<div style="width:1200px;height:630px;background:${ACCENT};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;text-align:center;padding:64px">
-       <img src="${LOCKUP_INDIGO}" alt="" style="height:150px;width:${Math.round(150 * LOCKUP_INDIGO_ASPECT)}px;flex:none">
-       <div>
-         <div style="${DISPLAY};font-size:58px;color:${PAPER};line-height:1.15">Practise piano in your browser</div>
-         <div style="font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:26px;color:${PAPER};opacity:.8;margin-top:18px">${new URL(siteUrl).host} · free, no account, nothing to install</div>
-       </div>
+    `<div style="width:1200px;height:630px;background:${ACCENT};display:flex;align-items:center;justify-content:center;padding:64px">
+       ${markGroup({
+           tile: FRAMED_TILE,
+           name: NAME_WHITE,
+           size: 300,
+           wide: true,
+           measure: 560,
+           ink: PAPER,
+           display: DISPLAY,
+           ui: "font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif",
+           tagline: "Practise piano in your browser",
+           line: `${new URL(siteUrl).host} · free, no account, nothing to install`,
+       })}
      </div>`,
     { width: 1200, height: 630, path: "public/og.png" },
 );
@@ -159,5 +162,5 @@ await browser.close();
 console.log(
     "public/: icon-512, icon-192 and favicon.ico (16, 32, 48) from brand/mark/tile.svg; " +
         "icon-180 from square.svg; icon-maskable-512 and -192 from maskable.svg; " +
-        "icon-banner-512 from lockup-light.svg; og.png from lockup-indigo.svg",
+        "icon-banner-512 from lockup-light.svg; og.png from tile-framed.svg and name-white.svg",
 );
