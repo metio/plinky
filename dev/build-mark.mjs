@@ -7,8 +7,8 @@
 // black ones, the plink falling down the middle key onto its strike point. Every coordinate
 // and hex in art() and defs() was measured off her slide, so they are copied here as they
 // are and never adjusted by eye. The other forms only place that same drawing: on a circle,
-// on a rounded tile, on a full-bleed square, inside a launcher's safe zone, above the name,
-// or beside it.
+// on a rounded tile, on a full-bleed square, inside a launcher's safe zone, with no ground at
+// all, above the name, or beside it.
 //
 // The name is Fredoka at weight 600, converted to outlines so no file here depends on a font
 // loading. The outlines come from the variable Fredoka the app ships
@@ -92,6 +92,11 @@ const RING = `<circle cx="50" cy="50" r="48.6" fill="none" stroke="#fff" stroke-
 // name. Its ring is the circle's, following the tile's corners at the same inset.
 const tile = `<rect width="100" height="100" rx="22" fill="${GROUND}"/><rect width="100" height="100" rx="22" fill="url(#${ID}g)"/>`;
 const TILE_RING = `<rect x="1.4" y="1.4" width="97.2" height="97.2" rx="20.6" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.2"/>`;
+
+// The keys alone, for a dark stage that needs no ground behind them: the white keys carry
+// their own edge there. The view is cut to the drawing — its halo at the top, the white keys'
+// lip at the bottom — so a layout sizes the keys and not a margin.
+const KEYS_VIEW = { x: 20, y: 6, width: 60, height: 72 };
 
 // The name, as one path.
 const face = fontkit
@@ -241,6 +246,12 @@ const FILES = {
     "symbol-ringed.svg": symbol(true),
     // The app icon: the rounded tile a launcher or a tab shows as it is.
     "tile.svg": file(100, 100, `${defs()}${tile}${art()}`),
+    // The keys, the plink and its strike point with nothing behind them, for a dark stage.
+    "keys.svg": file(
+        KEYS_VIEW.width,
+        KEYS_VIEW.height,
+        `${defs()}<g transform="translate(${-KEYS_VIEW.x} ${-KEYS_VIEW.y})">${art()}</g>`,
+    ),
     // Full bleed, for anything that rounds or circles the corners itself: Apple's touch
     // icon, and a profile picture every platform crops to a circle. Inside that circle it is
     // exactly the symbol.
