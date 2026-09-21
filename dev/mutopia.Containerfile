@@ -13,7 +13,7 @@
 # Run via: ilo --no-rc shell --remote-user pwuser --update-remote-user-uid \
 #            --containerfile dev/mutopia.Containerfile dev/plinky-mutopia:latest bash -c '…'
 
-FROM docker.io/library/python:3.14-slim-bookworm@sha256:9ab8d9c8514b44f90cf0029dd42fdd7e9e211e639c8b995304cc04568dee900f
+FROM docker.io/library/python:3.14-slim-bookworm@sha256:82bc3c539b8813ada9d68c63b40158fa002f7f33de9bf3312a3dfdc0620dff56
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends lilypond git \
