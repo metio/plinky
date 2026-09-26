@@ -18,11 +18,11 @@ export const LATEST_RELEASES: Release[] = [
                 twip: true,
             },
             {
-                body: "**A new logo.** Three keys on indigo, with a note falling down the middle one to\nstrike it. At the top of every page it sits on a rounded tile beside the name, the\nsame tile as the icon in your browser tab, and it keeps its own colours whichever ones\nyou pick. The name keeps its pink dot over the i, now perfectly round.",
+                body: "**The name at the top of every page keeps its own colours.** The logo is the one you\nknow, and beside it the name is set a little larger, in its own deep ink, with a\nperfectly round pink dot over the i. Both stay exactly as they are whichever colours\nyou pick and whether the page is light or dark.",
                 twip: true,
             },
             {
-                body: "**The keyboard on the front page is a way into practising.** Each of its seven white\nkeys carries one of the ways a teacher would suggest, with a small drawing on it:\nloop the hard bar, go slowly, one hand at a time, hear it first, mix pieces up, come\nback later, and learn the chords. A key still sounds when you press it, and its way\nto practise opens underneath, with why it works and a piece to try it on. A MIDI\npiano or your computer keys open them too. The long list of them further down the\npage is gone, and nothing plays a note any more when your mouse passes over a list.",
+                body: "**The keyboard on the front page is a way into practising.** Each of its seven white\nkeys carries one of the ways a teacher would suggest, with a small drawing on it:\nloop the hard bar, go slowly, one hand at a time, hear it first, mix pieces up, come\nback later, and learn the chords. A key still sounds when you press it, and its way\nto practise opens underneath, with why it works and a piece to try it on. A MIDI\npiano or your computer keys open them too. These keys carry no note names, whatever\nyou have chosen in Settings — the word on a key is the way to practise it opens. The\nlong list of them further down the page is gone, and nothing plays a note any more\nwhen your mouse passes over a list.",
                 twip: true,
             },
             {
