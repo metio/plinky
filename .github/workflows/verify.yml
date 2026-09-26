@@ -72,9 +72,10 @@ jobs:
       # And no note below the bottom of the keyboard, which is a note no player can reach —
       # a run waiting for one waits forever.
       - run: nix develop --command ci-repair-check
-      # The vector mark in brand/mark is what its generator writes. Every icon, card and
-      # thumbnail is rendered from those files, so a hand edit to one, or a font update that
-      # moves the outlined name, would otherwise reach the next render unannounced.
+      # The outlined name in brand/name-white.svg, and the proposed vector mark beside it,
+      # are what their generator writes. Every social image sets that name, so a hand edit to
+      # it, or a font update that moves its outlines, would otherwise reach the next render
+      # unannounced.
       - run: nix develop --command ci-mark-check
   news:
     name: news

@@ -43,11 +43,12 @@ const STAGE = "#000000";
 const GLOW = "#180a2e";
 const PAPER = "#f9f8fc";
 
-// The keys alone, from the vector mark (npm run mark): no tile and no circle. On this
-// near-black stage a ground of the mark's indigo is a second colour competing with the title,
-// and the white keys carry their own edge against the dark. The card sets the name itself,
-// with the domain as its tail, which is why the lockup does not belong here either.
-const keys = `data:image/svg+xml;base64,${(await read("brand/mark/keys.svg")).toString("base64")}`;
+// The keys alone, from the artwork's own keys-without-tile drawing (npm run logo): no tile
+// and no circle. On this near-black stage a ground of the mark's violet is a second colour
+// competing with the title, and the white keys carry their own edge against the dark. The
+// card sets the name itself, with the domain as its tail, which is why the lockup does not
+// belong here either.
+const keys = `data:image/png;base64,${(await read("brand/plinky-keys.png")).toString("base64")}`;
 
 const fredoka = await read(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",

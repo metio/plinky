@@ -7,8 +7,9 @@ import { DOMAIN, TITTLE, WORDMARK_PARTS } from "../../../core/wordmark";
 // a round pink dot over the i.
 //
 // A component rather than markup inside the header, because the name is not the header's:
-// the header wears it and the stories judge it, and the outlined lockups in brand/mark set
-// the same face with the same spacing and the same dot (core/wordmark). The ink is
+// the header wears it and the stories judge it, and the outlined name the social kit sets
+// (brand/name-white.svg) has the same face, the same spacing and the same dot
+// (core/wordmark). The ink is
 // --color-brand-ink and the dot --color-brand-dot; both belong to the mark and so stay the
 // same whatever palette a player picks. The tracking is core/wordmark's TRACKING: none on a
 // light ground, 0.05em once the ground turns dark.

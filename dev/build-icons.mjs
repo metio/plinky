@@ -1,34 +1,31 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Renders every icon the app ships from the vector mark in brand/mark — the launcher icons,
+// Renders every icon the app ships from the keyed artwork in brand/ — the launcher icons,
 // Apple's touch icon, the maskable icons, the favicon, the README banner and the social
-// card. Run `npm run icons` after `npm run mark` changes the mark.
+// card. Run `npm run icons` after `npm run logo` rewrites the artwork.
 //
 // These used to be made by hand, which meant the sources and the images beside them could
 // disagree and nothing would say so. One source, one command.
 
 import { readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
-import { markGroup, markImage } from "./brandGroup.mjs";
+import { framedMark, markGroup, markImage, picture } from "./brandGroup.mjs";
 import { tokenValue } from "./brandTokens.mjs";
 
-// Carried into the page as data URIs rather than file:// URLs, so the render does not depend
-// on where the browser thinks its document lives.
-const mark = async (name) =>
-    `data:image/svg+xml;base64,${(await readFile(`brand/mark/${name}`)).toString("base64")}`;
-// The rounded tile, for anything that shows an icon as it is: a tab, a launcher that does
-// not mask, a bookmark.
-const TILE = await mark("tile.svg");
-// Full bleed, for anything that rounds the corners itself.
-const SQUARE = await mark("square.svg");
-// Full bleed with the drawing inside the safe zone, for launchers that crop to a shape.
-const MASKABLE = await mark("maskable.svg");
-// The lockup and the social card's parts, with their own proportions, so a height is all a
-// layout has to choose.
-const LOCKUP_LIGHT = markImage(await readFile("brand/mark/lockup-light.svg"));
-const FRAMED_TILE = markImage(await readFile("brand/mark/tile-framed.svg"));
-const NAME_WHITE = markImage(await readFile("brand/mark/name-white.svg"));
+// Three drawings, each carried into the page as a data URI rather than a file:// URL, so the
+// render does not depend on where the browser thinks its document lives.
+//
+// The lockup carries the name in its own artwork and goes where there is room to read it.
+// The icon is the same picture without the name, for the tab and the launcher, where a
+// wordmark is a smudge at the size it is worn. The keys are that again without the tile, for
+// setting on a ground the tile would have no edge against.
+const png = async (path) => markImage(await readFile(path), "image/png");
+const LOCKUP = await png("brand/plinky-mark.png");
+const ICON = await png("brand/plinky-icon.png");
+const KEYS = await png("brand/plinky-keys.png");
+// The outlined name, which the social card sets beside the framed icon (`npm run mark`).
+const NAME_WHITE = markImage(await readFile("brand/name-white.svg"));
 
 // The palette is the app's, read off its tokens: the banner and the social card paint on the
 // same paper, in the same ink, as the brand kit and the pages themselves.
@@ -64,30 +61,38 @@ async function shoot(html, { width, height, path }) {
     return png;
 }
 
-const picture = (src, size) =>
-    `<img src="${src}" alt="" width="${size}" height="${size}" style="width:${size}px;height:${size}px">`;
+// A square of accent with the keys inside it, filling the given share of the frame. No
+// transparency anywhere, so nothing can paint its own colour into a corner — and the keys
+// rather than the tile, because a tile on a ground of nearly its own colour has no edge to
+// show and reads as a smudge.
+const filled = (size, share) =>
+    `<div style="width:${size}px;height:${size}px;background:${ACCENT};display:flex;align-items:center;justify-content:center">
+       ${picture(KEYS, Math.round(size * share))}
+     </div>`;
 
-// The manifest's icons, from the tile. It carries its rounded silhouette in its alpha, which
-// is right wherever nothing masks it.
+// The manifest's icons, from the wordless icon. It carries its rounded silhouette in its
+// alpha, which is right wherever nothing masks it, and it is never clipped: a radius applied
+// here is a guess at the artwork's own curve, and one slightly tight leaves a sliver of
+// ground showing all the way round.
 for (const size of [512, 192]) {
-    await shoot(picture(TILE, size), {
+    await shoot(picture(ICON, size), {
         width: size,
         height: size,
         path: `public/icon-${size}.png`,
     });
 }
 
-// Apple's touch icon, from the full-bleed square. iOS rounds the corners itself and paints
-// black into anything transparent, so the tile's own transparent corners would come back as
-// dark wedges.
-await shoot(picture(SQUARE, 180), { width: 180, height: 180, path: "public/icon-180.png" });
+// Apple's touch icon, full bleed. iOS rounds the corners itself and paints black into
+// anything transparent, so the tile's own transparent corners would come back as dark
+// wedges.
+await shoot(filled(180, 0.86), { width: 180, height: 180, path: "public/icon-180.png" });
 
 // The maskable form. A launcher that masks does not letterbox: it crops the icon to its own
 // shape — a circle on some Android launchers, a squircle on others — and paints its own
 // ground behind whatever is transparent. So the ground reaches every edge here and the
 // drawing sits inside the middle 80%, which is the part the format promises to leave alone.
 for (const size of [512, 192]) {
-    await shoot(picture(MASKABLE, size), {
+    await shoot(filled(size, 0.76), {
         width: size,
         height: size,
         path: `public/icon-maskable-${size}.png`,
@@ -100,7 +105,7 @@ for (const size of [512, 192]) {
 const FAVICON_SIZES = [16, 32, 48];
 const images = [];
 for (const size of FAVICON_SIZES) {
-    images.push(await shoot(picture(TILE, size), { width: size, height: size }));
+    images.push(await shoot(picture(ICON, size), { width: size, height: size }));
 }
 const header = Buffer.alloc(6 + 16 * images.length);
 header.writeUInt16LE(0, 0); // reserved
@@ -122,11 +127,12 @@ images.forEach((png, index) => {
 await writeFile("public/favicon.ico", Buffer.concat([header, ...images]));
 
 // The README banner: the lockup on paper beside the tagline, with room around it so it does
-// not sit tight against whatever follows it in the file.
+// not sit tight against whatever follows it in the file. The lockup carries the name itself,
+// so the only type here is the one thing it does not say.
 await shoot(
-    `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:24px;padding:0 24px">
-       <img src="${LOCKUP_LIGHT.src}" alt="" style="height:64px;width:${Math.round(64 * LOCKUP_LIGHT.aspect)}px;flex:none">
-       <div style="${DISPLAY};font-size:28px;color:${INK};line-height:1.15">Practise piano in your browser</div>
+    `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:22px;padding:0 28px">
+       ${picture(LOCKUP, 120)}
+       <div style="${DISPLAY};font-size:32px;color:${INK};line-height:1.15">Practise piano in your browser</div>
      </div>`,
     { width: 512, height: 160, path: "public/icon-banner-512.png" },
 );
@@ -142,7 +148,7 @@ if (!siteUrl) {
 await shoot(
     `<div style="width:1200px;height:630px;background:${ACCENT};display:flex;align-items:center;justify-content:center;padding:64px">
        ${markGroup({
-           tile: FRAMED_TILE,
+           mark: framedMark(ICON, PAPER),
            name: NAME_WHITE,
            size: 300,
            wide: true,
@@ -160,7 +166,8 @@ await shoot(
 await browser.close();
 
 console.log(
-    "public/: icon-512, icon-192 and favicon.ico (16, 32, 48) from brand/mark/tile.svg; " +
-        "icon-180 from square.svg; icon-maskable-512 and -192 from maskable.svg; " +
-        "icon-banner-512 from lockup-light.svg; og.png from tile-framed.svg and name-white.svg",
+    "public/: icon-512, icon-192 and favicon.ico (16, 32, 48) from brand/plinky-icon.png; " +
+        "icon-180 and the maskables from brand/plinky-keys.png on the accent; " +
+        "icon-banner-512 from brand/plinky-mark.png; og.png from the framed icon and " +
+        "brand/name-white.svg",
 );

@@ -5,34 +5,31 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # The Plinky kit
 
-Everything here is generated. The mark is vector, in `mark/`, written by `npm run mark`;
-every picture in the rest of the kit is rendered from those files and from `app/app.css` by
-`npm run brand`, so the colours in a poster are the colours in the app by construction —
-there is no second copy to keep in step. Edit the app or the mark's generator; rerun the
-scripts. `npm run brand` reads resolved token values out of the built stylesheet, so a build
-has to exist first: `npm run build:single` (or `ci-build`), then `npm run brand`.
+Everything here is generated. The mark is the three drawings at the top level — the lockup,
+the wordless icon and the keys — keyed off their backgrounds by `npm run logo` from the
+artwork in `source/`; the outlined name is written by `npm run mark`; every picture in the
+rest of the kit is rendered from those files and from `app/app.css` by `npm run brand`, so
+the colours in a poster are the colours in the app by construction — there is no second copy
+to keep in step. Edit the app or a generator; rerun the scripts. `npm run brand` reads
+resolved token values out of the built stylesheet, so a build has to exist first:
+`npm run build:single` (or `ci-build`), then `npm run brand`.
+
+`proposed-mark/` is a vector mark the app does not use; its own README says what it is.
 
 | File | What it is |
 | --- | --- |
-| `mark/tile.svg` | The symbol on a rounded tile: the app icon, the favicon, the app header and the per-piece link cards. |
-| `mark/tile-framed.svg` | The tile in a thick white frame, for an indigo ground the tile would otherwise vanish into: every social image, the YouTube watermark. |
-| `mark/keys.svg` | The keys, the falling plink and its strike point with no ground at all, for a dark stage: the video thumbnails. |
-| `mark/symbol.svg` | The symbol on its circle, for a platform that shows a round profile picture and accepts a transparent one. Nothing else uses it. |
-| `mark/square.svg` | The symbol on a full-bleed square, for anything that rounds or circles the corners itself — Apple's touch icon, a profile picture. Inside a circle it is exactly the symbol. |
-| `mark/maskable.svg` | Full bleed with the drawing inside the middle 80%, for Android launchers that crop an icon to their own shape. |
-| `mark/badge.svg` | The name inside the circle, under the symbol, for places that show the mark without a caption. |
-| `mark/lockup-light.svg` | The tile beside the name, for a light ground. |
-| `mark/lockup-indigo.svg` | The same for an indigo ground: the framed tile, and the name in white with a little more spacing. |
-| `mark/lockup-dark.svg` | The same for any other dark ground, without the frame. |
-| `mark/name-white.svg` | The name alone in white, which the social images set beside or under the framed tile. |
-| `icon/plinky-*.png` | The tile at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
-| `icon/badge-512.png` | The badge, transparent outside its circle. |
+| `plinky-mark.png` | The lockup: the tile, the keys, the falling plink and the name in its own letterforms. Where there is room to read it — the README banner, the lockup sheets. |
+| `plinky-icon.png` | The same artwork with the name taken out: the app icon, the favicon, the app header, the per-piece link cards, and what stands in the frame on every social image. |
+| `plinky-keys.png` | The keys, the falling plink and its strike point with no tile at all, for a ground the tile would have no edge against: the maskable icons, Apple's touch icon, the video thumbnails. |
+| `name-white.svg` | The name alone in white, outlined from Fredoka, which the social images set beside or under the framed icon. |
+| `source/*.png` | The three drawings as they arrived, before the background was keyed out. |
+| `icon/plinky-*.png` | The icon at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
 | `icon/lockup-paper.png` | The lockup over the tagline on paper, 960×320 at 2×, for light surfaces. |
-| `icon/lockup-indigo.png` | The same on indigo. |
+| `icon/lockup-indigo.png` | The same on indigo, where the lockup stands in its white frame. |
 | `palette.png` | Every colour with its role, as a sheet. |
 | `palette.json` | The same, for tools. Hex plus the token each comes from. |
 | `type.png` | The two faces, set as the app sets them. |
-| `social/profile-square-*.png` | The profile picture, at 256 · 512 · 800: the symbol alone, from the full-bleed square. |
+| `social/profile-square-*.png` | The profile picture, at 256 · 512 · 800: the wordless icon, bled past the frame so no ground shows under a round crop. |
 | `social/open-graph-1200x630.png` | What a shared link unfurls as. |
 | `social/square-1080.png` | A square post. |
 | `social/instagram-portrait-1080x1350.png` | Instagram's tallest feed size — a square crops out of it without loss, and not the other way round. |
@@ -41,7 +38,7 @@ has to exist first: `npm run build:single` (or `ci-build`), then `npm run brand`
 | `social/reddit-banner-*.png` | Reddit's community banner, desktop 1072×128 and mobile 1080×128. |
 | `social/github-social-1280x640.png` | A repository's social preview: what GitHub, Slack and a chat client unfurl for a link to the code. |
 | `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
-| `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the framed tile and nothing else. |
+| `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent outside the frame, so it is the framed icon and nothing else. |
 
 ## Where each one goes
 
@@ -56,15 +53,17 @@ has to exist first: `npm run build:single` (or `ci-build`), then `npm run brand`
 One profile picture serves them all: it is one mark, and a name each would drift apart the
 first time somebody edited only one.
 
-The profile picture is the symbol alone, as the designer recommended for an avatar: it is
-shown at about 56px beside a comment, where a name would be a smear. It is a **square**, not
-a circle, even though every platform shows it as one. A drawn circle leaves its corners
-transparent or white, and YouTube's crop is a hair wider than the circle, so those corners
-showed as pale arcs along the top edge. Inside any circular crop the square is exactly the
-symbol, and beyond its edge there is only more of the same indigo.
+The profile picture is the wordless icon: it is shown at about 56px beside a comment, where
+a name would be a smear, and every platform crops it to a circle, which would cut straight
+through the lockup's name. It is a **square**, not a circle. A drawn circle leaves its
+corners transparent or white, and YouTube's crop is a hair wider than the circle, so those
+corners showed as pale arcs along the top edge. It carries no ground of its own either — any
+colour behind the artwork shows as a ring the moment the crop lands, and the artwork is drawn
+with a vignette, so there is no single edge colour to match it to. The artwork is bled past
+the frame instead, which puts every transparent pixel outside the circle.
 
-Every picture on indigo sets the same group: the framed tile, large, then the name, then
-the tagline and its small line. The wide pictures set the words beside the tile; the square
+Every picture on indigo sets the same group: the framed icon, large, then the name, then
+the tagline and its small line. The wide pictures set the words beside the icon; the square
 and tall ones set them under it. The GitHub preview sets the same group on the designer's
 navy rather than indigo. The covers
 differ because the crops do — Facebook takes a wide strip and narrows it on a phone, Reddit
@@ -139,40 +138,44 @@ lines and it is the licence's one condition.
 
 ## The mark
 
-The symbol is three white keys with two black ones between them on an indigo circle, and a
-plink falling down the middle key onto its strike point, which sits at the centre of the
-key. It is the designer's own Optimised Option 3 in her colours — the indigo ground
-`#3200af`, a forget-me-not glow behind the keys, a violet trail and strike point — and every
-coordinate and hex in it was measured off her slide. It is drawn flat, with one light
-direction, and nothing is added to it for any of its forms: the tile, the square, the
-maskable icon, the badge and the lockups only place the same drawing.
+The mark is three white keys with two black ones between them on a rounded violet tile, and
+a plink falling down the middle key onto its strike point. It arrives as three drawings
+rather than one cut out of another: cutting one from another means repainting the ground
+where something was and sliding what is left back into place, and the tile's highlight and
+the falling note's glow come along with it — a glow blends into the ground behind it, so with
+the ground gone it stops being a glow and becomes a blob with an edge.
 
-**On an indigo ground the tile stands in a thick white frame.** Without it the tile has no
-edge against a ground of nearly its own colour, and the symbol reads as keys floating on
-indigo. The frame is an eleventh of the tile's width on every side, with its corners the
-tile's grown by that much, and it is for that ground only; on paper, black or ink the tile
-is its own edge. **On a dark stage the keys go alone**, with no tile or circle behind them:
-the video thumbnails set `keys.svg`, whose white keys carry their own edge against the
-dark. **The circle is for round profile pictures only**, and even there the kit hands out
-the full-bleed square, which every platform crops to the same circle.
+**On an indigo ground the icon stands in a thick white frame.** Without it the tile has no
+edge against a ground of nearly its own colour, and the keys read as floating on indigo. The
+frame is an eleventh of the artwork's width on every side, with a radius of its own; on
+paper, black or navy the tile is its own edge. **On a dark stage the keys go alone**, with no
+tile behind them: the video thumbnails, the maskable icons and Apple's touch icon set
+`plinky-keys.png`, whose white keys carry their own edge against the dark.
 
 **The name is Fredoka at weight 600**, the face the app already ships, set with no extra
 spacing on a light ground and with 0.05em of letter-spacing on indigo or any dark ground,
 where light type needs more air to stay open. On paper it is ink `#1c1640`; on indigo and
-dark grounds it is white. In the lockups it is converted to outlines, so no file depends on
-a font loading. `core/wordmark.ts` holds the spacing for every place that sets the name live
+dark grounds it is white. In `name-white.svg` it is converted to outlines, so no file depends
+on a font loading. `core/wordmark.ts` holds the spacing for every place that sets the name live
 — the app header, the promo thumbnails and an exported video.
 
-**The tile keeps its own silhouette.** The rounded corners of `tile.svg` are the drawing's,
-so it is scaled and never clipped with a border-radius, which is a guess at the curve and
-one slightly tight leaves a sliver of ground showing all the way round. Where a platform
-rounds the corners itself, use `square.svg`.
+**The tile keeps its own silhouette.** The rounded corners of `plinky-icon.png` are the
+drawing's, so it is scaled and never clipped with a border-radius, which is a guess at the
+curve and one slightly tight leaves a sliver of ground showing all the way round. Where a
+platform paints its own colour behind transparency — Apple's touch icon, an Android
+launcher's mask — the kit hands out the keys on a solid accent square instead.
 
-`npm run mark` (`dev/build-mark.mjs`) writes every file in `mark/`. It takes the name's
-outlines from the variable Fredoka in `node_modules`, instanced at weight 600 with the
-face's own kerning. `npm run mark -- --check` fails if a file there is missing or differs
-from what the script writes, which is the gate that keeps a hand edit or a font update from
-reaching the icons unannounced.
+`npm run logo` (`dev/key-mark.mjs`) writes the three drawings from `source/`. The artwork
+arrives flattened onto white, so the background is found rather than assumed: `core/matte.ts`
+floods inward from the corners across near-white, which is why the piano keys survive — they
+are white too, and enclosed. `npm run logo -- --check` reports a master that no longer
+matches its source.
+
+`npm run mark` (`dev/build-mark.mjs`) writes `name-white.svg` and the proposed vector mark
+beside it. It takes the name's outlines from the variable Fredoka in `node_modules`,
+instanced at weight 600 with the face's own kerning. `npm run mark -- --check` fails if a
+file it writes is missing or differs, which is the gate that keeps a hand edit or a font
+update from reaching the social images unannounced.
 
 ## The colours
 
@@ -215,7 +218,7 @@ something the app cannot deliver in one tap.
 ## Using it
 
 Every file here is the Plinky Authors' own work under AGPL-3.0-or-later, declared by the
-`brand/**` entry in `REUSE.toml`; the SVGs in `mark/` also carry it inline.
+`brand/**` entry in `REUSE.toml`; the SVGs also carry it inline.
 
 Anything made from this kit is about Plinky, so it inherits Plinky's own claims: free, no
 account, nothing to install, and a catalogue that is Creative Commons throughout with

@@ -6,14 +6,14 @@
 // specimen, and social images at the sizes the places we post want.
 //
 // Everything is derived. The colours are read out of app/app.css and the mark out of the
-// vector files in brand/mark (npm run mark), so a poster made from this kit cannot be in
-// last month's palette: the kit is regenerated (`npm run brand`) and the values come from
-// the app itself. Nothing here is hand-kept, which is the only way a brand kit stays true a
-// year from now.
+// keyed artwork in brand/ (npm run logo), so a poster made from this kit cannot be in last
+// month's palette: the kit is regenerated (`npm run brand`) and the values come from the app
+// itself. Nothing here is hand-kept, which is the only way a brand kit stays true a year
+// from now.
 
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
-import { markGroup, markImage } from "./brandGroup.mjs";
+import { framedMark, markGroup, markImage, picture } from "./brandGroup.mjs";
 import { tokenValue } from "./brandTokens.mjs";
 
 const OUT = "brand";
@@ -69,22 +69,15 @@ const colour = Object.fromEntries(
 );
 
 // The mark, carried into each page as a data URI rather than a file:// URL, so the render
-// does not depend on where the browser thinks its document lives.
-const MARK = {};
-for (const name of [
-    "tile",
-    "tile-framed",
-    "square",
-    "badge",
-    "lockup-light",
-    "lockup-indigo",
-    "name-white",
-]) {
-    MARK[name] = markImage(await readFile(`brand/mark/${name}.svg`));
-}
-// One form of the mark at a given height; the width follows from its own proportions.
-const img = (name, height) =>
-    `<img src="${MARK[name].src}" alt="" style="height:${height}px;width:${Math.round(height * MARK[name].aspect)}px;flex:none;display:block">`;
+// does not depend on where the browser thinks its document lives. The lockup carries the
+// name in its own artwork; the icon is the same picture with the name taken out, for
+// anywhere the name is set as type beside it or would be a smear.
+const png = async (path) => markImage(await readFile(path), "image/png");
+const LOCKUP = await png("brand/plinky-mark.png");
+const ICON = await png("brand/plinky-icon.png");
+// The outlined name, written by `npm run mark`: type rather than logo, which is why it is
+// the one file of that generator's the kit still sets.
+const NAME_WHITE = markImage(await readFile("brand/name-white.svg"));
 
 await mkdir(`${OUT}/icon`, { recursive: true });
 await mkdir(`${OUT}/social`, { recursive: true });
@@ -107,6 +100,47 @@ const UI = "font-family:Inter,system-ui,sans-serif";
 
 const browser = await chromium.launch();
 
+// How far the artwork has to be scaled up for its own edges to fall outside the frame.
+//
+// A profile picture must carry no ground: any colour behind the tile shows as a ring the
+// moment a platform crops it to a circle. So the artwork is bled past the frame instead and
+// the background is left transparent. Every pixel inside the circle is then artwork, and the
+// frame's corners — the only place transparency survives — are outside the circle every
+// platform crops to.
+//
+// The factor is measured rather than fixed: the transparent margin is a property of the
+// artwork, so a constant here would need revisiting every time the artwork is redrawn.
+async function bleedOf(dataUrl) {
+    const page = await browser.newPage();
+    const scale = await page.evaluate(async (src) => {
+        const img = new Image();
+        img.src = src;
+        await img.decode();
+        const n = img.naturalWidth;
+        const canvas = document.createElement("canvas");
+        canvas.width = n;
+        canvas.height = n;
+        const context = canvas.getContext("2d");
+        context.drawImage(img, 0, 0);
+        // Along the middle row, which crosses the tile's flat left and right sides rather
+        // than its rounded corners: how far in before the artwork is solid?
+        const row = context.getImageData(0, Math.round(n / 2), n, 1).data;
+        let inset = 0;
+        while (inset < n / 4 && row[inset * 4 + 3] < 250) inset++;
+        // Scale so those insets land outside the frame, plus a pixel of slack for the
+        // rounding either side.
+        return (n + 2) / Math.max(1, n - 2 * (inset + 1));
+    }, dataUrl);
+    await page.close();
+    return scale;
+}
+
+// A picture whose every visible pixel is artwork: bled past its frame, nothing behind it.
+const bled = (art, size, scale) =>
+    `<div style="width:${size}px;height:${size}px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+       ${picture(art, Math.round(size * scale))}
+     </div>`;
+
 async function shoot(html, { width, height, path, scale = 1, full = false, transparent = false }) {
     const page = await browser.newPage({
         viewport: { width, height },
@@ -128,7 +162,7 @@ async function shoot(html, { width, height, path, scale = 1, full = false, trans
 // The app icon, at the sizes a store, a tab and a favourites bar ask for. Transparent
 // outside the tile's own rounded silhouette, which is how it arrives.
 for (const size of [1024, 512, 192, 180, 64, 32]) {
-    await shoot(img("tile", size), {
+    await shoot(picture(ICON, size), {
         width: size,
         height: size,
         path: `${OUT}/icon/plinky-${size}.png`,
@@ -136,37 +170,29 @@ for (const size of [1024, 512, 192, 180, 64, 32]) {
     });
 }
 
-// The name inside the circle, for places that show the mark without a caption.
-await shoot(img("badge", 512), {
-    width: 512,
-    height: 512,
-    path: `${OUT}/icon/badge-512.png`,
-    transparent: true,
-});
-
-// The lockup above the tagline, on paper and on indigo. On indigo the tile stands in its
-// white frame and the name opens up a little. The frame adds an eleventh of the tile on each
-// side, so the framed lockup is set that much taller to keep the tile itself the same size.
-const lockupSheet = (ground, ink, form, height) => `
+// The lockup above the tagline, on paper and on indigo. On indigo it stands in its white
+// frame, which gives it the edge a tile of nearly the ground's own colour would not have.
+// The frame adds an eleventh of the artwork on each side, so the framed sheet is set that
+// much taller to keep the artwork itself the same size. The lockup carries the name, so the
+// only type on either sheet is the tagline.
+const framedLockup = framedMark(LOCKUP, colour.paper);
+const lockupSheet = (ground, ink, form) => `
 <div style="width:960px;height:320px;background:${ground};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px">
-  ${img(form, height)}
+  ${form}
   <div style="${DISPLAY};font-size:40px;color:${ink};line-height:1.12">Practise piano in your browser</div>
 </div>`;
-await shoot(lockupSheet(colour.paper, colour.ink, "lockup-light", 112), {
+await shoot(lockupSheet(colour.paper, colour.ink, picture(LOCKUP, 168)), {
     width: 960,
     height: 320,
     path: `${OUT}/icon/lockup-paper.png`,
     scale: 2,
 });
-await shoot(
-    lockupSheet(colour.indigo, colour.paper, "lockup-indigo", Math.round((112 * 13) / 11)),
-    {
-        width: 960,
-        height: 320,
-        path: `${OUT}/icon/lockup-indigo.png`,
-        scale: 2,
-    },
-);
+await shoot(lockupSheet(colour.indigo, colour.paper, framedLockup(Math.round((168 * 13) / 11))), {
+    width: 960,
+    height: 320,
+    path: `${OUT}/icon/lockup-indigo.png`,
+    scale: 2,
+});
 
 // The palette, as a sheet somebody can hold next to a design.
 const swatch = ([name, , why]) => `
@@ -205,14 +231,15 @@ await shoot(
     { width: 1200, height: 700, path: `${OUT}/type.png`, scale: 2 },
 );
 
-// The places we post, at the sizes they want. On indigo the tile stands in its white frame,
+// The places we post, at the sizes they want. On indigo the icon stands in its white frame,
 // which gives it the edge a tile of nearly the ground's own colour does not have, and it is
 // set large: the mark is the first thing a picture shows, the name the second. A wide
 // picture sets the words beside the tile, a square or tall one under it.
+const framedIcon = framedMark(ICON, colour.paper);
 const group = (size, options) =>
     markGroup({
-        tile: MARK["tile-framed"],
-        name: MARK["name-white"],
+        mark: framedIcon,
+        name: NAME_WHITE,
         size,
         ink: colour.paper,
         display: DISPLAY,
@@ -248,21 +275,25 @@ await shoot(social(1080, 1350, 380), {
     path: `${OUT}/social/instagram-portrait-1080x1350.png`,
 });
 
-// The profile picture: the symbol alone, the designer's own recommendation for an avatar.
-// Every platform crops one to a circle — Reddit, Facebook, Instagram, YouTube — and shows
-// it at about 56px beside a comment, where a name would be a smear.
+// The profile picture: the wordless icon, since every platform crops one to a circle —
+// Reddit, Facebook, Instagram, YouTube — which cuts straight through a name set under the
+// keys, and shows it at about 56px beside a comment, where that word is a smear.
 //
-// It is the full-bleed square rather than the circle. Drawing the circle here would leave
-// its corners transparent or white, and YouTube's crop is a hair wider than the circle, so
-// those corners showed as pale arcs along the top. Inside any circular crop the square is
-// exactly the symbol, and past its edge there is only the same indigo ground to reveal.
+// It is full bleed, with no ground of its own and the artwork bled past the frame. A ground
+// of any colour shows as a ring the moment the crop lands: ink showed as a dark one, and the
+// tile's own violet sampled a few pixels in showed as a lighter one, because the artwork is
+// drawn with a vignette and so has no single edge colour to match. Drawing the circle here
+// instead put white in the corners, and YouTube's crop is a hair wider than the circle, so
+// those corners showed as pale arcs along the top.
 //
 // 800 is what YouTube asks for; 512 covers Facebook and Instagram; 256 is Reddit's.
+const iconBleed = await bleedOf(ICON.src);
 for (const size of [256, 512, 800]) {
-    await shoot(img("square", size), {
+    await shoot(bled(ICON, size, iconBleed), {
         width: size,
         height: size,
         path: `${OUT}/social/profile-square-${size}.png`,
+        transparent: true,
     });
 }
 
@@ -312,9 +343,9 @@ await shoot(banner(1080), {
 });
 
 // The watermark YouTube overlays on a playing video, over whatever the video shows.
-// Transparent, so it is the framed tile and nothing else: the frame is its edge on a dark
-// frame and on an indigo one alike.
-await shoot(img("tile-framed", 150), {
+// Transparent outside the frame, so it is the framed icon and nothing else: the frame is its
+// edge on a dark frame and on an indigo one alike.
+await shoot(framedIcon(150), {
     width: 150,
     height: 150,
     path: `${OUT}/social/youtube-watermark-150.png`,
@@ -356,4 +387,4 @@ await writeFile(
     )}\n`,
 );
 
-console.log(`brand/ rebuilt from ${CSS} and brand/mark`);
+console.log(`brand/ rebuilt from ${CSS} and the artwork in brand/`);

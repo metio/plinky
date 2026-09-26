@@ -8,9 +8,6 @@ import { GradeBadge } from "./gradeBadge";
 import { HeaderNav } from "../ui/navBar";
 import { HelpLink } from "./helpLink";
 import { Wordmark } from "../ui/wordmark";
-// Its own hashed file under /assets rather than inlined: the header is on every page, so the
-// tile is fetched once and cached for good instead of riding in every visitor's script.
-import tileUrl from "../../../brand/mark/tile.svg?no-inline";
 
 // The bar at the top of every page: the mark, the grade you are working at, the
 // destinations on a wide screen, and the two things you reach for from anywhere — help and
@@ -45,20 +42,21 @@ export function SiteHeader({ badge = <GradeBadge /> }: { badge?: ReactNode }) {
         <header className="bg-raised px-6 py-3 font-sans md:sticky md:top-0 md:z-40">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {/* The mark's horizontal lockup: the symbol on its rounded tile, the same
-                        tile the tab and the launcher show, and the name beside it at three
-                        quarters of its height. Both are decorative — the link carries the
-                        accessible name. */}
+                    {/* The mark's horizontal lockup: the wordless icon, the same artwork the
+                        tab and the launcher show, and the name beside it as text. Both are
+                        decorative — the link carries the accessible name. */}
                     <Link
                         to="/"
                         aria-label={m.header_home_label()}
                         className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
-                        {/* The symbol is an image of the brand's own vector source, so it
-                            keeps the designer's colours whatever palette or mode the page is
-                            in: nothing in the theme can reach inside it. */}
+                        {/* The launcher icon, already in public/ and already fetched by the
+                            manifest, so the header costs no second file. It carries its
+                            rounded silhouette in its alpha and is never clipped: a radius
+                            here is a guess at the artwork's own curve, and one slightly tight
+                            leaves a sliver of ground showing all the way round. */}
                         <img
-                            src={tileUrl}
+                            src="/icon-192.png"
                             alt=""
                             width={32}
                             height={32}
