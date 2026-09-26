@@ -5,7 +5,6 @@ import { type ReactNode, useId, useMemo, useState } from "react";
 import { HOME_OCTAVE, METHODS, methodOnKey } from "../../../core/practiceMethods";
 import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardFinish, useKeyboardTheme } from "../../hooks/useKeyboardTheme";
-import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useNoteNaming } from "../../hooks/useNoteNaming";
 import { useVoicedInput } from "../../hooks/useVoicedInput";
 import { type KeyDressing, Keyboard } from "../ui/keyboard";
@@ -28,7 +27,6 @@ import { METHOD_DRAWING, METHOD_LABEL, METHOD_NAME, MethodLeaf } from "./practic
 // The heading that names the menu, and the anchor a link to it lands on, belong to the page
 // section that holds it.
 export function HeroKeyboard({ children }: { children?: ReactNode }) {
-    const labels = useNoteLabels();
     const naming = useNoteNaming();
     const theme = useKeyboardTheme();
     const finish = useKeyboardFinish();
@@ -91,7 +89,11 @@ export function HeroKeyboard({ children }: { children?: ReactNode }) {
                 to={HOME_OCTAVE.to}
                 lit={new Set(heldNotes)}
                 rise
-                labels={labels}
+                // These keys carry a method apiece, so a pitch printed beside the word
+                // would be a second name on the same key. The player's label setting
+                // rules every other keybed; here the keys are a menu. `naming` still
+                // follows it, so each key is spoken with the pitch the player reads.
+                labels="off"
                 naming={naming}
                 well="w-full"
                 bed="h-48 sm:h-52"

@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useEffect } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider, useMidiConnection } from "../../contexts/midi";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { PianoKeyboard } from "./pianoKeyboard";
 
 afterEach(cleanup);
@@ -29,6 +30,19 @@ describe("PianoKeyboard", () => {
         expect(screen.getByLabelText("C 4")).toBeDefined();
         expect(screen.getByLabelText("C sharp 4")).toBeDefined();
         expect(screen.getByLabelText("D 4")).toBeDefined();
+    });
+
+    it("prints the note name on every key when the player asks for every key", () => {
+        const { services } = renderWithServices(
+            <MidiProvider>
+                <PianoKeyboard from={60} to={62} />
+            </MidiProvider>,
+        );
+        act(() => {
+            services.prefs.save({ ...services.prefs.load(), noteLabels: "all" });
+        });
+        expect(within(screen.getByLabelText("C 4")).getByText("C")).toBeDefined();
+        expect(within(screen.getByLabelText("D 4")).getByText("D")).toBeDefined();
     });
 
     it("highlights the expected note", () => {
