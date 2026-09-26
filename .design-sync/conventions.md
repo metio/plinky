@@ -73,8 +73,9 @@ tables, labels, numbers. Numbers that line up in a column are set `tabular-nums`
 has no glyphs for; nothing about a design has to account for that.)
 
 Shape follows what a thing is. Anything touched is generously rounded — buttons, pills,
-cards. Anything *printed* — a staff, a table, a score — keeps its square corners and
-hairline rules, because rounding a staff makes it a widget instead of a page.
+fields. Anything *printed* — a staff, a table, a score, a list of Folio rows — keeps its
+square corners and hairline rules, because rounding a staff makes it a widget instead of a
+page.
 
 While something is loading, the app draws the plink: a note falls, lands, and rings. It is
 the one loading gesture, at every size; there is no spinner to reach for.
@@ -89,8 +90,16 @@ signal state). Every button clears a 44px tap target. A selected state is never 
 for multi-select filters that each stand alone. `buttonClasses(variant)` gives the same
 look to an element that must not be a `<button>` — a `<Link>`, a file-input `<label>`.
 
-`Card` is one radius, one hairline, one ground; a caller chooses only `pad`
-(`snug`/`normal`/`roomy`) and `quiet` to drop the border. `PageHeader` opens every page:
+`Folio` is the one list layout, and there is no card. A `FolioRow` is a margin (a
+drawing, a figure or a line icon), the name in the display face, one line, an optional
+action at the end of the line, and an optional body beneath. It has no border, no corner,
+no shadow and no ground; a hairline above each row and one under the last separate them.
+Rows inside a `Folio` share one margin as wide as its widest item, so figures stay
+right-aligned; a figure on the Stats page sits in the margin (`FolioFigure`). A row that
+goes somewhere is one link (`to`), and a group of settings is a row whose body holds the
+controls (`SettingsSection` with an `icon`). Controls and containers that are not content
+keep their frames: inputs, dialogs, popovers, toasts, banners, menus, the score and the
+keyboards. `PageHeader` opens every page:
 an optional line of small caps, the name in the display face, a line under it, and a slot
 on the right. A route never writes its own title. `EmptyState` says what the emptiness
 means and offers one thing to press — never a centred shrug.

@@ -15,8 +15,8 @@ import { Wordmark } from "../ui/wordmark";
 //
 // Its own file because it is the most-seen component in the app and had no stories at all
 // while it sat inside the root layout, where nothing could render it in isolation. Every
-// visual decision here — the lockup's tittle, the bouquet's five colours, the slim sticky
-// bar — was going unchecked between releases.
+// visual decision here — the lockup, the bouquet's five colours, the slim sticky bar — was
+// going unchecked between releases.
 //
 // The badge is a parameter for the same reason the rest of this moved: GradeBadge reads the
 // mastery store and renders NOTHING until that read resolves, so a screenshot of this bar
@@ -42,23 +42,27 @@ export function SiteHeader({ badge = <GradeBadge /> }: { badge?: ReactNode }) {
         <header className="bg-raised px-6 py-3 font-sans md:sticky md:top-0 md:z-40">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {/* The wordmark is text (it follows the theme for free); its i is the
-                        dotless ı with a pink dot drawn above, echoing the app icon's
-                        accent. Decorative only — the link carries the accessible name. */}
+                    {/* The mark's horizontal lockup: the wordless icon, the same artwork the
+                        tab and the launcher show, and the name beside it as text. Both are
+                        decorative — the link carries the accessible name. */}
                     <Link
                         to="/"
                         aria-label={m.header_home_label()}
                         className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
-                        {/* The wordless form of the mark: the tile, the keys and the falling
-                            plink, with the name taken out. The name is set beside it here,
-                            and at 32px the lockup's own lettering would be a smudge under a
-                            legible copy of the same word. It carries its rounded silhouette
-                            in its alpha, so it is NOT clipped — a radius is a guess at the
-                            artwork's own curve, and one slightly tight leaves a sliver of
-                            ground showing all the way round. */}
-                        <img src="/icon-192.png" alt="" className="h-8 w-8 shrink-0" />
-                        <Wordmark className="text-xl" />
+                        {/* The launcher icon, already in public/ and already fetched by the
+                            manifest, so the header costs no second file. It carries its
+                            rounded silhouette in its alpha and is never clipped: a radius
+                            here is a guess at the artwork's own curve, and one slightly tight
+                            leaves a sliver of ground showing all the way round. */}
+                        <img
+                            src="/icon-192.png"
+                            alt=""
+                            width={32}
+                            height={32}
+                            className="h-8 w-8 shrink-0"
+                        />
+                        <Wordmark className="text-2xl" />
                     </Link>
                     {badge}
                 </div>

@@ -72,7 +72,7 @@ so every reading aid and layout choice is a tap away mid-piece without a row of 
 crowding the music.
 
 That setup panel — before a run and behind the full-screen **Set up** button alike —
-reads like the Settings page: each theme in its own titled card that explains itself.
+reads like the Settings page: each theme in its own titled row that explains itself.
 **Skill level** leads, one choice that sets the reading aids below to match you (tweak
 any and it reads Custom); then **how you play** (which hand, keep-up, the metronome),
 the **reading aids** (colour, the notes highway, hidden notes, finger numbers), the
@@ -298,7 +298,7 @@ one-tap **review session** walks you through everything that's fading, and you c
   right order (or use the arrow buttons), and give each an optional target tempo
   and note, plus a free-form description for the whole set. The page splits into
   two tabs — your assignments, and the one you're creating or editing. Give the set a
-  **date you're working toward** — a lesson, an exam, a recital — and its card counts
+  **date you're working toward** — a lesson, an exam, a recital — and its row counts
   down beside how many pieces are still to learn; the date travels with a shared set,
   so handing one out hands out its date too. Save it,
   **edit it later**, share it by link, or pass it around as a file; each piece
@@ -348,6 +348,14 @@ one-tap **review session** walks you through everything that's fading, and you c
   seen by somebody deciding whether to open Plinky at all, while the app opens for somebody
   who has already arrived and may never have played before.
 
+- **How Plinky looks** — two more questions in Settings, under Appearance. **Theme** follows
+  your device, or stays light, dark or **black**: a true-black page with neutral greys and no
+  tint at the edges, which a phone's OLED screen shows as light switched off. **Colours**
+  picks the palette, in any theme: *indigo*, deep indigo on paper white with soft
+  forget-me-not blue, which is what a new player gets, or *violet*, a brighter violet on warm
+  paper with gold for what you earned. Both are in place before the page first paints, so it
+  never flashes the wrong colours on the way in.
+
 - **Handing an assignment back** — the loop used to run one way: a teacher shares a
   list, and never learns what happened, because progress lives on the student's
   device. Now each assignment offers **Hand your results back**: type a name and the
@@ -383,7 +391,7 @@ grade boundaries are set against teaching collections whose level is settled, fr
 Burgmüller's easy studies through the two-part inventions to the Chopin études. So a piece
 keeps its grade as the catalogue grows, and grade 3 means the same thing next month.
 
-- **You** — your one progress page: the grade you're at on the eight-grade ladder and
+- **Stats** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
@@ -410,7 +418,8 @@ an hour:
 
 - **Warm up** — the day's challenge across the top, with your next rung of the
   sight-reading arcade (labelled with the key it will ask for), a fresh drill and a round
-  of ear training in a row beneath it.
+  of ear training in a row beneath it. Under them sits a one-octave keyboard to put your
+  hands on, whose white keys carry the ways to practise (below).
 - **Work on** — your open assignment's next step ("Continue *First steps* — step 2 of
   5"), which goes straight into that piece, whatever is fading and wants a refresh, or
   the gentlest piece you haven't learned yet. A **Surprise me** button picks one for you.
@@ -650,13 +659,17 @@ learning, settling in, polishing, or just keeping it. The stage comes from the r
 schedule rather than from anything you set. Give a piece a date you're working toward
 — an exam, a recital, a lesson — and it moves to the top with the days counted down.
 
-**[Ways to practise](https://plinky.fun/en/methods/)** names six things a teacher
-would suggest, says why each one works, and hands you straight to the Plinky control
-that does it: looping the two bars that keep going wrong, dropping the tempo until
-the notes land, taking one hand at a time, hearing a phrase before playing it, mixing
-pieces up in a review session, and letting a piece go quiet before coming back to it.
-Each one carries a button that opens a piece at your own grade with the method already
-set up — slowed down, one hand, or looping the opening phrase.
+**Ways to practise** live on the front page's keyboard, one octave from middle C. Each
+of its seven white keys carries one thing a teacher would suggest, with a small drawing
+on the key: looping the two bars that keep going wrong, dropping the tempo until the
+notes land, taking one hand at a time, hearing a phrase before playing it, mixing pieces
+up in a review session, letting a piece go quiet before coming back to it, and learning
+the chords of a key as blocks. Pressing a key sounds it and opens that method underneath:
+why it works, the Plinky control that does it, how long a go takes, and a button that
+opens a piece at your own grade with the method already set up — slowed down, one hand,
+or looping the opening phrase. A MIDI piano or the computer keys open them the same way,
+and the black keys simply play. Nothing in Plinky sounds a note when a pointer passes
+over it; only a key you press does.
 
 A piece can also be opened that way by hand, which is useful for a teacher: adding
 `?speed=0.6&hands=left&loop=5-8` to a `/play/` address opens it at sixty per cent of
@@ -820,10 +833,12 @@ play — the same engine behind every mode.
 
 `brand/` holds the mark, the palette with each colour's role, a type specimen and
 ready-made social images — everything somebody needs to make something *about* Plinky. It
-is generated: `npm run brand` rebuilds it from `app/app.css` and `brand/plinky-mark.png`, so a
-poster cannot end up in a palette the app has moved on from. `brand/README.md` carries the
-rules, including the three colours that mean something and must never be borrowed for
-decoration.
+is generated: `npm run logo` keys the background out of the drawn artwork and writes
+`brand/plinky-mark.png`, `brand/plinky-icon.png` and `brand/plinky-keys.png`, `npm run mark`
+writes the name outlined from the Fredoka the app ships, and `npm run brand` renders the rest
+of the kit from those files and `app/app.css`, so a poster cannot end up in a palette the app
+has moved on from. `brand/README.md` carries the rules, including the three colours that mean
+something and must never be borrowed for decoration.
 
 Plinky's components are also published as a design system, so a design tool builds with
 the real parts rather than generic ones: every storied component compiles into a bundle

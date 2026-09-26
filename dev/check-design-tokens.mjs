@@ -17,9 +17,12 @@
 //      a hue; `bg-accent-solid` names a role, defined once in app.css. core/ is
 //      pure but still holds class strings, and the scales living there — the
 //      grade letters — drift the same way a component would.
-//   2. Every token declares both themes. A token that exists only in @theme
-//      would silently render its light value on a dark page — exactly the bug
-//      rule 1 exists to prevent — so a missing `.dark` entry fails here.
+//   2. Every token declares both themes, and every palette declares both modes.
+//      A token that exists only in @theme would silently render its light value
+//      on a dark page — exactly the bug rule 1 exists to prevent — so a missing
+//      `.dark` entry fails here. The same goes one level up: a palette other than
+//      the default sets every token any palette varies, in its light block and its
+//      dark one, or that token would show the default palette's colour inside it.
 //   3. Every token is used. An unused one is a role nothing plays, and it makes
 //      the next reader reach for a name the product does not actually have.
 //   4. No `hover:`/`focus:`/`active:` utility resolves to the same token as the
@@ -37,34 +40,33 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { paletteGaps, tokenLayers } from "./tokenLayers.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const css = readFileSync(join(root, "app", "app.css"), "utf8");
 
-// The two halves of the token layer, delimited by their own headings.
-function section(from, to) {
-    const start = css.indexOf(from);
-    const end = css.indexOf(to);
-    if (start === -1 || end === -1 || end < start) {
-        console.error(`check-design-tokens: cannot find the "${from}" block in app/app.css`);
-        process.exit(1);
-    }
-    return css.slice(start, end);
+let layers;
+try {
+    layers = tokenLayers(css);
+} catch (error) {
+    console.error(`check-design-tokens: ${error.message}`);
+    process.exit(1);
 }
-// Every token the block declares, with what it resolves to: the palette step named
-// inside `var(--color-…)` where there is one, else the literal value. Reading only the
+
+// Every token a block declares, with what it resolves to: the palette step named inside
+// `var(--color-…)` where there is one, else the literal value. Reading only the
 // var()-valued tokens let the literal ones — the surface, the ink, the accents — escape
 // both the both-themes check and the unused check.
-const declared = (src) =>
+const resolved = (tokens) =>
     new Map(
-        [...src.matchAll(/--color-([\w-]+):\s*([^;]+);/g)].map((m) => [
-            m[1],
-            m[2].match(/^var\(--color-([\w-]+)\)/)?.[1] ?? m[2].trim(),
+        [...tokens].map(([name, value]) => [
+            name,
+            value.match(/^var\(--color-([\w-]+)\)/)?.[1] ?? value,
         ]),
     );
 
-const light = declared(section("/* ── The colour tokens", "/* The dark half"));
-const dark = declared(section("/* The dark half", "/* Use self-hosted Inter"));
+const light = resolved(layers.light);
+const dark = resolved(layers.dark);
 
 const failures = [];
 
@@ -79,6 +81,9 @@ for (const name of dark.keys()) {
     if (!light.has(name)) {
         failures.push(`app/app.css  \`${name}\` is set under .dark but never declared in @theme`);
     }
+}
+for (const gap of paletteGaps(layers)) {
+    failures.push(`app/app.css  ${gap}`);
 }
 
 // Which palette step each token resolves to, so a rejected utility can be told
@@ -122,7 +127,9 @@ function walk(dir) {
         if (SKIP.has(entry.name)) continue;
         const path = join(dir, entry.name);
         if (entry.isDirectory()) out.push(...walk(path));
-        else if (/\.(ts|tsx)$/.test(entry.name)) out.push(path);
+        // The drawings sprite names the art tokens in its symbols' styles, which is the only
+        // place anything uses them; it has no class lists to check.
+        else if (/\.(ts|tsx|svg)$/.test(entry.name)) out.push(path);
     }
     return out;
 }
@@ -157,7 +164,7 @@ for (const file of [...walk(join(root, "app")), ...walk(join(root, "core"))]) {
     for (const name of light.keys()) {
         if (new RegExp(`[-:]${name}(?![\\w-])`).test(src)) used.add(name);
     }
-    for (const { text, offset } of classLists(src)) {
+    for (const { text, offset } of rel.endsWith(".svg") ? [] : classLists(src)) {
         const classes = text.split(/\s+/).filter(Boolean);
         for (const token of classes) {
             const state = STATE_UTILITY.exec(token);
@@ -201,8 +208,13 @@ if (failures.length > 0) {
     for (const failure of failures) console.error(`  ${failure}`);
     console.error(
         "\nEvery colour is named for its role in app/app.css. Use the token, or add one\n" +
-            "there (both themes) if the role is genuinely new.",
+            "there (both themes, and every palette if it varies) if the role is genuinely new.",
     );
     process.exit(1);
 }
-console.log(`check-design-tokens: ${light.size} tokens, both themes each; no raw palette colours.`);
+const palettes = layers.palettes.size + 1;
+const varying = new Set([...layers.palettes.values()].flatMap((p) => [...(p.light?.keys() ?? [])]));
+console.log(
+    `check-design-tokens: ${light.size} tokens, both themes each; ${varying.size} vary across ` +
+        `${palettes} palettes, each set in both modes; no raw palette colours.`,
+);

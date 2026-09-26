@@ -209,7 +209,12 @@ nix develop --command ci-widths  # CI ONLY — every page fits 320/360/390px, in
                       # language that stresses a narrow layout hardest (it builds that
                       # locale first; dev/widest-locale.mjs derives which)
 npm run brand         # regenerates brand/ from app.css + the icon (not a gate)
-npm run icons         # regenerates public/ icons + favicon from icon.svg (not a gate)
+npm run logo          # keys the background out of brand/source/* and writes the shipped
+                      # artwork, brand/plinky-{mark,icon,keys}.png; `-- --check` reports stale
+npm run mark          # writes brand/name-white.svg (the outlined name) and the proposed
+                      # vector mark the app does not ship, brand/proposed-mark/*.svg;
+                      # `-- --check` is the blocking gate
+npm run icons         # regenerates public/ icons + favicon + og.png from the artwork (not a gate)
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # makes git call a file binary, and a binary file reviews
                       # as an empty diff

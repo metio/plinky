@@ -11,6 +11,36 @@ import type { Release } from "./changelog";
 export const LATEST_RELEASES: Release[] = [
     {
         date: "2026-09-13",
+        label: "evening",
+        entries: [
+            {
+                body: "**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with\nsoft forget-me-not blue where it used lilac and gold, and cooler greys so the page\nreads more clearly. If you liked the violet, Settings brings it back under Colours.\nThe theme can also be Black: a true-black page for phone screens at night, in either\nset of colours. The pictures on the help page show the new look, in your language.",
+                twip: true,
+            },
+            {
+                body: "**The name at the top of every page keeps its own colours.** The logo is the one you\nknow, and beside it the name is set a little larger, in its own deep ink, with a\nperfectly round pink dot over the i. Both stay exactly as they are whichever colours\nyou pick and whether the page is light or dark.",
+                twip: true,
+            },
+            {
+                body: "**The keyboard on the front page is a way into practising.** Each of its seven white\nkeys carries one of the ways a teacher would suggest, with a small drawing on it:\nloop the hard bar, go slowly, one hand at a time, hear it first, mix pieces up, come\nback later, and learn the chords. A key still sounds when you press it, and its way\nto practise opens underneath, with why it works and a piece to try it on. A MIDI\npiano or your computer keys open them too. These keys carry no note names, whatever\nyou have chosen in Settings — the word on a key is the way to practise it opens. The\nlong list of them further down the page is gone, and nothing plays a note any more\nwhen your mouse passes over a list.",
+                twip: true,
+            },
+            {
+                body: "**Lists without boxes.** Lessons, tools, settings, your stats and the result of a run\nare no longer drawn as cards. Each is a row with an icon, a drawing or a number at\nits left edge, its name, and a line about it, with a thin rule between one row and\nthe next, like the contents page of a music book. On the Stats page every number\nsits at the start of its row, so the figures line up down the page, and the eight\ngrades of the ladder fit in a shorter list.",
+                twip: true,
+            },
+            {
+                body: "**Small drawings beside what you can learn.** Everything under Learn and Teach, and\neach of the little tools, now starts with a drawing of a thing a pianist keeps\nnearby: a stave, a tuning fork, a pencil, a stopwatch, a stack of graded books. They\nare drawn in the same hand as the ones on the front page's keys, and take on your\ncolours, light or dark.",
+                twip: true,
+            },
+            {
+                body: "**Stats says what is missing when it has counted your notes.** When a period has\nnotes played but no time logged, as after you remove a sitting, the practice diary\nsays the notes are counted and no time was logged. It used to say there was nothing\nhere yet, right under the notes it had just counted.",
+                twip: true,
+            },
+        ],
+    },
+    {
+        date: "2026-09-13",
         label: null,
         entries: [
             {
@@ -23,88 +53,6 @@ export const LATEST_RELEASES: Release[] = [
             },
             {
                 body: "**A note written twice in a chord takes one finger.** Where two voices share a note,\nas they often do in hymns and part-songs, the suggested fingering counted it as two\nkeys and could stretch your hand for a key it had already taken: an octave with its\ntop note doubled came out as 3-1-4. Both copies now share one finger, and the rest of\nthe chord is fingered the way your hand actually plays it.",
-                twip: true,
-            },
-        ],
-    },
-    {
-        date: "2026-09-12",
-        label: "evening",
-        entries: [
-            {
-                body: "**Two slides at once each land on their own note.** Where both hands glide across\nthe keys together, Listen swept only one of them, and could send it to the other\nhand's note instead, the right hand diving into the bass. Each slide now runs from\nits own note to the one it is written to reach, both hands together. A slide that\nlands on a note and sets straight off again from it, up and back down, now plays\nboth halves too, where it used to drop one.",
-                twip: true,
-            },
-            {
-                body: "**Listen shakes both hands' tremolos.** Where both hands write a tremolo on the same\nbeat, as a piano reduction of an orchestra often does, Listen shook the right hand and\nstruck the left once. Both now shimmer together, each at the speed its own slashes\nask for.",
-                twip: true,
-            },
-            {
-                body: "**Switching a reading aid while a piece plays leaves no stray highlight.** Turning\nnote colours or finger numbers on or off during Listen, or while a take replayed,\nleft the note sounding at that moment lit as if it still were, long after the music\nhad moved on. The highlight now carries on with the music and the trail stays\nunbroken.",
-                twip: true,
-            },
-            {
-                body: "**Back after a rest takes back only the rest.** Writing notes one at a time, a\nBack pressed after a rest also removed the note before it, and two rests in a row\nwent with the note too. Back now undoes exactly the last thing you entered, a note,\na chord or a rest, and leaves the cursor where it began.",
-                twip: true,
-            },
-            {
-                body: "**Compose shows the time a loaded piece is really in.** Opening a file with five,\nseven or twelve beats to the bar wrote its bars out that way, while the Time menu\nread 2/4 — and picking 2/4 from it did nothing. The menu now lists the piece's own\ntime beside the usual four, and keeps it there after you pick another, so a wrong\npick can be put back.",
-                twip: true,
-            },
-            {
-                body: "**Grades line up with the teaching books.** Each grade is measured against\nwell-known teaching collections — Anna Magdalena, Burgmüller, the two-part inventions\nand more. With chords now fingered by their pitches, every piece was measured again\nand the grades were re-cut against those books. About five hundred pieces sit at a new\ngrade, most of them one step up and some one step down; nothing about how you play\nthem changes.",
-                twip: true,
-            },
-            {
-                body: "**A missing page speaks your language.** Following a stale or mistyped link, or\nlanding on a page that stopped working, used to show a page in English whatever\nlanguage the rest of the site was in. It now speaks yours, with a way home and the\nsame way to report the problem.",
-                twip: true,
-            },
-            {
-                body: "**The first link on every page is named in your language.** A screen reader\nannounced the logo's link home in English on every page, in the middle of a\nFrench or Japanese one. It now reads in the language of the page.",
-                twip: true,
-            },
-            {
-                body: "**A glossary link without a language opens the glossary.** An address like\nplinky.fun/glossary/piano/, typed by hand or copied without its language, opened\nthe free-play keyboard instead of the entry for the piano mark. It now opens the\nentry, in your language.",
-                twip: true,
-            },
-            {
-                body: "**Scale names follow your note names everywhere.** Switching how notes are named\nin Settings, H or B, do re mi or letters, renamed the scales on the keys and in\nMusic, while Today, Stats and the review session kept the old names until you\nreloaded. They now change with the rest.",
-                twip: true,
-            },
-            {
-                body: "**Slurs in songs land on the right hand again.** In a song for voice and piano, the\nsinger's line is left off the page, and every slur the piano's music carries was\nmoving one staff down: the tune under a slur played detached, while a staccato bass\nunder it was held long, in Listen and in what a run asked of you. Each slur now\nstays on the staff it is drawn on, with the singer on the page or off it.",
-                twip: true,
-            },
-            {
-                body: "**A tremolo shakes only its own note.** When a piano's right hand had a tremolo and\nthe other hand, or a singer, had a note at the same moment, Listen shook that note\ntoo, over and over, even a singer's note that wasn't on the page. Now the other\nnote sounds once while the tremolo shakes. A glissando also ends where its own part\nsays, never on a note the singer slides to.",
-                twip: true,
-            },
-            {
-                body: "**The piano follows its own dynamics in a song.** Where the singer was marked\nquieter or louder than the piano, or had a crescendo the piano didn't, Listen\nplayed the piano at the singer's level, and a run asked you for it too. The piano\nnow keeps to the dynamics and pedalling written for it.",
-                twip: true,
-            },
-            {
-                body: "**Stopping a duet stops the other hand.** While Plinky played the other hand for\nyou, pressing Stop, leaving full screen or starting Listen left the notes it had\nlined up still playing, one after another, on a page where nothing was running,\nand under Listen they came out of step with it. Stopping now silences the other\nhand at once. Play a run to its end and the other hand still finishes the piece.",
-                twip: true,
-            },
-            {
-                body: "**Stop means stop in a play-along too.** Pressing Stop while keeping up with the\nbeat left the guide notes and the other hand ringing for their whole length, so a\nslow chord could carry on over the next count-in. They now fade the moment you stop,\nwhile a run you play to its end still lets its last notes ring.",
-                twip: true,
-            },
-            {
-                body: "**Finishing a piece plays its little flourish again.** The short chime for reaching\nthe end of a piece waits a moment before it sounds, and leaving full screen at the end\nof a run cut it off before it began. It now plays over your grade, and the last\nnotes of the piece ring out with it.",
-                twip: true,
-            },
-            {
-                body: "**The notes you take longest to find are timed honestly after Keep going.** When\nyou couldn't find a note and played the next one to move on, that next note was\nfiled as found in no time at all, so the notes you stumble around most looked like\nyour quickest. It now counts the whole time you spent getting there.",
-                twip: true,
-            },
-            {
-                body: "**Find your level reads every note.** With Thin the texture set in Settings, the\nplacement test was thinned too: the melody alone, or just the melody and bass. You\ncould climb past drills you couldn't yet read as written, and the level it saved came\nout too high. The test now always sets each drill in full.",
-                twip: true,
-            },
-            {
-                body: "**Finger numbers sit the right way up on every chord.** Some scores write a chord's\nnotes from the top down, and on those the suggested fingering came out upside down:\nthe thumb printed on the top note of a right-hand chord and the little finger on the\nbottom, in the score and in the finger-position editor. A chord is now fingered by its\npitches, whichever order they were written in.",
                 twip: true,
             },
         ],

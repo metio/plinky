@@ -4,7 +4,9 @@
 import type { Preview } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 import { MidiProvider } from "../app/contexts/midi";
+import { applyTheme } from "../app/lib/theme";
 import { localeNames } from "../core/locales";
+import { DEFAULT_PALETTE, PALETTES, parseTheme } from "../core/theme";
 import { locales, overwriteGetLocale } from "../app/paraglide/runtime.js";
 import "../app/app.css";
 // The app self-hosts Inter (see root.tsx); stories must render with the same
@@ -50,19 +52,30 @@ const preview: Preview = {
                 items: [
                     { value: "light", title: "Light", icon: "sun" },
                     { value: "dark", title: "Dark", icon: "moon" },
+                    { value: "black", title: "Black", icon: "contrast" },
                 ],
                 dynamicTitle: true,
             },
         },
+        palette: {
+            description: "Palette",
+            toolbar: {
+                icon: "paintbrush",
+                items: PALETTES.map((palette) => ({ value: palette, title: palette })),
+                dynamicTitle: true,
+            },
+        },
     },
-    initialGlobals: { locale: "en", theme: "light" },
+    initialGlobals: { locale: "en", theme: "light", palette: DEFAULT_PALETTE },
     decorators: [
         // Components read the MIDI context and some render <Link>, so every story
         // gets a provider and an in-memory router. The toolbar globals drive
-        // Paraglide's locale and the .dark class (see app.css).
+        // Paraglide's locale and the theme the app itself would stamp (see app.css).
         (Story, context) => {
             overwriteGetLocale(() => context.globals.locale ?? "en");
-            document.documentElement.classList.toggle("dark", context.globals.theme === "dark");
+            applyTheme(
+                parseTheme({ palette: context.globals.palette, mode: context.globals.theme }),
+            );
             return (
                 <MemoryRouter>
                     <MidiProvider>

@@ -25,7 +25,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { readFile as read } from "node:fs/promises";
 import { chromium } from "playwright";
 import { folderFor, PIECES } from "./pieces.mjs";
-import { DOMAIN, TITTLE as TITTLE_EM, tittleFromBoxBottom, WORDMARK } from "../../core/wordmark.ts";
+import { DOMAIN, DOT, TITTLE, TRACKING, WORDMARK_PARTS } from "../../core/wordmark.ts";
 
 const OUT = argValue("--out") ?? "promo";
 const ONLY = argValue("--only");
@@ -42,15 +42,12 @@ function argValue(flag) {
 const STAGE = "#000000";
 const GLOW = "#180a2e";
 const PAPER = "#f9f8fc";
-const PLINK = "#aa36fc";
-// The dot, anchored to the inline box's bottom — the end CSS gives us here. The numbers are
-// core/wordmark's, the same ones the app header and an exported video's canvas draw from.
-const TITTLE = `bottom:${tittleFromBoxBottom()}em;width:${TITTLE_EM.size}em;height:${TITTLE_EM.size}em`;
 
-// The keys alone — no tile, no lockup. A tile would need an edge to read as a tile, and on
-// this ground it has none, so it becomes a smudge behind the keys; the white keys carry
-// their own edge against the dark. The card sets the name itself, which is why the lockup
-// does not belong here either.
+// The keys alone, from the artwork's own keys-without-tile drawing (npm run logo): no tile
+// and no circle. On this near-black stage a ground of the mark's violet is a second colour
+// competing with the title, and the white keys carry their own edge against the dark. The
+// card sets the name itself, with the domain as its tail, which is why the lockup does not
+// belong here either.
 const keys = `data:image/png;base64,${(await read("brand/plinky-keys.png")).toString("base64")}`;
 
 const fredoka = await read(
@@ -81,7 +78,9 @@ const CUTS = [
         scale: 1,
         padding: "72px 88px",
         titleWidth: 820,
-        keys: "right:36px;bottom:-40px;width:440px;height:440px",
+        // Right of the title's column, standing on the wordmark's line, so the longest title
+        // ends above the keys' tops.
+        keys: "right:96px;bottom:64px;height:420px",
     },
     {
         file: "thumb-short.png",
@@ -94,12 +93,18 @@ const CUTS = [
         // leave rather than on the floor — dropped to the bottom it opens a dead band
         // across the middle of the card, which is most of a portrait tile. A portrait tile
         // has width to spare, and the shape is what survives the shrink to a grid tile.
-        keys: "left:50%;transform:translateX(-50%);bottom:400px;width:740px;height:740px",
+        keys: "left:50%;transform:translateX(-50%);bottom:420px;height:700px",
     },
 ];
 
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
+
+// The round pink dot over the name's i, placed from the baseline as the app header places it:
+// a zero-size inline block before the dotless ı sits on the baseline at its left edge, and
+// the dot hangs off it by core/wordmark's measurements. A line may break beside an inline
+// block, so the lockup is set nowrap.
+const DOT_ANCHOR = `<span style="position:relative;display:inline-block;width:0;height:0;vertical-align:baseline"><span style="position:absolute;left:${TITTLE.stemCentre}em;bottom:${TITTLE.baseAbove}em;width:${TITTLE.size}em;height:${TITTLE.size}em;transform:translateX(-50%);border-radius:50%;background:${DOT}"></span></span>`;
 
 function card(piece, cut) {
     return `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
@@ -117,9 +122,7 @@ function card(piece, cut) {
                 wrote the name twice on a card that has room to say it once — so the domain
                 is the wordmark's own tail, in the same face, and the address and the name
                 are the same object. -->
-           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:-0.01em;color:${PAPER};line-height:1">
-             ${WORDMARK.before}<span style="position:relative">${WORDMARK.stem}<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>${WORDMARK.after}${DOMAIN}
-           </div>
+           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1;white-space:nowrap">${WORDMARK_PARTS.before}${DOT_ANCHOR}${WORDMARK_PARTS.stem}${WORDMARK_PARTS.after}${DOMAIN}</div>
          </div>`;
 }
 

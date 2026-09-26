@@ -162,13 +162,14 @@ SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The brand kit: every file in it is rendered by dev/build-brand.mjs from the app's own
-# tokens and the icon, so they are our own art and carry the project's licence. The
+# tokens and the logo artwork, so they are our own art and carry the project's licence. The
 # JSON and the images cannot hold a comment; the README does and is left alone.
 #
-# Three exceptions are not rendered by that script: brand/source/plinky-mark.png is the mark
-# as its author supplied it, brand/plinky-mark.png is that file with its background keyed
-# out, and brand/plinky-icon.png is the same mark with its wordmark removed — the last two
-# both written by dev/key-mark.mjs. All three are ours and carry the same licence.
+# The artwork itself — brand/source/*.png as it was drawn, brand/plinky-*.png with the
+# background keyed out by dev/key-mark.mjs — is ours too. So is the vector mark in
+# brand/proposed-mark, which the app does not ship, and the outlined name beside it; both are
+# written by dev/build-mark.mjs and each SVG also carries the two SPDX lines as an XML
+# comment.
 [[annotations]]
 path = ["brand/**/*.png", "brand/**/*.svg", "brand/palette.json"]
 precedence = "override"

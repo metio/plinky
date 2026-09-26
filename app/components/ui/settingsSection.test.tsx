@@ -19,7 +19,7 @@ describe("SettingsSection", () => {
         expect(screen.getByText("controls")).toBeTruthy();
     });
 
-    it("renders as a card with its icon and hint when given an icon", () => {
+    it("renders as a Folio row with its icon and hint when given an icon", () => {
         render(
             <SettingsSection title="Sound" hint="Plinky can play notes" icon={<svg role="img" />}>
                 <p>controls</p>

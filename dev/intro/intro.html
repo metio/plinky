@@ -12,23 +12,25 @@
     --bg-deep: #0b0720;
     --bg-lift: #1a1140;
     --glow: #7c3aed;
-    --plink: #d946ef;
+    --plink: #a836fe;
     --url-ink: #e9e4ff;
 
     /* Sized against the stage's own width (100cqw == 1920px), so the composition holds
-       at any size with no script involved. The master is 1024px, so at 27% of 1920 the
-       mark is 520px and never upscales. */
+       at any size with no script involved. The mark is vector, so at 27% of 1920 it is
+       drawn at 520px as sharply as at any other size. */
     --logo-size: 27.08cqw;
     --url-gap: 2.81cqw;
 
-    /* Where things are inside the mark, measured off the artwork itself. */
-    --dot-start-y: 11.5%;
+    /* Where things are inside the mark, read off brand/proposed-mark/badge.svg: the glow the plink
+       falls from, the strike point it lands on (the circle's centre, by design), and the
+       band the name's outlines occupy. */
+    --dot-start-y: 7.5%;
     --dot-hit-x: 50%;
-    --dot-hit-y: 56.3%;
-    --word-x0: 16.6%;
-    --word-x1: 86%;
-    --word-y0: 68.4%;
-    --word-y1: 92.8%;
+    --dot-hit-y: 50%;
+    --word-x0: 18.5%;
+    --word-x1: 81.2%;
+    --word-y0: 62.1%;
+    --word-y1: 82.5%;
 
     /* The timeline. Every duration below is a slice of this. */
     --t-fade: 0.5s;
@@ -102,8 +104,8 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 #dot {
     position: absolute;
     left: var(--dot-hit-x); top: var(--dot-start-y);
-    width: 3.6%; aspect-ratio: 1;
-    margin: -1.8% 0 0 -1.8%;
+    width: 5.2%; aspect-ratio: 1;
+    margin: -2.6% 0 0 -2.6%;
     border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, #fff 38%, var(--plink) 72%, transparent 74%);
     box-shadow: 0 0 1.35cqw 0.3cqw color-mix(in srgb, var(--plink) 70%, transparent);
@@ -168,7 +170,7 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 /* The tittle of the "i" catches the light a moment after the sweep reaches it. */
 #sparkle {
     position: absolute;
-    left: 45.5%; top: 71%;
+    left: 41.5%; top: 63.8%;
     width: 2.4%; aspect-ratio: 1; margin: -1.2% 0 0 -1.2%;
     border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, color-mix(in srgb, var(--plink) 80%, white) 45%, transparent 70%);
@@ -203,7 +205,7 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 <div id="stage">
     <div id="halo"></div>
     <div id="lockup">
-        <img id="mark" alt="Plinky" src="../../brand/plinky-mark.png" />
+        <img id="mark" alt="Plinky" src="../../brand/proposed-mark/badge.svg" />
         <div id="keyflash"></div>
         <div id="ripple"></div>
         <div id="dot"></div>

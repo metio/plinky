@@ -8,6 +8,47 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 13 September 2026 — evening
+
+**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with
+soft forget-me-not blue where it used lilac and gold, and cooler greys so the page
+reads more clearly. If you liked the violet, Settings brings it back under Colours.
+The theme can also be Black: a true-black page for phone screens at night, in either
+set of colours. The pictures on the help page show the new look, in your language.
+
+**The name at the top of every page keeps its own colours.** The logo is the one you
+know, and beside it the name is set a little larger, in its own deep ink, with a
+perfectly round pink dot over the i. Both stay exactly as they are whichever colours
+you pick and whether the page is light or dark.
+
+**The keyboard on the front page is a way into practising.** Each of its seven white
+keys carries one of the ways a teacher would suggest, with a small drawing on it:
+loop the hard bar, go slowly, one hand at a time, hear it first, mix pieces up, come
+back later, and learn the chords. A key still sounds when you press it, and its way
+to practise opens underneath, with why it works and a piece to try it on. A MIDI
+piano or your computer keys open them too. These keys carry no note names, whatever
+you have chosen in Settings — the word on a key is the way to practise it opens. The
+long list of them further down the page is gone, and nothing plays a note any more
+when your mouse passes over a list.
+
+**Lists without boxes.** Lessons, tools, settings, your stats and the result of a run
+are no longer drawn as cards. Each is a row with an icon, a drawing or a number at
+its left edge, its name, and a line about it, with a thin rule between one row and
+the next, like the contents page of a music book. On the Stats page every number
+sits at the start of its row, so the figures line up down the page, and the eight
+grades of the ladder fit in a shorter list.
+
+**Small drawings beside what you can learn.** Everything under Learn and Teach, and
+each of the little tools, now starts with a drawing of a thing a pianist keeps
+nearby: a stave, a tuning fork, a pencil, a stopwatch, a stack of graded books. They
+are drawn in the same hand as the ones on the front page's keys, and take on your
+colours, light or dark.
+
+**Stats says what is missing when it has counted your notes.** When a period has
+notes played but no time logged, as after you remove a sitting, the practice diary
+says the notes are counted and no time was logged. It used to say there was nothing
+here yet, right under the notes it had just counted.
+
 ## 13 September 2026
 
 **A chord written for both hands is graded the way you play it.** Where one staff

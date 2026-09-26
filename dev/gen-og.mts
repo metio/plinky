@@ -102,6 +102,8 @@ async function main() {
     const host = new URL(
         readFileSync("core/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1] ?? "",
     ).host;
+    // The wordless icon (npm run logo): it stands beside the site's name in the corner, the
+    // way the app header sets it.
     const mark = `data:image/png;base64,${readFileSync("brand/plinky-icon.png").toString("base64")}`;
     // The faces travel with the page: a headless browser has neither installed. Latin
     // only, as the site's own card — a title in another script falls to the system face.

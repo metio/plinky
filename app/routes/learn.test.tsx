@@ -21,8 +21,7 @@ const show = (overrides = {}) =>
         overrides,
     );
 
-const hrefFor = (label: string) =>
-    screen.getByText(`${label} →`).closest("a")?.getAttribute("href");
+const hrefFor = (label: string) => screen.getByText(label).closest("a")?.getAttribute("href");
 
 describe("the Learn page", () => {
     it("gathers the whole schoolroom, each entry saying what it is", () => {
@@ -35,7 +34,7 @@ describe("the Learn page", () => {
             m.tools_title(),
             m.placement_title(),
         ]) {
-            expect(screen.getByText(`${label} →`)).toBeTruthy();
+            expect(screen.getByText(label)).toBeTruthy();
         }
         // The entry carries the page's own opening line, so the two always agree.
         expect(screen.getByText(m.theory_intro({ count: LESSONS.length }))).toBeTruthy();
@@ -52,7 +51,7 @@ describe("the Learn page", () => {
         expect(hrefFor(m.placement_title())).toBe("/en/placement/");
     });
 
-    it("climbs a scale under a mouse, and stays quiet under a finger", () => {
+    it("stays quiet under a passing mouse and a finger alike", () => {
         const strike = vi.fn();
         const audio: AudioEngine = {
             now: () => 0,
@@ -72,14 +71,11 @@ describe("the Learn page", () => {
         };
         show({ audio });
 
-        const first = screen.getByText(`${m.basics_title()} →`).closest("a") as HTMLElement;
-        fireEvent.pointerEnter(first, { pointerType: "mouse" });
-        expect(strike).toHaveBeenCalledTimes(1);
-        expect(strike.mock.calls[0]?.[0]?.note).toBe(60);
-
-        // A tap fires pointerenter too; it stays silent so touch browsing doesn't
-        // read as phantom key presses.
-        fireEvent.pointerEnter(first, { pointerType: "touch" });
-        expect(strike).toHaveBeenCalledTimes(1);
+        // Only a key that is pressed makes a note in Plinky; a list is read, not played.
+        for (const link of screen.getAllByRole("link")) {
+            fireEvent.pointerEnter(link, { pointerType: "mouse" });
+            fireEvent.pointerEnter(link, { pointerType: "touch" });
+        }
+        expect(strike).not.toHaveBeenCalled();
     });
 });

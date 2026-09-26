@@ -3,7 +3,6 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { HubList } from "./hubList";
-import { BookIcon, EarIcon, KeysIcon } from "./icons";
 
 const meta: Meta<typeof HubList> = {
     title: "UI/HubList",
@@ -20,21 +19,24 @@ export const Entries: Story = {
         entries: [
             {
                 to: "/basics",
-                label: "Meet the keyboard",
-                blurb: "Never played before? Six things, and you'll be playing notes on purpose. No piano needed — the keys below work fine.",
-                Icon: KeysIcon,
+                label: () => "Meet the keyboard",
+                blurb: () =>
+                    "Never played before? Six things, and you'll be playing notes on purpose. No piano needed — the keys below work fine.",
+                drawing: "keys",
             },
             {
                 to: "/theory",
-                label: "How the music works",
-                blurb: "Eight short lessons on what a stave is actually telling you. Each one has something to play — read the paragraph, then hear it.",
-                Icon: BookIcon,
+                label: () => "How the music works",
+                blurb: () =>
+                    "Eight short lessons on what a stave is actually telling you. Each one has something to play — read the paragraph, then hear it.",
+                drawing: "staff",
             },
             {
                 to: "/ear",
-                label: "Ear training",
-                blurb: "Away from the piano? Your ears can still practise — name the notes and the distances between them.",
-                Icon: EarIcon,
+                label: () => "Ear training",
+                blurb: () =>
+                    "Away from the piano? Your ears can still practise — name the notes and the distances between them.",
+                drawing: "tuningFork",
             },
         ],
     },

@@ -38,7 +38,7 @@ import { LanguageSwitcher } from "../components/ui/languageSwitcher";
 import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
 import { KeyLightsSettings } from "../components/features/keyLightsSettings";
-import { ThemeToggle } from "../components/features/themeToggle";
+import { ThemePicker } from "../components/features/themePicker";
 import { useMidiConnection } from "../contexts/midi";
 import { usePrefs } from "../hooks/usePrefs";
 import { useSynth } from "../hooks/useSynth";
@@ -147,7 +147,9 @@ export default function Settings() {
             <PageHeader title={m.nav_settings()} hint={m.settings_subtitle()} />
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
                 <SettingsIndex groups={groups} current={hash.slice(1)} />
-                <div className="space-y-8">
+                {/* No gap between the sections: each is a Folio row that carries its own
+                    padding and hairline, and a gap would sit the rule off-centre. */}
+                <div>
                     {/* Each control is guarded on its own, INSIDE its section rather than around
                 it: the heading and the hint are copy that cannot fail, and leaving them
                 standing means a panel that breaks still says which setting it was. This
@@ -551,12 +553,9 @@ export default function Settings() {
                         hint={m.settings_appearance_hint()}
                         icon={<SlidersIcon className={ICON} />}
                     >
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-body">{m.settings_theme()}</span>
-                            <FeatureBoundary feature="ThemeToggle">
-                                <ThemeToggle />
-                            </FeatureBoundary>
-                        </div>
+                        <FeatureBoundary feature="ThemePicker">
+                            <ThemePicker />
+                        </FeatureBoundary>
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-body">{m.settings_language()}</span>
                             <FeatureBoundary feature="LanguageSwitcher">

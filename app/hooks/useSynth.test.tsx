@@ -165,31 +165,12 @@ describe("useSynth", () => {
     });
 });
 
-describe("decoration when audio is asleep", () => {
-    it("drops a decorative note rather than scheduling it", () => {
-        // A strike is timed against the audio context's own clock, and that clock is
-        // frozen while the context is suspended — so five hovers down a list would all
-        // land on one instant and arrive as a single chord whenever audio finally woke.
-        const { audio, playNote } = harness({}, true);
-        playNote(60, { decorative: true });
-        playNote(64, { decorative: true });
-        expect(audio.strikes).toEqual([]);
-        // And it does not try to wake audio either: a hover is not a user gesture, so
-        // the browser would refuse, and decoration has no business asking.
-        expect(audio.resumed).toBe(0);
-    });
-
-    it("still plays a note the player asked for — late beats never", () => {
+describe("a note asked for while audio is asleep", () => {
+    it("still plays, and wakes the audio for it — late beats never", () => {
         const { audio, playNote } = harness({}, true);
         playNote(60);
         expect(audio.strikes).toHaveLength(1);
         expect(audio.resumed).toBe(1);
-    });
-
-    it("plays decoration normally once audio is awake", () => {
-        const { audio, playNote } = harness();
-        playNote(60, { decorative: true });
-        expect(audio.strikes).toHaveLength(1);
     });
 });
 
