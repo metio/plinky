@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Writes brand/mark/: every form of the mark, as vector, from one description.
+// Writes brand/proposed-mark/: every form of the designer's vector mark, from one
+// description. The app does not use them — see brand/proposed-mark/README.md — but they stay
+// reproducible and checked, so the proposal cannot rot while it waits.
 //
 // The symbol is the designer's Optimised Option 3 in her own colours: three white keys, two
 // black ones, the plink falling down the middle key onto its strike point. Every coordinate
@@ -17,12 +19,12 @@
 // fontkit cannot instance a WOFF2 directly — its WOFF2 reader never applies the variation
 // to the outlines — which is why the TrueType step is there.
 //
-// Every raster Plinky ships is rendered from these files: `npm run icons` (public/),
-// `npm run brand` (the rest of brand/), `npm run og` (the per-piece cards) and
-// `npm run promo:thumbs`.
+// The one file here the app does ship is the outlined name, brand/name-white.svg. It is
+// type rather than logo — the social kit (`npm run brand`) and the link card
+// (`npm run icons`) set it beside whichever mark is current — so it lives in brand/ itself.
 //
-//   npm run mark            write brand/mark/*.svg
-//   npm run mark -- --check fail if any file there is missing or differs
+//   npm run mark            write brand/proposed-mark/*.svg and brand/name-white.svg
+//   npm run mark -- --check fail if any of them is missing or differs
 
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import * as fontkit from "fontkit";
@@ -37,7 +39,9 @@ import {
 } from "../core/wordmark.ts";
 import { tokenValue } from "./brandTokens.mjs";
 
-const OUT = "brand/mark";
+const OUT = "brand/proposed-mark";
+// The outlined name, which the shipped kit sets beside the shipped mark.
+const NAME_FILE = "brand/name-white.svg";
 const FONT = "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2";
 const CHECK = process.argv.includes("--check");
 
@@ -281,35 +285,44 @@ const FILES = {
     "lockup-light.svg": lockup({ framed: false, ink: NAME_INK, tracking: TRACKING.light }),
     "lockup-indigo.svg": lockup({ framed: true, ink: "#fff", tracking: TRACKING.dark }),
     "lockup-dark.svg": lockup({ framed: false, ink: "#fff", tracking: TRACKING.dark }),
-    // The name alone, white, for the social images to set beside the framed tile.
-    "name-white.svg": nameOnly(),
+};
+
+// The outlined name is written beside the kit rather than inside the archive: it is type,
+// and the shipped social images set it beside the shipped mark.
+const SHIPPED = { [NAME_FILE]: nameOnly() };
+
+const WRITTEN = {
+    ...Object.fromEntries(
+        Object.entries(FILES).map(([name, content]) => [`${OUT}/${name}`, content]),
+    ),
+    ...SHIPPED,
 };
 
 if (CHECK) {
     const stale = [];
-    for (const [name, content] of Object.entries(FILES)) {
-        const current = await readFile(`${OUT}/${name}`, "utf8").catch(() => null);
-        if (current !== content) stale.push(name);
+    for (const [path, content] of Object.entries(WRITTEN)) {
+        const current = await readFile(path, "utf8").catch(() => null);
+        if (current !== content) stale.push(path);
     }
-    // A form this script no longer writes would otherwise stay in the kit looking current.
+    // A form this script no longer writes would otherwise stay in the folder looking current.
     const orphans = (await readdir(OUT)).filter(
         (name) => name.endsWith(".svg") && !Object.hasOwn(FILES, name),
     );
     if (orphans.length > 0) {
-        console.error(`brand/mark holds files nothing writes: ${orphans.join(", ")}.`);
+        console.error(`${OUT} holds files nothing writes: ${orphans.join(", ")}.`);
         console.error("Delete them, or add them back to dev/build-mark.mjs.");
         process.exit(1);
     }
     if (stale.length > 0) {
-        console.error(`brand/mark is out of date: ${stale.join(", ")}.`);
+        console.error(`The mark is out of date: ${stale.join(", ")}.`);
         console.error("Run `npm run mark` and commit the result.");
         process.exit(1);
     }
-    console.log(`brand/mark: all ${Object.keys(FILES).length} files are current.`);
+    console.log(`The mark: all ${Object.keys(WRITTEN).length} files are current.`);
 } else {
     await mkdir(OUT, { recursive: true });
-    for (const [name, content] of Object.entries(FILES)) {
-        await writeFile(`${OUT}/${name}`, content);
+    for (const [path, content] of Object.entries(WRITTEN)) {
+        await writeFile(path, content);
     }
-    console.log(`brand/mark: wrote ${Object.keys(FILES).join(", ")}.`);
+    console.log(`Wrote ${Object.keys(WRITTEN).join(", ")}.`);
 }
