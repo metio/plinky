@@ -2,15 +2,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { type MethodId, METHODS, type PracticeMethod } from "../../../core/practiceMethods";
+import { namingFor, pitchLabelIn } from "../../../core/noteNaming";
+import {
+    HOME_OCTAVE,
+    type MethodId,
+    METHODS,
+    type PracticeMethod,
+} from "../../../core/practiceMethods";
 import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider, useMidiConnection } from "../../contexts/midi";
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
+import { noteWords } from "../ui/noteWords";
 import { HeroKeyboard } from "./heroKeyboard";
 import { METHOD_LABEL, METHOD_NAME } from "./practiceMethods";
 
@@ -43,7 +50,11 @@ const mount = (funnelNote = 60) => {
         </MemoryRouter>
     );
     const view = renderWithServices(tree(true), { audio, midi: fakeMidi() });
-    return { audio, hide: () => view.rerender(tree(false)) };
+    return {
+        audio,
+        services: view.services,
+        hide: () => view.rerender(tree(false)),
+    };
 };
 
 const method = (id: MethodId): PracticeMethod => {
@@ -76,6 +87,25 @@ describe("HeroKeyboard", () => {
             expect(key.getAttribute("aria-controls")).toBe(leafId);
         }
         expect(undressedKeys()).toHaveLength(5);
+    });
+
+    it("prints no note name, whatever the player set, and still says the pitch", () => {
+        const { services } = mount();
+        act(() => {
+            services.prefs.save({ ...services.prefs.load(), noteLabels: "all" });
+        });
+        const naming = namingFor("all", "en");
+        const words = noteWords("en");
+        for (let note = HOME_OCTAVE.from; note <= HOME_OCTAVE.to; note++) {
+            const printed = pitchLabelIn(note, naming.system, words);
+            expect(within(keybed()).queryAllByText(printed)).toHaveLength(0);
+        }
+        // The spoken name is untouched: every key still names its pitch and octave.
+        const named = within(keybed())
+            .getAllByRole("button")
+            .map((key) => key.getAttribute("aria-label") ?? "");
+        expect(named.filter((label) => label.includes("C 4"))).toHaveLength(1);
+        expect(named.filter((label) => label.includes("C sharp 4"))).toHaveLength(1);
     });
 
     it("opens the first key's method before anything is pressed", () => {

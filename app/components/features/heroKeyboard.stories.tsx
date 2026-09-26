@@ -8,8 +8,9 @@ import { HeroKeyboard } from "./heroKeyboard";
 
 // The front page's playable octave, with a way to practise on each white key and the first
 // key's method open below it, as the page arrives. Sound, lighting and opening another
-// method happen only on a press, so the resting render is static; an in-memory store keeps
-// the note labels at their default setting.
+// method happen only on a press, so the resting render is static; these keys print no
+// pitch, whatever a player's setting says, so the in-memory store settles nothing but the
+// rest of the defaults.
 const meta: Meta<typeof HeroKeyboard> = {
     title: "Features/HeroKeyboard",
     component: HeroKeyboard,
