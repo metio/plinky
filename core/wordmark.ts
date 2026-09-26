@@ -6,8 +6,9 @@
 //
 // One description, because the name is set in places that cannot share a renderer — the app
 // header (DOM), the promo thumbnails (HTML screenshotted by Chromium), an exported video
-// (canvas) and the outlined lockups in brand/mark (dev/build-mark.mjs). Each reads its
-// spacing and its dot from here, so the name is one wordmark everywhere.
+// (canvas) and the outlined name the social kit sets, brand/name-white.svg
+// (dev/build-mark.mjs). Each reads its spacing and its dot from here, so the name is one
+// wordmark everywhere.
 
 // What the name says. Every accessible name and every piece of text that is read rather than
 // looked at uses this, never the parts below.
