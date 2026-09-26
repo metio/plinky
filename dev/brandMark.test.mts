@@ -4,9 +4,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-// The forms in brand/mark only place one drawing. `npm run mark -- --check` keeps the files
-// current with their generator; these pin what the forms promise about that drawing.
-const read = (name: string) => readFileSync(`brand/mark/${name}`, "utf8");
+// The forms in brand/proposed-mark only place one drawing. `npm run mark -- --check` keeps
+// the files current with their generator; these pin what the forms promise about that
+// drawing. The app ships the raster logo instead — see brand/proposed-mark/README.md — and
+// the outlined name it does ship sits one directory up.
+const MARK = "brand/proposed-mark";
+const read = (name: string) => readFileSync(`${MARK}/${name}`, "utf8");
 const tile = read("tile.svg");
 // The drawing: everything the tile draws after its ground and its glow.
 const art = tile.slice(
@@ -44,10 +47,11 @@ describe("the vector mark", () => {
     });
 
     it("carries the licence in every file", () => {
-        for (const name of readdirSync("brand/mark").filter((file) => file.endsWith(".svg"))) {
-            expect(read(name), name).toMatch(
-                /^<!--\nSPDX-FileCopyrightText: The Plinky Authors\nSPDX-License-Identifier: AGPL-3\.0-or-later\n-->/,
-            );
+        const licensed =
+            /^<!--\nSPDX-FileCopyrightText: The Plinky Authors\nSPDX-License-Identifier: AGPL-3\.0-or-later\n-->/;
+        for (const name of readdirSync(MARK).filter((file) => file.endsWith(".svg"))) {
+            expect(read(name), name).toMatch(licensed);
         }
+        expect(readFileSync("brand/name-white.svg", "utf8")).toMatch(licensed);
     });
 });
