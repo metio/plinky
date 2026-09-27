@@ -119,8 +119,20 @@ export function meta({ params }: Route.MetaArgs) {
     return [
         ...routeMeta(score.title, description),
         ...imageMeta(pieceImage(score.id), score.title),
-        { "script:ld+json": musicCompositionData(score.title, credit, locale) },
-        { "script:ld+json": breadcrumbData(locale, trail) },
+        // Structured data only where the document this hydrates against was prerendered
+        // carrying it — the bundled pieces. A title or a card is a head tag React matches
+        // by what it says, so one the document lacks costs nothing; a <script> is matched
+        // by position, and the next one React finds is claimed whatever it holds. A block
+        // rendered over a document that has none is therefore claimed as the analytics
+        // beacon, and React answers the disagreement by throwing the document away and
+        // rendering it again from nothing. A piece the player imported is served the bare
+        // shell, and its structured data would be read by nobody but them in any case.
+        ...(score.bundled
+            ? [
+                  { "script:ld+json": musicCompositionData(score.title, credit, locale) },
+                  { "script:ld+json": breadcrumbData(locale, trail) },
+              ]
+            : []),
     ];
 }
 
