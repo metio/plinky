@@ -7,9 +7,10 @@ import { useEffect } from "react";
 //
 // A route's meta() is static, and some of what a page is about arrives after the page
 // does — a composer's dates and the records that identify them are fetched, not bundled.
-// The block is written here instead, and only here: two writers of one `<script>` means
-// React reconciling its own version over the fuller one on hydration, which would leave a
-// crawler that runs the app reading less than the document it was served.
+// The block is written here instead, and only here. A page whose document the edge writes
+// must render no block of its own: React matches a head `<script>` by position rather than
+// by what it holds, so a block rendered over a document that carries its own somewhere
+// else is claimed as the wrong element, and React answers by throwing the document away.
 //
 // Matched by its `@type`, so a page carrying several blocks — a work and a trail — writes
 // each without disturbing the others.

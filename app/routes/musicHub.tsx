@@ -124,8 +124,10 @@ export function shelfPath(shelf: Shelf): string {
 
 // No meta() and no structured data from it. The edge writes this page's document
 // (functions/_middleware.js), and a title React renders over one already there is written
-// twice unless it matches exactly; the page writes its own head below, once it knows
-// which shelf it is.
+// twice unless it matches exactly, while a `<script>` is claimed by position rather than
+// by what it holds — so a structured-data block rendered here would be claimed as the
+// analytics beacon and cost the whole document. The page writes its own head below, once
+// it knows which shelf it is.
 
 type Piece = { id: string; title: string; composer: string; grade?: number; incipit?: string };
 

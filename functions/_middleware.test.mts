@@ -112,6 +112,10 @@ const SHELL =
     '<meta name="twitter:image:alt" content="Plinky — piano practice in your browser"/>' +
     '<link rel="icon" href="/favicon.ico" sizes="32x32"/>' +
     '<script>/* theme */</script><script>/* history */</script>' +
+    // The root stylesheet sits here, after the bootstrap scripts: React writes a
+    // <link rel="stylesheet"> in place rather than hoisting it to the front of the head,
+    // which is what puts it between the app's own scripts and the beacon.
+    '<link rel="stylesheet" href="/assets/root-abc123.css"/>' +
     '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"></script>' +
     '</head><body><div id="root"></div></body></html>';
 
@@ -469,19 +473,24 @@ describe("documentFor", () => {
         expect([...order].sort((a, b) => a - b)).toEqual(order);
     });
 
-    it("writes the structured data after the bootstrap scripts, before the beacon", () => {
-        // React pairs head scripts by position, so a block written before the theme
-        // bootstrap is reconciled against the bootstrap: the app's ld+json type lands on
-        // that script and the block the edge wrote is gone. A prerendered page carries
-        // them here, so an edge-written one carries them here too.
+    it("writes the structured data past every script the app renders", () => {
+        // React claims the next head `<script>` it finds for the next one the app renders,
+        // whatever that script holds, and the pages written here render none of these
+        // blocks — so among the app's own scripts there is no position they could take.
+        // Past the last of them there is: React's walk never reaches an element after the
+        // one it claims last. app/edgeDocument.test.tsx hydrates the result to prove it.
         const scripts = [...html.matchAll(/<script[^>]*>/g)].map((match) => match[0]);
         expect(scripts).toEqual([
             "<script>",
             "<script>",
-            '<script type="application/ld+json">',
-            '<script type="application/ld+json">',
             '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js">',
+            '<script type="application/ld+json">',
+            '<script type="application/ld+json">',
         ]);
+        // And still inside the head, which is where a crawler reads them.
+        expect(html.indexOf('<script type="application/ld+json">')).toBeLessThan(
+            html.indexOf("</head>"),
+        );
     });
 
     it("leaves a shell with no beacon titled but without structured data", () => {

@@ -86,11 +86,12 @@ export function meta({ params }: Route.MetaArgs) {
         ...(person ? imageMeta(personImage(person.slug), person.name) : []),
     ];
     // No structured data here. The edge writes this page's document
-    // (functions/_middleware.js), and a `<script>` React renders into the head is not
-    // reconciled against the one already there the way a title or a meta tag is — it is
-    // appended, leaving the page saying who the composer is twice. The page writes both
-    // blocks after mount instead (useStructuredData below), which is also the only moment
-    // it knows the composer's dates and the records that identify them.
+    // (functions/_middleware.js), and a `<script>` is not matched against the document by
+    // what it holds the way a title or a meta tag is — React claims the next one it finds
+    // in the head, whatever that is, so a block rendered here would be claimed as the
+    // analytics beacon and the disagreement would cost the whole document. The page writes
+    // both blocks after mount instead (useStructuredData below), which is also the only
+    // moment it knows the composer's dates and the records that identify them.
     return tags;
 }
 

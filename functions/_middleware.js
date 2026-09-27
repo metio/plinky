@@ -498,14 +498,27 @@ export function localePath(pathname) {
 // the app will look for what it wrote.
 const ROUTE_TAGS_AFTER = /<meta name="twitter:image:alt" content="[^"]*"\/?>/;
 
-// Where the app writes a route's structured data: after the two theme bootstrap scripts,
-// immediately before the analytics beacon. React reconciles the head's children by
-// position within a tag name, so a script element in the wrong place is not merely
-// misplaced — the app's first ld+json block is matched against the document's first
-// script, whatever that script is, and its type attribute lands on the theme bootstrap
-// while the block the edge wrote disappears. The blocks therefore go exactly where a
-// prerendered page carries them.
-const LD_BEFORE = /<script type="module" src="https:\/\/static\.cloudflareinsights\.com/;
+// The analytics beacon, which is the last element app/root.tsx puts in the head, and so
+// the proof that this shell is the one these rewrites were written against. A shell
+// without it keeps its title and its card and goes without structured data.
+const APP_HEAD_LAST = /<script type="module" src="https:\/\/static\.cloudflareinsights\.com/;
+
+// The end of the head, which is where the structured data goes: past every element the
+// app renders.
+//
+// React hydrates the head by walking its children in order, and it claims the next
+// `<script>` it finds for the next script the app renders — a `<script>` with neither
+// `src` nor `async` is never skipped, whatever its type. An ld+json block among the
+// app's own head scripts is therefore claimed as one of them: the beacon lands on the
+// first block, its JSON text belongs to no element the app rendered, and React answers
+// by throwing the whole document away and rendering it again from nothing. The pages
+// written here carry blocks the app renders none of, so there is no position among the
+// app's scripts where they could sit.
+//
+// Past the last of them there is. React's walk never reaches an element after the one it
+// claims last, and head is a singleton, which React leaves whatever it did not claim.
+// The blocks are still in the head, which is where a crawler reads them.
+const HEAD_END = /<\/head>/;
 
 // The shell rewritten into the page's own document, in the shape the app's own meta()
 // would have given a page that knew its subject at build time: the same title shape,
@@ -586,11 +599,11 @@ export function documentFor(shell, list, page, about = null) {
     // mismatch, and React throws the shell away and renders from nothing. The head is
     // where the page speaks for itself; the body is the app's.
     const titled = addressed.replace(ROUTE_TAGS_AFTER, (found) => `${found}${routeTags}`);
-    // The beacon is the app's own last head script, so it is the anchor. A shell without
-    // it keeps its title and its card and goes without structured data, rather than
-    // carrying blocks somewhere React will reconcile the wrong element against them.
-    return LD_BEFORE.test(titled)
-        ? titled.replace(LD_BEFORE, (found) => `${structuredData}${found}`)
+    // A shell whose head does not end the way the app's does is a shell this was not
+    // written against: it keeps its title and its card and goes without structured data,
+    // rather than carrying blocks somewhere React will reconcile an element against them.
+    return APP_HEAD_LAST.test(titled) && HEAD_END.test(titled)
+        ? titled.replace(HEAD_END, () => `${structuredData}</head>`)
         : titled;
 }
 
