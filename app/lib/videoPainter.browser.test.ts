@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?inline";
 import { beforeAll, describe, expect, it } from "vitest";
 import { LEAD_IN_MS } from "../../core/videoFrames";
 import { BACKGROUND, FONT_FAMILY, takeHighwayPainter, takeScenePainter } from "./videoPainter";
@@ -77,11 +77,19 @@ function countAccentPixels(context: OffscreenCanvasRenderingContext2D, tolerance
 // The exporter paints into a canvas owned by the running app, where the app's
 // face is already registered; a bare test document has no faces at all, so
 // register the same one the app ships to reproduce those conditions.
+//
+// The face arrives inlined rather than as a URL: fetching it would queue behind
+// whatever else the server is transforming, and under coverage the whole tree is
+// instrumented, which is enough to outlast the hook.
 describe("the burnt-in text", () => {
     beforeAll(async () => {
         const face = new FontFace("Inter Variable", `url(${interLatin})`);
         await face.load();
         document.fonts.add(face);
+    });
+
+    it("carries the face inline, so loading it cannot queue behind the server", () => {
+        expect(interLatin.startsWith("data:")).toBe(true);
     });
 
     // A canvas silently falls through to the next family when the one it names
