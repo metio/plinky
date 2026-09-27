@@ -2,6 +2,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-09-27
+  label: night
+  entries:
+    - |-
+      **Composer pages, piece pages and the music shelves open without redrawing
+      themselves.** Each of those arrives already written for the piece or the person it
+      is about, and the browser was throwing that page away and drawing it again from
+      nothing the moment it opened. They now open as they arrive.
+
+- date: 2026-09-27
   label: evening
   entries:
     - |-

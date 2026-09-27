@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 27 September 2026 — night
+
+**Composer pages, piece pages and the music shelves open without redrawing
+themselves.** Each of those arrives already written for the piece or the person it
+is about, and the browser was throwing that page away and drawing it again from
+nothing the moment it opened. They now open as they arrive.
+
 ## 27 September 2026 — evening
 
 **Settings opens without redrawing itself.** The recorded-piano panel arrived already
