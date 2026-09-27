@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 27 September 2026 — evening
+
+**Settings opens without redrawing itself.** The recorded-piano panel arrived already
+crediting the instrument and counting 637 recordings — figures that were never this
+device's — and the browser threw the page away and drew it again to correct them. It
+now opens saying nothing has arrived yet, and fills in with what your device holds.
+
 ## 27 September 2026
 
 **Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with

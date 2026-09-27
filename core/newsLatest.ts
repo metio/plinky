@@ -11,6 +11,16 @@ import type { Release } from "./changelog";
 export const LATEST_RELEASES: Release[] = [
     {
         date: "2026-09-27",
+        label: "evening",
+        entries: [
+            {
+                body: "**Settings opens without redrawing itself.** The recorded-piano panel arrived already\ncrediting the instrument and counting 637 recordings — figures that were never this\ndevice's — and the browser threw the page away and drew it again to correct them. It\nnow opens saying nothing has arrived yet, and fills in with what your device holds.",
+                twip: true,
+            },
+        ],
+    },
+    {
+        date: "2026-09-27",
         label: null,
         entries: [
             {
@@ -35,24 +45,6 @@ export const LATEST_RELEASES: Release[] = [
             },
             {
                 body: "**Stats says what is missing when it has counted your notes.** When a period has\nnotes played but no time logged, as after you remove a sitting, the practice diary\nsays the notes are counted and no time was logged. It used to say there was nothing\nhere yet, right under the notes it had just counted.",
-                twip: true,
-            },
-        ],
-    },
-    {
-        date: "2026-09-13",
-        label: null,
-        entries: [
-            {
-                body: "**A chord written for both hands is graded the way you play it.** Where one staff\nholds more notes than a hand can span, like the crossing thirds in Mozart's A major\nsonata or the tenor and bass of a hymn written on one line, the grade read them as a\nsingle impossible stretch. When your other hand is free to take those notes, the grade\nnow counts them as shared between your hands. Seventy-five pieces sit a grade or two\neasier for it, and no piece's own grade went up. The easier ways into a piece, like\nthe melody alone, are measured afresh too, so a few pieces now start a grade higher\nor lower, and none offers a way in that is no easier than the piece itself.",
-                twip: true,
-            },
-            {
-                body: "**A slide that lands on a chord goes on from it.** Where a slide arrives on one note\nof a chord and the next sets off from another note of the same chord, Listen could\ndrop the second slide and simply strike its notes. Both slides now sound, one\narriving and the next leaving, whichever way round the chord is written.",
-                twip: true,
-            },
-            {
-                body: "**A note written twice in a chord takes one finger.** Where two voices share a note,\nas they often do in hymns and part-songs, the suggested fingering counted it as two\nkeys and could stretch your hand for a key it had already taken: an octave with its\ntop note doubled came out as 3-1-4. Both copies now share one finger, and the rest of\nthe chord is fingered the way your hand actually plays it.",
                 twip: true,
             },
         ],

@@ -2,6 +2,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-09-27
+  label: evening
+  entries:
+    - |-
+      **Settings opens without redrawing itself.** The recorded-piano panel arrived already
+      crediting the instrument and counting 637 recordings — figures that were never this
+      device's — and the browser threw the page away and drew it again to correct them. It
+      now opens saying nothing has arrived yet, and fills in with what your device holds.
+
+- date: 2026-09-27
   entries:
     - |-
       **Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with
