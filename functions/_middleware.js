@@ -609,6 +609,15 @@ export function documentFor(shell, list, page, about = null) {
 
 export async function onRequest(context) {
     const url = new URL(context.request.url);
+    // One hostname carries the site. www answers from the same project, so without this
+    // every page exists at two addresses: a crawler reads both, and what each earns is
+    // split between them. The canonical tag names the one to keep, and this leaves
+    // nothing to weigh up. Permanent, and before every other rule, so none of them sees
+    // the hostname a visitor is about to leave.
+    if (url.hostname.startsWith("www.")) {
+        url.hostname = url.hostname.slice("www.".length);
+        return Response.redirect(url.toString(), 301);
+    }
     // The bare root has no page of its own: it names the language pages, and a visitor
     // belongs on theirs. Sent there at the edge, so a crawler follows a redirect to a real
     // page instead of reading a shell whose only content is the script that would have

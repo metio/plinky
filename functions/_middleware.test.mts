@@ -173,6 +173,16 @@ beforeEach(() => {
 });
 
 describe("onRequest", () => {
+    it("sends www to the hostname that owns the site, keeping the path and the query", async () => {
+        const response = await onRequest({
+            ...served("/en/music/?grade=3", 404, "shell"),
+            request: new Request("https://www.plinky.fun/en/music/?grade=3"),
+        });
+
+        expect(response.status).toBe(301);
+        expect(response.headers.get("location")).toBe("https://plinky.fun/en/music/?grade=3");
+    });
+
     it("writes a piece the catalogue holds its own document, with a 200", async () => {
         const response = await onRequest(served("/en/play/47xd2XDpYFCy/", 404, SHELL, SHELL_HEADERS));
 
