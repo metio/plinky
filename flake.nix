@@ -150,6 +150,17 @@
             # said each of those once into a log and carried on.
             (pkgs.writeShellScriptBin "ci-promo" ''exec npm run promo:check "$@"'')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
+            # The help page's pictures, retaken from the app they are pictures of. The
+            # build is baked in here for the same reason ci-build's locale is: this one
+            # needs the ALL-LOCALES tree, the one thing build:single cannot give it —
+            # tree-shaken to a single language, every other one photographs as the empty
+            # SPA shell. dev/help-screenshots.mjs refuses such a tree rather than taking
+            # two hundred and sixty pictures of nothing.
+            (pkgs.writeShellScriptBin "ci-help-shots" ''
+              set -e
+              npm run build
+              exec npm run help:shots "$@"
+            '')
           ];
         in
         {
