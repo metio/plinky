@@ -51,6 +51,7 @@ function world(
         // A pack of a different size, for the one question that needs more than one
         // recording to answer.
         manifest?: SampleManifest;
+        warmOnStart?: boolean;
     } = {},
 ) {
     const pack = options.manifest ?? MANIFEST;
@@ -74,6 +75,7 @@ function world(
         context: async () => ({ decodeAudioData }) as unknown as BaseAudioContext,
         remember: (enabled) => remembered.push(enabled),
         enabled: options.enabled ?? true,
+        warmOnStart: options.warmOnStart,
     });
     return { source, asked, remembered, decodeAudioData };
 }
@@ -87,6 +89,17 @@ describe("webSampleSource", () => {
         const { source, asked } = world();
         await vi.waitFor(() => expect(source.manifest()).not.toBeNull());
         expect(asked).toEqual(["https://samples.test/v1/manifest.json"]);
+    });
+
+    it("asks for nothing at all where there is no device to warm", async () => {
+        // The prerender builds one of these per page. It has no cache to count and nobody
+        // to play for, so a manifest fetched there is a request per static document spent
+        // on an answer the document may not carry — the choice is the device's, and the
+        // document is every device's.
+        const { source, asked } = world({ warmOnStart: false });
+        await vi.waitFor(() => expect(source.state().loading).toBe(false));
+        expect(asked).toEqual([]);
+        expect(source.manifest()).toBeNull();
     });
 
     it("reports what the device holds, not what this session fetched", async () => {

@@ -155,6 +155,11 @@ function defaultSamples(overrides: Partial<AppServices>): SampleSource {
         remember: (enabled) => {
             store.set(SAMPLES_ENABLED, enabled ? "1" : "0");
         },
+        // Only a browser has a device to warm for. The prerender builds a services set per
+        // page, so without this every static document costs the sample CDN a request for a
+        // manifest no document may carry — and the prerender must be able to run with no
+        // network at all.
+        warmOnStart: typeof window !== "undefined",
         // The engine's own context, so a decoded recording belongs to the context that
         // will play it. Null before the first gesture unlocks audio, which is exactly when
         // nothing is being played anyway.

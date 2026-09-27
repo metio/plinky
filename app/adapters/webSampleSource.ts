@@ -41,6 +41,12 @@ export type WebSampleOptions = {
     // is the one bit that says whether to use them.
     remember: (enabled: boolean) => void;
     enabled: boolean;
+    // Whether to fetch the manifest and count the cache the moment the source exists.
+    // True in a browser, where there is a device whose recordings are worth having ready.
+    // The prerender is the case for false: it has no cache to count and no player to
+    // fetch for, and one request per static document is a build's worth of traffic spent
+    // on an answer the document may not carry.
+    warmOnStart?: boolean;
 };
 
 export function webSampleSource(options: WebSampleOptions): SampleSource {
@@ -200,7 +206,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
     // without being asked again. The choice survives in storage and the manifest does not,
     // so without this the panel would sit claiming to fetch something nothing had started,
     // and the first piece would pay for a round trip already owed.
-    if (state.enabled) {
+    if (state.enabled && (options.warmOnStart ?? true)) {
         const done = begin();
         void Promise.all([loadManifest(), countHeld()]).finally(done);
     }
