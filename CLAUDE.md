@@ -223,6 +223,11 @@ npm run size          # bundle budget — measures the ci-build output
 npm run a11y:light    # CI ONLY — axe over the built site (builds it first)
 npm run a11y:dark     # CI ONLY
 nix develop --command ci-lighthouse  # CI ONLY — perf/SEO/CLS budgets (builds the site)
+nix develop --command ci-help-shots  # the all-locales build plus the help page's 260
+                      # pictures (not a gate). CI runs this on every push to main and
+                      # commits back whatever came out different, so it is here to look
+                      # at a change to them, never to remember. `-- --locales=de` takes
+                      # one language instead of twenty-six
 ```
 
 **Every per-visitor budget measures the same build, and each gate now produces it.**
@@ -258,6 +263,40 @@ nix develop --command ci-markdown
 installed `node_modules` still matches `package-lock.json` — after a rebase or
 pull that bumps a dependency, run `npm ci` first, or the local gate runs older
 tools than CI's fresh install and can pass what CI fails.
+
+## The help pictures
+
+`.github/workflows/help-shots.yml` keeps `public/help/` current, so nothing about the
+help page's screenshots is anybody's to remember. Every push to main runs
+`ci-help-shots` — an all-locales build, then `dev/help-screenshots.mjs` over ten pages in
+twenty-six languages — and commits the pictures that came out different straight back to
+main, signed off, with no pull request. A retaken screenshot has nothing for a reviewer
+to decide.
+
+Four things about it are worth knowing before touching it.
+
+**It cannot loop, twice over.** A push made with the built-in `GITHUB_TOKEN` raises no
+workflow events, which is also why there is no personal access token here — the last one
+expired and turned a janitor into a silent failure. On top of that the trigger ignores
+the two paths the workflow itself writes, so its own commit could not start a run even if
+the token behaved otherwise.
+
+**It dispatches the deploy.** That same no-events rule means the commit does not publish
+itself, and the site would go on serving the old pictures until some later push. A
+`workflow_dispatch` is the one event `GITHUB_TOKEN` may raise, so the run ends by asking
+Publish Website for a deploy of main's tip. The cost is a second deploy on a push whose
+pictures moved; deleting that last step trades it for pictures that reach the site a push
+late.
+
+**The ledger is not committed on its own.** `dev/help-shots.json` records what each
+language was last photographed against, and its fingerprint moves whenever the built
+asset names do — which is nearly every push, since Vite hashes them from content. So a
+run whose pictures all came out byte-identical writes no commit at all rather than an
+empty-looking one; the fingerprint is simply derived again next time.
+
+**A full re-shoot is 8.7 MB of webp.** That is what the directory weighs, and the git
+history grows by roughly that much whenever a change moves every picture — a colour, a
+font, the header. Most pushes move nothing visible and commit nothing.
 
 ## The design system on claude.ai/design
 

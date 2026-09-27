@@ -870,7 +870,10 @@ behaves — one section per area, and it drops you on the section for the page y
 from. It is a manual rather than a table of contents: the pages it used to list at the
 top now live on **Learn**, where they can be found without knowing to look under a
 question mark. The text is translated with the rest of the UI, so a reader gets it in their own
-language, and the pictures of each page live in `public/help/`.
+language, and the pictures of each page live in `public/help/`. They are taken from a
+real build rather than by hand: every push to `main` retakes them and commits back the
+ones that came out different, so a picture cannot go on showing a screen the app no
+longer has.
 
 Content and app ship together: the words are messages like every other string, held to
 all 26 languages by `npm run messages:check`, and the pictures are files in the tree. So
