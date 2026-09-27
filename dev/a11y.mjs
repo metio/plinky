@@ -42,6 +42,13 @@ const axeSrc = readFileSync("node_modules/axe-core/axe.min.js", "utf8");
 // cannot be audited as though it were the page.
 const fellBack = new Set();
 
+// What each page threw while it loaded, if anything. An uncaught error is not an
+// accessibility violation and axe has nothing to say about it, but this sweep is the only
+// gate that opens every page in a real browser — and a page React threw out and rendered
+// again from scratch is not the page the audit read. A hydration mismatch on Settings
+// showed up as one page error per screenshot for months with nothing failing over it.
+const threw = new Map();
+
 // A static server matching how Cloudflare Pages serves the build: directory URLs map
 // to their index.html, and unknown paths fall back to the SPA shell.
 const { server } = await serveStatic(ROOT, {
@@ -65,6 +72,9 @@ for (const path of PAGES) {
         reducedMotion: "reduce",
     });
     const page = await ctx.newPage();
+    page.on("pageerror", (error) => {
+        threw.set(path, [...(threw.get(path) ?? []), error.message.split("\n")[0]]);
+    });
     await page.addInitScript((theme) => {
         try {
             localStorage.setItem("plinky:theme", JSON.stringify(theme));
@@ -117,4 +127,17 @@ if (unbuilt.length > 0) {
             "the site the audit expects: nix develop --command npm run a11y:light\n",
     );
 }
-process.exitCode = total > 0 || unbuilt.length > 0 ? 1 : 0;
+if (threw.size > 0) {
+    console.error(`\n${threw.size} of the ${PAGES.length} audited pages threw while loading:`);
+    for (const [path, messages] of threw) {
+        console.error(`  ${path}`);
+        for (const message of messages) {
+            console.error(`    ${message}`);
+        }
+    }
+    console.error(
+        "\nA React error number decodes at https://react.dev/errors/<number>; #418 and #423\n" +
+            "are hydration, meaning the static document disagrees with the first client render.\n",
+    );
+}
+process.exitCode = total > 0 || unbuilt.length > 0 || threw.size > 0 ? 1 : 0;
