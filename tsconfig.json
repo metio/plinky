@@ -6,7 +6,7 @@
     ".react-router/types/**/*",
     ".storybook/**/*"
   ],
-  "exclude": ["dev/*.mts", "pdmx", "studio"],
+  "exclude": ["dev/*.mts", "pdmx", "worker"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["node", "vite/client"],
