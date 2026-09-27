@@ -2,12 +2,29 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useSyncExternalStore } from "react";
-import { sampleCredit } from "../../../core/sampledPiano";
+import { sampleCredit, samplesEnabled } from "../../../core/sampledPiano";
 import { usePersistence, useSampleSource } from "../../contexts/services";
+import { NO_SAMPLES, type SampleState } from "../../ports/sampleSource";
 import { Button } from "../ui/button";
 import { ConfirmButton } from "../ui/confirmButton";
 import { SwitchField } from "../ui/fields";
 import { m } from "../../paraglide/messages.js";
+
+// What this panel can say before it knows the device: the choice at its default, and
+// nothing fetched.
+//
+// The static document is one file every device opens, so it may not carry a figure that
+// belongs to any single one of them — and the machine that prerenders it has a sample
+// source of its own, which will happily have fetched a manifest by the time the page is
+// written. Server render and first hydration both read this constant instead, so the
+// document and every first client render agree; the subscription reports what this device
+// actually holds on the render straight after, like the rest of the stored state on this
+// page.
+//
+// `enabled` is the stored default rather than `false`, read from the one function that
+// decides it, so the switch in the static document is already in the position a device
+// that has never touched it will find it in.
+const BEFORE_ANY_DEVICE: SampleState = { ...NO_SAMPLES, enabled: samplesEnabled(null) };
 
 // The choice between the piano Plinky synthesises and a recorded one.
 //
@@ -26,9 +43,16 @@ export function GrandPianoSetting() {
     const state = useSyncExternalStore(
         samples.subscribe,
         () => samples.state(),
-        () => samples.state(),
+        () => BEFORE_ANY_DEVICE,
     );
-    const manifest = samples.manifest();
+    // Through the subscription for the same reason the figures are: read straight off the
+    // source, the credit is whatever the renderer happened to have fetched, which on the
+    // prerender is a line no first paint anywhere can match.
+    const manifest = useSyncExternalStore(
+        samples.subscribe,
+        () => samples.manifest(),
+        () => null,
+    );
     return (
         <div className="space-y-2">
             <SwitchField

@@ -3,9 +3,15 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { act } from "react";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 import type { SampleManifest } from "../../../core/sampledPiano";
 import { fakeSampleSource } from "../../adapters/fakeSampleSource";
+import { memoryStore } from "../../adapters/memoryStore";
+import { createServices, ServicesProvider } from "../../contexts/services";
+import type { SampleSource } from "../../ports/sampleSource";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { switchOn, toggle } from "../../testing/controls";
 import { m } from "../../paraglide/messages.js";
@@ -103,5 +109,57 @@ describe("GrandPianoSetting", () => {
             ).toBeTruthy(),
         );
         expect(switchOn(m.settings_grand_piano)).toBe(true);
+    });
+});
+
+describe("GrandPianoSetting, prerendered", () => {
+    // The prerender writes one document that every device opens, and the machine writing
+    // it runs a sample source of its own: give it a manifest and the credit line, the
+    // pack total and the button's label all become that machine's, which no first paint
+    // anywhere can match. React throws a hydration mismatch and discards the whole tree —
+    // on the live site this was one uncaught error per Settings load.
+    const hydrationErrors = async (built: SampleSource, opening: SampleSource) => {
+        const html = renderToString(
+            <ServicesProvider services={createServices({ store: memoryStore(), samples: built })}>
+                <GrandPianoSetting />
+            </ServicesProvider>,
+        );
+        const container = document.createElement("div");
+        container.innerHTML = html;
+        document.body.append(container);
+        const complaints: string[] = [];
+        await act(async () => {
+            hydrateRoot(
+                container,
+                <ServicesProvider
+                    services={createServices({ store: memoryStore(), samples: opening })}
+                >
+                    <GrandPianoSetting />
+                </ServicesProvider>,
+                { onRecoverableError: (error) => complaints.push(String(error)) },
+            );
+        });
+        return { html, complaints };
+    };
+
+    it("says nothing the machine that built it happened to have fetched", async () => {
+        const { html } = await hydrationErrors(fakeSampleSource(MANIFEST), fakeSampleSource(null));
+        expect(html).not.toContain(MANIFEST.instrument);
+        expect(html).toContain(m.settings_grand_piano_offline());
+    });
+
+    it("hydrates on a device that has fetched nothing", async () => {
+        const { complaints } = await hydrationErrors(
+            fakeSampleSource(MANIFEST),
+            fakeSampleSource(null),
+        );
+        expect(complaints).toEqual([]);
+    });
+
+    it("hydrates on a device that already holds the pack", async () => {
+        const held = fakeSampleSource(MANIFEST);
+        held.put("C4v8.opus");
+        const { complaints } = await hydrationErrors(fakeSampleSource(null), held);
+        expect(complaints).toEqual([]);
     });
 });
