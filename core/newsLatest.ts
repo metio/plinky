@@ -10,8 +10,8 @@ import type { Release } from "./changelog";
 
 export const LATEST_RELEASES: Release[] = [
     {
-        date: "2026-09-13",
-        label: "evening",
+        date: "2026-09-27",
+        label: null,
         entries: [
             {
                 body: "**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with\nsoft forget-me-not blue where it used lilac and gold, and cooler greys so the page\nreads more clearly. If you liked the violet, Settings brings it back under Colours.\nThe theme can also be Black: a true-black page for phone screens at night, in either\nset of colours. The pictures on the help page show the new look, in your language.",

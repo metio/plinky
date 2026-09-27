@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
-## 13 September 2026 — evening
+## 27 September 2026
 
 **Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with
 soft forget-me-not blue where it used lilac and gold, and cooler greys so the page
