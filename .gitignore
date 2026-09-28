@@ -49,6 +49,12 @@ __pycache__/
 /reports/
 
 
+# The help page's pictures, taken by dev/help-screenshots.mjs from a real build. The
+# deploy takes them per language and ships them in that language's artifact, so what a
+# reader sees is a picture of the build serving it; a local `npm run build && npm run
+# help:shots` writes the same files here for a local help page to show.
+/public/help/
+
 # Promo assets rendered by npm run promo:videos and promo:thumbs — generated, never
 # committed. One folder per piece under its composer, holding the reel, the full-length
 # YouTube cut and the thumbnail.
