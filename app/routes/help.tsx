@@ -31,15 +31,16 @@ export function meta(_args: Route.MetaArgs) {
 //
 // Content and app ship together: the text lives in the message catalogue like every
 // other string, so `npm run messages:check` holds all 26 languages to the same set
-// of keys, and the pictures are files in `public/help/`. A reader gets the help that
-// belongs to the build they are running, offline included.
+// of keys, and the pictures are served from /help/<locale>/ — taken of each language's
+// own build by the deploy (dev/help-screenshots.mjs), never kept in the repository. A
+// reader gets the help that belongs to the build they are running, offline included.
 //
 // The `key` is the hash the header's ? links to, so a section's anchor is its name.
 const SECTIONS: {
     key: string;
     title: () => string;
     text: () => string;
-    // File in public/help/, when the section has a picture of its page.
+    // The picture's name under /help/<locale>/, when the section has one.
     image?: string;
     imageAlt?: () => string;
 }[] = [
@@ -152,10 +153,11 @@ function HelpBlock({ section }: { section: (typeof SECTIONS)[number] }) {
                     width={1200}
                     height={750}
                     className="h-auto w-full rounded-lg border border-line"
-                    // A locale whose pictures have not been taken yet falls back to the
-                    // English ones rather than showing a broken image. The generator takes
-                    // every locale, so this is for the window between adding a language
-                    // and the next screenshot run — not a state anybody should stay in.
+                    // A locale with no pictures falls back to the English ones rather
+                    // than showing a broken image. The deploy takes every language, so on
+                    // the live site this is for the window between adding a language and
+                    // the deploy that first builds it; a branch preview prerenders English
+                    // alone and leans on it for the other twenty-five.
                     onError={(event) => {
                         const image = event.currentTarget;
                         const fallback = `/help/en/${section.image}.webp`;

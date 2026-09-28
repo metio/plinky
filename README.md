@@ -870,15 +870,17 @@ behaves — one section per area, and it drops you on the section for the page y
 from. It is a manual rather than a table of contents: the pages it used to list at the
 top now live on **Learn**, where they can be found without knowing to look under a
 question mark. The text is translated with the rest of the UI, so a reader gets it in their own
-language, and the pictures of each page live in `public/help/`. They are taken from a
-real build rather than by hand: every push to `main` retakes them and commits back the
-ones that came out different, so a picture cannot go on showing a screen the app no
-longer has.
+language, and each section carries a picture of the page it describes, in that language.
+
+The pictures are taken from a real build rather than by hand, and they are taken by the
+deploy: every language's build shoots its own ten of the site it has just made, and they
+ship with it. So a picture cannot go on showing a screen the app no longer has, and none
+of them are kept in the repository.
 
 Content and app ship together: the words are messages like every other string, held to
-all 26 languages by `npm run messages:check`, and the pictures are files in the tree. So
-the help you read always matches the build you are running, and it works offline like the
-rest of the app.
+all 26 languages by `npm run messages:check`, and the pictures arrive with the same
+build. So the help you read always matches the app you are running, and it works offline
+like the rest of it.
 
 ## About page
 

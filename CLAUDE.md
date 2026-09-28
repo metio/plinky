@@ -223,11 +223,10 @@ npm run size          # bundle budget — measures the ci-build output
 npm run a11y:light    # CI ONLY — axe over the built site (builds it first)
 npm run a11y:dark     # CI ONLY
 nix develop --command ci-lighthouse  # CI ONLY — perf/SEO/CLS budgets (builds the site)
-nix develop --command ci-help-shots  # the all-locales build plus the help page's 260
-                      # pictures (not a gate). CI runs this on every push to main and
-                      # commits back whatever came out different, so it is here to look
-                      # at a change to them, never to remember. `-- --locales=de` takes
-                      # one language instead of twenty-six
+npm run help:shots    # the help page's pictures, of the build in build/client (not a
+                      # gate, and nothing a push needs: the deploy takes them). Locally
+                      # `npm run build && npm run help:shots` fills all twenty-six;
+                      # `-- --locales=de` takes one
 ```
 
 **Every per-visitor budget measures the same build, and each gate now produces it.**
@@ -266,53 +265,33 @@ tools than CI's fresh install and can pass what CI fails.
 
 ## The help pictures
 
-`.github/workflows/help-shots.yml` keeps `public/help/` current, so nothing about the
-help page's screenshots is anybody's to remember. Every push to main runs
-`ci-help-shots` — an all-locales build, then `dev/help-screenshots.mjs` over ten pages in
-twenty-six languages — and commits the pictures that came out different straight back to
-main, signed off, with no pull request. A retaken screenshot has nothing for a reviewer
-to decide.
+The help page shows ten pictures of the app in each of twenty-six languages, and **the
+deploy takes them**. Each language's build job in `.github/workflows/website.yml` runs
+`dev/help-screenshots.mjs` over the tree it has just built, uploads the ten webp files in
+its own artifact, and `dev/merge-locale-artifacts.mjs` lands them at
+`build/client/help/<locale>/` — which is the address `app/routes/help.tsx` asks for. So a
+picture is always of the build serving it, and there is nothing to remember, nothing to
+commit and no token or branch rule in the way.
 
-Four things about it are worth knowing before touching it.
+Three things about it are worth knowing before touching it.
 
-**It cannot loop, twice over.** A push made with the built-in `GITHUB_TOKEN` raises no
-workflow events, which is also why there is no personal access token here — the last one
-expired and turned a janitor into a silent failure. On top of that the trigger ignores
-the two paths the workflow itself writes, so its own commit could not start a run even if
-the token behaved otherwise.
+**Nothing is tracked.** `public/help/` is gitignored and the ledger is gone. A fresh clone
+has no pictures at all, so a local help page shows ten empty frames until
+`npm run build && npm run help:shots` writes them there. No gate minds: `npm run
+a11y:light` and `ci-lighthouse` are clean over all 25 pages with no `build/client/help/`
+at all, the size budget weighs `build/client/assets` alone, and the alt text a sweep reads
+comes from the message catalogue, which is there whether the picture is or not.
 
-**It dispatches the deploy.** That same no-events rule means the commit does not publish
-itself, and the site would go on serving the old pictures until some later push. A
-`workflow_dispatch` is the one event `GITHUB_TOKEN` may raise, so the run ends by asking
-Publish Website for a deploy of main's tip. The cost is a second deploy on a push whose
-pictures moved; deleting that last step trades it for pictures that reach the site a push
-late.
+**The merge refuses a language that arrived without them.** Nothing else in the deploy can
+produce the pictures, so an artifact with no `help/<locale>/` is a language whose help page
+would silently show the English screens. `dev/merge-locale-artifacts.mjs` stops instead.
 
-**The ledger is not committed on its own.** `dev/help-shots.json` records what each
-language was last photographed against, and its fingerprint moves whenever the built
-asset names do — which is nearly every push, since Vite hashes them from content. So a
-run whose pictures all came out byte-identical writes no commit at all rather than an
-empty-looking one; the fingerprint is simply derived again next time.
-
-**A full re-shoot is 8.7 MB of webp.** That is what the directory weighs, and the git
-history grows by roughly that much whenever a change moves every picture — a colour, a
-font, the header. Most pushes move nothing visible and commit nothing.
-
-## The design system on claude.ai/design
-
-Plinky's components are published as a design system, so a design agent builds with the
-real parts instead of generic ones. `/design-sync` in Claude Code runs it: it compiles
-every storied component into a bundle, screenshots each preview against this repo's own
-Storybook render, and uploads only what matched. `.design-sync/` holds the settings
-(`config.json`), the repo-specific gotchas (`NOTES.md`), the conventions header the agent
-reads (`conventions.md`), and the four hand-owned previews; everything else there is
-generated and gitignored.
-
-Two things to know before running it. It compiles `app/paraglide/` for **English and
-German alone** — all 26 locales are three quarters of the bundle and push it past the
-upload's size cap — so **run `npm run messages` afterwards** or the tree stays
-two-language. And it builds a reference Storybook into `.design-sync/sb-reference/`, which
-no repo gate builds, so a `.storybook/` change can break it while every gate stays green.
+**A preview shoots English alone.** `.github/workflows/preview.yml` prerenders English
+only, so English is the one set it can take; every other language falls back to it, which
+is what the `onError` in `app/routes/help.tsx` does. The shoot runs after `build:locales`
+has stamped the service worker, so a preview's keep-offline list does not name the ten —
+stamping twice fails, and a preview is for looking at a branch rather than testing it
+offline.
 
 ## Conventions the tools don't fully enforce
 
