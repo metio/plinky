@@ -6,15 +6,23 @@
 // showing a navigation bar and a colour scheme the app had stopped having: nothing
 // connected the pictures to the thing they were pictures of.
 //
-// Run it after an ALL-LOCALES build: `npm run build && npm run help:shots`. Not
-// `build:single` — that tree-shakes to one language, which is right for what a visitor
-// downloads and useless for photographing twenty-six of them.
+// Nothing here is committed. The deploy takes them: each language's build job in
+// .github/workflows/website.yml shoots its own ten from the site it has just built and
+// ships them in its artifact, so what reaches a reader is a picture of the build serving
+// it. Two shapes, one script:
+//
+//   npm run help:shots -- --locales=de --out=build/client/help   # one language, in place
+//   npm run build && npm run help:shots                          # all of them, locally
+//
+// The local form needs an ALL-LOCALES build, because that is the only tree that holds
+// twenty-six languages to photograph; `--locales=` narrows it to the ones a single-locale
+// build has. Either way the pictures land under <out>/<locale>/, which is what the help
+// page asks for at /help/<locale>/<name>.webp.
 //
 // A picture is taken per locale, because help that describes a button by a name the
 // screenshot beside it does not use has to be translated a second time by the person
 // reading it. A reader fetches only their own set, so twenty-six of them cost a visitor
-// exactly what one did; what grows is the repo, which is why nothing is re-shot unless
-// something it is a picture OF has changed.
+// exactly what one did.
 //
 // Every shot is of a fresh device — no progress, no imported scores, nothing dismissed —
 // because that is the app a reader opening the help page is most likely looking at, and
@@ -23,15 +31,14 @@
 // The webp encoding is done by the browser that took the shot (a canvas encodes it), so
 // this needs no image library and no host binary: anywhere Playwright runs, this runs.
 
-import { createHash } from "node:crypto";
 import { existsSync, readdirSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { basename, join } from "node:path";
 import { chromium } from "playwright";
 import { serveStatic } from "./staticServer.mjs";
 
 const CLIENT = "build/client";
-const OUT = "public/help";
+const DEFAULT_OUT = "public/help";
 // The size the help page reserves for them (see app/routes/help.tsx), so a picture
 // never arrives and pushes the page around.
 const WIDTH = 1200;
@@ -58,9 +65,6 @@ const SHOTS = [
     ["settings", "settings/"],
 ];
 
-// What the pictures were taken of, so a run can tell what is worth taking again.
-const LEDGER = "dev/help-shots.json";
-
 // The languages to photograph: whatever has a message file, which is the same list
 // `messages:check` holds every locale to. Reading it rather than restating it means a
 // twenty-seventh language needs no edit here.
@@ -69,54 +73,19 @@ const LOCALES = readdirSync("messages")
     .map((name) => basename(name, ".json"))
     .sort();
 
-// A locale's pictures are stale when its own words change, or when the app they are
-// pictures of changes. The first is the message file; the second is the built asset
-// names, which Vite derives from content — so any change to the app moves them and every
-// locale is re-shot, while a reworded German string re-shoots German alone.
-// The catalogue is in the pictures too — the music list shows its titles and its count —
-// and it is served as a file rather than bundled, so no asset name moves when it changes.
-// Hashing it here is what stops a re-import leaving all 260 pictures quietly out of date.
-const CATALOGUE = join(CLIENT, "songs", "manifest.json");
-const appFingerprint = createHash("sha256")
-    .update(readdirSync(join(CLIENT, "assets")).sort().join("\n"))
-    .update(existsSync(CATALOGUE) ? await readFile(CATALOGUE) : "")
-    .digest("hex")
-    .slice(0, 16);
-
-async function localeFingerprint(locale) {
-    const words = await readFile(join("messages", `${locale}.json`), "utf8");
-    return createHash("sha256").update(`${appFingerprint}\n${words}`).digest("hex").slice(0, 16);
-}
-
 // The built site as it is served: a prerendered document per path, everything else a
 // file, and the SPA shell for anything that has neither.
 function serve() {
     return serveStatic(CLIENT, { fallback: "spa", host: "127.0.0.1" });
 }
 
-if (!existsSync(join(CLIENT, "index.html"))) {
-    console.error(`No build in ${CLIENT}. Run \`npm run build\` first.`);
-    process.exit(1);
-}
-
-// A single-locale build has only its own tree, and every other language would be served
-// the SPA shell — which photographs as an empty page rather than as a failure, so it is
-// worth refusing outright.
-const sample = LOCALES.find((locale) => locale !== "en") ?? "en";
-if (!existsSync(join(CLIENT, sample, "index.html"))) {
-    console.error(
-        `${CLIENT} holds only one language (no ${sample}/). These pictures are of all ` +
-            `${LOCALES.length} of them — run \`npm run build\`, not \`build:single\`.`,
-    );
-    process.exit(1);
-}
-
-// Which languages to take, and why. `--all` re-shoots everything; `--locales=de,fr` takes
-// a named few, which is how you check a change without driving two hundred and sixty page
-// loads through a browser.
+// Which languages to take, and where to put them. `--locales=de,fr` takes a named few,
+// which is both how the deploy takes one and how you check a change without driving two
+// hundred and sixty page loads through a browser. `--out=` points them somewhere other
+// than public/, which is what a build job shooting into its own tree needs.
 const argv = process.argv.slice(2);
 const only = argv.find((one) => one.startsWith("--locales="))?.slice("--locales=".length);
-const forced = argv.includes("--all");
+const OUT = argv.find((one) => one.startsWith("--out="))?.slice("--out=".length) ?? DEFAULT_OUT;
 const asked = only ? only.split(",").filter(Boolean) : LOCALES;
 const unknown = asked.filter((locale) => !LOCALES.includes(locale));
 if (unknown.length > 0) {
@@ -124,30 +93,27 @@ if (unknown.length > 0) {
     process.exit(1);
 }
 
-const ledger = existsSync(LEDGER) ? JSON.parse(await readFile(LEDGER, "utf8")) : {};
-const wanted = [];
-for (const locale of asked) {
-    const fingerprint = await localeFingerprint(locale);
-    const complete = SHOTS.every(([name]) => existsSync(join(OUT, locale, `${name}.webp`)));
-    if (!forced && complete && ledger[locale] === fingerprint) {
-        continue;
-    }
-    wanted.push([locale, fingerprint]);
+// A language the build does not hold would be served the SPA shell — which photographs as
+// an empty page rather than as a failure, so it is worth refusing outright. This is the
+// one check that catches asking twenty-six languages of a build pinned to one, and asking
+// for a language of a build pinned to another.
+const missing = asked.filter((locale) => !existsSync(join(CLIENT, locale, "index.html")));
+if (missing.length > 0) {
+    console.error(
+        `${CLIENT} has no pages for ${missing.join(", ")}. A pinned build ` +
+            `(PLINKY_LOCALE=xx npm run build:client) holds one language; ` +
+            `\`npm run build\` holds all ${LOCALES.length}.`,
+    );
+    process.exit(1);
 }
 
-if (wanted.length === 0) {
-    console.log(`Every language's pictures are current (${asked.length} checked).`);
-    process.exit(0);
-}
-console.log(
-    `Taking ${wanted.length * SHOTS.length} pictures: ${wanted.map(([l]) => l).join(", ")}`,
-);
+console.log(`Taking ${asked.length * SHOTS.length} pictures: ${asked.join(", ")}`);
 
 const { server, port } = await serve();
 const browser = await chromium.launch();
 
 let taken = 0;
-for (const [locale, fingerprint] of wanted) {
+for (const locale of asked) {
     const page = await browser.newPage({
         viewport: { width: WIDTH, height: HEIGHT },
         deviceScaleFactor: 1,
@@ -194,14 +160,9 @@ for (const [locale, fingerprint] of wanted) {
         taken += 1;
     }
     await page.close();
-
-    // Written per language rather than at the end, so a run cut short keeps what it earned
-    // and the next one picks up where it stopped instead of starting over.
-    ledger[locale] = fingerprint;
-    await writeFile(LEDGER, `${JSON.stringify(ledger, Object.keys(ledger).sort(), 4)}\n`);
     console.log(`  ${locale}  ${SHOTS.length} pictures`);
 }
 
 await browser.close();
 server.close();
-console.log(`Took ${taken} help pictures at ${WIDTH}×${HEIGHT}, quality ${QUALITY}.`);
+console.log(`Took ${taken} help pictures at ${WIDTH}×${HEIGHT}, quality ${QUALITY}, into ${OUT}/.`);
