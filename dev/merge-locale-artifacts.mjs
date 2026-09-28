@@ -10,8 +10,10 @@
 //   <artifacts>/site-root/     — the all-locales base: "/", the SPA fallback, the
 //                                public assets (songs, exercises, favicon…), and
 //                                the root-redirect chunks.
-//   <artifacts>/site-<locale>/ — that locale's <locale>/ pages + its assets/
-//                                (tree-shaken to its own language).
+//   <artifacts>/site-<locale>/ — that locale's <locale>/ pages, its assets/
+//                                (tree-shaken to its own language), and the ten
+//                                help/<locale>/ pictures its build job photographed
+//                                of itself.
 //
 // Content-hashed filenames make the assets merge safe: locale-independent chunks
 // are byte-identical across builds and collapse to one copy; message-bearing
@@ -43,8 +45,18 @@ for (const entry of readdirSync(ARTIFACTS)) {
             `merge-locale-artifacts: artifact ${entry} is missing its ${locale}/ pages.`,
         );
     }
+    // The help page's pictures, taken by that build job of the very tree it uploaded.
+    // Nothing else in the deploy can produce them and nothing in the repository holds
+    // them, so a locale arriving without its ten is a language whose help page would
+    // show the English screens instead — worth stopping for rather than serving.
+    if (!existsSync(`${dir}/help/${locale}`)) {
+        throw new Error(
+            `merge-locale-artifacts: artifact ${entry} is missing its help/${locale}/ pictures.`,
+        );
+    }
     cpSync(`${dir}/${locale}`, `${CLIENT}/${locale}`, { recursive: true });
     cpSync(`${dir}/assets`, `${CLIENT}/assets`, { recursive: true });
+    cpSync(`${dir}/help/${locale}`, `${CLIENT}/help/${locale}`, { recursive: true });
     merged += 1;
 }
 

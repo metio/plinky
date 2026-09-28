@@ -101,13 +101,27 @@ jobs:
         run: nix develop --command npm run build:client
         env:
           PLINKY_LOCALE: ${{ matrix.locale }}
+      - name: Take the help pictures
+        # Ten pictures of this language's own pages, which the help page shows beside its
+        # text so a reader sees the app in the words their app uses. Taken here, from the
+        # tree this job has just built and is about to upload, rather than kept in the
+        # repository: a picture that ships with the build it is a picture of cannot go on
+        # showing a screen the app no longer has, and nothing is committed, so no token
+        # and no branch rule is involved. 8.7 MB of webp leaves the history with it.
+        # See dev/help-screenshots.mjs.
+        env:
+          LOCALE: ${{ matrix.locale }}
+        run: nix develop --command npm run help:shots -- --locales="$LOCALE" --out=build/client/help
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: site-${{ matrix.locale }}
-          # Only this locale's pages + chunks; the public assets come from site-root.
+          # This locale's pages, its chunks and its help pictures; the public assets come
+          # from site-root. The merge step below refuses an artifact with no pictures —
+          # nothing else in the deploy can produce them.
           path: |
             build/client/${{ matrix.locale }}
             build/client/assets
+            build/client/help/${{ matrix.locale }}
           retention-days: 1
 
   deploy:

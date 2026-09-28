@@ -55,6 +55,19 @@ jobs:
         run: nix develop --command npm run build:locales
         env:
           PLINKY_LOCALES: en
+      - name: Take the help pictures (English)
+        # The help page's pictures are not in the repository — production takes them per
+        # language, one set per build job (website.yml). English is the one language this
+        # build prerenders, so it is the one set that can be taken here; every other
+        # language's help page falls back to it, which is what app/routes/help.tsx does
+        # for a language whose pictures are missing. Without this step the help page
+        # previews with ten empty frames. See dev/help-screenshots.mjs.
+        #
+        # After build:locales, which ends by stamping the service worker, so a preview's
+        # keep-offline list does not name these ten. Stamping again would fail — the
+        # placeholders it writes over are gone — and a preview is for looking at a branch
+        # rather than for testing it offline.
+        run: nix develop --command npm run help:shots -- --locales=en --out=build/client/help
       - name: Add SPA fallback
         # The shell for a path with no prerendered document, plus the routes where the
         # middleware corrects its status — Pages would otherwise serve a real page with
