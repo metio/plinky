@@ -484,6 +484,17 @@ describe("a credit that names more than one person", () => {
         expect(canonicalPeople("J. P. Storm")).toEqual(["J. P. Storm"]);
     });
 
+    it("names nobody when the credit cleans away to nothing", () => {
+        // A credit of whitespace or punctuation alone — a player's own import, a corpus row
+        // with an empty composer field. One blank name in the list is not one person: the
+        // credit beside the title renders as an empty element, and a caller taking the
+        // first name is handed "" where nothing at all was the answer.
+        for (const credit of ["", " ", "   ", "\t", "."]) {
+            expect(canonicalPeople(credit)).toEqual([]);
+            expect(personSlugs(credit)).toEqual([]);
+        }
+    });
+
     it("reads no credit off Object's prototype", () => {
         // The hand-kept pairs are looked up by the credit itself, and every object answers
         // for "constructor" and "toString" whether or not anybody put them there. A score

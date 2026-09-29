@@ -607,9 +607,15 @@ export function canonicalPeople(raw: string): string[] {
     // two people written tight, and read as one they made a page for a composer nobody has
     // heard of — while the real pair sat elsewhere in the directory with their own pieces.
     const parts = cleaned.split(/\s*\/\s*|\s+&\s+|\s+\b(?:and|y|e|et|und|och)\b\s+/i);
-    return parts.length === 1
-        ? [cleaned]
-        : parts.map((part) => canonicalComposer(part.trim())).filter((part) => part !== "");
+    if (parts.length === 1) {
+        // A credit that cleans away to nothing names nobody, and the empty list says so.
+        // An empty string in the list reads as one person whose name is blank instead: the
+        // credit renders as an empty element beside the title, and a caller taking the
+        // first name is handed "" where it expected either a name or nothing at all. The
+        // split path already drops its empty parts, so this is the same rule on both.
+        return cleaned === "" ? [] : [cleaned];
+    }
+    return parts.map((part) => canonicalComposer(part.trim())).filter((part) => part !== "");
 }
 
 // The slug a single, already-canonical name gets, or "" when it names no person.
