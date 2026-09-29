@@ -3,6 +3,7 @@
 
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { heldNotes } from "../../../core/heldNotes";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
 import {
     keyLabelIn,
@@ -233,7 +234,7 @@ export function Keyboard({
     // Enter/Space key, or a screen-reader click. Reference-counting per note is what lets
     // two fingers share a key without one lifting silencing the other, and what keeps a
     // real press alive when an assistive-tech auto-release fires for its own source.
-    const noteSources = useRef(new Map<number, Set<string>>());
+    const held = useRef(heldNotes());
     // The note each active pointer currently sounds, and the set of pointers still down —
     // tracked apart from the note so a glide that drifts off the keys (a gap, the badge,
     // past the edge) releases the note yet stays live, and re-entering a key re-presses.
@@ -256,14 +257,7 @@ export function Keyboard({
     onReleaseRef.current = onRelease;
 
     const sound = useCallback((source: string, note: number, velocity?: number) => {
-        let set = noteSources.current.get(note);
-        if (!set) {
-            set = new Set();
-            noteSources.current.set(note, set);
-        }
-        const wasSilent = set.size === 0;
-        set.add(source);
-        if (wasSilent) {
+        if (held.current.press(source, note)) {
             // Pass velocity only when a tap position gave one, so keyboard/AT presses
             // stay a bare note the funnel loudens with its default.
             if (velocity === undefined) {
@@ -274,20 +268,14 @@ export function Keyboard({
         }
     }, []);
     const silence = useCallback((source: string, note: number) => {
-        const set = noteSources.current.get(note);
-        if (!set?.has(source)) {
-            return;
-        }
-        set.delete(source);
-        if (set.size === 0) {
-            noteSources.current.delete(note);
+        if (held.current.release(source, note)) {
             onReleaseRef.current?.(note);
         }
     }, []);
 
     useEffect(() => {
         const timers = clickTimers.current;
-        const sources = noteSources.current;
+        const sounding = held.current;
         return () => {
             for (const id of timers) {
                 window.clearTimeout(id);
@@ -295,10 +283,9 @@ export function Keyboard({
             timers.clear();
             // A key still held at unmount (route/mode switch mid-press) never gets its
             // release event, so let it go here or its voice rings on and its lit state sticks.
-            for (const note of sources.keys()) {
+            for (const note of sounding.releaseAll()) {
                 onReleaseRef.current?.(note);
             }
-            sources.clear();
         };
     }, []);
 
