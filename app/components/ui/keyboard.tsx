@@ -3,7 +3,7 @@
 
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { heldNotes } from "../../../core/heldNotes";
+import { keybed } from "../../../core/keybed";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
 import {
     keyLabelIn,
@@ -19,11 +19,6 @@ import { keyState } from "../../../core/keyState";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { finishFor, type KeyboardFinish } from "../../../core/keyboardFinish";
-
-// What a pointer calls itself when it sounds and silences a note. One name, because a
-// note is released by the source that sounded it: the two spelling it differently is the
-// shape of a key left sounding forever.
-const pointerSource = (pointerId: number) => `p${pointerId}`;
 
 // Where each navigation key takes the focus. A semitone either way, an octave up or down,
 // and the ends of the keybed — every one of them preventing the default AND halting the
@@ -234,12 +229,7 @@ export function Keyboard({
     // Enter/Space key, or a screen-reader click. Reference-counting per note is what lets
     // two fingers share a key without one lifting silencing the other, and what keeps a
     // real press alive when an assistive-tech auto-release fires for its own source.
-    const held = useRef(heldNotes());
-    // The note each active pointer currently sounds, and the set of pointers still down —
-    // tracked apart from the note so a glide that drifts off the keys (a gap, the badge,
-    // past the edge) releases the note yet stays live, and re-entering a key re-presses.
-    const pointerNote = useRef(new Map<number, number>());
-    const activePointers = useRef(new Set<number>());
+    const keybedRef = useRef(keybed());
     // When a pointer last went down, and when a key was last used, so the compatibility
     // `click` that trails a real press or an Enter/Space activation can be told apart
     // from a screen reader's synthesized activation.
@@ -257,7 +247,7 @@ export function Keyboard({
     onReleaseRef.current = onRelease;
 
     const sound = useCallback((source: string, note: number, velocity?: number) => {
-        if (held.current.press(source, note)) {
+        if (keybedRef.current.press(source, note).pressed !== null) {
             // Pass velocity only when a tap position gave one, so keyboard/AT presses
             // stay a bare note the funnel loudens with its default.
             if (velocity === undefined) {
@@ -268,14 +258,14 @@ export function Keyboard({
         }
     }, []);
     const silence = useCallback((source: string, note: number) => {
-        if (held.current.release(source, note)) {
+        if (keybedRef.current.release(source, note).released !== null) {
             onReleaseRef.current?.(note);
         }
     }, []);
 
     useEffect(() => {
         const timers = clickTimers.current;
-        const sounding = held.current;
+        const sounding = keybedRef.current;
         return () => {
             for (const id of timers) {
                 window.clearTimeout(id);
@@ -313,19 +303,24 @@ export function Keyboard({
     // tap sounds exactly once and a glide sounds each key it crosses exactly once. A null
     // note releases the current one but leaves the pointer active for re-entry.
     const movePointer = (pointerId: number, note: number | null, velocity?: number) => {
-        const prev = pointerNote.current.get(pointerId);
-        if (prev === note) {
+        told(keybedRef.current.pointerTo(pointerId, note), velocity);
+    };
+
+    // What the keybed crossed, said to the parent: a note that stopped sounding, then one
+    // that started. Velocity only where a tap position gave one, so keyboard and
+    // assistive-tech presses stay a bare note the funnel loudens with its default.
+    const told = (edge: { pressed: number | null; released: number | null }, velocity?: number) => {
+        if (edge.released !== null) {
+            onReleaseRef.current?.(edge.released);
+        }
+        if (edge.pressed === null) {
             return;
         }
-        if (prev !== undefined) {
-            silence(pointerSource(pointerId), prev);
+        if (velocity === undefined) {
+            onPressRef.current?.(edge.pressed);
+        } else {
+            onPressRef.current?.(edge.pressed, velocity);
         }
-        if (note === null) {
-            pointerNote.current.delete(pointerId);
-            return;
-        }
-        pointerNote.current.set(pointerId, note);
-        sound(pointerSource(pointerId), note, velocity);
     };
 
     const down = (event: React.PointerEvent) => {
@@ -337,7 +332,6 @@ export function Keyboard({
         }
         event.preventDefault();
         lastPointerDown.current = event.timeStamp;
-        activePointers.current.add(event.pointerId);
         // Capture the pointer to the whole keybed so every move keeps arriving here even
         // as the finger slides across keys and past the edge; each move is hit-tested to
         // the key beneath it. This is what turns a drag into a glide — reliably on touch,
@@ -351,12 +345,15 @@ export function Keyboard({
         if (event.pointerType === "touch") {
             navigator.vibrate?.(8);
         }
-        movePointer(event.pointerId, Number(key.dataset.note), velocityAt(event.clientY, key));
+        told(
+            keybedRef.current.pointerDown(event.pointerId, Number(key.dataset.note)),
+            velocityAt(event.clientY, key),
+        );
     };
     const move = (event: React.PointerEvent) => {
         // Gate on the pointer still being down, NOT on it currently sounding a note, so a
         // glide that dipped off the keys re-engages when it returns.
-        if (!activePointers.current.has(event.pointerId)) {
+        if (!keybedRef.current.tracks(event.pointerId)) {
             return;
         }
         const key = keyElementAt(event.clientX, event.clientY);
@@ -366,17 +363,12 @@ export function Keyboard({
             key ? velocityAt(event.clientY, key) : undefined,
         );
     };
-    const endPointer = useCallback(
-        (pointerId: number) => {
-            const prev = pointerNote.current.get(pointerId);
-            if (prev !== undefined) {
-                silence(pointerSource(pointerId), prev);
-                pointerNote.current.delete(pointerId);
-            }
-            activePointers.current.delete(pointerId);
-        },
-        [silence],
-    );
+    const endPointer = useCallback((pointerId: number) => {
+        const { released } = keybedRef.current.pointerEnd(pointerId);
+        if (released !== null) {
+            onReleaseRef.current?.(released);
+        }
+    }, []);
     const up = (event: React.PointerEvent) => endPointer(event.pointerId);
 
     // A window-level backstop for the pointer's end. Pointer capture keeps a glide's moves
