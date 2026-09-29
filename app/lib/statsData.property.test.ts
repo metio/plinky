@@ -37,7 +37,7 @@ const arbItem: fc.Arbitrary<GradedMastery> = fc
     .tuple(
         fc.stringMatching(/^[a-z]{1,6}$/),
         fc.integer({ min: 1, max: MAX_GRADE }),
-        fc.constantFrom("piece" as const, "ear" as const, "exercise" as const),
+        fc.constantFrom("piece" as const, "ear" as const),
         arbMastery,
     )
     .map(([id, grade, kind, mastery]) => ({
@@ -66,7 +66,7 @@ const arbInput: fc.Arbitrary<YouInput> = fc
     .record({
         items: fc.array(arbItem, { maxLength: 24 }),
         catalogue: arbCatalogue,
-        mode: fc.constantFrom("gentle" as const, "steady" as const),
+        mode: fc.constantFrom("gentle" as const, "competitive" as const),
         reviewCap: fc.integer({ min: 0, max: 12 }),
         reachedGrade: fc.integer({ min: 0, max: MAX_GRADE }),
         flawless: fc.boolean(),
