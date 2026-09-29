@@ -94,6 +94,7 @@ path = [
     "dev/grade-anchors.json",
     "dev/builtin-assignments.json",
     "dev/retired-routes.json",
+    "dev/models/traces/*/*.itf.json",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
