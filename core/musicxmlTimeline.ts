@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { lookupOr } from "./lookup";
 import { pitchMidiOf } from "./notes";
 import { child, numberOf, text } from "./musicxmlDom";
 
@@ -131,7 +132,7 @@ function marksOf(note: Element): XmlNoteMarks {
         accent: has("accent"),
         marcato: has("strong-accent"),
         fermata: has("fermata"),
-        ornament: ornamentTag ? (ORNAMENT_TAGS[ornamentTag] ?? null) : null,
+        ornament: ornamentTag ? lookupOr(ORNAMENT_TAGS, ornamentTag) : null,
         arpeggiate: has("arpeggiate"),
         tremolo: tremoloOf(note),
         glissandos: glissandosOf(note),

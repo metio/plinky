@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { known, lookup } from "./lookup";
+
 // The facts about note letters that every other module was quietly keeping its own
 // copy of: which letters there are, how far each sits above C, and what a key
 // signature does to them.
@@ -44,7 +46,7 @@ export function alterFor(letter: string, fifths: number): number {
 // The MIDI number for a written pitch. Octave 4 holds middle C (MIDI 60), the
 // convention MusicXML and every module here already assume.
 export function midiOf(step: string, octave: number, alter = 0): number {
-    return (octave + 1) * 12 + (SEMITONE[step] ?? 0) + alter;
+    return (octave + 1) * 12 + lookup(SEMITONE, step, 0) + alter;
 }
 
 // The sounding pitch a MusicXML <pitch> element writes, as a MIDI number, or null when
@@ -55,7 +57,7 @@ export function pitchMidiOf(pitch: Element): number | null {
     const first = (tag: string): string | null =>
         pitch.getElementsByTagName(tag)[0]?.textContent?.trim() ?? null;
     const step = (first("step") ?? "").toUpperCase();
-    if (SEMITONE[step] === undefined) {
+    if (!known(SEMITONE, step)) {
         return null;
     }
     const octaveText = first("octave");
@@ -122,7 +124,7 @@ export function spellMidi(
 // The accidental that puts a letter on a pitch class: the smaller way round, -6 to 5, so a
 // letter a step or two from the pitch reaches it with a sharp or flat, or a double.
 export function alterOnto(pitchClass: number, step: string): number {
-    return ((((pitchClass - (SEMITONE[step] ?? 0)) % 12) + 18) % 12) - 6;
+    return ((((pitchClass - lookup(SEMITONE, step, 0)) % 12) + 18) % 12) - 6;
 }
 
 // A MIDI note spelled for a key signature: the letter whose signature alteration
@@ -136,7 +138,7 @@ export function spellInKey(
     const pc = ((midi % 12) + 12) % 12;
     for (const letter of LETTERS) {
         const alter = alterFor(letter, fifths);
-        if (((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
+        if ((((lookup(SEMITONE, letter, 0) + alter) % 12) + 12) % 12 === pc) {
             return { step: letter, octave: octaveOf(midi, letter, alter), alter };
         }
     }
@@ -144,7 +146,7 @@ export function spellInKey(
     // natural sign, is how a reader expects to see it — F natural in G major is F♮, not
     // E♯, and D natural in D♭ major is D♮, not E𝄫.
     for (const letter of LETTERS) {
-        if ((SEMITONE[letter] ?? 0) === pc) {
+        if (lookup(SEMITONE, letter, 0) === pc) {
             return { step: letter, octave: octaveOf(midi, letter, 0), alter: 0 };
         }
     }
@@ -152,7 +154,7 @@ export function spellInKey(
     // sharps in sharp keys, flats in flat keys. Never a double accidental.
     const alter = fifths < 0 ? -1 : 1;
     for (const letter of LETTERS) {
-        if (((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
+        if ((((lookup(SEMITONE, letter, 0) + alter) % 12) + 12) % 12 === pc) {
             return { step: letter, octave: octaveOf(midi, letter, alter), alter };
         }
     }
@@ -165,5 +167,5 @@ export function spellInKey(
 // alteration comes back out here.
 export function octaveOf(midi: number, letter: string, alter: number): number {
     const natural = midi - alter;
-    return Math.floor(natural / 12) - 1 + (natural % 12 < (SEMITONE[letter] ?? 0) ? 1 : 0);
+    return Math.floor(natural / 12) - 1 + (natural % 12 < lookup(SEMITONE, letter, 0) ? 1 : 0);
 }

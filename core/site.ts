@@ -1,3 +1,4 @@
+import { lookup } from "./lookup";
 import { type PersonAbout, sameAsFor } from "./personAbout";
 import { CHANNELS } from "./social";
 // SPDX-FileCopyrightText: The Plinky Authors
@@ -149,8 +150,12 @@ const OG_LOCALE: Record<string, string> = {
     sq: "sq_AL",
 };
 
+// Own-property only. A bare lookup answers for every name on Object's prototype, so a
+// path segment reading "toString" or "constructor" resolves to a function, and the
+// og:locale tag then carries a stringified function to every platform that unfurls the
+// link. A locale the app does not have must read as the default, and that is English.
 export function ogLocale(locale: string): string {
-    return OG_LOCALE[locale] ?? "en_US";
+    return lookup(OG_LOCALE, locale, "en_US");
 }
 
 // schema.org data for a content page that isn't a specific work or person — the

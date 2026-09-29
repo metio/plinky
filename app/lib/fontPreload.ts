@@ -13,6 +13,7 @@
 // So the preload names the subset the page's own text is drawn from. Naming the wrong one
 // is worse than naming none: the connection is spent on glyphs nothing renders.
 
+import { lookup } from "../../core/lookup";
 import interCyrillic from "@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2?url";
 import interGreek from "@fontsource-variable/inter/files/inter-greek-wght-normal.woff2?url";
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
@@ -39,7 +40,7 @@ export function interSubsetFor(locale: string): string | null {
     if (SYSTEM_FONT_LOCALES.has(locale)) {
         return null;
     }
-    return BY_LOCALE[locale] ?? interLatin;
+    return lookup(BY_LOCALE, locale, interLatin);
 }
 
 // One preload link, in the shape a route's links() returns.
