@@ -3,12 +3,7 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import {
-    type HarmonyBar,
-    type HarmonyKey,
-    type HarmonyNote,
-    readHarmony,
-} from "./harmony";
+import { type HarmonyBar, type HarmonyKey, type HarmonyNote, readHarmony } from "./harmony";
 import { chordPitches, pitchClassOf, SEMITONES_PER_OCTAVE } from "./theory";
 
 // Reading the chords out of a piece: what the analysis panel shows, what the chord
@@ -155,9 +150,7 @@ describe("the chords read out of a piece", () => {
                     }
                     // Touching spans of the same chord are one chord held, and showing
                     // them as two would read as a change the music never made.
-                    expect(`${span.root}:${span.quality}`).not.toBe(
-                        `${next.root}:${next.quality}`,
-                    );
+                    expect(`${span.root}:${span.quality}`).not.toBe(`${next.root}:${next.quality}`);
                 });
             }),
         );
@@ -176,7 +169,9 @@ describe("the chords read out of a piece", () => {
 
                 // A chord is its pitch classes, so playing the whole thing an octave
                 // higher is the same harmony — only the bass note moves with it.
-                expect(readHarmony(raised).map((span) => [span.root, span.quality, span.from])).toEqual(
+                expect(
+                    readHarmony(raised).map((span) => [span.root, span.quality, span.from]),
+                ).toEqual(
                     readHarmony(timeline).map((span) => [span.root, span.quality, span.from]),
                 );
             }),
