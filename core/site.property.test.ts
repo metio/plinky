@@ -102,7 +102,13 @@ describe("what a link unfurls as", () => {
                     expect(parsed.pathname.startsWith(folder)).toBe(true);
                     expect(parsed.pathname.endsWith(".png")).toBe(true);
                     expect(parsed.search).toBe("");
-                    expect(parsed.pathname).not.toContain("..");
+                    // One segment under the folder, and no segment that climbs out of
+                    // it. A file NAMED "..png" is harmless; a segment that IS ".." is
+                    // the traversal, and new URL would already have resolved it away,
+                    // which is what makes the folder check above meaningful.
+                    const segments = parsed.pathname.slice(folder.length).split("/");
+                    expect(segments.length).toBe(1);
+                    expect(segments).not.toContain("..");
                 }
             }),
         );
