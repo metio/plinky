@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { createReloadHold } from "../../core/reloadHold";
+
 // Watches the offline service worker for a newer build and, when one is ready,
 // surfaces it as a prompt instead of letting it seize the tab. Everything
 // side-effecting arrives injected — the container, the reload, the timers — so
@@ -139,16 +141,15 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
             notify();
         });
 
-    // A reload wanted now but parked because env.holdReload said the player is
-    // mid-run; flushReload releases it once the hold clears.
-    let reloadPending = false;
+    // A reload wanted now is parked when env.holdReload says the player is mid-run, and
+    // flushReload releases it once the hold clears. The decision is core/reloadHold —
+    // the rule is a pure unit there, driven by a model, while what follows here is the
+    // plumbing that only a browser can run.
+    const hold = createReloadHold(() => env.holdReload?.() ?? false);
     const requestReload = () => {
-        if (env.holdReload?.()) {
-            reloadPending = true;
-            return;
+        if (hold.want()) {
+            env.reload();
         }
-        reloadPending = false;
-        env.reload();
     };
 
     // A new worker taking control evicts the previous build's cache, so reload onto it
@@ -236,8 +237,8 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
         registrationFailed: () => registrationFailed,
         applyUpdate,
         flushReload() {
-            if (reloadPending) {
-                requestReload();
+            if (hold.flush()) {
+                env.reload();
             }
         },
         dispose() {
