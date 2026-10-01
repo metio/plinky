@@ -15,9 +15,12 @@ function atUtcMidnight(dateKey: string): number {
     return Date.parse(`${dateKey}T00:00:00Z`);
 }
 
-// The key `delta` days after `dateKey` (negative goes back). A key that isn't a
-// date comes back unchanged, so a corrupt stored key cannot turn into "NaN-NaN-NaN"
-// and seed a range that never terminates.
+// The key `delta` days after `dateKey` (negative goes back). A key the parser cannot
+// read comes back unchanged, so a corrupt stored key cannot turn into "NaN-NaN-NaN" and
+// seed a range that never terminates. A key that parses into a day the calendar does not
+// have is normalised rather than refused — "2026-02-29" shifts from the 1st of March —
+// because the guard here is about parsing, not about being a real day. Where the
+// difference matters, isDateKey is the check: daysInRange uses it on both ends.
 export function shiftDay(dateKey: string, delta: number): string {
     const start = atUtcMidnight(dateKey);
     if (!Number.isFinite(start)) {
