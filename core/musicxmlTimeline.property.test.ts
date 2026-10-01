@@ -33,8 +33,28 @@ const arbItem: fc.Arbitrary<Item> = fc.oneof(
     fc.constant({ kind: "grace" as const }),
 );
 
-const arbBar = fc.array(arbItem, { minLength: 1, maxLength: 5 });
-const arbPart = fc.array(arbBar, { minLength: 1, maxLength: 4 });
+// A chord member sounds with the note before it, so the first sounding note of a bar
+// cannot be one, and nor can one following a rest. Settled here rather than re-decided
+// when the XML is written: position is not a safe way to tell, because trimming a bar
+// moves everything in it — which is how a flagged note that became the bar's first
+// element lost its <chord/>, started advancing time, and overflowed the metre.
+const settled = (items: Item[]): Item[] => {
+    let afterNote = false;
+    return items.map((item) => {
+        if (item.kind === "grace") {
+            return item;
+        }
+        if (item.kind === "rest") {
+            afterNote = false;
+            return item;
+        }
+        const chord = item.chord && afterNote;
+        afterNote = true;
+        return { ...item, chord };
+    });
+};
+
+const arbBar = fc.array(arbItem, { minLength: 1, maxLength: 5 }).map(settled);
 
 const itemXml = (item: Item, at: number) => {
     if (item.kind === "grace") {
@@ -44,8 +64,7 @@ const itemXml = (item: Item, at: number) => {
         return `<note><rest/><duration>${item.ticks}</duration><voice>1</voice></note>`;
     }
     const step = "CDEFGAB"[at % 7] ?? "C";
-    // A chord member only counts as one where something precedes it in the bar.
-    const chord = item.chord && at > 0 ? "<chord/>" : "";
+    const chord = item.chord ? "<chord/>" : "";
     return `<note>${chord}<pitch><step>${step}</step><octave>4</octave></pitch><duration>${item.ticks}</duration><voice>1</voice></note>`;
 };
 
@@ -74,31 +93,67 @@ const scoreOf = (parts: Item[][][]) => {
 
 // Two parts of their own shapes: the case where one hand's voice stops short of the
 // barline and the other runs on.
-const arbScore = fc.array(arbPart, { minLength: 1, maxLength: 2 }).map(scoreOf);
+//
+// Every part carries the same number of measures, because that is what MusicXML means by
+// a part: the measures are the piece's, and each part says what happens in each of them.
+// Parts of unequal length generate a file no engraver would write, where the music's end
+// follows the shortest part while a longer one still holds notes past it — which reads as
+// the timeline losing a note and is nothing of the kind.
+const sameLengthParts = (bar: fc.Arbitrary<Item[]>) =>
+    fc
+        .tuple(fc.integer({ min: 1, max: 4 }), fc.integer({ min: 1, max: 2 }))
+        .chain(([bars, parts]) =>
+            fc.array(fc.array(bar, { minLength: bars, maxLength: bars }), {
+                minLength: parts,
+                maxLength: parts,
+            }),
+        );
+
+const arbScore = sameLengthParts(arbBar).map(scoreOf);
 
 // The same bars, trimmed to what the metre asks for. A bar written longer than its metre
 // keeps its notes' onsets while its advance to the next bar is capped, so its last notes
 // sit past where the music is said to run to — true of the file, not a fault of the
 // reader, and the reason the law below is stated only where the bars fit.
-const fitting = (items: Item[]) => {
+// Whether an item takes time and whether it is written as a chord member are the same
+// question, so they are answered in one pass over what has been kept. Deciding them
+// separately is what let a bar reach a metre and a half: a chord member that survived
+// the trim and then lost its flag — its predecessor having been a rest — became an
+// ordinary note whose duration nobody had counted.
+const fitting = (items: Item[]): Item[] => {
+    const kept: Item[] = [];
     let ticks = 0;
-    return items.filter((item) => {
+    let afterNote = false;
+    for (const item of items) {
         if (item.kind === "grace") {
-            return true;
+            kept.push(item);
+            continue;
         }
-        if (item.kind === "note" && item.chord) {
-            return true;
+        if (item.kind === "note" && item.chord && afterNote) {
+            // Sounds with the note before it, so it takes no time of its own.
+            kept.push(item);
+            continue;
+        }
+        if (ticks + item.ticks > WHOLE) {
+            continue;
         }
         ticks += item.ticks;
-        return ticks <= WHOLE;
-    });
+        kept.push(item.kind === "note" ? { ...item, chord: false } : item);
+        afterNote = item.kind === "note";
+    }
+    return kept;
 };
+// Every part carries the SAME bars, which is the other half of what a measure means: all
+// parts fill it to the same duration, padding with rests where a voice has stopped. Parts
+// that disagree about a bar's length leave the music's end ambiguous — it follows one
+// part while a longer one still holds notes past it, which reads as the timeline losing a
+// note and is nothing of the kind.
 const arbFittingScore = fc
-    .array(fc.array(arbBar.map(fitting), { minLength: 1, maxLength: 4 }), {
-        minLength: 1,
-        maxLength: 2,
-    })
-    .map(scoreOf);
+    .tuple(
+        fc.array(arbBar.map(fitting), { minLength: 1, maxLength: 4 }),
+        fc.integer({ min: 1, max: 2 }),
+    )
+    .map(([bars, parts]) => scoreOf(Array.from({ length: parts }, () => bars)));
 
 describe("reading a score's timeline", () => {
     it("never places a note before the one in front of it", () => {
