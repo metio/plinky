@@ -1777,6 +1777,23 @@ wiring is explicit. What follows is the complete list of edits.
 `ci-reuse` requires the two SPDX lines on every worker source file. `ci-typos`,
 `ci-yaml` and `ci-actionlint` cover the new workflow.
 
+**`ci-reuse` behaves differently on this machine than in CI, and the difference is
+worth knowing before it wastes an afternoon.** `reuse` 6.2.0 prunes a git-ignored
+directory only at the repository root: `node_modules/`, `.react-router/` and
+`.stryker-tmp/` are skipped, `worker/node_modules/` is not, and it reports three
+thousand vendored files with no SPDX header. Neither an anchored nor an unanchored
+`.gitignore` pattern changes this, nor does a `.gitignore` inside `worker/`; `git
+ls-files --exclude-standard --ignored --others --directory` lists both directories,
+so the information reaches `reuse` and is dropped after the first level.
+
+CI is unaffected, because the lint gate and `ci-worker` run as separate jobs with
+separate checkouts and only the second installs the worker's dependencies. So the
+gate is honest where it counts and noisy where it does not — which is the wrong way
+round for the one gate whose whole purpose is to be run locally before pushing. The
+fix belongs in `metio/nix-devshell`, where `ci-reuse` is defined once for every repo,
+rather than in a per-repo workaround here. Until then: run `ci-reuse` before
+`ci-worker`, or read past the `worker/node_modules` lines.
+
 **Must be excluded or it breaks the build.** The root `tsconfig.json` has
 `include: ["**/*"]` and would typecheck `worker/**` against a DOM library it does
 not use. `worker` joins `exclude` beside `studio`, and the worker gets its own
@@ -1841,6 +1858,43 @@ under `worker/**`, applying migrations then deploying, using the existing
 carries Cloudflare Pages Edit at account scope and needs Workers Scripts Edit, D1
 Edit and R2 Edit added — a token change, not a new credential.
 
+## Provisioning
+
+Everything below is an account action rather than a repository one, which is why it is
+a checklist rather than a script. Nothing in the tree performs any of it, and the
+Worker in `worker/` deploys without any of it — `/v1/health` has no bindings, on
+purpose, so the pipeline can be built and reviewed before the storage exists.
+
+**The one-way door first.** D1, R2 and Durable Objects each accept an `eu`
+jurisdiction **only at creation**, and it cannot be added afterwards: a database
+created without it is fixed only by creating a second, copying the data, and swapping
+a binding on a live API. Preview counts, because preview receives real payloads during
+testing.
+
+```sh
+wrangler d1 create plinky --location eu           # and plinky-preview
+wrangler r2 bucket create plinky-vault --jurisdiction eu
+```
+
+Verify with `wrangler d1 info` before writing a row into either.
+
+**The token.** `CLOUDFLARE_API_TOKEN` exists as a repository secret and carries
+Cloudflare Pages:Edit at account scope, which is what deploys the site. Deploying a
+Worker additionally needs Workers Scripts:Edit; D1:Edit and R2:Edit follow when the
+phase that binds them starts. This is a scope change to an existing credential rather
+than a new one.
+
+**The order.** The privacy policy's API section is published before the client makes
+its first request — see [Privacy and law](#privacy-and-law) for why that deadline is
+the client's first call rather than the Worker's first deploy, and what the section
+has to name.
+
+**The deploy workflow is manual until all three are true.**
+`.github/workflows/api.yml` runs on `workflow_dispatch` and carries its
+push-on-`main` trigger commented out directly above, ready to be uncommented. A
+push-triggered job that cannot authenticate turns `main` red on every unrelated commit,
+which is how a repository learns to ignore a red `main`.
+
 ## Rollout
 
 Five phases, numbered 0 to 4. Phase 2 delivers two capabilities. Each is independently shippable, independently
@@ -1848,9 +1902,33 @@ revertible, and ends with the app fully working whether or not the phase's
 capability is switched on. No phase begins before its predecessor is deployed and
 observed.
 
-**Phase 0 — the pipeline.** `worker/` scaffolding, `wrangler.toml`, a `/v1/health`
-endpoint returning the feature-flag envelope, every CI table row above wired, and
-the deploy workflow green. Nothing in the client changes.
+**Phase 0 — the pipeline. Repository side shipped 2026-08-26; the account side is
+[Provisioning](#provisioning) and is Sebastian's to run.** `worker/` scaffolding,
+`wrangler.toml`, a `/v1/health` endpoint returning the feature-flag envelope, every CI
+table row above wired, and the deploy workflow written. Nothing in the client changes,
+and nothing has been deployed.
+
+What is in the tree: the router, the response envelope, the CORS allowlist and the
+health endpoint, with fourteen tests running in workerd through
+`@cloudflare/vitest-pool-workers`; `ci-worker` in `flake.nix` and a `worker` job in
+`verify.yml` wired into the `verify` aggregate; the `worker-points-down` rule, with
+`worker/src` added to both `TREES` and `MUST_SEE` in `dev/check-architecture.mjs` so
+the rule is covered by the same floor that catches a cruise seeing nothing; `worker` in
+`biome.json` and out of the root `tsconfig.json`; and `worker/node_modules` ignored,
+which the root pattern did not cover because it is anchored.
+
+Three things this phase learned that the plan had not anticipated.
+**`compatibility_date` cannot outrun the workerd the test pool bundles** — it trails
+published wrangler by a few days, and a date newer than the binary supports fails every
+test with `ERR_RUNTIME_FAILURE`. **The pool's API is a Vite plugin in 0.22**
+(`cloudflareTest({ wrangler: { configPath } })`), not the `defineWorkersConfig` this
+document's era assumed, and `cloudflare:test`'s `env` and `SELF` are deprecated in
+favour of handlers taking their environment as an argument — which is what the
+architecture section already required for its own reasons. And **knip stays at the
+root**: enrolling the worker would make the root gate depend on the worker's
+`node_modules` being installed, coupling two independent jobs, so the worker's
+`tsconfig.json` carries `noUnusedLocals`/`noUnusedParameters` and biome lints it, which
+covers what knip would have found in a tree this size.
 
 Two things in this phase are irreversible or externally binding, so they are
 called out rather than left to the checklist. **Every D1 database and R2 bucket —
@@ -1984,6 +2062,10 @@ never rewritten.
 | 2026-08-26 | This design depends on the release model and would not survive its reversal | Every push to `main` deploys and there are no versions or tags, which is what makes "the artist edits, the site redeploys" a wait of minutes. Under the CalVer scheme this project used until 2026-08-13 the same design would have parked an artist's typo until the next scheduled release, which is exactly why the answer then was a live CMS. If releases ever come back, this decision has to be re-argued rather than inherited |
 | 2026-08-26 | Moderation is a dial: text publishes, a new link or image queues | The property worth keeping is that nothing a stranger writes appears unread on a site children use. A human in every loop is not the only way to hold it — an artist with no accepted submission has no token at all, so there is no anonymous write path, and what needs reading is what carries a payload elsewhere |
 | 2026-08-26 | The harvest allowlist never gates a submission | Measured: a living artist's own CC0 work is rejected by `isPublicDomain` and always will be, since there is no death year to check and no listed surname to match. Correct for a scraped corpus where an uploader's licence claim is worth nothing; the exact opposite where the submitter is the rights holder and attests to it. Wiring the two together would lock out every artist the capability is for |
+| 2026-08-26 | The worker's `compatibility_date` follows the test pool's workerd, not the calendar | `@cloudflare/vitest-pool-workers` bundles a workerd trailing published wrangler by a few days, and a date newer than it supports fails every test with `ERR_RUNTIME_FAILURE`. Raise the two together and take the pool's answer |
+| 2026-08-26 | knip stays at the root; the worker is covered by biome and its own `noUnusedLocals` | A knip workspace would make the root gate depend on `worker/node_modules` being installed, coupling two jobs that are otherwise independent. For a tree this size the compiler and the linter find what knip would |
+| 2026-08-26 | `worker/src` joins `MUST_SEE` in `dev/check-architecture.mjs`, not only `TREES` | `TREES` alone would let `worker-points-down` be evaluated over nothing and still pass, which is the exact failure that script exists to catch. The same change stops `sourceCount` walking `node_modules`, which a sub-project has and `app/` never did |
+| 2026-08-26 | The deploy workflow ships manual, with its push trigger commented out beside it | The token has no Workers scope yet, and a push-triggered job that cannot authenticate turns `main` red on every unrelated commit — which is how a repository learns to ignore a red `main` |
 | 2026-08-13 | Artist profiles live in the repository and change through the submission queue, not through an editing endpoint | With no CMS to proxy, a live-edit path would mean building a store, a token, a field whitelist and a link allowlist to guard it. A profile edit is a submission like a piece is, which the artist decision above already chose as the mechanism — so the read path is a file that ships with the build, and nothing an artist writes is public until a person has read it |
 
 ## Open questions
