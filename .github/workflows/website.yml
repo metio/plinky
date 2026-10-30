@@ -54,6 +54,8 @@ jobs:
       locales: ${{ steps.list.outputs.locales }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - id: list
         run: echo "locales=$(nix develop --command node -p "JSON.stringify(require('./project.inlang/settings.json').locales)")" >> "$GITHUB_OUTPUT"
@@ -64,6 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - run: nix develop --command npm ci
       - name: Build root
@@ -94,6 +98,8 @@ jobs:
         locale: ${{ fromJSON(needs.setup.outputs.locales) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - run: nix develop --command npm ci
       - name: Build ${{ matrix.locale }}
@@ -135,6 +141,7 @@ jobs:
           # the one the live site was built from to work out which addresses changed. A
           # shallow clone has neither commit's tree to compare.
           fetch-depth: 0
+          persist-credentials: false
       - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
