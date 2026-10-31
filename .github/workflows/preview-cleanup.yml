@@ -47,6 +47,7 @@ jobs:
       ${{ vars.PREVIEW_ENABLED == 'true'
           && (github.event_name == 'workflow_dispatch' || github.event.ref_type == 'branch') }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Plan the cleanup
         id: plan

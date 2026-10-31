@@ -22,6 +22,7 @@ jobs:
     # Only act on score submissions; the issue form prefixes the title.
     if: startsWith(github.event.issue.title, '[Score] ')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     outputs:
@@ -31,12 +32,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - name: Setup Node.js
-        # No dependency cache: this job runs for anyone's issue, and a cache saved from
-        # it would be restorable by the default branch's other workflows.
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+      # No package cache: this job runs for anyone's issue, and a cache saved from
+      # it would be restorable by the default branch's other workflows.
+      - uses: metio/ci/breto@ac4eab9855ea1c083e82ee4a143a4ecaa9f1cb4f # 2026.10.31214114
         with:
-          node-version: 26
+          cache: "false"
+          # renovate: datasource=node-version depName=node
+          packages: node@26.13.0
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Validate the submitted MusicXML
@@ -48,6 +50,7 @@ jobs:
     name: comment
     needs: check
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       issues: write
     steps:
