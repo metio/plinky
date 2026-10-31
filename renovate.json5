@@ -1,0 +1,37 @@
+// SPDX-FileCopyrightText: The plinky Authors
+// SPDX-License-Identifier: AGPL-3.0-or-later
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>metio/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "description": "Pull the playwright npm bump out of the shared js group and into one PR with the nix flake update (rule below). The vitest browser + a11y gates drive the chromium baked into the nix closure (PLAYWRIGHT_BROWSERS_PATH — nixpkgs' playwright-driver, inherited through the devshell flake input), and each playwright npm release hard-codes the chromium revision it expects, so the npm package and that driver are two halves of one version: whichever moves first fails the browser gate until the other catches up. Grouping them means the flake bump that advances the driver and the matching playwright bump land in the same PR and go green together, instead of two separate red PRs that each fail to automerge alone. Until nixpkgs ships the matching driver the grouped PR waits (gated on the browser check); when it does, Renovate folds the flake update into this branch, the gate passes and it automerges.",
+      "groupName": "browser toolchain",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "playwright"
+      ]
+    },
+    {
+      "description": "Ride the flake.lock (devshell input) update in the same PR as the playwright npm bump above — advancing the devshell input is what carries nixpkgs' playwright-driver forward, so the two must move together to keep the browser gate green.",
+      "groupName": "browser toolchain",
+      "matchManagers": [
+        "nix"
+      ]
+    },
+    {
+      "allowedVersions": "<7",
+      "description": "Hold typescript on 6.x until dependency-cruiser supports 7. depcruise reads .ts and .tsx only through a TypeScript compiler inside its peer range (>=2.0.0 <7.0.0); outside it there is no failure to notice — it registers no scannable extensions, enumerates nothing, finds no violations in the nothing it enumerated and exits 0. That is how `npm run arch` stayed green from the 7.0.0 bump on 2026-08-02 until 2026-08-19, with ui-is-pure, stores-point-down and adapters-only-at-the-composition-root all evaluated over an empty set. Minor and patch updates inside 6.x still flow. Drop this rule when dependency-cruiser ships TS 7 support — by its own message that waits on the TS 7 API being published and stable, not on a particular TypeScript release. dev/check-architecture.mjs now fails when a cruise reaches too little of app/ or core/, so removing this rule too early makes the gate say so instead of passing over nothing.",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "typescript"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: The plinky Authors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[default]
+extend-ignore-re = []
+
+[default.extend-words]
+edn = "edn"
+
+[default.extend-identifiers]
+
+[files]
+extend-exclude = ["LICENSES/"]

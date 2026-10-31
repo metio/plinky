@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: The plinky Authors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+cff-version: 1.2.0
+title: plinky
+message: If you use this software, please cite it as below.
+type: software
+authors:
+- family-names: Hoß
+  given-names: Sebastian
+  email: seb@hoß.de
+url: https://github.com/metio/plinky/
+license: AGPL-3.0-or-later
+keywords:
+  - learning
+  - midi
+  - piano
