@@ -1,0 +1,25 @@
+{
+  "include": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "types": ["@cloudflare/workers-types"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    // knip covers the root project and stops there: enrolling the worker would make the
+    // root gate depend on the worker's node_modules being installed, coupling two jobs
+    // that are otherwise independent. Biome's noUnusedVariables and these two cover what
+    // matters for a tree this size — an unused import, local or parameter.
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}

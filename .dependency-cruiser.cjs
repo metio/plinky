@@ -159,6 +159,20 @@ module.exports = {
             to: { path: ["^app/"] },
         },
         {
+            name: "worker-points-down",
+            comment:
+                "worker/ is the optional backend. It may use core/ — the same pure grading, " +
+                "parsers and codecs the browser runs, which is the whole reason there is no " +
+                "second implementation to drift — and it must never reach into app/. There is " +
+                "no DOM in workerd, so an import that reached a component would fail at deploy " +
+                "rather than here; what this actually guards is the quieter case, a helper " +
+                "lifted out of app/lib because it looked pure and dragging a browser global " +
+                "in behind it.",
+            severity: "error",
+            from: { path: "^worker/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
+            to: { path: "^app/" },
+        },
+        {
             name: "osmd-stays-at-the-surface",
             comment:
                 "OpenSheetMusicDisplay is the concrete score renderer — a stateful engine the " +
@@ -186,6 +200,7 @@ module.exports = {
                     "\\.d\\.ts$",
                     "(^|/)\\.[^/]+\\.(c|m)?[jt]s$", // dotfiles like this config
                     "^app/routes/", // react-router loads these by path string, not import
+                    "^worker/src/index\\.ts$", // wrangler loads this by path too
                     "^app/root\\.tsx$",
                     "^app/routes\\.ts$",
                     "^app/entry\\.server\\.tsx$",
