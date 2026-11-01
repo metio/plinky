@@ -15,7 +15,7 @@ jobs:
     # Its `detect` job enables each gate from this repo's package.json scripts.
     # Named "Frontend" so its checks read "Frontend / build", "Frontend / browser", …
     name: Frontend
-    uses: metio/ci/.github/workflows/frontend.yml@1bcfd5d852697876af6c191fa597cf5aab22cb62 # 2026.10.31124002
+    uses: metio/ci/.github/workflows/frontend.yml@d4a165ac035d1fa1a7aee5b27192d0aed9c7a0b0 # main
     with:
       # Node returns DNS records verbatim, so a bare `localhost` can resolve to
       # ::1 first — the prerender's internal server and its own fetch would then
@@ -56,7 +56,7 @@ jobs:
           # present — a shallow clone has nothing to walk.
           fetch-depth: 0
           persist-credentials: false
-      - uses: metio/ci/dco@1bcfd5d852697876af6c191fa597cf5aab22cb62 # 2026.10.31124002
+      - uses: metio/ci/dco@d4a165ac035d1fa1a7aee5b27192d0aed9c7a0b0 # main
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
