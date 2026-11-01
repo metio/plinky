@@ -1,6 +1,16 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-11-01
+  entries:
+    - |-
+      **A link that opens a particular ear drill, or the shelf's Manage tab, opens without
+      redrawing itself.** A link naming an exercise and its level — a review link, or one
+      of today's suggestions — arrives as the same page everyone gets, with only the
+      address saying which drill it is, and the browser threw that page away and drew it
+      again the moment it read the address. Those links now open as they arrive, and still
+      land where they name.
+
 - date: 2026-09-27
   label: night
   entries:

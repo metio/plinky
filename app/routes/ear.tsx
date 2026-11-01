@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useSearchParams } from "react-router";
+import { NO_QUERY, useHydrated } from "../hooks/useHydrated";
 import { useSeededState } from "../hooks/useSeededState";
 import { type EarExerciseId, parseProgression } from "../../core/earExercise";
 import { routeMeta, webPageData } from "../../core/site";
@@ -47,7 +48,14 @@ function isExercise(value: string | null): value is EarExerciseId {
 export default function Ear() {
     // A suggestion or a review link can open straight on a chosen drill (?exercise=&level=);
     // otherwise the page rests on the first interval level.
-    const [params] = useSearchParams();
+    //
+    // The address is read only once the page is running. Every page ships as a static
+    // document and one document answers every query string, so it is written as though
+    // there were none; a first client render that read the query would disagree with the
+    // document it is hydrating, and React answers that by discarding the markup and
+    // rendering again. A shared drill link paints the default for one frame instead.
+    const [liveParams] = useSearchParams();
+    const params = useHydrated() ? liveParams : NO_QUERY;
     const exerciseParam = params.get("exercise");
     const [exercise, setExercise] = useSeededState<EarExerciseId>(exerciseParam, (param) =>
         isExercise(param) ? param : "intervals",

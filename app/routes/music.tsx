@@ -3,6 +3,7 @@
 
 import { useMemo, useRef } from "react";
 import { useSearchParams } from "react-router";
+import { NO_QUERY, useHydrated } from "../hooks/useHydrated";
 import { Show } from "../components/features/conditional";
 import { MusicFilters } from "../components/features/musicFilters";
 import { MusicRow } from "../components/features/musicRow";
@@ -43,7 +44,11 @@ export default function MusicRoute() {
     // read once for the whole list rather than per row.
     const { prefs } = usePrefs();
     const { items, mastery, loaded, remove, assignmentsUsing } = useMusicItems();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [liveParams, setSearchParams] = useSearchParams();
+    // Read once the page is running, for the same reason the ear page does: the static
+    // document was written with no query, so a first client render that chose a tab from
+    // one would disagree with it.
+    const searchParams = useHydrated() ? liveParams : NO_QUERY;
     // ?grade=6 opens the shelf on that grade — the roadmap's rows link here, so pressing
     // a grade you have not reached lands on its pieces rather than on an explanation.
     const filters = useMusicFilters(items, mastery);

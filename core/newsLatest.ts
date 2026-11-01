@@ -10,21 +10,21 @@ import type { Release } from "./changelog";
 
 export const LATEST_RELEASES: Release[] = [
     {
-        date: "2026-09-27",
-        label: "night",
+        date: "2026-11-01",
+        label: null,
         entries: [
             {
-                body: "**Composer pages, piece pages and the music shelves open without redrawing\nthemselves.** Each of those arrives already written for the piece or the person it\nis about, and the browser was throwing that page away and drawing it again from\nnothing the moment it opened. They now open as they arrive.",
+                body: "**A link that opens a particular ear drill, or the shelf's Manage tab, opens without\nredrawing itself.** A link naming an exercise and its level — a review link, or one\nof today's suggestions — arrives as the same page everyone gets, with only the\naddress saying which drill it is, and the browser threw that page away and drew it\nagain the moment it read the address. Those links now open as they arrive, and still\nland where they name.",
                 twip: true,
             },
         ],
     },
     {
         date: "2026-09-27",
-        label: "evening",
+        label: "night",
         entries: [
             {
-                body: "**Settings opens without redrawing itself.** The recorded-piano panel arrived already\ncrediting the instrument and counting 637 recordings — figures that were never this\ndevice's — and the browser threw the page away and drew it again to correct them. It\nnow opens saying nothing has arrived yet, and fills in with what your device holds.",
+                body: "**Composer pages, piece pages and the music shelves open without redrawing\nthemselves.** Each of those arrives already written for the piece or the person it\nis about, and the browser was throwing that page away and drawing it again from\nnothing the moment it opened. They now open as they arrive.",
                 twip: true,
             },
         ],

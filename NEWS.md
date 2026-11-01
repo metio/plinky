@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 1 November 2026
+
+**A link that opens a particular ear drill, or the shelf's Manage tab, opens without
+redrawing itself.** A link naming an exercise and its level — a review link, or one
+of today's suggestions — arrives as the same page everyone gets, with only the
+address saying which drill it is, and the browser threw that page away and drew it
+again the moment it read the address. Those links now open as they arrive, and still
+land where they name.
+
 ## 27 September 2026 — night
 
 **Composer pages, piece pages and the music shelves open without redrawing
