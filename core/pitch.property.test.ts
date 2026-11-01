@@ -95,7 +95,12 @@ describe("how loud a frame is", () => {
                 (samples, gain) => {
                     const quiet = Float32Array.from(samples);
                     const loud = Float32Array.from(samples.map((sample) => sample * gain));
-                    fc.pre(rms(quiet) > 0);
+                    // Above the denormals, where float32 stops being able to hold the
+                    // difference: its smallest step near 1e-45 is the whole value, so a
+                    // frame there times 1.1 rounds back to itself and reads as no louder.
+                    // That is the storage type's floor, not something rms decides, and it
+                    // is forty orders of magnitude below any frame a microphone produces.
+                    fc.pre(rms(quiet) > 1e-30);
 
                     expect(rms(loud)).toBeGreaterThan(rms(quiet));
                 },
