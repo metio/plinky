@@ -136,8 +136,10 @@ describe("the provenance shown for a piece", () => {
                     return;
                 }
                 // A source credits its editors as a body where the edition names
-                // nobody; where the piece names someone, that is who engraved it.
-                expect(source.credit).toBe(piece.credit ?? sourceInfo(piece.source)?.credit);
+                // nobody; where the piece names someone, that is who engraved it. An
+                // empty credit names nobody either, so the source's own still stands —
+                // which is why this is an "or" and not a null check.
+                expect(source.credit).toBe(piece.credit || sourceInfo(piece.source)?.credit);
             }),
         );
     });
