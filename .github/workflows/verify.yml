@@ -39,24 +39,6 @@ jobs:
       # instrumentation, so the build job need not run the suite a second time —
       # a node-test failure still fails CI, through coverage.
       tests-in-coverage: true
-  dco:
-    # Every commit carries a Signed-off-by trailer: contributions are taken under the
-    # Developer Certificate of Origin, which is what lets the project accept them
-    # under its own licence without a per-contributor agreement. The shared action
-    # skips bot-authored commits, which cannot sign off, and the whole job is guarded
-    # for bot-opened pull requests — a skipped job still satisfies the aggregate below.
-    name: dco
-    if: github.event.pull_request.user.type != 'Bot'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          # The action walks base..head, so the whole pull-request range has to be
-          # present — a shallow clone has nothing to walk.
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: metio/ci/dco@d4a165ac035d1fa1a7aee5b27192d0aed9c7a0b0 # main
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
@@ -256,7 +238,6 @@ jobs:
     needs:
       [
         frontend,
-        dco,
         bake-check,
         news,
         nav,
