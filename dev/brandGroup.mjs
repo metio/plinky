@@ -61,16 +61,20 @@ export function markGroup({
     title = Math.round(size * (wide ? 0.19 : 0.21)),
     small = Math.round(title * 0.46),
     measure,
+    // The small line is set in a face half the tagline's size, so the measure that breaks
+    // the tagline where it should breaks the small line mid-phrase. It takes its own when
+    // a layout has the room; where it does not, it keeps the column's.
+    lineMeasure = measure,
 }) {
     const nameHeight = Math.round(size * (wide ? 0.4 : 0.42));
     const align = wide ? "flex-start" : "center";
     return `
 <div style="display:flex;flex-direction:${wide ? "row" : "column"};align-items:center;gap:${Math.round(size * (wide ? 0.17 : 0.14))}px">
   ${mark(size)}
-  <div style="display:flex;flex-direction:column;align-items:${align};text-align:${wide ? "left" : "center"};${measure ? `max-width:${measure}px` : ""}">
+  <div style="display:flex;flex-direction:column;align-items:${align};text-align:${wide ? "left" : "center"}">
     ${picture(name, nameHeight)}
-    <div style="${display};font-size:${title}px;color:${ink};line-height:1.12;letter-spacing:-0.01em;text-wrap:balance;margin-top:${Math.round(size * 0.05)}px">${tagline}</div>
-    <div style="${ui};font-size:${small}px;color:${ink};opacity:.8;line-height:1.3;margin-top:${Math.round(title * 0.3)}px">${line}</div>
+    <div style="${display};font-size:${title}px;color:${ink};line-height:1.12;letter-spacing:-0.01em;text-wrap:balance;${measure ? `max-width:${measure}px` : ""};margin-top:${Math.round(size * 0.05)}px">${tagline}</div>
+    <div style="${ui};font-size:${small}px;color:${ink};opacity:.8;line-height:1.3;${lineMeasure ? `max-width:${lineMeasure}px` : ""};margin-top:${Math.round(title * 0.3)}px">${line}</div>
   </div>
 </div>`;
 }

@@ -15,7 +15,7 @@
 //   CLOUDFLARE_API_TOKEN    an R2 token with object read+write on this bucket alone
 //
 // Usage:
-//   node dev/piano/upload-pack.mjs --bucket klimpi-samples [--pack piano-pack] [--prefix v1]
+//   node dev/piano/upload-pack.mjs --bucket plinky-samples [--pack piano-pack] [--prefix v1]
 //
 // A published prefix is immutable: the app caches every recording by URL, so a re-encode
 // belongs under a new one (v2/) rather than over an old one. This refuses to overwrite for

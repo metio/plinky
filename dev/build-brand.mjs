@@ -26,12 +26,8 @@ const PALETTE = [
     ["ink", "--color-ink", "Type, staff lines, anything printed."],
     ["pencil", "--color-muted", "The teacher's annotation: hints, captions, asides."],
     ["rule", "--color-line", "Hairlines and dividers."],
-    ["indigo", "--color-accent", "Anything you can press. Links, buttons, the cursor."],
-    [
-        "forget-me-not",
-        "--color-spark",
-        "Anything earned — grades, section marks, the day's own thing.",
-    ],
+    ["fuchsia", "--color-accent", "Anything you can press. Links, buttons, the cursor."],
+    ["brass", "--color-spark", "Anything earned — grades, section marks, the day's own thing."],
     [
         "name",
         "--color-brand-ink",
@@ -170,7 +166,7 @@ for (const size of [1024, 512, 192, 180, 64, 32]) {
     });
 }
 
-// The lockup above the tagline, on paper and on indigo. On indigo it stands in its white
+// The lockup above the tagline, on paper and on fuchsia. On fuchsia it stands in its white
 // frame, which gives it the edge a tile of nearly the ground's own colour would not have.
 // The frame adds an eleventh of the artwork on each side, so the framed sheet is set that
 // much taller to keep the artwork itself the same size. The lockup carries the name, so the
@@ -187,10 +183,10 @@ await shoot(lockupSheet(colour.paper, colour.ink, picture(LOCKUP, 168)), {
     path: `${OUT}/icon/lockup-paper.png`,
     scale: 2,
 });
-await shoot(lockupSheet(colour.indigo, colour.paper, framedLockup(Math.round((168 * 13) / 11))), {
+await shoot(lockupSheet(colour.fuchsia, colour.paper, framedLockup(Math.round((168 * 13) / 11))), {
     width: 960,
     height: 320,
-    path: `${OUT}/icon/lockup-indigo.png`,
+    path: `${OUT}/icon/lockup-fuchsia.png`,
     scale: 2,
 });
 
@@ -207,7 +203,7 @@ const swatch = ([name, , why]) => `
 await shoot(
     `<div style="width:1200px;background:${colour.paper};padding:48px;${UI}">
        <div style="${DISPLAY};font-size:40px;color:${colour.ink}">Klimpi — the palette</div>
-       <div style="font-size:15px;color:${colour.pencil};margin:8px 0 32px">Every colour is named for its role. The indigo carries anything you can press; the grading colours are spoken for and never decorate.</div>
+       <div style="font-size:15px;color:${colour.pencil};margin:8px 0 32px">Every colour is named for its role. The fuchsia carries anything you can press; the grading colours are spoken for and never decorate.</div>
        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">${PALETTE.map(swatch).join("")}</div>
        <div style="${DISPLAY};font-size:26px;color:${colour.ink};margin:44px 0 6px">Spoken for</div>
        <div style="font-size:15px;color:${colour.pencil};margin-bottom:24px">These three carry meaning on the one screen where colour is information. Never borrow them for decoration.</div>
@@ -219,11 +215,11 @@ await shoot(
 // The type, set the way the app sets it.
 await shoot(
     `<div style="width:1200px;height:700px;background:${colour.paper};padding:56px;${UI};color:${colour.ink}">
-       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour["forget-me-not"]}">Display — Fredoka</div>
+       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour.brass}">Display — Fredoka</div>
        <div style="${DISPLAY};font-size:72px;letter-spacing:-0.015em;margin:12px 0 8px">Practise piano in your browser</div>
        <div style="${DISPLAY};font-size:40px;color:${colour.ink}">Tuesday morning</div>
        <div style="height:1px;background:${colour.rule};margin:40px 0"></div>
-       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour["forget-me-not"]}">Interface — Inter</div>
+       <div style="font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:${colour.brass}">Interface — Inter</div>
        <div style="font-size:19px;margin:12px 0 6px">Play it as slowly as you like — the notes wait for you.</div>
        <div style="font-size:15px;color:${colour.pencil}">Grade 3 · skill 214 · nine pieces on the stand</div>
        <div style="font-size:15px;font-variant-numeric:tabular-nums;margin-top:16px">♩ = 72 · bar 17 · 94%</div>
@@ -231,7 +227,7 @@ await shoot(
     { width: 1200, height: 700, path: `${OUT}/type.png`, scale: 2 },
 );
 
-// The places we post, at the sizes they want. On indigo the icon stands in its white frame,
+// The places we post, at the sizes they want. On fuchsia the icon stands in its white frame,
 // which gives it the edge a tile of nearly the ground's own colour does not have, and it is
 // set large: the mark is the first thing a picture shows, the name the second. A wide
 // picture sets the words beside the tile, a square or tall one under it.
@@ -249,7 +245,7 @@ const group = (size, options) =>
         ...options,
     });
 const social = (width, height, size, options = {}) => `
-<div style="width:${width}px;height:${height}px;background:${colour.indigo};display:flex;align-items:center;justify-content:center;padding:${Math.round(width / 12)}px">
+<div style="width:${width}px;height:${height}px;background:${colour.fuchsia};display:flex;align-items:center;justify-content:center;padding:${Math.round(width / 12)}px">
   ${group(size, { wide: width / height > 1.3, ...options })}
 </div>`;
 await shoot(social(1200, 630, 300, { measure: 440 }), {
@@ -303,7 +299,7 @@ for (const size of [256, 512, 800]) {
 // That box is a sixth of the picture: a banner designed edge to edge loses its ends on
 // three devices out of four.
 await shoot(
-    `<div style="width:2048px;height:1152px;background:${colour.indigo};display:flex;align-items:center;justify-content:center">
+    `<div style="width:2048px;height:1152px;background:${colour.fuchsia};display:flex;align-items:center;justify-content:center">
        <div style="width:1235px;height:338px;display:flex;align-items:center;justify-content:center">
          ${group(284, { wide: true })}
        </div>
@@ -317,7 +313,7 @@ await shoot(
 // but ground. Rendered at twice the size it is shown, which is what keeps it crisp on the
 // screens people actually have.
 await shoot(
-    `<div style="width:1640px;height:624px;background:${colour.indigo};display:flex;align-items:center;justify-content:center">
+    `<div style="width:1640px;height:624px;background:${colour.fuchsia};display:flex;align-items:center;justify-content:center">
        ${group(280, { wide: true, measure: 408 })}
      </div>`,
     { width: 1640, height: 624, path: `${OUT}/social/facebook-cover-1640x624.png` },
@@ -328,7 +324,7 @@ await shoot(
 // no crop takes it, and as tall as the strip allows. At this height the derived type would
 // be too small to read, so the tagline and its line are set at sizes of their own.
 const banner = (width) => `
-<div style="width:${width}px;height:128px;background:${colour.indigo};display:flex;align-items:center;justify-content:flex-start;padding-left:${Math.round(width * 0.3)}px">
+<div style="width:${width}px;height:128px;background:${colour.fuchsia};display:flex;align-items:center;justify-content:flex-start;padding-left:${Math.round(width * 0.3)}px">
   ${group(102, { wide: true, title: 26, small: 15 })}
 </div>`;
 await shoot(banner(1072), {
@@ -344,7 +340,7 @@ await shoot(banner(1080), {
 
 // The watermark YouTube overlays on a playing video, over whatever the video shows.
 // Transparent outside the frame, so it is the framed icon and nothing else: the frame is its
-// edge on a dark frame and on an indigo one alike.
+// edge on a dark frame and on a fuchsia one alike.
 await shoot(framedIcon(150), {
     width: 150,
     height: 150,
@@ -357,7 +353,7 @@ await shoot(framedIcon(150), {
 // a circle, so the name can be set at a size that reads.
 //
 // The ground is the designer's navy, the name's own ink: a code host's page is mostly dark
-// chrome or white, and this one stands apart from the indigo every post wears. Everything
+// chrome or white, and this one stands apart from the fuchsia every post wears. Everything
 // stays inside the middle three quarters: an unfurl is re-cropped by whoever is doing the
 // unfurling, and a preview designed edge to edge loses its ends.
 await shoot(

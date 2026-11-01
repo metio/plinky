@@ -1130,9 +1130,15 @@ which is what makes all of the above safe.
 
 ### The bucket
 
-An R2 bucket, `klimpi-samples`, published read-only at `samples.klimpi.app`. R2 has no
+An R2 bucket, `plinky-samples`, published read-only at `samples.klimpi.app`. R2 has no
 egress charge, which is the whole reason it is R2 rather than anything else: this is a
 read-mostly pile of immutable audio served to browsers.
+
+The bucket keeps the name it was created under. A bucket cannot be renamed, and the one
+that exists holds 621 objects a player's device has already cached by URL — so the name
+is a fact about the account rather than a label, and it stays whatever the rebrand did to
+the rest of the prose. The same is true of the Cloudflare Pages projects the site and its
+previews deploy to.
 
 The path carries a version — `/v1/…` — and **a published version is immutable**. Every
 recording is cached by URL on the player's device; a re-encode under an unchanged name is
@@ -1142,20 +1148,20 @@ moves with it.
 Setting it up, once:
 
 1. **Create the bucket.** Cloudflare dashboard → R2 → *Create bucket*, named
-   `klimpi-samples`, in the automatic location. Leave it private for now.
+   `plinky-samples`, in the automatic location. Leave it private for now.
 2. **Build the pack**, with the library unpacked somewhere outside the repository:
    `npm run piano:build -- --library <dir> --out piano-pack`. It writes
    `piano-pack/v1/` — 621 `.opus` files, a `manifest.json` carrying the licence, and a
    `README.txt` beside it with the credit and the byte count.
 3. **Upload it** under the same `v1/` prefix. The dashboard refuses more than a hundred
    files at a time and a pack is six hundred, so `npm run piano:upload -- --bucket
-   klimpi-samples` drives wrangler once per object, eight at a time, and remembers what
+   plinky-samples` drives wrangler once per object, eight at a time, and remembers what
    landed so a dropped connection costs only the rest. It needs `CLOUDFLARE_ACCOUNT_ID`
    and `CLOUDFLARE_API_TOKEN` in the environment — an R2 token with object read/write on
    this bucket alone — and never takes them as arguments, because a token on a command
    line ends up in shell history.
 
-   By hand it is `npx wrangler r2 object put klimpi-samples/v1/<name> --file <path>
+   By hand it is `npx wrangler r2 object put plinky-samples/v1/<name> --file <path>
    --remote`. **`--remote` is not optional**: without it wrangler writes to a local
    simulator and reports success. Upload `manifest.json` **last** — while it is absent the
    app has no pack at all, which is a better half-uploaded state than a manifest naming

@@ -21,12 +21,12 @@
             "token": "--color-line",
             "why": "Hairlines and dividers."
         },
-        "indigo": {
+        "fuchsia": {
             "hex": "#b8217a",
             "token": "--color-accent",
             "why": "Anything you can press. Links, buttons, the cursor."
         },
-        "forget-me-not": {
+        "brass": {
             "hex": "#a67c2e",
             "token": "--color-spark",
             "why": "Anything earned — grades, section marks, the day's own thing."

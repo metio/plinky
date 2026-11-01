@@ -9,28 +9,30 @@
 <style>
 :root {
     /* Everything adjustable lives here. */
-    --bg-deep: #0b0720;
-    --bg-lift: #1a1140;
-    --glow: #7c3aed;
-    --tinkle: #a836fe;
-    --url-ink: #e9e4ff;
+    --bg-deep: #0f0b15;
+    --bg-lift: #2b2238;
+    --glow: #c8237f;
+    --tinkle: #e8379b;
+    --url-ink: #f6f3fa;
 
     /* Sized against the stage's own width (100cqw == 1920px), so the composition holds
-       at any size with no script involved. The mark is vector, so at 27% of 1920 it is
-       drawn at 520px as sharply as at any other size. */
-    --logo-size: 27.08cqw;
-    --url-gap: 2.81cqw;
+       at any size with no script involved. */
+    --tile-size: 19cqw;
+    --name-width: 124%;
+    --name-gap: 8%;
+    --url-gap: 2.4cqw;
 
-    /* Where things are inside the mark, read off brand/proposed-mark/badge.svg: the glow the tinkle
-       falls from, the strike point it lands on (the circle's centre, by design), and the
-       band the name's outlines occupy. */
-    --dot-start-y: 7.5%;
-    --dot-hit-x: 50%;
-    --dot-hit-y: 50%;
-    --word-x0: 18.5%;
-    --word-x1: 81.2%;
-    --word-y0: 62.1%;
-    --word-y1: 82.5%;
+    /* Where the key the K's arms grow out of sits inside the tile, read off
+       brand/source/klimpi-app-icon.svg: the artwork is 1024 square and the pressed key's
+       centre falls at 374.8, 512. That is where the tinkle lands. */
+    --key-x: 36.6%;
+    --key-y: 50%;
+    --dot-start-y: -24%;
+
+    /* The first of the name's two dots, read off brand/name-white.svg: a 129.78x44 box
+       with the dot's centre at 48.77, 10.05. The sweep reaches it mid-pass. */
+    --tittle-x: 37.58%;
+    --tittle-y: 22.84%;
 
     /* The timeline. Every duration below is a slice of this. */
     --t-fade: 0.5s;
@@ -81,14 +83,22 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 
 #lockup {
     position: absolute;
-    left: 50%; top: 44%;
+    left: 50%; top: 47%;
     transform: translate(-50%, -50%);
-    width: var(--logo-size); height: var(--logo-size);
+    width: var(--tile-size);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+/* The tile, and the box every impact below measures itself against. */
+#tile { position: relative; width: 100%; aspect-ratio: 1; }
+/* The name, and the box the shine and the sparkle measure themselves against. */
+#name { position: relative; width: var(--name-width); margin-top: var(--name-gap); }
+#name img { display: block; width: 100%; }
 
 /* The mark itself, never redrawn and never cut. Everything else is light laid over it. */
 #mark {
-    position: absolute; inset: 0;
+    display: block;
     width: 100%; height: 100%;
     opacity: 0;
     transform: scale(0.98);
@@ -103,9 +113,9 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
    same light arriving, so it lands exactly where the artwork has it and then hands over. */
 #dot {
     position: absolute;
-    left: var(--dot-hit-x); top: var(--dot-start-y);
-    width: 5.2%; aspect-ratio: 1;
-    margin: -2.6% 0 0 -2.6%;
+    left: var(--key-x); top: var(--dot-start-y);
+    width: 7%; aspect-ratio: 1;
+    margin: -3.5% 0 0 -3.5%;
     border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, #fff 38%, var(--tinkle) 72%, transparent 74%);
     box-shadow: 0 0 1.35cqw 0.3cqw color-mix(in srgb, var(--tinkle) 70%, transparent);
@@ -115,14 +125,14 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
                dot-out 0.34s calc(var(--t-fall-in) + var(--t-fall)) ease-out forwards;
 }
 @keyframes dot-in { to { opacity: 1; } }
-@keyframes dot-fall { to { top: var(--dot-hit-y); } }
+@keyframes dot-fall { to { top: var(--key-y); } }
 @keyframes dot-out { to { opacity: 0; transform: scale(1.5); } }
 
 /* The impact: one soft ring, and the key brightening under it. */
 #ripple {
     position: absolute;
-    left: var(--dot-hit-x); top: var(--dot-hit-y);
-    width: 4%; aspect-ratio: 1; margin: -2% 0 0 -2%;
+    left: var(--key-x); top: var(--key-y);
+    width: 5.5%; aspect-ratio: 1; margin: -2.75% 0 0 -2.75%;
     border-radius: 50%;
     border: 0.1cqw solid color-mix(in srgb, var(--tinkle) 85%, white);
     opacity: 0;
@@ -134,8 +144,8 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 }
 #keyflash {
     position: absolute;
-    left: var(--dot-hit-x); top: var(--dot-hit-y);
-    width: 13%; height: 15%; margin: -7% 0 0 -6.5%;
+    left: var(--key-x); top: var(--key-y);
+    width: 20%; height: 9%; margin: -4.5% 0 0 -10%;
     border-radius: 0.62cqw;
     background: radial-gradient(circle, rgba(255,255,255,0.75) 0%, transparent 68%);
     opacity: 0;
@@ -147,9 +157,7 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
    letters. The mark underneath is untouched — this only adds. */
 #shine {
     position: absolute;
-    left: var(--word-x0); top: var(--word-y0);
-    width: calc(var(--word-x1) - var(--word-x0));
-    height: calc(var(--word-y1) - var(--word-y0));
+    inset: 0;
     overflow: hidden;
     opacity: 0;
     animation: shine-on 0.01s var(--t-shine-in) forwards;
@@ -167,11 +175,11 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 }
 @keyframes shine-sweep { to { left: 104%; } }
 
-/* The tittle of the "i" catches the light a moment after the sweep reaches it. */
+/* The dot over the first "i" catches the light a moment after the sweep reaches it. */
 #sparkle {
     position: absolute;
-    left: 41.5%; top: 63.8%;
-    width: 2.4%; aspect-ratio: 1; margin: -1.2% 0 0 -1.2%;
+    left: var(--tittle-x); top: var(--tittle-y);
+    width: 7%; aspect-ratio: 1; margin: -3.5% 0 0 -3.5%;
     border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, color-mix(in srgb, var(--tinkle) 80%, white) 45%, transparent 70%);
     opacity: 0;
@@ -180,10 +188,8 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 @keyframes sparkle { 0% { opacity: 0; transform: scale(0.4); } 40% { opacity: 0.95; transform: scale(1); } 100% { opacity: 0; transform: scale(1.25); } }
 
 #url {
-    position: absolute;
-    left: 50%;
-    top: calc(44% + var(--logo-size) / 2 + var(--url-gap));
-    transform: translate(-50%, 0.73cqw);
+    margin-top: var(--url-gap);
+    transform: translateY(0.73cqw);
     font: 600 2.08cqw/1 "Nunito Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     letter-spacing: 0.14em;
     color: var(--url-ink);
@@ -191,7 +197,7 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
     text-shadow: 0 0 1.35cqw color-mix(in srgb, var(--glow) 55%, transparent);
     animation: url-in 0.55s var(--t-url-in) cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
-@keyframes url-in { to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes url-in { to { opacity: 1; transform: translateY(0); } }
 
 @media (prefers-reduced-motion: reduce) {
     #halo, #mark, #dot, #ripple, #keyflash, #shine, #shine::after, #sparkle, #url {
@@ -205,14 +211,18 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 <div id="stage">
     <div id="halo"></div>
     <div id="lockup">
-        <img id="mark" alt="Klimpi" src="../../brand/proposed-mark/badge.svg" />
-        <div id="keyflash"></div>
-        <div id="ripple"></div>
-        <div id="dot"></div>
-        <div id="shine"></div>
-        <div id="sparkle"></div>
-    </div>
-    <div id="url">klimpi.app</div>
+        <div id="tile">
+            <img id="mark" alt="Klimpi" src="../../brand/klimpi-icon.png" />
+            <div id="keyflash"></div>
+            <div id="ripple"></div>
+            <div id="dot"></div>
+        </div>
+        <div id="name">
+            <img alt="" src="../../brand/name-white.svg" />
+            <div id="shine"></div>
+            <div id="sparkle"></div>
+        </div>
+        <div id="url">klimpi.app</div>
 </div>
 </div>
 
@@ -278,7 +288,7 @@ if (!location.search.includes("render")) {
     go.id = "go";
     go.textContent = "▶ Play with sound";
     go.style.cssText =
-        "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9;padding:10px 18px;border-radius:999px;border:1px solid #4c1d95;background:#1a1140;color:#e9e4ff;font:600 14px system-ui;cursor:pointer";
+        "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9;padding:10px 18px;border-radius:999px;border:1px solid #5f2250;background:#3a1530;color:#ffc0e5;font:600 14px system-ui;cursor:pointer";
     go.onclick = start;
     document.body.append(go);
 }

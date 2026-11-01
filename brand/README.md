@@ -25,7 +25,7 @@ resolved token values out of the built stylesheet, so a build has to exist first
 | `source/*.png` | The three drawings as they arrived, before the background was keyed out. |
 | `icon/klimpi-*.png` | The icon at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
 | `icon/lockup-paper.png` | The lockup over the tagline on paper, 960×320 at 2×, for light surfaces. |
-| `icon/lockup-indigo.png` | The same on indigo, where the lockup stands in its white frame. |
+| `icon/lockup-fuchsia.png` | The same on fuchsia, where the lockup stands in its white frame. |
 | `palette.png` | Every colour with its role, as a sheet. |
 | `palette.json` | The same, for tools. Hex plus the token each comes from. |
 | `type.png` | The two faces, set as the app sets them. |

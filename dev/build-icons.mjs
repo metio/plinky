@@ -32,7 +32,11 @@ const NAME_WHITE = markImage(await readFile("brand/name-white.svg"));
 const css = await readFile("app/app.css", "utf8");
 const PAPER = tokenValue(css, "", "--color-surface");
 const INK = tokenValue(css, "", "--color-ink");
-const ACCENT = tokenValue(css, "", "--color-accent-solid");
+// The mark's own aubergine: the name's ink on paper, and the ground white type and the
+// keys are set on. It is the colour of the icon's tile, so a plate painted with it reads
+// as more of the tile rather than as a second ground behind it — and the K's fuchsia arms
+// and its pressed key keep their contrast, which they lose against a fuchsia plate.
+const AUBERGINE = tokenValue(css, "", "--color-brand-ink");
 
 // The tagline is set in the app's own display face, so the render has to carry the font
 // with it — a headless browser has no Fredoka installed, and the fallback would not be the
@@ -61,12 +65,12 @@ async function shoot(html, { width, height, path }) {
     return png;
 }
 
-// A square of accent with the keys inside it, filling the given share of the frame. No
-// transparency anywhere, so nothing can paint its own colour into a corner — and the keys
-// rather than the tile, because a tile on a ground of nearly its own colour has no edge to
-// show and reads as a smudge.
+// A square of the mark's aubergine with the keys inside it, filling the given share of
+// the frame. No transparency anywhere, so nothing can paint its own colour into a corner —
+// and the keys rather than the tile, because a tile on a ground of its own colour has no
+// edge to show and reads as a smudge.
 const filled = (size, share) =>
-    `<div style="width:${size}px;height:${size}px;background:${ACCENT};display:flex;align-items:center;justify-content:center">
+    `<div style="width:${size}px;height:${size}px;background:${AUBERGINE};display:flex;align-items:center;justify-content:center">
        ${picture(KEYS, Math.round(size * share))}
      </div>`;
 
@@ -146,13 +150,14 @@ if (!siteUrl) {
     throw new Error("could not find SITE_URL in core/site.ts");
 }
 await shoot(
-    `<div style="width:1200px;height:630px;background:${ACCENT};display:flex;align-items:center;justify-content:center;padding:64px">
+    `<div style="width:1200px;height:630px;background:${AUBERGINE};display:flex;align-items:center;justify-content:center;padding:64px">
        ${markGroup({
            mark: framedMark(ICON, PAPER),
            name: NAME_WHITE,
            size: 300,
            wide: true,
            measure: 560,
+           lineMeasure: 700,
            ink: PAPER,
            display: DISPLAY,
            ui: "font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif",
