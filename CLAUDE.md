@@ -208,6 +208,15 @@ npm run nav           # navigation-depth budget
 nix develop --command ci-widths  # CI ONLY — every page fits 320/360/390px, in the
                       # language that stresses a narrow layout hardest (it builds that
                       # locale first; dev/widest-locale.mjs derives which)
+nix develop --command ci-hydration  # CI ONLY — every address whose PARAMETERS decide what
+                      # renders still hydrates the document it was sent (builds the site
+                      # first). One static document answers every query string, so a page
+                      # reading the address as it hydrates disagrees with its own markup
+                      # and React discards it. Nothing else sees it: development
+                      # client-renders from the start, and the axe sweep and Lighthouse
+                      # read paths with no query. The addresses are hand-kept in
+                      # dev/check-hydration.mjs, and one that stops resolving fails rather
+                      # than quietly measuring the fallback shell
 npm run brand         # regenerates brand/ from app.css + the icon (not a gate)
 npm run logo          # keys the background out of brand/source/* and writes the shipped
                       # artwork, brand/plinky-{mark,icon,keys}.png; `-- --check` reports stale

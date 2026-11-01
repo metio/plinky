@@ -21,6 +21,7 @@
         "exercises:reid": "tsx dev/reid-exercises.mts",
         "format": "biome check --write .",
         "help:shots": "node dev/help-screenshots.mjs",
+        "hydration": "node dev/check-hydration.mjs",
         "icons": "node dev/build-icons.mjs",
         "knip": "npm run messages && react-router typegen && knip",
         "lint": "biome check --error-on-warnings",

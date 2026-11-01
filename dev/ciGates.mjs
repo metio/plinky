@@ -56,4 +56,10 @@ export function gatesInWorkflow(path = ".github/workflows/verify.yml") {
 // each builds the site or drives a browser over it. Named as flake.nix defines them, and
 // the parity gate checks that every name here is one the flake defines — a heavy gate
 // listed under a name the flake never had would run loose on the first job that added it.
-export const HEAVY = new Set(["ci-build", "ci-lighthouse", "ci-widths", "ci-test-browser"]);
+export const HEAVY = new Set([
+    "ci-build",
+    "ci-hydration",
+    "ci-lighthouse",
+    "ci-widths",
+    "ci-test-browser",
+]);

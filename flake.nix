@@ -122,6 +122,16 @@
               exec npx --yes @lhci/cli autorun "$@"
             '')
             (pkgs.writeShellScriptBin "ci-size" ''exec npm run size "$@"'')
+            # Builds the site and reads the addresses whose parameters decide what renders.
+            # One static document answers every query string, so a page that reads the
+            # address as it hydrates disagrees with the markup it was sent — invisible in
+            # development, where there is no document to disagree with.
+            (pkgs.writeShellScriptBin "ci-hydration" ''
+              set -e
+              npm run build:single
+              node dev/single-locale-build.mjs "the hydration gate"
+              exec npm run hydration "$@"
+            '')
             # Builds the language that stresses a narrow layout hardest, then measures it.
             # English is the one language whose layout needs no checking — every string was
             # written to fit it — so the locale is derived from the messages rather than
