@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Import-only image for the Mutopia harvest, and one of the two things left that still
-# want a container — the toolchain is otherwise a nix flake. LilyPond is large (Guile,
+# want a container — the toolchain is otherwise .breto.edn. LilyPond is large (Guile,
 # fonts), so it stays isolated here rather than in anything a build touches. The pipeline
 # is:
 #   .ly  --lilypond-->  MIDI  --music21-->  two-staff piano MusicXML

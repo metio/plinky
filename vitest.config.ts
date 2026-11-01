@@ -183,7 +183,7 @@ export default defineConfig({
                     browser: {
                         enabled: true,
                         // Font rendering, pinned. Everything else about the render
-                        // box is already fixed — one engine from the flake, one
+                        // box is already fixed — one engine from playwright, one
                         // viewport, self-hosted fonts, frozen animations — and text
                         // was the last thing left floating with the machine: on
                         // Linux, Chromium takes hinting and subpixel settings from
@@ -226,7 +226,7 @@ export default defineConfig({
                         // One canonical render box: the screenshots are pixel
                         // baselines, so the viewport must never float with the
                         // environment. Chromium-only for the same reason — one
-                        // engine, pinned by the flake on every machine.
+                        // engine, pinned by playwright on every machine.
                         viewport: { width: 800, height: 600 },
                         instances: [{ browser: "chromium" }],
                         expect: {

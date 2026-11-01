@@ -3,7 +3,7 @@
 name: Publish Website
 # Production deploys to Cloudflare Pages (project "klimpi"), by direct upload from
 # here rather than through Cloudflare's Git integration: the build must run in the
-# repo's nix devshell and across the per-locale matrix below, neither of which
+# repo's breto toolchain and across the per-locale matrix below, neither of which
 # Cloudflare's own builder can reproduce.
 #
 # Setup this workflow depends on:
@@ -27,7 +27,7 @@ on:
     # into it. Four kinds were already missing, each of which rewrites the site:
     # dev/pages.mjs, which react-router.config.ts imports to decide WHICH PAGES EXIST;
     # project.inlang/settings.json, the locale list the matrix below is built from, so a new
-    # language would have deployed nothing; flake.nix and flake.lock, the toolchain
+    # language would have deployed nothing; .breto.edn, the toolchain
     # everything is built with; and dev/merge-locale-artifacts.mjs, dev/stamp-sw.mjs,
     # dev/gen-sitemap.mjs, dev/spa-fallback.mjs and dev/gen-redirects.mjs, which the deploy
     # job runs over the output it uploads.
@@ -57,9 +57,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
       - id: list
-        run: echo "locales=$(nix develop --command node -p "JSON.stringify(require('./project.inlang/settings.json').locales)")" >> "$GITHUB_OUTPUT"
+        run: echo "locales=$(node -p "JSON.stringify(require('./project.inlang/settings.json').locales)")" >> "$GITHUB_OUTPUT"
 
   build-root:
     name: Build root (all locales)
@@ -70,20 +72,23 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
       - name: Build root
         # Supplies "/" (a runtime language-detect redirect, so it can't be pinned
         # to one locale) and the SPA fallback, plus the public assets and the
         # root-redirect chunks.
-        run: nix develop --command npm run build:client
+        run: npm run build:client
         env:
           KLIMPI_ROOT_ONLY: "1"
       - name: Paint piece cards
         # One card per catalogue piece, the picture its link unfurls as. Painted here,
         # once, rather than in every language's build: the card is language-neutral.
         # See dev/gen-og.mts.
-        run: nix develop --command npm run og
+        run: npm run og
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: site-root
@@ -103,11 +108,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
       - name: Build ${{ matrix.locale }}
         # Tree-shaken to this one language; prerenders only its /<locale>/ pages.
-        run: nix develop --command npm run build:client
+        run: npm run build:client
         env:
           KLIMPI_LOCALE: ${{ matrix.locale }}
       - name: Take the help pictures
@@ -120,7 +128,7 @@ jobs:
         # See dev/help-screenshots.mjs.
         env:
           LOCALE: ${{ matrix.locale }}
-        run: nix develop --command npm run help:shots -- --locales="$LOCALE" --out=build/client/help
+        run: npm run help:shots -- --locales="$LOCALE" --out=build/client/help
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: site-${{ matrix.locale }}
@@ -146,36 +154,38 @@ jobs:
           # shallow clone has neither commit's tree to compare.
           fetch-depth: 0
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           path: artifacts
       - name: Merge locale bundles
-        run: nix develop --command node dev/merge-locale-artifacts.mjs artifacts
+        run: node dev/merge-locale-artifacts.mjs artifacts
       - name: Stamp service worker + sitemap
         # No npm install: both scripts use only Node built-ins + settings.json.
-        run: nix develop --command node dev/stamp-sw.mjs && nix develop --command node dev/gen-sitemap.mjs
+        run: node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs
       - name: Add SPA fallback
         # The shell for a path with no prerendered document, plus the routes where the
         # middleware corrects its status — Pages would otherwise serve a real page with
         # a 404. See dev/spa-fallback.mjs.
-        run: nix develop --command node dev/spa-fallback.mjs
+        run: node dev/spa-fallback.mjs
       - name: Add redirects
         # Every address the site used to answer at — a retired page, a link with no
         # language in it — sent on with a 301, so a crawler follows it rather than
         # recording a 404. See dev/gen-redirects.mjs.
-        run: nix develop --command node dev/gen-redirects.mjs
+        run: node dev/gen-redirects.mjs
       - name: Check the links
         # Every internal link in the tree names the address that answers, rather than one
         # the host redirects to. A page that links to its own site through a 301 spends a
         # crawl on a hop, and Search Console records where it was sent from as a page that
         # redirects rather than as a page. See dev/check-links.mjs.
-        run: nix develop --command node dev/check-links.mjs
+        run: node dev/check-links.mjs
       - name: Count the upload
         # Cloudflare Pages refuses a deployment past twenty thousand files, and the pages
         # in every language plus a card per piece are most of the way there. See
         # dev/check-deploy-files.mjs.
-        run: nix develop --command node dev/check-deploy-files.mjs
+        run: node dev/check-deploy-files.mjs
       - name: Deploy Website
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -188,7 +198,7 @@ jobs:
         # the commit, and it either is main's tip or it is not. Without it every
         # deployment is anonymous and staleness can only be guessed at from the content.
         run: >-
-          nix develop --command npx --yes wrangler@4 pages deploy build/client
+          npx --yes wrangler@4 pages deploy build/client
           --project-name=plinky
           --branch=main
           --commit-hash="$GITHUB_SHA"
@@ -200,4 +210,4 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         env:
           BEFORE: ${{ github.event.before }}
-        run: nix develop --command node dev/submit-indexnow.mjs "$BEFORE" "$GITHUB_SHA"
+        run: node dev/submit-indexnow.mjs "$BEFORE" "$GITHUB_SHA"

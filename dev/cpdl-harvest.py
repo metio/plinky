@@ -18,7 +18,7 @@ Two phases so the large scrape is resumable and its yield is known before downlo
            the permissive editions: {page, title, composer, spdx, file}. One per page.
   reduce — download and reduce the planned editions into <out-dir>.
 
-Needs music21, which the flake does not carry. Run it in the Mutopia image, which
+Needs music21, which .breto.edn does not carry. Run it in the Mutopia image, which
 installs it for the same reason:
   ilo --no-rc shell --remote-user pwuser --update-remote-user-uid \
     --containerfile dev/mutopia.Containerfile dev/klimpi-mutopia:latest bash -c '…'

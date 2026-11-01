@@ -15,17 +15,15 @@ What a run of `/design-sync` needs to know about this repo. The durable settings
   storied component. `node .design-sync/make-entry.mjs` derives it from the reference
   storybook's `index.json`, so a component that gains a story joins the bundle on the next
   run and a renamed one cannot linger.
-- **Every command goes through the flake**: `nix develop --command …`, with
-  `NP_RUNTIME=bwrap` exported. `node` and `npm` do not exist on the host.
-- **Never run two `nix develop --command npm …` invocations at once** — each regenerates
+- **Every command needs `eval "$(breto env)"` first**: `node` and `npm` come from
+  `.breto.edn`.
+- **Never run two `npm …` invocations at once** — each regenerates
   the gitignored `app/paraglide/`, and a mid-read resolve error fails a dozen files
   spuriously. The converter's own `node .ds-sync/…` runs are safe to parallelise; npm
   scripts are not.
-- **Playwright comes from the flake**, pinned to `playwright-driver` and reachable only
-  inside `nix develop` (`PLAYWRIGHT_BROWSERS_PATH` points into the nix store, which does
-  not exist outside the namespace). So `.ds-sync/` installs `esbuild ts-morph
-  @types/react` only — `playwright` resolves upward to the repo's own copy, which already
-  matches the browsers. Never `npx playwright install`.
+- **Playwright comes from `package.json`**, and its browsers from `browsers`. So
+  `.ds-sync/` installs `esbuild ts-morph @types/react` only — `playwright` resolves
+  upward to the repo's own copy, which already matches the browsers.
 
 ## Learnings
 
@@ -120,7 +118,7 @@ missing an entry — which is what happened when the hand-made cards were replac
 
 - The reference storybook is not built by any repo gate, so nothing else would catch it
   breaking. Rebuild it whenever `.storybook/` or a story changes:
-  `nix develop --command npx storybook build -c .storybook -o "$PWD/.design-sync/sb-reference"`.
+  `npx storybook build -c .storybook -o "$PWD/.design-sync/sb-reference"`.
 
 ## Findings from the 2026-08-23 re-sync
 

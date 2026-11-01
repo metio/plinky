@@ -10,8 +10,10 @@
 
 import { readFileSync } from "node:fs";
 
+const BROWSER_INSTALL = "npx playwright install --with-deps chromium firefox";
+
 // Steps that set a job up rather than gate it.
-export const SETUP_COMMANDS = new Set(["npm ci"]);
+export const SETUP_COMMANDS = new Set(["npm ci", BROWSER_INSTALL]);
 
 // Every ci-* wrapper named by a step, and every raw command that should have been one.
 export function gatesInWorkflow(path = ".github/workflows/verify.yml") {
@@ -29,7 +31,7 @@ export function gatesInWorkflow(path = ".github/workflows/verify.yml") {
         if (line.trim().startsWith("#")) {
             continue;
         }
-        const invocation = line.match(/nix develop --command\s+(.+?)\s*$/);
+        const invocation = line.match(/^\s*(?:- )?run: (?!\|)(.+?)\s*$/);
         if (!invocation) {
             continue;
         }
@@ -53,9 +55,9 @@ export function gatesInWorkflow(path = ".github/workflows/verify.yml") {
 // tree. Named rather than guessed, and NAMED IN THE OUTPUT when skipped: a runner that
 // quietly leaves five gates out reads as "everything passed" when it is not.
 // The wrappers `npm run ci:local` leaves to CI or to a deliberate `--all` under `capped`:
-// each builds the site or drives a browser over it. Named as flake.nix defines them, and
-// the parity gate checks that every name here is one the flake defines — a heavy gate
-// listed under a name the flake never had would run loose on the first job that added it.
+// each builds the site or drives a browser over it. Named as .breto.edn defines them, and
+// the parity gate checks that every name here is one .breto.edn defines — a heavy gate
+// listed under a name it never had would run loose on the first job that added it.
 export const HEAVY = new Set([
     "ci-build",
     "ci-hydration",

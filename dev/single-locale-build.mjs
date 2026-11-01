@@ -52,7 +52,7 @@ export function requireSingleLocaleBuild(gate) {
             `\`npm run build\`, which ${gate} can't measure (a visitor downloads one language, ` +
             "not all of them).\n" +
             "Build the single locale CI and the deploy use, then re-run:\n" +
-            "  nix develop --command npm run build:single\n",
+            "  npm run build:single\n",
     );
     process.exit(1);
 }

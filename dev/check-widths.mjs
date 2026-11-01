@@ -21,7 +21,7 @@
 // was the one language whose layout did not need checking.
 //
 // Build-dependent, so it runs where the other build-dependent checks run rather than in
-// the pre-push loop: `nix develop --command ci-widths`.
+// the pre-push loop: `ci-widths`.
 
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
@@ -53,7 +53,7 @@ const root = "build/client";
 const built = builtLocales();
 if (built.length === 0) {
     console.error(
-        "No build to measure. Run `nix develop --command ci-widths`, which builds the\n" +
+        "No build to measure. Run `ci-widths`, which builds the\n" +
             "locale that stresses a narrow layout hardest and then runs this.",
     );
     process.exit(1);
@@ -61,7 +61,7 @@ if (built.length === 0) {
 if (built.length > 1) {
     console.error(
         `build/client holds ${built.length} prerendered locales. This measures one, the way a\n` +
-            "visitor reads one. Run `nix develop --command ci-widths`.",
+            "visitor reads one. Run `ci-widths`.",
     );
     process.exit(1);
 }

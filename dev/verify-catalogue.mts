@@ -12,7 +12,7 @@
 // would reach a player as a piece that will not open or will not keep time, and a sample
 // cannot promise their absence.
 //
-//   nix develop --command npx tsx dev/verify-catalogue.mts
+//   npx tsx dev/verify-catalogue.mts
 
 import { readdirSync, readFileSync } from "node:fs";
 import { JSDOM } from "jsdom";
