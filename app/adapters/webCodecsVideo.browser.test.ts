@@ -51,12 +51,13 @@ describe("webCodecsVideoExporter", () => {
         // here rather than in somebody's chat.
         const video = document.createElement("video");
         video.muted = true;
-        video.preload = "metadata";
+        video.preload = "auto";
         const url = URL.createObjectURL(blob);
         try {
             video.src = url;
             await new Promise<void>((resolve, reject) => {
-                video.onloadedmetadata = () => resolve();
+                // Firefox reports a provisional size until the first frame has decoded.
+                video.onloadeddata = () => resolve();
                 video.onerror = () =>
                     reject(new Error(`the player refused the file: ${video.error?.message}`));
             });
