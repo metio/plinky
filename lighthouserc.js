@@ -125,7 +125,20 @@ const SCRIPT_LIGHT = SCRIPT_LIGHT_RECORDED + HEADROOM;
 // two switches with their copy in Greek. Measured 670,194 against 667,648 with the left
 // hand as chords, and the progression transfer above it weighs one kilobyte more in the
 // app bundle; the app ratchet moved 422 → 428 for the same commits.
-const SCRIPT_NOTATION_RECORDED = 673792;
+// 658 KiB → 676 KiB: the rebrand, and the drift it landed on top of. The play page first
+// measured 690,209 against 690,176 — over by 33 bytes — and 690,347 by the end of the
+// branch. Main measures 690,020 on the same page, 156 bytes under that same limit, so the
+// whole rename, the third palette and the wordmark's second dot weigh 327 bytes between
+// them; the other sixteen kibibytes are not theirs. The figure said 658 KiB while the page
+// had been 674 for some time, which left the margin spent before this branch touched it.
+// The app bundle's own ratchet says the same from the other side — main measures 12.3 KiB
+// over ITS recorded figure and this branch 12.4. So this is recorded at what the page now
+// measures rather than at the smallest number that would pass: a figure already sixteen
+// kibibytes inside its own headroom is not a headroom, and the next branch to add a
+// paragraph of Greek would pay for everything that came before it. The light cap below is
+// 65% spent on the same reading (settings, 280,990 against 286,720) and is left where it
+// is, having not yet grown past its margin.
+const SCRIPT_NOTATION_RECORDED = 692224;
 const SCRIPT_NOTATION = SCRIPT_NOTATION_RECORDED + HEADROOM;
 
 const common = {

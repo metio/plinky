@@ -100,10 +100,8 @@ export function SiteHeader({ badge = <GradeBadge /> }: { badge?: ReactNode }) {
                     </Link>
                 </div>
             </div>
-            {/* The bouquet, laid flat. Five colours that carry no meaning anywhere else in
-                the app — which is what lets them be purely the brand's own furniture here
-                and the flower's petals on the front page. It is a graphic, not text, so it
-                only needs 3:1, and every one of the five clears that on both themes. */}
+            {/* The bouquet, laid flat (core/bouquet). It is a graphic, not text, so it only
+                needs 3:1, and every one of the five clears that on both themes. */}
             <span aria-hidden="true" className="-mx-6 -mb-3 mt-3 flex h-[3px]">
                 {BOUQUET.map((fill) => (
                     <span key={fill} className={`flex-1 ${fill}`} />
