@@ -115,8 +115,15 @@ const named = [...new Set([...notation, ...noindex])];
 // (dev/check-bundle-size.mjs): a feature's copy in Greek is a kilobyte, and a limit set
 // right at the last measurement failed one branch after another for it. The figure moves,
 // with a paragraph here, when a page grows past the margin.
+// 264 KiB → 276 KiB: the same two months of drift the app bundle's ledger records
+// (dev/check-bundle-size.mjs), read on the other cap. Settings is the heaviest page under
+// it and measures 281,591 against 286,720 — inside the margin, so nothing failed and
+// nothing moved the figure, which is how 68% of the headroom came to be spent with no line
+// here. The home page is 1 KiB behind it. Recorded at what the page measures, for the
+// reason the entry above gives: a margin already spent is not a margin, and the branch
+// that trips it is never the one that filled it.
 const HEADROOM = 16 * 1024;
-const SCRIPT_LIGHT_RECORDED = 270336;
+const SCRIPT_LIGHT_RECORDED = 282624;
 const SCRIPT_LIGHT = SCRIPT_LIGHT_RECORDED + HEADROOM;
 //
 // 652 KiB → 658 KiB: the chords program. Chord names on the page, the left hand as chords

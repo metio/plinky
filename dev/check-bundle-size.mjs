@@ -531,6 +531,17 @@ const BUDGET_VENDOR_KB = 324;
 // something before anything is fetched. The archive itself is fetched and weighs nothing
 // here. Measured at 439.4.
 //
+// 452. Two months of drift rather than one change. Three hundred and eighty commits and a
+// hundred and four player-visible entries since 439 was recorded on 2026-09-08: the
+// calm-brand redesign and the black theme, the front page's keyboard, the drawings beside
+// each way to practise, the grade re-cut against the teaching books, a long run of fixes
+// to chords, slides and tremolos, and the rename to Klimpi with a third palette. Not one
+// of them crossed the sixteen-kilobyte margin by itself, which is exactly why none of them
+// moved this figure and why the margin was down to three kilobytes before anyone looked.
+// Recorded at what main measures so the margin is a margin again: a ratchet whose headroom
+// has been spent is no longer a ratchet, it is a tripwire for whichever branch happens to
+// arrive next, and the cost lands on a change that did not cause it. Measured at 451.9.
+//
 // The figure above is what main last weighed, and the ledger goes on recording every raise
 // of it. What fails the build is no longer the figure itself but the figure plus a margin:
 // a feature's worth of copy in twenty-six languages is a kilobyte or two, and a ratchet set
@@ -541,7 +552,7 @@ const BUDGET_VENDOR_KB = 324;
 // chunk, weigh more than that. Growth inside the margin prints its delta and passes; the
 // recorded figure moves, with a paragraph here, when a change crosses the margin — which is
 // still a decision, made every dozen features rather than every one.
-const APP_RECORDED_KB = 439;
+const APP_RECORDED_KB = 452;
 const APP_HEADROOM_KB = 16;
 const BUDGET_APP_KB = APP_RECORDED_KB + APP_HEADROOM_KB;
 
