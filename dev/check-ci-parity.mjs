@@ -42,9 +42,7 @@ for (const name of HEAVY) {
 
 for (const name of required) {
     if (!defined.has(name)) {
-        problems.push(
-            `job command \`${name}\` has no matching command in .breto.edn`,
-        );
+        problems.push(`job command \`${name}\` has no matching command in .breto.edn`);
     }
 }
 
