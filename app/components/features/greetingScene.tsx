@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { PETALS } from "../../../core/bouquet";
 import type { PartOfDay } from "../../../core/greeting";
 
 // The small drawing beside the greeting: one per part of the day, so the thing next to
@@ -19,8 +20,6 @@ import type { PartOfDay } from "../../../core/greeting";
 // grade bands) stays out, so nobody has to wonder whether a pink balloon is telling them
 // something.
 
-const PETALS = ["bg-bloom-sun", "bg-bloom-leaf", "bg-bloom-sky", "bg-tinkle", "bg-bloom-rose"];
-
 // How long the stalk takes to draw itself, in seconds. The petals wait it out, so this has
 // to agree with `--animate-stem-draw` in app.css — the two are one gesture split across a
 // stylesheet and a component, and a petal opening on a half-grown stem is what disagreement
@@ -36,11 +35,11 @@ const STEM_SECONDS = 1.15;
 const RAYS: [number, string][] = [
     [0, "bg-bloom-sun"],
     [45, "bg-bloom-flame"],
-    [90, "bg-bloom-rose"],
+    [90, "bg-bloom-violet"],
     [135, "bg-bloom-sun"],
     [180, "bg-bloom-flame"],
     [225, "bg-bloom-sun"],
-    [270, "bg-bloom-rose"],
+    [270, "bg-bloom-violet"],
     [315, "bg-bloom-sun"],
 ];
 
@@ -117,7 +116,7 @@ function Flower() {
 // different heights and on different offsets, because three balloons rising in step is one
 // balloon drawn three times.
 const BALLOONS: { colour: string; string: string; left: number; top: number; delay: string }[] = [
-    { colour: "bg-bloom-rose", string: "text-bloom-leaf", left: 8, top: 14, delay: "0s" },
+    { colour: "bg-bloom-violet", string: "text-bloom-leaf", left: 8, top: 14, delay: "0s" },
     { colour: "bg-tinkle", string: "text-bloom-sun", left: 26, top: 6, delay: "-1.2s" },
     { colour: "bg-bloom-sky", string: "text-tinkle", left: 42, top: 16, delay: "-2.4s" },
 ];
@@ -164,7 +163,7 @@ function Balloons() {
 
 const SPARKS: { left: number; top: number; size: number; colour: string; delay: string }[] = [
     { left: 4, top: 10, size: 20, colour: "text-bloom-sun", delay: "0s" },
-    { left: 40, top: 6, size: 17, colour: "text-bloom-rose", delay: "-0.8s" },
+    { left: 40, top: 6, size: 17, colour: "text-bloom-violet", delay: "-0.8s" },
     { left: 28, top: 30, size: 18, colour: "text-tinkle", delay: "-1.6s" },
     { left: 8, top: 42, size: 14, colour: "text-bloom-sky", delay: "-2.2s" },
     { left: 50, top: 38, size: 12, colour: "text-bloom-sun", delay: "-2.8s" },
@@ -172,7 +171,7 @@ const SPARKS: { left: number; top: number; size: number; colour: string; delay: 
 
 const DOTS: { left: number; top: number; size: number; colour: string; delay: string }[] = [
     { left: 38, top: 2, size: 8, colour: "bg-tinkle", delay: "-0.4s" },
-    { left: 2, top: 34, size: 6, colour: "bg-bloom-rose", delay: "-1.1s" },
+    { left: 2, top: 34, size: 6, colour: "bg-bloom-violet", delay: "-1.1s" },
     { left: 58, top: 24, size: 6, colour: "bg-accent-soft", delay: "-1.9s" },
     { left: 26, top: 58, size: 8, colour: "bg-bloom-sky", delay: "-2.5s" },
 ];

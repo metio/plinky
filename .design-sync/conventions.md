@@ -60,7 +60,7 @@ baked into an exported image; `hand-left` / `hand-right` distinguish the two han
 staff. A decorative green on a screen where colour is the information is a lie.
 
 Five colours are the exception, and they exist BECAUSE of that rule: `spark`, `tinkle`,
-`bloom-leaf`, `bloom-sky` and `bloom-rose` mean nothing anywhere in the app, which is what
+`bloom-leaf`, `bloom-sky` and `bloom-violet` mean nothing anywhere in the app, which is what
 frees them to be brand furniture — the rule under the header and the petals of the front
 page's flower. Use them for decoration and never to say anything. A grade letter takes
 `spark` for the top tier and then the three state colours, because a grade IS a verdict;

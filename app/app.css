@@ -215,12 +215,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        bands, the hands — stays out of this set, so nobody has to wonder whether a pink
        balloon is telling them something.
        They are bright on purpose: the greeting's illustrations are drawn entirely from them,
-       and at the old weights the sun came out a bronze medallion rather than sunlight. */
+       and at the old weights the sun came out a bronze medallion rather than sunlight.
+       They must also stay apart from each other and from `tinkle`, which stands beside
+       them in the bouquet and in the flower: a petal within a degree or two of its
+       neighbour's hue turns five petals into four, and the bar under the header into four
+       bands. That is what keeps this set clear of the brand's own fuchsia. */
     --color-bloom-sun: #e8a723;
     --color-bloom-flame: #ef7d3a;
     --color-bloom-leaf: #57a01f;
     --color-bloom-sky: #1e86d6;
-    --color-bloom-rose: #e0359a;
+    --color-bloom-violet: #aa36fc;
 
     /* The tinkle: one note, played. It is the note the loader drops and a petal of the
        header's bouquet, and nothing else — the brand's whole spark, spent in one place.
@@ -390,7 +394,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-bloom-flame: #f58c4a;
     --color-bloom-leaf: #6cb52f;
     --color-bloom-sky: #3699e0;
-    --color-bloom-rose: #e84fa6;
+    --color-bloom-violet: #c56bff;
 
     --color-ghost: #2bb3a8;
     --color-ghost-text: #7fe0d6;

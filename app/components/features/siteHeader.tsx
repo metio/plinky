@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { BOUQUET } from "../../../core/bouquet";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { m } from "../../paraglide/messages.js";
 import type { ReactNode } from "react";
@@ -104,11 +105,9 @@ export function SiteHeader({ badge = <GradeBadge /> }: { badge?: ReactNode }) {
                 and the flower's petals on the front page. It is a graphic, not text, so it
                 only needs 3:1, and every one of the five clears that on both themes. */}
             <span aria-hidden="true" className="-mx-6 -mb-3 mt-3 flex h-[3px]">
-                <span className="flex-1 bg-spark" />
-                <span className="flex-1 bg-bloom-leaf" />
-                <span className="flex-1 bg-bloom-sky" />
-                <span className="flex-1 bg-tinkle" />
-                <span className="flex-1 bg-bloom-rose" />
+                {BOUQUET.map((fill) => (
+                    <span key={fill} className={`flex-1 ${fill}`} />
+                ))}
             </span>
         </header>
     );

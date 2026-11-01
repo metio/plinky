@@ -50,6 +50,30 @@ export function luminance([r, g, b]: Rgb): number {
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
+// A colour in Oklab, which is built so that an equal step anywhere in it is an equal step
+// to the eye — unlike sRGB, where the same numeric move is a different amount of green and
+// of blue.
+function oklab([r, g, b]: Rgb): Rgb {
+    const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    return [
+        0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+        1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+        0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+    ];
+}
+
+// How far apart two colours look. Contrast answers whether ink is readable on a ground;
+// this answers whether two colours side by side are the same colour, which is a different
+// question — two fills can differ enormously in contrast against the page and still be
+// indistinguishable from each other. Hue alone cannot answer it either: a few degrees
+// apart is plenty when the lightness differs and nothing when it does not.
+export function distance(one: Rgb, other: Rgb): number {
+    const [a, b] = [oklab(one), oklab(other)];
+    return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
 export function contrast(one: Rgb, other: Rgb): number {
     const [light, dark] = [luminance(one), luminance(other)].sort((x, y) => y - x) as [
         number,
