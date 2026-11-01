@@ -124,7 +124,7 @@ if (unbuilt.length > 0) {
     }
     console.error(
         "\nA clean sweep over pages that do not exist is the one result worth nothing. Build\n" +
-            "the site the audit expects: nix develop --command npm run a11y:light\n",
+            "the site the audit expects: npm run a11y:light\n",
     );
 }
 if (threw.size > 0) {

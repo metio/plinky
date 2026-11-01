@@ -27,8 +27,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # A dispatch defaults to a dry run, so seeing what would go out never risks
       # sending it; the schedule posts for real. A week with nothing worth posting
       # exits without submitting rather than announcing that nothing happened.
@@ -52,4 +54,4 @@ jobs:
           if [ -n "$ON_DATE" ]; then
             set -- "$@" "$ON_DATE"
           fi
-          nix develop --command ci-twip "$@"
+          ci-twip "$@"

@@ -4,6 +4,7 @@
 # A tuplet is a music term (triplets, quintuplets, …), not a misspelling of
 # "tuple".
 [default.extend-words]
+edn = "edn"
 tuplet = "tuplet"
 tuplets = "tuplets"
 # "The Weeknd" is a recording artist in the copyright denylist, not a misspelling.

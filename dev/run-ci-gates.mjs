@@ -31,8 +31,7 @@ const failed = [];
 for (const [index, name] of chosen.entries()) {
     process.stdout.write(`  [${index + 1}/${chosen.length}] ${name.padEnd(22)}`);
     const started = Date.now();
-    // Run the wrapper the way CI does. Already inside the devShell when invoked through
-    // npm, so the wrapper is on PATH.
+    // Run the wrapper the way CI does. `breto env` puts the command on PATH.
     const run = spawnSync(name, { stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" });
     const seconds = ((Date.now() - started) / 1000).toFixed(0);
     if (run.status === 0) {
@@ -40,7 +39,7 @@ for (const [index, name] of chosen.entries()) {
         continue;
     }
     console.log(`FAILED ${seconds}s`);
-    // A wrapper that could not be run at all — not on PATH, outside the devshell — has no
+    // A wrapper that could not be run at all — not on PATH, outside `breto env` — has no
     // output of its own; the spawn error is the whole story, and dropping it printed a
     // FAILED with nothing under it.
     const output = `${run.stdout ?? ""}${run.stderr ?? ""}`.trimEnd();

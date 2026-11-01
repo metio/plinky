@@ -1,0 +1,61 @@
+;; SPDX-FileCopyrightText: The Klimpi Authors
+;; SPDX-License-Identifier: AGPL-3.0-or-later
+
+{:packages ["@lint" "jq" "node@24.22.2"]
+ :commands
+ {"browsers" {:run "exec npx playwright install chromium firefox \"$@\""
+             :description "Install the browsers of the playwright version in package.json"}
+ "capped" {:run "set -e
+if [ -n \"${CI:-}\" ] || ! systemd-run --user --scope --quiet -- true >/dev/null 2>&1; then
+  exec \"$@\"
+fi
+exec systemd-run --user --scope --quiet --collect \\
+  -p \"CPUQuota=${CAPPED_CPU:-600%}\" \\
+  -p \"MemoryMax=${CAPPED_MEM:-8G}\" \\
+  -p MemorySwapMax=0 \\
+  -p IOWeight=50 \\
+  -- \"$@\""}
+ "ci-typecheck" {:run "exec npm run typecheck \"$@\""}
+ "ci-test" {:run "exec npm run test \"$@\""}
+ "ci-test-browser" {:run "exec npm run test:browser \"$@\""}
+ "ci-arch" {:run "exec npm run arch \"$@\""}
+ "ci-nav" {:run "exec npm run nav \"$@\""}
+ "ci-bytes" {:run "exec npm run bytes \"$@\""}
+ "ci-tailwind" {:run "exec npm run tailwind \"$@\""}
+ "ci-tokens" {:run "exec npm run tokens \"$@\""}
+ "ci-knip" {:run "exec npm run knip \"$@\""}
+ "ci-biome" {:run "exec npm run lint \"$@\""}
+ "ci-messages-check" {:run "exec npm run messages:check \"$@\""}
+ "ci-bake-check" {:run "exec npm run songs:bake -- --check \"$@\""}
+ "ci-prune-check" {:run "exec npm run songs:prune -- --check \"$@\""}
+ "ci-repair-check" {:run "exec npm run songs:repair -- --check \"$@\""}
+ "ci-people-check" {:run "exec npm run people:dupes -- --check \"$@\""}
+ "ci-mark-check" {:run "exec npm run mark -- --check \"$@\""}
+ "ci-news-check" {:run "exec npm run news:check \"$@\""}
+ "ci-twip" {:run "exec npm run twip -- \"$@\""}
+ "ci-build" {:run "exec npm run build:single \"$@\""}
+ "ci-lighthouse" {:run "set -e
+npm run build:single
+node dev/single-locale-build.mjs \"the lighthouse gate\"
+exec npx --yes @lhci/cli autorun \"$@\""}
+ "ci-size" {:run "exec npm run size \"$@\""}
+ "ci-hydration" {:run "set -e
+npm run build:single
+node dev/single-locale-build.mjs \"the hydration gate\"
+exec npm run hydration \"$@\""}
+ "ci-widths" {:run "set -e
+# One locale per writing system, not one worst case. The widest word is an
+# argument about LENGTH and a sound one: if the longest fits, every shorter
+# one does. It says nothing about SHAPE, and shape is what breaks a control —
+# Korean, Japanese and Chinese are the SHORTEST of the twenty-six by character
+# count, so they were never the worst case and never swept, while having the
+# tallest glyphs and entirely different line-breaking. Each build measures the
+# same pages at the same widths; only the language changes.
+for locale in $(node dev/locale-stress.mjs --scripts); do
+  echo \"── $locale ──\"
+  KLIMPI_LOCALE=\"$locale\" npm run build
+  npm run widths \"$@\"
+done"}
+ "ci-anchors" {:run "exec npm run songs:anchors \"$@\""}
+ "ci-promo" {:run "exec npm run promo:check \"$@\""}
+ "ci-parity" {:run "exec npm run ci:parity \"$@\""}}}

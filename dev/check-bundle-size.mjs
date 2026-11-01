@@ -3,7 +3,7 @@
 
 // Verifies the built client JavaScript stays within budget, so the bundle can't
 // grow unnoticed — and that no dev-only surface leaks into what visitors run.
-// Run after a SINGLE-locale build (`nix develop --command ci-build`, i.e.
+// Run after a SINGLE-locale build (`ci-build`, i.e.
 // `KLIMPI_LOCALE=en npm run build`) — the same build CI and the deploy measure. A
 // plain all-locales `npm run build` is caught below and rejected, because its
 // summed multi-language bundle is ~3× the per-visitor weight the budget tracks.
