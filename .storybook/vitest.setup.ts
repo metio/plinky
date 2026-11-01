@@ -199,7 +199,7 @@ const captureTarget = async (root: HTMLElement) => {
 // renders (and any play function has run), what it rendered is compared against a
 // committed per-story baseline, then the `.dark` class — the same switch the app's
 // theme store flips — goes on the root element and a second, `-dark`-named
-// baseline is compared. The project runs only on chromium pinned by the flake, so
+// baseline is compared. The project runs only on chromium pinned by playwright, so
 // local and CI rasterize with the same engine; the preview self-hosts the fonts
 // (awaited here) and freezes animations, which is what makes a pixel comparison
 // meaningful. Refresh baselines with `npm run test:storybook -- -u`.

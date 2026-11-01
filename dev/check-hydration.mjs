@@ -18,7 +18,7 @@
 // passing, so a renamed route cannot leave this measuring the fallback shell.
 //
 // Build-dependent, so it runs where the other build-dependent checks run:
-// `nix develop --command ci-hydration`.
+// `ci-hydration`.
 
 import { chromium } from "playwright";
 import { builtLocales } from "./single-locale-build.mjs";
@@ -42,8 +42,8 @@ const built = builtLocales();
 if (built.length !== 1) {
     console.error(
         built.length === 0
-            ? "No build to read. Run `nix develop --command ci-hydration`, which builds the\nsite and then reads it."
-            : `build/client holds ${built.length} prerendered locales. This reads one, the way a\nvisitor reads one. Run \`nix develop --command ci-hydration\`.`,
+            ? "No build to read. Run `ci-hydration`, which builds the\nsite and then reads it."
+            : `build/client holds ${built.length} prerendered locales. This reads one, the way a\nvisitor reads one. Run \`ci-hydration\`.`,
     );
     process.exit(1);
 }

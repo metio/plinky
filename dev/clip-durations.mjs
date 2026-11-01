@@ -9,7 +9,7 @@
 // asked for reads as a bug that is not there, and hides one that is.
 //
 // Read straight out of the container rather than decoded, so this needs neither the H.264
-// decoder the devshell's ffmpeg lacks nor a browser: it is the video track's own media
+// decoder a stock ffmpeg may lack nor a browser: it is the video track's own media
 // header, which is the clip's length by definition.
 //
 // What it is for: the clips are cut at a musical silence inside a window rather than at a

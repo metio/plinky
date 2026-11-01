@@ -11,11 +11,11 @@ jobs:
     # The shared Vite/React pipeline (build, browser + coverage, the story
     # screenshots, biome lint, knip, a11y light/dark, lighthouse, and the metio lint
     # gate: reuse, typos, yamllint, actionlint, markdownlint), run through this
-    # repo's flake devShell.
+    # repo's .breto.edn toolchain.
     # Its `detect` job enables each gate from this repo's package.json scripts.
     # Named "Frontend" so its checks read "Frontend / build", "Frontend / browser", …
     name: Frontend
-    uses: metio/ci/.github/workflows/frontend.yml@d4a165ac035d1fa1a7aee5b27192d0aed9c7a0b0 # 2026.11.1111906
+    uses: metio/ci/.github/workflows/frontend.yml@676eae8d602603658694ef656486f37d099fb7ed
     with:
       # Node returns DNS records verbatim, so a bare `localhost` can resolve to
       # ::1 first — the prerender's internal server and its own fetch would then
@@ -24,8 +24,8 @@ jobs:
       # Size and lighthouse are per-visitor budgets: build one locale (tree-shaken
       # to its own language) so they measure what a single language ships. The
       # deploy builds every locale and merges them (npm run build:locales). The
-      # per-locale invocation lives in the ci-build flake wrapper, so this and a
-      # local `nix develop --command ci-build` stay one definition.
+      # per-locale invocation lives in the ci-build command, so this and a
+      # local `ci-build` stay one definition.
       #
       # lighthouserc.json audits one run per page over three categories, which is
       # what keeps that job inside its timeout. Both narrowings follow from what
@@ -35,6 +35,7 @@ jobs:
       # three. The accessibility category is left out because axe already gates
       # a11y in light and dark, where Lighthouse only ever sees light.
       build-command: ci-build
+      browsers: chromium firefox
       # `npm run coverage` runs the same vitest projects `npm test` does, plus
       # instrumentation, so the build job need not run the suite a second time —
       # a node-test failure still fails CI, through coverage.
@@ -47,23 +48,25 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # The catalogue's grades must match the octiles of the committed song costs, so a
       # dedup/import that forgot `npm run songs:bake` can't ship inconsistent grades.
-      - run: nix develop --command ci-bake-check
+      - run: ci-bake-check
       # And nothing a machine transcribed rather than a person engraved, nor a second copy
       # of a work already here. Both were found by ear before they were found by anything
       # else, and neither shows up in a grade or a bar count.
-      - run: nix develop --command ci-prune-check
+      - run: ci-prune-check
       # And no note below the bottom of the keyboard, which is a note no player can reach —
       # a run waiting for one waits forever.
-      - run: nix develop --command ci-repair-check
+      - run: ci-repair-check
       # The outlined name in brand/name-white.svg, and the proposed vector mark beside it,
       # are what their generator writes. Every social image sets that name, so a hand edit to
       # it, or a font update that moves its outlines, would otherwise reach the next render
       # unannounced.
-      - run: nix develop --command ci-mark-check
+      - run: ci-mark-check
   news:
     name: news
     runs-on: ubuntu-latest
@@ -72,12 +75,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # NEWS.md is rendered from changelog.yaml, and the weekly round-up reads the same
       # list — so a hand-edited file, or an entry added without regenerating, would leave
       # the page players are sent to disagreeing with what gets posted.
-      - run: nix develop --command ci-news-check
+      - run: ci-news-check
   nav:
     name: nav
     runs-on: ubuntu-latest
@@ -86,10 +91,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
       # Pure source analysis (no dependencies), so it skips the install step: a new
       # feature can't bury a page deeper than the navigation-depth budget.
-      - run: nix develop --command ci-nav
+      - run: ci-nav
   arch:
     name: arch
     runs-on: ubuntu-latest
@@ -98,11 +105,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
-      - run: nix develop --command ci-arch
+      - run: ci-arch
   people:
     name: people
     runs-on: ubuntu-latest
@@ -111,11 +120,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # Two composer pages that might be one person need a human to rule on which. The
       # rulings live in dev/catalog-people-distinct.json; a merge belongs in core/person.ts.
-      - run: nix develop --command ci-people-check
+      - run: ci-people-check
   bytes:
     name: bytes
     runs-on: ubuntu-latest
@@ -124,11 +135,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # A control byte makes git treat a source file as binary, and a binary file
       # reviews as an empty diff — so the change nobody can see is the one that ships.
-      - run: nix develop --command ci-bytes
+      - run: ci-bytes
   tailwind:
     name: tailwind
     runs-on: ubuntu-latest
@@ -137,11 +150,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # Every class name in source must compile against app/app.css — an unknown
       # utility silently applies no styling, which no other gate can see.
-      - run: nix develop --command ci-tailwind
+      - run: ci-tailwind
   tokens:
     name: tokens
     runs-on: ubuntu-latest
@@ -150,11 +165,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
       # Pure source analysis (no dependencies): colour is named for its role in
       # app/app.css and every token declares both themes, so a component can
       # never hand-pair a light and a dark hue and let the two drift apart.
-      - run: nix develop --command ci-tokens
+      - run: ci-tokens
   i18n:
     name: i18n
     runs-on: ubuntu-latest
@@ -163,11 +180,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
       # Pure source analysis (no dependencies), so it skips the install step: every
       # locale must carry every base-locale message, so a new string can't ship
       # untranslated and silently fall back to English.
-      - run: nix develop --command ci-messages-check
+      - run: ci-messages-check
   widths:
     name: widths
     runs-on: ubuntu-latest
@@ -176,8 +195,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
       # Every page must fit the phone it is read on, in the language that stresses a
       # narrow layout hardest rather than in English. One word that cannot be broken
       # drags the whole document sideways on every page at once, and the translations
@@ -187,7 +209,7 @@ jobs:
       #
       # The story screenshots cannot see this: they render at a fixed 800px, and the
       # browser tests run without Tailwind.
-      - run: nix develop --command ci-widths
+      - run: ci-widths
   hydration:
     name: hydration
     runs-on: ubuntu-latest
@@ -196,14 +218,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
       # Every page ships as one static document that answers every query string, so a
       # page choosing what to show from the address as it hydrates disagrees with the
       # markup it was sent, and React discards that markup and renders again. Nothing
       # else sees it: development client-renders from the start, the axe sweep and
       # Lighthouse read paths with no query, and the browser tests never load a document.
-      - run: nix develop --command ci-hydration
+      - run: ci-hydration
   anchors:
     name: anchors
     runs-on: ubuntu-latest
@@ -212,14 +237,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
-      - run: nix develop --command npm ci
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
       # The grade boundaries in GRADE_THRESHOLDS were calibrated against named teaching
       # collections, and a piece keeps its grade because those numbers do not move. This
       # checks the collections still resolve to the catalogue: a pattern that silently
       # stops matching leaves the file claiming nineteen anchors while the next
       # calibration runs on eighteen, and nothing else would say so.
-      - run: nix develop --command ci-anchors
+      - run: ci-anchors
   promo:
     name: promo
     runs-on: ubuntu-latest
@@ -228,12 +255,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
       # Pure source analysis (no dependencies): the hand-curated promo list must name
       # pieces the catalogue can actually render — resolving, solo piano, CC0. The
       # curation itself is a judgement; these three are not, and all three had quietly
       # stopped holding.
-      - run: nix develop --command ci-promo
+      - run: ci-promo
   ci-parity:
     name: ci-parity
     runs-on: ubuntu-latest
@@ -242,11 +271,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
+      - uses: metio/ci/breto@bfcb1a4d37c4fd4d5d9c27181191dcad0d04f90c # 2026.11.1211658
+        with:
+          registries: github:metio/toolchains
       # Pure source analysis (no dependencies): every gate job must run through a
-      # ci-* wrapper defined in flake.nix, so a local `nix develop --command
-      # ci-<name>` runs exactly what CI runs.
-      - run: nix develop --command ci-parity
+      # ci-* command defined in .breto.edn, so a local `ci-<name>` runs exactly what CI runs.
+      - run: ci-parity
   verify:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.

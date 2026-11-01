@@ -12,42 +12,44 @@ is described in [ARCHITECTURE.md](ARCHITECTURE.md) and **enforced** by
 
 ## The dev environment
 
-The toolchain is a nix flake (`flake.nix`) built on the shared
-[metio/nix-devshell](https://github.com/metio/nix-devshell) — node, chromium +
-firefox (for the vitest browser + a11y gates), and the shared lint gate (reuse,
-typos, yamllint, actionlint, markdownlint). Run any command through it so
-local and CI resolve the identical versions pinned in `flake.lock`:
+The toolchain is defined in `.breto.edn` and installed by
+[breto](https://github.com/metio/breto): node and the shared lint tools (reuse,
+typos, yamllint, actionlint, markdownlint). Put it on `PATH` so local and CI resolve
+the same versions, and install the browsers that match `playwright` in
+`package.json`:
 
 ```sh
-nix develop --command npm test      # one-off
-nix develop                         # or enter the shell, then run commands bare
+eval "$(breto env)"
+npm ci
+browsers
 ```
 
-CI mirrors this exactly: every job in `.github/workflows/verify.yml` is
-`nix develop --command …` behind the `metio/nix-devshell` action, and the
+Playwright downloads its own chromium and firefox. Fedora is not one of its
+supported hosts, so a browser that fails to start here needs its missing system
+library named from the error.
+
+CI mirrors this: every job in `.github/workflows/verify.yml` installs `.breto.edn`
+with the `metio/ci/breto` action, and the
 `Frontend` job delegates to `metio/ci`'s reusable `frontend.yml`, which is where
 the shared lint gate, coverage, the story screenshots, a11y and Lighthouse run —
 they are easy to forget precisely because this repo's own workflow never names
-them. The
-`playwright` npm version is held to the flake's `playwright-driver`, so bump
-both together.
+them.
 
-Each gate is also a **`ci-<name>` wrapper** defined with `writeShellScriptBin` in
-`flake.nix`, capturing exactly how CI invokes it (e.g. `ci-build` bakes in the
-per-locale `KLIMPI_LOCALE=en` build the size budget measures, `ci-reuse` is
-`reuse lint`). So `nix develop --command ci-<name>` runs precisely what CI runs,
-and the same name works bare inside `nix develop` — the `ci-` prefix leaves the raw
+Each gate is also a **`ci-<name>` command** defined in
+`.breto.edn`, capturing exactly how CI invokes it (e.g. `ci-build` bakes in the
+per-locale build the size budget measures). So `ci-<name>` runs precisely what CI
+runs — the `ci-` prefix leaves the raw
 tool free for its other modes. A CI gate job must invoke its check through a
-`ci-*` wrapper, never a raw command inline; `npm run ci:parity` is a blocking gate
-that enforces this and that every wrapper a job names exists in `flake.nix`. The
-shared lint-gate wrappers (`ci-reuse`, `ci-typos`, `ci-yaml`, `ci-actionlint`,
-`ci-markdown`) are not defined here — they come from
-`devshell.lib.mkDevShell`, so every metio repo inherits one definition, and this
-flake only defines the gates that are Klimpi's own.
+`ci-*` command, never a raw command inline; `npm run ci:parity` is a blocking gate
+that enforces this and that every command a job names exists in `.breto.edn`. The
+shared lint commands (`ci-reuse`, `ci-typos`, `ci-yaml`, `ci-actionlint`,
+`ci-markdown`, and `ci-lint` for all of them) are not defined here — they come from
+the `@lint` group of metio/toolchains, and `.breto.edn` only defines the gates that
+are Klimpi's own.
 
 ## The gate
 
-**`nix develop --command npm run ci:local` runs every gate this workflow runs**,
+**`npm run ci:local` runs every gate this workflow runs**,
 read out of `.github/workflows/verify.yml` rather than chosen by hand — fifteen
 of them in well under a minute. Use it instead of picking gates that look related
 to a change, because the relation that matters is the workflow's, not the
@@ -72,7 +74,7 @@ because nothing regenerates that file: adding an export to the module without
 declaring it compiles locally and fails the job.
 
 **Check the exit code of each one.** A cheap gate you skip is a gate CI runs for
-you, slower and after the push. The whole point of the flake is that local and CI
+you, slower and after the push. `.breto.edn` exists so that local and CI
 resolve identical tools.
 
 **Five gates are heavy, and on this host they run under `capped` — always.**
@@ -82,11 +84,11 @@ That froze the browser twice and killed a tmux session, with the load average
 past 40 on sixteen cores.
 
 ```sh
-nix develop --command capped npm run coverage
-nix develop --command capped npm run test:storybook -- -u
-nix develop --command capped ci-lighthouse
-nix develop --command capped npm run a11y:light
-CAPPED_MEM=14G nix develop --command capped npm run test:browser
+capped npm run coverage
+capped npm run test:storybook -- -u
+capped ci-lighthouse
+capped npm run a11y:light
+CAPPED_MEM=14G capped npm run test:browser
 ```
 
 | Gate | What it does |
@@ -97,7 +99,7 @@ CAPPED_MEM=14G nix develop --command capped npm run test:browser
 | `npm run a11y:light` / `a11y:dark` | Builds the site, then axe over the same 22 pages, twice. |
 | `npm run test:browser` | Three vitest projects — chromium, firefox, mobile — each with its own browser. Needs `CAPPED_MEM=14G`; see below. |
 
-`capped` is a devShell wrapper (`flake.nix`) that puts the command in a systemd
+`capped` is a command in `.breto.edn` that puts the command in a systemd
 scope with `CPUQuota=600%`, `MemoryMax=8G`, `MemorySwapMax=0` and `IOWeight=50`.
 `MemorySwapMax=0` is the one that saves the machine: denied swap, a run that
 overreaches is OOM-killed inside its own scope while everything outside keeps its
@@ -116,14 +118,14 @@ the exit code of a pipeline around it says. `CAPPED_MEM=14G` completes it, and o
 this 30G host still leaves the desktop its pages.
 
 Two things `capped` does not fix. It bounds one command, not two: running two
-`nix develop --command npm …` invocations at once still races on the gitignored
+`npm …` invocations at once still races on the gitignored
 `app/paraglide/` (see below), and two capped runs still add up. And CI remains
 where these gates are *expected* to run — pushing and reading the run is still
 cheaper than a local sweep when you have no particular reason to reproduce one.
 
 The other host limit is the ordinary one: this is a Fedora Atomic (ostree)
-machine with rootless Podman and nix-portable, so a gate needing `kind`, a
-privileged container, a system-level nix daemon, or real MIDI/audio hardware
+machine with rootless Podman, so a gate needing `kind`, a
+privileged container, or real MIDI/audio hardware
 could not run here at all. Klimpi has no such gate today.
 
 **Only English used to be verified, and the deploy ships 26 languages.** English is the
@@ -146,16 +148,16 @@ components rather than pages.
 
 `ci-build` dies with `EMFILE: too many open files, watch` when this host's inotify
 instances (`fs.inotify.max_user_instances`, 128) are exhausted — an editor plus a few
-builds is enough. `CHOKIDAR_USEPOLLING=true nix develop --command ci-build` polls
+builds is enough. `CHOKIDAR_USEPOLLING=true ci-build` polls
 instead of watching and completes.
 
-Never run two `nix develop --command npm …` invocations concurrently: each
+Never run two `npm …` invocations concurrently: each
 regenerates the gitignored `app/paraglide/`, and a mid-read resolve error fails
 a dozen files spuriously. One at a time.
 
 Check exit codes directly — `$?` after a pipe reports the *last* command's
 status, so `npm run x | tail` reports `tail`'s success and hides the failure.
-Use `nix develop --command <cmd> > /tmp/x.log 2>&1; echo "EXIT: $?"`.
+Use `<cmd> > /tmp/x.log 2>&1; echo "EXIT: $?"`.
 
 The repo's own gates:
 
@@ -200,15 +202,15 @@ npm run people:dupes  # the report: composer pages that might be one person
 npm run people:dupes -- --check  # the gate (blocking) — every candidate pair needs a
                       # ruling in dev/catalog-people-distinct.json, or an alias in
                       # core/person.ts if they really are one person
-npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
+npm run ci:parity     # every CI gate job maps to a ci-* command (blocking)
 npm run knip          # dead code (blocking)
 npm run lint          # biome lint + format; a WARNING fails it too
                       # (--error-on-warnings), so dead code cannot accumulate
 npm run nav           # navigation-depth budget
-nix develop --command ci-widths  # CI ONLY — every page fits 320/360/390px, in the
+ci-widths  # CI ONLY — every page fits 320/360/390px, in the
                       # language that stresses a narrow layout hardest (it builds that
                       # locale first; dev/widest-locale.mjs derives which)
-nix develop --command ci-hydration  # CI ONLY — every address whose PARAMETERS decide what
+ci-hydration  # CI ONLY — every address whose PARAMETERS decide what
                       # renders still hydrates the document it was sent (builds the site
                       # first). One static document answers every query string, so a page
                       # reading the address as it hydrates disagrees with its own markup
@@ -227,11 +229,11 @@ npm run icons         # regenerates public/ icons + favicon + og.png from the ar
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # makes git call a file binary, and a binary file reviews
                       # as an empty diff
-nix develop --command ci-build   # the single-locale (en) build CI + the deploy measure
+ci-build   # the single-locale (en) build CI + the deploy measure
 npm run size          # bundle budget — measures the ci-build output
 npm run a11y:light    # CI ONLY — axe over the built site (builds it first)
 npm run a11y:dark     # CI ONLY
-nix develop --command ci-lighthouse  # CI ONLY — perf/SEO/CLS budgets (builds the site)
+ci-lighthouse  # CI ONLY — perf/SEO/CLS budgets (builds the site)
 npm run help:shots    # the help page's pictures, of the build in build/client (not a
                       # gate, and nothing a push needs: the deploy takes them). Locally
                       # `npm run build && npm run help:shots` fills all twenty-six;
@@ -254,17 +256,17 @@ sweep and `ci-lighthouse`. The trap that remains is only the one you have to ask
 run `npm run build` by hand, then a gate, and it stops you.
 
 The shared metio lint gate runs in CI through `metio/ci`'s reusable
-`frontend.yml`, which is why it is easy to forget it exists — its wrappers come
-from `devshell.lib.mkDevShell` and run here exactly as they run there. Prose
+`frontend.yml`, which is why it is easy to forget it exists — its commands come
+from the `@lint` group and run here exactly as they run there. Prose
 comments and locale strings are the bulk of most diffs, so `ci-typos` earns its
 place:
 
 ```sh
-nix develop --command ci-typos
-nix develop --command ci-reuse
-nix develop --command ci-yaml
-nix develop --command ci-actionlint
-nix develop --command ci-markdown
+ci-typos
+ci-reuse
+ci-yaml
+ci-actionlint
+ci-markdown
 ```
 
 `typecheck` and `lint` first verify (via `dev/check-node-modules.mjs`) that the
@@ -375,7 +377,7 @@ offline.
   vitest project screenshots every story light and dark (the hook flips the
   `.dark` root class for a second, `-dark`-named baseline) and compares both
   to committed baselines in `app/**/__story-shots__/` (chromium-only, fixed
-  800×600 viewport, the flake pinning the browser so local and CI rasterize
+  800×600 viewport, the `playwright` pin fixing the browser so local and CI rasterize
   the same way — closely, but not to the pixel). After an intentional visual
   change — or when adding a story —
   refresh with `npm run test:storybook -- -u` and commit the changed images; a

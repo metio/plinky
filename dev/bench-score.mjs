@@ -13,7 +13,7 @@
 // page is loaded in a fresh context with a cold cache, and every figure reported is a median
 // of several runs. The same command on the same build gives the same answer.
 //
-//   nix develop --command node dev/bench-score.mjs [--rates=1,4,6] [--runs=5] [--net=fast4g]
+//   node dev/bench-score.mjs [--rates=1,4,6] [--runs=5] [--net=fast4g]
 //
 // The network matters as much as the CPU here and localhost has none, which flatters the
 // app badly: a megabyte of engraver and six hundred kilobytes of catalogue arrive in
@@ -21,7 +21,7 @@
 // describe a machine nobody owns.
 //
 // Serve the build first, or pass --base:
-//   nix develop --command npx http-server build/client -p 8420 -s
+//   npx http-server build/client -p 8420 -s
 
 import { chromium } from "playwright";
 

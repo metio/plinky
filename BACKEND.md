@@ -1797,7 +1797,7 @@ not use. `worker` joins `exclude` beside `studio`, and the worker gets its own
 | `worker/vitest.config.ts`, owned by the worker | `worker/` | Worker tests never execute |
 | A knip **workspace** entry, not just `project` | `knip.json` | See below |
 | `worker/**` in the include list | `biome.json` | Worker code is unlinted |
-| `ci-worker` wrapper | `flake.nix` | `ci:parity` fails the build |
+| `ci-worker` command | `.breto.edn` | `ci:parity` fails the build |
 | A `worker` job plus `needs:` entry | `.github/workflows/verify.yml` | The job does not gate merges |
 
 **The worker owns its own vitest config.** Adding a `worker` project to the root
@@ -1819,20 +1819,18 @@ half-configuration is a red build.
 
 `ci:parity` is the gate that makes this list self-enforcing in one direction: a CI
 job invoking anything other than a `ci-*` wrapper fails, and a `ci-*` name with no
-`writeShellScriptBin` in `flake.nix` fails. It does not catch the reverse — a
+command in `.breto.edn` fails. It does not catch the reverse — a
 directory nobody wired into a gate — which is why this table exists and why the
 phase-0 checklist ends by verifying each row.
 
-The new wrapper follows the established form:
+The new command follows the established form:
 
-```nix
-(pkgs.writeShellScriptBin "ci-worker" ''
-  set -e
-  cd "$(git rev-parse --show-toplevel)"/worker
-  npm ci
-  npm run typecheck
-  exec npm test "$@"
-'')
+```clojure
+"ci-worker" {:run "set -e
+cd worker
+npm ci
+npm run typecheck
+exec npm test \"$@\""}
 ```
 
 `set -e` is not decoration. Without it the wrapper reports only the exit code of

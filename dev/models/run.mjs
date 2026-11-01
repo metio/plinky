@@ -7,7 +7,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Regenerates the traces each Quint model's replay test runs against. Quint is not in
-// the devShell — it is needed to WRITE traces, never to replay them, so it stays an
+// .breto.edn — it is needed to WRITE traces, never to replay them, so it stays an
 // on-demand npx download rather than a tool every CI job installs.
 //
 // Each model is checked against its own invariant first: a trace is only worth replaying
