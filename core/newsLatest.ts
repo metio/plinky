@@ -11,7 +11,17 @@ import type { Release } from "./changelog";
 export const LATEST_RELEASES: Release[] = [
     {
         date: "2026-11-01",
-        label: null,
+        label: "night",
+        entries: [
+            {
+                body: "**The bar at the top of your phone takes the colour of the page.** In dark or black\nit was staying white, a bright strip above a dark screen. It now follows whichever\ntheme and colours you picked.",
+                twip: true,
+            },
+        ],
+    },
+    {
+        date: "2026-11-01",
+        label: "evening",
         entries: [
             {
                 body: "**Plinky is now Klimpi.** New name, new mark — a piano keyboard standing upright as\nthe K, with the key you press in fuchsia. Everything you have done is still here:\nyour scores, your pieces, your takes, all on your device as before. Nothing to sign\nin to, nothing to move across.",
@@ -23,16 +33,6 @@ export const LATEST_RELEASES: Release[] = [
             },
             {
                 body: "**A link that opens a particular ear drill, or the shelf's Manage tab, opens without\nredrawing itself.** A link naming an exercise and its level — a review link, or one\nof today's suggestions — arrives as the same page everyone gets, with only the\naddress saying which drill it is, and the browser threw that page away and drew it\nagain the moment it read the address. Those links now open as they arrive, and still\nland where they name.",
-                twip: true,
-            },
-        ],
-    },
-    {
-        date: "2026-09-27",
-        label: "night",
-        entries: [
-            {
-                body: "**Composer pages, piece pages and the music shelves open without redrawing\nthemselves.** Each of those arrives already written for the piece or the person it\nis about, and the browser was throwing that page away and drawing it again from\nnothing the moment it opened. They now open as they arrive.",
                 twip: true,
             },
         ],

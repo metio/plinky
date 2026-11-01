@@ -240,7 +240,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 {/* The browser paints its own chrome with this — the address bar on Android,
                     the title bar of an installed window. It names the header's colour, so
                     the chrome above continues the page rather than drawing a seam across
-                    the top of the app. */}
+                    the top of the app.
+
+                    The header is `bg-raised`, which is white in every light palette and a
+                    near-black in every dark one, so this static value is the light answer
+                    and applyTheme (app/lib/theme.ts) replaces it with the resolved token
+                    once the theme is settled. A meta tag cannot follow a class, and the
+                    `prefers-color-scheme` form would follow the OS rather than the mode a
+                    player picked. */}
                 <meta name="theme-color" content="#ffffff" />
                 <link rel="canonical" href={pageUrl} />
                 {/* One alternate per language so search engines serve the right

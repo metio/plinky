@@ -2,6 +2,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 - date: 2026-11-01
+  label: night
+  entries:
+    - |-
+      **The bar at the top of your phone takes the colour of the page.** In dark or black
+      it was staying white, a bright strip above a dark screen. It now follows whichever
+      theme and colours you picked.
+
+- date: 2026-11-01
+  label: evening
   entries:
     - |-
       **Plinky is now Klimpi.** New name, new mark — a piano keyboard standing upright as
