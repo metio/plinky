@@ -134,6 +134,52 @@ const report = (width, where, over) => {
     problems.push(`${width}px ${where}: ${over.spill}px past the screen — ${blame}`);
 };
 
+// Starts a question and waits for its keypad — the last thing a question builds, so once
+// its number keys are there, so are the dots and the slots.
+//
+// The click is retried rather than trusted. A prerendered document whose text disagrees
+// with the first client render is re-rendered from scratch, which replaces the button
+// while a click is on its way to it; the click then lands on a node nothing is listening
+// to, and the question never starts. Clicking a question that HAS started is harmless —
+// the button is gone by then — so retrying costs nothing and removes the race.
+//
+// Returns null when the question started, or the problem to report. Reporting beats
+// throwing: a bare selector timeout says only that something was not there, and this
+// gate runs six builds deep in CI where nobody can look at the page afterwards.
+async function startQuestion(page, width, where) {
+    const errors = [];
+    const onError = (error) => errors.push(String(error).split("\n")[0].slice(0, 100));
+    page.on("pageerror", onError);
+    try {
+        const start = page.getByRole("button", { name: START, exact: true });
+        for (let attempt = 0; attempt < 3; attempt++) {
+            await start.click({ timeout: 5_000 }).catch(() => {});
+            const keypad = await page
+                .waitForSelector("[aria-keyshortcuts]", { timeout: 5_000 })
+                .catch(() => null);
+            if (keypad !== null) {
+                return null;
+            }
+        }
+        const buttons = (await page.getByRole("button").allInnerTexts())
+            .map((text) => text.replace(/\s+/g, " ").trim())
+            .filter((text) => text !== "")
+            .slice(0, 6);
+        // What was seen, not what it means: the button list says whether the question
+        // started at all, which is the first thing to know and the one thing a bare
+        // selector timeout never said.
+        return (
+            `${width}px ${where}: nothing matching \`[aria-keyshortcuts]\` after three ` +
+            `attempts at the \`${START}\` button, which is ` +
+            `${(await start.count()) > 0 ? "still on the page" : "gone from the page"}. ` +
+            `Buttons: ${buttons.join(" / ") || "none"}. ` +
+            `Page errors: ${errors.length > 0 ? errors.join(" / ") : "none"}`
+        );
+    } finally {
+        page.off("pageerror", onError);
+    }
+}
+
 try {
     for (const width of WIDTHS) {
         const page = await browser.newPage({ viewport: { width, height: 720 } });
@@ -147,11 +193,15 @@ try {
         for (const { exercise, level, selector, count } of QUESTIONS) {
             const where = `/ear?exercise=${exercise}&level=${level}`;
             const url = `${pageUrl(`http://localhost:${port}`, LOCALE, "/ear")}?exercise=${exercise}&level=${level}`;
-            await page.goto(url, { waitUntil: "domcontentloaded" });
-            await page.getByRole("button", { name: START, exact: true }).click();
-            // The keypad is the last thing a question builds: once its number keys are
-            // there, so are the dots and the slots.
-            await page.waitForSelector("[aria-keyshortcuts]", { timeout: 15_000 });
+            // Settled rather than merely parsed, the way the other browser gates load a
+            // page: the start button is in the prerendered document, so it is clickable
+            // before the app is listening, and a click that lands first does nothing.
+            await page.goto(url, { waitUntil: "networkidle" });
+            const trouble = await startQuestion(page, width, where);
+            if (trouble !== null) {
+                problems.push(trouble);
+                continue;
+            }
             await page.waitForTimeout(600);
             const shown = await page.locator(selector).count();
             if (shown !== count) {
