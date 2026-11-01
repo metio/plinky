@@ -8,7 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Klimpi has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
-## 1 November 2026
+## 1 November 2026 — night
+
+**The bar at the top of your phone takes the colour of the page.** In dark or black
+it was staying white, a bright strip above a dark screen. It now follows whichever
+theme and colours you picked.
+
+## 1 November 2026 — evening
 
 **Plinky is now Klimpi.** New name, new mark — a piano keyboard standing upright as
 the K, with the key you press in fuchsia. Everything you have done is still here:
