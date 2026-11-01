@@ -18,13 +18,32 @@
 // carries its proportions in its viewBox; anything else is square, which every form of the
 // mark is.
 export function markImage(bytes, type = "image/svg+xml") {
-    const [, width, height] =
-        (type === "image/svg+xml" && bytes.toString().match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/)) ||
-        [];
     return {
         src: `data:${type};base64,${Buffer.from(bytes).toString("base64")}`,
-        aspect: width ? Number(width) / Number(height) : 1,
+        aspect: aspectOf(bytes, type),
     };
+}
+
+// The artwork's own proportions, read out of the file. A picture whose width is then
+// computed from its height is the same shape it was drawn in; the fallback of 1 below is
+// a square, which silently squashes anything that is not one — the lockup is 1024 by 339,
+// and as a square it came out at a third of its width with the letters run together.
+function aspectOf(bytes, type) {
+    if (type === "image/svg+xml") {
+        const [, width, height] = bytes.toString().match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/) ?? [];
+        return width ? Number(width) / Number(height) : 1;
+    }
+    // A PNG carries its size in the IHDR chunk, as two big-endian uint32 at bytes 16 and
+    // 20, right after the eight-byte signature and the chunk's own length and name.
+    const PNG = "\x89PNG\r\n\x1a\n";
+    if (bytes.length > 24 && bytes.subarray(0, 8).toString("binary") === PNG) {
+        const width = bytes.readUInt32BE(16);
+        const height = bytes.readUInt32BE(20);
+        if (width > 0 && height > 0) {
+            return width / height;
+        }
+    }
+    return 1;
 }
 
 // A picture at a given height; the width follows from its own proportions.
@@ -35,16 +54,31 @@ export function picture({ src, aspect }, height) {
 // How much wider the white frame makes the mark: an eleventh of the artwork on each side.
 const FRAMED = 13 / 11;
 
-// The mark on a white plate, for an indigo ground its own tile would otherwise vanish into.
-// The size given is the plate's outer edge, so a layout chooses one number and the frame's
-// cost is the frame's business. The plate's radius is its own; the artwork is never clipped,
-// because a radius applied to it is a guess at its own curve and one slightly tight leaves a
-// sliver of ground showing all the way round.
+// The mark on a white plate, for a brand-coloured ground its own tile would otherwise
+// vanish into. The size given is the plate's outer HEIGHT, so a layout chooses one number
+// and the frame's cost is the frame's business. The plate's radius is its own; the artwork
+// is never clipped, because a radius applied to it is a guess at its own curve and one
+// slightly tight leaves a sliver of ground showing all the way round.
+//
+// The plate takes the artwork's proportions. For the square icon that is the square it
+// always was; for the lockup, which is three times as wide as it is tall, a square plate
+// framed the "Kl" and left the rest of the name outside it on the ground.
 export function framedMark(art, paper) {
     return (size) => {
         const inner = Math.round(size / FRAMED);
         const pad = Math.round((size - inner) / 2);
-        return `<div style="width:${size}px;height:${size}px;background:${paper};border-radius:26%;padding:${pad}px;flex:none;display:block">${picture(art, inner)}</div>`;
+        // The artwork plus its frame on each side, written as the asked-for size plus
+        // whatever the artwork is wider than tall. A square mark then keeps exactly the
+        // size it was given — computing `inner * aspect + pad * 2` instead rounds its way
+        // to a pixel either side of it, which moved every social image that sets one.
+        const width = size + Math.round(inner * (art.aspect - 1));
+        // A percentage border-radius resolves per axis, so on a wide plate 26% is 26% of
+        // its width across and of its height down — a stretched ellipse rather than the
+        // corner the square plate has. Off the height in pixels it is the same corner at
+        // any width. A square keeps the percentage it always had: the two agree to within
+        // a rounding, and that rounding is a pixel on every social image that sets one.
+        const radius = art.aspect === 1 ? "26%" : `${Math.round(size * 0.26)}px`;
+        return `<div style="width:${width}px;height:${size}px;background:${paper};border-radius:${radius};padding:${pad}px;flex:none;display:block">${picture(art, inner)}</div>`;
     };
 }
 

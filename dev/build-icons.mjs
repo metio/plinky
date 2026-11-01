@@ -130,13 +130,18 @@ images.forEach((png, index) => {
 });
 await writeFile("public/favicon.ico", Buffer.concat([header, ...images]));
 
-// The README banner: the lockup on paper beside the tagline, with room around it so it does
+// The README banner: the lockup on paper above the tagline, with room around it so it does
 // not sit tight against whatever follows it in the file. The lockup carries the name itself,
 // so the only type here is the one thing it does not say.
+//
+// Stacked rather than side by side, because the lockup is three times as wide as it is
+// tall. Beside the tagline it leaves about seventy pixels for it, which breaks "Practise
+// piano in your browser" over four lines; shrunk until the tagline fits on one, the name
+// is too small to read at the 220px the README shows this at.
 await shoot(
-    `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:22px;padding:0 28px">
-       ${picture(LOCKUP, 120)}
-       <div style="${DISPLAY};font-size:32px;color:${INK};line-height:1.15">Practise piano in your browser</div>
+    `<div style="width:512px;height:160px;background:${PAPER};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 28px">
+       ${picture(LOCKUP, 72)}
+       <div style="${DISPLAY};font-size:28px;color:${INK};line-height:1.15;white-space:nowrap">Practise piano in your browser</div>
      </div>`,
     { width: 512, height: 160, path: "public/icon-banner-512.png" },
 );
