@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { finishFor, type KeyboardFinish } from "../../core/keyboardFinish";
@@ -27,7 +27,7 @@ import {
     stepCenterAt,
     wrapTitle,
 } from "../../core/videoScene";
-import { DOT, drawnWordmark, TRACKING, tittleCircle, WORDMARK_PARTS } from "../../core/wordmark";
+import { DOT, drawnWordmark, stemPrefixes, TRACKING, tittleCircle } from "../../core/wordmark";
 
 // Paints one frame of the exported video: a dark stage headed by the piece's title with
 // the composer under it and the wordmark opposite, then the notation (when a snapshot was
@@ -122,7 +122,7 @@ export type ScenePainterInput = {
     // Whether the piece's title is burnt into the top-left. The provenance
     // credit line is never affected — the catalogue is credit-required.
     showTitle?: boolean;
-    // Whether the Plinky lockup rides the top-right.
+    // Whether the Klimpi lockup rides the top-right.
     showWordmark?: boolean;
     // The resting white / black key hex from the chosen keyboard skin, so the video's
     // keys match the app. Absent falls back to the classic palette.
@@ -201,7 +201,7 @@ function withTracking<T>(context: Context2D, unit: number, draw: () => T): T {
 
 // The name, right-aligned on `rightX` and sitting on `baselineY`: the same letterforms the
 // header and the thumbnails set, in the display face at the mark's weight, with the dotless
-// stem and the round pink dot core/wordmark places over it.
+// stems and the round fuchsia dots core/wordmark places over them.
 function paintWordmark(context: Context2D, rightX: number, baselineY: number, unit: number): void {
     const size = Math.round(unit * WORDMARK_SCALE);
     context.font = fontAt(600, WORDMARK_SCALE, unit, DISPLAY_FAMILY);
@@ -214,15 +214,16 @@ function paintWordmark(context: Context2D, rightX: number, baselineY: number, un
         const left = rightX - context.measureText(text).width;
         context.fillStyle = INK;
         context.fillText(text, left, baselineY);
-        // The stem begins where the letters before it end, their spacing included.
-        const stemLeft = left + context.measureText(WORDMARK_PARTS.before).width;
-        const dot = tittleCircle(stemLeft, baselineY, size);
         context.fillStyle = DOT;
-        context.beginPath();
-        // A square with a radius of half its side is a circle, which keeps the stage's one
-        // round shape on the same primitive as everything else drawn here.
-        context.roundRect(dot.cx - dot.r, dot.cy - dot.r, dot.r * 2, dot.r * 2, dot.r);
-        context.fill();
+        for (const prefix of stemPrefixes()) {
+            // A stem begins where the letters before it end, their spacing included.
+            const dot = tittleCircle(left + context.measureText(prefix).width, baselineY, size);
+            context.beginPath();
+            // A square with a radius of half its side is a circle, which keeps the stage's
+            // one round shape on the same primitive as everything else drawn here.
+            context.roundRect(dot.cx - dot.r, dot.cy - dot.r, dot.r * 2, dot.r * 2, dot.r);
+            context.fill();
+        }
     });
 }
 

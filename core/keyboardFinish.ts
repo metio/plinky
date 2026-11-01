@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // How a key is shaded — the second axis of the keyboard's look, beside its colour.
@@ -38,7 +38,7 @@ const KEY_BASE =
 const BLACK_BASE =
     "absolute top-0 transition-[transform,background-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark-soft";
 
-// The default, and the look the front page has always had: flat, bright, friendly. Plinky
+// The default, and the look the front page has always had: flat, bright, friendly. Klimpi
 // is for somebody who has not played before, and a toy piano is a kinder first sight than
 // a concert instrument.
 export const JOYFUL: KeyboardFinish = {

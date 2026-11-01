@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { readFileSync, readdirSync } from "node:fs";
@@ -66,19 +66,19 @@ export default {
     prerender() {
         const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS, ...GLOSSARY_PATHS, ...THEORY_PATHS];
         const localized = generateStaticLocalizedUrls(paths).map((url) => url.pathname);
-        // A per-locale build (PLINKY_LOCALE=de) pins getLocale to its language, so
+        // A per-locale build (KLIMPI_LOCALE=de) pins getLocale to its language, so
         // it can only render its own pages correctly — prerender just those. The
         // bare "/" redirect detects the visitor's language at runtime and must NOT
         // be pinned, so it comes from the default (all-locales) build alone, which
         // also supplies the SPA fallback for non-prerendered dynamic routes.
-        const pinned = process.env.PLINKY_LOCALE;
+        const pinned = process.env.KLIMPI_LOCALE;
         if (pinned) {
             return localized.filter((path) => path.startsWith(`/${pinned}/`));
         }
         // The default (all-locales) build in the per-locale pipeline only needs to
         // supply "/" and the SPA fallback; the localized pages come from the pinned
         // builds. A plain `npm run build` (local dev/preview) prerenders everything.
-        if (process.env.PLINKY_ROOT_ONLY) {
+        if (process.env.KLIMPI_ROOT_ONLY) {
             return ["/"];
         }
         return ["/", ...localized];

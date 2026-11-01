@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -7,6 +7,7 @@ import {
     drawnWordmark,
     TITTLE,
     TRACKING,
+    stemPrefixes,
     tittleCircle,
     WORDMARK,
     WORDMARK_PARTS,
@@ -17,20 +18,34 @@ describe("wordmarkText", () => {
     it("is the name, with the domain as its own tail when asked", () => {
         expect(wordmarkText(false)).toBe(WORDMARK);
         expect(wordmarkText(true)).toBe(`${WORDMARK}${DOMAIN}`);
-        expect(wordmarkText(true)).toBe("Plinky.fun");
+        expect(wordmarkText(true)).toBe("Klimpi.app");
     });
 });
 
 describe("the name as it is drawn", () => {
-    it("is the same letters with a dotless stem, so the drawn dot is the only one", () => {
-        expect(drawnWordmark(false)).toBe("Plınky");
-        expect(drawnWordmark(true)).toBe("Plınky.fun");
+    it("is the same letters with dotless stems, so the drawn dots are the only ones", () => {
+        expect(drawnWordmark(false)).toBe("Klımpı");
+        expect(drawnWordmark(true)).toBe("Klımpı.app");
         expect(WORDMARK_PARTS.stem).toBe("ı");
-        expect(drawnWordmark(false).replace(WORDMARK_PARTS.stem, "i")).toBe(WORDMARK);
+        expect(drawnWordmark(false).replaceAll(WORDMARK_PARTS.stem, "i")).toBe(WORDMARK);
+    });
+
+    it("has a stem for every i in the name, and a prefix for every stem", () => {
+        const dotted = [...WORDMARK].filter((letter) => letter === "i").length;
+        expect(WORDMARK_PARTS.runs).toHaveLength(dotted + 1);
+        expect(stemPrefixes()).toHaveLength(dotted);
+    });
+
+    it("gives each stem the letters that stand before it, so a dot lands on every one", () => {
+        expect(stemPrefixes()).toEqual(["Kl", "Klımp"]);
+        for (const prefix of stemPrefixes()) {
+            expect(drawnWordmark(false).startsWith(prefix)).toBe(true);
+            expect(drawnWordmark(false)[prefix.length]).toBe(WORDMARK_PARTS.stem);
+        }
     });
 });
 
-describe("the dot over the i", () => {
+describe("the dot over an i", () => {
     it("sits over the stem, with its underside where the face puts its own tittle", () => {
         const size = 40;
         const { cx, cy, r } = tittleCircle(100, 200, size);

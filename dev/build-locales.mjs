@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Builds the site once per locale, each bundle tree-shaken down to its own
@@ -6,25 +6,25 @@
 // them into one build/client so a visitor to /de/… downloads only German.
 //
 // Layout of the merge:
-//   - A default all-locales build (PLINKY_ROOT_ONLY) supplies "/", the SPA
+//   - A default all-locales build (KLIMPI_ROOT_ONLY) supplies "/", the SPA
 //     fallback, and the root-redirect chunks — the only place the app must be
 //     able to detect the visitor's language at runtime, so it can't be pinned.
-//   - Each pinned build (PLINKY_LOCALE=xx) supplies build/client/<xx>/ pages and
+//   - Each pinned build (KLIMPI_LOCALE=xx) supplies build/client/<xx>/ pages and
 //     its own hashed chunks. Content-hashed filenames make the merge safe:
 //     locale-independent chunks (OSMD, pure logic) are byte-identical across
 //     builds and collapse to one copy; message-bearing chunks differ per locale
 //     and coexist, each referenced only by its locale's HTML.
 //
 // A plain `npm run build` stays the fast single all-locales build for local dev;
-// this orchestration is for the deploy. Set PLINKY_LOCALES=en,de to build a
+// this orchestration is for the deploy. Set KLIMPI_LOCALES=en,de to build a
 // subset (for testing the merge).
 
 import { execFileSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 
 const settings = JSON.parse(readFileSync("./project.inlang/settings.json", "utf8"));
-const locales = process.env.PLINKY_LOCALES
-    ? process.env.PLINKY_LOCALES.split(",").map((l) => l.trim())
+const locales = process.env.KLIMPI_LOCALES
+    ? process.env.KLIMPI_LOCALES.split(",").map((l) => l.trim())
     : settings.locales;
 
 const CLIENT = "build/client";
@@ -50,12 +50,12 @@ rmSync(MERGED, { recursive: true, force: true });
 mkdirSync(MERGED, { recursive: true });
 
 // 1. The all-locales base: "/" + SPA fallback + root-redirect chunks.
-build({ PLINKY_ROOT_ONLY: "1", PLINKY_LOCALE: "" }, "root (all locales)");
+build({ KLIMPI_ROOT_ONLY: "1", KLIMPI_LOCALE: "" }, "root (all locales)");
 cpSync(CLIENT, MERGED, { recursive: true });
 
 // 2. Each language, pinned and tree-shaken; keep its pages + chunks.
 for (const locale of locales) {
-    build({ PLINKY_LOCALE: locale, PLINKY_ROOT_ONLY: "" }, `locale ${locale}`);
+    build({ KLIMPI_LOCALE: locale, KLIMPI_ROOT_ONLY: "" }, `locale ${locale}`);
     if (!existsSync(`${CLIENT}/${locale}`)) {
         throw new Error(`build-locales: expected ${CLIENT}/${locale} from the ${locale} build.`);
     }

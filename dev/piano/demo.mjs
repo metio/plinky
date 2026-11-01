@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Renders a catalogue piece twice — once through the synth Plinky ships, once through the
+// Renders a catalogue piece twice — once through the synth Klimpi ships, once through the
 // Salamander Grand Piano — so the two can be listened to side by side before any of it is
 // built into the app.
 //

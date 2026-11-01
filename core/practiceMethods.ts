@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Ways to practise, each tied to the control in Plinky that performs it.
+// Ways to practise, each tied to the control in Klimpi that performs it.
 //
-// Plinky already has the machinery for every one of these — a bar-range loop, a
+// Klimpi already has the machinery for every one of these — a bar-range loop, a
 // tempo dial, one-hand practice, blanked noteheads, a review queue — but they read
 // as features rather than as methods, so a player who has never been taught how to
 // practise does not know which one to reach for or why. Naming the method and

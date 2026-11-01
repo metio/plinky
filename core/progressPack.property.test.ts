@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import fc from "fast-check";
@@ -29,7 +29,7 @@ describe("progress pack properties", () => {
         );
     });
 
-    it("never admits a key that would address storage outside Plinky's own", () => {
+    it("never admits a key that would address storage outside Klimpi's own", () => {
         fc.assert(
             fc.property(entries, (source) => {
                 const result = parseProgressPack(serializeProgress(source, ""));

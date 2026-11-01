@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -100,7 +100,7 @@ describe("FeatureBoundary", () => {
         const href = screen
             .getByRole("link", { name: m.action_report_problem() })
             .getAttribute("href");
-        expect(href).toContain("github.com/metio/plinky/issues/new");
+        expect(href).toContain("github.com/metio/klimpi/issues/new");
         expect(decodeURIComponent(href ?? "")).toContain("SlowNotes");
         expect(decodeURIComponent(href ?? "")).toContain("panel exploded");
     });

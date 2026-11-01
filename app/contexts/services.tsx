@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
@@ -140,7 +140,7 @@ export type AppServices = {
 // Where the recordings are published. A version sits in the path because a pack is
 // immutable once uploaded: the app caches every recording by URL, and a changed encoding
 // under an unchanged name is the one thing a cache cannot notice.
-const SAMPLES_BASE = "https://samples.plinky.fun/v1";
+const SAMPLES_BASE = "https://samples.klimpi.app/v1";
 
 // The key that remembers whether the player asked for the real piano. The recordings
 // themselves live in the browser's cache, which the player never has to think about; this

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { readFileSync } from "node:fs";
@@ -187,7 +187,7 @@ describe("every plural message in every locale", () => {
         // 1 234 ends in four, so Russian takes the few form, which "1 234" as text hides.
         expect(notes(1234, "ru")).toBe(`${(1234).toLocaleString("ru")} ноты`);
         expect(m.recap_boast({ notes: notes(1, "en"), days: 1, month: "May" })).toBe(
-            "1 note across 1 day in May, on Plinky 🎹",
+            "1 note across 1 day in May, on Klimpi 🎹",
         );
         expect(m.recap_card_detail({ month: "May", days: 1 })).toBe("May · 1 day");
     });

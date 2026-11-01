@@ -1,11 +1,11 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Finding the background an image was flattened onto.
 //
 // Artwork often arrives without transparency — exported once, over white, because that is
 // what the tool did. The shape then carries its old background baked into the corners, and
-// every use of it on any other colour shows a halo. Plinky's mark arrived exactly so: a
+// every use of it on any other colour shows a halo. Klimpi's mark arrived exactly so: a
 // rounded violet square with four white corner wedges and no alpha channel at all.
 //
 // The fix is not to crop to a radius. A radius is a guess about the artwork's own curve, and

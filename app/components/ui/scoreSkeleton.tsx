@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { m } from "../../paraglide/messages.js";
-import { Plink } from "./plink";
+import { Tinkle } from "./tinkle";
 
 // The staff a piece is about to appear on, drawn while it is still being fetched and set.
 //
@@ -26,11 +26,11 @@ export function ScoreSkeleton({ engraving = false }: { engraving?: boolean }) {
                         <div key={line} className="h-px w-full bg-line" />
                     ))}
                 </div>
-                {/* The plink lands on the middle line. Placed over the staff rather than
+                {/* The tinkle lands on the middle line. Placed over the staff rather than
                 tinting it, so the lines keep their weight, and centred on the slot so the
                 note falls onto the staff rather than past it. */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <Plink className="h-full w-6" />
+                    <Tinkle className="h-full w-6" />
                 </div>
             </div>
             <p role="status" className="text-sm text-muted">

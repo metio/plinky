@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import fc from "fast-check";
@@ -56,7 +56,7 @@ const KNOWN: Known = {
                 one: "Grade {grade}, {bars} bar, {tempo} beats per minute.",
                 other: "Grade {grade}, {bars} bars, {tempo} beats per minute.",
             },
-            person: "{name}’s pieces on Plinky.",
+            person: "{name}’s pieces on Klimpi.",
             home: "Today",
             music: "Music",
             grade: "Grade {grade}",
@@ -77,7 +77,7 @@ const KNOWN: Known = {
                 one: "Stufe {grade}, {bars} Takt, {tempo} Schläge pro Minute.",
                 other: "Stufe {grade}, {bars} Takte, {tempo} Schläge pro Minute.",
             },
-            person: "Stücke von {name} auf Plinky.",
+            person: "Stücke von {name} auf Klimpi.",
             home: "Heute",
             music: "Musik",
             grade: "Stufe {grade}",
@@ -100,16 +100,16 @@ const KNOWN: Known = {
 // document has to replace rather than add to.
 const SHELL =
     '<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/>' +
-    '<link rel="canonical" href="https://plinky.fun/"/>' +
-    '<link rel="alternate" hrefLang="en" href="https://plinky.fun/en/"/>' +
-    '<link rel="alternate" hrefLang="de" href="https://plinky.fun/de/"/>' +
-    '<meta property="og:type" content="website"/><meta property="og:site_name" content="Plinky"/>' +
-    '<meta property="og:url" content="https://plinky.fun/"/><meta property="og:locale" content="en_US"/>' +
+    '<link rel="canonical" href="https://klimpi.app/"/>' +
+    '<link rel="alternate" hrefLang="en" href="https://klimpi.app/en/"/>' +
+    '<link rel="alternate" hrefLang="de" href="https://klimpi.app/de/"/>' +
+    '<meta property="og:type" content="website"/><meta property="og:site_name" content="Klimpi"/>' +
+    '<meta property="og:url" content="https://klimpi.app/"/><meta property="og:locale" content="en_US"/>' +
     '<meta property="og:locale:alternate" content="de_DE"/>' +
-    '<meta property="og:image" content="https://plinky.fun/og.png"/>' +
-    '<meta property="og:image:alt" content="Plinky — piano practice in your browser"/>' +
-    '<meta name="twitter:image" content="https://plinky.fun/og.png"/>' +
-    '<meta name="twitter:image:alt" content="Plinky — piano practice in your browser"/>' +
+    '<meta property="og:image" content="https://klimpi.app/og.png"/>' +
+    '<meta property="og:image:alt" content="Klimpi — piano practice in your browser"/>' +
+    '<meta name="twitter:image" content="https://klimpi.app/og.png"/>' +
+    '<meta name="twitter:image:alt" content="Klimpi — piano practice in your browser"/>' +
     '<link rel="icon" href="/favicon.ico" sizes="32x32"/>' +
     '<script>/* theme */</script><script>/* history */</script>' +
     // The root stylesheet sits here, after the bootstrap scripts: React writes a
@@ -144,7 +144,7 @@ function served(
     requestHeaders: Record<string, string> = {},
 ) {
     return {
-        request: new Request(`https://plinky.fun${path}`, { headers: requestHeaders }),
+        request: new Request(`https://klimpi.app${path}`, { headers: requestHeaders }),
         next: async () => new Response(body, { status, headers }),
         env: {
             ASSETS: {
@@ -176,11 +176,11 @@ describe("onRequest", () => {
     it("sends www to the hostname that owns the site, keeping the path and the query", async () => {
         const response = await onRequest({
             ...served("/en/music/?grade=3", 404, "shell"),
-            request: new Request("https://www.plinky.fun/en/music/?grade=3"),
+            request: new Request("https://www.klimpi.app/en/music/?grade=3"),
         });
 
         expect(response.status).toBe(301);
-        expect(response.headers.get("location")).toBe("https://plinky.fun/en/music/?grade=3");
+        expect(response.headers.get("location")).toBe("https://klimpi.app/en/music/?grade=3");
     });
 
     it("writes a piece the catalogue holds its own document, with a 200", async () => {
@@ -191,9 +191,9 @@ describe("onRequest", () => {
         // The shell's length no longer describes the body.
         expect(response.headers.get("content-length")).toBeNull();
         const html = await response.text();
-        expect(html).toContain("<title>Ode to Joy · Plinky</title>");
-        expect(html).toContain('<link rel="canonical" href="https://plinky.fun/en/play/47xd2XDpYFCy/"/>');
-        expect(html).not.toContain('href="https://plinky.fun/"');
+        expect(html).toContain("<title>Ode to Joy · Klimpi</title>");
+        expect(html).toContain('<link rel="canonical" href="https://klimpi.app/en/play/47xd2XDpYFCy/"/>');
+        expect(html).not.toContain('href="https://klimpi.app/"');
     });
 
     it("keeps the 404 for a piece the catalogue does not hold", async () => {
@@ -232,7 +232,7 @@ describe("onRequest", () => {
         const response = await onRequest(served("/de/person/frederic-chopin/", 404, SHELL));
         const html = await response.text();
         expect(response.status).toBe(200);
-        expect(html).toContain("<title>Frédéric Chopin · Plinky</title>");
+        expect(html).toContain("<title>Frédéric Chopin · Klimpi</title>");
         expect(html).not.toContain("sameAs");
     });
 
@@ -241,8 +241,8 @@ describe("onRequest", () => {
         expect(response.status).toBe(200);
         const html = await response.text();
         expect(html).toContain('<html lang="de"');
-        expect(html).toContain("<title>Frédéric Chopin · Plinky</title>");
-        expect(html).toContain("Stücke von Frédéric Chopin auf Plinky.");
+        expect(html).toContain("<title>Frédéric Chopin · Klimpi</title>");
+        expect(html).toContain("Stücke von Frédéric Chopin auf Klimpi.");
     });
 
     it("addresses the shell to a generated exercise, which has no document of its own", async () => {
@@ -254,17 +254,17 @@ describe("onRequest", () => {
         expect(response.headers.get("content-length")).toBeNull();
         const html = await response.text();
         expect(html).toContain('<html lang="de"');
-        expect(html).toContain('<link rel="canonical" href="https://plinky.fun/de/play/chords-c-major.1bi2/"/>');
-        expect(html).toContain('<link rel="alternate" hrefLang="en" href="https://plinky.fun/en/play/chords-c-major.1bi2/"/>');
-        expect(html).not.toContain('href="https://plinky.fun/"');
+        expect(html).toContain('<link rel="canonical" href="https://klimpi.app/de/play/chords-c-major.1bi2/"/>');
+        expect(html).toContain('<link rel="alternate" hrefLang="en" href="https://klimpi.app/en/play/chords-c-major.1bi2/"/>');
+        expect(html).not.toContain('href="https://klimpi.app/"');
         expect(html).not.toContain("<title>");
     });
 
     it("addresses the shell to any other language page it is handed", async () => {
         const response = await onRequest(served("/en/music", 404, SHELL));
         const html = await response.text();
-        expect(html).toContain('<link rel="canonical" href="https://plinky.fun/en/music/"/>');
-        expect(html).toContain('<meta property="og:url" content="https://plinky.fun/en/music/"/>');
+        expect(html).toContain('<link rel="canonical" href="https://klimpi.app/en/music/"/>');
+        expect(html).toContain('<meta property="og:url" content="https://klimpi.app/en/music/"/>');
     });
 
     it("presumes every page real when the list cannot be read, and serves the shell", async () => {
@@ -313,10 +313,10 @@ describe("onRequest", () => {
             served("/", 200, "root shell", {}, 200, { "accept-language": "de-AT,de;q=0.9,en;q=0.8" }),
         );
         expect(german.status).toBe(302);
-        expect(german.headers.get("location")).toBe("https://plinky.fun/de/");
+        expect(german.headers.get("location")).toBe("https://klimpi.app/de/");
         expect(german.headers.get("vary")).toBe("Cookie, Accept-Language");
         const crawler = await onRequest(served("/", 200, "root shell"));
-        expect(crawler.headers.get("location")).toBe("https://plinky.fun/en/");
+        expect(crawler.headers.get("location")).toBe("https://klimpi.app/en/");
     });
 
     it("sends the bare root to the language the player picked, over the browser's", async () => {
@@ -327,7 +327,7 @@ describe("onRequest", () => {
             }),
         );
         expect(chosen.status).toBe(302);
-        expect(chosen.headers.get("location")).toBe("https://plinky.fun/pt/");
+        expect(chosen.headers.get("location")).toBe("https://klimpi.app/pt/");
         expect(chosen.headers.get("vary")).toBe("Cookie, Accept-Language");
     });
 
@@ -338,7 +338,7 @@ describe("onRequest", () => {
                 cookie: `${LOCALE_COOKIE}=xx`,
             }),
         );
-        expect(stale.headers.get("location")).toBe("https://plinky.fun/de/");
+        expect(stale.headers.get("location")).toBe("https://klimpi.app/de/");
     });
 
     it("serves the root's own document when the list cannot be read", async () => {
@@ -423,12 +423,12 @@ describe("documentFor", () => {
 
     it("writes the head the layout would have written for the page", () => {
         expect(html).toContain('<html lang="de"');
-        expect(html).toContain("<title>Ode to Joy · Plinky</title>");
+        expect(html).toContain("<title>Ode to Joy · Klimpi</title>");
         expect(html).toContain(
             '<meta name="description" content="Spiele „Ode to Joy“ von Ludwig van Beethoven im Browser."/>',
         );
-        expect(html).toContain('<link rel="canonical" href="https://plinky.fun/de/play/47xd2XDpYFCy/"/>');
-        expect(html).toContain('<meta property="og:url" content="https://plinky.fun/de/play/47xd2XDpYFCy/"/>');
+        expect(html).toContain('<link rel="canonical" href="https://klimpi.app/de/play/47xd2XDpYFCy/"/>');
+        expect(html).toContain('<meta property="og:url" content="https://klimpi.app/de/play/47xd2XDpYFCy/"/>');
         expect(html).toContain('<meta property="og:locale" content="de_DE"/>');
         expect(html).toContain('<meta property="og:title" content="Ode to Joy"/>');
         expect(html).toContain('<meta name="twitter:title" content="Ode to Joy"/>');
@@ -437,11 +437,11 @@ describe("documentFor", () => {
     it("names every language the page exists in, and the default among them", () => {
         for (const locale of KNOWN.locales) {
             expect(html).toContain(
-                `<link rel="alternate" hrefLang="${locale}" href="https://plinky.fun/${locale}/play/47xd2XDpYFCy/"/>`,
+                `<link rel="alternate" hrefLang="${locale}" href="https://klimpi.app/${locale}/play/47xd2XDpYFCy/"/>`,
             );
         }
         expect(html).toContain(
-            '<link rel="alternate" hrefLang="x-default" href="https://plinky.fun/en/play/47xd2XDpYFCy/"/>',
+            '<link rel="alternate" hrefLang="x-default" href="https://klimpi.app/en/play/47xd2XDpYFCy/"/>',
         );
         // The other languages as card alternates, this one not among them.
         expect(html).toContain('<meta property="og:locale:alternate" content="en_US"/>');
@@ -449,21 +449,21 @@ describe("documentFor", () => {
     });
 
     it("shows a piece's own card, and the site's for a composer", () => {
-        expect(html).toContain('<meta property="og:image" content="https://plinky.fun/og/47xd2XDpYFCy.png"/>');
+        expect(html).toContain('<meta property="og:image" content="https://klimpi.app/og/47xd2XDpYFCy.png"/>');
         expect(html).toContain('<meta property="og:image:alt" content="Ode to Joy"/>');
-        expect(html).toContain('<meta name="twitter:image" content="https://plinky.fun/og/47xd2XDpYFCy.png"/>');
-        expect(html).not.toContain("https://plinky.fun/og.png");
+        expect(html).toContain('<meta name="twitter:image" content="https://klimpi.app/og/47xd2XDpYFCy.png"/>');
+        expect(html).not.toContain("https://klimpi.app/og.png");
         const person =
             documentFor(SHELL, KNOWN, { locale: "en", kind: "person", id: "frederic-chopin" }) ?? "";
         // A composer has a card of their own too, under a folder so a slug can never
         // collide with a piece id.
         expect(person).toContain(
-            '<meta property="og:image" content="https://plinky.fun/og/person/frederic-chopin.png"/>',
+            '<meta property="og:image" content="https://klimpi.app/og/person/frederic-chopin.png"/>',
         );
-        expect(person).not.toContain("https://plinky.fun/og.png");
+        expect(person).not.toContain("https://klimpi.app/og.png");
         // A shelf has none, so it keeps the site's.
         const shelf = documentFor(SHELL, KNOWN, { locale: "en", kind: "grade", id: "7" }) ?? "";
-        expect(shelf).toContain('<meta property="og:image" content="https://plinky.fun/og.png"/>');
+        expect(shelf).toContain('<meta property="og:image" content="https://klimpi.app/og.png"/>');
     });
 
     it("writes the route's tags where the app writes them, in the app's order", () => {
@@ -523,20 +523,20 @@ describe("documentFor", () => {
 
     it("leaves a shell it does not recognise addressed but untitled", () => {
         // Better a page with the right canonical and no title than one with two titles.
-        const strange = '<html lang="en"><head><link rel="canonical" href="https://plinky.fun/"/></head><body></body></html>';
+        const strange = '<html lang="en"><head><link rel="canonical" href="https://klimpi.app/"/></head><body></body></html>';
         const html = documentFor(strange, KNOWN, page) ?? "";
-        expect(html).toContain('<link rel="canonical" href="https://plinky.fun/de/play/47xd2XDpYFCy/"/>');
+        expect(html).toContain('<link rel="canonical" href="https://klimpi.app/de/play/47xd2XDpYFCy/"/>');
         expect(html).not.toContain("<title>");
     });
 
     it("says one thing about itself: the root's own head is gone", () => {
-        expect(html).not.toContain('href="https://plinky.fun/"');
-        expect(html).not.toContain('href="https://plinky.fun/en/"');
+        expect(html).not.toContain('href="https://klimpi.app/"');
+        expect(html).not.toContain('href="https://klimpi.app/en/"');
         expect(html.match(/<link rel="canonical"/g)).toHaveLength(1);
         expect(html.match(/<meta property="og:url"/g)).toHaveLength(1);
         expect(html.match(/<meta property="og:locale"/g)).toHaveLength(1);
         // What the shell carries for every page stays.
-        expect(html).toContain('<meta property="og:site_name" content="Plinky"/>');
+        expect(html).toContain('<meta property="og:site_name" content="Klimpi"/>');
         expect(html).toContain('<link rel="icon" href="/favicon.ico"');
     });
 
@@ -558,7 +558,7 @@ describe("documentFor", () => {
             "Ludwig van Beethoven",
             "Ode to Joy",
         ]);
-        expect(data[1].itemListElement[2].item).toBe("https://plinky.fun/de/person/ludwig-van-beethoven/");
+        expect(data[1].itemListElement[2].item).toBe("https://klimpi.app/de/person/ludwig-van-beethoven/");
     });
 
     it("leaves the body to the app", () => {
@@ -569,7 +569,7 @@ describe("documentFor", () => {
 
     it("escapes what a title or a name brings with it", () => {
         const nocturne = documentFor(SHELL, KNOWN, { locale: "en", kind: "play", id: "ZgIdHVhH0mUb" }) ?? "";
-        expect(nocturne).toContain("<title>Nocturne &lt;Op. 9&gt; · Plinky</title>");
+        expect(nocturne).toContain("<title>Nocturne &lt;Op. 9&gt; · Klimpi</title>");
         expect(nocturne).toContain('content="Nocturne &lt;Op. 9&gt;"');
         // The structured data holds the raw title, with nothing in it that could close
         // the script element.
@@ -584,13 +584,13 @@ describe("documentFor", () => {
 
     it("lists a composer's pieces easiest first, as an ItemList", () => {
         const person = documentFor(SHELL, KNOWN, { locale: "en", kind: "person", id: "ludwig-van-beethoven" }) ?? "";
-        expect(person).toContain("<title>Ludwig van Beethoven · Plinky</title>");
+        expect(person).toContain("<title>Ludwig van Beethoven · Klimpi</title>");
         expect(person.indexOf("Ode to Joy")).toBeLessThan(person.indexOf("Für Elise"));
         const list = describePage(KNOWN, { locale: "en", kind: "person", id: "ludwig-van-beethoven" });
         expect(list?.links.map((link) => link.path)).toEqual(["/play/47xd2XDpYFCy/", "/play/aZSWdZeRKnuA/"]);
         expect(list?.data).toMatchObject({
             "@type": "Person",
-            url: "https://plinky.fun/en/person/ludwig-van-beethoven/",
+            url: "https://klimpi.app/en/person/ludwig-van-beethoven/",
             subjectOf: { "@type": "ItemList", numberOfItems: 2 },
         });
     });
@@ -780,7 +780,7 @@ describe("the catalogue's shelves", () => {
             served("/en/music/collection/beethoven-two/", 404, SHELL, SHELL_HEADERS),
         );
         expect(found.status).toBe(200);
-        expect(await found.text()).toContain("<title>Beethoven — Two pieces · Plinky</title>");
+        expect(await found.text()).toContain("<title>Beethoven — Two pieces · Klimpi</title>");
         const missing = await onRequest(
             served("/en/music/collection/nonesuch/", 404, SHELL, SHELL_HEADERS),
         );
@@ -815,9 +815,9 @@ describe("the catalogue's shelves", () => {
         const response = await onRequest(served("/en/music/grade/7/", 404, SHELL, SHELL_HEADERS));
         expect(response.status).toBe(200);
         const html = await response.text();
-        expect(html).toContain("<title>Grade 7 piano pieces · Plinky</title>");
+        expect(html).toContain("<title>Grade 7 piano pieces · Klimpi</title>");
         expect(html).toContain(
-            '<link rel="canonical" href="https://plinky.fun/en/music/grade/7/"/>',
+            '<link rel="canonical" href="https://klimpi.app/en/music/grade/7/"/>',
         );
         expect(html).toContain('"@type":"CollectionPage"');
     });
@@ -846,7 +846,7 @@ describe("an address carrying replacement patterns", () => {
             const response = await onRequest(served(path, 404, SHELL, SHELL_HEADERS));
             expect(response.status).toBe(200);
             const html = await response.text();
-            const url = `https://plinky.fun${new URL(`https://plinky.fun${path}`).pathname}`;
+            const url = `https://klimpi.app${new URL(`https://klimpi.app${path}`).pathname}`;
             expect(html).toContain(`<link rel="canonical" href="${escaped(url)}"/>`);
             expect(html).toContain(`<meta property="og:url" content="${escaped(url)}"/>`);
             expect(count(html, "<html")).toBe(1);
@@ -865,12 +865,12 @@ describe("an address carrying replacement patterns", () => {
                 (tail) => {
                     const path = `/${tail}/`;
                     const html = shellFor(SHELL, KNOWN, "en", path);
-                    const url = `https://plinky.fun/en${path}`;
+                    const url = `https://klimpi.app/en${path}`;
                     expect(html).toContain(`<link rel="canonical" href="${escaped(url)}"/>`);
                     expect(html).toContain(`<meta property="og:url" content="${escaped(url)}"/>`);
                     for (const one of KNOWN.locales) {
                         expect(html).toContain(
-                            `<link rel="alternate" hrefLang="${one}" href="${escaped(`https://plinky.fun/${one}${path}`)}"/>`,
+                            `<link rel="alternate" hrefLang="${one}" href="${escaped(`https://klimpi.app/${one}${path}`)}"/>`,
                         );
                     }
                     // Everything outside the addressed tags is the shell's, once.

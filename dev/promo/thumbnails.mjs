@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A thumbnail per video, each naming its own piece.
@@ -48,7 +48,7 @@ const PAPER = "#f9f8fc";
 // competing with the title, and the white keys carry their own edge against the dark. The
 // card sets the name itself, with the domain as its tail, which is why the lockup does not
 // belong here either.
-const keys = `data:image/png;base64,${(await read("brand/plinky-keys.png")).toString("base64")}`;
+const keys = `data:image/png;base64,${(await read("brand/klimpi-keys.png")).toString("base64")}`;
 
 const fredoka = await read(
     "node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2",
@@ -100,11 +100,13 @@ const CUTS = [
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
 
-// The round pink dot over the name's i, placed from the baseline as the app header places it:
-// a zero-size inline block before the dotless ı sits on the baseline at its left edge, and
-// the dot hangs off it by core/wordmark's measurements. A line may break beside an inline
-// block, so the lockup is set nowrap.
+// The round fuchsia dot over each of the name's i's, placed from the baseline as the app
+// header places it: a zero-size inline block before each dotless ı sits on the baseline at its
+// left edge, and the dot hangs off it by core/wordmark's measurements. A line may break beside
+// an inline block, so the lockup is set nowrap.
 const DOT_ANCHOR = `<span style="position:relative;display:inline-block;width:0;height:0;vertical-align:baseline"><span style="position:absolute;left:${TITTLE.stemCentre}em;bottom:${TITTLE.baseAbove}em;width:${TITTLE.size}em;height:${TITTLE.size}em;transform:translateX(-50%);border-radius:50%;background:${DOT}"></span></span>`;
+
+const DRAWN_NAME = WORDMARK_PARTS.runs.join(`${DOT_ANCHOR}${WORDMARK_PARTS.stem}`) + DOMAIN;
 
 function card(piece, cut) {
     return `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>
@@ -118,11 +120,11 @@ function card(piece, cut) {
              <div style="font-size:${titleSize(piece.title, cut.scale)}px;font-weight:600;color:${PAPER};line-height:1.08;letter-spacing:-0.015em;text-wrap:balance">${piece.title}</div>
              <div style="font-family:Inter,system-ui,sans-serif;font-size:${Math.round(36 * cut.scale)}px;color:${PAPER};opacity:.72;margin-top:${Math.round(20 * cut.scale)}px">${piece.composer}</div>
            </div>
-           <!-- One lockup, not two. Setting the wordmark and then "plinky.fun" beside it
+           <!-- One lockup, not two. Setting the wordmark and then "klimpi.app" beside it
                 wrote the name twice on a card that has room to say it once — so the domain
                 is the wordmark's own tail, in the same face, and the address and the name
                 are the same object. -->
-           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1;white-space:nowrap">${WORDMARK_PARTS.before}${DOT_ANCHOR}${WORDMARK_PARTS.stem}${WORDMARK_PARTS.after}${DOMAIN}</div>
+           <div style="position:relative;font-size:${Math.round(56 * cut.scale)}px;font-weight:600;letter-spacing:${TRACKING.dark}em;color:#fff;line-height:1;white-space:nowrap">${DRAWN_NAME}</div>
          </div>`;
 }
 

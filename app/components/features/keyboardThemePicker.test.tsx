@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -20,7 +20,7 @@ describe("KeyboardThemePicker", () => {
 
     it("leaves every skin free to pick — a fresh player can wear any of them", async () => {
         renderWithServices(<KeyboardThemePicker />);
-        // A brand-new device is grade 0, yet no skin is gated: Plinky never locks looks.
+        // A brand-new device is grade 0, yet no skin is gated: Klimpi never locks looks.
         for (const name of [m.theme_sunset(), m.theme_forest(), m.theme_berry()]) {
             const skin = await screen.findByRole("button", { name: new RegExp(name) });
             expect((skin as HTMLButtonElement).disabled).toBe(false);

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -8,8 +8,8 @@ import { DAILY_EPOCH, dailyChallenge, dailyNumber, todayKey } from "./daily";
 import { isDateKey, shiftDay } from "./dateKey";
 import { readTimeline } from "./musicxmlTimeline";
 
-// The daily challenge: the one thing in Plinky every player meets on the same day, so
-// two people comparing "Plinky #94" must be comparing the same phrase. It is generated
+// The daily challenge: the one thing in Klimpi every player meets on the same day, so
+// two people comparing "Klimpi #94" must be comparing the same phrase. It is generated
 // from the date alone — never the device's catalogue — which makes the laws sharp: the
 // same date gives the same music anywhere, and the number counts days rather than
 // opens. Nothing here may depend on what a player has, or has done.
@@ -112,7 +112,7 @@ describe("the day's phrase", () => {
             fc.property(arbKey, (key) => {
                 const number = dailyNumber(key);
 
-                expect(dailyChallenge(key, number).xml).toContain(`Plinky #${number}`);
+                expect(dailyChallenge(key, number).xml).toContain(`Klimpi #${number}`);
             }),
         );
     });

@@ -1,17 +1,17 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Publish Website
-# Production deploys to Cloudflare Pages (project "plinky"), by direct upload from
+# Production deploys to Cloudflare Pages (project "klimpi"), by direct upload from
 # here rather than through Cloudflare's Git integration: the build must run in the
 # repo's nix devshell and across the per-locale matrix below, neither of which
 # Cloudflare's own builder can reproduce.
 #
 # Setup this workflow depends on:
-#   1. A Cloudflare Pages project named "plinky" (Direct Upload / no Git connection)
+#   1. A Cloudflare Pages project named "klimpi" (Direct Upload / no Git connection)
 #      with its production branch set to "main".
 #   2. Repo secrets CLOUDFLARE_API_TOKEN (template "Cloudflare Pages — Edit") and
 #      CLOUDFLARE_ACCOUNT_ID. The preview workflow uses the same two.
-#   3. plinky.fun attached as a custom domain on that project. The zone is already in
+#   3. klimpi.app attached as a custom domain on that project. The zone is already in
 #      the same Cloudflare account, so adding the domain writes the records itself;
 #      the old GitHub Pages A/CNAME records go at the same time.
 on:
@@ -78,7 +78,7 @@ jobs:
         # root-redirect chunks.
         run: nix develop --command npm run build:client
         env:
-          PLINKY_ROOT_ONLY: "1"
+          KLIMPI_ROOT_ONLY: "1"
       - name: Paint piece cards
         # One card per catalogue piece, the picture its link unfurls as. Painted here,
         # once, rather than in every language's build: the card is language-neutral.
@@ -109,7 +109,7 @@ jobs:
         # Tree-shaken to this one language; prerenders only its /<locale>/ pages.
         run: nix develop --command npm run build:client
         env:
-          PLINKY_LOCALE: ${{ matrix.locale }}
+          KLIMPI_LOCALE: ${{ matrix.locale }}
       - name: Take the help pictures
         # Ten pictures of this language's own pages, which the help page shows beside its
         # text so a reader sees the app in the words their app uses. Taken here, from the

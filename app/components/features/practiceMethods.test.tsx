@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -37,12 +37,12 @@ describe("MethodLeaf", () => {
         expect(screen.getByText(m.methods_dose({ count: 15 }))).toBeTruthy();
     });
 
-    it("leads with the reason and follows with what Plinky gives you", () => {
+    it("leads with the reason and follows with what Klimpi gives you", () => {
         renderWithServices(leaf("chunking"));
         // Somebody who does not know why looping two bars beats replaying the piece will
         // not reach for the loop, so the reason comes first and is not labelled.
         expect(screen.getByText(m.method_chunking_why())).toBeTruthy();
-        expect(screen.getByText(`${m.methods_in_plinky()}:`)).toBeTruthy();
+        expect(screen.getByText(`${m.methods_in_klimpi()}:`)).toBeTruthy();
     });
 
     it("assembles the catalogue once, and not again when another method opens", async () => {

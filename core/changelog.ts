@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// What changed, and when — the only record Plinky keeps of it.
+// What changed, and when — the only record Klimpi keeps of it.
 //
 // There are no version numbers, no tags and no release days: every push to main deploys,
 // so nothing derives this from the log and nothing ever could. Unwritten at the time
@@ -164,13 +164,13 @@ export function parseChangelog(raw: unknown): { releases: Release[]; problems: s
 }
 
 const HEADER = `<!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # What's new
 
-Plinky has no version numbers and no release days — every change goes live the moment
+Klimpi has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.`;
 
 const FOOTER = `---
@@ -195,10 +195,10 @@ export function renderNews(releases: readonly Release[]): string {
 // this week's takes its place at the top of the subreddit. Exported so the two are one
 // string: a reworded title that no longer matched would quietly leave every previous week
 // pinned until the slots ran out.
-export const ROUND_UP_PREFIX = "This week in Plinky";
+export const ROUND_UP_PREFIX = "This week in Klimpi";
 
 // The title the weekly round-up is posted under. Dated rather than numbered: a number
-// would be a version, and Plinky does not have those.
+// would be a version, and Klimpi does not have those.
 export function roundUpTitle(on: string): string {
     return `${ROUND_UP_PREFIX} — ${headingFor({ date: on, label: null, entries: [] })}`;
 }
@@ -225,9 +225,9 @@ export function roundUpsToUnpin(posts: readonly PostedRoundUp[], keep: string): 
 export const POST_LIMIT = 40_000;
 
 const OPENING =
-    "Everything that changed in Plinky this week. Plinky has no version numbers — every change goes live the moment it's ready, so this is just what landed.";
-const CLOSING = "Play at https://plinky.fun — free, in your browser, nothing to install.";
-const FULL_LIST = "https://github.com/metio/plinky/blob/main/NEWS.md";
+    "Everything that changed in Klimpi this week. Klimpi has no version numbers — every change goes live the moment it's ready, so this is just what landed.";
+const CLOSING = "Play at https://klimpi.app — free, in your browser, nothing to install.";
+const FULL_LIST = "https://github.com/metio/klimpi/blob/main/NEWS.md";
 
 // The round-up's body. The entries are already written for a player, so they go out as
 // they were written; what is added is only the frame — a line saying what this is, and

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Runs `react-router build`, retrying ONLY the transient prerender flake. React Router
@@ -22,13 +22,13 @@ import { applyPrerenderRetryPatch } from "./patch-prerender-retry.mjs";
 // installed with --ignore-scripts and the postinstall hook was skipped.
 console.log(`build-retry: prerender retry patch — ${applyPrerenderRetryPatch()}`);
 
-// A plain `npm run build` — no PLINKY_LOCALE, no PLINKY_ROOT_ONLY — is the
+// A plain `npm run build` — no KLIMPI_LOCALE, no KLIMPI_ROOT_ONLY — is the
 // all-locales dev build: every language in one tree, for local preview. It is not
 // what ships (the deploy builds one locale per language via dev/build-locales.mjs)
 // and not what the size gate measures. Say so, because reaching for it before
 // `npm run size` measures ~3× the per-visitor weight and trips the budget — use
 // `nix develop --command ci-build` for that path instead.
-if (!process.env.PLINKY_LOCALE && !process.env.PLINKY_ROOT_ONLY) {
+if (!process.env.KLIMPI_LOCALE && !process.env.KLIMPI_ROOT_ONLY) {
     console.log(
         "ℹ all-locales dev build (every language in one tree — local preview only).\n" +
             "  For the bundle-size / a11y gates build a single locale: " +

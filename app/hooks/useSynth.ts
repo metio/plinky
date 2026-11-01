@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useMemo } from "react";
@@ -80,7 +80,7 @@ export function useSynth(): UseSynthResult {
         [prefsStore, audio],
     );
 
-    // Whether the player's own instrument is already making this sound, so Plinky must not
+    // Whether the player's own instrument is already making this sound, so Klimpi must not
     // make it again; see soundsOnItsOwn. A caller that names no device is not an instrument
     // path and always sounds.
     const ownVoice = useCallback(

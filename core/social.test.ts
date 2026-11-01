@@ -1,11 +1,11 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { CHANNELS } from "./social";
 
-describe("the channels Plinky is followed on", () => {
+describe("the channels Klimpi is followed on", () => {
     it("is named once and read everywhere", () => {
         expect(CHANNELS.map((channel) => channel.brand)).toEqual([
             "instagram",

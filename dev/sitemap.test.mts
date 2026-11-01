@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -11,7 +11,7 @@ import { buildSitemaps, edgeEntries, pageUrl } from "./sitemap.mjs";
 // file, and the failure arrives weeks later in Search Console. So the shape is pinned here,
 // against fixture pages rather than a 26-locale build.
 
-const SITE = "https://plinky.fun";
+const SITE = "https://klimpi.app";
 const LASTMOD = "2026-08-07";
 
 const entries = (locales: string[], paths: string[]) =>
@@ -29,16 +29,16 @@ const build = (options: Record<string, unknown> = {}) =>
 
 describe("pageUrl", () => {
     it("gives the locale index a bare trailing slash", () => {
-        expect(pageUrl(SITE, "de", "/")).toBe("https://plinky.fun/de/");
+        expect(pageUrl(SITE, "de", "/")).toBe("https://klimpi.app/de/");
     });
 
     it("keeps the trailing slash the prerendered document is served at", () => {
         // The document's own <link rel="canonical"> names this exact form; naming the
         // slashless one here would leave the sitemap and the page disagreeing about which
         // URL is real, and each locale's cluster would stop resolving.
-        expect(pageUrl(SITE, "de", "/about")).toBe("https://plinky.fun/de/about/");
+        expect(pageUrl(SITE, "de", "/about")).toBe("https://klimpi.app/de/about/");
         expect(pageUrl(SITE, "en", "/play/K2k2MQKNlj6d")).toBe(
-            "https://plinky.fun/en/play/K2k2MQKNlj6d/",
+            "https://klimpi.app/en/play/K2k2MQKNlj6d/",
         );
     });
 });
@@ -130,7 +130,7 @@ describe("buildSitemaps", () => {
             noindex: [],
         });
 
-        expect(children.get("en")).toContain("<loc>https://plinky.fun/en/play/a&amp;b/</loc>");
+        expect(children.get("en")).toContain("<loc>https://klimpi.app/en/play/a&amp;b/</loc>");
         expect(children.get("en")).not.toContain("a&b");
     });
 
@@ -206,7 +206,7 @@ describe("edgeEntries", () => {
         expect(pieceUrls(children.get("en"))).toHaveLength(1);
         expect(pieceUrls(children.get("de"))).toHaveLength(1);
         expect(children.get("de")).toContain(
-            'hreflang="en" href="https://plinky.fun/en/play/abc/"',
+            'hreflang="en" href="https://klimpi.app/en/play/abc/"',
         );
     });
 });

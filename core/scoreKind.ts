@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // What a score is written for.
 //
 // Roughly two thirds of the catalogue is a song with a piano part or a choral setting
-// reduced to a grand staff. Both are playable — Plinky opens the piano part and can sound
+// reduced to a grand staff. Both are playable — Klimpi opens the piano part and can sound
 // the rest as accompaniment — and neither is what a beginner's grade should be built
 // from. Recording which is which is what lets the ladder ask for piano writing while the
 // library keeps everything.

@@ -1,12 +1,12 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Preview
 # Per-branch preview deploys to Cloudflare Pages, in a project of their own
-# ("plinky-preview") separate from production's ("plinky", website.yml). A distinct
-# origin per branch is the point: all of Plinky's state lives in localStorage, which is
+# ("plinky-preview") separate from production's ("klimpi", website.yml). A distinct
+# origin per branch is the point: all of Klimpi's state lives in localStorage, which is
 # per-origin, so a preview must never share production's origin or it could read and
 # corrupt real users' data. Each push publishes to <slug>.plinky-preview.pages.dev
-# (and <slug>.preview.plinky.fun once the custom domain is attached), and records a
+# (and <slug>.preview.klimpi.app once the custom domain is attached), and records a
 # GitHub Deployment so the PR shows the environment and a "View deployment" link —
 # deliberately not a PR comment, which would email on every push.
 #
@@ -21,8 +21,8 @@ name: Preview
 #   2. Create an API token (template: "Cloudflare Pages — Edit") and add repo secrets
 #      CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
 #   3. For nice URLs: add the custom domain in the Pages project and a wildcard CNAME
-#      *.preview → plinky-preview.pages.dev in plinky.fun's DNS, then set the repo
-#      variable PREVIEW_DOMAIN=preview.plinky.fun. Left unset, the URLs are the free
+#      *.preview → plinky-preview.pages.dev in klimpi.app's DNS, then set the repo
+#      variable PREVIEW_DOMAIN=preview.klimpi.app. Left unset, the URLs are the free
 #      <slug>.plinky-preview.pages.dev, which need no DNS.
 on:
   workflow_dispatch:
@@ -54,10 +54,10 @@ jobs:
       - uses: metio/nix-devshell@d0c25fdb0d2c08f23bc62c867317a266b6f1a5c1 # 2026.9.12204255
       - run: nix develop --command npm ci
       - name: Build (English prerender, all languages at runtime)
-        # Set PLINKY_LOCALES to a comma list to prerender more languages.
+        # Set KLIMPI_LOCALES to a comma list to prerender more languages.
         run: nix develop --command npm run build:locales
         env:
-          PLINKY_LOCALES: en
+          KLIMPI_LOCALES: en
       - name: Take the help pictures (English)
         # The help page's pictures are not in the repository — production takes them per
         # language, one set per build job (website.yml). English is the one language this

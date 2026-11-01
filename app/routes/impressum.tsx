@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { noindexMeta, routeMeta } from "../../core/site";
@@ -18,7 +18,7 @@ export function meta(_args: Route.MetaArgs) {
     // footer, so noindex it (and it is left out of the sitemap). Its translations
     // inherit the same noindex.
     return [
-        ...routeMeta("Impressum", "Anbieterkennzeichnung von Plinky nach § 5 DDG."),
+        ...routeMeta("Impressum", "Anbieterkennzeichnung von Klimpi nach § 5 DDG."),
         noindexMeta(),
     ];
 }
@@ -52,10 +52,10 @@ export default function Impressum() {
                 <p className="text-sm leading-relaxed text-body">
                     {m.contact_email_label()}{" "}
                     <a
-                        href="mailto:contact@plinky.fun"
+                        href="mailto:contact@klimpi.app"
                         className="text-accent-strong hover:underline"
                     >
-                        contact@plinky.fun
+                        contact@klimpi.app
                     </a>
                 </p>
             </section>

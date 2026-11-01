@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -85,9 +85,9 @@ describe("serialize / parse", () => {
         expect(parseAssignment(serializeAssignment(assignment))).toEqual(assignment);
     });
 
-    it("rejects a document that isn't a Plinky assignment", () => {
+    it("rejects a document that isn't a Klimpi assignment", () => {
         expect(() => parseAssignment(JSON.stringify({ format: "something-else" }))).toThrow(
-            /not a Plinky assignment/,
+            /not a Klimpi assignment/,
         );
     });
 

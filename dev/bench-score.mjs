@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // How long a piece takes to appear, on a slow device.
@@ -69,7 +69,7 @@ async function measure(browser, rate) {
     const context = await browser.newContext({
         viewport: { width: 1280, height: 900 },
         // The service worker is blocked, and that is the whole reason any byte-level figure
-        // here means anything. Plinky's worker intercepts every same-origin GET, and the
+        // here means anything. Klimpi's worker intercepts every same-origin GET, and the
         // DevTools network throttling applied below governs the PAGE's network stack, not the
         // worker's — so with it running, a 1.27 MB chunk arrives in 28 ms over a link
         // emulated at 200 KB/s, reporting a transferSize of zero because a worker answered.

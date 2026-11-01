@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useRef, useState } from "react";
@@ -11,7 +11,7 @@ import {
 
 // Moves a piece into the octave the player's instrument can actually reach.
 //
-// The move is a transposition by whole octaves, and Plinky already has transposition —
+// The move is a transposition by whole octaves, and Klimpi already has transposition —
 // the control, the reset, the re-engraving, the grading against the sounding pitch. So
 // this sets that value rather than inventing a parallel one: the piece really is being
 // played twelve semitones down, the notation says so, and "Reset to the written key" is

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The dev server a render drives, and the guarantee that it is the one this run started.
@@ -47,7 +47,7 @@ export async function startDevServer(port) {
     }
     const child = spawn("npx", ["react-router", "dev", "--port", String(port)], {
         stdio: ["ignore", "pipe", "inherit"],
-        env: { ...process.env, PLINKY_NO_WATCH: "1" },
+        env: { ...process.env, KLIMPI_NO_WATCH: "1" },
     });
     // Vite answers a taken port by taking the next one and mentioning it in passing. Left
     // unread, that one line is the whole bug, so it ends the run here.

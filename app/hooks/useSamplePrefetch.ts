@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useRef } from "react";
@@ -24,7 +24,7 @@ import { collectMatchSteps } from "./useScoreMatcher";
 // the catalogue that is three of them for a first study and two dozen for a grade 8.
 //
 // Nothing waits on it. A recording that has not arrived is a note the synthesised voice
-// plays, so the worst case for a slow connection is the instrument Plinky always had.
+// plays, so the worst case for a slow connection is the instrument Klimpi always had.
 //
 // IT IS CALLED WHEN A RENDER FINISHES, not by an effect watching for one. That distinction
 // is the whole reliability of it. A piece in another key is a different set of recordings —

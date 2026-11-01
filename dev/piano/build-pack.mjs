@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Encodes the Salamander library for the web: every recording, whole, one file each, with
@@ -183,7 +183,7 @@ writeFileSync(
     join(OUT, "README.txt"),
     `Salamander Grand Piano V3 by Alexander Holm, CC-BY-3.0\n` +
         `${manifest.source}\n\n` +
-        `Encoded for Plinky: Opus ${BITRATE} kb/s, whole recordings, one file each.\n` +
+        `Encoded for Klimpi: Opus ${BITRATE} kb/s, whole recordings, one file each.\n` +
         `${count} files, ${(bytes / 1_000_000).toFixed(1)} MB, manifest ${digest}\n`,
 );
 

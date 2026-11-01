@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { lookupOr } from "./lookup";
@@ -7,7 +7,7 @@ import { child, numberOf, text } from "./musicxmlDom";
 
 // Reading the music out of a MusicXML document, rather than out of the engraver.
 //
-// Everything Plinky needs to know about a piece — when each note starts, how long it
+// Everything Klimpi needs to know about a piece — when each note starts, how long it
 // lasts, which marks are written over it — is in the file. It has been read off the
 // engraver instead because the engraver was already there, and that has cost a great deal:
 // its object graph is undocumented and its shipped bundle is minified, so every fact is a

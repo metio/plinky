@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
@@ -45,14 +45,14 @@ async function saveImage(svg: string, boast: string): Promise<void> {
     if (!png) {
         return;
     }
-    const file = new File([png], "plinky.png", { type: "image/png" });
+    const file = new File([png], "klimpi.png", { type: "image/png" });
     if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], text: boast });
         return;
     }
     // The shared download defers revoking its object URL: revoked on the same tick, the
     // browser's fetch of it can lose the race and Firefox drops the file outright.
-    downloadBlob(png, "image/png", "plinky.png");
+    downloadBlob(png, "image/png", "klimpi.png");
 }
 
 // Copy / save-image / per-platform buttons shared by every card. `text` is the

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { ColoringModes, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
@@ -34,7 +34,7 @@ const PHRASE = generateDrill(
 );
 
 // The class the feedback layer tags its per-note halos with.
-const HALO = ".plinky-note-halo";
+const HALO = ".klimpi-note-halo";
 
 // Two eighth notes joined by a beam, then a quarter — a note whose beam and stem sit
 // outside the notehead group, so the test can confirm the halo never touches them.

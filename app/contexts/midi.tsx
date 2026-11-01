@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useLatest } from "../hooks/useLatest";
@@ -67,7 +67,7 @@ declare global {
     interface Window {
         // Test/dev bridge for injecting notes as if from a MIDI device; attached
         // by MidiProvider outside production. See its effect below.
-        __plinky?: {
+        __klimpi?: {
             play: (note: number, velocity?: number) => void;
             release: (note: number) => void;
             // Move one of the three pedals, as a real device's control change would — so a
@@ -85,7 +85,7 @@ declare global {
                 heldNotes: number[];
                 octaveOffset: number;
             };
-            // Wipe all local Plinky state and reload — a quick fresh start in dev.
+            // Wipe all local Klimpi state and reload — a quick fresh start in dev.
             reset: () => void;
         };
     }
@@ -117,7 +117,7 @@ type MidiContextValue = {
     // the page goes away.
     silenceEcho: () => void;
     // The lighted keyboard, if the player asked for one and something is connected.
-    // Separate from echoNote on purpose: that shows what Plinky HAS played, this shows
+    // Separate from echoNote on purpose: that shows what Klimpi HAS played, this shows
     // what is coming, and the two cannot share one stream of messages. Always present —
     // it simply sends nothing when the feature is off or no device is listening, so no
     // caller has to check.
@@ -454,7 +454,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         if (import.meta.env.PROD) {
             return;
         }
-        window.__plinky = {
+        window.__klimpi = {
             play: (note, velocity = 80) =>
                 emitNote("noteon", note, velocity, 1, "Test bridge", performance.now()),
             release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
@@ -472,7 +472,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             },
         };
         return () => {
-            window.__plinky = undefined;
+            window.__klimpi = undefined;
         };
     }, [emitNote, emitPedal, store, makeHandler]);
 

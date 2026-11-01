@@ -1,11 +1,11 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Working on Plinky
+# Working on Klimpi
 
-Plinky is a client-only React Router SPA (no backend; all state in the browser).
+Klimpi is a client-only React Router SPA (no backend; all state in the browser).
 The architecture — a pure `core/` under ports, adapters, stores and components —
 is described in [ARCHITECTURE.md](ARCHITECTURE.md) and **enforced** by
 `npm run arch` (dependency-cruiser + `dev/check-globals.mjs`).
@@ -34,7 +34,7 @@ both together.
 
 Each gate is also a **`ci-<name>` wrapper** defined with `writeShellScriptBin` in
 `flake.nix`, capturing exactly how CI invokes it (e.g. `ci-build` bakes in the
-per-locale `PLINKY_LOCALE=en` build the size budget measures, `ci-reuse` is
+per-locale `KLIMPI_LOCALE=en` build the size budget measures, `ci-reuse` is
 `reuse lint`). So `nix develop --command ci-<name>` runs precisely what CI runs,
 and the same name works bare inside `nix develop` — the `ci-` prefix leaves the raw
 tool free for its other modes. A CI gate job must invoke its check through a
@@ -43,7 +43,7 @@ that enforces this and that every wrapper a job names exists in `flake.nix`. The
 shared lint-gate wrappers (`ci-reuse`, `ci-typos`, `ci-yaml`, `ci-actionlint`,
 `ci-markdown`) are not defined here — they come from
 `devshell.lib.mkDevShell`, so every metio repo inherits one definition, and this
-flake only defines the gates that are Plinky's own.
+flake only defines the gates that are Klimpi's own.
 
 ## The gate
 
@@ -124,7 +124,7 @@ cheaper than a local sweep when you have no particular reason to reproduce one.
 The other host limit is the ordinary one: this is a Fedora Atomic (ostree)
 machine with rootless Podman and nix-portable, so a gate needing `kind`, a
 privileged container, a system-level nix daemon, or real MIDI/audio hardware
-could not run here at all. Plinky has no such gate today.
+could not run here at all. Klimpi has no such gate today.
 
 **Only English used to be verified, and the deploy ships 26 languages.** English is the
 one language none of these gates needed to check: it is the shortest, and every string in
@@ -219,7 +219,7 @@ nix develop --command ci-hydration  # CI ONLY — every address whose PARAMETERS
                       # than quietly measuring the fallback shell
 npm run brand         # regenerates brand/ from app.css + the icon (not a gate)
 npm run logo          # keys the background out of brand/source/* and writes the shipped
-                      # artwork, brand/plinky-{mark,icon,keys}.png; `-- --check` reports stale
+                      # artwork, brand/klimpi-{mark,icon,keys}.png; `-- --check` reports stale
 npm run mark          # writes brand/name-white.svg (the outlined name) and the proposed
                       # vector mark the app does not ship, brand/proposed-mark/*.svg;
                       # `-- --check` is the blocking gate
@@ -239,7 +239,7 @@ npm run help:shots    # the help page's pictures, of the build in build/client (
 ```
 
 **Every per-visitor budget measures the same build, and each gate now produces it.**
-`npm run build:single` (`PLINKY_LOCALE=en npm run build`) is the one definition of that
+`npm run build:single` (`KLIMPI_LOCALE=en npm run build`) is the one definition of that
 build — one tree-shaken locale, exactly what the deploy ships. `ci-build`, both a11y
 sweeps and `ci-lighthouse` all route through it, so there is nothing to sequence and
 nothing to remember.
@@ -439,7 +439,7 @@ offline.
   its octiles — but they do not follow the model on their own, so `songs:bake` fails when
   a category's tiles collapse into one grade.
 
-- **A named work is a built-in assignment, not a new kind of thing.** Plinky already has
+- **A named work is a built-in assignment, not a new kind of thing.** Klimpi already has
   assignments — a named, ordered list of pieces — so a book of studies is one, and there is
   no second concept for a player to learn. `dev/builtin-assignments.json` names the works
   (composer and title patterns, plus the `least` number of pieces below which the set has
@@ -486,7 +486,7 @@ offline.
   carries a `why`. A composer's *spelling* is a different question: `ALIASES` in
   `core/person.ts` maps a spelling to one person for display, across every piece bearing
   it, now and in future.
-- **Every file** carries the two SPDX header lines declaring the Plinky Authors
+- **Every file** carries the two SPDX header lines declaring the Klimpi Authors
   and the AGPL-3.0-or-later licence (or a `REUSE.toml` entry when the format can't
   hold comments), like the top of this file. The catalogue is the exception: scores
   and manifests keep their own Creative Commons terms in `REUSE.toml`, and a
@@ -507,7 +507,7 @@ offline.
   `changelog.yaml` and `README.md` in the [VOICE.md](VOICE.md) register.
 - **Add an entry to `changelog.yaml` in the same change**, for anything a player
   would notice — a new feature, a changed behaviour, a bug they'd have hit.
-  Plinky has no versions, tags or releases (every push to main deploys), so
+  Klimpi has no versions, tags or releases (every push to main deploys), so
   nothing else records what changed and nothing generates it from the log:
   unwritten at the time means unwritten for good. Write for a player, not a
   contributor — what is different on screen and why it matters — in the
@@ -532,11 +532,11 @@ offline.
 
 ## Product guardrails
 
-- **No streaks, ever.** Plinky never punishes a missed day; the daily challenge
+- **No streaks, ever.** Klimpi never punishes a missed day; the daily challenge
   has a ✓ and cumulative stats, nothing consecutive.
 - **No ranked competition, ever.** No leaderboards, no ladders, no rank against
   other players — decided 2026-08-09, and it is the same instinct the streak rule
-  refuses. Ranking is pressure, and the friendliness Plinky promotes is worth more
+  refuses. Ranking is pressure, and the friendliness Klimpi promotes is worth more
   than the engagement a ladder would buy. Comparison is allowed only in the shape
   the daily share grid already uses: a histogram of where people landed, showing a
   player their own band and never a position above or below anyone. See

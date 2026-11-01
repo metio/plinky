@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Renders every icon the app ships from the keyed artwork in brand/ — the launcher icons,
@@ -21,9 +21,9 @@ import { tokenValue } from "./brandTokens.mjs";
 // wordmark is a smudge at the size it is worn. The keys are that again without the tile, for
 // setting on a ground the tile would have no edge against.
 const png = async (path) => markImage(await readFile(path), "image/png");
-const LOCKUP = await png("brand/plinky-mark.png");
-const ICON = await png("brand/plinky-icon.png");
-const KEYS = await png("brand/plinky-keys.png");
+const LOCKUP = await png("brand/klimpi-mark.png");
+const ICON = await png("brand/klimpi-icon.png");
+const KEYS = await png("brand/klimpi-keys.png");
 // The outlined name, which the social card sets beside the framed icon (`npm run mark`).
 const NAME_WHITE = markImage(await readFile("brand/name-white.svg"));
 
@@ -137,7 +137,7 @@ await shoot(
     { width: 512, height: 160, path: "public/icon-banner-512.png" },
 );
 
-// The social card every link to Plinky unfurls as. It is made here, from the same mark as
+// The social card every link to Klimpi unfurls as. It is made here, from the same mark as
 // the launcher icons, because it was made by hand once and then sat two identities out of
 // date while every gate stayed green. It sets the same group as the brand kit's open-graph
 // image, with the address in its small line.
@@ -166,8 +166,8 @@ await shoot(
 await browser.close();
 
 console.log(
-    "public/: icon-512, icon-192 and favicon.ico (16, 32, 48) from brand/plinky-icon.png; " +
-        "icon-180 and the maskables from brand/plinky-keys.png on the accent; " +
-        "icon-banner-512 from brand/plinky-mark.png; og.png from the framed icon and " +
+    "public/: icon-512, icon-192 and favicon.ico (16, 32, 48) from brand/klimpi-icon.png; " +
+        "icon-180 and the maskables from brand/klimpi-keys.png on the accent; " +
+        "icon-banner-512 from brand/klimpi-mark.png; og.png from the framed icon and " +
         "brand/name-white.svg",
 );

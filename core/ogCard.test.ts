@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -9,7 +9,7 @@ const OPTIONS = {
     palette: { paper: "#fff", ink: "#111", muted: "#666", accent: "#4915d2" },
     fonts: { display: "font-family:Fredoka", body: "font-family:Inter" },
     mark: "data:image/png;base64,AAAA",
-    host: "plinky.fun",
+    host: "klimpi.app",
 };
 
 describe("pieceCardHtml", () => {
@@ -25,7 +25,7 @@ describe("pieceCardHtml", () => {
         expect(html).toContain(`width:${CARD_WIDTH}px;height:${CARD_HEIGHT}px`);
         expect(html).toContain(">Ode to Joy</div>");
         expect(html).toContain(">Ludwig van Beethoven</div>");
-        expect(html).toContain(">plinky.fun</span>");
+        expect(html).toContain(">klimpi.app</span>");
         expect(html).toContain('<img src="data:image/png;base64,AAAA"');
         // The opening bar, in the accent.
         expect(html).toContain("<svg ");

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Which staves of a score are the piano, and which belong to something else.
@@ -22,7 +22,7 @@ export type ScoreParts = {
     // left hand finds nothing to play, which is the honest answer.
     left: number;
     // Every other staff — the singer, a second instrument. Never demanded of the player;
-    // Plinky can sound them as accompaniment, and hides them unless asked.
+    // Klimpi can sound them as accompaniment, and hides them unless asked.
     other: number[];
 };
 

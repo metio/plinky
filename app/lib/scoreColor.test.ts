@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -97,7 +97,7 @@ describe("paintBarSelection / clearBarSelection", () => {
     it("fills one backdrop rect per bar in the inclusive range", () => {
         const { svg } = makeSvg();
         paintBarSelection(svg, boxes, 0, 1);
-        const rects = svg.querySelectorAll("rect.plinky-bar-selection");
+        const rects = svg.querySelectorAll("rect.klimpi-bar-selection");
         expect(rects).toHaveLength(2);
         expect(rects[0]?.getAttribute("fill")).toBe(SELECT_COLOR);
         // Translucent, and never eating the clicks meant for selecting a bar.
@@ -109,7 +109,7 @@ describe("paintBarSelection / clearBarSelection", () => {
         const { svg, note } = makeSvg();
         paintBarSelection(svg, boxes, 0, 0);
         // The selection rect is inserted before the existing note group.
-        expect(svg.firstElementChild?.classList.contains("plinky-bar-selection")).toBe(true);
+        expect(svg.firstElementChild?.classList.contains("klimpi-bar-selection")).toBe(true);
         expect(svg.lastElementChild).toBe(note);
     });
 
@@ -117,14 +117,14 @@ describe("paintBarSelection / clearBarSelection", () => {
         const { svg } = makeSvg();
         paintBarSelection(svg, boxes, 0, 2);
         paintBarSelection(svg, boxes, 1, 1);
-        expect(svg.querySelectorAll("rect.plinky-bar-selection")).toHaveLength(1);
+        expect(svg.querySelectorAll("rect.klimpi-bar-selection")).toHaveLength(1);
     });
 
     it("clears every backdrop rect", () => {
         const { svg, note } = makeSvg();
         paintBarSelection(svg, boxes, 0, 2);
         clearBarSelection(svg);
-        expect(svg.querySelectorAll("rect.plinky-bar-selection")).toHaveLength(0);
+        expect(svg.querySelectorAll("rect.klimpi-bar-selection")).toHaveLength(0);
         expect(svg.firstElementChild).toBe(note); // the note group is untouched
     });
 });

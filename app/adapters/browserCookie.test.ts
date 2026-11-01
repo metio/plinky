@@ -1,19 +1,19 @@
 // @vitest-environment jsdom
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { browserCookies } from "./browserCookie";
 
 afterEach(() => {
-    browserCookies.write("plinky-test", "", 0);
+    browserCookies.write("klimpi-test", "", 0);
     vi.restoreAllMocks();
 });
 
 describe("browserCookies", () => {
     it("writes a site-wide cookie the next read sees", () => {
-        expect(browserCookies.write("plinky-test", "de", 60)).toBe(true);
-        expect(browserCookies.read()).toContain("plinky-test=de");
+        expect(browserCookies.write("klimpi-test", "de", 60)).toBe(true);
+        expect(browserCookies.read()).toContain("klimpi-test=de");
     });
 
     it("scopes the cookie to the whole site and gives it the lifetime asked for", () => {
@@ -24,14 +24,14 @@ describe("browserCookies", () => {
         vi.spyOn(document, "cookie", "set").mockImplementation((value: string) => {
             written.push(value);
         });
-        browserCookies.write("plinky-test", "de", 60);
-        expect(written).toEqual(["plinky-test=de; path=/; max-age=60"]);
+        browserCookies.write("klimpi-test", "de", 60);
+        expect(written).toEqual(["klimpi-test=de; path=/; max-age=60"]);
     });
 
     it("forgets a cookie written with no lifetime left", () => {
-        browserCookies.write("plinky-test", "de", 60);
-        browserCookies.write("plinky-test", "", 0);
-        expect(browserCookies.read()).not.toContain("plinky-test=");
+        browserCookies.write("klimpi-test", "de", 60);
+        browserCookies.write("klimpi-test", "", 0);
+        expect(browserCookies.read()).not.toContain("klimpi-test=");
     });
 
     it("answers empty and false where the page may not use cookies", () => {
@@ -42,6 +42,6 @@ describe("browserCookies", () => {
             throw new DOMException("denied", "SecurityError");
         });
         expect(browserCookies.read()).toBe("");
-        expect(browserCookies.write("plinky-test", "de", 60)).toBe(false);
+        expect(browserCookies.write("klimpi-test", "de", 60)).toBe(false);
     });
 });

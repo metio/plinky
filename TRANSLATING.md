@@ -1,11 +1,11 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Translating Plinky
+# Translating Klimpi
 
-Plinky speaks 26 languages. Every UI string lives in `messages/<locale>.json`, with
+Klimpi speaks 26 languages. Every UI string lives in `messages/<locale>.json`, with
 English (`messages/en.json`) as the source. A string with no translation yet falls
 back to English, so the app always works while a language catches up.
 
@@ -22,7 +22,7 @@ key must exist in `en.json`.
 
 ## Please keep
 
-- **"Plinky"** unchanged — it's the name, not a word to translate.
+- **"Klimpi"** unchanged — it's the name, not a word to translate.
 - Placeholders such as `{count}` or `{title}` exactly as written, braces included.
 - Emoji, and any leading or trailing spaces.
 - The tone: warm and inviting, like the English source — [VOICE.md](VOICE.md) spells

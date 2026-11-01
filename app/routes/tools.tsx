@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
@@ -165,7 +165,7 @@ function CircleOfFifths() {
                         ),
                     })
                 }
-                filename={`plinky-chords-${pitchSymbol(selected.tonic, naming, selected.spelling)}`}
+                filename={`klimpi-chords-${pitchSymbol(selected.tonic, naming, selected.spelling)}`}
                 pictureLabel={m.tools_circle_save_chords()}
             />
         </Panel>
@@ -219,7 +219,7 @@ function ScaleExplorer() {
                     root: pitchSymbol(ROOT + Number(tonic), naming),
                     name: scaleName(scale),
                 })}
-                filename="plinky-scale"
+                filename="klimpi-scale"
             />
         </Panel>
     );
@@ -256,7 +256,7 @@ function ChordExplorer() {
                     root: pitchSymbol(ROOT + Number(root), naming),
                     name: chordName(quality),
                 })}
-                filename="plinky-chord"
+                filename="klimpi-chord"
             />
         </Panel>
     );
@@ -388,7 +388,7 @@ function TapTempo({ onFound }: { onFound: (bpm: number) => void }) {
 // Small tools that need no account, no instrument and no lesson: a circle of fifths
 // you can hear, a scale and a chord shown on the keys, and a tempo read off your own
 // tapping. Each one is a thing a player looks up mid-practice, and each is built from
-// the same engines the rest of Plinky runs on.
+// the same engines the rest of Klimpi runs on.
 export default function ToolsRoute() {
     // The tempo the tap tool finds is the tempo the metronome should keep, so the number
     // lives in the one place both panels can see rather than being typed in twice.

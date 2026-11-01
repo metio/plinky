@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { MAX_GRADE } from "./scoreDifficulty";
@@ -6,7 +6,7 @@ import { MAX_GRADE } from "./scoreDifficulty";
 // The collectible badges: every earned moment the app already records, laid out
 // as one durable set. Everything here is CUMULATIVE — a badge, once earned, can
 // never un-earn (the inputs only ever grow), and none involves consecutive days:
-// Plinky never punishes a break.
+// Klimpi never punishes a break.
 
 export type StarKind = "bronze" | "silver" | "gold";
 

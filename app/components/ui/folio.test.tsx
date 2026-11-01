@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -18,12 +18,12 @@ afterEach(cleanup);
 describe("FolioRow", () => {
     it("names itself as a heading at the level asked for, with its line and body", () => {
         render(
-            <FolioRow heading="h2" name="Sound" line="Plinky can play notes" margin={<svg />}>
+            <FolioRow heading="h2" name="Sound" line="Klimpi can play notes" margin={<svg />}>
                 <p>controls</p>
             </FolioRow>,
         );
         expect(screen.getByRole("heading", { level: 2, name: "Sound" })).toBeTruthy();
-        expect(screen.getByText("Plinky can play notes")).toBeTruthy();
+        expect(screen.getByText("Klimpi can play notes")).toBeTruthy();
         expect(screen.getByText("controls")).toBeTruthy();
     });
 

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -176,8 +176,8 @@ describe("a note asked for while audio is asleep", () => {
 
 describe("when the player's own instrument makes the sound", () => {
     // Reported from a real piano over USB MIDI: every note was being played twice, once by
-    // the piano and once by Plinky a few milliseconds behind. It is also why a stuck note
-    // was audible at all — the voice that hung was Plinky's copy, not the piano's string.
+    // the piano and once by Klimpi a few milliseconds behind. It is also why a stuck note
+    // was audible at all — the voice that hung was Klimpi's copy, not the piano's string.
     const MIDI = "Yamaha P-125";
 
     it("leaves a note from the instrument to the instrument", () => {
@@ -201,7 +201,7 @@ describe("when the player's own instrument makes the sound", () => {
         expect(audio.voices.map((one) => one.note)).toEqual([60, 62, 64]);
     });
 
-    it("still plays everything Plinky plays by itself", () => {
+    it("still plays everything Klimpi plays by itself", () => {
         // Listen, the metronome, the duet's other hand and every demonstration go through
         // strike rather than press, and none of them is the player's own instrument.
         const { audio, synth } = harness({ instrumentSounds: true });

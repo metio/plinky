@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import fc from "fast-check";
@@ -17,7 +17,7 @@ import {
 import { shiftDay } from "./dateKey";
 
 // The list of what changed, and the two things made from it: the published file players
-// are sent to, and the weekly post. Plinky has no versions, so this list is the only
+// are sent to, and the weekly post. Klimpi has no versions, so this list is the only
 // record — an entry lost between the file and the post is a change nobody hears about,
 // and one posted twice is a week that reads as a repeat.
 
@@ -258,7 +258,7 @@ describe("the post itself", () => {
                 const full = roundUpBody(releases, POST_LIMIT);
                 const total = releases.reduce((sum, release) => sum + release.entries.length, 0);
 
-                expect(full).toContain("plinky.fun");
+                expect(full).toContain("klimpi.app");
                 for (const release of releases) {
                     for (const entry of release.entries) {
                         expect(full).toContain(entry.body);

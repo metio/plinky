@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useLatest } from "./useLatest";
@@ -551,7 +551,7 @@ export function useOsmdScore(
     // the parsed sheet, so the labels are created afresh per the rule — all when on, none
     // when off.
     // OSMD re-renders itself when the window resizes — `autoResize: true` above installs its
-    // own listener — and that render replaces the whole <svg>, taking every overlay Plinky
+    // own listener — and that render replaces the whole <svg>, taking every overlay Klimpi
     // has drawn on it with it: the loop's red bars, the difficulty heat map, the note paint.
     //
     // Nothing told us it had happened. renderVersion is bumped by OUR relayout path, so the

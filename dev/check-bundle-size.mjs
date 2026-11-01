@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Verifies the built client JavaScript stays within budget, so the bundle can't
 // grow unnoticed — and that no dev-only surface leaks into what visitors run.
 // Run after a SINGLE-locale build (`nix develop --command ci-build`, i.e.
-// `PLINKY_LOCALE=en npm run build`) — the same build CI and the deploy measure. A
+// `KLIMPI_LOCALE=en npm run build`) — the same build CI and the deploy measure. A
 // plain all-locales `npm run build` is caught below and rejected, because its
 // summed multi-language bundle is ~3× the per-visitor weight the budget tracks.
 //
@@ -46,7 +46,7 @@ const ON_DEMAND = /webCodecsVideo|webAudioFile|webCodecsAudio|offlineAudio/;
 const ON_DEMAND_LEAST_KB = 8;
 
 // What a single visitor downloads, in two independent measurements. CI builds one
-// locale (`PLINKY_LOCALE=en npm run build`), because the deploy ships a tree-shaken
+// locale (`KLIMPI_LOCALE=en npm run build`), because the deploy ships a tree-shaken
 // bundle per language (dev/build-locales.mjs) — a German visitor never downloads
 // Korean. So these track real per-visitor weight, not the summed all-locales output.
 //
@@ -545,11 +545,11 @@ const APP_RECORDED_KB = 439;
 const APP_HEADROOM_KB = 16;
 const BUDGET_APP_KB = APP_RECORDED_KB + APP_HEADROOM_KB;
 
-// Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
+// Dev-only surfaces that must never ship: the window.__klimpi test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
 // `import.meta.env.PROD` early-return that the production build strips as dead
 // code; this asserts the stripping actually happened, on the artifact itself.
-const FORBIDDEN = ["__plinky", "Test bridge", "plinky-preview-mocks"];
+const FORBIDDEN = ["__klimpi", "Test bridge", "plinky-preview-mocks"];
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

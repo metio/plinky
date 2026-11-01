@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Compiles the Paraglide messages. Run via `npm run messages` (and as the
@@ -13,20 +13,20 @@ import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { compile } from "@inlang/paraglide-js";
 
-// The inlang project to compile. PLINKY_INLANG_PROJECT points at a copy carrying a
+// The inlang project to compile. KLIMPI_INLANG_PROJECT points at a copy carrying a
 // narrower locale list — design-sync compiles one language, because a bundle holding all
 // 26 is three quarters message data.
-const project = process.env.PLINKY_INLANG_PROJECT ?? "./project.inlang";
+const project = process.env.KLIMPI_INLANG_PROJECT ?? "./project.inlang";
 const settings = JSON.parse(readFileSync(`${project}/settings.json`, "utf8"));
 const locales = settings.locales;
 
 // The locale a per-locale build is pinned to (see the experimentalStaticLocale
 // note below), validated up front so a typo fails the build instead of silently
 // producing an all-locales bundle.
-const staticLocale = process.env.PLINKY_LOCALE;
+const staticLocale = process.env.KLIMPI_LOCALE;
 if (staticLocale && !locales.includes(staticLocale)) {
     throw new Error(
-        `PLINKY_LOCALE="${staticLocale}" is not a known locale (${locales.join(", ")}).`,
+        `KLIMPI_LOCALE="${staticLocale}" is not a known locale (${locales.join(", ")}).`,
     );
 }
 
@@ -119,7 +119,7 @@ await compile({
     strategy: ["url", "cookie", "localStorage", "preferredLanguage", "baseLocale"],
     urlPatterns,
     emitTsDeclarations: true,
-    // Per-locale builds: `PLINKY_LOCALE=de npm run build` pins the compiled
+    // Per-locale builds: `KLIMPI_LOCALE=de npm run build` pins the compiled
     // static locale to a literal ("de"), so the runtime-branched `if (locale ===
     // "…")` arms for the other locales become dead code and tree-shake out —
     // that build ships only its own language. Unset (dev, test, the default

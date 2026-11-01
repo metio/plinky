@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Renders NEWS.md from changelog.yaml, and checks it is current.
@@ -68,7 +68,7 @@ const quote = (value: string): string => {
 const latestSource = (): string =>
     [
         // REUSE-IgnoreStart — the generated file's own header, not this file's.
-        "// SPDX-FileCopyrightText: The Plinky Authors",
+        "// SPDX-FileCopyrightText: The Klimpi Authors",
         "// SPDX-License-Identifier: AGPL-3.0-or-later",
         // REUSE-IgnoreEnd
         "",

@@ -1,7 +1,7 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 ---
-name: This week in Plinky
+name: This week in Klimpi
 # Sunday evening UTC, after the week it reports on has finished.
 on:  # yamllint disable-line rule:truthy
   schedule:

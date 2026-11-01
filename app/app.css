@@ -1,5 +1,5 @@
 /*
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 */
 
@@ -11,10 +11,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
    below. A component writes `text-muted` once; it never pairs
    `text-gray-500 dark:text-gray-400` by hand.
 
-   Those two blocks are the default palette, `indigo`. Every other palette
+   Those two blocks are the default palette, `fuchsia`. Every other palette
    (core/theme.ts) overrides the tokens it changes in two blocks of its own, keyed
    off `data-palette` on <html>, and the black mode swaps the grounds under
-   `.dark.black` for either palette. All of it is set before first paint by the
+   `.dark.black` for any palette. All of it is set before first paint by the
    root's bootstrap script, so no page paints one palette and then another.
 
    The hand-paired form is what these replace, and it drifts: the same intent
@@ -37,56 +37,58 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
    Opacity modifiers work as usual: `bg-accent-surface/50`. */
 @theme {
-    /* The default palette, `indigo`: the deep indigo of the mark on paper, and
-       forget-me-not blue for every tint of it. The indigo, the two forget-me-not tints, the
-       paper, the stone rule and the grey-brown ink are the palette as it was drawn, at
-       their measured values; every other step is derived from them to clear the same
-       floors the `violet` palette clears, which dev/tokenContrast.test.mts measures for
-       every palette in every mode.
+    /* The default palette, `fuchsia`: the mark's own colours — fuchsia for what you
+       press, aubergine for the writing and the grounds, brass for what you earned. The
+       fuchsia steps and the aubergine are the mark as it was drawn, at their measured
+       values; every other step is derived from them to clear the same floors the
+       `violet` palette clears, which dev/tokenContrast.test.mts measures for every
+       palette in every mode.
 
-       The paper is cool rather than cream, because printed music is white paper, and the
-       ink stays grey-brown, the colour of print rather than of a screen. */
+       The paper stays near-white, because printed music is white paper, and the ink is
+       an aubergine grey rather than a black — the colour of the mark's outline. */
     /* Surfaces, back to front. */
-    --color-surface: #f2f4f4; /* the page itself — the score's own paper */
+    --color-surface: #f7f4f8; /* the page itself — the score's own paper */
     --color-raised: #ffffff; /* cards and popovers over it, a shade lighter */
-    --color-sunken: #eaedee; /* inset panels */
-    --color-subtle: #e5e9ea; /* quiet fills, chips, hovers */
-    --color-subtle-strong: #d6dbdd;
+    --color-sunken: #f1edf3; /* inset panels */
+    --color-subtle: #ece7f0; /* quiet fills, chips, hovers */
+    --color-subtle-strong: #ded7e4;
 
-    /* Hairlines, at the weight a staff line is printed: stone grey, dark enough to hold
-       a divider on the cool page. */
-    --color-line-faint: #e5e9ea;
-    --color-line: #d5d0c8; /* the default border */
-    --color-line-strong: #b8b1a6; /* inputs and controls */
+    /* Hairlines, at the weight a staff line is printed: a greyed aubergine, dark enough
+       to hold a divider on the near-white page. */
+    --color-line-faint: #ece7f0;
+    --color-line: #dcd3e1; /* the default border */
+    --color-line-strong: #bcafc6; /* inputs and controls */
 
-    /* Text, strongest to quietest. Printing ink is grey-brown, not blue-black.
+    /* Text, strongest to quietest. The ink is the mark's aubergine, greyed as it
+       lightens, not a blue-black.
        muted and faint are the two that were solved for rather than picked: each clears its
        contrast floor against the DARKEST ground it can land on (the subtle fill), not just
        against white. */
-    --color-ink: #2a2219; /* headings, primary text */
-    --color-ink-soft: #3d3429;
-    --color-body: #50463a; /* running copy */
-    --color-muted: #736554; /* secondary and helper text — the pencil */
-    --color-faint: #8a7d6c; /* receded, decorative glyphs */
-    --color-ink-disabled: #bdb6ab; /* quieter still than faint */
+    --color-ink: #241a33; /* headings, primary text */
+    --color-ink-soft: #352a47;
+    --color-body: #473c59; /* running copy */
+    --color-muted: #6b5f7d; /* secondary and helper text — the pencil */
+    --color-faint: #867aa0; /* receded, decorative glyphs */
+    --color-ink-disabled: #b9b0c4; /* quieter still than faint */
 
-    /* Indigo carries the brand: links, selection, the primary action. Its tints are
-       forget-me-not blue rather than a lilac of the indigo itself: a lilac reads as a
-       passing trend and turns shrill at the lightness a tint needs. */
-    --color-accent: #3a0fa8;
-    --color-accent-strong: #2f0c8c; /* link text */
-    --color-accent-deep: #230869;
-    --color-accent-ink: #230869; /* text on accent-surface */
-    --color-accent-solid: #3a0fa8; /* filled button */
-    --color-accent-solid-hover: #2f0c8c;
-    --color-accent-surface: #eaf0fd; /* tinted panel */
-    --color-accent-fill: #d7e3fb; /* tinted hover */
-    --color-accent-line: #aac2f5;
-    --color-accent-line-strong: #869eec;
-    --color-accent-ring: #3a0fa8; /* focus ring */
+    /* Fuchsia carries the brand: links, selection, the primary action. Three steps of it
+       do different work, and swapping them puts text under the floor — the bright
+       #e8379b of the mark is a shape colour, not a text one (3.85:1 on white), the
+       filled button is a step deeper, and the text a step deeper again. */
+    --color-accent: #b8217a;
+    --color-accent-strong: #a3196a; /* link text */
+    --color-accent-deep: #7e155a;
+    --color-accent-ink: #7e155a; /* text on accent-surface */
+    --color-accent-solid: #c8237f; /* filled button — white on it, 5.25:1 */
+    --color-accent-solid-hover: #b01f6e;
+    --color-accent-surface: #fce4f1; /* tinted panel */
+    --color-accent-fill: #f9cfe4; /* tinted hover */
+    --color-accent-line: #f2a9cd;
+    --color-accent-line-strong: #e8379b;
+    --color-accent-ring: #c8237f; /* focus ring */
     /* A lighter accent fill: progress bars, the race track, a decorative mark. The
-       forget-me-not deepened until it holds 3:1 on the page, as a bar has to. */
-    --color-accent-soft: #6784dd;
+       mark's own fuchsia, which holds 3.53:1 on the page, as a bar has to. */
+    --color-accent-soft: #e8379b;
 
     /* Correct, saved, on target. Green only — `emerald` said the same thing. */
     --color-success: var(--color-green-700);
@@ -123,9 +125,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        the accent. */
     /* The score sheet. The page carries the same value, so a staff sits on the
        page rather than in a card on it. */
-    --color-paper: #f8fafa;
-    --color-paper-line: #bccbe6;
-    --color-paper-ink: #8494b8;
+    --color-paper: #fbf9fc;
+    --color-paper-line: #c9bcd6;
+    --color-paper-ink: #8d84a0;
     /* Piano keys are a physical object: a white key stays white in dark mode,
        the same way the score sheet stays paper. Inverting them would be a
        different instrument. */
@@ -141,13 +143,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-black-ink: var(--color-gray-200);
     --color-key-spent: var(--color-gray-400); /* a key the round is done with */
     --color-key-spent-ink: var(--color-gray-200);
-    --color-key-hover: #e3eafc;
+    --color-key-hover: #fce4f1;
     /* A drawing printed on a key (the front page's keys carry the ways to practise). The
        key face does not invert, so these hold their light values in both modes, and they
-       follow the palette: the palette's own indigo, its soft accent and its tint. */
-    --color-key-art: #3a0fa8;
-    --color-key-art-soft: #6784dd;
-    --color-key-art-ground: #d7e3fb;
+       follow the palette: the palette's own brand colour, its soft accent and its tint. */
+    --color-key-art: #c8237f;
+    --color-key-art-soft: #e8379b;
+    --color-key-art-ground: #f9cfe4;
     /* A drawing on the page (drawings.svg): its outline, the soft ground behind it, its
        one accent and a sheet of paper in it. Outline, ground and paper are the page's own
        roles; the accent has its own value, because the dark soft accent is a fill for a
@@ -205,7 +207,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        hard to find: nearly every hue in this app is already saying something, and a
        decorative green beside a green that means "you played it right" would be a lie.
        These sit in the gaps left when the grade letters stopped restating themselves in
-       seven hues. With `spark` and `plink`, which the brand owns and which never carry
+       seven hues. With `spark` and `tinkle`, which the brand owns and which never carry
        data, they are the five petals of the greeting's flower.
        Each is the lightest value that still reads at 4.5:1 on its own theme. */
     /* The decorative hues, and the only ones in the app that mean nothing at all. Every
@@ -220,43 +222,51 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-bloom-sky: #1e86d6;
     --color-bloom-rose: #e0359a;
 
-    /* The plink: one note, played. It is the note the loader drops and a petal of the
+    /* The tinkle: one note, played. It is the note the loader drops and a petal of the
        header's bouquet, and nothing else — the brand's whole spark, spent in one place.
+       It is its own variable rather than the ghost's or the accent's, so moving the brand
+       never moves the "race your own recording" colour, and moving either never moves
+       this; the three mean entirely different things. */
+    --color-tinkle: #e8379b;
 
-       It had been borrowing the ghost's fuchsia, so the brand and the "race your own
-       recording" colour were one variable: moving either moved the other, and they mean
-       entirely different things. */
-    --color-plink: #aa36fc;
+    /* The name beside the mark: the mark's aubergine on a light ground, white on a dark
+       one. It belongs to the mark rather than the palette, so it is the same whichever
+       colours a player picks. dev/build-mark.mjs reads the light value for the outlined
+       lockups. */
+    --color-brand-ink: #2b2140;
 
-    /* The name beside the mark: the designer's ink on a light ground, white on a dark one.
-       It belongs to the mark rather than the palette, so it is the same whichever colours a
-       player picks. dev/build-mark.mjs reads the light value for the outlined lockups. */
-    --color-brand-ink: #1c1640;
+    /* The round dot over each of the name's two i's: the mark's fuchsia, the colour of
+       the pressed key the K's arms grow out of. It belongs to the mark, so it is the same
+       in every palette and mode; core/wordmark's DOT holds the same value for the canvas
+       and the generated files. */
+    --color-brand-dot: #e8379b;
 
-    /* The round dot over the name's i: the plink's own pink, as the dot always was. It
-       belongs to the mark, so it is the same in every palette and mode; core/wordmark's DOT
-       holds the same value for the canvas and the generated files. */
-    --color-brand-dot: #aa36fc;
-
-    --color-ghost: var(--color-fuchsia-500);
-    --color-ghost-text: var(--color-fuchsia-600);
+    /* The ghost: your own earlier run, racing beside you. It follows the palette because
+       it has to stay a different colour from the one you press — in `fuchsia` the brand
+       is already a bright pink, 27° of hue from the fuchsia the ghost carries elsewhere
+       and at the same lightness, so the two badges on the race verdict would read as one
+       colour. Here the ghost is teal: a calm second runner, and nothing else in the
+       chrome is teal. */
+    --color-ghost: #0f7c7a;
+    --color-ghost-text: #0b5f5d;
     /* The notes highway tints the two hands apart. */
     --color-hand-right: var(--color-indigo-500);
     --color-hand-right-soft: var(--color-indigo-300);
     --color-hand-left: var(--color-teal-500);
     --color-hand-left-soft: var(--color-teal-300);
-    /* What you earned: the S grade, a section's label, the day's own thing. In `indigo`
-       it is the forget-me-not's deeper blue — a calm reward, a separate hue from the
-       indigo you press, and the one colour the chrome spends on it. It is drawn as a
-       border and as a large letter, so it clears 3:1 on every ground it lands on. */
-    --color-spark: #4769cc;
-    /* The same blue dark enough to carry a caption or a chip label: 4.5:1 on every
+    /* What you earned: the S grade, a section's label, the day's own thing. In `fuchsia`
+       it is brass — the pedals, the hinges, the gilt on a fallboard. It is the one warm
+       colour the chrome is allowed, it is a separate hue from the fuchsia you press, and
+       it is drawn as a border and as a large letter, so it clears 3:1 on every ground it
+       lands on. */
+    --color-spark: #a67c2e;
+    /* The same brass dark enough to carry a caption or a chip label: 4.5:1 on every
        ground, spark-surface included. */
-    --color-spark-strong: #2b4a9e;
-    --color-spark-soft: #869eec;
-    /* A forget-me-not tint a shade cooler than accent-surface, so a chip reads as a
-       reward rather than as a panel of the brand. */
-    --color-spark-surface: #e6f0fb;
+    --color-spark-strong: #7d5b1c;
+    --color-spark-soft: #c09a4e;
+    /* A gold tint rather than the page, so a chip reads as gilt rather than as a panel of
+       the brand. */
+    --color-spark-surface: #faf0dd;
     /* The footer's heart, on hover. */
 }
 
@@ -264,41 +274,43 @@ SPDX-License-Identifier: AGPL-3.0-or-later
    `@layer theme` defaults; `.dark` sits on <html>, which is also `:root`. */
 /* The same album under a lamp. */
 .dark {
-    /* Night paper: a cool near-black at the paper's own hue, so the page is the same
-       sheet with the lamp turned down, and the ink turns to the paper's white with the
-       grey-brown kept in its quieter steps. The one indigo thing on a screen is still the
-       thing you are meant to press. */
-    --color-surface: #101317;
-    --color-raised: #181c22;
-    --color-sunken: #0b0d10;
-    --color-subtle: #20252c;
-    --color-subtle-strong: #2b313a;
+    /* Night aubergine: the mark's own outline colour taken down to a near-black, so the
+       page is the same sheet with the lamp turned down, and the ink turns to the paper's
+       white with the aubergine kept in its quieter steps. The one fuchsia thing on a
+       screen is still the thing you are meant to press. */
+    --color-surface: #17121f;
+    --color-raised: #211a2c;
+    --color-sunken: #0f0b15;
+    --color-subtle: #2b2238;
+    --color-subtle-strong: #392e49;
 
-    --color-line-faint: #181c22;
-    --color-line: #252a31;
-    --color-line-strong: #3a414b;
+    --color-line-faint: #211a2c;
+    --color-line: #2e2540;
+    --color-line-strong: #453a58;
 
-    --color-ink: #f2f4f4;
-    --color-ink-soft: #e4e5e3;
-    --color-body: #d3d0ca;
-    --color-muted: #9e9a92;
-    --color-faint: #857f76;
-    --color-ink-disabled: #4d4a45;
+    --color-ink: #f6f3fa;
+    --color-ink-soft: #e9e3f0;
+    --color-body: #d2cada;
+    --color-muted: #9d94ab;
+    --color-faint: #837a91;
+    --color-ink-disabled: #564e63;
 
-    /* The indigo lifted toward blue rather than toward lilac for text on the dark ground,
-       and a brighter indigo for the filled button, which the deep one would sink into. */
-    --color-accent: #b0b4f8;
-    --color-accent-strong: #c8cbfa;
-    --color-accent-deep: #e0e2fd;
-    --color-accent-ink: #e0e2fd;
-    --color-accent-solid: #4424c0;
-    --color-accent-solid-hover: #5234d0;
-    --color-accent-surface: #161b36;
-    --color-accent-fill: #1f264d;
-    --color-accent-line: #2d376b;
-    --color-accent-line-strong: #4b5cb0;
-    --color-accent-ring: #869eec;
-    --color-accent-soft: #5b74d6;
+    /* The fuchsia lifted toward pink for text on the dark ground, and a deep fuchsia for
+       the filled button: the bright one is a shape colour, and white on it measures
+       2.55:1 — a filled button carries white text in both themes (see the `white` rule in
+       dev/tokenContrast.test.mts), so the solid goes the other way instead. */
+    --color-accent: #ff6ec0;
+    --color-accent-strong: #ff93d0;
+    --color-accent-deep: #ffc0e5;
+    --color-accent-ink: #ffc0e5;
+    --color-accent-solid: #b81f73;
+    --color-accent-solid-hover: #c8237f;
+    --color-accent-surface: #3a1530;
+    --color-accent-fill: #4d1c40;
+    --color-accent-line: #5f2250;
+    --color-accent-line-strong: #c8237f;
+    --color-accent-ring: #ff6ec0;
+    --color-accent-soft: #e8379b;
 
     --color-success: var(--color-green-300);
     --color-success-solid: var(--color-green-700);
@@ -323,9 +335,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
     /* The score sheet keeps its light paper in both themes — a staff is read as
        ink on paper, and inverting it costs legibility for no gain. */
-    --color-paper: #f8fafa;
-    --color-paper-line: #bccbe6;
-    --color-paper-ink: #8494b8;
+    --color-paper: #fbf9fc;
+    --color-paper-line: #c9bcd6;
+    --color-paper-ink: #8d84a0;
 
     /* Gray, not stone, even though the grounds are warm: the on-screen keyboard's resting
        colours come from the skins in core/keyboardTheme.ts, whose hexes are also baked
@@ -337,13 +349,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-black-ink: var(--color-gray-200);
     --color-key-spent: var(--color-gray-700);
     --color-key-spent-ink: var(--color-gray-500);
-    --color-key-hover: #d7e3fb;
-    --color-key-art: #3a0fa8;
-    --color-key-art-soft: #6784dd;
-    --color-key-art-ground: #d7e3fb;
+    --color-key-hover: #f9cfe4;
+    --color-key-art: #c8237f;
+    --color-key-art-soft: #e8379b;
+    --color-key-art-ground: #f9cfe4;
     --color-art-stroke: var(--color-accent);
     --color-art-ground: var(--color-accent-fill);
-    --color-art-accent: #869eec;
+    --color-art-accent: #ff93d0;
     --color-art-paper: var(--color-raised);
     --color-key-held: var(--color-green-500);
     --color-key-next: var(--color-indigo-400);
@@ -371,28 +383,139 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-strong: var(--color-indigo-500);
     --color-heat-deep: var(--color-indigo-300);
 
-    --color-plink: #c56bff;
+    --color-tinkle: #ff8acf;
     --color-brand-ink: #ffffff;
-    --color-brand-dot: #aa36fc;
+    --color-brand-dot: #e8379b;
     --color-bloom-sun: #f0b73a;
     --color-bloom-flame: #f58c4a;
     --color-bloom-leaf: #6cb52f;
     --color-bloom-sky: #3699e0;
     --color-bloom-rose: #e84fa6;
 
-    --color-ghost: var(--color-fuchsia-500);
-    --color-ghost-text: var(--color-fuchsia-400);
+    --color-ghost: #2bb3a8;
+    --color-ghost-text: #7fe0d6;
 
     --color-hand-right: var(--color-indigo-300);
     --color-hand-right-soft: var(--color-indigo-500);
     --color-hand-left: var(--color-teal-300);
     --color-hand-left-soft: var(--color-teal-500);
 
+    --color-spark: #e0b25c;
+    --color-spark-strong: #d9aa52;
+    --color-spark-soft: #c79b45;
+    --color-spark-surface: #261e10;
+
+}
+
+/* The indigo palette, light: a deep indigo on cool paper, with forget-me-not blue for
+   every tint of it. The tints are forget-me-not rather than a lilac of the indigo itself,
+   because a lilac turns shrill at the lightness a tint needs. The paper is cool rather
+   than cream and the ink is grey-brown, the colour of print rather than of a screen. */
+[data-palette="indigo"] {
+    --color-surface: #f2f4f4;
+    --color-raised: #ffffff;
+    --color-sunken: #eaedee;
+    --color-subtle: #e5e9ea;
+    --color-subtle-strong: #d6dbdd;
+
+    --color-line-faint: #e5e9ea;
+    --color-line: #d5d0c8;
+    --color-line-strong: #b8b1a6;
+
+    --color-ink: #2a2219;
+    --color-ink-soft: #3d3429;
+    --color-body: #50463a;
+    --color-muted: #736554;
+    --color-faint: #8a7d6c;
+    --color-ink-disabled: #bdb6ab;
+
+    --color-accent: #3a0fa8;
+    --color-accent-strong: #2f0c8c;
+    --color-accent-deep: #230869;
+    --color-accent-ink: #230869;
+    --color-accent-solid: #3a0fa8;
+    --color-accent-solid-hover: #2f0c8c;
+    --color-accent-surface: #eaf0fd;
+    --color-accent-fill: #d7e3fb;
+    --color-accent-line: #aac2f5;
+    --color-accent-line-strong: #869eec;
+    --color-accent-ring: #3a0fa8;
+    --color-accent-soft: #6784dd;
+
+    --color-paper: #f8fafa;
+    --color-paper-line: #bccbe6;
+    --color-paper-ink: #8494b8;
+    --color-key-hover: #e3eafc;
+    --color-art-accent: var(--color-accent-soft);
+    --color-key-art: #3a0fa8;
+    --color-key-art-soft: #6784dd;
+    --color-key-art-ground: #d7e3fb;
+
+    /* Nothing else here is pink, so the ghost keeps the fuchsia it carries by default. */
+    --color-ghost: var(--color-fuchsia-500);
+    --color-ghost-text: var(--color-fuchsia-600);
+
+    /* The forget-me-not's deeper blue: a calm reward, a separate hue from the indigo you
+       press, and the one colour the chrome spends on what you earned. */
+    --color-spark: #4769cc;
+    --color-spark-strong: #2b4a9e;
+    --color-spark-soft: #869eec;
+    /* A forget-me-not tint a shade cooler than accent-surface, so a chip reads as a
+       reward rather than as a panel of the brand. */
+    --color-spark-surface: #e6f0fb;
+}
+
+/* The indigo palette, dark: a cool near-black at the paper's own hue, so the page is the
+   same sheet with the lamp turned down. The indigo lifts toward blue rather than toward
+   lilac for text, and the filled button takes a brighter indigo, which the deep one would
+   sink into. */
+.dark[data-palette="indigo"] {
+    --color-surface: #101317;
+    --color-raised: #181c22;
+    --color-sunken: #0b0d10;
+    --color-subtle: #20252c;
+    --color-subtle-strong: #2b313a;
+
+    --color-line-faint: #181c22;
+    --color-line: #252a31;
+    --color-line-strong: #3a414b;
+
+    --color-ink: #f2f4f4;
+    --color-ink-soft: #e4e5e3;
+    --color-body: #d3d0ca;
+    --color-muted: #9e9a92;
+    --color-faint: #857f76;
+    --color-ink-disabled: #4d4a45;
+
+    --color-accent: #b0b4f8;
+    --color-accent-strong: #c8cbfa;
+    --color-accent-deep: #e0e2fd;
+    --color-accent-ink: #e0e2fd;
+    --color-accent-solid: #4424c0;
+    --color-accent-solid-hover: #5234d0;
+    --color-accent-surface: #161b36;
+    --color-accent-fill: #1f264d;
+    --color-accent-line: #2d376b;
+    --color-accent-line-strong: #4b5cb0;
+    --color-accent-ring: #869eec;
+    --color-accent-soft: #5b74d6;
+
+    --color-paper: #f8fafa;
+    --color-paper-line: #bccbe6;
+    --color-paper-ink: #8494b8;
+    --color-key-hover: #d7e3fb;
+    --color-art-accent: #869eec;
+    --color-key-art: #3a0fa8;
+    --color-key-art-soft: #6784dd;
+    --color-key-art-ground: #d7e3fb;
+
+    --color-ghost: var(--color-fuchsia-500);
+    --color-ghost-text: var(--color-fuchsia-400);
+
     --color-spark: #8fb8ef;
     --color-spark-strong: #a6c8f4;
     --color-spark-soft: #6f93d8;
     --color-spark-surface: #111b2c;
-
 }
 
 /* The violet palette, light. A brighter violet accent over warm paper and brown-black
@@ -441,6 +564,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-art: #4915d2;
     --color-key-art-soft: #9b7cf0;
     --color-key-art-ground: #e2d7fd;
+
+    /* The accent is a violet at hue 290 and the ghost's fuchsia sits at 324, far enough
+       apart that the ghost keeps the pink it carries by default. */
+    --color-ghost: var(--color-fuchsia-500);
+    --color-ghost-text: var(--color-fuchsia-600);
 
     /* Gold against violet: the pedals, the hinges, the gilt on a fallboard. It is the
        only warm colour the chrome is allowed, and it goes on things you earned. It stays
@@ -505,6 +633,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-art-soft: #9b7cf0;
     --color-key-art-ground: #e2d7fd;
 
+    --color-ghost: var(--color-fuchsia-500);
+    --color-ghost-text: var(--color-fuchsia-400);
+
     --color-spark: #e0b25c;
     --color-spark-strong: #d9aa52;
     --color-spark-soft: #c79b45;
@@ -568,7 +699,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     /* The staff standing in for a piece that is still arriving: a soft band travels
        along it the way a reader's eye would. Opacity and position only — the staff
        occupies the score's own slot, so nothing moves when the real notation lands. */
-    /* The plink: the app's one loading gesture, and the same event the mark draws — a
+    /* The tinkle: the app's one loading gesture, and the same event the mark draws — a
        note falls, lands on a key, and rings. All three parts share one duration so the
        trail, the impact and the ring stay one motion rather than three loops drifting
        apart. The easing lives in the keyframes, per step, because a fall and a rebound
@@ -588,9 +719,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --animate-twinkle: twinkle 3.2s ease-in-out infinite;
     --animate-head-rise: head-rise 1.15s ease-out both;
     --animate-note-fall: note-fall 3.4s cubic-bezier(0.5, 0, 0.75, 0) infinite;
-    --animate-plink-fall: plink-fall 1.6s infinite;
-    --animate-plink-trail: plink-trail 1.6s linear infinite;
-    --animate-plink-ring: plink-ring 1.6s linear infinite;
+    --animate-tinkle-fall: tinkle-fall 1.6s infinite;
+    --animate-tinkle-trail: tinkle-trail 1.6s linear infinite;
+    --animate-tinkle-ring: tinkle-ring 1.6s linear infinite;
 }
 
 @keyframes petal-in {
@@ -729,7 +860,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     }
 }
 
-@keyframes plink-fall {
+@keyframes tinkle-fall {
     0% {
         transform: translateY(-240%) scale(1);
         opacity: 0;
@@ -773,7 +904,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 /* Drawn from the top down, at the speed the note is falling, so it is the path already
    travelled rather than a line the note happens to be near. */
-@keyframes plink-trail {
+@keyframes tinkle-trail {
     0% {
         transform: scaleY(0);
         opacity: 0.8;
@@ -790,7 +921,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 }
 
 /* Leaves at the moment of impact, not before it. */
-@keyframes plink-ring {
+@keyframes tinkle-ring {
     0%,
     42% {
         transform: scale(0.3);

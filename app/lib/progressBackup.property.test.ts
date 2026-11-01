@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import fc from "fast-check";
@@ -13,7 +13,7 @@ const value = fc.string({ maxLength: 60 });
 const prefixed = (entries: Record<string, string>) =>
     Object.fromEntries(Object.entries(entries).map(([k, v]) => [PREFIX + k, v]));
 
-// A device (Plinky's keys plus another site's), a bundle, and a quota the device already
+// A device (Klimpi's keys plus another site's), a bundle, and a quota the device already
 // fits inside with some room to spare.
 const scenario = fc.record({
     here: fc.dictionary(key, value),

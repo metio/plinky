@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { nextIn } from "../../../core/cycle";
@@ -61,7 +61,7 @@ export function KeyboardQuickControls({
     // omits the pair and the cycle button stays off the bar.
     noteHints?: NoteHints;
     onNoteHints?: (value: NoteHints) => void;
-    // Your instrument is sounding your notes already, so Plinky stays out of the way.
+    // Your instrument is sounding your notes already, so Klimpi stays out of the way.
     // Optional, like the hint pair: a surface with no instrument in play omits it.
     instrumentSounds?: boolean;
     onInstrumentSounds?: (value: boolean) => void;

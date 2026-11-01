@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cookieValue } from "../core/localeCarry";
@@ -203,7 +203,7 @@ const escapeHtml = (value) =>
 const fill = (message, values) =>
     message.replace(/\{(\w+)\}/g, (whole, key) => (key in values ? values[key] : whole));
 
-const SITE_NAME = "Plinky";
+const SITE_NAME = "Klimpi";
 
 // One shelf of the catalogue: a grade, or an era.
 //
@@ -214,7 +214,7 @@ const SITE_NAME = "Plinky";
 // credits, read from the other end.
 function shelf(list, page, strings, people) {
     const path = `/music/${page.kind}/${encodeURIComponent(page.id)}/`;
-    const origin = "https://plinky.fun";
+    const origin = "https://klimpi.app";
     const url = (to) => `${origin}/${page.locale}${to}`;
     let ids;
     let headline;
@@ -393,7 +393,7 @@ export function describe(list, page, about = null) {
         .map((id) => ({ id, ...list.pieces[id] }))
         .filter((piece) => piece.title)
         .sort((a, b) => (a.grade ?? 99) - (b.grade ?? 99) || a.title.localeCompare(b.title));
-    const url = (locale, to) => `https://plinky.fun/${locale}${to}`;
+    const url = (locale, to) => `https://klimpi.app/${locale}${to}`;
     return {
         path,
         headline: person.name,
@@ -444,7 +444,7 @@ export function describe(list, page, about = null) {
 // data twice. So this writes what app/root.tsx writes, where it writes it, and nothing
 // the app would not.
 export function shellFor(shell, list, locale, path) {
-    const origin = "https://plinky.fun";
+    const origin = "https://klimpi.app";
     const pageUrl = `${origin}/${locale}${path}`;
     const strings = list.strings[locale] ?? list.strings[list.base] ?? {};
     const cluster = [
@@ -528,7 +528,7 @@ export function documentFor(shell, list, page, about = null) {
     if (!described) {
         return null;
     }
-    const origin = "https://plinky.fun";
+    const origin = "https://klimpi.app";
     const { locale } = page;
     const title = `${described.headline} · ${SITE_NAME}`;
     const crumbs = {

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
@@ -155,7 +155,7 @@ function SessionRow({
     );
 }
 
-// Time spent at a piano Plinky never heard. A practice diary that only counts what
+// Time spent at a piano Klimpi never heard. A practice diary that only counts what
 // it measured undercounts every player who owns an acoustic instrument, and the
 // report they hand a teacher would be wrong in the direction that matters.
 function BackLogForm({ now }: { now: Date }) {
@@ -288,7 +288,7 @@ export function PracticeReport({
                 new Date(at).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
             ),
             "text/csv",
-            "plinky-practice.csv",
+            "klimpi-practice.csv",
         );
 
     return (

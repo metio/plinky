@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {
@@ -9,7 +9,7 @@ import {
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { PREFIX } from "./resetDevice";
 
-// Reading and restoring a whole device's Plinky state through the storage seam.
+// Reading and restoring a whole device's Klimpi state through the storage seam.
 // The bundle format itself is `core/progressPack`; this is the half that knows
 // where the values live.
 //
@@ -44,7 +44,7 @@ export function countProgressEntries(kv: KeyValueStore): number {
     return Object.keys(readEntries(kv)).length;
 }
 
-// This device's whole Plinky state as a bundle. `savedAt` is supplied by the
+// This device's whole Klimpi state as a bundle. `savedAt` is supplied by the
 // caller (the clock is an adapter concern, not this module's).
 export function exportProgress(kv: KeyValueStore, savedAt: string): string {
     return serializeProgress(readEntries(kv), savedAt);

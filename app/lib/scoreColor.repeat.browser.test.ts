@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
@@ -116,11 +116,11 @@ describe("the ghost's mark beside the run's colour", () => {
 
         litHalos([{ element: c!, color: PLAYED_COLOR }]);
         markGhost([c!, d!], "#123456");
-        expect(document.querySelectorAll("rect.plinky-ghost-mark")).toHaveLength(2);
+        expect(document.querySelectorAll("rect.klimpi-ghost-mark")).toHaveLength(2);
         // The repeat uncolours C while the ghost sits on it.
         clearHalosWithin(osmd, { from: 0, to: 0 });
         unmarkGhost([c!, d!]);
-        expect(document.querySelectorAll("rect.plinky-ghost-mark")).toHaveLength(0);
+        expect(document.querySelectorAll("rect.klimpi-ghost-mark")).toHaveLength(0);
         expect(haloColor(c!)).toBeNull();
         expect(haloColor(d!)).toBeNull();
 

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { TEMPO_MAX, TEMPO_MIN } from "./playback";
@@ -190,7 +190,7 @@ export function parseAssignment(json: string): Assignment {
         throw new Error("That file is not valid JSON.");
     }
     if (!isRecord(data) || data.format !== FORMAT) {
-        throw new Error("That is not a Plinky assignment.");
+        throw new Error("That is not a Klimpi assignment.");
     }
     if (!Array.isArray(data.items)) {
         throw new Error("The assignment has no items.");

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -50,7 +50,7 @@ function engraving(count: number) {
     return { svg, notes };
 }
 
-const halosIn = (svg: SVGSVGElement) => svg.querySelectorAll(".plinky-note-halo").length;
+const halosIn = (svg: SVGSVGElement) => svg.querySelectorAll(".klimpi-note-halo").length;
 
 const COLORS = ["#16a34a", "#dc2626", "#2563eb"];
 
@@ -228,7 +228,7 @@ describe("the marks a run leaves on the score", () => {
                 // The ghost passing over a note leaves no trace in what the run recorded.
                 expect(haloColor(note)).toBe(played);
                 expect(halosIn(svg)).toBe(1);
-                expect(svg.querySelectorAll(".plinky-ghost-mark").length).toBe(0);
+                expect(svg.querySelectorAll(".klimpi-ghost-mark").length).toBe(0);
             }),
         );
     });

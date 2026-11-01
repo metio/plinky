@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -76,7 +76,7 @@ describe("routeRules", () => {
 
 describe("writeSpaFallback", () => {
     it("writes the shell and the route rules into the build output", () => {
-        const out = mkdtempSync(join(tmpdir(), "plinky-spa-"));
+        const out = mkdtempSync(join(tmpdir(), "klimpi-spa-"));
         writeFileSync(`${out}/__spa-fallback.html`, "<!doctype html><title>shell</title>");
 
         const { rules } = writeSpaFallback(out);
@@ -91,7 +91,7 @@ describe("writeSpaFallback", () => {
     it("fails when the build emitted no shell to fall back to", () => {
         // An empty 404.html would be a blank page for every catalogue piece, so a missing
         // fallback has to stop the deploy rather than produce one.
-        const out = mkdtempSync(join(tmpdir(), "plinky-spa-"));
+        const out = mkdtempSync(join(tmpdir(), "klimpi-spa-"));
         expect(existsSync(`${out}/__spa-fallback.html`)).toBe(false);
         expect(() => writeSpaFallback(out)).toThrow(/emitted no SPA fallback/);
     });

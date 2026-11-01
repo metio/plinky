@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
@@ -24,7 +24,7 @@ export function meta(_args: Route.MetaArgs) {
     ];
 }
 
-// The two founders, in the order the operation runs: Sol leads and gives Plinky
+// The two founders, in the order the operation runs: Sol leads and gives Klimpi
 // its warmth; Sebastian builds it. Each title is kept in the founder's own
 // language — "La Jefa" is Spanish (Sol is Mexican), "der Architekt" German
 // (Sebastian is German) — so both are literals, like the names. Only the bios
@@ -44,7 +44,7 @@ const FOUNDERS = [
     },
 ] as const;
 
-// A two-note "plink" — Plinky's own motif, and here a small duet standing in for
+// A two-note "plink" — Klimpi's own motif, and here a small duet standing in for
 // the two people. Decorative, so it's hidden from assistive tech.
 function DuetMark() {
     return (
@@ -62,9 +62,9 @@ export default function About() {
     const [kiss, setKiss] = useState(0);
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            {/* What Plinky is, kept somewhere it stays. The front page offers this to a
+            {/* What Klimpi is, kept somewhere it stays. The front page offers this to a
                 first visit and then steps aside for the day's practice, which is right
-                there and would leave a player who wanted to explain Plinky to somebody
+                there and would leave a player who wanted to explain Klimpi to somebody
                 with nowhere to point. */}
             <header className="space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
@@ -72,7 +72,7 @@ export default function About() {
                 </p>
                 {/* The same display face every page's title is set in — this one keeps a
                     step of extra size on a wide screen, being the page that says what
-                    Plinky is rather than one you work on. */}
+                    Klimpi is rather than one you work on. */}
                 <h1 className="text-balance font-display text-3xl font-semibold tracking-tight sm:text-4xl">
                     {m.home_heading()}
                 </h1>
@@ -181,10 +181,10 @@ export default function About() {
                     {m.about_contact_body()}
                 </p>
                 <a
-                    href="mailto:contact@plinky.fun"
+                    href="mailto:contact@klimpi.app"
                     className="inline-block rounded-full bg-accent-surface px-4 py-1.5 text-sm font-medium text-accent-strong transition hover:bg-accent-fill"
                 >
-                    contact@plinky.fun
+                    contact@klimpi.app
                 </a>
             </section>
         </main>

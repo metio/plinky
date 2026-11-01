@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Where Plinky can be followed, written down once.
+// Where Klimpi can be followed, written down once.
 //
 // These are read by the site footer, by every promo video's description and by every
 // composer playlist. They had drifted: the Facebook Page was linked by
@@ -22,13 +22,13 @@ export type Channel = {
 };
 
 export const CHANNELS: readonly Channel[] = [
-    { brand: "instagram", label: "Instagram", href: "https://www.instagram.com/plinky.piano" },
+    { brand: "instagram", label: "Instagram", href: "https://www.instagram.com/klimpi.piano" },
     // The clean numeric path, not profile.php?id=…. A username on the Page would be better
-    // still — facebook.com/plinkypiano — and only its owner can claim one.
+    // still — facebook.com/klimpipiano — and only its owner can claim one.
     { brand: "facebook", label: "Facebook", href: "https://www.facebook.com/61591963944991" },
     // The handle rather than the channel id: it is the same channel, and this form stays
     // readable in a status bar and survives being renamed.
-    { brand: "youtube", label: "YouTube", href: "https://www.youtube.com/@PlinkyPiano" },
-    { brand: "reddit", label: "Reddit", href: "https://www.reddit.com/r/plinky_piano/" },
-    { brand: "github", label: "GitHub", href: "https://github.com/metio/plinky" },
+    { brand: "youtube", label: "YouTube", href: "https://www.youtube.com/@KlimpiPiano" },
+    { brand: "reddit", label: "Reddit", href: "https://www.reddit.com/r/klimpi_piano/" },
+    { brand: "github", label: "GitHub", href: "https://github.com/metio/klimpi" },
 ];

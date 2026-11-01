@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -27,7 +27,7 @@ import { Button } from "../ui/button";
 
 // Read a rhythm and tap it back.
 //
-// Rhythm is graded everywhere else in Plinky as a by-product of playing pitches, which
+// Rhythm is graded everywhere else in Klimpi as a by-product of playing pitches, which
 // leaves nowhere to work on reading a rhythm by itself — and hides which of the two a
 // wobbly run was. Here there is no pitch at all: one line, one sound, and the only
 // question is when. Anything counts as a tap, because what is being tested is the

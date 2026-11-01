@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The scale a piece is built from, offered before you play it.
@@ -6,7 +6,7 @@
 // A piece in E♭ major is three flats a hand has to find without looking. Playing the E♭
 // scale once first is what a teacher would ask for, and it is the oldest piece of piano
 // pedagogy there is: the skill in isolation, then the same skill in real music, minutes
-// apart. What makes it worth building rather than assuming is that Plinky knows the key
+// apart. What makes it worth building rather than assuming is that Klimpi knows the key
 // exactly — the score is parsed on the way in, so this is read rather than guessed.
 //
 // It is an offer and never a requirement. Gating the piece behind the scale is the shape

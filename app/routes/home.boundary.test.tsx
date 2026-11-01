@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -46,7 +46,7 @@ describe("Home with a broken panel", () => {
         expect(screen.getByText(m.feature_broken())).toBeTruthy();
         // …and everything around it still works.
         // The day's heading goes down with the panel that owns it; what the page says
-        // Plinky is does not.
+        // Klimpi is does not.
         expect(screen.getByText(m.home_heading())).toBeTruthy();
         expect(screen.getByText(m.home_eyebrow())).toBeTruthy();
         expect(screen.getByRole("button", { name: m.action_try_again() })).toBeTruthy();

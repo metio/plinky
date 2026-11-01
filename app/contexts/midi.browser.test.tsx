@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { render, screen, waitFor } from "@testing-library/react";
@@ -151,7 +151,7 @@ describe("MidiProvider over the fake seam in a real browser", () => {
     });
 });
 
-describe("the __plinky bridge", () => {
+describe("the __klimpi bridge", () => {
     it("drives raw bytes through the parse pipeline and reads state back", async () => {
         render(
             <ServicesProvider services={{ midi: fakeMidi() }}>
@@ -160,7 +160,7 @@ describe("the __plinky bridge", () => {
                 </MidiProvider>
             </ServicesProvider>,
         );
-        const bridge = window.__plinky;
+        const bridge = window.__klimpi;
         expect(bridge).toBeDefined();
 
         bridge?.midiBytes([0x91, 72, 88]); // channel 2 note-on C5

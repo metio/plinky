@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect } from "react";
@@ -8,7 +8,7 @@ import { pageTitle } from "../../core/site";
 //
 // A route's meta() is static: it runs before anything has loaded, and for a catalogue
 // piece — three thousand of the pieces, everything that is not bundled into the app —
-// it knows only that a piece is being opened. So the document said "Play · Plinky" for
+// it knows only that a piece is being opened. So the document said "Play · Klimpi" for
 // every one of them, and kept saying it after the piece was on screen. A crawler that
 // runs the app reads the document as it stands once the app has run, which is what a
 // search result shows: three thousand pieces, one title between them.

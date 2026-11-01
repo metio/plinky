@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 version = 1
@@ -8,7 +8,7 @@ version = 1
 [[annotations]]
 path = ["package.json", "package-lock.json", "tsconfig.json", "renovate.json", "biome.json", "knip.json", "lighthouserc.json", "public/manifest.webmanifest", "messages/*.json", "project.inlang/settings.json"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The IndexNow key file. Its whole content is the key, which is how a search engine
@@ -17,7 +17,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = ["public/f20affed073f07eb6d5c409f78c1ee70.txt"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # flake.lock is nix-generated JSON; it pins the toolchain both CI and local
@@ -25,7 +25,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = "flake.lock"
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # Catalog scores (MusicXML) are transcriptions/arrangements of public-domain or
@@ -34,7 +34,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = ["scores/*.musicxml"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "CC0-1.0"
 
 # The curated song catalogue: scores harvested from several public-domain sources (PDMX,
@@ -97,7 +97,7 @@ path = [
     "dev/models/traces/*/*.itf.json",
 ]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # What Wikidata says about the composers the catalogue credits — a line, the years, and
@@ -112,7 +112,7 @@ SPDX-License-Identifier = "CC0-1.0"
 [[annotations]]
 path = ["public/songs/manifest.json"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The same manifest cut into slices, so opening one piece reads about ten kilobytes
@@ -120,7 +120,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = ["public/songs/index/*.json"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The named works — an opus, a book of studies, a suite — resolved to the piece ids the
@@ -128,7 +128,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = ["public/songs/builtin-assignments.json"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The finger-exercise catalogue. Scales/arpeggios are generated client-side (no
@@ -138,7 +138,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = ["public/exercises/manifest.json"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
@@ -153,14 +153,14 @@ SPDX-License-Identifier = "CC0-1.0"
 [[annotations]]
 path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The brand kit: every file in it is rendered by dev/build-brand.mjs from the app's own
 # tokens and the logo artwork, so they are our own art and carry the project's licence. The
 # JSON and the images cannot hold a comment; the README does and is left alone.
 #
-# The artwork itself — brand/source/*.png as it was drawn, brand/plinky-*.png with the
+# The artwork itself — brand/source/*.png as it was drawn, brand/klimpi-*.png with the
 # background keyed out by dev/key-mark.mjs — is ours too. So is the vector mark in
 # brand/proposed-mark, which the app does not ship, and the outlined name beside it; both are
 # written by dev/build-mark.mjs and each SVG also carries the two SPDX lines as an XML
@@ -168,7 +168,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = ["brand/**/*.png", "brand/**/*.svg", "brand/palette.json"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The design-sync settings: our own configuration for the component sync, in a format that
@@ -176,7 +176,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = [".design-sync/config.json", ".design-sync/tsconfig.types.json"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # Story screenshot baselines: rendered from our own components by the visual
@@ -184,7 +184,7 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = ["app/**/__story-shots__/**/*.png"]
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # A tsconfig for typechecking dev/*.mts, which the main one excludes. JSON carries no
@@ -192,6 +192,6 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 [[annotations]]
 path = "tsconfig.devcheck.json"
 precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-FileCopyrightText = "The Klimpi Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 

@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 """Harvests public-domain choral editions from CPDL (ChoralWiki) into two-staff piano MusicXML.
@@ -21,7 +21,7 @@ Two phases so the large scrape is resumable and its yield is known before downlo
 Needs music21, which the flake does not carry. Run it in the Mutopia image, which
 installs it for the same reason:
   ilo --no-rc shell --remote-user pwuser --update-remote-user-uid \
-    --containerfile dev/mutopia.Containerfile dev/plinky-mutopia:latest bash -c '…'
+    --containerfile dev/mutopia.Containerfile dev/klimpi-mutopia:latest bash -c '…'
   python3 dev/cpdl-harvest.py plan sources/cpdl/plan.json
   python3 dev/cpdl-harvest.py reduce sources/cpdl/plan.json sources/cpdl/_mxl [--limit N]
 """
@@ -36,7 +36,7 @@ import urllib.request
 from pathlib import Path
 
 API = "https://www.cpdl.org/wiki/api.php"
-UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) plinky-catalogue-research"}
+UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) klimpi-catalogue-research"}
 
 
 def api(**params):

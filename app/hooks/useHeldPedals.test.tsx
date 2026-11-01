@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -30,7 +30,7 @@ describe("useHeldPedals", () => {
     it("starts the engine under a pedal already held on arrival", () => {
         const { audio, arrive } = mount();
         act(() => {
-            window.__plinky?.pedal("sustain", true);
+            window.__klimpi?.pedal("sustain", true);
         });
         arrive();
         expect(audio.pedals).toEqual([
@@ -43,8 +43,8 @@ describe("useHeldPedals", () => {
     it("lifts a pedal the engine was last told was down, once the foot is up", () => {
         const { audio, arrive } = mount();
         act(() => {
-            window.__plinky?.pedal("soft", true);
-            window.__plinky?.pedal("soft", false);
+            window.__klimpi?.pedal("soft", true);
+            window.__klimpi?.pedal("soft", false);
         });
         arrive();
         expect(audio.pedals).toContainEqual({ pedal: "soft", down: false });

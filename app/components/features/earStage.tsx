@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
@@ -11,7 +11,7 @@ import { EarIcon } from "../ui/icons";
 import { m } from "../../paraglide/messages.js";
 
 // The listening surface. It stays dark in both themes on purpose: everywhere else in
-// Plinky there is something to read, and here there deliberately isn't — the panel is
+// Klimpi there is something to read, and here there deliberately isn't — the panel is
 // a lights-off stage that says the answer is in your ears, not on the screen.
 //
 // The only thing it draws is one dot per note, blooming exactly when that note sounds.

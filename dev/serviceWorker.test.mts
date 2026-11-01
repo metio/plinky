@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { readFileSync } from "node:fs";
@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 // gets with no network is asserted on the file the deploy ships rather than on a
 // description of it.
 
-const ORIGIN = "https://plinky.fun";
+const ORIGIN = "https://klimpi.app";
 const SOURCE = readFileSync("public/sw.js", "utf8")
     .replace("__BUILD_HASH__", "test")
     .replace("__PRECACHE__", "/assets/entry-abc.js");
@@ -386,7 +386,7 @@ describe("a new build taking over", () => {
     );
 
     it("keeps the piano recordings the page stored in a cache of its own", async () => {
-        const recording = "https://samples.plinky.fun/v1/C4v8.m4a";
+        const recording = "https://samples.klimpi.app/v1/C4v8.m4a";
         world.caches.set("plinky-piano-v1", new Map([[recording, new Response("C4")]]));
         await world.activate();
         const piano = world.caches.get("plinky-piano-v1");

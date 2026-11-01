@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The score-submission check (.github/scripts/validate-submission.mjs) without the
@@ -55,11 +55,11 @@ export async function checkSubmission(body, render) {
     } else {
         const result = await render(xml);
         if (!result.ok) {
-            problems.push("Plinky couldn't render this MusicXML — please check that it is valid.");
+            problems.push("Klimpi couldn't render this MusicXML — please check that it is valid.");
         } else {
             notes = result.count;
             if (notes === 0) {
-                problems.push("The score has no playable notes — Plinky could not use it.");
+                problems.push("The score has no playable notes — Klimpi could not use it.");
             }
         }
     }
@@ -72,7 +72,7 @@ export async function checkSubmission(body, render) {
 
     const lines = [
         problems.length === 0
-            ? `✅ **Looks good!** This renders and plays ${notes} note${notes === 1 ? "" : "s"} in Plinky. A maintainer will review it and add it to the catalog.`
+            ? `✅ **Looks good!** This renders and plays ${notes} note${notes === 1 ? "" : "s"} in Klimpi. A maintainer will review it and add it to the catalog.`
             : `⚠️ **This needs a change before it can be added:**\n${problems.map((problem) => `- ${problem}`).join("\n")}`,
     ];
     if (licensed) {

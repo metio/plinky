@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -10,7 +10,7 @@ import { resetDevice } from "./resetDevice";
 afterEach(() => localStorage.clear());
 
 describe("resetDevice", () => {
-    it("clears every plinky key and leaves others untouched", () => {
+    it("clears every klimpi key and leaves others untouched", () => {
         localStorage.setItem("plinky:prefs", "{}");
         localStorage.setItem("plinky:mastery:scale-c-major", "{}");
         localStorage.setItem("plinky:scores", "[]");

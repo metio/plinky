@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Renders short promo clips of catalogue pieces, for posting.
@@ -6,7 +6,7 @@
 // The app's video export runs in a browser — WebCodecs for the picture, an offline audio
 // render for the sound — so this drives a headless Chromium against the dev server and
 // asks it to run the app's own painter and encoder (dev/promo/renderPromo.ts). Nothing is
-// reimplemented here: a clip that does not look like Plinky is not worth posting.
+// reimplemented here: a clip that does not look like Klimpi is not worth posting.
 //
 // Usage: npm run promo:videos [-- --out dir] [--seconds 20] [--size 1080] [--fps 60]
 //        [--youtube] landscape 1920x1080, the whole piece · [--shorts] portrait 1080x1920
@@ -86,10 +86,10 @@ const FPS = Number(argValue("--fps") ?? 60);
 // the thumb, and that only holds while the mapping never moves.
 const NOTE_COLOR = "finger";
 // The recorded piano, unless asked for the synthesised one. A clip is the first time most
-// people hear Plinky, and the instrument it advertises should be the good one.
+// people hear Klimpi, and the instrument it advertises should be the good one.
 const SAMPLES = process.argv.includes("--synth")
     ? undefined
-    : (argValue("--samples") ?? "https://samples.plinky.fun/v1");
+    : (argValue("--samples") ?? "https://samples.klimpi.app/v1");
 const KEYBOARD_DEPTH = "shallow";
 // The dev server this run drives. Overridable so a one-off clip can be rendered beside a
 // long batch without the two ever sharing a server — which is the thing startDevServer
@@ -100,7 +100,7 @@ const PORT = Number(argValue("--port") ?? 5199);
 const ONLY = argValue("--only");
 // Render the named works instead of the curated shelf: every CC0 piece of every built-in
 // assignment, so each collection can go up as a playlist somebody can work through without
-// ever opening Plinky. Full length only is the point there — a twenty-five-second cut of a
+// ever opening Klimpi. Full length only is the point there — a twenty-five-second cut of a
 // study teaches nobody anything — so this implies --youtube.
 const COLLECTIONS = process.argv.includes("--collections");
 // Pick up where a previous run stopped, rather than re-rendering an hour of finished
@@ -358,7 +358,7 @@ try {
                 {
                     scoreUrl: url,
                     title: piece.title,
-                    // No plinky.fun here: the wordmark already rides the top-right corner, and
+                    // No klimpi.app here: the wordmark already rides the top-right corner, and
                     // the credit line is for what the catalogue owes the source.
                     //
                     // And no licence line. Every promo piece is CC0 — scoreUrl refuses anything

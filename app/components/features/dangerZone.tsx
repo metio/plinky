@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
@@ -9,7 +9,7 @@ import { ConfirmButton } from "../ui/confirmButton";
 import { TrashIcon } from "../ui/icons";
 import { SettingsSection } from "../ui/settingsSection";
 
-// Erase all of this device's Plinky data and start fresh. Destructive and
+// Erase all of this device's Klimpi data and start fresh. Destructive and
 // irreversible, so it sits behind the app-wide two-click ConfirmButton; the copy
 // points at the Library backup for anyone who wants to keep their scores first.
 export function DangerZone() {
@@ -26,7 +26,7 @@ export function DangerZone() {
         // key with everything else, and the leftover check underneath stays honest.
         void samples.forget();
         resetDevice(store);
-        // A refused removal leaves Plinky keys behind. Reloading would hide that the
+        // A refused removal leaves Klimpi keys behind. Reloading would hide that the
         // wipe never took, so report it and let the player try again instead.
         if (store.keys().some((key) => key.startsWith(PREFIX))) {
             setFailed(true);

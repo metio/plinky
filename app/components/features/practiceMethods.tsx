@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { Link } from "react-router";
@@ -120,7 +120,7 @@ function MethodAction({
     );
 }
 
-// One way to practise, opened: its drawing in the margin, then why it works, what Plinky
+// One way to practise, opened: its drawing in the margin, then why it works, what Klimpi
 // gives you to do it with, how long a go at it takes, and a button that opens a piece with
 // it already set up.
 //
@@ -153,7 +153,7 @@ export function MethodLeaf({ id, method }: { id: string; method: PracticeMethod 
                 </h3>
                 <p className="leading-relaxed text-body">{WHY[method.id]()}</p>
                 <p className="leading-relaxed text-muted">
-                    <span className="font-semibold text-body">{m.methods_in_plinky()}:</span>{" "}
+                    <span className="font-semibold text-body">{m.methods_in_klimpi()}:</span>{" "}
                     {HOW[method.id]()}
                 </p>
                 <p className="text-sm text-muted first-letter:uppercase">

@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Cosmetic skins for the on-screen keyboard's resting keys — the unpressed white and
 // black key colours. Purely decorative: the lit / expected-next / wrong-note feedback
 // colours are untouched (they carry meaning, so a skin never dims them), and so are the
-// keys' shape and behaviour. Every skin is free and available from the first day — Plinky
+// keys' shape and behaviour. Every skin is free and available from the first day — Klimpi
 // never locks looks behind progress. "classic" is the default and byte-identical to the
 // keyboard's original palette, so the app looks unchanged until a skin is chosen.
 export type KeyboardTheme = {

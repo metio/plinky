@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // What a downloadable Salamander pack would weigh, measured rather than guessed.
@@ -61,7 +61,7 @@ function chosen(list, count) {
     });
 }
 
-const work = mkdtempSync(join(tmpdir(), "plinky-pack-"));
+const work = mkdtempSync(join(tmpdir(), "klimpi-pack-"));
 try {
     console.log(`\nOpus ${BITRATE} kb/s, first ${TAIL}s of each recording:\n`);
     console.log("  layers   files      pack size   per key");

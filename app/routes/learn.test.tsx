@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -71,7 +71,7 @@ describe("the Learn page", () => {
         };
         show({ audio });
 
-        // Only a key that is pressed makes a note in Plinky; a list is read, not played.
+        // Only a key that is pressed makes a note in Klimpi; a list is read, not played.
         for (const link of screen.getAllByRole("link")) {
             fireEvent.pointerEnter(link, { pointerType: "mouse" });
             fireEvent.pointerEnter(link, { pointerType: "touch" });

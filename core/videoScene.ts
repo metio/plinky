@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The pure layout of the exported video's scene: where each piano key sits and
@@ -134,7 +134,7 @@ export function highwayBlocks(
 
 // The credit line burnt into the video: the composer and the source. A shared file must
 // carry the piece's provenance with it; the licence goes on the line below (licenseLine)
-// and the wordmark's "plinky.fun" is rendered separately by the painter.
+// and the wordmark's "klimpi.app" is rendered separately by the painter.
 export function provenanceLine(attribution: Attribution): string {
     const parts: string[] = [];
     if (attribution.composer) {

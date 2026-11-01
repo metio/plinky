@@ -1,14 +1,24 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # What's new
 
-Plinky has no version numbers and no release days — every change goes live the moment
+Klimpi has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
 ## 1 November 2026
+
+**Plinky is now Klimpi.** New name, new mark — a piano keyboard standing upright as
+the K, with the key you press in fuchsia. Everything you have done is still here:
+your scores, your pieces, your takes, all on your device as before. Nothing to sign
+in to, nothing to move across.
+
+**A new set of colours to go with it.** Fuchsia for what you press, aubergine for
+the page at night, brass for what you earned. It opens this way, and the two you
+already know are still in Settings → Colours: Indigo and Violet. Any of the three
+works in light, dark or black, so pick the pair you like.
 
 **A link that opens a particular ear drill, or the shelf's Manage tab, opens without
 redrawing itself.** A link naming an exercise and its level — a review link, or one
@@ -33,7 +43,7 @@ now opens saying nothing has arrived yet, and fills in with what your device hol
 
 ## 27 September 2026
 
-**Calmer colours, and a black theme.** Plinky wears deep indigo on paper white, with
+**Calmer colours, and a black theme.** Klimpi wears deep indigo on paper white, with
 soft forget-me-not blue where it used lilac and gold, and cooler greys so the page
 reads more clearly. If you liked the violet, Settings brings it back under Colours.
 The theme can also be Black: a true-black page for phone screens at night, in either
@@ -142,7 +152,7 @@ announced the logo's link home in English on every page, in the middle of a
 French or Japanese one. It now reads in the language of the page.
 
 **A glossary link without a language opens the glossary.** An address like
-plinky.fun/glossary/piano/, typed by hand or copied without its language, opened
+klimpi.app/glossary/piano/, typed by hand or copied without its language, opened
 the free-play keyboard instead of the entry for the piano mark. It now opens the
 entry, in your language.
 
@@ -168,7 +178,7 @@ quieter or louder than the piano, or had a crescendo the piano didn't, Listen
 played the piano at the singer's level, and a run asked you for it too. The piano
 now keeps to the dynamics and pedalling written for it.
 
-**Stopping a duet stops the other hand.** While Plinky played the other hand for
+**Stopping a duet stops the other hand.** While Klimpi played the other hand for
 you, pressing Stop, leaving full screen or starting Listen left the notes it had
 lined up still playing, one after another, on a page where nothing was running,
 and under Listen they came out of step with it. Stopping now silences the other
@@ -242,12 +252,12 @@ and could even name the wrong hand as the one lagging. Your grade already left s
 out of its timing, and now the grid and the strip do too. A skipped note still counts
 as a slip, and on the strip it shows as just its red ring, with no timing dot.
 
-**With the microphone on, your first notes after stopping Listen are heard.** Plinky
+**With the microphone on, your first notes after stopping Listen are heard.** Klimpi
 ignores what the microphone hears of its own speaker, and it kept ignoring a note
 Listen had played for as long as that note would have rung, even once Stop had
 silenced it. Start a piece straight after listening and its opening notes, the ones
 Listen had just played, could go unheard for a few seconds. A stopped note now stops
-counting as Plinky's own the moment it goes quiet.
+counting as Klimpi's own the moment it goes quiet.
 
 **Every note is called what your keys call it.** The keys could say do re mi, but
 the chord under your hands, the ear-training keys, the key mapping, the tools and
@@ -266,9 +276,9 @@ still rename it.
 
 **A screen reader names the piano's keys in your language.** Every key on the
 on-screen keyboard, and the wrong-note announcement, was read out in English
-whatever language Plinky was in, so a German page said "Falsche Note: F sharp 4".
+whatever language Klimpi was in, so a German page said "Falsche Note: F sharp 4".
 Keys are now read out in your language, with the same note names as the rest of
-Plinky: "Falsche Note: Fis 4" in German, with H for B natural, and "Mauvaise note :
+Klimpi: "Falsche Note: Fis 4" in German, with H for B natural, and "Mauvaise note :
 do dièse 4" in French.
 
 **In German, the circle of fifths calls B natural H.** German reads the letter B as
@@ -316,7 +326,7 @@ logged, while the week, the month and the year showed it. It now adds up every
 sitting since your first, and its calendar starts on that day.
 
 **An address without a language opens its page, slash or no slash.** Typing
-plinky.fun/music/, or taking the language out of a link you copied, opened the Today
+klimpi.app/music/, or taking the language out of a link you copied, opened the Today
 page, while the same address without the final slash opened Music. Both now open the
 page they name, in your language.
 
@@ -351,10 +361,10 @@ flat key went past seven. The transposition now always lands on the nearer name 
 new key, F major there, the way it already did for the moves that had two names to
 choose from.
 
-**Plinky opens without a connection, from its icon too.** With no network, opening
-Plinky from its icon on your home screen, or opening a page you had never visited on
-that device, showed your browser's own error page in place of Plinky. Both now open
-Plinky, and the pages you have visited open as they always did.
+**Klimpi opens without a connection, from its icon too.** With no network, opening
+Klimpi from its icon on your home screen, or opening a page you had never visited on
+that device, showed your browser's own error page in place of Klimpi. Both now open
+Klimpi, and the pages you have visited open as they always did.
 
 **Notes you are holding stop when you leave the page.** Hold a chord on the Piano
 page, in Compose, in the keyboard tour or on the home page's keyboard and follow a
@@ -364,9 +374,9 @@ leave.
 
 **The microphone hears every note you play, the same one twice included.** With the
 microphone listening on the Piano page, in Compose, on the home page's keyboard or in
-Keep up, Plinky played each note back over your piano, and a note you repeated soon
+Keep up, Klimpi played each note back over your piano, and a note you repeated soon
 after was taken for that echo and never heard, so it went missing from a sketch or a
-run. Plinky now leaves a piano it hears through the microphone to make its own sound.
+run. Klimpi now leaves a piano it hears through the microphone to make its own sound.
 
 **Keep up keeps time through grace notes.** In Keep up, a grace note held on for
 its whole written length before the note it decorates, and a very quick one a little
@@ -385,7 +395,7 @@ story.
 and a MIDI piano without speakers of its own all wrote notes onto the staff in
 complete silence, so the only way to hear a take was to stop and play it back. Every
 note now sounds as you play it, on the same piano and with the same pedals as the
-rest of Plinky.
+rest of Klimpi.
 
 **A pedal you are holding keeps working into the next run.** Finish a run with your
 foot still on the sustain pedal, press Practice again without lifting it, and the
@@ -404,7 +414,7 @@ run, and the recordings are back as soon as it ends.
 **The Piano page makes a sound.** A key pressed there lit up and that was all:
 whatever you played, on the screen, the computer keys or a MIDI piano without
 speakers of its own, was silent, and the pedals did nothing. Every note now sounds on
-the same piano as the rest of Plinky, for as long as you hold it, and all three pedals
+the same piano as the rest of Klimpi, for as long as you hold it, and all three pedals
 work. The pedals work on the keyboard on the home page now too.
 
 **A play-along or a sight-read after a finished run starts properly.** Finish a
@@ -431,13 +441,13 @@ a few bars inside a repeated passage, and after the first time through the curso
 box and the scrolling moved on to the bar printed next, while the notes you were
 asked for came from the start of the loop again. The cursor now goes back with you.
 
-**The recorded grand piano you downloaded stays downloaded.** Every time Plinky
+**The recorded grand piano you downloaded stays downloaded.** Every time Klimpi
 updated, the recordings kept on your device were thrown away with the old version, so
 a piano fetched for a flight could be gone by take-off, and with no network every note
 fell back to the plainer piano. They now stay on your device through updates.
 
-**Plinky opens in the language you picked.** Choose a language in Settings and then
-come back to plinky.fun, or open Plinky from your home screen, and it opened in your
+**Klimpi opens in the language you picked.** Choose a language in Settings and then
+come back to klimpi.app, or open Klimpi from your home screen, and it opened in your
 browser's language instead, every time. It now remembers your choice and opens in it,
 including a language you picked before today.
 
@@ -505,10 +515,10 @@ plain rest without its dot, and a triplet taken out lost its bracket and was dra
 ordinary quavers, so the bar on the page no longer added up. The rest now prints at
 exactly the value the note had, dot and triplet bracket included.
 
-**A video or sound file of a take finishes even when Plinky updates.** A long video
-takes minutes to make, and if a new version of Plinky arrived meanwhile, switching
+**A video or sound file of a take finishes even when Klimpi updates.** A long video
+takes minutes to make, and if a new version of Klimpi arrived meanwhile, switching
 tabs and coming back could reload the page halfway through, so the file never
-arrived and nothing said why. Plinky now waits until the file is saved before it
+arrived and nothing said why. Klimpi now waits until the file is saved before it
 updates.
 
 **A score you just added can be backed up straight away.** Add a score on the
@@ -542,13 +552,13 @@ address until the name is ready.
 **A screen reader names the colour theme in your language.** The button that
 switches between light, dark and your system's theme read its choice out in English,
 so a German reader heard "Design: dark" while the button said Dunkel. It now says the
-theme's name in the language Plinky speaks to you, and leaves out the picture beside
+theme's name in the language Klimpi speaks to you, and leaves out the picture beside
 it.
 
 **One of something is counted as one.** With a single piece due, the button offered
 to "Review 1 pieces"; a month with one day of playing said "1 days", a best day of
 one note said "1 notes", and a date set for tomorrow was "1 days away". Each now
-reads the way you would say it, in every language Plinky speaks, including those
+reads the way you would say it, in every language Klimpi speaks, including those
 that use a third or fourth form for a number, as Polish and Russian do. A date that
 falls today says "today" rather than "0 days away".
 
@@ -558,14 +568,14 @@ showed "1 Noten", "1 notes" or "1 notas", and a Music search with one match coun
 one score as several. Both now use the singular, and Polish, Czech, Russian and the
 other languages with more than two forms get the right one for every count.
 
-**Every count in Plinky agrees with its number.** With one learned piece, the home
+**Every count in Klimpi agrees with its number.** With one learned piece, the home
 page said "1 pieces on the stand", your very first note was "1 notes played", a
 composer with a single piece in the catalogue had "1 pieces to play", Compose
 counted the first note of a take as "1 notes", and a single report pasted in to
 collect a class's results read "1 reports", a set of a single piece offered to
 "Show the 1 pieces", a month you shared after one day of playing said "1 days", and
 a piece one bar long was "1 bars".
-Each now reads the way you would say it, in every language Plinky speaks, with the
+Each now reads the way you would say it, in every language Klimpi speaks, with the
 third and fourth forms Polish, Czech, Russian and their neighbours use for two, five
 or twenty-one. In Portuguese, a search with no matches found "0 partitura", as though
 nothing were one score; zero now takes the plural there, as it does in Portugal.
@@ -573,7 +583,7 @@ nothing were one score; zero now takes the plural there, as it does in Portugal.
 **Seconds are written with your own decimal comma.** The notes you are slowest to
 read on the Stats page, and the margin you beat or lost to a ghost by, always used a
 full stop: a German reader saw "1.4s" beside figures that elsewhere read "1,4". Both
-now follow the language Plinky speaks to you.
+now follow the language Klimpi speaks to you.
 
 ## 9 September 2026 — night
 
@@ -633,7 +643,7 @@ left on the end of a name no longer makes a second Bartók; and initials that me
 somebody already in the catalogue now lead to them, so Rachmaninoff's pieces are all
 in one place.
 
-**Links without a language in them work again.** An address like `plinky.fun/about`
+**Links without a language in them work again.** An address like `klimpi.app/about`
 — the shape a link takes when it is copied out of somewhere that dropped the
 language — had quietly stopped working for a dozen pages, including Help, the
 glossary and the two legal pages, and answered "page not found" instead of sending
@@ -657,7 +667,7 @@ what was on screen and nothing else, so there was no way to send somebody the an
 list writes it there: a fermata is at `/glossary/fermata`, with its engraving, its
 keyboard and both readings of the phrase, exactly as before.
 
-**What changed, and when, is now a page on the site.** Plinky has no version numbers
+**What changed, and when, is now a page on the site.** Klimpi has no version numbers
 and no release days — everything goes live the moment it is finished — so this list
 is the only record there is, and until now reading it meant leaving for a file on a
 code-hosting site. It is the "What is new" link at the foot of every page.
@@ -695,7 +705,7 @@ had only asked for the written force, so the notes it shaded quieter were covere
 by the built-in voice — which is what made a repeated passage sound muffled the
 second time through.
 
-**plinky.fun opens in your language straight away.** The bare address used to load
+**klimpi.app opens in your language straight away.** The bare address used to load
 an empty page first and only then send you to your language. It is sent on before
 anything loads now, in the language your browser asks for, or English — which is
 also what a search engine is shown, instead of a blank page.
@@ -713,7 +723,7 @@ It answers "not found" now, so a browser, a search engine and a bookmark all lea
 the truth, while every piece and composer that exists opens exactly as before.
 
 **Old links land where the page went.** A link to a page that has since moved —
-the old You page, the Library, the separate trainers — or a link from before Plinky
+the old You page, the Library, the separate trainers — or a link from before Klimpi
 spoke twenty-six languages, with no language in its address, used to answer with
 "not found" until the app had loaded and sent you on. It is sent on straight away
 now, so a bookmark or a search result still opens the right page.
@@ -733,7 +743,7 @@ broken chord, one tone to a beat, which is how most left hands actually meet a
 chord. Every combination has its own address, so a link opens the same exercise
 for anyone.
 
-**Keep Plinky on this device.** A new switch in Settings fetches every page of the
+**Keep Klimpi on this device.** A new switch in Settings fetches every page of the
 app on each visit — about a megabyte when a new version ships, and nothing when
 it hasn't — so wherever you practise without a connection, every page is there.
 Pieces you open are kept as you go, as they always were.
@@ -791,7 +801,7 @@ bass they cannot manage yet. And before a run, a new panel says what the piece i
 built on: its chords, commonest first, the loop it keeps coming back to, with a link
 to practise the key's chord set and one to hear the progression in the ear drill.
 
-**The chords, named on the page.** Turn on *Name the chords* and Plinky writes C, Am,
+**The chords, named on the page.** Turn on *Name the chords* and Klimpi writes C, Am,
 G7 above the staff wherever the notes make a chord clear — read off the notes, since
 most scores write no symbols of their own — so a bar reads as the shape it is built
 on, and a shape you know from one piece is the same in the next. It stays quiet where
@@ -820,7 +830,7 @@ again are cleared, in Practice, Keep up and Listen alike.
 section, the green landed a few notes behind where you were, and once the run had
 left the section no note was coloured at all — on a piece opening with three
 repeated bars, bar 4 was the last to turn green. Uncolouring the repeated bars left
-Plinky's place in the score at the top; it stays where you are now.
+Klimpi's place in the score at the top; it stays where you are now.
 
 **Two composers are two composers, in any language.** A credit joining two people
 with the Spanish *y* — "Lemoine y Carulli" — was read as one composer with an odd
@@ -857,7 +867,7 @@ its own strike to its own lift.
 **A piano's own notes are timed by the piano.** Notes from a MIDI instrument are now
 stamped when the key went down rather than when the browser got round to reading
 them, so a busy page repainting a score no longer nudges your timing. And in Keep
-up, a digital piano that makes its own sound is no longer echoed by Plinky as well
+up, a digital piano that makes its own sound is no longer echoed by Klimpi as well
 — the same rule the rest of the app already follows.
 
 **Settings has an index down the side.** The page had grown to a dozen sections and
@@ -927,10 +937,10 @@ stopped the moment the tune moved. Every note now sounds where it is written, an
 tremolo carries on beneath them for as long as the page says.
 
 **Your progress no longer vanishes when the catalogue fails to load once.** If the
-list of pieces could not be fetched the moment Plinky opened — a poor connection, a
+list of pieces could not be fetched the moment Klimpi opened — a poor connection, a
 hiccup right after an update — everything you had learned read as nothing for the
 rest of the visit: the grade in the header dropped, the Stats page lost its level, and
-reviews and suggestions came up empty until you reloaded. Plinky now asks again on
+reviews and suggestions came up empty until you reloaded. Klimpi now asks again on
 the next look, so the pieces and your progress on them are back the moment the
 connection is.
 
@@ -969,7 +979,7 @@ that let it in has been taken off the list until then.
 
 **Passages under an 8va sound, and are graded, in the right octave.** A score
 writes down the pitch that sounds; the dotted line above the staff only says where
-the notes are drawn. Plinky was reading the line as a correction and moving every
+the notes are drawn. Klimpi was reading the line as a correction and moving every
 note under it by an octave — Listen played the passage an octave low, and playing it
 as printed was marked wrong. Tremolos and glissandos read from the score had a
 similar slip and sounded an octave high. All three now sound the pitch the score
@@ -1099,8 +1109,8 @@ lagging-hand note vanished. Rows are named by the hand that played them.
 Restart or Practice before letting the final keys go saved the take without its
 grade, for good. The run is graded first now.
 
-**The tab that installed Plinky follows updates applied elsewhere.** The first tab
-ever to open Plinky on a device ignored an update another tab applied later and kept
+**The tab that installed Klimpi follows updates applied elsewhere.** The first tab
+ever to open Klimpi on a device ignored an update another tab applied later and kept
 running the old page over a cache that update had cleared. It reloads like any other
 tab now.
 
@@ -1162,10 +1172,10 @@ dropping you back to replay the bars you had just heard.
 
 ## 30 August 2026
 
-**Installing Plinky gives you a proper app icon.** Added to a phone's home screen or
+**Installing Klimpi gives you a proper app icon.** Added to a phone's home screen or
 a desktop, the icon was a small tile marooned in a white circle with a band of white
 all round it. Launchers crop an icon to their own shape and fill whatever is left
-with their own colour, so Plinky now ships an icon made for that: the violet reaches
+with their own colour, so Klimpi now ships an icon made for that: the violet reaches
 every edge and the keys sit in the middle, whatever shape your launcher cuts it to.
 Reinstall to pick it up.
 
@@ -1176,10 +1186,10 @@ dead page, even while the page opened perfectly for you. Nothing about playing
 changes, and the links you already have keep working.
 
 **A video you export says who wrote the piece and what its licence is, in words.**
-The piece's name and the composer under it are both set in Plinky's own lettering, and
+The piece's name and the composer under it are both set in Klimpi's own lettering, and
 the licence gets a line of its own written out in full — "CC0 1.0 Universal Public
 Domain Dedication" rather than a code. The credit used to run along the bottom edge,
-where the falling notes crossed it and the keys washed it out. The Plinky mark in the
+where the falling notes crossed it and the keys washed it out. The Klimpi mark in the
 corner is the same one the app wears, plink and all. The progress bar is gone: the
 notes falling already tell you where you are, and the bar was saying it twice. Nothing
 about a piece changes; it is the same music, credited where you can read it.
@@ -1205,7 +1215,7 @@ nine others. The lessons still read in order; the index is for re-entering them.
 
 **Counting things reads correctly in every language now.** &ldquo;2 items&rdquo; and
 &ldquo;5 items&rdquo; take different words in Polish, Russian, Ukrainian, Czech,
-Slovak, Croatian, Serbian and Romanian, and Plinky was choosing between two forms with
+Slovak, Croatian, Serbian and Romanian, and Klimpi was choosing between two forms with
 an English rule. Each language now gets the forms it actually has.
 
 ## 29 August 2026 — evening
@@ -1262,7 +1272,7 @@ actually have, whatever shape you export in. Portrait videos change the most.
 
 **The gates now check the language that stresses the app hardest, not English.**
 English is the one language they never needed to check: it is the shortest, and every
-label in Plinky was written to fit in it. The weight budget, both accessibility
+label in Klimpi was written to fit in it. The weight budget, both accessibility
 sweeps and the performance audit now measure Greek, whose text runs to twice the
 bytes — 21.8 KB a Greek reader has always downloaded and nothing had ever weighed.
 Pages are checked at phone width in Danish, which holds the longest word a line
@@ -1272,7 +1282,7 @@ out from the translations, so they follow them.
 **Every page is now checked at phone width in Danish, not English.** A page that
 scrolls sideways on a phone is never a decision somebody made — it is one word that
 cannot be broken, dragging the whole document with it. English was the one language
-that could never show this up, because every label in Plinky was written to fit in
+that could never show this up, because every label in Klimpi was written to fit in
 it; long words arrive in translation. The check now builds whichever language holds
 the longest unbreakable word and measures that, so it follows the translations
 instead of being pointed at one language and left there.
@@ -1294,7 +1304,7 @@ the eight grades again, the studies sit between grades 1 and 6, and every exerci
 draws its opening notes on its row the way pieces do.
 
 **A grade now means the same thing every day.** Until now a piece's grade was its
-place in a queue: Plinky sorted the whole catalogue by difficulty and cut it into
+place in a queue: Klimpi sorted the whole catalogue by difficulty and cut it into
 eight equal piles, so a grade meant "in the easiest eighth of everything here so
 far" — and every time the catalogue grew, pieces you had already worked on quietly
 changed grade underneath you. Grades are now fixed marks on a scale, set against
@@ -1326,7 +1336,7 @@ quietly crediting the wrong one — and the practice ladder can offer piano writ
 without steering a beginner into a Schubert accompaniment.
 
 **German note names.** German notation calls B natural **H** and keeps **B** for B
-flat, so a scale Plinky called "B-Dur" was asking a German reader to play the wrong
+flat, so a scale Klimpi called "B-Dur" was asking a German reader to play the wrong
 one. Scale and arpeggio names on the German site now use the note names German
 musicians actually write, accidentals included — Fis, Es, As. The other languages
 that share this convention, among them Polish, Czech, Danish and Swedish, still read
@@ -1343,7 +1353,7 @@ made accompaniments look far easier than they are. Around a quarter of the
 catalogue has moved grade as a result, most of it by one, and the pieces that moved
 furthest are the songs whose piano writing was never being looked at.
 
-**A tab left open on an old version won't overwrite your newer progress.** Plinky
+**A tab left open on an old version won't overwrite your newer progress.** Klimpi
 updates itself quietly, so a tab you opened yesterday can still be running
 yesterday's version — and it would happily save over work done since, quietly
 flattening anything it didn't understand. Such a tab now stops saving and says so,
@@ -1358,7 +1368,7 @@ cannot finish leaves the device exactly as it was. In the rare case where even t
 is refused, the message says so plainly instead.
 
 **Arrow keys scroll the page again, and Space presses buttons.** The computer
-keyboard is one of the ways to play Plinky, and it was taking the keys it needs on
+keyboard is one of the ways to play Klimpi, and it was taking the keys it needs on
 every page — not only where you play. On Help, Settings or the glossary, pressing
 Down did nothing at all instead of scrolling; the language picker could not be
 changed from the keyboard; and if you had bound Space to the sustain pedal, as the
@@ -1385,7 +1395,7 @@ anywhere unless you press it.
 **Your progress is harder to lose.** Browsers treat ordinary site storage as
 disposable and can clear it when a device runs short of space — which, for an app
 that keeps everything on your own device and nothing on a server, meant months of
-practice could go without warning. Plinky now asks your browser to hold on to what
+practice could go without warning. Klimpi now asks your browser to hold on to what
 you have done, once you have finished a run. Most grant it without asking; a few
 check with you first.
 
@@ -1396,9 +1406,9 @@ usual and quietly vanished on the next reload.
 
 ## 27 August 2026
 
-**If your piano makes its own sound, Plinky can stop doubling it.** Playing a digital
+**If your piano makes its own sound, Klimpi can stop doubling it.** Playing a digital
 or acoustic piano through MIDI, every note came out twice — once from the instrument
-and once from Plinky a moment behind. There is a switch in Settings now, and a button
+and once from Klimpi a moment behind. There is a switch in Settings now, and a button
 above the keys while you play. It quiets only the notes you play: Listen, the
 metronome, the other hand and every demonstration carry on as before. The on-screen
 and computer keyboards carry on too, since they have no sound of their own.
@@ -1568,7 +1578,7 @@ the bottom of the screen gains a Home button, so you can get back from deep insi
 long piece without scrolling all the way up. On a wider screen the menu across the top
 now stays with you as you scroll instead.
 
-**A warmer Plinky in daylight.** The light theme was violet everywhere — the page, the
+**A warmer Klimpi in daylight.** The light theme was violet everywhere — the page, the
 cards, the hairlines, even the writing — which left violet nothing to mean. The paper
 is warm now and the ink is a true brown-black, with violet kept for the logo and for
 whichever button matters most on the screen you are looking at. The little drawings
@@ -1585,7 +1595,7 @@ bars, but you could no longer see which ones. It stays put now, however much you
 scroll or turn the phone.
 
 **A link without a language in it now opens the page you asked for.** Every page in
-Plinky lives under a language — `/en/`, `/de/` — and an address typed or shared
+Klimpi lives under a language — `/en/`, `/de/` — and an address typed or shared
 without one used to go astray: `/music` landed on the home page, and a link to a
 piece landed on "we couldn't find that" even though the piece was right there. Both
 now open the page you asked for, in your own language, keeping anything the link was
@@ -1593,7 +1603,7 @@ carrying with it.
 
 **Ways to practise now hands you the piece, not just the advice.** Each of the six
 methods is written in plainer words than before, leads with why it works, says what
-in Plinky does it, and carries a button
+in Klimpi does it, and carries a button
 that opens a piece at your own grade with the method already set up — slowed down,
 one hand only, or looping the opening phrase. You can write one of these links
 yourself too, which is handy for a teacher: adding `?speed=0.6&hands=left` to a
@@ -1626,7 +1636,7 @@ now, with a five-colour stripe under it — the flower's petals, laid flat — a
 kept for the mark and for whichever button matters most on the screen you are looking
 at.
 
-**Plinky looks like its name now.** The app wears its own logo — the violet tile with
+**Klimpi looks like its name now.** The app wears its own logo — the violet tile with
 the white keys and the note falling onto one — and the colour and the lettering follow
 it the rest of the way down: a violet band across the top of every screen, rounded
 letterforms for every title, and the page under it kept near-white so a score still
@@ -1689,7 +1699,7 @@ catalogue ask for one.
 
 **A piece that changes key sounds right after the change.** Ornaments — trills, turns,
 mordents — reach for a neighbouring note, and which note that is depends on the key.
-Plinky used to read only the key a piece opened in, so a trill after a change played a
+Klimpi used to read only the key a piece opened in, so a trill after a change played a
 note that was not in the music.
 
 **Your saved runs show every score, not three of them.** The Runs tab listed accuracy,
@@ -1700,7 +1710,7 @@ list, so they cannot drift apart again.
 **The recorded grand piano is on by default.** It has been there for a while behind a
 switch in Settings, which meant almost nobody ever heard it. Nothing is downloaded
 before you play: the recordings still arrive a piece at a time, a few hundred
-kilobytes each, and the switch is still there if you would rather Plinky made the
+kilobytes each, and the switch is still there if you would rather Klimpi made the
 sound itself.
 
 **The piano is standing in a room now.** Every note used to go straight out with no
@@ -1768,7 +1778,7 @@ piece's own page now, and pressing it plays the piece where you already are inst
 opening the full-screen view. Hearing what something sounds like is a question you ask
 before deciding to play it.
 
-**The keys light up as Plinky plays.** While Listen is playing, each note lights its
+**The keys light up as Klimpi plays.** While Listen is playing, each note lights its
 key for as long as it sounds — the left hand in teal, the right in indigo, the same
 two colours the falling-notes highway uses. The keyboard used to sit there showing
 whatever the abandoned run had lit, which was telling you about something that had
@@ -1776,7 +1786,7 @@ stopped happening.
 
 ## 22 August 2026 — evening
 
-**Plinky plays music now, not just notes.** Most pieces in the library — nearly every
+**Klimpi plays music now, not just notes.** Most pieces in the library — nearly every
 teaching study — print no dynamics at all, because a player is expected to supply the
 weighting themselves. Played back literally, every note the same, a study is a
 metronome with pitches. The bar now has its shape: the first beat carries most, the
@@ -1837,16 +1847,16 @@ practice has always used, is available for a video too.
 line beside it is now spread from the bottom up instead of struck flat, with every
 note left ringing. And a passage under an 8va line — printed low to keep it off the
 leger lines — used to be played an octave below where it belongs; it now sounds where
-it is meant to, and Plinky asks you for the same octave it prints.
+it is meant to, and Klimpi asks you for the same octave it prints.
 
 **Trills, mordents and turns are played, not just printed.** The little signs above a
-note mean "play a short figure here", and Plinky drew them and then played the plain
+note mean "play a short figure here", and Klimpi drew them and then played the plain
 note underneath — so a reader learning to recognise one heard nothing happen where it
 was written. They now sound, in the key the piece is in: a trill in E flat reaches for
 the B flat, not the B.
 
 **The long arches over the notes finally do something.** A slur asks for its notes to
-be joined, and Plinky read every one of them and then played them exactly as if they
+be joined, and Klimpi read every one of them and then played them exactly as if they
 were not there — each note stopping at the instant the next began, which the ear hears
 as a seam rather than a join. Slurred notes now ring a little into the note they are
 joined to, the way a pianist holds the key until the next finger is down. Pieces
@@ -1860,7 +1870,7 @@ it does while you play.
 
 ## 20 August 2026 — night
 
-**A rhythm trainer, with no notes in it.** Everywhere else in Plinky your timing is
+**A rhythm trainer, with no notes in it.** Everywhere else in Klimpi your timing is
 measured while you are also busy finding the right notes, so a wobbly run never tells
 you which of the two went wrong. **Learn → Rhythm** asks only the one question: a line
 of notation, a count-in, and you tap it back — on a piano, your computer keys, or the
@@ -1891,7 +1901,7 @@ photograph of it, so it comes out crisp at whatever size the paper is.
 
 **More scales and chords to look up.** The modes are complete — Locrian was the one
 missing — and the chord explorer has gained sixths, suspended chords, added ninths,
-the minor-major seventh and the ninth chords. Plinky will name them under your hands
+the minor-major seventh and the ninth chords. Klimpi will name them under your hands
 on the home page too.
 
 ## 20 August 2026
@@ -1906,7 +1916,7 @@ see when an import goes wrong is finally in your own language.
 
 ## 19 August 2026
 
-**The help page shows pictures of Plinky in your language.** Every screenshot on it
+**The help page shows pictures of Klimpi in your language.** Every screenshot on it
 used to be of the English app, whichever language you were reading — so the text
 named a button and the picture beside it showed a different word. There is now a set
 per language. You only ever download your own, so the page is no heavier than it was.
@@ -1917,7 +1927,7 @@ so and offers to try again or report it, while everything around it keeps workin
 It matters most in Settings, where the backup and the reset live: those are the
 things you need reachable precisely when something has gone wrong.
 
-**Plinky names the chord you just played.** Put your hands down anywhere on the
+**Klimpi names the chord you just played.** Put your hands down anywhere on the
 keyboard on the home page — computer keys, the on-screen keys, or a piano plugged
 in — and it says what you found: the note, the interval, or the chord, with the
 bass after a slash where you have played an inversion. It is the one thing you
@@ -2040,7 +2050,7 @@ It does now. The bar highlight on the phone's focus strip could go missing after
 kind of redraw, and stays put.
 
 **Pieces fit the keyboard you actually have.** Not every keyboard has 88 keys, and a
-61-key one simply has no key for the low notes a piece might reach. Plinky now reads the
+61-key one simply has no key for the low notes a piece might reach. Klimpi now reads the
 size off your keyboard's name where it can — a "Keystation 61" says what it is — and you
 can measure it exactly by pressing the two end keys under *Keyboard size* in Settings. A
 piece that reaches past your keys then moves into them by whole octaves, so nothing asks
@@ -2076,16 +2086,16 @@ had the same problem, does too.
 replay and the video export — press a key yourself and you still got the synthesised one.
 Every note you play comes from the recordings now, and each key you strike picks the
 recording of that key struck that hard. It was also much too quiet: the recordings already
-carry the dynamic they were played at, and Plinky was turning them down by how hard you
+carry the dynamic they were played at, and Klimpi was turning them down by how hard you
 hit the key on top of that, so a soft note was played softly twice.
 
 **A recorded grand piano, if you want one.** Settings → Sound has a switch for it: real
-recordings of a concert grand instead of the sound Plinky makes itself, sixteen different
+recordings of a concert grand instead of the sound Klimpi makes itself, sixteen different
 recordings of every key depending on how hard you hit it. There is no download to sit
 through — the recordings arrive while you play, a few hundred kilobytes a piece, and stay
 on your device — and nothing ever waits for them: a note whose recording has not landed
 yet is played the way it always was. Your videos are exported with whichever piano you
-heard. The instrument is the Salamander Grand Piano by Alexander Holm, and Plinky credits
+heard. The instrument is the Salamander Grand Piano by Alexander Holm, and Klimpi credits
 it under the switch.
 
 **A piece that opens on a vamp shows its tune.** The little staff under a title draws the
@@ -2104,17 +2114,17 @@ louder or softer across the notes it covers, the ledger lines that carry music p
 five, and the repeat marks — which, being repeat marks, play their bar twice. Each one is
 drawn as real notation and most can be heard both ways. Any piece carrying one of them
 now lists it in the set-up panel before a run, ledger lines included: nothing in a score
-marks those, so Plinky works them out from the pitch and the clef.
+marks those, so Klimpi works them out from the pitch and the clef.
 
 **Tenuto now sounds like something.** The mark asks for a note's full length and a little
-weight behind it. Plinky was giving it the length — which is what an unmarked note gets
+weight behind it. Klimpi was giving it the length — which is what an unmarked note gets
 anyway — and none of the weight, so a piece could carry the mark on every note and sound
 identical. It plays with that weight now, and is graded for it.
 
-**Plinky has a subreddit.** [r/plinky_piano](https://www.reddit.com/r/plinky_piano/),
+**Klimpi has a subreddit.** [r/klimpi_piano](https://www.reddit.com/r/klimpi_piano/),
 linked at the foot of every page beside the others.
 
-**Plinky has four places now, and a shape to the day.** The bar along the bottom (or
+**Klimpi has four places now, and a shape to the day.** The bar along the bottom (or
 the top, on a wide screen) used to name five things of five different kinds, and a good
 quarter of the app lived behind the **?** — the theory course, the glossary of marks,
 the little tools and the keyboard tour were only ever reachable through a few links at
@@ -2134,11 +2144,11 @@ Each row names the piece it opens, with the set it came from underneath, so you 
 what pressing it will do before you press it — and where a piece stands, if you've played
 it: *best C so far, learned at A*. A step moves on when the piece counts as learned, and
 learned means a run reaching the grade you set in Settings, so playing something through
-once and finding it offered again is Plinky holding the door rather than ignoring you. It
+once and finding it offered again is Klimpi holding the door rather than ignoring you. It
 says so now instead of leaving you to guess.
 
-**What Plinky is** now has a permanent home at the top of the [about
-page](https://plinky.fun/en/about/), with the two of us below it. The front page still
+**What Klimpi is** now has a permanent home at the top of the [about
+page](https://klimpi.app/en/about/), with the two of us below it. The front page still
 opens with it on a first visit and then gets out of the way — but if you ever want to
 show somebody what this is, there is somewhere to point.
 
@@ -2167,7 +2177,7 @@ with a control inside a run's set-up panel, and their button said "Try it" and l
 the catalogue; they now offer what they actually can — a piece to try it on.
 
 **The help page shows the app you're actually using.** Its pictures were taken by hand
-and had drifted a long way behind — a navigation bar and a colour scheme Plinky stopped
+and had drifted a long way behind — a navigation bar and a colour scheme Klimpi stopped
 having. They're taken from a real build now, so they can't drift again.
 
 **The same page, wherever you are.** Every page's own name is now set the same way and in
@@ -2177,13 +2187,13 @@ boxes. The You page reads in the order its opening line promises: what you can p
 now, then the ladder, then how it has been going, with everything worth sharing together
 at the foot.
 
-**Plinky has a face now.** The wordmark and each page's own title are set in a schoolbook
+**Klimpi has a face now.** The wordmark and each page's own title are set in a schoolbook
 serif — the kind of type a piano album is printed in — while everything you press stays in
 the plain face it was, because a control should disappear and a title should not. The word
 you're on in the bar is underlined in brass rather than tinted blue, so the bar reads as a
 place you're standing in.
 
-**And Plinky looks like the book it teaches from.** Warm ivory paper, soft brown-black
+**And Klimpi looks like the book it teaches from.** Warm ivory paper, soft brown-black
 ink, brass on the things you've earned, and a deep ink blue on anything you can press.
 The page is now the same paper the staff is printed on, so a score sits on the page
 instead of in a white box on it. The colours that *mean* something haven't moved: green
@@ -2205,7 +2215,7 @@ composer's page. It comes with the
 catalogue rather than being worked out on the spot, so a list of music reads as music
 without waiting for anything to load.
 
-The two pieces that ship inside Plinky — *Ode to Joy* and *Twinkle, Twinkle, Little
+The two pieces that ship inside Klimpi — *Ode to Joy* and *Twinkle, Twinkle, Little
 Star* — were the exception, and so is anything you've imported yourself: those are read
 straight from the score, so every row on the shelf now opens with its own first bar.
 The two of ours also say where they came from at last: our own transcriptions, given
@@ -2220,7 +2230,7 @@ actually written for it.
 **The icon looks like the app now.** Everything on screen moved to ivory paper and ink
 last week; the icon stayed behind in the violet it was born in, so the square in your tab
 and on your home screen belonged to a different-looking product from the page it opened.
-It is Plinky's own ink blue now, with ivory keys — and the pink dot, the plink, is the
+It is Klimpi's own ink blue now, with ivory keys — and the pink dot, the plink, is the
 same one that sits on the i in the name. The dot also got a colour of its own in the code:
 it had been borrowing the shade the ghost-race replay uses, which meant the brand and a
 feature shared one setting.
@@ -2246,7 +2256,7 @@ changing your mind meant overwriting every note by hand, or wiping the whole dev
 button in the fingering strip now, behind a confirm.
 
 **A lighted keyboard knows its own name.** Switch the key lights on with a Yamaha EZ-300
-or a Casio LK-S plugged in and Plinky now sets that maker's channels itself, instead of
+or a Casio LK-S plugged in and Klimpi now sets that maker's channels itself, instead of
 asking you to pick the make of the piano in front of you. It is a starting point, not a
 lock: the picker is right underneath and Test the lights settles it in a second.
 
@@ -2256,7 +2266,7 @@ wraps — the twelve keys of the circle of fifths and the thirteen scale names f
 phone screen with tan, and the one you had chosen was lost in it. Past six options the
 same control now drops the track and outlines each choice instead. The circle of fifths
 also stops using filled buttons for the twelve keys: a key you have not picked was drawn
-as "the thing to press", which is what the button style means everywhere else in Plinky.
+as "the thing to press", which is what the button style means everywhere else in Klimpi.
 
 **Music has a Composers tab.** Seven hundred and fifty people are credited in the
 catalogue, each with a page of their own — and the only way to reach one was to find a
@@ -2307,7 +2317,7 @@ right for whatever that page offers — so whichever page you land on, it looks 
 same app. Section headings within a page had six spellings and now have one, and the
 review session finally has a heading in both of its quiet states.
 
-**A piece tells you what you can do with it.** Everything Plinky can put on a piece —
+**A piece tells you what you can do with it.** Everything Klimpi can put on a piece —
 one hand at a time, keeping up with the beat, the duet, sight-reading it cold, hidden
 notes, the vanishing bars, racing your ghost, looping a passage, transposing it, the tempo
 trainer — lived inside a fold called "Set up your run", and behind a *second* fold if you
@@ -2321,7 +2331,7 @@ Keeping up with the beat was also two controls writing one thing: a "Keep up" sw
 a tempo choice inside sight-reading that quietly moved the same lever. It is one **Pace**
 control now: at your own pace, or keep up.
 
-**Nothing in Plinky is locked, and now it says so.** Grades describe how hard the music
+**Nothing in Klimpi is locked, and now it says so.** Grades describe how hard the music
 is to read; they have never decided what you may open. The eight-grade map on You now
 carries that in as many words, and every grade on it is a link: press Grade 8 on your
 first day and you land on its four hundred pieces, all of them yours to try. The map also
@@ -2388,7 +2398,7 @@ with a pair of zeros over an empty week chart, and eight grade rows each reading
 practice, under a heading saying they are all-time totals (the month's recap further down
 counts the same two things), and a grade row shows how far it is to its next star until
 there is a tally worth printing. What's ready for you next is drawn with each piece's
-opening bars, like every other list of music in Plinky — and a piece with no mark on file
+opening bars, like every other list of music in Klimpi — and a piece with no mark on file
 now keeps its place in the column instead of jumping left.
 
 **The badge beside the wordmark waits until it has news.** A device that had mastered
@@ -2398,7 +2408,7 @@ piece, which is also when the skill rating becomes a real number. You is in the
 navigation the whole time either way.
 
 **The footer says About.** The heart at the foot of every page led to the page about
-Plinky and the people who make it, but a heart on its own doesn't say so — it sat beside
+Klimpi and the people who make it, but a heart on its own doesn't say so — it sat beside
 two labelled legal links as the one thing you had to guess at. It now carries the word.
 
 **Music opens on the music.** The card offering to write your own piece sat above the
@@ -2419,7 +2429,7 @@ the box offers, and an empty one falls back to the piece's own marking.
 
 ## 16 August 2026 — later
 
-**Plinky moved to a new home.** The site is now served from Cloudflare Pages instead of
+**Klimpi moved to a new home.** The site is now served from Cloudflare Pages instead of
 GitHub Pages. Nothing about the app changes and nothing you have saved is affected — it
 should simply load a little faster, since the files a browser has already downloaded no
 longer need re-checking on every visit. The privacy policy names the new host.
@@ -2427,7 +2437,7 @@ longer need re-checking on every visit. The privacy policy names the new host.
 ## 16 August 2026
 
 **No more cookie banner.** The consent box that met you on your first visit is gone, and
-so is the switch in Settings behind it. Plinky counts page views with a measurement that
+so is the switch in Settings behind it. Klimpi counts page views with a measurement that
 uses no cookies, stores nothing on your device and identifies nobody, so there is nothing
 left to ask you and nothing left for you to turn off. The Privacy block in Settings now
 just says what happens, and the privacy policy has been rewritten to match.
@@ -2513,19 +2523,19 @@ Learn. They lost their buttons: four of the six only ever offered to send you to
 library, and three of them are done with a control inside a run — the reading was the
 point.
 
-**Plinky has a new icon.** The old one was a little keyboard with a dot above it — the
+**Klimpi has a new icon.** The old one was a little keyboard with a dot above it — the
 same picture as every other music app, and at the size a browser tab shows it, an
 unreadable smudge. The new one is the letter **P** set in Literata, the typeface the app
 prints its titles in, with a pink note sitting in the bowl of the letter. It is the same
-pink as the dot on the i in the name, and it is still the only pink Plinky uses.
+pink as the dot on the i in the name, and it is still the only pink Klimpi uses.
 
 In the browser tab you get the letter on its own, without the blue tile — a tab is the
-browser's furniture, not Plinky's, so the mark sits on it rather than carrying a box along.
+browser's furniture, not Klimpi's, so the mark sits on it rather than carrying a box along.
 It turns pale on a dark browser so it stays readable either way.
 
 **Your own key layout stays put.** If you play on the computer keyboard and gave a note a
 key that the other hand was already using, the layout looked right at the time and then
-came back as the standard one the next time you opened Plinky — quietly, without saying
+came back as the standard one the next time you opened Klimpi — quietly, without saying
 anything. It now keeps what you set. The note whose key you took reads as a dash until you
 give it one of its own, and **Reset to default** is there whenever you want the standard
 layout back.
@@ -2533,7 +2543,7 @@ layout back.
 **Grades now know the difference between hard to reach and hard to play.** Until now a
 piece's grade came entirely from how awkward it is to *finger* — how far your hands
 stretch, how much they move. That is a real part of difficulty, and it was the only part
-Plinky measured, so a study of racing sixteenths in three voices could sit at grade 1
+Klimpi measured, so a study of racing sixteenths in three voices could sit at grade 1
 because the notes happened to fall under the hand, while a slow, gentle piece with wide
 left-hand chords sat at grade 8.
 
@@ -2573,7 +2583,7 @@ it picks the thread up again when you scroll back to the end.
 ## 13 August 2026 — night
 
 **The help page comes with the app now.** Its words and its pictures used to be fetched
-from a content service every time you opened it; they are part of Plinky itself from now
+from a content service every time you opened it; they are part of Klimpi itself from now
 on. So help loads instantly, reads correctly in all 26 languages, works with no
 connection at all, and always describes the version you are actually running. The page
 also gained two sections while it was being rebuilt: a short welcome, and a round-up of
@@ -2581,7 +2591,7 @@ the corners worth exploring — the theory course, the glossary of notation mark
 little tools, the practice methods.
 
 **The board is gone**, and so is the what's-new banner on the home page. Both were
-pinboards fed from outside the app, and Plinky no longer talks to anything but your own
+pinboards fed from outside the app, and Klimpi no longer talks to anything but your own
 device.
 
 ## 13 August 2026 — evening
@@ -2595,7 +2605,7 @@ start playing again.
 ## 13 August 2026 — later
 
 **The sustain pedal in the score is followed.** Where a piece marks the pedal down,
-Plinky now knows it: Listen lets the harmony pool the way the marking asks instead of
+Klimpi now knows it: Listen lets the harmony pool the way the marking asks instead of
 playing each note dry and stopping it dead, and your expression feedback no longer reads
 a pedalled passage as choppy. That last one was a real unfairness — under the pedal you
 are meant to let go of the keys early and let the piano hold the sound, and doing exactly
@@ -2606,7 +2616,7 @@ that used to look like clipping every note short.
 **Ornaments are no longer graded on a detail the music leaves to you.** A grace note is
 played before the note it decorates — but how far before is your call, and the two usual
 answers are a good distance apart: crushed in right against the beat, or leaned on so that
-it borrows time from the note it belongs to. Both are right. Plinky had to pick one to
+it borrows time from the note it belongs to. Both are right. Klimpi had to pick one to
 draw the ornament at, and was quietly marking down anyone who chose the other. The timing
 feedback now accepts either. Nothing else about your timing has changed — every ordinary
 note is judged exactly as before.
@@ -2614,7 +2624,7 @@ note is judged exactly as before.
 ## 12 August 2026 — night
 
 **Grace notes are played, not stacked.** An ornament is printed on top of the note it
-decorates, and Plinky was reading that literally: it asked you to press the little note
+decorates, and Klimpi was reading that literally: it asked you to press the little note
 and the big one at the same instant, which is the opposite of what the music says and
 impossible to get right. A grace note is now a note of its own, played just before the
 one it belongs to — in a run, in Listen, and in the play-along alike. Pieces with
@@ -2622,8 +2632,8 @@ ornaments in them are playable now, and Listen sounds them the way you would.
 
 ## 12 August 2026 — evening
 
-**Plinky can hear the dynamics again — and it turns out it never could.** Loud and soft
-markings were being read from the wrong place, so on every piece Plinky behaved as though
+**Klimpi can hear the dynamics again — and it turns out it never could.** Loud and soft
+markings were being read from the wrong place, so on every piece Klimpi behaved as though
 none were written: Listen played each note at the same volume however the music was
 marked, and the expression score simply had nothing to say about your shading. Marked
 loudness now reaches both. A mark holds until the next one, so an *mf* in the first bar is
@@ -2635,7 +2645,7 @@ music and your expression feedback to start appearing where it used to stay blan
 
 **A chord is heard as the several notes it is.** When you play two notes at once that the
 score marks differently — a bass note held under a clipped melody note, one voice moving
-under another that sustains — Plinky used to read the whole moment off its longest note.
+under another that sustains — Klimpi used to read the whole moment off its longest note.
 So the shorter one was measured against an instruction meant for its neighbour, and
 whatever was written on it went unnoticed. Each key you press is now compared with what
 the score asked of that key: its own length, its own weight. Your expression feedback on
@@ -2670,12 +2680,12 @@ yours — a sung melody sitting above the music you were meant to read, and the 
 left hand out of reach of hands-separate practice. Those pieces now open showing your
 two staves and nothing else, with the hands the right way round. If you'd like the rest
 back, **Other parts** in Settings prints it above yours and plays it along with you; it
-is accompaniment, never something Plinky asks you to play.
+is accompaniment, never something Klimpi asks you to play.
 
 ## 11 August 2026 — later
 
 **Your keyboard can show you what's coming.** If your piano lights its own keys —
-Casio's LK series, Yamaha's EZ series — Plinky now lights the key you're about to play,
+Casio's LK series, Yamaha's EZ series — Klimpi now lights the key you're about to play,
 before you play it, and keeps it lit until you find it. On a two-hand piece each hand
 lights on its own channel. Because practice waits for you rather than running to a
 clock, the light simply follows where you are in the music. Set it up in **Settings →
@@ -2687,7 +2697,7 @@ It follows your next-note hint setting rather than adding one of its own, so if 
 asked for hints only after a slip, that's when the keys light too — and during a
 sight-read they stay dark like every other reading aid.
 
-The older switch that mirrors what Plinky *has* played is still there; it's now called
+The older switch that mirrors what Klimpi *has* played is still there; it's now called
 
 **Follow along on my keyboard**, which is what it always did.
 
@@ -2725,13 +2735,13 @@ everywhere.
 *"Which hand lagged" can finally see the two hands apart.* When you play a chord with
 both hands, the app noted the moment the chord was complete — one time for the pair. So
 on hands-together music, which is most music, the two hands were being compared using
-the same number, and the answer was always "you kept pace". Plinky now records when each
+the same number, and the answer was always "you kept pace". Klimpi now records when each
 hand actually struck. Note that a hand which is simply early or late but steady still
 reads as even, because timing is judged against your own pace: it is unevenness that
 shows up as lagging.
 
 *Two-hand chords know which hand plays which note.* When both hands land together —
-which is 41% of the moments in the catalogue — Plinky was only recording that the
+which is 41% of the moments in the catalogue — Klimpi was only recording that the
 chord involved both hands, not which note belonged to which. So the notes highway
 coloured the whole chord one hand's colour, and a lighted keyboard lit every note of it
 on both of its channels. Each note now takes its own hand: the bass notes left, the
@@ -2746,7 +2756,7 @@ you finish and walk away with a key still down, the run is still graded on the w
 *Follow along and key lighting no longer talk over each other.* Both send MIDI to the
 same instrument, and on a Yamaha they were using the same channel — so following along
 would light keys you hadn't been asked to play, and the lights could cut a note short.
-Plinky now moves the follow-along to a channel the lights aren't using. Nothing to set.
+Klimpi now moves the follow-along to a channel the lights aren't using. Nothing to set.
 
 *Hovering the home page no longer saves up its sounds.* Each card on the front page
 gives a soft note as the mouse passes over it — but before you've clicked anything,
@@ -2761,25 +2771,25 @@ Pacific, and two entries on the same day couldn't be told apart, so deleting one
 deleted both. A scale started on the tools or theory page kept playing after you
 navigated away.
 
-**Plinky is now licensed AGPL-3.0-or-later.** It was 0BSD, which let anyone do
+**Klimpi is now licensed AGPL-3.0-or-later.** It was 0BSD, which let anyone do
 anything with the code including keeping their changes to themselves. Under the AGPL
 you can still run it, self-host it and change it — that is guaranteed — with one
-condition: if you modify Plinky and let other people use your version over a network,
-those people get your source too. Improvements to a public Plinky stay public.
+condition: if you modify Klimpi and let other people use your version over a network,
+those people get your source too. Improvements to a public Klimpi stay public.
 
 Nothing changes for you as a player, and nothing changes for the music: every piece in
 the catalogue keeps its own Creative Commons licence, credited in the app exactly as
 before.
 
 **A short course in how the music works.** [How the music
-works](https://plinky.fun/en/theory/) is eight lessons on what a stave is actually
+works](https://klimpi.app/en/theory/) is eight lessons on what a stave is actually
 telling you — the page as a picture of the keyboard, half steps and whole steps, the
 octave, major and minor scales, why a piece carries sharps, triads, and the single key
 that turns a major chord minor. Each lesson is a paragraph and something to play, so
 you hear the idea rather than only read it. The glossary says what a mark means; this
 says why the music is built that way. Both are linked from Help.
 
-**Every composer has a real page now.** Plinky credits 542 composers across the
+**Every composer has a real page now.** Klimpi credits 542 composers across the
 catalogue, and the ones with a few pieces to their name now have a proper page that
 loads with their name and their piece count already on it, rather than filling in a
 moment later. Fixing that turned up a pile of duplicates: Carl Czerny was three
@@ -2792,14 +2802,14 @@ claiming pages of their own.
 
 ## 10 August 2026
 
-**A page of little tools.** [Little tools](https://plinky.fun/en/tools/) collects the
+**A page of little tools.** [Little tools](https://klimpi.app/en/tools/) collects the
 things you look up in the middle of practising, and none of them need an account or an
 instrument. A **circle of fifths** you can hear — pick a key and it names its signature
 and its relative minor and plays its chord. A **scale** and a **chord** explorer that
 light the notes up on a keyboard from any root. And a **tap tempo** reader for when you
 know how fast a piece goes but not the number.
 
-**Plinky can hear how you shaped it.** The run summary has a new Expression reading:
+**Klimpi can hear how you shaped it.** The run summary has a new Expression reading:
 how closely you followed the dynamics and articulation the score actually writes.
 Loudness is judged as a shape rather than a level — did you play louder where the
 music says louder — so it costs you nothing to have a light touch or a heavy piano.
@@ -2817,14 +2827,14 @@ Give it the day you're working toward and the card counts down, alongside how ma
 its pieces you still have to learn. The date travels with the set, so a teacher
 handing one out hands out its date too.
 
-**Plinky keeps a practice diary now.** It always knew how many notes you'd played and
+**Klimpi keeps a practice diary now.** It always knew how many notes you'd played and
 on how many days; it had no idea how long you'd sat there. Runs now fold into the
 sitting they belong to, and **You → Your practice** rolls it up over a week, a month,
 three months or a year — time played, days played, a typical sitting, and a grid
 showing where the practice went. Every day in the range is drawn, quiet ones included.
 Nothing counts consecutive days.
 
-Played somewhere Plinky couldn't hear? Add those minutes yourself; they're marked as
+Played somewhere Klimpi couldn't hear? Add those minutes yourself; they're marked as
 hand-logged wherever they show up. Each sitting can carry a note and a word for how it
 went. The whole log downloads as a spreadsheet or prints — handy if a teacher asks
 what you've been doing.
@@ -2836,21 +2846,21 @@ piece a date you're working toward and it moves to the top, with the days counte
 down.
 
 **Six ways to practise, and where to do them.** The new [Ways to
-practise](https://plinky.fun/en/methods/) page names what a teacher would suggest —
+practise](https://klimpi.app/en/methods/) page names what a teacher would suggest —
 loop the two awkward bars, slow it down, one hand at a time, hear it before you play
-it, mix pieces up, come back to it later — and links each to the part of Plinky that
+it, mix pieces up, come back to it later — and links each to the part of Klimpi that
 already does it.
 
 ## 3 August 2026
 
 **The arcade button reads properly under the pointer.** Hovering it lightened the fill
 while the label stayed white, which left the two too close together to read — and it
-was the only filled button in Plinky that brightened on hover instead of deepening.
+was the only filled button in Klimpi that brightened on hover instead of deepening.
 It now darkens like the rest, and the label stays legible throughout.
 
 ## 2 August 2026
 
-**Colours read the same in both themes.** Every colour in Plinky is now named for the
+**Colours read the same in both themes.** Every colour in Klimpi is now named for the
 job it does — the muted grey of a hint, the green of a right answer, the indigo of the
 next note to play — instead of being written out twice, once for the light theme and
 once for dark. The two had quietly drifted apart in places, and pulling them back
@@ -2886,7 +2896,7 @@ way back except closing it. Lengths inside the file are now bounded, so a file l
 that is rejected and the app keeps going.
 
 **Imports and share links are checked for size, not just shape.** A shared run, an
-imported score and a restored backup all arrive from outside Plinky. Each was checked
+imported score and a restored backup all arrive from outside Klimpi. Each was checked
 for being well-formed, which says nothing about how much memory the next step will ask
 for. Each is now sized first.
 
@@ -2909,7 +2919,7 @@ Those cells are now neutralised.
 
 ## 31 July 2026
 
-**The first six things about a piano.** Everything else in Plinky assumes you already
+**The first six things about a piano.** Everything else in Klimpi assumes you already
 know that the black keys come in twos and threes, that the white ones repeat, and that
 a dot on a staff means one particular key under your hand. None of that is obvious, and
 none of it was written down. `/basics` is that missing first hour, cut to the six facts
@@ -2982,7 +2992,7 @@ standing.
 
 **A placement test that finds your level by reading.** Most apps ask a newcomer to
 pick beginner, intermediate or advanced and take them at their word, which is how
-people land somewhere that bores or drowns them. Plinky asked nothing and started
+people land somewhere that bores or drowns them. Klimpi asked nothing and started
 everyone at the bottom. The test walks a ladder instead: read a short drill, and the
 next one is harder or easier depending on how that went.
 
@@ -3002,13 +3012,13 @@ added it up. Read the treble staff fluently but stall on every ledger line below
 middle C and the grade folded both into one number. The You page now names the notes
 that take you longest, so a hunch becomes something you can practise.
 
-**Do, re, mi where that's what the notes are called.** Plinky speaks 26 languages and
+**Do, re, mi where that's what the notes are called.** Klimpi speaks 26 languages and
 had been labelling its keys C, D, E in all of them. For roughly half that isn't the
 note's name — in French, Italian, Spanish, Portuguese, Romanian, Russian, Ukrainian,
 Serbian, Greek and much of Asia a musician says "sol" the way an English one says
 "G". The keys can now carry the names you actually use.
 
-**Plinky can light up your piano.** The MIDI connection only ever listened, so a
+**Klimpi can light up your piano.** The MIDI connection only ever listened, so a
 piano with lit keys — which is most of the affordable ones — was told nothing. Listen
 can now echo each note it sounds, so a piece can be watched on the instrument as well
 as heard. Off by default, behind a switch in Settings.
@@ -3036,12 +3046,12 @@ on, and the placement test no longer counts toward your per-note reading times.
 ## 28 July 2026
 
 **Read a piece cold, once, with nothing to lean on.** Practice is repetition until a
-piece is learned; sight-reading is the opposite discipline, and Plinky couldn't tell
+piece is learned; sight-reading is the opposite discipline, and Klimpi couldn't tell
 them apart — a first cold read and the twentieth rehearsal of the same bars counted
 the same. Sight-read mode sits in the setup panel's extra-challenge group, and what
 it records is kept apart from your practice best.
 
-**Take your whole progress to another device.** Everything Plinky remembers lived in
+**Take your whole progress to another device.** Everything Klimpi remembers lived in
 one browser and nowhere else. Only scores had an export, so mastery, the review
 schedule, takes, ghosts, fingerings, preferences, favourites and achievements had no
 way off the device — a new phone started from zero, and a browser clearing its
@@ -3051,7 +3061,7 @@ and restores it on the other side.
 ## 25 July 2026
 
 **The anonymous usage analysis covers more of the app.** If you've turned it on — it
-stays off until you do, and nothing loads unless you agree — Plinky now also counts
+stays off until you do, and nothing loads unless you agree — Klimpi now also counts
 which buttons, links and switches get used, how far the onboarding steps get, and
 whether features like importing a score, sharing a run or the daily challenge are
 actually reached.

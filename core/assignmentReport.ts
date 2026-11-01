@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type Assignment, MAX_ITEMS, MAX_NAME_LENGTH, MAX_ID_LENGTH } from "./assignment";

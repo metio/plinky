@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { FeatureBoundary } from "../components/features/featureBoundary";
@@ -32,7 +32,7 @@ export default function Home() {
                 lands in empty space instead of pushing the rest of it down. A page that
                 rearranges itself while you are reading it is the one thing every visit
                 would otherwise have in common. */}
-            {/* What Plinky is, for a stranger and for anything reading the page without
+            {/* What Klimpi is, for a stranger and for anything reading the page without
                 running it. The keyboard that used to sit here is in the warm-up now,
                 where putting your hands on it is the first thing the day asks. */}
             <section className="space-y-3 returning:hidden">

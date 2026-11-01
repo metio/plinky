@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // What a note is called, which is not the same everywhere — and which the player decides.
@@ -100,7 +100,7 @@ const LETTERS_B: LocaleNaming = { names: "letters", b: "b", h: "german", lowerMi
 const LETTERS_H: LocaleNaming = { names: "letters", b: "h", h: "german", lowerMinor: true };
 const SOLFEGE: LocaleNaming = { names: "solfege", b: "b", h: "german", lowerMinor: false };
 
-// The default for each language Plinky speaks, with the reason. Where a country is
+// The default for each language Klimpi speaks, with the reason. Where a country is
 // genuinely split, the default follows what its schools teach today; the player can
 // always choose the other in Settings.
 const LOCALE_NAMING: Record<string, LocaleNaming> = {
@@ -138,7 +138,7 @@ const LOCALE_NAMING: Record<string, LocaleNaming> = {
     nl: LETTERS_B,
     // Japanese, Korean and Chinese sing do-re-mi in school but name keys with their own
     // letters (ハ長調, 다장조) or with Latin ones (C大调), and read chord symbols in Latin
-    // letters. Plinky has no iroha or Korean letter names, so Latin letters with B.
+    // letters. Klimpi has no iroha or Korean letter names, so Latin letters with B.
     ja: LETTERS_B,
     ko: LETTERS_B,
     zh: LETTERS_B,

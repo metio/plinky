@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
 import fc from "fast-check";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MODES, PALETTES } from "../../core/theme";
+import { DEFAULT_PALETTE, MODES, PALETTES } from "../../core/theme";
 import { memoryStore } from "../adapters/memoryStore";
 import { applyTheme } from "../lib/theme";
 import { createThemeStore, THEME_STORAGE_KEY, themeBootstrapScript } from "./themeStore";
@@ -12,7 +12,7 @@ import { createThemeStore, THEME_STORAGE_KEY, themeBootstrapScript } from "./the
 describe("themeStore", () => {
     it("defaults to the default palette, following the OS", () => {
         expect(createThemeStore(memoryStore()).load()).toEqual({
-            palette: "indigo",
+            palette: DEFAULT_PALETTE,
             mode: "system",
         });
     });
@@ -28,20 +28,20 @@ describe("themeStore", () => {
 
     it("keeps a mode a device saved before there were palettes", () => {
         const store = createThemeStore(memoryStore({ [THEME_STORAGE_KEY]: '"dark"' }));
-        expect(store.load()).toEqual({ palette: "indigo", mode: "dark" });
+        expect(store.load()).toEqual({ palette: DEFAULT_PALETTE, mode: "dark" });
     });
 
     it("reads a corrupt or foreign stored value as the default", () => {
         const corrupt = createThemeStore(memoryStore({ [THEME_STORAGE_KEY]: "not json" }));
-        expect(corrupt.load()).toEqual({ palette: "indigo", mode: "system" });
+        expect(corrupt.load()).toEqual({ palette: DEFAULT_PALETTE, mode: "system" });
         const foreign = createThemeStore(memoryStore({ [THEME_STORAGE_KEY]: '"neon"' }));
-        expect(foreign.load()).toEqual({ palette: "indigo", mode: "system" });
+        expect(foreign.load()).toEqual({ palette: DEFAULT_PALETTE, mode: "system" });
     });
 
     it("reports a refused write", () => {
         const store = createThemeStore({ ...memoryStore(), set: () => false });
         expect(store.save({ palette: "violet", mode: "light" })).toBe(false);
-        expect(store.load()).toEqual({ palette: "indigo", mode: "system" });
+        expect(store.load()).toEqual({ palette: DEFAULT_PALETTE, mode: "system" });
     });
 });
 
@@ -107,15 +107,23 @@ describe("themeBootstrapScript", () => {
     });
 
     it("follows the OS in the default palette when nothing is stored", () => {
-        expect(bootstrap(null, true)).toEqual({ dark: true, black: false, palette: "indigo" });
-        expect(bootstrap(null, false)).toEqual({ dark: false, black: false, palette: "indigo" });
+        expect(bootstrap(null, true)).toEqual({
+            dark: true,
+            black: false,
+            palette: DEFAULT_PALETTE,
+        });
+        expect(bootstrap(null, false)).toEqual({
+            dark: false,
+            black: false,
+            palette: DEFAULT_PALETTE,
+        });
     });
 
     it("still falls back to the OS preference when the stored value is corrupt", () => {
         expect(bootstrap("not json", true)).toEqual({
             dark: true,
             black: false,
-            palette: "indigo",
+            palette: DEFAULT_PALETTE,
         });
     });
 

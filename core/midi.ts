@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The Web MIDI API types ship in TypeScript's DOM lib. At runtime, though, only
@@ -108,26 +108,26 @@ export function isPreciseInput(device: string): boolean {
 }
 
 // Whether the note came from an instrument the player is touching, rather than from a
-// stand-in for one. It decides whether Plinky voices the note itself: a real piano or a
+// stand-in for one. It decides whether Klimpi voices the note itself: a real piano or a
 // digital one may already be making the sound, while a drawn key and a computer key make
-// none and would be silent if Plinky did not answer them.
+// none and would be silent if Klimpi did not answer them.
 //
 // The same set as isPreciseInput today, and deliberately a second function rather than a
 // second use of the first: one asks how tightly to time a run and the other asks whether
-// to make a sound, and a silent MIDI controller — precise, and needing Plinky's voice —
+// to make a sound, and a silent MIDI controller — precise, and needing Klimpi's voice —
 // would move one of them without the other.
 export function isInstrumentInput(device: string): boolean {
     return !STAND_INS.includes(device);
 }
 
-// Whether a note from this source is already sounding without Plinky, so Plinky must not
+// Whether a note from this source is already sounding without Klimpi, so Klimpi must not
 // voice it a second time. An instrument is, when the player says it has speakers of its own
 // (`instrumentSounds`); a drawn key and a computer key never are.
 //
 // The microphone always is, whatever the setting: it can only hear a note that is already
 // in the room. Voicing it would double every note, and worse, the copy from the speaker
 // marks that pitch as recently struck, so the echo guard in front of the microphone takes
-// the player's next strike of it — or of its octave — for Plinky's own sound and drops it.
+// the player's next strike of it — or of its octave — for Klimpi's own sound and drops it.
 export function soundsOnItsOwn(device: string, instrumentSounds: boolean): boolean {
     return device === MIC_DEVICE || (instrumentSounds && isInstrumentInput(device));
 }

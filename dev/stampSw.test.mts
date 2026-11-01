@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -20,7 +20,7 @@ const LOCALES: string[] = JSON.parse(readFileSync("project.inlang/settings.json"
 // A build output with just what the stamp reads: two hashed assets, a root document
 // naming one of them, the unstamped worker and the unstamped offline page.
 function fakeBuild(): string {
-    const out = mkdtempSync(join(tmpdir(), "plinky-stamp-"));
+    const out = mkdtempSync(join(tmpdir(), "klimpi-stamp-"));
     mkdirSync(`${out}/assets`);
     writeFileSync(`${out}/assets/entry.client-abc123.js`, "");
     writeFileSync(`${out}/assets/root-def456.css`, "");
@@ -45,7 +45,7 @@ describe("the offline page's copy", () => {
     });
 
     it("refuses a language missing one of its strings", () => {
-        const dir = mkdtempSync(join(tmpdir(), "plinky-messages-"));
+        const dir = mkdtempSync(join(tmpdir(), "klimpi-messages-"));
         writeFileSync(`${dir}/xx.json`, JSON.stringify({ offline_title: "Title" }));
         expect(() => offlineCopy(["xx"], dir)).toThrow(/offline_body/);
     });

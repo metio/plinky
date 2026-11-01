@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useSyncExternalStore } from "react";
@@ -23,13 +23,14 @@ const MODE_NAMES: Record<Mode, () => string> = {
 };
 
 const PALETTE_NAMES: Record<Palette, () => string> = {
+    fuchsia: m.palette_fuchsia,
     indigo: m.palette_indigo,
     violet: m.palette_violet,
 };
 
 // Two questions, each with every answer in view: how dark, and which colours. They are
-// independent — either palette in any mode — so one list of every pairing would ask the
-// same thing eight ways.
+// independent — any palette in any mode — so one list of every pairing would ask the
+// same thing twelve ways.
 export function ThemePicker() {
     const themeStore = useThemeStore();
     const theme = useSyncExternalStore(themeStore.subscribe, themeStore.load, () => DEFAULT_THEME);

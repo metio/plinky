@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -122,7 +122,7 @@ describe("ScoreViewer on a phone", () => {
             { timeout: 30000 },
         );
         expect(screen.queryByLabelText("Loop from bar")).toBeNull();
-        expect(score.querySelectorAll("rect.plinky-bar-selection")).toHaveLength(0);
+        expect(score.querySelectorAll("rect.klimpi-bar-selection")).toHaveLength(0);
     });
 
     it("narrows the loop to a tapped bar, filling it with a red overlay", async () => {
@@ -161,7 +161,7 @@ describe("ScoreViewer on a phone", () => {
             },
             { timeout: 30000 },
         );
-        const fills = score.querySelectorAll("rect.plinky-bar-selection");
+        const fills = score.querySelectorAll("rect.klimpi-bar-selection");
         expect(fills.length).toBeGreaterThan(0);
         expect(fills[0]?.getAttribute("fill")).toBe("#ef4444");
     });
@@ -194,7 +194,7 @@ describe("ScoreViewer on a phone", () => {
             clientY: rect.top + rect.height * 0.5,
         });
         expect(screen.queryByLabelText("Loop from bar")).toBeNull();
-        expect(score.querySelectorAll("rect.plinky-bar-selection").length).toBe(0);
+        expect(score.querySelectorAll("rect.klimpi-bar-selection").length).toBe(0);
     });
 
     it("colours notes on the score as they are played", async () => {

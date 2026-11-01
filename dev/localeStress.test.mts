@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { mkdtempSync, writeFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { heaviestLocale, localesByScript, scriptOf, widestLocale } from "./locale-stress.mjs";
 
 const withMessages = (locales: Record<string, Record<string, string>>): string => {
-    const dir = mkdtempSync(join(tmpdir(), "plinky-widest-"));
+    const dir = mkdtempSync(join(tmpdir(), "klimpi-widest-"));
     for (const [locale, messages] of Object.entries(locales)) {
         writeFileSync(join(dir, `${locale}.json`), JSON.stringify(messages));
     }
@@ -122,7 +122,7 @@ describe("one locale per writing system", () => {
         expect(scriptOf("Πλίνκι πιάνο")).toBe("greek");
         expect(scriptOf("プリンキー")).toBe("kana");
         expect(scriptOf("플링키 피아노")).toBe("hangul");
-        expect(scriptOf("Plinky piano")).toBe("latin");
+        expect(scriptOf("Klimpi piano")).toBe("latin");
     });
 
     it("does not call a Latin string Greek because one term is", () => {

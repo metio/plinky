@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Mirrors app/components/ui/confirmButton.stories.tsx. Owned rather than generated
@@ -7,7 +7,7 @@
 // the resting button where storybook shows the red confirm + cancel pair. The armed
 // state has no prop: the click is the only way in, so the preview performs it on mount.
 import { useEffect, useRef, useState } from "react";
-import { CloseIcon, ConfirmButton } from "plinky";
+import { CloseIcon, ConfirmButton } from "klimpi";
 
 const noop = () => {};
 

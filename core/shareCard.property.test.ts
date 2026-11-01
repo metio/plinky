@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -15,7 +15,7 @@ import {
     svgCard,
 } from "./shareCard";
 
-// What a player posts after a run. It leaves Plinky and lands somewhere nobody can fix
+// What a player posts after a run. It leaves Klimpi and lands somewhere nobody can fix
 // it, so the faults are permanent: a grid that reads one way on screen and another once
 // shared, a card that will not render because a piece's title had an ampersand in it, a
 // brag that turns out to be an advert.
@@ -132,7 +132,7 @@ describe("the grid as a player posts it", () => {
                 // No link, so a shared run reads as the player's own brag rather than
                 // an ad; the credit lives on the image card instead.
                 expect(text.toLowerCase()).not.toContain("http");
-                expect(text.toLowerCase()).not.toContain("plinky.fun");
+                expect(text.toLowerCase()).not.toContain("klimpi.app");
             }),
         );
     });

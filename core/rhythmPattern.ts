@@ -1,11 +1,11 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { quartersMs } from "./elapsed";
 
 // Rhythms to read and tap, as a graded ladder.
 //
-// Rhythm is already graded everywhere else in Plinky, but only ever as a by-product of
+// Rhythm is already graded everywhere else in Klimpi, but only ever as a by-product of
 // playing pitches: you read a piece, and how well you kept time falls out of how well you
 // played it. That leaves the reader who can hold a pulse but cannot yet *read* one with
 // nowhere to work — and it hides which of the two a wobbly run was. Here there are no

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -86,11 +86,11 @@ describe("piano route", () => {
     it("sounds a note from a MIDI piano too", () => {
         const { audio } = mount();
         act(() => {
-            window.__plinky?.play(67);
+            window.__klimpi?.play(67);
         });
         expect(audio.voices).toContainEqual({ kind: "press", note: 67, gain: expect.any(Number) });
         act(() => {
-            window.__plinky?.release(67);
+            window.__klimpi?.release(67);
         });
         expect(audio.voices.at(-1)).toEqual({ kind: "release", note: 67, holdScale: 1 });
     });
@@ -99,11 +99,11 @@ describe("piano route", () => {
         const { audio } = mount();
         for (const pedal of ["sustain", "sostenuto", "soft"] as const) {
             act(() => {
-                window.__plinky?.pedal(pedal, true);
+                window.__klimpi?.pedal(pedal, true);
             });
             expect(audio.pedals.at(-1)).toEqual({ pedal, down: true });
             act(() => {
-                window.__plinky?.pedal(pedal, false);
+                window.__klimpi?.pedal(pedal, false);
             });
             expect(audio.pedals.at(-1)).toEqual({ pedal, down: false });
         }
@@ -116,7 +116,7 @@ describe("piano route", () => {
         // no piece here to frame the window, so it has to follow the player.
         expect(screen.queryByRole("button", { name: /^C ?7$/ })).toBeNull();
         act(() => {
-            window.__plinky?.play(96); // C7
+            window.__klimpi?.play(96); // C7
         });
         expect(screen.getByRole("button", { name: /^C ?7$/ })).toBeTruthy();
     });

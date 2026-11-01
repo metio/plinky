@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useSyncExternalStore } from "react";
@@ -26,7 +26,7 @@ import { m } from "../../paraglide/messages.js";
 // that has never touched it will find it in.
 const BEFORE_ANY_DEVICE: SampleState = { ...NO_SAMPLES, enabled: samplesEnabled(null) };
 
-// The choice between the piano Plinky synthesises and a recorded one.
+// The choice between the piano Klimpi synthesises and a recorded one.
 //
 // There is no download button and no progress bar, because there is no download: the
 // recordings arrive a piece at a time, a few hundred kilobytes each, and the instrument

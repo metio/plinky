@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -75,7 +75,7 @@ export const Section: Story = {
             heading="h2"
             margin={<SpeakerIcon className={folioIconClasses} />}
             name="Sound"
-            line="What Plinky plays back, and how."
+            line="What Klimpi plays back, and how."
         >
             <SwitchField label="Play sounds" checked={true} onChange={() => {}} />
         </FolioRow>

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useHistoryStore } from "../../contexts/services";
@@ -165,8 +165,8 @@ export function StatsView() {
                             boast={m.progress_share_boast()}
                             heading={
                                 summary
-                                    ? `Plinky ${summary.daysPracticed}·${summary.totalNotes}`
-                                    : "Plinky"
+                                    ? `Klimpi ${summary.daysPracticed}·${summary.totalNotes}`
+                                    : "Klimpi"
                             }
                         />
                     ) : (

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?inline";
@@ -100,7 +100,7 @@ describe("the burnt-in text", () => {
         const context = new OffscreenCanvas(WIDTH, HEIGHT).getContext("2d")!;
         const measure = (family: string) => {
             context.font = `500 40px ${family}`;
-            return context.measureText("plinky.fun").width;
+            return context.measureText("klimpi.app").width;
         };
 
         expect(document.fonts.check(`500 40px "Inter Variable"`)).toBe(true);

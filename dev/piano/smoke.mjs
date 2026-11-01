@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Drives a deployed Plinky and checks that the recorded piano actually arrives.
+// Drives a deployed Klimpi and checks that the recorded piano actually arrives.
 //
 // It exists because of a failure the whole test suite could not see: the port made a
 // caller resolve notes through the manifest before it could ask for anything, the manifest
@@ -14,11 +14,11 @@
 // Run it after deploying, and after touching anything about where the recordings come
 // from: the bucket's CORS, its custom domain, the base URL, the prefetch.
 //
-// Usage: node dev/piano/smoke.mjs [--base https://plinky.fun] [--piece 47xd2XDpYFCy]
+// Usage: node dev/piano/smoke.mjs [--base https://klimpi.app] [--piece 47xd2XDpYFCy]
 
 import { chromium } from "playwright";
 
-const BASE = (argValue("--base") ?? "https://plinky.fun").replace(/\/$/, "");
+const BASE = (argValue("--base") ?? "https://klimpi.app").replace(/\/$/, "");
 const PIECE = argValue("--piece") ?? "47xd2XDpYFCy";
 const SWITCH = argValue("--switch") ?? "Recorded grand piano";
 const WAIT = Number(argValue("--wait") ?? 20000);

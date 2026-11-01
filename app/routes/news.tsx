@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
@@ -16,7 +16,7 @@ import type { Route } from "./+types/news";
 
 // What changed, on the site rather than in a file on a code-hosting service.
 //
-// Plinky has no versions and no releases, so the changelog is the only record of what
+// Klimpi has no versions and no releases, so the changelog is the only record of what
 // happened and when — and it lived in NEWS.md, which a player has to leave the site to
 // read. The page ships with the newest releases in its own document and fetches the rest.
 

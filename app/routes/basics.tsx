@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useNavigate } from "react-router";
@@ -19,7 +19,7 @@ export function meta(_args: Route.MetaArgs) {
     return [...routeMeta(m.basics_title(), m.meta_basics_description()), noindexMeta()];
 }
 
-// The way in for someone who has never touched a piano. Everything else in Plinky
+// The way in for someone who has never touched a piano. Everything else in Klimpi
 // assumes the keyboard is already understood; this is the missing first hour.
 export default function Basics() {
     const onboarding = useOnboardingStore();

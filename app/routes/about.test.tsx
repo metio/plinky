@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -34,13 +34,13 @@ describe("About", () => {
         expect(screen.getByAltText("Sebastian Hoß").className).toContain("animate-lean");
     });
 
-    it("tells why Plinky was made and how to get in touch", () => {
+    it("tells why Klimpi was made and how to get in touch", () => {
         renderWithServices(<About />);
         expect(screen.getByRole("heading", { name: m.about_why_title() })).toBeTruthy();
         expect(screen.getByText(m.about_why_body())).toBeTruthy();
         expect(screen.getByRole("heading", { name: m.about_contact_title() })).toBeTruthy();
-        expect(screen.getByRole("link", { name: "contact@plinky.fun" }).getAttribute("href")).toBe(
-            "mailto:contact@plinky.fun",
+        expect(screen.getByRole("link", { name: "contact@klimpi.app" }).getAttribute("href")).toBe(
+            "mailto:contact@klimpi.app",
         );
     });
 });

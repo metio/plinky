@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { MIC_DEVICE } from "../../../core/midi";
@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 import { MicCalibrationWizard } from "./micCalibrationWizard";
 
 // Hear an acoustic piano and confirm it works: the listen button, the state of
-// the microphone, and a live read-out of the last note Plinky heard — so a
+// the microphone, and a live read-out of the last note Klimpi heard — so a
 // player can strike a key and see it recognized before starting a piece.
 // Settings hides this whole block where no microphone API exists.
 export function MicConnect() {

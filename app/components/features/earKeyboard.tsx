@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { keyLane } from "../../../core/keyboardGeometry";
@@ -14,7 +14,7 @@ import { answerClasses, VERDICT_FILL, type Verdict } from "./earVerdict";
 // The answer surface for the perfect-pitch exercise. The question is "which note was
 // that?", and the answer set is the twelve notes — which is a keyboard. Naming C by
 // pressing C needs no explaining, and it keeps the answer in the vocabulary the player
-// already uses everywhere else in Plinky.
+// already uses everywhere else in Klimpi.
 //
 // One octave, no octave choice: the exercise asks for the note, not the register.
 //
@@ -24,7 +24,7 @@ import { answerClasses, VERDICT_FILL, type Verdict } from "./earVerdict";
 // spoken by its name rather than its glyph, which a screen reader reads as "number".
 
 // One octave from C, laid out by the same core/keyboardGeometry every other keyboard in
-// Plinky is laid out by. The white list, the black keys' boundaries and their widths were
+// Klimpi is laid out by. The white list, the black keys' boundaries and their widths were
 // worked out again here, in numbers that happened to agree with it — a third set of piano
 // proportions, and the one nothing would have caught if it drifted.
 const OCTAVE_FROM = 60;

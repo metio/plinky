@@ -1,6 +1,6 @@
 {
-    "name": "Plinky",
-    "short_name": "Plinky",
+    "name": "Klimpi",
+    "short_name": "Klimpi",
     "description": "Piano practice in your browser — with a MIDI keyboard or your computer keys.",
     "start_url": "/",
     "scope": "/",

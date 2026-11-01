@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { Button } from "../components/ui/button";
@@ -601,7 +601,7 @@ export default function Settings() {
                         icon={<QuestionIcon className={ICON} />}
                     >
                         <a
-                            href="https://github.com/metio/plinky/issues"
+                            href="https://github.com/metio/klimpi/issues"
                             target="_blank"
                             rel="noreferrer"
                             className={`text-sm ${linkClasses}`}

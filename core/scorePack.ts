@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { isRecord } from "./guards";
 import { jsonOf, NOT_JSON } from "./json";
 
-// The Plinky score-bundle format: a JSON document with MusicXML embedded, used to
+// The Klimpi score-bundle format: a JSON document with MusicXML embedded, used to
 // back up a library and to share or mass-import a set of scores. Each score carries
 // its own content, so a bundle is self-contained.
 
@@ -66,7 +66,7 @@ export function serializePack(scores: PackScore[]): string {
 }
 
 // Parse and validate a bundle, dropping malformed scores. Throws when the document is not
-// a usable Plinky score bundle.
+// a usable Klimpi score bundle.
 //
 // The messages are for whoever reads a stack trace or an issue report, not for the reader:
 // core has no language, and the surface that catches these says so in the reader's own
@@ -77,7 +77,7 @@ export function parsePack(json: string): ScorePack {
         throw new Error("That file is not valid JSON.");
     }
     if (!isRecord(data) || data.format !== FORMAT) {
-        throw new Error("That is not a Plinky score bundle.");
+        throw new Error("That is not a Klimpi score bundle.");
     }
     if (!Array.isArray(data.scores)) {
         throw new Error("The score bundle has no scores.");

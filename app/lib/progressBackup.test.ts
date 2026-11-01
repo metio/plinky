@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -25,7 +25,7 @@ function crowdedStore(seed: Record<string, string>, limit: number): KeyValueStor
 const x = (n: number) => "x".repeat(n);
 
 describe("progress backup", () => {
-    it("carries every Plinky value and leaves other sites' keys behind", () => {
+    it("carries every Klimpi value and leaves other sites' keys behind", () => {
         const store = memoryStore({ ...device, "other-app": "keep" });
 
         const restored = memoryStore();
@@ -57,7 +57,7 @@ describe("progress backup", () => {
         expect(target.get("plinky:prefs")).toBe('{"noteLabels":"off"}');
     });
 
-    it("cannot be made to write outside Plinky's own keys", () => {
+    it("cannot be made to write outside Klimpi's own keys", () => {
         const target = memoryStore({ "other-app": "keep" });
         const hostile = JSON.stringify({
             format: "plinky-progress",

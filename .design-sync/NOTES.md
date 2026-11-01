@@ -1,16 +1,16 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Syncing Plinky to claude.ai/design
+# Syncing Klimpi to claude.ai/design
 
 What a run of `/design-sync` needs to know about this repo. The durable settings live in
 `config.json` beside this file; these are the things a config field cannot hold.
 
 ## Repo shape
 
-- **There is no `dist/`.** Plinky is a private application, not a published component
+- **There is no `dist/`.** Klimpi is a private application, not a published component
   library, so the converter is pointed at `.design-sync/entry.ts` — a barrel of every
   storied component. `node .design-sync/make-entry.mjs` derives it from the reference
   storybook's `index.json`, so a component that gains a story joins the bundle on the next
@@ -39,7 +39,7 @@ What a run of `/design-sync` needs to know about this repo. The durable settings
   name a story imports from those directories must then exist on the global, which is
   what `COMPANIONS` in `make-entry.mjs` covers.
 - `[GENERAL]` `_ds_bundle.js` was 14 MB, over the 12 MB the upload accepts, and 11.8 MB
-  of it was Paraglide — all 26 locales. `PLINKY_LOCALE` only marks the other languages
+  of it was Paraglide — all 26 locales. `KLIMPI_LOCALE` only marks the other languages
   dead and the converter bundles unminified, so nothing removed them → compile the
   messages for one locale instead (`.design-sync/messages-en.mjs`). 3.5 MB.
 - `[GENERAL]` Every preview threw `import.meta.glob is not a function` at module init →
@@ -125,7 +125,7 @@ missing an entry — which is what happened when the hand-made cards were replac
 ## Findings from the 2026-08-23 re-sync
 
 - **`info`, `love` and the seven `grade-*` colours were removed from the app** — grades take
-  `spark` plus the three state colours, `info` folded into `accent`, `love` into `plink`.
+  `spark` plus the three state colours, `info` folded into `accent`, `love` into `tinkle`.
   The conventions header named `info`, `grade-s` and `grade-f`; those three claims were
   corrected. Anything naming a token has to be re-checked against `app/app.css` on each
   sync — a header that names a colour which no longer resolves is worse than one that says

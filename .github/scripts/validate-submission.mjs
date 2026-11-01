@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Validates a score-submission issue: reads the MusicXML from the form body and
 // renders it with the same OpenSheetMusicDisplay the app uses (in headless
-// Chromium), confirming it loads and produces playable notes — i.e. that Plinky
+// Chromium), confirming it loads and produces playable notes — i.e. that Klimpi
 // can actually use it. Writes `valid` and a JSON-encoded markdown `report` to
 // GITHUB_OUTPUT.
 //

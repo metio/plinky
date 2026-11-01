@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Checks that a published pack is the pack that was built, in full.
@@ -9,16 +9,16 @@
 // object the manifest names, compares sizes with what was built, and checks the headers a
 // browser will actually need.
 //
-// Usage: node dev/piano/verify-pack.mjs [--base https://samples.plinky.fun/v1] [--pack piano-pack/v1]
+// Usage: node dev/piano/verify-pack.mjs [--base https://samples.klimpi.app/v1] [--pack piano-pack/v1]
 
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const BASE = argValue("--base") ?? "https://samples.plinky.fun/v1";
+const BASE = argValue("--base") ?? "https://samples.klimpi.app/v1";
 const PACK = argValue("--pack") ?? "piano-pack/v1";
 const CONCURRENCY = Number(argValue("--concurrency") ?? 16);
 // The origin the app is served from, so the CORS answer is the one it will get.
-const ORIGIN = argValue("--origin") ?? "https://plinky.fun";
+const ORIGIN = argValue("--origin") ?? "https://klimpi.app";
 
 function argValue(flag) {
     const index = process.argv.indexOf(flag);

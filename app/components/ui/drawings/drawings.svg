@@ -1,9 +1,9 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <!--
-Every drawing in Plinky, one symbol each, fetched once and cached. The hand is one: a 72×56
+Every drawing in Klimpi, one symbol each, fetched once and cached. The hand is one: a 72×56
 grid, one 2.2 stroke with round ends and joins, a soft ground behind the object and one
 accent, with staff lines drawn thinner and fainter (1.3, .75) than the objects on them.
 

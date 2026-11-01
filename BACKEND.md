@@ -1,11 +1,11 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # Backend mode
 
-Plinky works today with no server. Backend mode is an optional layer that adds the
+Klimpi works today with no server. Backend mode is an optional layer that adds the
 few capabilities a browser cannot provide alone — collecting results for a teacher,
 comparing a daily run against other people, moving progress between devices,
 accepting a submitted score without GitHub. It is additive: with no backend
@@ -139,7 +139,7 @@ Cloudflare, on the free tier. Three reasons, in order of weight.
 **The account and the domain are already there.** Preview deploys run on
 Cloudflare Pages with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` already
 configured as repository secrets, and `wrangler` already runs in `preview.yml`.
-The `plinky.fun` zone is on Cloudflare nameservers. A Worker adds no new vendor,
+The `klimpi.app` zone is on Cloudflare nameservers. A Worker adds no new vendor,
 no new billing relationship, and no new credential.
 
 **Zero egress on R2.** Serving scores and progress bundles is almost entirely
@@ -156,7 +156,7 @@ and pay for, plus egress); Deno Deploy or Fly.io (comparable free tiers, new
 vendor, no existing credential); Supabase or Firebase (a full account system is
 the opposite of the no-accounts posture, and the free tiers are the ones most
 prone to change); extending Sanity (a content CMS, unsuited to per-run writes —
-and since removed from Plinky altogether).
+and since removed from Klimpi altogether).
 
 ## Free-tier budget
 
@@ -239,17 +239,17 @@ an abuser or an enrolment wave rather than organic growth.
 
 ## Topology
 
-Production serves from Cloudflare Pages at `plinky.fun` (moved from GitHub Pages on
+Production serves from Cloudflare Pages at `klimpi.app` (moved from GitHub Pages on
 2026-08-13; the site is still a static build uploaded by `website.yml`, only the host
 changed). The API needs a host, and there are two ways to give it one.
 
-**Option A — `api.plinky.fun`, a separate origin.** A Worker on its own subdomain.
+**Option A — `api.klimpi.app`, a separate origin.** A Worker on its own subdomain.
 Simple, independent of the website deploy, and reversible by deleting a DNS
 record. Costs a CORS preflight `OPTIONS` on every non-simple request, and a
 preflight is a billable Worker request, so browser API calls roughly double
 against the 100k/day allowance.
 
-**Option B — `plinky.fun/api/*`, the same origin.** A Worker route on the apex,
+**Option B — `klimpi.app/api/*`, the same origin.** A Worker route on the apex,
 with Pages continuing to serve everything else. No preflights, no CORS
 configuration, and cookies would work if they were ever wanted.
 
@@ -271,8 +271,8 @@ Environments:
 
 | Environment | Worker | Data | Client reaches it via |
 | --- | --- | --- | --- |
-| Production | `plinky-api` | D1 `plinky`, R2 `plinky-vault` | `VITE_API_BASE=https://api.plinky.fun` |
-| Preview | `plinky-api-preview` | D1 `plinky-preview`, R2 `plinky-vault-preview` | Set per preview deploy |
+| Production | `klimpi-api` | D1 `klimpi`, R2 `klimpi-vault` | `VITE_API_BASE=https://api.klimpi.app` |
+| Preview | `klimpi-api-preview` | D1 `plinky-preview`, R2 `klimpi-vault-preview` | Set per preview deploy |
 | Local | `wrangler dev` | Local D1 and R2 emulation | `.env.local` |
 
 Preview and production must never share a database. Preview branches are
@@ -362,9 +362,9 @@ discipline applies across the network, where the failure is likelier. A caller
 must be able to distinguish "the server said no" from "the server was not there",
 because the first is worth telling the player about and the second is not.
 
-**Adapters.** In `app/adapters/`, named `plinkyApi<Domain>.ts`, each a
-`createPlinkyApi<Domain>(fetchUrl: Fetcher, config: ApiConfig | null = apiConfigFromEnv())`
-factory. A shared `app/adapters/plinkyApi.ts` holds the boundary in one place:
+**Adapters.** In `app/adapters/`, named `klimpiApi<Domain>.ts`, each a
+`createKlimpiApi<Domain>(fetchUrl: Fetcher, config: ApiConfig | null = apiConfigFromEnv())`
+factory. A shared `app/adapters/klimpiApi.ts` holds the boundary in one place:
 config from environment, URL construction, and the single defensive
 chokepoint that collapses a network throw, a non-OK status and a malformed body
 to one value.
@@ -505,7 +505,7 @@ say they are. Each is an accounts feature, and accounts are out of scope.
 
 ## Capability: result collection
 
-The cheapest capability that changes what Plinky can do for a teacher, and the
+The cheapest capability that changes what Klimpi can do for a teacher, and the
 first one built.
 
 **Flow.** A teacher opens `/class`, creates a class, and receives a write token
@@ -554,7 +554,7 @@ the save carries the identity the save then stores. `buildReport` stamps
 this section also wanted arrives with the classes it names, rather than as a field
 with nothing to hold.
 
-Plinky has no live users, so the format simply changed and the tests changed with
+Klimpi has no live users, so the format simply changed and the tests changed with
 it, rather than needing a compatibility path.
 
 The same change fixed what it uncovered: `/collect` rendered every pasted report in
@@ -715,7 +715,7 @@ whether the artist is really who they say: the maintainer already curates every
 piece that enters the catalogue, and that curation is the verification. No claiming flow, no
 identity service, no accounts.
 
-What this gives an artist is a page on Plinky listing their own pieces, playable
+What this gives an artist is a page on Klimpi listing their own pieces, playable
 by anyone, credited and licensed under the CC terms they chose. What it gives the
 catalogue is music that exists nowhere else. The licence gate above is unchanged —
 an artist publishing here is choosing CC0, CC-BY or CC-BY-SA for that piece, which
@@ -881,7 +881,7 @@ There is no verified tier to graduate to: ranked competition is
 framing invariant 4 exists to avoid, so the line matters. A histogram showing
 "most people landed here" is encouragement and belongs. A ranking showing who is
 above you is pressure and does not. This capability builds the histogram only, and
-that is the whole of comparison in Plinky.
+that is the whole of comparison in Klimpi.
 
 ## Capability: progress vault
 
@@ -931,7 +931,7 @@ content hash and a tombstone mark:
 pulls everything with `rev > lastSeenRev`, which makes sync incremental and makes
 a resumed sync cheap.
 
-**The merge clock is logical, not wall-clock.** Every timestamp Plinky stores
+**The merge clock is logical, not wall-clock.** Every timestamp Klimpi stores
 today comes from `Date.now()` — `Take.createdAt` is documented as wall-clock,
 and `Mastery.updatedAt`, `SightReadRecord.playedAt` and `PlacementResult.takenAt`
 are the same. A device with a clock three days fast would win every comparison
@@ -944,7 +944,7 @@ clocks are equal, without which last-write-wins is not commutative. The document
 already refuses to trust a client clock for `reported_at`; the merge decision
 variable deserves the same suspicion.
 
-**Deletion needs tombstones, or nothing can ever be deleted.** Plinky deletes in
+**Deletion needs tombstones, or nothing can ever be deleted.** Klimpi deletes in
 seven places today: clearing a fingering map, removing a take, removing an
 assignment, un-starring a favourite, deleting an imported score, removing a practice
 session, and clearing a placement result. Only the first removes a key; the rest
@@ -960,7 +960,7 @@ collected 90 days after the last member syncs past them, which is bounded by the
 365-day vault retention below.
 
 **Merge policy is per store, and it is the real work.** Last-write-wins is wrong
-for most of what Plinky stores. The policy table is part of the design, not an
+for most of what Klimpi stores. The policy table is part of the design, not an
 implementation detail:
 
 | Key or family | Merge | Reason |
@@ -1104,7 +1104,7 @@ costs a player nothing they still hold locally.
 ## Capability: the recorded piano
 
 **Live as of 2026-08-16, and not a backend.** The recorded grand piano is static bytes on
-object storage, no Worker, no state, no identity — the first thing Plinky serves from
+object storage, no Worker, no state, no identity — the first thing Klimpi serves from
 anywhere but its own origin. It is recorded here because it is the first non-Pages origin
 and because the next person to add one should find the reasoning.
 
@@ -1130,7 +1130,7 @@ which is what makes all of the above safe.
 
 ### The bucket
 
-An R2 bucket, `plinky-samples`, published read-only at `samples.plinky.fun`. R2 has no
+An R2 bucket, `klimpi-samples`, published read-only at `samples.klimpi.app`. R2 has no
 egress charge, which is the whole reason it is R2 rather than anything else: this is a
 read-mostly pile of immutable audio served to browsers.
 
@@ -1142,33 +1142,33 @@ moves with it.
 Setting it up, once:
 
 1. **Create the bucket.** Cloudflare dashboard → R2 → *Create bucket*, named
-   `plinky-samples`, in the automatic location. Leave it private for now.
+   `klimpi-samples`, in the automatic location. Leave it private for now.
 2. **Build the pack**, with the library unpacked somewhere outside the repository:
    `npm run piano:build -- --library <dir> --out piano-pack`. It writes
    `piano-pack/v1/` — 621 `.opus` files, a `manifest.json` carrying the licence, and a
    `README.txt` beside it with the credit and the byte count.
 3. **Upload it** under the same `v1/` prefix. The dashboard refuses more than a hundred
    files at a time and a pack is six hundred, so `npm run piano:upload -- --bucket
-   plinky-samples` drives wrangler once per object, eight at a time, and remembers what
+   klimpi-samples` drives wrangler once per object, eight at a time, and remembers what
    landed so a dropped connection costs only the rest. It needs `CLOUDFLARE_ACCOUNT_ID`
    and `CLOUDFLARE_API_TOKEN` in the environment — an R2 token with object read/write on
    this bucket alone — and never takes them as arguments, because a token on a command
    line ends up in shell history.
 
-   By hand it is `npx wrangler r2 object put plinky-samples/v1/<name> --file <path>
+   By hand it is `npx wrangler r2 object put klimpi-samples/v1/<name> --file <path>
    --remote`. **`--remote` is not optional**: without it wrangler writes to a local
    simulator and reports success. Upload `manifest.json` **last** — while it is absent the
    app has no pack at all, which is a better half-uploaded state than a manifest naming
    recordings that have not arrived. Serve the audio as `audio/ogg` and everything with
    `cache-control: public, max-age=31536000, immutable`.
 4. **Give it a domain.** Bucket → *Settings* → *Public access* → *Custom domain* →
-   `samples.plinky.fun`. Cloudflare adds the DNS record itself when the zone is on the
+   `samples.klimpi.app`. Cloudflare adds the DNS record itself when the zone is on the
    same account. Do **not** enable the `r2.dev` public URL: it is rate-limited and its
    hostname would end up in a cache somewhere.
 5. **Allow the app to read it.** Bucket → *Settings* → *CORS policy*: `GET` and `HEAD`
-   from `https://plinky.fun` and the preview origin, no credentials. Without this the
+   from `https://klimpi.app` and the preview origin, no credentials. Without this the
    fetches fail as CORS errors even though the objects are public.
-6. **Cache it hard.** A Cache Rule on `samples.plinky.fun/*` with an edge TTL of a year
+6. **Cache it hard.** A Cache Rule on `samples.klimpi.app/*` with an edge TTL of a year
    and *Respect origin* off. The bytes are immutable by construction, so nothing here can
    go stale. Objects uploaded through the dashboard carry no `cache-control` of their own
    — `npm run piano:upload` sets one, the dashboard does not — so without the rule every
@@ -1215,12 +1215,12 @@ without its licence is a pack that cannot ship.
 
 ## Declined: ranked competition
 
-**Plinky will not have ranked competition, and therefore will not have a
-server-side referee.** Decided 2026-08-09. The reasoning is about what Plinky is
+**Klimpi will not have ranked competition, and therefore will not have a
+server-side referee.** Decided 2026-08-09. The reasoning is about what Klimpi is
 for: a ladder ranks players against each other, and ranking is a form of pressure
 that the rest of the product deliberately refuses. Invariant 4 already rules out
 streaks because they punish a missed day. A ladder is the same instinct wearing a
-different hat, and the friendliness Plinky promotes is worth more than the
+different hat, and the friendliness Klimpi promotes is worth more than the
 engagement a ranking would buy.
 
 This section stays because the analysis is worth keeping. Without it, the idea
@@ -1262,7 +1262,7 @@ for the client-only case, and it does not weaken.
 
 ## Deferred: the artist marketplace
 
-**Letting artists sell their music through Plinky is deferred, not declined.** The
+**Letting artists sell their music through Klimpi is deferred, not declined.** The
 idea is sound and the demand is plausible. What stops it being a phase is that its
 obligations are the substance of the feature rather than a long tail, and that the
 one fact which should decide it — whether living artists actually publish here at
@@ -1275,11 +1275,11 @@ registration and filing that implies for a German operator; DSA intermediary
 duties; notice-and-takedown, because somebody will eventually upload work they do
 not own; content moderation at a volume curation cannot absorb; refunds,
 chargebacks and tax reporting; and a contributor agreement carrying a warranty and
-an indemnity. Together these convert Plinky from a curated publisher into a
+an indemnity. Together these convert Klimpi from a curated publisher into a
 marketplace, which is a different liability regime and a materially different
 amount of one person's time.
 
-**Two collisions are specific to Plinky and make it harder here than in general.**
+**Two collisions are specific to Klimpi and make it harder here than in general.**
 
 *A paid piece has to be export-locked, and the app promises the opposite.*
 Progress backup, MIDI and MusicXML export and share links exist because a player
@@ -1590,10 +1590,10 @@ never searchable — and they reduce exposure without removing the obligation.
 reaches a classroom.** Two independent problems: consent given because a teacher
 instructed it is not freely given, and Art. 8 sets the digital-consent age at 16
 in Germany, above most of the pupils in question. The workable structure is that
-the school is controller and Plinky is processor, with the school's own basis
+the school is controller and Klimpi is processor, with the school's own basis
 (public task under the relevant *Landesdatenschutzgesetz*) covering the
 processing and a processor agreement covering us. That is a different product
-posture from anything Plinky has today, and it is the question that actually gates
+posture from anything Klimpi has today, and it is the question that actually gates
 classroom use. It needs an answer from someone qualified to give one.
 
 **A DPIA is likely required before result collection ships.** Systematic
@@ -1636,7 +1636,7 @@ the beacon cannot answer a question about a feature.
 | DPIA covering result collection | Phase 1 in real classrooms |
 | DPIA extension covering the vault | Phase 4 |
 
-**The claim to preserve, stated accurately.** Plinky today collects nothing beyond a
+**The claim to preserve, stated accurately.** Klimpi today collects nothing beyond a
 cookie-free page-view count, and it fetches nothing from anyone but its own origin and
 the analytics beacon. After phase 1 that
 becomes "collects nothing unless a teacher opts in, and then a nickname and a
@@ -1941,7 +1941,7 @@ never rewritten.
 | Date | Decision | Reasoning |
 | --- | --- | --- |
 | 2026-08-09 | Cloudflare over a VPS or another edge platform | Existing account, credentials and domain; zero R2 egress; free-plan Durable Objects |
-| 2026-08-09 | `api.plinky.fun` for phases 0–3 over a same-origin route | A separate origin cannot break the production site; the preflight cost is affordable at projected volume |
+| 2026-08-09 | `api.klimpi.app` for phases 0–3 over a same-origin route | A separate origin cannot break the production site; the preflight cost is affordable at projected volume |
 | 2026-08-09 | D1 for rows, R2 for bulk, KV for nothing | KV allows 1,000 writes/day, which no write path can live inside |
 | 2026-08-09 | The worker imports `core/` rather than reimplementing grading | `core/` is already pure and already shared with `dev/`; a second implementation would drift |
 | 2026-08-09 | Capability tokens over accounts | Accounts bring passwords, recovery, PII and a support burden, for no capability in scope |
@@ -1950,9 +1950,9 @@ never rewritten.
 | 2026-08-09 | Two trust tiers, never a proof claim | Reproducibility of a verdict is not authenticity of a stream; no server-side scheme separates a good bot from a good player |
 | 2026-08-09 | Human review mandatory for submitted scores | The CC-only policy is a licensing obligation, and automated acceptance would create a UGC liability regime |
 | 2026-08-09 | A vault has its own id, and devices join it by pairing | A vault keyed on its creating device is one no second device can ever reach, which makes the capability impossible rather than merely awkward |
-| 2026-08-09 | Deletions are tombstones, not absences | Plinky deletes in five places today, and a merge treating absence as "not yet seen" resurrects every one of them on the next sync |
+| 2026-08-09 | Deletions are tombstones, not absences | Klimpi deletes in five places today, and a merge treating absence as "not yet seen" resurrects every one of them on the next sync |
 | 2026-08-09 | Domain caps are applied locally, never during merge | Capping a merged union at five destroys recordings, which are the only values in the store that cannot be re-derived |
-| 2026-08-09 | The merge clock is a hybrid logical clock | Every timestamp Plinky stores is `Date.now()`, so a skewed device would win every comparison and silently revert the other's edits |
+| 2026-08-09 | The merge clock is a hybrid logical clock | Every timestamp Klimpi stores is `Date.now()`, so a skewed device would win every comparison and silently revert the other's edits |
 | 2026-08-09 | Uploads go through the Worker, not a presigned R2 URL | R2 presigned URLs cannot express a maximum size and are replayable until expiry, against the one product that bills rather than failing closed |
 | 2026-08-09 | Score fingerprinting and validation run in GitHub Actions | The 10 ms CPU ceiling applies to cron and queue consumers too; unzipping and fingerprinting one ordinary score measures ~50 ms |
 | 2026-08-09 | Rate limits key on capability tokens; IP only by prefix as a backstop | A per-IP write limit rejects most of a class behind one school NAT while constraining nobody who holds an IPv6 `/64` |
@@ -1963,7 +1963,7 @@ never rewritten.
 | 2026-08-09 | The privacy policy names Cloudflare before phase 0 deploys | The health poll alone sends visitor IPs to a new processor, before any feature exists |
 | 2026-08-09 | The API deploy triggers on `core/**` as well as `worker/**` | Otherwise a shared-code change ships to the browser and not the server, which is exactly the drift invariant 7 forbids |
 | 2026-08-09 | The worker owns its vitest config, following `studio/` | A root project and a `cd worker && npm test` wrapper are mutually exclusive, and the root project would pull worker files into the coverage ratchet |
-| 2026-08-09 | **No ranked competition, and therefore no referee.** Supersedes the two-trust-tiers row above | Ranking players against each other is pressure, and the friendliness Plinky promotes is worth more than the engagement a ladder would buy. It is the same instinct invariant 4 already refuses in streaks. The technical case was weak independently — a referee could not have proven anything, and the server has no answer key to grade against — but the product reason decides it on its own |
+| 2026-08-09 | **No ranked competition, and therefore no referee.** Supersedes the two-trust-tiers row above | Ranking players against each other is pressure, and the friendliness Klimpi promotes is worth more than the engagement a ladder would buy. It is the same instinct invariant 4 already refuses in streaks. The technical case was weak independently — a referee could not have proven anything, and the server has no answer key to grade against — but the product reason decides it on its own |
 | 2026-08-09 | The daily histogram is the whole of comparison | With no ladder to graduate to, "reported" stops being a lower tier and becomes the only tier, which simplifies the schema and the copy alike |
 | 2026-08-09 | A shared assignment carries a teacher-minted id and a class id | The share code drops the local id and the receiver mints its own, so thirty pupils produce thirty ids for one assignment and a server-side results table cannot group them |
 | 2026-08-09 | A device holds a set of class memberships, not one | A pupil at two schools, or taking two subjects at one school, is the ordinary case rather than the exception; binding the class to the assignment removes the picker and the mistake it invites |
@@ -1996,7 +1996,7 @@ phase 0.
    exchange for two capabilities. Blocks phases 2 and 4.
 2. **Who is controller for classroom use, and who writes the DPIA?** Consent is
    not a valid basis for teacher-instructed submissions by pupils under 16, so
-   result collection in a German school needs the school as controller, Plinky as
+   result collection in a German school needs the school as controller, Klimpi as
    processor, and a processor agreement — or a different design. This needs
    someone qualified. Blocks phase 1 reaching real classrooms, not its
    development.

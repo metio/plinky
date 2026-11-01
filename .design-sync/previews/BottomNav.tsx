@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Mirrors app/components/ui/navBar.stories.tsx, with one addition the story does not need.
@@ -7,7 +7,7 @@
 // top edge, leaving the card blank. A frame with its own height — and a transform, which
 // makes it the containing block for fixed descendants — puts the bar back on a floor.
 import type { ReactNode } from "react";
-import { BottomNav, HeaderNav } from "plinky";
+import { BottomNav, HeaderNav } from "klimpi";
 
 const Frame = ({ children }: { children: ReactNode }) => (
     <div style={{ position: "relative", height: 260, transform: "translateZ(0)" }}>{children}</div>

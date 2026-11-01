@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { PartOfDay } from "../../../core/greeting";
@@ -19,7 +19,7 @@ import type { PartOfDay } from "../../../core/greeting";
 // grade bands) stays out, so nobody has to wonder whether a pink balloon is telling them
 // something.
 
-const PETALS = ["bg-bloom-sun", "bg-bloom-leaf", "bg-bloom-sky", "bg-plink", "bg-bloom-rose"];
+const PETALS = ["bg-bloom-sun", "bg-bloom-leaf", "bg-bloom-sky", "bg-tinkle", "bg-bloom-rose"];
 
 // How long the stalk takes to draw itself, in seconds. The petals wait it out, so this has
 // to agree with `--animate-stem-draw` in app.css — the two are one gesture split across a
@@ -108,7 +108,7 @@ function Flower() {
             </span>
             {/* A note falls to the flower — the app's own gesture, and the one thing here
                 nothing else in the set does. */}
-            <span className="absolute left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-plink animate-note-fall motion-reduce:hidden" />
+            <span className="absolute left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-tinkle animate-note-fall motion-reduce:hidden" />
         </>
     );
 }
@@ -118,8 +118,8 @@ function Flower() {
 // balloon drawn three times.
 const BALLOONS: { colour: string; string: string; left: number; top: number; delay: string }[] = [
     { colour: "bg-bloom-rose", string: "text-bloom-leaf", left: 8, top: 14, delay: "0s" },
-    { colour: "bg-plink", string: "text-bloom-sun", left: 26, top: 6, delay: "-1.2s" },
-    { colour: "bg-bloom-sky", string: "text-plink", left: 42, top: 16, delay: "-2.4s" },
+    { colour: "bg-tinkle", string: "text-bloom-sun", left: 26, top: 6, delay: "-1.2s" },
+    { colour: "bg-bloom-sky", string: "text-tinkle", left: 42, top: 16, delay: "-2.4s" },
 ];
 
 function Balloons() {
@@ -165,13 +165,13 @@ function Balloons() {
 const SPARKS: { left: number; top: number; size: number; colour: string; delay: string }[] = [
     { left: 4, top: 10, size: 20, colour: "text-bloom-sun", delay: "0s" },
     { left: 40, top: 6, size: 17, colour: "text-bloom-rose", delay: "-0.8s" },
-    { left: 28, top: 30, size: 18, colour: "text-plink", delay: "-1.6s" },
+    { left: 28, top: 30, size: 18, colour: "text-tinkle", delay: "-1.6s" },
     { left: 8, top: 42, size: 14, colour: "text-bloom-sky", delay: "-2.2s" },
     { left: 50, top: 38, size: 12, colour: "text-bloom-sun", delay: "-2.8s" },
 ];
 
 const DOTS: { left: number; top: number; size: number; colour: string; delay: string }[] = [
-    { left: 38, top: 2, size: 8, colour: "bg-plink", delay: "-0.4s" },
+    { left: 38, top: 2, size: 8, colour: "bg-tinkle", delay: "-0.4s" },
     { left: 2, top: 34, size: 6, colour: "bg-bloom-rose", delay: "-1.1s" },
     { left: 58, top: 24, size: 6, colour: "bg-accent-soft", delay: "-1.9s" },
     { left: 26, top: 58, size: 8, colour: "bg-bloom-sky", delay: "-2.5s" },

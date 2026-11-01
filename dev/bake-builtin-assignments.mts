@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Resolves the named works in dev/builtin-assignments.json to the piece ids the catalogue
@@ -7,7 +7,7 @@
 // A pianist works through a book, not a piece: the two-part inventions, Burgmüller's
 // studies, the Goldberg variations. Those sets already exist inside the catalogue but are
 // invisible in it — three thousand rows sorted by difficulty, with no sign that fifteen of
-// them are one work. Naming them costs nothing new to learn, because Plinky already has
+// them are one work. Naming them costs nothing new to learn, because Klimpi already has
 // the thing they become: an assignment.
 //
 // Resolved here rather than in the browser so no pattern-matching table reaches a

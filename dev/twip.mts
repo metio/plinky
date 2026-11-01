@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Posts the week's changes to r/plinky_piano.
+// Posts the week's changes to r/klimpi_piano.
 //
 // Reads the same list NEWS.md is rendered from, so the round-up and the page players are
 // sent to cannot disagree about what shipped.
@@ -35,9 +35,9 @@ import {
     roundUpTitle,
 } from "../core/changelog";
 
-const SUBREDDIT = "plinky_piano";
+const SUBREDDIT = "klimpi_piano";
 const WINDOW_DAYS = 7;
-const AGENT = "plinky-twip/1.0 (by u/plinky_bot)";
+const AGENT = "klimpi-twip/1.0 (by u/klimpi_bot)";
 
 const dry = process.argv.includes("--dry-run");
 

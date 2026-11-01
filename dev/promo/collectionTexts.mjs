@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A YouTube playlist description per named work, written beside the clips it collects.
 //
-// The point of these is somebody who will never open Plinky. The app turns these
+// The point of these is somebody who will never open Klimpi. The app turns these
 // collections into assignments a player works through in order, gentlest first; a playlist
 // is the same order, the same pieces, for somebody who just wants to watch and learn. That
 // only holds while both come from one list, which is why this reads the baked assignments
@@ -22,7 +22,7 @@ import { uploadText } from "./uploadText.mjs";
 const OUT = process.argv.includes("--out")
     ? process.argv[process.argv.indexOf("--out") + 1]
     : "promo";
-const SITE = "https://plinky.fun";
+const SITE = "https://klimpi.app";
 
 function describe(set) {
     const short =
@@ -30,11 +30,11 @@ function describe(set) {
             ? `${set.pieces.length} of the ${set.held} pieces the catalogue holds are here — the rest are under a licence that cannot travel with a video.`
             : null;
     return [
-        `${set.name}, played in Plinky — the notes falling as they sound, and the keys lighting under them.`,
+        `${set.name}, played in Klimpi — the notes falling as they sound, and the keys lighting under them.`,
         "",
         // Order is the whole value of a collection: the app hands these to a player as an
         // assignment, gentlest first, and a playlist in the same order is the same lesson.
-        "In playing order, gentlest first — the same order Plinky gives them to a player working through the set.",
+        "In playing order, gentlest first — the same order Klimpi gives them to a player working through the set.",
         short,
         "",
         `Work through this set yourself: ${SITE}/en/assignments/`,
@@ -42,7 +42,7 @@ function describe(set) {
         "The colour of each note is the finger that plays it:",
         ...FINGER_LEGEND,
         "",
-        "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
+        "Klimpi is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
         "",
         SITE,
         "",
@@ -77,7 +77,7 @@ for (const set of collections()) {
     await mkdir(dir, { recursive: true });
     // The words that go up with the playlist, exactly as a piece's own youtube.txt carries
     // the words for its clip.
-    await writeFile(`${dir}/youtube.txt`, uploadText(`${set.name} | Plinky`, describe(set)));
+    await writeFile(`${dir}/youtube.txt`, uploadText(`${set.name} | Klimpi`, describe(set)));
     // And the assembly list, which is for whoever is doing the uploading rather than for
     // anybody watching. Kept apart from the description so neither has to be read around
     // the other, and so the description can be pasted into YouTube whole.

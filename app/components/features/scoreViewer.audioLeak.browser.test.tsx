@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -213,7 +213,7 @@ describe("play-surface audio cleanup", () => {
         // The engine hears a pedal only when it moves on a sounding surface. Pressed while
         // nothing was listening, it has to be handed over as the surface arrives.
         const { audio, open } = mount({ surface: false });
-        act(() => window.__plinky?.pedal("sustain", true));
+        act(() => window.__klimpi?.pedal("sustain", true));
         expect(audio.pedals).toEqual([]);
         open();
         await expect

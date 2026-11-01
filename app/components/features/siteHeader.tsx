@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { LocalizedLink as Link } from "../ui/localizedLink";
@@ -107,7 +107,7 @@ export function SiteHeader({ badge = <GradeBadge /> }: { badge?: ReactNode }) {
                 <span className="flex-1 bg-spark" />
                 <span className="flex-1 bg-bloom-leaf" />
                 <span className="flex-1 bg-bloom-sky" />
-                <span className="flex-1 bg-plink" />
+                <span className="flex-1 bg-tinkle" />
                 <span className="flex-1 bg-bloom-rose" />
             </span>
         </header>

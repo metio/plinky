@@ -1,11 +1,11 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# How Plinky talks
+# How Klimpi talks
 
-Plinky is a piano teacher who is delighted you showed up and has nowhere else to be.
+Klimpi is a piano teacher who is delighted you showed up and has nowhere else to be.
 Warm, unhurried, never disappointed in you. Every string in `messages/en.json` is that
 teacher speaking, so this page is the contract every one of them keeps.
 
@@ -22,7 +22,7 @@ different relationship.
 | --- | --- |
 | Play today's challenge, get graded, and share your result grid. | A new piece every day — the same one for everyone. Give it a go, see how it lands, and share your grid if you'd like. |
 | Drop a MusicXML file to add it to your library. | Got a score of your own? Drop it in and it plays like any other piece. |
-| Set your hand size to personalize the suggested finger positions. | Tell Plinky how far you reach and the finger positions follow your hands. |
+| Set your hand size to personalize the suggested finger positions. | Tell Klimpi how far you reach and the finger positions follow your hands. |
 | Press Listen to hear the piece, then play along slowly. | Have a listen first, then play along as slowly as you like. |
 
 A chain of imperatives is the tell: *pick a piece, play it, share it*. One verb is an
@@ -46,7 +46,7 @@ sentence doing routine work reads as nervous rather than happy.
 
 ## Never nag
 
-There are **no streaks in Plinky, ever** — and the copy carries the same promise the
+There are **no streaks in Klimpi, ever** — and the copy carries the same promise the
 product does. Nothing implies debt, lapse, or a missed day you should feel bad about.
 Say what's there; never why the reader was away.
 
@@ -71,8 +71,8 @@ fault, and what still works. No apology theatre, no blame.
 
 ## Second person, present tense, active voice
 
-Plinky talks to **you**. It rarely talks about itself, and never in the third person
-plural — there's no "we" behind the app. `Plinky can listen through the microphone` ✓;
+Klimpi talks to **you**. It rarely talks about itself, and never in the third person
+plural — there's no "we" behind the app. `Klimpi can listen through the microphone` ✓;
 `We've added microphone support` ✗.
 
 Prefer the present: `Every run is graded` over `Every run will be graded`.
@@ -84,7 +84,7 @@ Existing keys are inconsistent about this; fix them as you touch them.
 
 ## Music words are worth learning
 
-Plinky is a piano teacher, so it uses the real word and makes it easy — a beginner who
+Klimpi is a piano teacher, so it uses the real word and makes it easy — a beginner who
 finishes a piece should have picked up the vocabulary for free. Don't dumb down; don't
 assume either.
 
@@ -94,7 +94,7 @@ assume either.
 ## Before you add a string
 
 Read it aloud. If it sounds like a form, a manual, or a disappointed parent, it isn't
-Plinky yet. Then check:
+Klimpi yet. Then check:
 
 - Would a person say this out loud to someone at a piano?
 - Is there a verb chain that wants to be an invitation?

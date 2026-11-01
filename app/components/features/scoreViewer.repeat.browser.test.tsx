@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -40,7 +40,7 @@ const REPEATED = `<?xml version="1.0" encoding="UTF-8"?>
   </part>
 </score-partwise>`;
 
-const halos = () => document.querySelectorAll(".plinky-note-halo").length;
+const halos = () => document.querySelectorAll(".klimpi-note-halo").length;
 
 const strike = async (name: string) => {
     const key = await screen.findByLabelText(name);

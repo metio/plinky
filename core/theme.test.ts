@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { DEFAULT_THEME, parseTheme, resolveShade } from "./theme";
+import { DEFAULT_PALETTE, DEFAULT_THEME, parseTheme, resolveShade } from "./theme";
 
 describe("parseTheme", () => {
     it("accepts every palette in every mode", () => {
@@ -17,13 +17,13 @@ describe("parseTheme", () => {
     });
 
     it("reads a bare stored mode as that mode in the default palette", () => {
-        expect(parseTheme("dark")).toEqual({ palette: "indigo", mode: "dark" });
-        expect(parseTheme("light")).toEqual({ palette: "indigo", mode: "light" });
+        expect(parseTheme("dark")).toEqual({ palette: DEFAULT_PALETTE, mode: "dark" });
+        expect(parseTheme("light")).toEqual({ palette: DEFAULT_PALETTE, mode: "light" });
     });
 
     it("repairs each half on its own", () => {
         expect(parseTheme({ palette: "neon", mode: "dark" })).toEqual({
-            palette: "indigo",
+            palette: DEFAULT_PALETTE,
             mode: "dark",
         });
         expect(parseTheme({ palette: "violet", mode: "dim" })).toEqual({

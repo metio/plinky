@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Score submission
 on:
@@ -63,7 +63,7 @@ jobs:
         with:
           script: |
             const valid = process.env.VALID === "true";
-            const marker = "<!-- plinky-score-check -->";
+            const marker = "<!-- klimpi-score-check -->";
             const message = [
               marker,
               JSON.parse(process.env.REPORT),

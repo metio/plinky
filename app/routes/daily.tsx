@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
@@ -106,7 +106,7 @@ export default function DailyRoute() {
                 // The same take-it-with-you actions a play page's title line carries:
                 // print the phrase, or download it as MIDI/MusicXML.
                 actions={
-                    today ? <ExportMenu xml={today.xml} title={`Plinky #${today.number}`} /> : null
+                    today ? <ExportMenu xml={today.xml} title={`Klimpi #${today.number}`} /> : null
                 }
             />
 
@@ -129,7 +129,7 @@ export default function DailyRoute() {
                             key={today.number}
                             id={`daily-${today.number}`}
                             xml={today.xml}
-                            title={`Plinky #${today.number}`}
+                            title={`Klimpi #${today.number}`}
                             daily={today.number}
                             initialTempo={today.tempo}
                             lockTempo

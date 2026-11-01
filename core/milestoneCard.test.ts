@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // @vitest-environment jsdom
@@ -18,7 +18,7 @@ describe("svgMilestone", () => {
         const texts = [...doc.querySelectorAll("text")].map((t) => t.textContent);
         expect(texts).toContain("Grade 5");
         expect(texts).toContain("Skill 1840");
-        expect(texts).toContain("plinky.fun");
+        expect(texts).toContain("klimpi.app");
     });
 
     it("omits the detail line when there is none", () => {

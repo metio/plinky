@@ -1,7 +1,7 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# The Plinky development environment. It consumes the shared metio devShell
+# The Klimpi development environment. It consumes the shared metio devShell
 # (`devshell.lib.mkDevShell`), so the lint gate (reuse, typos, yamllint, actionlint,
 # shellcheck, markdownlint) is defined once org-wide, and every CI gate runs
 # through `nix develop --command …` — resolving the exact tool versions in
@@ -20,7 +20,7 @@
 # the browser check — a version ahead of the driver fails it and waits for the
 # next driver bump to rebase green, so the two converge without a manual edit.
 {
-  description = "Plinky: a client-only React Router SPA for learning the piano";
+  description = "Klimpi: a client-only React Router SPA for learning the piano";
 
   inputs = {
     devshell.url = "github:metio/nix-devshell";
@@ -147,7 +147,7 @@
               # same pages at the same widths; only the language changes.
               for locale in $(node dev/locale-stress.mjs --scripts); do
                 echo "── $locale ──"
-                PLINKY_LOCALE="$locale" npm run build
+                KLIMPI_LOCALE="$locale" npm run build
                 npm run widths "$@"
               done
             '')

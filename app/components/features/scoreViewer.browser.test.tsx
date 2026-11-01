@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { choose, chosen, reveal, switchOn, toggle } from "../../testing/controls";
@@ -457,7 +457,7 @@ describe("ScoreViewer", () => {
             { timeout: 30000 },
         );
         expect(screen.queryByLabelText("Loop from bar")).toBeNull();
-        expect(score.querySelectorAll("rect.plinky-bar-selection")).toHaveLength(0);
+        expect(score.querySelectorAll("rect.klimpi-bar-selection")).toHaveLength(0);
     });
 
     it("narrows the loop to a clicked bar, filling it with a red overlay", async () => {
@@ -502,7 +502,7 @@ describe("ScoreViewer", () => {
             { timeout: 30000 },
         );
         // The selected bar gets a red backdrop rect behind its notes.
-        const fills = score.querySelectorAll("rect.plinky-bar-selection");
+        const fills = score.querySelectorAll("rect.klimpi-bar-selection");
         expect(fills.length).toBeGreaterThan(0);
         expect(fills[0]?.getAttribute("fill")).toBe("#ef4444");
     });
@@ -1021,7 +1021,7 @@ describe("ScoreViewer", () => {
         await waitFor(
             () =>
                 expect(
-                    container.querySelector(`.plinky-note-halo[fill="${PLAYED_COLOR}"]`),
+                    container.querySelector(`.klimpi-note-halo[fill="${PLAYED_COLOR}"]`),
                 ).toBeTruthy(),
             {
                 timeout: 30000,
@@ -1054,7 +1054,7 @@ describe("ScoreViewer", () => {
         await waitFor(
             () =>
                 expect(
-                    container.querySelector(`.plinky-ghost-mark[stroke="${GHOST_COLOR}"]`),
+                    container.querySelector(`.klimpi-ghost-mark[stroke="${GHOST_COLOR}"]`),
                 ).toBeTruthy(),
             { timeout: 30000 },
         );
@@ -1125,7 +1125,7 @@ describe("ScoreViewer", () => {
         await expect
             .poll(
                 () =>
-                    Array.from(document.querySelectorAll(".plinky-note-halo")).some(
+                    Array.from(document.querySelectorAll(".klimpi-note-halo")).some(
                         (halo) => halo.getAttribute("fill") === WINDOW_COLOR,
                     ),
                 { timeout: 15000 },
@@ -1145,7 +1145,7 @@ describe("ScoreViewer", () => {
         await expect
             .poll(
                 () =>
-                    Array.from(document.querySelectorAll(".plinky-note-halo")).some(
+                    Array.from(document.querySelectorAll(".klimpi-note-halo")).some(
                         (halo) => halo.getAttribute("fill") === LISTENED_COLOR,
                     ),
                 { timeout: 15000 },
@@ -1164,7 +1164,7 @@ describe("ScoreViewer", () => {
         await expect
             .poll(
                 () =>
-                    document.querySelectorAll(`.plinky-note-halo[fill="${LISTENED_COLOR}"]`).length,
+                    document.querySelectorAll(`.klimpi-note-halo[fill="${LISTENED_COLOR}"]`).length,
                 {
                     timeout: 15000,
                 },
@@ -1173,7 +1173,7 @@ describe("ScoreViewer", () => {
         fireEvent.click(screen.getByRole("button", { name: "Restart" }));
         // The trail wipes, so the blue tells the story of the fresh pass only…
         expect(
-            document.querySelectorAll(`.plinky-note-halo[fill="${LISTENED_COLOR}"]`).length,
+            document.querySelectorAll(`.klimpi-note-halo[fill="${LISTENED_COLOR}"]`).length,
         ).toBe(0);
         // …and Listen keeps playing, now from the first note.
         expect(screen.getByRole("button", { name: "Listen" }).getAttribute("aria-pressed")).toBe(
@@ -1190,14 +1190,14 @@ describe("ScoreViewer", () => {
         await enterAndListen();
         await expect
             .poll(
-                () => document.querySelectorAll(`.plinky-note-halo[fill="${WINDOW_COLOR}"]`).length,
+                () => document.querySelectorAll(`.klimpi-note-halo[fill="${WINDOW_COLOR}"]`).length,
                 {
                     timeout: 15000,
                 },
             )
             .toBeGreaterThan(0);
         const sounding = Array.from(
-            document.querySelectorAll(`.plinky-note-halo[fill="${WINDOW_COLOR}"]`),
+            document.querySelectorAll(`.klimpi-note-halo[fill="${WINDOW_COLOR}"]`),
         );
         // The Listen button is pressed while playing; clicking it again stops.
         fireEvent.click(screen.getByRole("button", { name: "Listen" }));
@@ -1295,7 +1295,7 @@ describe("ScoreViewer", () => {
         await expect
             .poll(
                 () =>
-                    Array.from(document.querySelectorAll(".plinky-note-halo")).some(
+                    Array.from(document.querySelectorAll(".klimpi-note-halo")).some(
                         (halo) => halo.getAttribute("fill") === WINDOW_COLOR,
                     ),
                 { timeout: 15000 },
@@ -1842,7 +1842,7 @@ describe("the overlay survives a resize", () => {
         );
         mount(grand, { beatsPerBar: 4, options: { loop: { from: 1, to: 2 } } });
         await awaitReady();
-        const painted = () => document.querySelectorAll(".plinky-bar-selection").length;
+        const painted = () => document.querySelectorAll(".klimpi-bar-selection").length;
         await expect.poll(painted, { timeout: 30000 }).toBeGreaterThan(0);
 
         // What OSMD's own resize render does to us, done by hand: the overlay is wiped and
@@ -1854,7 +1854,7 @@ describe("the overlay survives a resize", () => {
         // labelled with the piece's title.
         const container = document.querySelector('[aria-label="T"]');
         expect(container).toBeTruthy();
-        for (const rect of document.querySelectorAll(".plinky-bar-selection")) {
+        for (const rect of document.querySelectorAll(".klimpi-bar-selection")) {
             rect.remove();
         }
         expect(painted()).toBe(0);

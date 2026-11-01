@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -55,21 +55,21 @@ describe("issueUrl", () => {
             issueUrl(
                 BASE,
                 describeError(routeError(404, "Not Found")),
-                "https://plinky.fun/xyz",
+                "https://klimpi.app/xyz",
                 "TestUA/1.0",
             ),
         );
         expect(url.origin + url.pathname).toBe(BASE);
         expect(url.searchParams.get("title")).toBe("Page not found");
         const body = url.searchParams.get("body") ?? "";
-        expect(body).toContain("**Page:** https://plinky.fun/xyz");
+        expect(body).toContain("**Page:** https://klimpi.app/xyz");
         expect(body).toContain("**Browser:** TestUA/1.0");
         expect(body).toContain("404 Not Found");
     });
 
     it("titles a crash with the first line of the technical detail only", () => {
         const url = new URL(
-            issueUrl(BASE, describeError(new Error("boom")), "https://plinky.fun/", "UA"),
+            issueUrl(BASE, describeError(new Error("boom")), "https://klimpi.app/", "UA"),
         );
         expect(url.searchParams.get("title")).toBe("Error: boom");
         // The multi-line stack stays in the body, not the title.

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type Beams, BEAMS } from "./beams";
@@ -86,7 +86,7 @@ export type Prefs = {
     // B or H for the last white key of the octave, wherever a letter names a note. Auto
     // follows the page's language, so it is only ever set by the player choosing.
     noteLetters: NoteLetters;
-    // Your own instrument makes the sound, so Plinky does not play your notes a second
+    // Your own instrument makes the sound, so Klimpi does not play your notes a second
     // time. A digital piano with speakers, or an acoustic one with MIDI fitted, is already
     // sounding every key you press — answering it adds a second voice a few milliseconds
     // behind your own. Off by default, because most keyboards a beginner plugs in are
@@ -97,14 +97,14 @@ export type Prefs = {
     // sound, and so do the on-screen and computer keyboards, which have no voice of their
     // own. Stored per device — the piano is in this room.
     instrumentSounds: boolean;
-    // Echo what Plinky plays to a connected instrument, lighting its keys.
+    // Echo what Klimpi plays to a connected instrument, lighting its keys.
     midiEcho: boolean;
     // Whether Listen plays with the human touch — the phrase settling, the last bar
     // broadening, the tune leading — or lands every note on the grid.
     listenShaping: boolean;
     // Light the keys you are about to play on an instrument that illuminates them —
     // Casio's MIDI In Navigate, Yamaha's Light Guide. Distinct from midiEcho, which
-    // shows what Plinky HAS played: this shows what comes next, which is the point.
+    // shows what Klimpi HAS played: this shows what comes next, which is the point.
     // How far ahead it goes is not a setting of its own; lighting a key is a reading
     // aid and answers to noteHints like every other one.
     keyLights: boolean;

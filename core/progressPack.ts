@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { isRecord } from "./guards";
 import { jsonOf, NOT_JSON } from "./json";
 
-// The Plinky progress-bundle format: every value this device holds — mastery,
+// The Klimpi progress-bundle format: every value this device holds — mastery,
 // review schedule, lifetime fingerprint, takes, ghosts, fingerings, preferences,
 // favourites, achievements and the score library — as one self-contained JSON
 // document. Progress lives only in the browser, so this bundle is the only way it
@@ -16,7 +16,7 @@ import { jsonOf, NOT_JSON } from "./json";
 // string (`dark`) indistinguishable on the way back in.
 //
 // Keys travel **without the storage prefix**. Restoring re-adds it, so a bundle can
-// only ever address Plinky's own keys — a hand-edited or hostile file has no way to
+// only ever address Klimpi's own keys — a hand-edited or hostile file has no way to
 // name a key belonging to anything else on the origin.
 
 export const PROGRESS_FORMAT = "plinky-progress";

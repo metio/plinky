@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type Assignment, makeAssignment } from "./assignment";
@@ -32,7 +32,7 @@ export function starterAssignment(input: {
 
 // A named work the catalogue holds, as an assignment.
 //
-// These are not a new kind of thing for a player to learn: Plinky already has assignments,
+// These are not a new kind of thing for a player to learn: Klimpi already has assignments,
 // and a book of studies is exactly one — a named, ordered list of pieces to work through.
 // The only difference from the set a teacher sends is where the list came from.
 //

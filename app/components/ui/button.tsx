@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-// Shared button primitives. Plinky is touch-first, so every button clears the 44px
+// Shared button primitives. Klimpi is touch-first, so every button clears the 44px
 // minimum tap target, and the variants give each screen one dominant `primary` with
 // quieter `secondary`/`ghost` around it (and `danger` for destructive actions) — so
 // the main action reads as the main action and selectors don't masquerade as buttons.

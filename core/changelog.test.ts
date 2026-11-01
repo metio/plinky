@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -216,7 +216,7 @@ describe("roundUp", () => {
 
 describe("roundUpTitle", () => {
     it("is dated, because a number would be a version and there are none", () => {
-        expect(roundUpTitle("2026-08-18")).toBe("This week in Plinky — 18 August 2026");
+        expect(roundUpTitle("2026-08-18")).toBe("This week in Klimpi — 18 August 2026");
     });
 });
 
@@ -234,7 +234,7 @@ describe("roundUpBody", () => {
         const body = roundUpBody([release()]);
         expect(body).toContain("**Something changed.** And here is what it means.");
         expect(body).not.toContain("more change");
-        expect(body).toContain("https://plinky.fun");
+        expect(body).toContain("https://klimpi.app");
     });
 
     it("dates each day it covers", () => {
@@ -254,7 +254,7 @@ describe("roundUpBody", () => {
         // post, not against the entries alone.
         expect(
             body.endsWith(
-                "Play at https://plinky.fun — free, in your browser, nothing to install.",
+                "Play at https://klimpi.app — free, in your browser, nothing to install.",
             ),
         ).toBe(true);
     });
@@ -276,7 +276,7 @@ describe("roundUpBody", () => {
     it("keeps the frame even when nothing fits", () => {
         const body = roundUpBody(many(4), 400);
         expect(body).toContain("…and 4 more changes this week");
-        expect(body).toContain("https://plinky.fun");
+        expect(body).toContain("https://klimpi.app");
     });
 });
 
@@ -288,27 +288,27 @@ describe("roundUpsToUnpin", () => {
         // ever pinned would work once, half-work once, and then stop — with the newest
         // week the one missing.
         const posts = [
-            post("This week in Plinky — 18 August 2026", false),
-            post("This week in Plinky — 11 August 2026", true, "t3_last"),
+            post("This week in Klimpi — 18 August 2026", false),
+            post("This week in Klimpi — 11 August 2026", true, "t3_last"),
         ];
-        expect(roundUpsToUnpin(posts, "This week in Plinky — 18 August 2026")).toEqual(["t3_last"]);
+        expect(roundUpsToUnpin(posts, "This week in Klimpi — 18 August 2026")).toEqual(["t3_last"]);
     });
 
     it("leaves somebody else's pinned post where it is", () => {
-        const posts = [post("Welcome to r/plinky_piano — start here", true, "t3_welcome")];
-        expect(roundUpsToUnpin(posts, "This week in Plinky — 18 August 2026")).toEqual([]);
+        const posts = [post("Welcome to r/klimpi_piano — start here", true, "t3_welcome")];
+        expect(roundUpsToUnpin(posts, "This week in Klimpi — 18 August 2026")).toEqual([]);
     });
 
     it("leaves this week's own post alone when it is already up", () => {
         // The retry path pins a post that a previous run posted but failed to pin;
         // unpinning it first would undo the thing being fixed.
-        const title = "This week in Plinky — 18 August 2026";
+        const title = "This week in Klimpi — 18 August 2026";
         expect(roundUpsToUnpin([post(title, true, "t3_this")], title)).toEqual([]);
     });
 
     it("ignores a round-up that is not pinned", () => {
         expect(
-            roundUpsToUnpin([post("This week in Plinky — 4 August 2026", false)], "anything"),
+            roundUpsToUnpin([post("This week in Klimpi — 4 August 2026", false)], "anything"),
         ).toEqual([]);
     });
 

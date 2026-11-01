@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A keyboard with notes marked on it, as a picture somebody can keep.
@@ -66,7 +66,7 @@ const CAPTION_SIZE = 46;
 const CAPTION_MIN = 24;
 const MARGIN = 48;
 
-// A palette of its own, deliberately, and the only keyboard in Plinky that has one. The
+// A palette of its own, deliberately, and the only keyboard in Klimpi that has one. The
 // app's keyboards follow the player's skin and finish (core/keyboardTheme,
 // core/keyboardFinish); this draws a chord chart to be printed or saved as a picture, where
 // somebody else's berry keys on cream paper help nobody and a gloss is wasted ink. Plain

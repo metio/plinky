@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { KeyValueStore } from "../ports/keyValueStore";
@@ -59,7 +59,7 @@ export function loadBundledScores(): Score[] {
             // Recorded here rather than in each file: these are our own transcriptions,
             // under the terms REUSE.toml already declares for scores/*.musicxml.
             license: "CC0-1.0",
-            source: "plinky",
+            source: "klimpi",
         };
     });
 }
@@ -189,7 +189,7 @@ export function exportAllPack(kv: KeyValueStore): string {
     return serializePack(loadUserScores(kv));
 }
 
-// Everything held locally — the user's imports plus Plinky's bundled pieces — as
+// Everything held locally — the user's imports plus Klimpi's bundled pieces — as
 // one bundle, so the built-in songs can leave the device too. The deep song
 // catalogue fetches on demand and isn't stored here, so it isn't included; each
 // of those pieces exports individually from its play page.

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
@@ -99,7 +99,7 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
                 to={top}
                 keys={to.map((note) => ({ note }))}
                 caption={`${label(fromRoot, fromQuality)} → ${label(toRoot, toQuality)}`}
-                filename="plinky-chord-change"
+                filename="klimpi-chord-change"
             />
         </>
     );

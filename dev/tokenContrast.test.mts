@@ -1,11 +1,11 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PALETTE, PALETTES } from "../core/theme";
+import { PALETTES } from "../core/theme";
 import { contrast } from "./contrast.mts";
 import { themeColours } from "./themeColours.mts";
 
@@ -74,9 +74,11 @@ describe("the chrome's colour pairings", () => {
     });
 
     it("measures the grey-brown pencil on a card where the eye puts it", () => {
-        // #736554 on white is 5.65:1. If this drifts, the measurement has come apart from
-        // what a browser shows, and every pass above means nothing.
-        const look = { palette: DEFAULT_PALETTE, shade: "light" } as const;
+        // `indigo`'s #736554 on white is 5.65:1. If this drifts, the measurement has come
+        // apart from what a browser shows, and every pass above means nothing. The
+        // control names its palette rather than taking the default one, so the number it
+        // pins is a property of the measurement and not of which palette ships first.
+        const look = { palette: "indigo", shade: "light" } as const;
         expect(contrast(colours.token(look, "muted"), colours.token(look, "raised"))).toBeCloseTo(
             5.65,
             1,

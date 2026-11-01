@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -21,12 +21,12 @@ describe("SettingsSection", () => {
 
     it("renders as a Folio row with its icon and hint when given an icon", () => {
         render(
-            <SettingsSection title="Sound" hint="Plinky can play notes" icon={<svg role="img" />}>
+            <SettingsSection title="Sound" hint="Klimpi can play notes" icon={<svg role="img" />}>
                 <p>controls</p>
             </SettingsSection>,
         );
         expect(screen.getByRole("heading", { level: 2, name: "Sound" })).toBeTruthy();
-        expect(screen.getByText("Plinky can play notes")).toBeTruthy();
+        expect(screen.getByText("Klimpi can play notes")).toBeTruthy();
     });
 
     it("renders an h3 with its hint for a nested panel", () => {

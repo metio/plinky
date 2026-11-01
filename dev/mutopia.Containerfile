@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Import-only image for the Mutopia harvest, and one of the two things left that still
@@ -11,7 +11,7 @@
 # performance), and it emits one track per staff so a piano grand staff survives.
 #
 # Run via: ilo --no-rc shell --remote-user pwuser --update-remote-user-uid \
-#            --containerfile dev/mutopia.Containerfile dev/plinky-mutopia:latest bash -c '…'
+#            --containerfile dev/mutopia.Containerfile dev/klimpi-mutopia:latest bash -c '…'
 
 FROM docker.io/library/python:3.15-slim-bookworm@sha256:575f8bc12ec26542e0678bc6b60e385218248019d433157ec327264a78c3a853
 

@@ -1,9 +1,9 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# The Plinky kit
+# The Klimpi kit
 
 Everything here is generated. The mark is the three drawings at the top level — the lockup,
 the wordless icon and the keys — keyed off their backgrounds by `npm run logo` from the
@@ -18,12 +18,12 @@ resolved token values out of the built stylesheet, so a build has to exist first
 
 | File | What it is |
 | --- | --- |
-| `plinky-mark.png` | The lockup: the tile, the keys, the falling plink and the name in its own letterforms. Where there is room to read it — the README banner, the lockup sheets. |
-| `plinky-icon.png` | The same artwork with the name taken out: the app icon, the favicon, the app header, the per-piece link cards, and what stands in the frame on every social image. |
-| `plinky-keys.png` | The keys, the falling plink and its strike point with no tile at all, for a ground the tile would have no edge against: the maskable icons, Apple's touch icon, the video thumbnails. |
+| `klimpi-mark.png` | The lockup: the tile, the keys, the falling plink and the name in its own letterforms. Where there is room to read it — the README banner, the lockup sheets. |
+| `klimpi-icon.png` | The same artwork with the name taken out: the app icon, the favicon, the app header, the per-piece link cards, and what stands in the frame on every social image. |
+| `klimpi-keys.png` | The keys, the falling plink and its strike point with no tile at all, for a ground the tile would have no edge against: the maskable icons, Apple's touch icon, the video thumbnails. |
 | `name-white.svg` | The name alone in white, outlined from Fredoka, which the social images set beside or under the framed icon. |
 | `source/*.png` | The three drawings as they arrived, before the background was keyed out. |
-| `icon/plinky-*.png` | The icon at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
+| `icon/klimpi-*.png` | The icon at 32 · 64 · 180 · 192 · 512 · 1024, transparent outside its own silhouette. |
 | `icon/lockup-paper.png` | The lockup over the tagline on paper, 960×320 at 2×, for light surfaces. |
 | `icon/lockup-indigo.png` | The same on indigo, where the lockup stands in its white frame. |
 | `palette.png` | Every colour with its role, as a sheet. |
@@ -106,16 +106,16 @@ pasted, not read as markdown:
 ```text
 Piano, one piece at a time.
 
-Every clip here is played by Plinky itself — the notes falling, the keys lighting under
+Every clip here is played by Klimpi itself — the notes falling, the keys lighting under
 them, each finger in its own colour. The music is public domain. The piano is a real one:
 the Salamander Grand Piano, recorded by Alexander Holm and shared under CC-BY 3.0.
 
-Plinky is free piano practice in your browser. No account, nothing to install. Bring a
+Klimpi is free piano practice in your browser. No account, nothing to install. Bring a
 MIDI keyboard or use your computer keys, then play any score you like — or drill
 sight-reading, rhythm, tempo and ear training. Every run is graded, and your scores stay
 on your device.
 
-Have a go: https://plinky.fun
+Have a go: https://klimpi.app
 ```
 
 And under each video, with the piece and composer filled in:
@@ -123,7 +123,7 @@ And under each video, with the piece and composer filled in:
 ```text
 {Piece} — {Composer}
 
-Played by Plinky, free piano practice in your browser: https://plinky.fun
+Played by Klimpi, free piano practice in your browser: https://klimpi.app
 
 The score is public domain (CC0). The piano is the Salamander Grand Piano by Alexander
 Holm, under CC-BY 3.0: https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html
@@ -150,7 +150,7 @@ edge against a ground of nearly its own colour, and the keys read as floating on
 frame is an eleventh of the artwork's width on every side, with a radius of its own; on
 paper, black or navy the tile is its own edge. **On a dark stage the keys go alone**, with no
 tile behind them: the video thumbnails, the maskable icons and Apple's touch icon set
-`plinky-keys.png`, whose white keys carry their own edge against the dark.
+`klimpi-keys.png`, whose white keys carry their own edge against the dark.
 
 **The name is Fredoka at weight 600**, the face the app already ships, set with no extra
 spacing on a light ground and with 0.05em of letter-spacing on indigo or any dark ground,
@@ -159,7 +159,7 @@ dark grounds it is white. In `name-white.svg` it is converted to outlines, so no
 on a font loading. `core/wordmark.ts` holds the spacing for every place that sets the name live
 — the app header, the promo thumbnails and an exported video.
 
-**The tile keeps its own silhouette.** The rounded corners of `plinky-icon.png` are the
+**The tile keeps its own silhouette.** The rounded corners of `klimpi-icon.png` are the
 drawing's, so it is scaled and never clipped with a border-radius, which is a guess at the
 curve and one slightly tight leaves a sliver of ground showing all the way round. Where a
 platform paints its own colour behind transparency — Apple's touch icon, an Android
@@ -195,7 +195,7 @@ lie. Never borrow them.
 ## The type
 
 **Fredoka** for anything titular — a rounded sans, friendly at a glance and legible at a
-thumbnail's size, which is the register Plinky wants. **Inter** for anything operable:
+thumbnail's size, which is the register Klimpi wants. **Inter** for anything operable:
 controls, tables, labels, numbers. Numbers that line up in a column are set tabular.
 
 Fredoka covers Latin; the app pairs it with Comfortaa for Greek and Cyrillic. Chinese,
@@ -209,7 +209,7 @@ outlined name in the mark, do not.
 
 ## The voice
 
-Plinky talks like a teacher who is glad you showed up. It invites, it never nags, and it
+Klimpi talks like a teacher who is glad you showed up. It invites, it never nags, and it
 never counts consecutive days at anybody — the product has no streaks and never will.
 `VOICE.md` in the repository root is the full contract; the two rules that catch most
 mistakes are: say what the reader gets, not what the product does, and never promise
@@ -217,10 +217,10 @@ something the app cannot deliver in one tap.
 
 ## Using it
 
-Every file here is the Plinky Authors' own work under AGPL-3.0-or-later, declared by the
+Every file here is the Klimpi Authors' own work under AGPL-3.0-or-later, declared by the
 `brand/**` entry in `REUSE.toml`; the SVGs also carry it inline.
 
-Anything made from this kit is about Plinky, so it inherits Plinky's own claims: free, no
+Anything made from this kit is about Klimpi, so it inherits Klimpi's own claims: free, no
 account, nothing to install, and a catalogue that is Creative Commons throughout with
 every piece credited. Those are true. Do not add ones that are not — no leaderboards, no
 "streak", no "practise every day or lose your progress".

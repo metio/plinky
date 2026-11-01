@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -32,7 +32,7 @@ describe("dailyChallenge", () => {
     it("emits a playable score-partwise document titled for the day", () => {
         const { xml } = dailyChallenge("2026-06-25", 1);
         expect(xml).toContain("<score-partwise");
-        expect(xml).toContain("<work-title>Plinky #1</work-title>");
+        expect(xml).toContain("<work-title>Klimpi #1</work-title>");
         expect(xml).toContain("<note>");
         expect(xml).toContain("<time><beats>4</beats>");
     });

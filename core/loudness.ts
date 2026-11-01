@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// How the player's two sound preferences become a loudness, for everything Plinky plays.
+// How the player's two sound preferences become a loudness, for everything Klimpi plays.
 //
 // One rule, in one place, because the alternative was three copies of it — the synth, the
 // metronome, the rhythm trainer — that had to agree and had no way of being made to. Turning

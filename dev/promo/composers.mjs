@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The words that go with a composer's playlist: a YouTube title and description, written
@@ -29,7 +29,7 @@ const outAt = process.argv.indexOf("--out");
 const OUT = (outAt >= 0 ? process.argv[outAt + 1] : undefined) ?? "promo";
 // One line per channel, from the single list in core/social.
 
-const SITE = "https://plinky.fun";
+const SITE = "https://klimpi.app";
 
 // A tradition is not somebody, so a playlist of traditional tunes is named for what it is
 // rather than credited to a person who does not exist.
@@ -51,14 +51,14 @@ function describe(composer) {
     const held = pages.reduce((sum, person) => sum + (indexedPerson(person.slug)?.pieces ?? 0), 0);
 
     const opening = traditional
-        ? "Traditional tunes played in Plinky — the notes falling as they sound, and the keys lighting under them."
-        : `${composer} played in Plinky — the notes falling as they sound, and the keys lighting under them.`;
+        ? "Traditional tunes played in Klimpi — the notes falling as they sound, and the keys lighting under them."
+        : `${composer} played in Klimpi — the notes falling as they sound, and the keys lighting under them.`;
 
     // One line per link. A playlist for two composers — the Ave Maria is Bach's prelude and
     // Gounod's melody — earns a line each rather than a sentence that has to choose.
     const links = pages.map(
         (person) =>
-            `${person.name} on Plinky (${indexedPerson(person.slug)?.pieces} pieces to play): ${SITE}/en/person/${person.slug}/`,
+            `${person.name} on Klimpi (${indexedPerson(person.slug)?.pieces} pieces to play): ${SITE}/en/person/${person.slug}/`,
     );
 
     return [
@@ -73,8 +73,8 @@ function describe(composer) {
         // while their titles were listed here and became a dangling "It opens" the moment
         // they were not.
         held > 0 && !traditional
-            ? `${held === 1 ? "It opens" : "Every one of them opens"} in the browser, ready to play. Plinky is a free piano practice app — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.`
-            : "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
+            ? `${held === 1 ? "It opens" : "Every one of them opens"} in the browser, ready to play. Klimpi is a free piano practice app — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.`
+            : "Klimpi is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
         "",
         SITE,
         "",
@@ -98,8 +98,8 @@ for (const composer of byComposer.keys()) {
     // The title carries the word a viewer searches for. A composer's name alone competes
     // with every recording ever made; the instrument is what narrows it.
     const title = TRADITIONAL.test(composer.trim())
-        ? "Traditional tunes on piano | Plinky"
-        : `${composer} — piano | Plinky`;
+        ? "Traditional tunes on piano | Klimpi"
+        : `${composer} — piano | Klimpi`;
     await writeFile(`${dir}/playlist.txt`, uploadText(title, describe(composer)));
     written += 1;
     if (pagesFor(composer).length === 0 && !TRADITIONAL.test(composer.trim())) {

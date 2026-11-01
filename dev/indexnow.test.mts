@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -10,7 +10,7 @@ const PAGES = [
     { path: "/music", module: "routes/music.tsx" },
 ];
 const LOCALES = ["en", "de"];
-const SITE = "https://plinky.fun";
+const SITE = "https://klimpi.app";
 
 const urls = (changed: string[], pieces: string[] = []) =>
     changedUrls({ changed, pages: PAGES, pieces, locales: LOCALES, siteUrl: SITE });
@@ -18,22 +18,22 @@ const urls = (changed: string[], pieces: string[] = []) =>
 describe("what a push tells the search engines about", () => {
     it("names a changed page in every language", () => {
         expect(urls(["app/routes/about.tsx"])).toEqual([
-            "https://plinky.fun/en/about/",
-            "https://plinky.fun/de/about/",
+            "https://klimpi.app/en/about/",
+            "https://klimpi.app/de/about/",
         ]);
     });
 
     it("names the locale root with one slash, not two", () => {
         expect(urls(["app/routes/home.tsx"])).toEqual([
-            "https://plinky.fun/en/",
-            "https://plinky.fun/de/",
+            "https://klimpi.app/en/",
+            "https://klimpi.app/de/",
         ]);
     });
 
     it("names every page of a language whose strings changed, and no other language", () => {
         const found = urls(["messages/de.json"]);
         expect(found).toHaveLength(PAGES.length);
-        expect(found.every((url: string) => url.startsWith("https://plinky.fun/de/"))).toBe(true);
+        expect(found.every((url: string) => url.startsWith("https://klimpi.app/de/"))).toBe(true);
     });
 
     it("says nothing for a language the site does not speak", () => {
@@ -58,8 +58,8 @@ describe("what a push tells the search engines about", () => {
 
     it("names a piece's page in every language when its row changed", () => {
         expect(urls([], ["abc"])).toEqual([
-            "https://plinky.fun/en/play/abc/",
-            "https://plinky.fun/de/play/abc/",
+            "https://klimpi.app/en/play/abc/",
+            "https://klimpi.app/de/play/abc/",
         ]);
     });
 
@@ -96,25 +96,25 @@ describe("which catalogue rows changed", () => {
 
 describe("the submissions themselves", () => {
     it("makes none for an empty set", () => {
-        expect(submissions([], { host: "plinky.fun" })).toEqual([]);
+        expect(submissions([], { host: "klimpi.app" })).toEqual([]);
     });
 
     it("carries the key where the engine will look for it", () => {
-        const [first] = submissions(["https://plinky.fun/en/"], { host: "plinky.fun", key: "k" });
+        const [first] = submissions(["https://klimpi.app/en/"], { host: "klimpi.app", key: "k" });
         expect(first).toEqual({
-            host: "plinky.fun",
+            host: "klimpi.app",
             key: "k",
-            keyLocation: "https://plinky.fun/k.txt",
-            urlList: ["https://plinky.fun/en/"],
+            keyLocation: "https://klimpi.app/k.txt",
+            urlList: ["https://klimpi.app/en/"],
         });
     });
 
     it("splits at the ten thousand a submission may carry", () => {
         const many = Array.from(
             { length: MAX_URLS + 5 },
-            (_, index) => `https://plinky.fun/${index}`,
+            (_, index) => `https://klimpi.app/${index}`,
         );
-        const batches = submissions(many, { host: "plinky.fun" });
+        const batches = submissions(many, { host: "klimpi.app" });
         expect(batches).toHaveLength(2);
         expect(batches[0]?.urlList).toHaveLength(MAX_URLS);
         expect(batches[1]?.urlList).toHaveLength(5);

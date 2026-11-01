@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Generated from changelog.yaml by dev/changelog.mts — do not edit.
@@ -13,6 +13,14 @@ export const LATEST_RELEASES: Release[] = [
         date: "2026-11-01",
         label: null,
         entries: [
+            {
+                body: "**Plinky is now Klimpi.** New name, new mark — a piano keyboard standing upright as\nthe K, with the key you press in fuchsia. Everything you have done is still here:\nyour scores, your pieces, your takes, all on your device as before. Nothing to sign\nin to, nothing to move across.",
+                twip: true,
+            },
+            {
+                body: "**A new set of colours to go with it.** Fuchsia for what you press, aubergine for\nthe page at night, brass for what you earned. It opens this way, and the two you\nalready know are still in Settings → Colours: Indigo and Violet. Any of the three\nworks in light, dark or black, so pick the pair you like.",
+                twip: true,
+            },
             {
                 body: "**A link that opens a particular ear drill, or the shelf's Manage tab, opens without\nredrawing itself.** A link naming an exercise and its level — a review link, or one\nof today's suggestions — arrives as the same page everyone gets, with only the\naddress saying which drill it is, and the browser threw that page away and drew it\nagain the moment it read the address. Those links now open as they arrive, and still\nland where they name.",
                 twip: true,

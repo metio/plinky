@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -37,7 +37,7 @@ afterEach(() => {
 
 describe("the song manifest", () => {
     it("round-trips its rows, minified", async () => {
-        dir = mkdtempSync(join(tmpdir(), "plinky-manifest-"));
+        dir = mkdtempSync(join(tmpdir(), "klimpi-manifest-"));
         const path = join(dir, "manifest.json");
         await writeSongs([ROW], path);
         expect(await readSongs(path)).toEqual([ROW]);
@@ -49,7 +49,7 @@ describe("the song manifest", () => {
     });
 
     it("refuses a file that is not a list of rows", () => {
-        dir = mkdtempSync(join(tmpdir(), "plinky-manifest-"));
+        dir = mkdtempSync(join(tmpdir(), "klimpi-manifest-"));
         const path = join(dir, "manifest.json");
         writeFileSync(path, "{}");
         expect(() => readSongsSync(path)).toThrow(/not a list/);
@@ -58,7 +58,7 @@ describe("the song manifest", () => {
 
 describe("where a shipped score is", () => {
     it("looks under the licence bucket first, then under every other", () => {
-        dir = mkdtempSync(join(tmpdir(), "plinky-songs-"));
+        dir = mkdtempSync(join(tmpdir(), "klimpi-songs-"));
         mkdirSync(join(dir, "cc0-1.0"));
         mkdirSync(join(dir, "cc-by-4.0"));
         mkdirSync(join(dir, "index"));

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Renders a catalogue piece to a video file, in a real browser, through the app's own
@@ -218,7 +218,7 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         // the player's chosen theme — never went near it.
         keyColors: { white: DEFAULT_THEME.whiteHex, black: DEFAULT_THEME.blackHex },
         // Always glossy, whatever the app's default is. A clip is an advertisement seen by
-        // somebody deciding whether to open Plinky at all, and the instrument should look
+        // somebody deciding whether to open Klimpi at all, and the instrument should look
         // like an instrument there; the app itself opens joyful, because the person in
         // front of it has already arrived and may never have played before.
         finish: GLOSSY,

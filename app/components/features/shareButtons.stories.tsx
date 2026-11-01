@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -16,7 +16,7 @@ export default meta;
 type Story = StoryObj<typeof ShareButtons>;
 
 const grid: Grid = [["best", "best", "good", "ok", "good", "best"]];
-const boast = "Plinky 42 A";
+const boast = "Klimpi 42 A";
 
 export const Default: Story = {
     args: {

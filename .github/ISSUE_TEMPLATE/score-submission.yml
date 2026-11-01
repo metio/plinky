@@ -1,7 +1,7 @@
-# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-FileCopyrightText: The Klimpi Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Submit a score
-description: Share a MusicXML score to be added to the Plinky catalog
+description: Share a MusicXML score to be added to the Klimpi catalog
 title: "[Score] "
 labels: ["score-submission"]
 body:
@@ -9,7 +9,7 @@ body:
     attributes:
       value: >
         Thanks for sharing a score! Paste its MusicXML below. An automated check
-        renders it the way Plinky does, then a maintainer reviews it before it
+        renders it the way Klimpi does, then a maintainer reviews it before it
         joins the catalog. Please only submit music you have the right to share.
   - type: input
     id: score-title

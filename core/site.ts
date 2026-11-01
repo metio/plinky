@@ -1,12 +1,12 @@
 import { lookup } from "./lookup";
 import { type PersonAbout, sameAsFor } from "./personAbout";
 import { CHANNELS } from "./social";
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Site-wide metadata shared between the layout's social tags and the home route's
 // structured data.
-export const SITE_URL = "https://plinky.fun";
+export const SITE_URL = "https://klimpi.app";
 
 // Every page prerenders to `<path>/index.html`, so the trailing-slash form is what
 // the static host serves and what the canonical link, the sitemap and the structured
@@ -22,10 +22,10 @@ export function withTrailingSlash(href: string): string {
 }
 
 // A page title with the most specific part first, ending in the brand, so a
-// bookmark list reads "C major scale · Practice · Plinky" — distinguishable at a
+// bookmark list reads "C major scale · Practice · Klimpi" — distinguishable at a
 // glance and aligned with the URL's path segments.
 export function pageTitle(...parts: string[]): string {
-    return [...parts, "Plinky"].join(" · ");
+    return [...parts, "Klimpi"].join(" · ");
 }
 
 // Per-page Open Graph + Twitter card tags. og:type/site_name/image and the
@@ -87,13 +87,13 @@ export const SITE_TAGLINE = "Piano practice in your browser";
 export const SITE_DESCRIPTION =
     "Practice piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear-training, and loop drills, with your scores kept on your device.";
 
-// schema.org structured data so search engines and assistants understand Plinky.
+// schema.org structured data so search engines and assistants understand Klimpi.
 // Built per render so inLanguage matches the page's locale.
 export function structuredData(locale: string) {
     return {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        name: "Plinky",
+        name: "Klimpi",
         description: SITE_DESCRIPTION,
         url: SITE_URL,
         inLanguage: locale,
@@ -113,7 +113,7 @@ export function structuredData(locale: string) {
         // The one line the name travels with, everywhere it is written.
         slogan: SITE_TAGLINE,
         publisher: { "@type": "Organization", name: "metio", url: "https://github.com/metio" },
-        // The profiles that are Plinky's own, so a search engine ties them to the site
+        // The profiles that are Klimpi's own, so a search engine ties them to the site
         // rather than to whichever page mentions the name first.
         sameAs: CHANNELS.map((channel) => channel.href),
     };
@@ -159,7 +159,7 @@ export function ogLocale(locale: string): string {
 }
 
 // schema.org data for a content page that isn't a specific work or person — the
-// about, help, and practice-surface pages. It names the page as part of the Plinky
+// about, help, and practice-surface pages. It names the page as part of the Klimpi
 // site (so search engines tie it to the site entity) rather than leaving it a bare,
 // context-free screen. `type` narrows it where a page has a standard specialization
 // (an AboutPage), defaulting to a plain WebPage. A theory lesson is a LearningResource,
@@ -178,7 +178,7 @@ export function webPageData(
         description,
         url: localeUrl(locale, path),
         inLanguage: locale,
-        isPartOf: { "@type": "WebSite", name: "Plinky", url: SITE_URL },
+        isPartOf: { "@type": "WebSite", name: "Klimpi", url: SITE_URL },
         primaryImageOfPage: `${SITE_URL}/og.png`,
     };
 }
@@ -197,7 +197,7 @@ export function musicCompositionData(title: string, composer: string, locale: st
 }
 
 // The locale-prefixed absolute URL of a page, matching the prerendered path
-// (trailing slash included): `https://plinky.fun/de/person/chopin/`.
+// (trailing slash included): `https://klimpi.app/de/person/chopin/`.
 function localeUrl(locale: string, path: string): string {
     return `${SITE_URL}/${locale}${path}`;
 }

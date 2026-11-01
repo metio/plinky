@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -46,7 +46,7 @@ describe("DangerZone", () => {
     });
 
     it("reports a failed wipe instead of reloading when storage refuses removals", () => {
-        // A store that keeps a Plinky key however hard it is told to delete it — the
+        // A store that keeps a Klimpi key however hard it is told to delete it — the
         // reset must surface the failure rather than reload into stale data.
         const refusing = { ...memoryStore({ "plinky:scores": "[]" }), remove: () => {} };
         renderWithServices(<DangerZone />, { store: refusing });

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Reads the Salamander Grand Piano's own SFZ into a map a sampler can play from.
@@ -6,7 +6,7 @@
 // The SFZ is the authority on which recording answers a given key and velocity: the
 // library samples every minor third and splits each key into sixteen velocity layers, and
 // guessing either mapping is how a sampled piano ends up sounding like a keyboard. Nothing
-// here is Plinky's opinion — it is the library's own file, parsed.
+// here is Klimpi's opinion — it is the library's own file, parsed.
 //
 // It is parsed as SFZ rather than as lines, because the format puts real meaning in the
 // structure and this library uses all of it:

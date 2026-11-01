@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A milestone share card: a branded 1080×1350 portrait announcing an achievement —
@@ -25,9 +25,9 @@ export function svgMilestone({ title, detail }: MilestoneCard): string {
 <rect width="${width}" height="${height}" fill="#0f172a"/>\
 <defs><linearGradient id="brand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>\
 <rect x="0" y="0" width="${width}" height="14" fill="url(#brand)"/>\
-<text x="${width / 2}" y="150" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="48" font-weight="600" text-anchor="middle">Plinky</text>\
+<text x="${width / 2}" y="150" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="48" font-weight="600" text-anchor="middle">Klimpi</text>\
 <text x="${width / 2}" y="660" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="160" font-weight="800" text-anchor="middle">${escapeXml(title)}</text>\
 ${detailText}\
-<text x="${width / 2}" y="1270" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
+<text x="${width / 2}" y="1270" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">klimpi.app</text>\
 </svg>`;
 }

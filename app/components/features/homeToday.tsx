@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type ReactNode, useEffect, useState } from "react";
@@ -618,7 +618,7 @@ export function HomeToday() {
                 label={m.today_moment_work()}
                 // What a piece needs to know about you, asked where the pieces are and
                 // only until it is answered: finger positions fit a hand, and a hand is
-                // the one thing Plinky cannot measure for itself.
+                // the one thing Klimpi cannot measure for itself.
                 hint={handSet ? undefined : m.grades_start_hand()}
                 hintTo={handSet ? undefined : "/settings#hand"}
             >

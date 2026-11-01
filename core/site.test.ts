@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -17,8 +17,8 @@ import {
 
 describe("pageTitle", () => {
     it("ends with the brand and leads with the specific part", () => {
-        expect(pageTitle("Sight-reading sprint")).toBe("Sight-reading sprint · Plinky");
-        expect(pageTitle("C major scale", "Practice")).toBe("C major scale · Practice · Plinky");
+        expect(pageTitle("Sight-reading sprint")).toBe("Sight-reading sprint · Klimpi");
+        expect(pageTitle("C major scale", "Practice")).toBe("C major scale · Practice · Klimpi");
     });
 });
 
@@ -28,7 +28,7 @@ describe("routeMeta", () => {
             string,
             string
         >[];
-        expect(tags.find((tag) => tag.title)?.title).toBe("Ear training · Plinky");
+        expect(tags.find((tag) => tag.title)?.title).toBe("Ear training · Klimpi");
         expect(tags.find((tag) => tag.property === "og:title")?.content).toBe("Ear training");
         expect(tags.find((tag) => tag.name === "twitter:description")?.content).toBe(
             "Hear a note and play it back",
@@ -57,8 +57,8 @@ describe("structuredData", () => {
     it("names the site's own profiles and its one line", () => {
         const data = structuredData("en");
         expect(data.slogan).toBe("Piano practice in your browser");
-        expect(data.sameAs).toContain("https://www.youtube.com/@PlinkyPiano");
-        expect(data.sameAs).toContain("https://github.com/metio/plinky");
+        expect(data.sameAs).toContain("https://www.youtube.com/@KlimpiPiano");
+        expect(data.sameAs).toContain("https://github.com/metio/klimpi");
         expect(data.sameAs).toHaveLength(5);
     });
 });
@@ -83,12 +83,12 @@ describe("webPageData", () => {
         expect(data["@type"]).toBe("WebPage");
         expect(data.name).toBe("Ear training");
         expect(data.description).toBe("Train your ear.");
-        expect(data.url).toBe("https://plinky.fun/de/ear/");
+        expect(data.url).toBe("https://klimpi.app/de/ear/");
         expect(data.inLanguage).toBe("de");
         expect(data.isPartOf).toEqual({
             "@type": "WebSite",
-            name: "Plinky",
-            url: "https://plinky.fun",
+            name: "Klimpi",
+            url: "https://klimpi.app",
         });
     });
 
@@ -118,12 +118,12 @@ describe("personData", () => {
         );
         expect(data["@type"]).toBe("Person");
         expect(data.name).toBe("Frédéric Chopin");
-        expect(data.url).toBe("https://plinky.fun/de/person/frederic-chopin/");
+        expect(data.url).toBe("https://klimpi.app/de/person/frederic-chopin/");
         expect(data.subjectOf?.numberOfItems).toBe(2);
         expect(data.subjectOf?.itemListElement[0]).toEqual({
             "@type": "ListItem",
             position: 1,
-            url: "https://plinky.fun/de/play/abc/",
+            url: "https://klimpi.app/de/play/abc/",
             name: "Prelude in E minor",
         });
     });
@@ -138,8 +138,8 @@ describe("breadcrumbData", () => {
         ]);
         expect(data["@type"]).toBe("BreadcrumbList");
         expect(data.itemListElement.map((crumb) => crumb.position)).toEqual([1, 2, 3]);
-        expect(data.itemListElement[0]?.item).toBe("https://plinky.fun/en/");
-        expect(data.itemListElement[2]?.item).toBe("https://plinky.fun/en/person/frederic-chopin/");
+        expect(data.itemListElement[0]?.item).toBe("https://klimpi.app/en/");
+        expect(data.itemListElement[2]?.item).toBe("https://klimpi.app/en/person/frederic-chopin/");
     });
 });
 

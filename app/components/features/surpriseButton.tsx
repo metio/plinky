@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { m } from "../../paraglide/messages.js";
 
-// "Not sure what to play? Let Plinky choose." One tap opens a piece at the edge of the
+// "Not sure what to play? Let Klimpi choose." One tap opens a piece at the edge of the
 // player's ability, varying the pick each press — a friction-free way into a run for
 // someone who just wants to sit down and play. Presentational: the parent owns which
 // piece a press resolves to and where it goes.

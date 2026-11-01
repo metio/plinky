@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { loadBundledScores, loadUserScores, userScoresRaw } from "./catalog";
@@ -13,7 +13,7 @@ import { type DecayMode, REVIEW_CAP } from "../../core/review";
 import { isDue, isLapsed, letterMin, type Mastery } from "../../core/mastery";
 import { MAX_GRADE, measureScore } from "../../core/scoreDifficulty";
 
-// Plinky's progression: each of the 1–MAX_GRADE difficulty grades is a pool of
+// Klimpi's progression: each of the 1–MAX_GRADE difficulty grades is a pool of
 // catalogue items, and you climb by *mastering* items of a grade — not by any single
 // thing. A grade earns a star tier at 5/12/25 mastered; you hold it by keeping those
 // pieces fresh (light spaced-repetition review of what you already know); and an
@@ -404,7 +404,7 @@ export function nextStar(
 // Whether this is something to put in front of a player as their next piece.
 //
 // Roughly two thirds of the catalogue is a song with a piano part or a choral setting
-// reduced to a grand staff. Both are playable — Plinky opens the piano part and can sound
+// reduced to a grand staff. Both are playable — Klimpi opens the piano part and can sound
 // the rest as accompaniment — and neither is what a grade should be built from: a
 // Schubert accompaniment offered as a first piece is a beginner meeting the wrong music.
 // They stay in the library and out of the ladder.

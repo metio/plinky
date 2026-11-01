@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Takes the pictures the help page shows of each part of the app, straight from a real
@@ -89,7 +89,7 @@ const OUT = argv.find((one) => one.startsWith("--out="))?.slice("--out=".length)
 const asked = only ? only.split(",").filter(Boolean) : LOCALES;
 const unknown = asked.filter((locale) => !LOCALES.includes(locale));
 if (unknown.length > 0) {
-    console.error(`Not a language Plinky speaks: ${unknown.join(", ")}`);
+    console.error(`Not a language Klimpi speaks: ${unknown.join(", ")}`);
     process.exit(1);
 }
 
@@ -101,7 +101,7 @@ const missing = asked.filter((locale) => !existsSync(join(CLIENT, locale, "index
 if (missing.length > 0) {
     console.error(
         `${CLIENT} has no pages for ${missing.join(", ")}. A pinned build ` +
-            `(PLINKY_LOCALE=xx npm run build:client) holds one language; ` +
+            `(KLIMPI_LOCALE=xx npm run build:client) holds one language; ` +
             `\`npm run build\` holds all ${LOCALES.length}.`,
     );
     process.exit(1);

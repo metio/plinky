@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -101,12 +101,12 @@ describe("Layout", () => {
         }
     });
 
-    it("names the home link Plinky, not the dotless letters the mark draws", () => {
+    it("names the home link Klimpi, not the dotless letters the mark draws", () => {
         // The wordmark sets a dotless ı under its drawn dot; a screen reader must still hear
         // the name, which the link's label carries and the mark leaves alone.
         renderLayout();
         const home = screen.getByRole("link", { name: m.header_home_label() });
-        expect(m.header_home_label()).toContain("Plinky");
+        expect(m.header_home_label()).toContain("Klimpi");
         expect(home.getAttribute("aria-label")).not.toContain("ı");
         expect(screen.queryByRole("link", { name: /ı/ })).toBeNull();
     });
@@ -130,7 +130,7 @@ describe("Layout", () => {
         ];
         renderLayout();
         expect(images().map((tag) => tag.getAttribute("content"))).toEqual([
-            "https://plinky.fun/og.png",
+            "https://klimpi.app/og.png",
         ]);
         cleanup();
         document.head.replaceChildren();
@@ -138,7 +138,7 @@ describe("Layout", () => {
             {
                 path: "/",
                 handle: { cardFor: () => true },
-                meta: () => [{ property: "og:image", content: "https://plinky.fun/og/x.png" }],
+                meta: () => [{ property: "og:image", content: "https://klimpi.app/og/x.png" }],
                 Component: () => (
                     <Layout>
                         <div data-testid="page" />
@@ -148,7 +148,7 @@ describe("Layout", () => {
         ]);
         render(<Stub />);
         expect(images().map((tag) => tag.getAttribute("content"))).toEqual([
-            "https://plinky.fun/og/x.png",
+            "https://klimpi.app/og/x.png",
         ]);
     });
 

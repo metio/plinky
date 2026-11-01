@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
@@ -53,7 +53,7 @@ describe("whether a link names the address that answers", () => {
 
 describe("the tree about to be uploaded", () => {
     const tree = () => {
-        const out = mkdtempSync(join(tmpdir(), "plinky-links-"));
+        const out = mkdtempSync(join(tmpdir(), "klimpi-links-"));
         mkdirSync(join(out, "en", "music"), { recursive: true });
         writeFileSync(join(out, "settings.json"), JSON.stringify({ locales: LOCALES }));
         return out;

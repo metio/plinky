@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { Drawing, type DrawingName } from "./drawings/drawing";
@@ -18,7 +18,7 @@ export type HubEntry = {
 // so a place that gathers things looks the same wherever you meet it. Each entry is a
 // Folio row that is one link, drawing and all.
 //
-// Silent: only a key that is pressed makes a note in Plinky, never a pointer passing over.
+// Silent: only a key that is pressed makes a note in Klimpi, never a pointer passing over.
 export function HubList({ entries }: { entries: HubEntry[] }) {
     return (
         <Folio>

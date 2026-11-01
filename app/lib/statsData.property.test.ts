@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import fc from "fast-check";
@@ -9,7 +9,7 @@ import type { GradeCatalogItem, GradedMastery } from "./gradeProgress";
 import { buildStatsData, type YouInput } from "./statsData";
 
 // Everything the Stats page shows, derived from what the player has done. The promise
-// the page makes is that it never takes anything away: Plinky has no streaks and no
+// the page makes is that it never takes anything away: Klimpi has no streaks and no
 // ranking, and a badge is the one thing here that could still punish a slump if a
 // weaker week could un-earn it. So the law with teeth is monotonicity — more practice,
 // or a mark already held, can only ever add.

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { mkdtempSync, readFileSync } from "node:fs";
@@ -76,7 +76,7 @@ describe("the table the deploy writes", () => {
         // Past the hundredth rule the file is still written, still deployed, and simply
         // not read — so this is the only thing standing between a renamed page and a
         // silent 404 on every address that names it without a language.
-        const out = mkdtempSync(join(tmpdir(), "plinky-redirects-"));
+        const out = mkdtempSync(join(tmpdir(), "klimpi-redirects-"));
         const { dynamic, fixed, total } = writeRedirects(out);
         expect(total).toBeLessThanOrEqual(REDIRECT_RULE_LIMIT);
         const written = readFileSync(`${out}/_redirects`, "utf8");

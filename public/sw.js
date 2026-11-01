@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A small offline cache with three strategies, chosen per request:
@@ -22,7 +22,7 @@ const CACHE = "plinky-build-__BUILD_HASH__";
 // shared with the page, which keeps caches of its own on the origin — the piano
 // recordings in "plinky-piano-v1", fetched once and meant to outlast every deploy — so
 // eviction touches only names this worker creates. The second arm is the names earlier
-// workers created ("plinky-v1", then "plinky-" and a twelve-digit build hash), so a device
+// workers created ("plinky-v1", then "klimpi-" and a twelve-digit build hash), so a device
 // still holding one has it evicted like any other old build.
 function isBuildCache(name) {
     return name.startsWith("plinky-build-") || /^plinky-(?:v1|[0-9a-f]{12})$/.test(name);

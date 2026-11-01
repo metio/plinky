@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -54,7 +54,7 @@ const KNOWN = {
             playBy: 'Play "{title}" by {composer} in your browser.',
             play: 'Play "{title}" in your browser.',
             playFacts: { one: "Grade {grade}.", other: "Grade {grade}." },
-            person: "{name}’s pieces on Plinky.",
+            person: "{name}’s pieces on Klimpi.",
             home: "Today",
             music: "Music",
             grade: "Grade {grade}",

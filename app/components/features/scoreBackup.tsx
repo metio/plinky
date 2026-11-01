@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -17,7 +17,7 @@ import { Button } from "../ui/button";
 import { linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 
-// Back up and restore the local score library as a Plinky score bundle: a "download
+// Back up and restore the local score library as a Klimpi score bundle: a "download
 // all" export and an import that accepts a bundle (a backup, or a set shared by a
 // teacher). Scores live only on this device, so this is how users keep them.
 export function ScoreBackup() {
@@ -45,13 +45,13 @@ export function ScoreBackup() {
     const count = useMemo(() => parseUserScores(raw).length, [raw]);
 
     const download = () => {
-        downloadBlob(exportAllPack(store), "application/json", "plinky-scores.json");
+        downloadBlob(exportAllPack(store), "application/json", "klimpi-scores.json");
     };
 
-    // The full local library, bundled pieces included — for taking Plinky's
+    // The full local library, bundled pieces included — for taking Klimpi's
     // built-in songs along, not just restoring your own.
     const downloadFull = () => {
-        downloadBlob(exportFullPack(store), "application/json", "plinky-library.json");
+        downloadBlob(exportFullPack(store), "application/json", "klimpi-library.json");
     };
 
     const importFile = async (file: File | undefined) => {

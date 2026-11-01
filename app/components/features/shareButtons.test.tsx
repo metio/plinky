@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -98,7 +98,7 @@ describe("ShareButtons", () => {
         const [blob, type, name] = vi.mocked(downloadBlob).mock.calls[0] ?? [];
         expect(blob).toBeInstanceOf(Blob);
         expect(type).toBe("image/png");
-        expect(name).toBe("plinky.png");
+        expect(name).toBe("klimpi.png");
     });
 
     it("opens Instagram alongside the image save when files can't be shared", () => {

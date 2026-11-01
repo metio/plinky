@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -39,8 +39,8 @@ export const Bare: Story = { args: { noteLabels: "off", noteHints: "never" } };
 // cycle button stays off the bar altogether.
 export const NoHints: Story = { args: { noteHints: undefined, onNoteHints: undefined } };
 
-// A piano that makes its own sound, so Plinky stays out of the way. The glyph is the
-// crossed-out speaker while it is on, and the plain one while Plinky is still answering.
+// A piano that makes its own sound, so Klimpi stays out of the way. The glyph is the
+// crossed-out speaker while it is on, and the plain one while Klimpi is still answering.
 export const OwnInstrument: Story = {
     args: { instrumentSounds: true, onInstrumentSounds: () => {} },
 };

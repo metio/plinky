@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
@@ -195,7 +195,7 @@ describe("library export packs", () => {
         // credits every other piece has something to say about them too.
         for (const bundled of loadBundledScores()) {
             expect(bundled.license).toBe("CC0-1.0");
-            expect(bundled.source).toBe("plinky");
+            expect(bundled.source).toBe("klimpi");
         }
     });
 

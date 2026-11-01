@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { toCsv } from "./csv";
@@ -19,7 +19,7 @@ import { daysBetween, daysInRange, isDateKey, MAX_RANGE_DAYS, shiftDay } from ".
 //   the pauses between them, so it flatters, but it is what "I practised from six to
 //   seven" means.
 //
-// A session recorded by hand (time at a piano Plinky never saw) sets both to the same
+// A session recorded by hand (time at a piano Klimpi never saw) sets both to the same
 // figure and carries `manual`, so a report can say which minutes were measured and
 // which were claimed.
 export type PracticeSession = {
@@ -35,7 +35,7 @@ export type PracticeSession = {
 };
 
 // How the session felt, asked never and offered always — the scale exists so a
-// player can annotate their own log, not so Plinky can score their mood. Ordered
+// player can annotate their own log, not so Klimpi can score their mood. Ordered
 // worst to best so a report can average it; "rough" is a legitimate entry and the
 // copy must never treat it as a failure.
 export const MOODS = ["rough", "slow", "steady", "good", "breakthrough"] as const;
@@ -162,7 +162,7 @@ export function foldSession(
     }
 
     // The most recent MEASURED session is the one a run may extend. A hand-logged sitting
-    // is a claim about time away from Plinky; a run that lands near it is separate
+    // is a claim about time away from Klimpi; a run that lands near it is separate
     // practice and must not be absorbed into it — and it must not stand in the way
     // either: a manual entry for today is anchored at noon, and read as "the last row"
     // it made every earlier-in-the-day run a session of its own.
@@ -219,7 +219,7 @@ export type ManualEntry = {
     label?: string;
 };
 
-// Adds a sitting the player did away from Plinky. Anchored at LOCAL noon on the given
+// Adds a sitting the player did away from Klimpi. Anchored at LOCAL noon on the given
 // day: the date keys these are read back through are local (see sessionDate), so an
 // anchor in UTC lands on the wrong day for anyone far enough east — at UTC+13 or +14,
 // noon UTC is already the following morning. Returns the log unchanged when the entry

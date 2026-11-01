@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -9,7 +9,7 @@ import { MIME_TYPES, neverBuilt, requestPath, resolveFile, serveStatic } from ".
 
 let root = "";
 beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), "plinky-static-"));
+    root = mkdtempSync(join(tmpdir(), "klimpi-static-"));
     writeFileSync(join(root, "index.html"), "<p>shell</p>");
     mkdirSync(join(root, "en"));
     writeFileSync(join(root, "en", "index.html"), "<p>en</p>");

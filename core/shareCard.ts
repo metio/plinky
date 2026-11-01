@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { escapeXml } from "./xmlText";
@@ -17,7 +17,7 @@ import { PRECISE_TOLERANCE, struckGaps, timingDeltas } from "./rhythm";
 // an honest snapshot meant to separate a strong performance from a weak one at a glance,
 // so it rewards playing at the piece's own tempo (Speed) — which a slow mouse-on-a-screen
 // run can't fake — and judges timing at the precise window rather than a widened one. The
-// same five colours back every surface (emoji text, image card, in-app grid) so a Plinky
+// same five colours back every surface (emoji text, image card, in-app grid) so a Klimpi
 // share is recognisable wherever it is posted.
 
 // One cleared note of a run, relative to the run's first note: its notated onset
@@ -76,7 +76,7 @@ const TIMING_ZERO_MS = 200;
 // bottom "absent" band. The bands stretch lower than the grade's A–F cutoffs on
 // purpose: a metric like timing clusters low, and a wall of one colour is no fun to
 // share. The same five levels back the emoji text, the image card and the in-app
-// grid, so a Plinky share looks the same wherever it's posted.
+// grid, so a Klimpi share looks the same wherever it's posted.
 const BANDS: ReadonlyArray<readonly [number, Level]> = [
     [0.78, "best"],
     [0.58, "good"],
@@ -319,7 +319,7 @@ export function clampHeading(heading: string): string {
 }
 
 // The card's own furniture, in the brand palette so an exported card reads as the app:
-// the deep violet ground, near-white heading, pale-plink footer. Deliberately separate
+// the deep violet ground, near-white heading, pale-tinkle footer. Deliberately separate
 // from FILL above — the bands are pinned to the emoji and must not follow the chrome.
 // Contrast checked against the ground (relative luminance 0.041): heading 11.0:1 and
 // footer 6.8:1, both comfortably past 4.5:1 for normal text.
@@ -353,6 +353,6 @@ export function svgCard(grid: Grid, heading: string): string {
 <rect width="${width}" height="${height}" fill="${CARD_GROUND}"/>\
 <text x="${width / 2}" y="${top - 64}" fill="${CARD_HEADING}" font-family="system-ui,sans-serif" font-size="64" font-weight="700" text-anchor="middle">${escapeXml(clampHeading(heading))}</text>\
 ${cells}\
-<text x="${width / 2}" y="${top + gridH + 96}" fill="${CARD_FOOTER}" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
+<text x="${width / 2}" y="${top + gridH + 96}" fill="${CARD_FOOTER}" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">klimpi.app</text>\
 </svg>`;
 }

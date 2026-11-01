@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import fc from "fast-check";
@@ -18,10 +18,10 @@ const body = fc
                 "### License\n",
                 "### MusicXML\n",
                 "CC0-1.0",
-                "PLINKY_EOF",
+                "KLIMPI_EOF",
                 "valid=true",
                 "valid<<",
-                "report<<PLINKY_EOF",
+                "report<<KLIMPI_EOF",
                 "report=",
                 "<<",
                 "=",

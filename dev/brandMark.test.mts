@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -18,7 +18,7 @@ const art = tile.slice(
 );
 
 describe("the vector mark", () => {
-    it("draws the keys, the plink and its strike point", () => {
+    it("draws the keys, the tinkle and its strike point", () => {
         expect(art).toContain('fill="#fdfdff"');
         expect(art).toContain('fill="#a836fe"');
     });
@@ -48,7 +48,7 @@ describe("the vector mark", () => {
 
     it("carries the licence in every file", () => {
         const licensed =
-            /^<!--\nSPDX-FileCopyrightText: The Plinky Authors\nSPDX-License-Identifier: AGPL-3\.0-or-later\n-->/;
+            /^<!--\nSPDX-FileCopyrightText: The Klimpi Authors\nSPDX-License-Identifier: AGPL-3\.0-or-later\n-->/;
         for (const name of readdirSync(MARK).filter((file) => file.endsWith(".svg"))) {
             expect(read(name), name).toMatch(licensed);
         }

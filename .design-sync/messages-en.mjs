@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Compiles app/paraglide/ for English alone, then runs the converter's build.
 //
 // All 26 locales come to 11.8 MB of the bundle — three quarters of it, and past the
-// 12 MB the upload accepts. Pinning PLINKY_LOCALE only marks the other languages dead;
+// 12 MB the upload accepts. Pinning KLIMPI_LOCALE only marks the other languages dead;
 // the converter bundles unminified, so nothing removes them. Compiling one locale is what
 // actually leaves them out. A design renders in one language, so this costs nothing.
 //
@@ -45,6 +45,6 @@ writeFileSync(
 
 execFileSync("node", ["dev/compile-messages.mjs"], {
     stdio: "inherit",
-    env: { ...process.env, PLINKY_INLANG_PROJECT: PROJECT, PLINKY_LOCALE: settings.baseLocale },
+    env: { ...process.env, KLIMPI_INLANG_PROJECT: PROJECT, KLIMPI_LOCALE: settings.baseLocale },
 });
 console.log(`app/paraglide: ${settings.baseLocale} only — run \`npm run messages\` to restore`);

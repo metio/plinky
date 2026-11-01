@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -56,9 +56,9 @@ function mount(services: Partial<AppServices> = midiFake) {
 // recorded duration is positive.
 async function strike(note: number) {
     await act(async () => {
-        window.__plinky?.play(note);
+        window.__klimpi?.play(note);
         await new Promise((resolve) => setTimeout(resolve, 30));
-        window.__plinky?.release(note);
+        window.__klimpi?.release(note);
     });
 }
 
@@ -69,11 +69,11 @@ describe("Compose", () => {
         const audio = fakeAudioEngine();
         mount({ ...midiFake, audio });
         await act(async () => {
-            window.__plinky?.play(64);
+            window.__klimpi?.play(64);
         });
         expect(audio.voices).toContainEqual({ kind: "press", note: 64, gain: expect.any(Number) });
         await act(async () => {
-            window.__plinky?.release(64);
+            window.__klimpi?.release(64);
         });
         expect(audio.voices.at(-1)).toMatchObject({ kind: "release", note: 64 });
     });

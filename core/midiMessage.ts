@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// The two MIDI messages the app ever sends. Echoing what Plinky plays to a connected
+// The two MIDI messages the app ever sends. Echoing what Klimpi plays to a connected
 // instrument makes a sound module play along, so a piece can be heard on the
 // instrument's own voice rather than the browser's.
 //

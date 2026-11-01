@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { LitKeys } from "../../core/keyLights";
@@ -8,7 +8,7 @@ import type { LitKeys } from "../../core/keyLights";
 // works out the difference from what it last showed, which is what makes it safe to
 // call on every render and impossible to leave a key stranded by a missed instruction.
 //
-// Deliberately separate from the sound path. What Plinky plays and what Plinky asks an
+// Deliberately separate from the sound path. What Klimpi plays and what Klimpi asks an
 // instrument to illuminate are different messages with different timing — the whole
 // point of the feature is a key that lights BEFORE it is played — so they cannot share
 // one output stream.

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // `_redirects` for Cloudflare Pages: every address the site used to answer at, sent on
@@ -116,7 +116,7 @@ export function writeRedirects(out = OUT, retiredPath = RETIRED) {
         );
     }
     const header =
-        "# SPDX-FileCopyrightText: The Plinky Authors\n# SPDX-License-Identifier: AGPL-3.0-or-later\n" +
+        "# SPDX-FileCopyrightText: The Klimpi Authors\n# SPDX-License-Identifier: AGPL-3.0-or-later\n" +
         "# Written by dev/gen-redirects.mjs at deploy; edit dev/retired-routes.json instead.\n";
     writeFileSync(`${out}/_redirects`, `${header}${rules.join("\n")}\n`);
     return { dynamic, fixed, total };

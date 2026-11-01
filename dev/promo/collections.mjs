@@ -1,13 +1,13 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The named works as sets of pieces to render and publish — one YouTube playlist each.
 //
-// Plinky already knows these: they are the built-in assignments, resolved from the
+// Klimpi already knows these: they are the built-in assignments, resolved from the
 // catalogue by `npm run songs:bake` into public/songs/builtin-assignments.json. Reading
 // that file rather than a second hand-written list is the point — a playlist and the
 // assignment a player works through are then the same set of pieces by construction, and
-// somebody who never opens Plinky can still work through Burgmüller in order.
+// somebody who never opens Klimpi can still work through Burgmüller in order.
 //
 // Only CC0 pieces are eligible, as everywhere else in the promo pipeline: the catalogue's
 // CC-BY-SA scores carry share-alike, which travels with a video, and a feed is the worst

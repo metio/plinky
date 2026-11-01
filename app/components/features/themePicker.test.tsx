@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -25,14 +25,14 @@ describe("ThemePicker", () => {
     it("opens on the default palette, following the system", () => {
         renderWithServices(<ThemePicker />);
         expect(chosen(m.settings_theme)).toBe(m.theme_system());
-        expect(chosen(m.settings_palette)).toBe(m.palette_indigo());
+        expect(chosen(m.settings_palette)).toBe(m.palette_fuchsia());
     });
 
     it("saves and paints a mode, keeping the palette", () => {
         const theme = createThemeStore(memoryStore());
         renderWithServices(<ThemePicker />, { theme });
         choose(m.settings_theme, m.theme_black);
-        expect(theme.load()).toEqual({ palette: "indigo", mode: "black" });
+        expect(theme.load()).toEqual({ palette: "fuchsia", mode: "black" });
         expect(root.classList.contains("dark")).toBe(true);
         expect(root.classList.contains("black")).toBe(true);
         expect(chosen(m.settings_theme)).toBe(m.theme_black());

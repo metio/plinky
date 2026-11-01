@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -22,7 +22,7 @@ afterEach(() => {
     localStorage.clear();
 });
 
-const halos = () => document.querySelectorAll("svg rect.plinky-note-halo").length;
+const halos = () => document.querySelectorAll("svg rect.klimpi-note-halo").length;
 
 // The page as a player with an earlier take sees it: a ghost of that take races along the
 // staff. It is stored the way the ghost store writes it, so the page finds it on its own.
@@ -111,7 +111,7 @@ describe("Play over a repeated opening", () => {
         // Long enough for the ghost to move off the third bar.
         await new Promise((r) => setTimeout(r, 1500));
         expect(halos()).toBe(0);
-        expect(document.querySelectorAll("rect.plinky-ghost-mark").length).toBeLessThanOrEqual(1);
+        expect(document.querySelectorAll("rect.klimpi-ghost-mark").length).toBeLessThanOrEqual(1);
     });
 
     it("uncolours all three bars when the repeat sends the run back", async () => {

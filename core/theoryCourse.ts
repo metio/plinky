@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A short course in the theory a reader needs to make sense of the page in front of
@@ -25,11 +25,11 @@ import type { DemoScore, DemoStep } from "./theoryDemo";
 
 export type UnitId = "reading" | "keys" | "harmony";
 
-// What the lesson puts under its text. Every one is built from an engine Plinky
+// What the lesson puts under its text. Every one is built from an engine Klimpi
 // already runs — the keybed, the synth, the engraver, the circle — so a lesson costs
 // a paragraph and a wiring line rather than a new feature.
 // What the lesson puts under its text: notes in time, on a stave, over a keyboard wide
-// enough to hold them. Built from engines Plinky already runs — the engraver, the synth,
+// enough to hold them. Built from engines Klimpi already runs — the engraver, the synth,
 // the keybed — so a lesson costs a paragraph and a few steps rather than a new feature.
 export type Demo = DemoScore & {
     // The keys the reader needs under the lesson. Not always the octave above middle C:

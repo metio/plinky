@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { daysBetween } from "./dateKey";
@@ -19,7 +19,7 @@ export function todayKey(now: Date): string {
 }
 
 // Day one of the daily challenge; the running number counts up from here so every
-// player refers to the same "Plinky #N" on a given date.
+// player refers to the same "Klimpi #N" on a given date.
 export const DAILY_EPOCH = "2026-06-25";
 
 export function dailyNumber(dateKey: string, epoch: string = DAILY_EPOCH): number {
@@ -60,7 +60,7 @@ export function dailyChallenge(dateKey: string, number: number): DailyChallenge 
             low: 72,
             high: 79,
             rhythm: "varied",
-            title: `Plinky #${number}`,
+            title: `Klimpi #${number}`,
         },
         rng,
     );

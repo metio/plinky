@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The first six things about a piano, for someone who has never touched one.
 //
-// Everything else in Plinky assumes the keyboard is already a thing you understand:
+// Everything else in Klimpi assumes the keyboard is already a thing you understand:
 // that the black keys come in groups, that the white ones repeat, that a dot printed on
 // a staff means one particular key under your hand. None of that is obvious, and none of
 // it is written down anywhere in the app. This is that missing first hour, cut down to

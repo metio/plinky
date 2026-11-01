@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
@@ -206,7 +206,7 @@ export function clientPointToSvg(
 // it can be recoloured or lifted; the halos vanish with the SVG on the next render, and a
 // halo the bulk clear detached reads as absent through its `isConnected` check.
 const halos = new WeakMap<Element, SVGRectElement>();
-const HALO_CLASS = "plinky-note-halo";
+const HALO_CLASS = "klimpi-note-halo";
 const HALO_PAD = 3;
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -265,7 +265,7 @@ export function litHalos(marks: readonly HaloMark[]): void {
 // note; a mark that replaced the halo would have to put something back when it left, and
 // could only guess what. Its own element leaves nothing to restore.
 const ghostMarks = new WeakMap<Element, SVGRectElement>();
-const GHOST_MARK_CLASS = "plinky-ghost-mark";
+const GHOST_MARK_CLASS = "klimpi-ghost-mark";
 
 export function markGhost(elements: readonly SVGElement[], color: string): void {
     const scales = new Map<SVGSVGElement, ReturnType<typeof svgScale>>();
@@ -418,13 +418,13 @@ export function collectMeasureBoxes(osmd: OpenSheetMusicDisplay, svg: SVGSVGElem
 // behind the notes, so the selected bars read as coloured. The rects are tagged and
 // inserted at the back of the SVG; clearBarSelection lifts them. Idempotent — it clears
 // any prior selection first.
-const SELECTION_CLASS = "plinky-bar-selection";
+const SELECTION_CLASS = "klimpi-bar-selection";
 
 // The fingering-difficulty heat-map: a translucent red wash behind each bar whose
 // opacity follows its 0..1 heat, so the hard passages size themselves at a glance.
 // Its own class, so it coexists with (and clears independently of) the loop's
 // selection fill.
-const HEAT_CLASS = "plinky-bar-heat";
+const HEAT_CLASS = "klimpi-bar-heat";
 
 // The engraved page's own <svg>, or null before one exists.
 //

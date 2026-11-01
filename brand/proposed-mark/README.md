@@ -1,12 +1,12 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # A proposed mark, not the shipped one
 
 The app does not use anything in this folder. The shipped logo is the raster artwork in
-`brand/plinky-mark.png`, `brand/plinky-icon.png` and `brand/plinky-keys.png`, and every icon,
+`brand/klimpi-mark.png`, `brand/klimpi-icon.png` and `brand/klimpi-keys.png`, and every icon,
 social image and thumbnail is rendered from those.
 
 These files are the designer's Optimised Option 3, drawn as vector in September 2026: three

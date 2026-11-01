@@ -1,19 +1,21 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A theme is two independent choices: which colours (the palette) and how dark (the
 // mode). Any palette works in any mode, so they are kept apart rather than listed as
-// combinations — two palettes and four modes are six answers to learn, where the
-// combinations would be eight.
+// combinations — three palettes and four modes are seven answers to learn, where the
+// combinations would be twelve.
 //
 // These are the one lists of valid choices. parseTheme and the pre-paint bootstrap
 // script both derive from them, so a value cannot be known to one and not the other.
 
-// `indigo` is the default: the deep indigo of the mark, forget-me-not tints and paper.
+// `fuchsia` is the default: the mark's own colours — fuchsia for what you press,
+// aubergine for the writing and the grounds, brass for what you earned.
+// `indigo` is a deep indigo on cool paper, with forget-me-not tints.
 // `violet` is a brighter violet on warm paper, with gold for what you earned.
-export const PALETTES = ["indigo", "violet"] as const;
+export const PALETTES = ["fuchsia", "indigo", "violet"] as const;
 export type Palette = (typeof PALETTES)[number];
-export const DEFAULT_PALETTE: Palette = "indigo";
+export const DEFAULT_PALETTE: Palette = "fuchsia";
 
 // `black` is a dark mode with a true-black ground, for screens that switch a black pixel
 // off. It is a mode rather than a palette because it answers "how dark", and either

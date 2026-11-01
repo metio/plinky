@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
@@ -10,7 +10,7 @@ import type { Route } from "./+types/datenschutz";
 // The privacy policy German/EU law requires (GDPR / DSGVO). Like the Impressum
 // the authoritative version is German and alone legally binding; every other
 // locale renders a machine translation carrying LegalTranslationNotice. It
-// describes what Plinky ACTUALLY does today: a client-only app that keeps its data
+// describes what Klimpi ACTUALLY does today: a client-only app that keeps its data
 // in the browser, hosted static files, and a cookie-free reach measurement — no
 // accounts, no cookies, no ads, and nothing to consent to. NOTE: the German text is a
 // grounded DRAFT, not vetted legal wording — verify it against a current generator
@@ -21,7 +21,7 @@ export function meta(_args: Route.MetaArgs) {
     // footer, so noindex it (and it is left out of the sitemap). Its translations
     // inherit the same noindex.
     return [
-        ...routeMeta("Datenschutzerklärung", "Wie Plinky mit deinen Daten umgeht."),
+        ...routeMeta("Datenschutzerklärung", "Wie Klimpi mit deinen Daten umgeht."),
         noindexMeta(),
     ];
 }
@@ -56,10 +56,10 @@ export default function Datenschutz() {
                     <br />
                     {m.contact_email_label()}{" "}
                     <a
-                        href="mailto:contact@plinky.fun"
+                        href="mailto:contact@klimpi.app"
                         className="text-accent-strong hover:underline"
                     >
-                        contact@plinky.fun
+                        contact@klimpi.app
                     </a>
                 </p>
             </Section>

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The words that go up with each clip: a YouTube title and description, written to
@@ -27,7 +27,7 @@ import { readSongsSync } from "../manifest.mts";
 // directory node happens to live in.
 const outAt = process.argv.indexOf("--out");
 const OUT = (outAt >= 0 ? process.argv[outAt + 1] : undefined) ?? "promo";
-const SITE = "https://plinky.fun";
+const SITE = "https://klimpi.app";
 
 const byId = new Map(readSongsSync().map((item) => [item.id, item]));
 
@@ -62,7 +62,7 @@ function describe(piece, entry) {
     // One line per paragraph: YouTube wraps a description to the reader's own width, so
     // hard breaks put in here show up as ragged half-lines on a phone.
     return [
-        `${piece.title}${credit(piece.composer)}, played in Plinky — the notes falling as they sound, and the keys lighting under them.`,
+        `${piece.title}${credit(piece.composer)}, played in Klimpi — the notes falling as they sound, and the keys lighting under them.`,
         "",
         facts.length > 0
             ? `${facts.join(", ")}.`.replace(/^./, (first) => first.toUpperCase())
@@ -79,7 +79,7 @@ function describe(piece, entry) {
         "The colour of each note is the finger that plays it:",
         ...FINGER_LEGEND,
         "",
-        "Plinky is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
+        "Klimpi is a free piano practice app that runs in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
         "",
         SITE,
         "",
@@ -130,7 +130,7 @@ const everyPiece = [...PIECES, ...collectionPieces()].filter((piece) => {
 function caption(piece, entry) {
     const grade = entry?.grade;
     return [
-        `${piece.title}${credit(piece.composer)} — played in Plinky.`,
+        `${piece.title}${credit(piece.composer)} — played in Klimpi.`,
         "",
         "The notes fall as they sound, the keys light under them, and each note is coloured for the finger that plays it.",
         "",
@@ -139,12 +139,12 @@ function caption(piece, entry) {
         "Finger colours:",
         ...FINGER_LEGEND,
         "",
-        "Plinky is a free piano practice app in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run went, hand by hand.",
+        "Klimpi is a free piano practice app in the browser — nothing to install, no account. It listens through a MIDI piano or your microphone and tells you how the run went, hand by hand.",
         "",
         SITE,
         entry?.license ? "" : null,
         entry?.license
-            ? `Score: ${entry.license}. Every piece in Plinky is Creative Commons — yours to play, share and record.`
+            ? `Score: ${entry.license}. Every piece in Klimpi is Creative Commons — yours to play, share and record.`
             : null,
     ]
         .filter((line) => line !== null)
@@ -176,9 +176,9 @@ for (const piece of everyPiece) {
 await writeFile(
     `${OUT}/channel.txt`,
     uploadText(
-        "Plinky — piano, played by the app",
+        "Klimpi — piano, played by the app",
         [
-            "Piano pieces played by Plinky, a free practice app that runs in the browser.",
+            "Piano pieces played by Klimpi, a free practice app that runs in the browser.",
             "",
             "Every clip is the app itself playing: the notes falling as they sound, the keys lighting under them, and each note coloured for the finger that plays it. The mapping never moves, so watching two of these teaches it without trying.",
             "",
@@ -187,11 +187,11 @@ await writeFile(
             "",
             "Every score is Creative Commons, so each piece here is one you are free to play, share and record.",
             "",
-            "Plinky needs no account and installs nothing. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
+            "Klimpi needs no account and installs nothing. It listens through a MIDI piano or your microphone and tells you how the run actually went, hand by hand.",
             "",
             SITE,
             "",
-            "More Plinky:",
+            "More Klimpi:",
             ...CHANNELS.filter((channel) => channel.label !== "YouTube").map(
                 (channel) => `${channel.label}: ${channel.href}`,
             ),

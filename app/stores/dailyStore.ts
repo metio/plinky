@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { DailyResult } from "../../core/daily";
@@ -6,7 +6,7 @@ import type { KeyValueStore } from "../ports/keyValueStore";
 import { createJsonStore, mergeSubscribe, parseJson } from "./jsonStore";
 
 // The daily challenge's per-device memory: the last daily completed (enough for a
-// ✓ on today's tile and the onboarding step — deliberately NOT a streak; Plinky
+// ✓ on today's tile and the onboarding step — deliberately NOT a streak; Klimpi
 // never counts consecutive days or punishes a missed one) and the finished run's
 // result, so re-opening the day's challenge shows it instead of a blank slate.
 

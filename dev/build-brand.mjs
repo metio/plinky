@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Builds brand/ — the kit anybody making something *about* Plinky works from: the mark at
+// Builds brand/ — the kit anybody making something *about* Klimpi works from: the mark at
 // every size, the lockups on both grounds, the palette with each colour's role, a type
 // specimen, and social images at the sizes the places we post want.
 //
@@ -38,8 +38,8 @@ const PALETTE = [
         "The name beside the mark on a light ground. White on a dark one.",
     ],
     [
-        "plink",
-        "--color-plink",
+        "tinkle",
+        "--color-tinkle",
         "The falling note: the loader, and a petal of the header's bouquet.",
     ],
 ];
@@ -73,8 +73,8 @@ const colour = Object.fromEntries(
 // name in its own artwork; the icon is the same picture with the name taken out, for
 // anywhere the name is set as type beside it or would be a smear.
 const png = async (path) => markImage(await readFile(path), "image/png");
-const LOCKUP = await png("brand/plinky-mark.png");
-const ICON = await png("brand/plinky-icon.png");
+const LOCKUP = await png("brand/klimpi-mark.png");
+const ICON = await png("brand/klimpi-icon.png");
 // The outlined name, written by `npm run mark`: type rather than logo, which is why it is
 // the one file of that generator's the kit still sets.
 const NAME_WHITE = markImage(await readFile("brand/name-white.svg"));
@@ -165,7 +165,7 @@ for (const size of [1024, 512, 192, 180, 64, 32]) {
     await shoot(picture(ICON, size), {
         width: size,
         height: size,
-        path: `${OUT}/icon/plinky-${size}.png`,
+        path: `${OUT}/icon/klimpi-${size}.png`,
         transparent: true,
     });
 }
@@ -206,7 +206,7 @@ const swatch = ([name, , why]) => `
   </div>`;
 await shoot(
     `<div style="width:1200px;background:${colour.paper};padding:48px;${UI}">
-       <div style="${DISPLAY};font-size:40px;color:${colour.ink}">Plinky — the palette</div>
+       <div style="${DISPLAY};font-size:40px;color:${colour.ink}">Klimpi — the palette</div>
        <div style="font-size:15px;color:${colour.pencil};margin:8px 0 32px">Every colour is named for its role. The indigo carries anything you can press; the grading colours are spoken for and never decorate.</div>
        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">${PALETTE.map(swatch).join("")}</div>
        <div style="${DISPLAY};font-size:26px;color:${colour.ink};margin:44px 0 6px">Spoken for</div>

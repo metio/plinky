@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { spawnSync } from "node:child_process";
@@ -30,7 +30,7 @@ function readOutputs(text: string) {
 // Runs the real validator as the workflow does. An empty MusicXML section keeps it from
 // launching a browser.
 function runValidator(body: string) {
-    const dir = mkdtempSync(join(tmpdir(), "plinky-submission-"));
+    const dir = mkdtempSync(join(tmpdir(), "klimpi-submission-"));
     const output = join(dir, "output");
     writeFileSync(output, "");
     const run = spawnSync(process.execPath, [SCRIPT], {
@@ -47,9 +47,9 @@ const HOSTILE = form({
     MusicXML: "_No response_",
     License: [
         "CC0-1.0",
-        "PLINKY_EOF",
+        "KLIMPI_EOF",
         'valid="; await github.rest.issues.update({owner:context.repo.owner,repo:context.repo.repo,issue_number:1,state:"closed"}); //',
-        "z<<PLINKY_EOF",
+        "z<<KLIMPI_EOF",
         "y",
     ].join("\n"),
 });
@@ -109,7 +109,7 @@ describe("checkSubmission", () => {
         expect(outputs.seen).toEqual(["<score-partwise/>"]);
         expect(outputs.valid).toBe("true");
         expect(outputs.report).toBe(
-            "✅ **Looks good!** This renders and plays 1 note in Plinky. A maintainer will review it and add it to the catalog.\n\nLicense: `CC0-1.0`",
+            "✅ **Looks good!** This renders and plays 1 note in Klimpi. A maintainer will review it and add it to the catalog.\n\nLicense: `CC0-1.0`",
         );
     });
 
@@ -149,7 +149,7 @@ describe("checkSubmission", () => {
     });
 
     it("rejects any licence but the form's options, and leaves it out of the report", async () => {
-        for (const License of ["", "CC-BY-NC-4.0", "CC0-1.0\nPLINKY_EOF", "cc0-1.0", "evil`"]) {
+        for (const License of ["", "CC-BY-NC-4.0", "CC0-1.0\nKLIMPI_EOF", "cc0-1.0", "evil`"]) {
             const outputs = await check({ MusicXML: "<score-partwise>", License });
             expect(outputs.valid).toBe("false");
             expect(outputs.report).toBe(

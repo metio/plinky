@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
@@ -45,7 +45,7 @@ const KNOWN_DISAGREEMENTS = 3;
 // BWV 601), and the cause is in the file rather than in the engraver: it carries
 // `<display-step>?</display-step>`, a literal question mark where a note letter belongs.
 // The engraver looks the letter up, gets nothing back and calls toLowerCase on it. Nobody
-// can open that piece in Plinky, which is a catalogue defect — the import should be
+// can open that piece in Klimpi, which is a catalogue defect — the import should be
 // rejecting a score whose pitch elements are not pitches.
 const UNENGRAVABLE = 1;
 

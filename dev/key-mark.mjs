@@ -1,12 +1,17 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Gives the artwork its transparency, where it does not already have it.
+// Rasterises the artwork into the three masters the rest of the kit renders from, and
+// gives it transparency where it does not already carry its own.
 //
-// Some of the marks arrive flattened onto white — a rounded violet square with four white
-// corner wedges and no alpha channel. Every icon rendered from one then carries those
-// corners, and on any ground that is not white they show as a bright halo: the launcher on
-// a dark phone, a tab strip in dark mode, a social card on a dark background.
+// The origins are vector, so they carry it: the alpha is the artist's, every edge is
+// exact, and nothing here has to infer what was meant. A vector has no opinion about the
+// box it sits in, though, which is what `box` on each source supplies.
+//
+// Raster artwork may arrive flattened onto white instead — a rounded tile with four white
+// corner wedges and no alpha channel. Every icon rendered from one carries those corners,
+// and on any ground that is not white they show as a bright halo: the launcher on a dark
+// phone, a tab strip in dark mode, a social card on a dark background.
 //
 // Cropping to a border-radius does not fix it. A radius is a guess at the artwork's own
 // curve, and a guess even slightly tight leaves a sliver of the old background showing all
@@ -14,17 +19,15 @@
 // assumed: `core/matte.ts` floods inward from the corners across near-white, which is why
 // the piano keys survive. They are white too, and enclosed — and this is also why "make
 // every white pixel transparent" cannot be the rule: it would erase the keys and, on the
-// lockup, the name.
+// lockup, the name. A top-left pixel that is already transparent is the whole test for
+// which of the two arrived.
 //
-// Artwork that already carries an alpha channel is left alone. That is the better way to
-// receive it and the reason to ask: a drawing with real transparency needs none of the
-// above, and nothing here has to infer what the artist meant.
+// Run through the browser because that is the only PNG codec and the only SVG rasteriser
+// here. The pixels come out, the decision is made by the tested function in core, and the
+// alpha goes back in.
 //
-// Run through the browser because that is the only PNG codec here. The pixels come out, the
-// decision is made by the tested function in core, and the alpha goes back in.
-//
-//   npm run mark            write the masters under brand/
-//   npm run mark -- --check fail if any is missing or stale
+//   npm run logo            write the masters under brand/
+//   npm run logo -- --check fail if any is missing or stale
 
 import { readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
@@ -40,10 +43,31 @@ import { flattenedBackground, maskedShare } from "../core/matte.ts";
 // something was and sliding what is left back into place, and the tile's own highlight and
 // the falling note's glow come along with it — a glow is made to blend into the ground
 // behind it, so with the ground gone it stops being a glow and becomes a blob with an edge.
+//
+// Each one names the box it is drawn into and how much air to leave inside it, because a
+// vector has no opinion about either. The icon is its own square tile and fills the box.
+// The keys sit centred in a square with air around them, which is how every square
+// consumer lays them out. The lockup keeps the wordmark's own proportions, since
+// `picture()` sizes artwork by its aspect.
 const SOURCES = [
-    { source: "brand/source/plinky-mark.png", out: "brand/plinky-mark.png", what: "the lockup" },
-    { source: "brand/source/plinky-icon.png", out: "brand/plinky-icon.png", what: "the icon" },
-    { source: "brand/source/plinky-keys.png", out: "brand/plinky-keys.png", what: "the keys" },
+    {
+        source: "brand/source/klimpi-wordmark.svg",
+        out: "brand/klimpi-mark.png",
+        what: "the lockup",
+        box: { width: 2508, height: 831, inset: 2 },
+    },
+    {
+        source: "brand/source/klimpi-app-icon.svg",
+        out: "brand/klimpi-icon.png",
+        what: "the icon",
+        box: { width: 1254, height: 1254, inset: 0 },
+    },
+    {
+        source: "brand/source/klimpi-mark.svg",
+        out: "brand/klimpi-keys.png",
+        what: "the keys",
+        box: { width: 1254, height: 1254, inset: 6 },
+    },
 ];
 // The keyed masters are emitted at the largest size anything is rendered from — the brand
 // kit's 1024 icon. Keeping them at the sources' own 1254 would commit a third more bytes
@@ -59,22 +83,37 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 
 let stale = false;
-for (const { source, out, what } of SOURCES) {
+for (const { source, out, what, box } of SOURCES) {
     const bytes = await readFile(source);
-    await page.setContent(
-        `<img id="mark" src="data:image/png;base64,${bytes.toString("base64")}">`,
-    );
+    const type = source.endsWith(".svg") ? "image/svg+xml" : "image/png";
+    await page.setContent(`<img id="mark" src="data:${type};base64,${bytes.toString("base64")}">`);
 
-    const size = await page.evaluate(async () => {
+    // Drawn into the declared box at the size it will be kept, so a vector is rasterised
+    // once, here, rather than scaled twice.
+    const size = await page.evaluate(async ({ width, height, inset }) => {
         const img = document.getElementById("mark");
         await img.decode();
         const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext("2d").drawImage(img, 0, 0);
+        canvas.width = width;
+        canvas.height = height;
+        const pad = Math.round((Math.min(width, height) * inset) / 100);
+        const scale = Math.min(
+            (width - pad * 2) / img.naturalWidth,
+            (height - pad * 2) / img.naturalHeight,
+        );
+        const drawn = { width: img.naturalWidth * scale, height: img.naturalHeight * scale };
+        canvas
+            .getContext("2d")
+            .drawImage(
+                img,
+                (width - drawn.width) / 2,
+                (height - drawn.height) / 2,
+                drawn.width,
+                drawn.height,
+            );
         globalThis.__canvas = canvas;
         return { width: canvas.width, height: canvas.height };
-    });
+    }, box);
 
     // Out as raw bytes rather than an array: a million pixels of JSON is minutes of
     // serialising.
@@ -155,7 +194,7 @@ for (const { source, out, what } of SOURCES) {
 }
 
 if (stale) {
-    console.error("Run `npm run mark` and commit the result.");
+    console.error("Run `npm run logo` and commit the result.");
     await browser.close();
     process.exit(1);
 }

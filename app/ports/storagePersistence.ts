@@ -1,9 +1,9 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Asking the browser to keep what the player has done.
 //
-// Everything Plinky remembers lives in browser storage on one device, and by default a
+// Everything Klimpi remembers lives in browser storage on one device, and by default a
 // browser holds that in a best-effort bucket it is free to evict whole when the disk
 // fills. A player who practised for months would open the app to grade 1, no history and
 // no takes, with nothing to distinguish it from a first visit. Persistence moves the

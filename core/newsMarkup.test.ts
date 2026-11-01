@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -19,9 +19,9 @@ describe("the little markup an entry is written in", () => {
     });
 
     it("reads a link, and code", () => {
-        expect(inlineParts("see [the notes](https://plinky.fun/en/) or `npm run news`")).toEqual([
+        expect(inlineParts("see [the notes](https://klimpi.app/en/) or `npm run news`")).toEqual([
             { kind: "text", text: "see " },
-            { kind: "link", text: "the notes", href: "https://plinky.fun/en/" },
+            { kind: "link", text: "the notes", href: "https://klimpi.app/en/" },
             { kind: "text", text: " or " },
             { kind: "code", text: "npm run news" },
         ]);

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Provenance for a catalogue piece: which licence it carries and where it came
@@ -142,7 +142,7 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
     // The demos that ship inside the app: our own transcriptions of music long out of
     // copyright, dedicated to the public domain. They are credited like everything else —
     // a catalogue that names its sources cannot leave its own two pieces anonymous.
-    plinky: { label: "Plinky", url: "https://github.com/metio/plinky/tree/main/scores" },
+    plinky: { label: "Klimpi", url: "https://github.com/metio/klimpi/tree/main/scores" },
     pdmx: { label: "PDMX", url: "https://github.com/pnlong/PDMX" },
     "openscore-lieder": {
         label: "OpenScore Lieder",

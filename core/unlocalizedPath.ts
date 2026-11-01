@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A segment written the way a language is: two letters, with an optional region or script
-// after a hyphen or underscore — "de", "DE", "en-US", "pt_BR", "sr-Latn". Every locale Plinky
+// after a hyphen or underscore — "de", "DE", "en-US", "pt_BR", "sr-Latn". Every locale Klimpi
 // ships has this shape and no page's first segment does; dev/pages.test.mts holds both to it.
 export const LANGUAGE_SHAPED = /^[a-z]{2}(?:[-_][a-z]{2,4})?$/i;
 

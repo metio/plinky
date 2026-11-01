@@ -1,11 +1,11 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # Architecture
 
-Plinky is a client-rendered React Router app assembled from a stack of layers. The one
+Klimpi is a client-rendered React Router app assembled from a stack of layers. The one
 rule that holds the whole thing together: **dependencies point strictly downward.** A
 layer may import from the layers below it and never from a layer above. `dependency-cruiser`
 enforces this on every push (`npm run arch`); the contract lives in `.dependency-cruiser.cjs`.

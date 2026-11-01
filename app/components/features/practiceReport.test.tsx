@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -84,7 +84,7 @@ describe("PracticeReport", () => {
         expect(screen.getByText(m.practice_empty())).toBeTruthy();
     });
 
-    it("adds time practised away from Plinky", () => {
+    it("adds time practised away from Klimpi", () => {
         const { practiceLog } = mount();
         fireEvent.change(screen.getByLabelText(m.practice_add_minutes()), {
             target: { value: "45" },

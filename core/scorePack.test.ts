@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -24,7 +24,7 @@ describe("score pack", () => {
     it("rejects non-JSON and non-bundle documents", () => {
         expect(() => parsePack("not json")).toThrow(/valid JSON/);
         expect(() => parsePack(JSON.stringify({ format: "something-else" }))).toThrow(
-            /not a Plinky score bundle/,
+            /not a Klimpi score bundle/,
         );
     });
 

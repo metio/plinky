@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -25,7 +25,7 @@ describe("Impressum", () => {
         expect(screen.getAllByText(/Sebastian Hoß/).length).toBeGreaterThan(0);
         expect(screen.getByText(/Bremer Platz 7/)).toBeTruthy();
         expect(screen.getByText(/48155 Münster/)).toBeTruthy();
-        const email = screen.getByRole("link", { name: "contact@plinky.fun" });
-        expect(email.getAttribute("href")).toBe("mailto:contact@plinky.fun");
+        const email = screen.getByRole("link", { name: "contact@klimpi.app" });
+        expect(email.getAttribute("href")).toBe("mailto:contact@klimpi.app");
     });
 });

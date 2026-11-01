@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -80,7 +80,7 @@ describe("Daily", () => {
         // no wider than the region itself, so no horizontal scrollbar appears.
         await waitFor(
             () => {
-                const region = screen.getByRole("img", { name: /Plinky #/ });
+                const region = screen.getByRole("img", { name: /Klimpi #/ });
                 expect(region.scrollWidth).toBeLessThanOrEqual(region.clientWidth + 1);
             },
             { timeout: 30000 },

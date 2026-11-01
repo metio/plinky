@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -261,7 +261,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 {/* Site-wide social-card fields; each route's meta adds the
                     per-page og:title / og:description and twitter equivalents. */}
                 <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="Plinky" />
+                <meta property="og:site_name" content="Klimpi" />
                 <meta property="og:url" content={pageUrl} />
                 <meta property="og:locale" content={ogLocale(locale)} />
                 {locales

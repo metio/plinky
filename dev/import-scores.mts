@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Imports curated open score corpora into the catalogue alongside the PDMX base.
@@ -195,7 +195,7 @@ function creditOf(
 
 const CONFIGS: Record<string, SourceConfig> = {
     "openscore-lieder": {
-        // 19th-century art song: a singer over a piano part. Kept deliberately — Plinky
+        // 19th-century art song: a singer over a piano part. Kept deliberately — Klimpi
         // opens the piano and can sound the voice as accompaniment — and labelled, so the
         // grade ladder does not offer a Schubert accompaniment as a first piece.
         kind: "voice-and-piano",

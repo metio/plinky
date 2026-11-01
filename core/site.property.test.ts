@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import fc from "fast-check";
@@ -81,7 +81,7 @@ describe("what a link unfurls as", () => {
             fc.property(fc.array(arbText, { minLength: 1, maxLength: 3 }), (parts) => {
                 const title = pageTitle(...parts);
 
-                expect(title.endsWith("Plinky")).toBe(true);
+                expect(title.endsWith("Klimpi")).toBe(true);
                 expect(title.startsWith(parts[0] as string)).toBe(true);
             }),
         );

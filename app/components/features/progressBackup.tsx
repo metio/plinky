@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useRef, useState } from "react";
@@ -37,7 +37,7 @@ export function ProgressBackup() {
         downloadBlob(
             exportProgress(store, savedAt),
             "application/json",
-            `plinky-progress-${savedAt.slice(0, 10)}.json`,
+            `klimpi-progress-${savedAt.slice(0, 10)}.json`,
         );
     };
 

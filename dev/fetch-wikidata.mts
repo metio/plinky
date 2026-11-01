@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Looks every composer the catalogue credits up on Wikidata and writes what it finds to
@@ -33,7 +33,7 @@ export type WikidataPerson = {
 };
 
 const API = "https://www.wikidata.org/w/api.php";
-const AGENT = "Plinky/1.0 (https://plinky.fun; catalogue enrichment)";
+const AGENT = "Klimpi/1.0 (https://klimpi.app; catalogue enrichment)";
 
 // Occupations that make a name a musician's: composer, pianist, conductor, musician,
 // organist, songwriter, music teacher, hymnwriter, lutenist, harpsichordist,

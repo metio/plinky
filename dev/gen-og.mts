@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Paints the card every piece's link unfurls as — build/client/og/<id>.png, one per piece
@@ -7,7 +7,7 @@
 //
 // Runs once per deploy, in the root build, not per language: the card is language-neutral,
 // and a picture painted twenty-six times is the same picture. Three thousand renders take a
-// few minutes; PLINKY_OG_LIMIT caps the count for a smoke run.
+// few minutes; KLIMPI_OG_LIMIT caps the count for a smoke run.
 //
 // The count matters for a reason beyond time. Cloudflare Pages holds at most twenty
 // thousand files in a deployment, the site's pages in twenty-six languages are about
@@ -104,7 +104,7 @@ async function main() {
     ).host;
     // The wordless icon (npm run logo): it stands beside the site's name in the corner, the
     // way the app header sets it.
-    const mark = `data:image/png;base64,${readFileSync("brand/plinky-icon.png").toString("base64")}`;
+    const mark = `data:image/png;base64,${readFileSync("brand/klimpi-icon.png").toString("base64")}`;
     // The faces travel with the page: a headless browser has neither installed. Latin
     // only, as the site's own card — a title in another script falls to the system face.
     const font = (path: string) =>
@@ -118,7 +118,7 @@ async function main() {
         body: "font-family:'Inter Variable',Inter,system-ui,sans-serif;font-variation-settings:'wght' 500",
     };
 
-    const limit = Number(process.env.PLINKY_OG_LIMIT ?? 0);
+    const limit = Number(process.env.KLIMPI_OG_LIMIT ?? 0);
     const jobs = limit > 0 ? cardJobs().slice(0, limit) : cardJobs();
     mkdirSync(OUT, { recursive: true });
     const pending = jobs.filter((job) => !existsSync(`${OUT}/${job.id}.png`));

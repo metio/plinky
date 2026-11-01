@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Uploads a built sample pack to its R2 bucket.
@@ -15,7 +15,7 @@
 //   CLOUDFLARE_API_TOKEN    an R2 token with object read+write on this bucket alone
 //
 // Usage:
-//   node dev/piano/upload-pack.mjs --bucket plinky-samples [--pack piano-pack] [--prefix v1]
+//   node dev/piano/upload-pack.mjs --bucket klimpi-samples [--pack piano-pack] [--prefix v1]
 //
 // A published prefix is immutable: the app caches every recording by URL, so a re-encode
 // belongs under a new one (v2/) rather than over an old one. This refuses to overwrite for
@@ -135,4 +135,4 @@ if (failed > 0) {
     console.log("Re-run to retry only what is missing; what landed is remembered.");
     process.exit(1);
 }
-console.log(`Check it: https://samples.plinky.fun/${PREFIX}/manifest.json`);
+console.log(`Check it: https://samples.klimpi.app/${PREFIX}/manifest.json`);

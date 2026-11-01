@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
@@ -249,10 +249,10 @@ describe("handScores / laggingHand", () => {
 
 describe("shareText", () => {
     it("stacks the boast over the grid with no link", () => {
-        const text = shareText("My run on Plinky 🎹", handGrid(spaced(6)));
+        const text = shareText("My run on Klimpi 🎹", handGrid(spaced(6)));
         const lines = text.split("\n");
-        expect(lines[0]).toBe("My run on Plinky 🎹");
-        expect(text).not.toMatch(/https?:|plinky\.fun/);
+        expect(lines[0]).toBe("My run on Klimpi 🎹");
+        expect(text).not.toMatch(/https?:|klimpi\.fun/);
         expect(text).not.toMatch(/\d+%/);
     });
 });

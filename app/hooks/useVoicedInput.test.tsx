@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // @vitest-environment jsdom
 
@@ -65,8 +65,8 @@ describe("useVoicedInput", () => {
     it("keeps a MIDI key's own articulation", () => {
         const { audio } = mount();
         act(() => {
-            window.__plinky?.play(60, 100);
-            window.__plinky?.release(60);
+            window.__klimpi?.play(60, 100);
+            window.__klimpi?.release(60);
         });
         expect(audio.voices.at(-1)).toEqual({ kind: "release", note: 60, holdScale: 1 });
     });
@@ -74,8 +74,8 @@ describe("useVoicedInput", () => {
     it("strikes harder for a harder key", () => {
         const { audio } = mount();
         act(() => {
-            window.__plinky?.play(60, 40);
-            window.__plinky?.play(62, 120);
+            window.__klimpi?.play(60, 40);
+            window.__klimpi?.play(62, 120);
         });
         const [soft, loud] = audio.voices as { gain: number }[];
         if (!soft || !loud) {
@@ -97,9 +97,9 @@ describe("useVoicedInput", () => {
         const { audio } = mount();
         audio.pedals.length = 0;
         act(() => {
-            window.__plinky?.pedal("sustain", true);
-            window.__plinky?.pedal("soft", true);
-            window.__plinky?.pedal("sustain", false);
+            window.__klimpi?.pedal("sustain", true);
+            window.__klimpi?.pedal("soft", true);
+            window.__klimpi?.pedal("sustain", false);
         });
         expect(audio.pedals).toEqual([
             { pedal: "sustain", down: true },
@@ -112,8 +112,8 @@ describe("useVoicedInput", () => {
         const { audio } = mount({ sound: false });
         audio.pedals.length = 0;
         act(() => {
-            window.__plinky?.play(60);
-            window.__plinky?.pedal("sustain", true);
+            window.__klimpi?.play(60);
+            window.__klimpi?.pedal("sustain", true);
         });
         expect(presses(audio)).toEqual([]);
         expect(audio.pedals).toEqual([{ pedal: "sustain", down: true }]);
@@ -125,9 +125,9 @@ describe("useVoicedInput", () => {
         const { audio, leave } = mount();
         leave();
         act(() => {
-            window.__plinky?.play(60);
+            window.__klimpi?.play(60);
         });
-        expect(window.__plinky).toBeDefined();
+        expect(window.__klimpi).toBeDefined();
         expect(audio.voices).toHaveLength(0);
     });
 });
@@ -137,7 +137,7 @@ describe("what the surface hears besides the sound", () => {
         const { pitch } = mount();
         act(() => {
             tap(60);
-            window.__plinky?.play(62);
+            window.__klimpi?.play(62);
             listen();
         });
         act(() => pitch.emit({ kind: "on", note: 64, velocity: 80 }));
@@ -149,7 +149,7 @@ describe("what the surface hears besides the sound", () => {
         // follows a piano that sounds on its own.
         for (const patch of [{ sound: false }, { instrumentSounds: true }]) {
             mount(patch);
-            act(() => window.__plinky?.play(60));
+            act(() => window.__klimpi?.play(60));
             expect(heard).toEqual([60]);
             cleanup();
         }
@@ -204,8 +204,8 @@ describe("the sources that already make their own sound", () => {
     it("leaves a MIDI piano that sounds on its own to itself, and still answers a tap", () => {
         const { audio } = mount({ instrumentSounds: true });
         act(() => {
-            window.__plinky?.play(60);
-            window.__plinky?.release(60);
+            window.__klimpi?.play(60);
+            window.__klimpi?.release(60);
             tap(64);
         });
         expect(presses(audio)).toEqual([64]);
@@ -215,7 +215,7 @@ describe("the sources that already make their own sound", () => {
 
     it("voices a silent MIDI controller", () => {
         const { audio } = mount({ instrumentSounds: false });
-        act(() => window.__plinky?.play(60));
+        act(() => window.__klimpi?.play(60));
         expect(presses(audio)).toEqual([60]);
     });
 });
@@ -223,7 +223,7 @@ describe("the sources that already make their own sound", () => {
 describe("leaving with keys still down", () => {
     it("ends a MIDI note still held, since its key-off will reach another page", () => {
         const { audio, leave } = mount();
-        act(() => window.__plinky?.play(60, 100));
+        act(() => window.__klimpi?.play(60, 100));
         leave();
         expect(audio.voices.at(-1)).toEqual({ kind: "release", note: 60, holdScale: 1 });
     });
@@ -238,10 +238,10 @@ describe("leaving with keys still down", () => {
     it("ends each held note once, and none it had already let go", () => {
         const { audio, leave } = mount();
         act(() => {
-            window.__plinky?.play(60);
-            window.__plinky?.play(64);
-            window.__plinky?.play(67);
-            window.__plinky?.release(64);
+            window.__klimpi?.play(60);
+            window.__klimpi?.play(64);
+            window.__klimpi?.play(67);
+            window.__klimpi?.release(64);
         });
         leave();
         expect(releases(audio)).toEqual([64, 60, 67]);
@@ -252,7 +252,7 @@ describe("leaving with keys still down", () => {
         // those pitches belongs to somebody else.
         for (const patch of [{ sound: false }, { instrumentSounds: true }]) {
             const { audio, leave } = mount(patch);
-            act(() => window.__plinky?.play(60));
+            act(() => window.__klimpi?.play(60));
             leave();
             expect(audio.voices).toEqual([]);
             cleanup();

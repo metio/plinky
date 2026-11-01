@@ -1,18 +1,18 @@
-<!-- SPDX-FileCopyrightText: The Plinky Authors -->
+<!-- SPDX-FileCopyrightText: The Klimpi Authors -->
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <meta charset="utf-8" />
 <!-- Matters when this file is opened directly; inside an iframe the embedding page sets
      the viewport instead, which is why the layout below asks no question a frame can
      answer wrongly. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Plinky intro</title>
+<title>Klimpi intro</title>
 <style>
 :root {
     /* Everything adjustable lives here. */
     --bg-deep: #0b0720;
     --bg-lift: #1a1140;
     --glow: #7c3aed;
-    --plink: #a836fe;
+    --tinkle: #a836fe;
     --url-ink: #e9e4ff;
 
     /* Sized against the stage's own width (100cqw == 1920px), so the composition holds
@@ -21,7 +21,7 @@
     --logo-size: 27.08cqw;
     --url-gap: 2.81cqw;
 
-    /* Where things are inside the mark, read off brand/proposed-mark/badge.svg: the glow the plink
+    /* Where things are inside the mark, read off brand/proposed-mark/badge.svg: the glow the tinkle
        falls from, the strike point it lands on (the circle's centre, by design), and the
        band the name's outlines occupy. */
     --dot-start-y: 7.5%;
@@ -99,7 +99,7 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 @keyframes mark-in { to { opacity: 1; } }
 @keyframes mark-settle { to { transform: scale(1); } }
 
-/* The plink. The mark already draws this dot at rest on the centre key — this is the
+/* The tinkle. The mark already draws this dot at rest on the centre key — this is the
    same light arriving, so it lands exactly where the artwork has it and then hands over. */
 #dot {
     position: absolute;
@@ -107,8 +107,8 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
     width: 5.2%; aspect-ratio: 1;
     margin: -2.6% 0 0 -2.6%;
     border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, #fff 38%, var(--plink) 72%, transparent 74%);
-    box-shadow: 0 0 1.35cqw 0.3cqw color-mix(in srgb, var(--plink) 70%, transparent);
+    background: radial-gradient(circle, #fff 0%, #fff 38%, var(--tinkle) 72%, transparent 74%);
+    box-shadow: 0 0 1.35cqw 0.3cqw color-mix(in srgb, var(--tinkle) 70%, transparent);
     opacity: 0;
     animation: dot-in 0.18s var(--t-fall-in) ease-out forwards,
                dot-fall var(--t-fall) var(--t-fall-in) cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards,
@@ -124,7 +124,7 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
     left: var(--dot-hit-x); top: var(--dot-hit-y);
     width: 4%; aspect-ratio: 1; margin: -2% 0 0 -2%;
     border-radius: 50%;
-    border: 0.1cqw solid color-mix(in srgb, var(--plink) 85%, white);
+    border: 0.1cqw solid color-mix(in srgb, var(--tinkle) 85%, white);
     opacity: 0;
     animation: ripple 0.85s calc(var(--t-fall-in) + var(--t-fall)) cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -173,7 +173,7 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
     left: 41.5%; top: 63.8%;
     width: 2.4%; aspect-ratio: 1; margin: -1.2% 0 0 -1.2%;
     border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, color-mix(in srgb, var(--plink) 80%, white) 45%, transparent 70%);
+    background: radial-gradient(circle, #fff 0%, color-mix(in srgb, var(--tinkle) 80%, white) 45%, transparent 70%);
     opacity: 0;
     animation: sparkle 0.5s calc(var(--t-shine-in) + 0.42s) ease-out forwards;
 }
@@ -205,14 +205,14 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 <div id="stage">
     <div id="halo"></div>
     <div id="lockup">
-        <img id="mark" alt="Plinky" src="../../brand/proposed-mark/badge.svg" />
+        <img id="mark" alt="Klimpi" src="../../brand/proposed-mark/badge.svg" />
         <div id="keyflash"></div>
         <div id="ripple"></div>
         <div id="dot"></div>
         <div id="shine"></div>
         <div id="sparkle"></div>
     </div>
-    <div id="url">plinky.fun</div>
+    <div id="url">klimpi.app</div>
 </div>
 </div>
 
@@ -221,10 +221,10 @@ body { margin: 0; display: grid; justify-items: center; align-content: start; }
 const IMPACT = 1.2;
 const DURATION = 5.0;
 
-// A soft piano-like plink, synthesised rather than sampled so the file stands alone —
+// A soft piano-like tinkle, synthesised rather than sampled so the file stands alone —
 // three harmonics over a fast decay, which is what a struck string sounds like from a
 // distance. Nothing here is a chord: one note, briefly.
-function plink(context, when) {
+function tinkle(context, when) {
     const out = context.createGain();
     out.gain.setValueAtTime(0.0001, when);
     out.gain.exponentialRampToValueAtTime(0.32, when + 0.006);
@@ -247,7 +247,7 @@ function plink(context, when) {
 // Frame-accurate seeking for the renderer: pause every animation and set a negative delay,
 // which is the same as asking the browser to show the frame at that time.
 const animated = () => [...document.querySelectorAll("#stage *, #stage")];
-window.plinkySeek = (seconds) => {
+window.klimpiSeek = (seconds) => {
     for (const el of animated()) {
         const style = getComputedStyle(el);
         if (style.animationName === "none") continue;
@@ -258,14 +258,14 @@ window.plinkySeek = (seconds) => {
             .join(", ");
     }
 };
-window.plinkyDuration = DURATION;
-window.plinkyImpact = IMPACT;
+window.klimpiDuration = DURATION;
+window.klimpiImpact = IMPACT;
 
 // Sound needs a gesture, so the preview offers one press and then runs clean.
 if (!location.search.includes("render")) {
     const start = () => {
         const context = new (window.AudioContext || window.webkitAudioContext)();
-        plink(context, context.currentTime + IMPACT);
+        tinkle(context, context.currentTime + IMPACT);
         for (const el of animated()) {
             el.style.animation = "none";
             void el.offsetWidth;

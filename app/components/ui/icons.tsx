@@ -1,11 +1,11 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
 
 // Original line-art icons, drawn as simple geometric paths so they carry no
 // third-party licence — they are ours, under the same licence as the rest of the app,
-// with no attribution or icon-set terms to honour wherever Plinky ships. Stroke
+// with no attribution or icon-set terms to honour wherever Klimpi ships. Stroke
 // follows currentColor, so each icon takes its button's text colour and theme.
 function Icon({ children, className = "h-4 w-4" }: { children: ReactNode; className?: string }) {
     return (
@@ -234,7 +234,7 @@ export function StarIcon({ className, filled = false }: IconProps & { filled?: b
     );
 }
 
-// A heart — the warmth behind Plinky, and the way to the people who made it.
+// A heart — the warmth behind Klimpi, and the way to the people who made it.
 export function HeartIcon({ className, filled = false }: IconProps & { filled?: boolean }) {
     return (
         <Icon className={className}>
@@ -320,7 +320,7 @@ export function HomeIcon({ className }: IconProps) {
 
 // A book — "the library".
 // An ear: the outer helix sweeping down to the lobe, with the inner curl. Ear training
-// is the one place in Plinky where looking at the screen won't help you.
+// is the one place in Klimpi where looking at the screen won't help you.
 export function EarIcon({ className }: IconProps) {
     return (
         <Icon className={className}>
@@ -458,7 +458,7 @@ export function SlidersIcon({ className }: IconProps) {
 }
 
 // A microphone on its stand — the room as an input device: play a real piano
-// and Plinky listens.
+// and Klimpi listens.
 export function MicIcon({ className }: IconProps) {
     return (
         <Icon className={className}>

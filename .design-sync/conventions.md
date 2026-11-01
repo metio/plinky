@@ -1,11 +1,11 @@
 <!--
-SPDX-FileCopyrightText: The Plinky Authors
+SPDX-FileCopyrightText: The Klimpi Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-## Building with Plinky
+## Building with Klimpi
 
-Plinky is a piano practice app: a player reads notation on screen and plays along on a
+Klimpi is a piano practice app: a player reads notation on screen and plays along on a
 MIDI keyboard, the computer keyboard, or an on-screen one. It is touch-first and playful —
 saturated violet, rounded letterforms, a bounce where something lands — and it never
 pressures anybody: there are no streaks and no leaderboards, so never design one.
@@ -38,7 +38,7 @@ Dark mode is a `dark` class on the root element, not a prop.
 
 ### Colour is named for its role, never for its hue
 
-Every colour is a Tailwind utility over a token defined in `_ds/plinky/styles.css`. Write
+Every colour is a Tailwind utility over a token defined in `_ds/klimpi/styles.css`. Write
 `text-muted`, never `text-gray-500 dark:text-gray-400` — each token already resolves to
 its own light and dark value, so a raw palette utility is both wrong in one theme and
 outside the system.
@@ -51,7 +51,7 @@ outside the system.
 | Accent | `accent` `accent-strong` `accent-solid` `accent-surface` `accent-fill` `accent-line` | Anything pressable. A deep ink blue that stays cool |
 | Earned | `spark` `spark-strong` `spark-soft` `spark-surface` | Stars, grades, the day's own thing. Brass |
 | State | `success` `warn` `danger` (each with `-surface`, `-line`, `-solid`) | Feedback |
-| Signature | `plink` | The dot on the i, and the note in the icon. Nowhere else |
+| Signature | `tinkle` | The dot on the i, and the note in the icon. Nowhere else |
 
 **Four families carry meaning and must never be borrowed for decoration.** `success` is
 the note the player found and `danger` the one they missed; `band-best` through
@@ -59,7 +59,7 @@ the note the player found and `danger` the one they missed; `band-best` through
 baked into an exported image; `hand-left` / `hand-right` distinguish the two hands on a
 staff. A decorative green on a screen where colour is the information is a lie.
 
-Five colours are the exception, and they exist BECAUSE of that rule: `spark`, `plink`,
+Five colours are the exception, and they exist BECAUSE of that rule: `spark`, `tinkle`,
 `bloom-leaf`, `bloom-sky` and `bloom-rose` mean nothing anywhere in the app, which is what
 frees them to be brand furniture — the rule under the header and the petals of the front
 page's flower. Use them for decoration and never to say anything. A grade letter takes
@@ -77,7 +77,7 @@ fields. Anything *printed* — a staff, a table, a score, a list of Folio rows �
 square corners and hairline rules, because rounding a staff makes it a widget instead of a
 page.
 
-While something is loading, the app draws the plink: a note falls, lands, and rings. It is
+While something is loading, the app draws the tinkle: a note falls, lands, and rings. It is
 the one loading gesture, at every size; there is no spinner to reach for.
 
 ### The primitives
@@ -114,12 +114,12 @@ works for two centuries.
 
 ### Where the truth is
 
-Read `_ds/plinky/styles.css` and its imports for the full token set, and each component's
+Read `_ds/klimpi/styles.css` and its imports for the full token set, and each component's
 own `.prompt.md` and `.d.ts` for its API. Both beat any summary here.
 
 ### Voice
 
-Plinky talks like a teacher who is glad you showed up: it invites, it never nags. Say what
+Klimpi talks like a teacher who is glad you showed up: it invites, it never nags. Say what
 the reader gets, not what the product does, and never promise something the app cannot
 deliver in one tap. Never write a streak, a rank, or "practise daily or lose your
 progress".

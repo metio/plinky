@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Writes brand/proposed-mark/: every form of the designer's vector mark, from one
@@ -6,7 +6,7 @@
 // reproducible and checked, so the proposal cannot rot while it waits.
 //
 // The symbol is the designer's Optimised Option 3 in her own colours: three white keys, two
-// black ones, the plink falling down the middle key onto its strike point. Every coordinate
+// black ones, the tinkle falling down the middle key onto its strike point. Every coordinate
 // and hex in art() and defs() was measured off her slide, so they are copied here as they
 // are and never adjusted by eye. The other forms only place that same drawing: on a circle,
 // on a rounded tile, in a white frame round the tile, on a full-bleed square, inside a
@@ -32,6 +32,7 @@ import { decompress } from "wawoff2";
 import {
     DOT,
     drawnWordmark,
+    stemPrefixes,
     TITTLE,
     TRACKING,
     tittleCircle,
@@ -155,16 +156,17 @@ const num = (value) => String(Math.round(value * 100) / 100);
 }
 
 // The name's outlines starting at `x` on `baseline`, `size` units tall, with `spacing` units
-// after every letter but the last, set with the dotless stem. Returns the path, the name's
-// width and the dot over its i.
+// after every letter but the last, set with the dotless stems. Returns the path, the name's
+// width and a dot over each i.
 function outline(x, baseline, size, spacing) {
     const scale = size / EM;
     const run = face.layout(drawnWordmark(false));
     const parts = [];
     let pen = x;
-    let dot = null;
+    const stems = new Set(stemPrefixes().map((prefix) => prefix.length));
+    const dots = [];
     run.glyphs.forEach((glyph, index) => {
-        if (index === WORDMARK_PARTS.before.length) dot = tittleCircle(pen, baseline, size);
+        if (stems.has(index)) dots.push(tittleCircle(pen, baseline, size));
         const at = (px, py) => `${num(pen + px * scale)} ${num(baseline - py * scale)}`;
         for (const { command, args } of glyph.path.commands) {
             if (command === "moveTo") parts.push(`M${at(args[0], args[1])}`);
@@ -180,12 +182,17 @@ function outline(x, baseline, size, spacing) {
         pen += run.positions[index].xAdvance * scale;
         if (index < run.glyphs.length - 1) pen += spacing;
     });
-    return { d: parts.join(""), width: pen - x, dot };
+    return { d: parts.join(""), width: pen - x, dots };
 }
 
-// The dot over the i, in the mark's pink whatever the ground.
-const dotOf = ({ dot }, extra = "") =>
-    `<circle fill="${DOT}"${extra} cx="${num(dot.cx)}" cy="${num(dot.cy)}" r="${num(dot.r)}"/>`;
+// The dots over the i's, in the mark's fuchsia whatever the ground.
+const dotOf = ({ dots }, extra = "") =>
+    dots
+        .map(
+            (dot) =>
+                `<circle fill="${DOT}"${extra} cx="${num(dot.cx)}" cy="${num(dot.cy)}" r="${num(dot.r)}"/>`,
+        )
+        .join("");
 
 // Where CSS puts the baseline in a line box as tall as the type (line-height 1): the face's
 // ascent and descent centred in the box, which is how the lockups were set on her board.
@@ -194,8 +201,8 @@ const baselineIn = (size) =>
 
 function file(width, height, body) {
     return (
-        `<!--\nSPDX-FileCopyrightText: The Plinky Authors\nSPDX-License-Identifier: AGPL-3.0-or-later\n-->\n` +
-        `<svg xmlns="http://www.w3.org/2000/svg" width="${num(width)}" height="${num(height)}" viewBox="0 0 ${num(width)} ${num(height)}" role="img" aria-label="Plinky">` +
+        `<!--\nSPDX-FileCopyrightText: The Klimpi Authors\nSPDX-License-Identifier: AGPL-3.0-or-later\n-->\n` +
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${num(width)}" height="${num(height)}" viewBox="0 0 ${num(width)} ${num(height)}" role="img" aria-label="Klimpi">` +
         `${body}</svg>\n`
     );
 }
@@ -245,7 +252,7 @@ function nameOnly() {
 // The launcher's safe zone. A launcher that masks crops to its own shape — a circle, a
 // squircle — and everything outside the middle circle of radius 40% is its to take. So the
 // ground reaches every edge and the drawing is scaled by 0.8 about the centre, which brings
-// its farthest point, the plink's glow, to 34 units from the centre. The glow's gradient is
+// its farthest point, the tinkle's glow, to 34 units from the centre. The glow's gradient is
 // drawn over the whole frame, since a gradient cut at the drawing's old edge would show as a
 // line across the icon.
 const MASK_SAFE = 0.8;
@@ -264,7 +271,7 @@ const FILES = {
     "tile.svg": file(100, 100, `${defs()}${tile}${art()}`),
     // The tile in its white frame, for an indigo ground.
     "tile-framed.svg": file(FRAMED, FRAMED, `${defs()}${framedTile()}`),
-    // The keys, the plink and its strike point with nothing behind them, for a dark stage.
+    // The keys, the tinkle and its strike point with nothing behind them, for a dark stage.
     "keys.svg": file(
         KEYS_VIEW.width,
         KEYS_VIEW.height,

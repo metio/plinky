@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { isRouteErrorResponse } from "react-router";
@@ -10,7 +10,7 @@ import { isRouteErrorResponse } from "react-router";
 
 // Where a bug report goes. Both the full-page error and a single broken panel link
 // here, so the destination is stated once.
-export const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
+export const REPO_ISSUES = "https://github.com/metio/klimpi/issues/new";
 
 // A page that does not exist, raised from a component rather than from a loader.
 //

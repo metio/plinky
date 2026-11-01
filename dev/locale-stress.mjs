@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Which language stresses the app hardest, printed for a build to measure.
@@ -149,7 +149,7 @@ export function heaviestLocale(dir = DIR) {
     return best;
 }
 
-// Printed bare on stdout so a shell can build with it: PLINKY_LOCALE=$(node …).
+// Printed bare on stdout so a shell can build with it: KLIMPI_LOCALE=$(node …).
 // The reasoning goes to stderr, where it is read by a person and ignored by the shell.
 if (import.meta.url === `file://${process.argv[1]}`) {
     if (process.argv.includes("--scripts")) {
