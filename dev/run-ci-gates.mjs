@@ -17,7 +17,6 @@
 // Usage: npm run ci:local [-- --all]
 
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
 import { gatesInWorkflow, HEAVY } from "./ciGates.mjs";
 
 const all = process.argv.includes("--all");
@@ -48,25 +47,6 @@ for (const [index, name] of chosen.entries()) {
 
 if (skipped.length > 0) {
     console.log(`\nNot run (heavy — pass --all):\n  ${skipped.join("\n  ")}`);
-}
-
-// The Frontend job delegates to metio/ci's reusable workflow, so the gates it brings —
-// the build, the size budget, coverage, the story screenshots, both accessibility sweeps,
-// Lighthouse, the browser fleet, and the shared lint gate — are named NOWHERE in this
-// repo's workflow and therefore nowhere in the list above. Saying "all green" without
-// saying that would be the same false completeness this script exists to end.
-if (
-    /uses:\s*metio\/ci\/\.github\/workflows\/frontend\.yml/.test(
-        readFileSync(".github/workflows/verify.yml", "utf8"),
-    )
-) {
-    console.log(
-        "\nNot covered at all: the Frontend job delegates to metio/ci, whose gates this\n" +
-            "workflow never names — build, size, coverage, story screenshots, a11y light and\n" +
-            "dark, Lighthouse, the browser projects, and the shared lint gate (ci-typos,\n" +
-            "ci-reuse, ci-yaml, ci-actionlint, ci-markdown). Run those yourself before a push\n" +
-            "that touches what they measure.",
-    );
 }
 
 if (failed.length > 0) {

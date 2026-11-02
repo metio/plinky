@@ -2,16 +2,17 @@
 ;; SPDX-License-Identifier: AGPL-3.0-or-later
 
 {:packages ["@lint" "jq"]
+ :env {"NODE_OPTIONS" "--dns-result-order=ipv4first"}
  :commands
  {"browsers" {:run "exec npx playwright install chromium firefox \"$@\""
              :description "Install the browsers of the playwright version in package.json"}
- "coverage" {:run "exec npm run coverage \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+ "ci-coverage" {:run "exec npm run coverage \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
              :description "Instrument the whole tree and rerun every project"}
- "stories" {:run "exec npm run test:storybook \"$@\"" :limits {:cpus 6 :memory "14G" :io-weight 50}
+ "ci-stories" {:run "exec npm run test:storybook \"$@\"" :limits {:cpus 6 :memory "14G" :io-weight 50}
             :description "Screenshot every story in both themes; -u refreshes the baselines"}
- "a11y-light" {:run "exec npm run a11y:light \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+ "ci-a11y-light" {:run "exec npm run a11y:light \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
                :description "Build the site and run axe over its pages in the light theme"}
- "a11y-dark" {:run "exec npm run a11y:dark \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+ "ci-a11y-dark" {:run "exec npm run a11y:dark \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
               :description "Build the site and run axe over its pages in the dark theme"}
  "ci-typecheck" {:run "exec npm run typecheck \"$@\""}
  "ci-test" {:run "exec npm run test \"$@\""}

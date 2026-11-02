@@ -7,39 +7,148 @@ on:
 permissions:
   contents: read
 jobs:
-  frontend:
-    # The shared Vite/React pipeline (build, browser + coverage, the story
-    # screenshots, biome lint, knip, a11y light/dark, lighthouse, and the metio lint
-    # gate: reuse, typos, yamllint, actionlint, markdownlint), run through this
-    # repo's .breto.edn toolchain.
-    # Its `detect` job enables each gate from this repo's package.json scripts.
-    # Named "Frontend" so its checks read "Frontend / build", "Frontend / browser", …
-    name: Frontend
-    uses: metio/ci/.github/workflows/frontend.yml@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
-    with:
-      # Node returns DNS records verbatim, so a bare `localhost` can resolve to
-      # ::1 first — the prerender's internal server and its own fetch would then
-      # land on different stacks and the request is refused. Force IPv4.
-      node-options: --dns-result-order=ipv4first
-      # Size and lighthouse are per-visitor budgets: build one locale (tree-shaken
-      # to its own language) so they measure what a single language ships. The
-      # deploy builds every locale and merges them (npm run build:locales). The
-      # per-locale invocation lives in the ci-build command, so this and a
-      # local `ci-build` stay one definition.
-      #
-      # lighthouserc.json audits one run per page over three categories, which is
-      # what keeps that job inside its timeout. Both narrowings follow from what
-      # the assertions actually gate: performance is warn-only, so the audits that
-      # can fail the build (script payload, layout shift, crawlability) are
-      # deterministic on a prerendered page and gain nothing from a median of
-      # three. The accessibility category is left out because axe already gates
-      # a11y in light and dark, where Lighthouse only ever sees light.
-      build-command: ci-build
-      browsers: chromium firefox
-      # `npm run coverage` runs the same vitest projects `npm test` does, plus
-      # instrumentation, so the build job need not run the suite a second time —
-      # a node-test failure still fails CI, through coverage.
-      tests-in-coverage: true
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      # ci-build builds one locale, tree-shaken to its own language, so the size budget
+      # measures what a single language ships; the deploy builds every locale.
+      - run: ci-typecheck
+      - run: ci-build
+      - run: ci-size
+  coverage:
+    name: coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
+      # Coverage runs the node and browser projects with instrumentation, so the node
+      # tests need no run of their own: a failing one fails coverage.
+      - run: ci-coverage
+  browser:
+    name: browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
+      - run: ci-test-browser
+  storybook:
+    name: storybook
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
+      - run: ci-stories
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: ci-biome
+  knip:
+    name: knip
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: ci-knip
+  accessibility-light:
+    name: accessibility-light
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
+      - run: ci-a11y-light
+  accessibility-dark:
+    name: accessibility-dark
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox
+      - run: ci-a11y-dark
+  lighthouse:
+    name: lighthouse
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - run: npm ci
+      - run: ci-lighthouse
+  repository-lint:
+    name: repository-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: metio/ci/breto@2c9b3ef3bf280e85541853d686e261dd7b92eac9 # 2026.11.2090039
+        with:
+          registries: github:metio/toolchains
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: ci-lint
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
@@ -283,7 +392,16 @@ jobs:
     name: Verify
     needs:
       [
-        frontend,
+        build,
+        coverage,
+        browser,
+        storybook,
+        lint,
+        knip,
+        accessibility-light,
+        accessibility-dark,
+        lighthouse,
+        repository-lint,
         bake-check,
         news,
         nav,
@@ -294,6 +412,7 @@ jobs:
         tokens,
         i18n,
         widths,
+        hydration,
         anchors,
         promo,
         ci-parity,

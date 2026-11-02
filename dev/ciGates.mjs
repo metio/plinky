@@ -59,9 +59,13 @@ export function gatesInWorkflow(path = ".github/workflows/verify.yml") {
 // the parity gate checks that every name here is one .breto.edn defines — a heavy gate
 // listed under a name it never had would run loose on the first job that added it.
 export const HEAVY = new Set([
+    "ci-a11y-dark",
+    "ci-a11y-light",
     "ci-build",
+    "ci-coverage",
     "ci-hydration",
     "ci-lighthouse",
+    "ci-stories",
     "ci-widths",
     "ci-test-browser",
 ]);

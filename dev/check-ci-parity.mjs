@@ -10,7 +10,8 @@
 // Pure source analysis over .breto.edn + the workflow (no build, no dependencies),
 // run via `npm run ci:parity` and its own CI job.
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { gatesInWorkflow, HEAVY } from "./ciGates.mjs";
 
 const project = readFileSync(".breto.edn", "utf8");
@@ -19,6 +20,11 @@ const project = readFileSync(".breto.edn", "utf8");
 const defined = new Set(
     [...project.matchAll(/^\s*\{?"(ci-[a-z0-9-]+)"\s+\{:run/gm)].map((match) => match[1]),
 );
+
+// A command of a group .breto.edn names, such as ci-lint of @lint, is linked into the
+// project's bin directory by `breto env`.
+const bin = process.env.BRETO_ENV_BIN;
+const linked = (name) => Boolean(bin) && existsSync(join(bin, name));
 
 const problems = [];
 const required = new Set();
@@ -41,7 +47,7 @@ for (const name of HEAVY) {
 }
 
 for (const name of required) {
-    if (!defined.has(name)) {
+    if (!defined.has(name) && !linked(name)) {
         problems.push(`job command \`${name}\` has no matching command in .breto.edn`);
     }
 }

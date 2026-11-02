@@ -29,11 +29,9 @@ supported hosts, so a browser that fails to start here needs its missing system
 library named from the error.
 
 CI mirrors this: every job in `.github/workflows/verify.yml` installs `.breto.edn`
-with the `metio/ci/breto` action, and the
-`Frontend` job delegates to `metio/ci`'s reusable `frontend.yml`, which is where
-the shared lint gate, coverage, the story screenshots, a11y and Lighthouse run —
-they are easy to forget precisely because this repo's own workflow never names
-them.
+with the `metio/ci/breto` action and runs a `ci-*` command, so CI runs the same Node,
+the same npm, the same variables and the same command lines as a local shell. The
+shared lint gate is the `repository-lint` job, which runs `ci-lint`.
 
 Each gate is also a **`ci-<name>` command** defined in
 `.breto.edn`, capturing exactly how CI invokes it (e.g. `ci-build` bakes in the
@@ -50,23 +48,20 @@ are Klimpi's own.
 ## The gate
 
 **`npm run ci:local` runs every gate this workflow runs**,
-read out of `.github/workflows/verify.yml` rather than chosen by hand — fifteen
-of them in well under a minute. Use it instead of picking gates that look related
+read out of `.github/workflows/verify.yml` rather than chosen by hand, the light
+ones in well under a minute. Use it instead of picking gates that look related
 to a change, because the relation that matters is the workflow's, not the
 diff's: a catalogue curation trips the composer index, a script switched to a
 different runner breaks the one job that installs nothing, a reading aid pushes a
 Lighthouse budget four hundred pages away. None of those look related to their
 change; all of them are.
 
-It skips the heavy gates and names them, and it says plainly that the Frontend
-job delegates to `metio/ci` — so build, **typecheck**, size, coverage, story
-screenshots, both a11y sweeps, Lighthouse, the browser projects and the shared
-lint gate are named nowhere in this workflow and therefore nowhere in its list.
+It skips the heavy gates and names them; `-- --all` runs them too.
 
-**"All 15 ran green" is not a green build, and reading it as one has already cost
-three red pushes.** The runner prints what it does not cover, and printing it is
-not the same as acting on it. A change that touches a component or a message
-needs `npm run a11y:light` at minimum — a colour token used for the wrong thing
+**A green run without `--all` is not a green build, and reading it as one has already
+cost three red pushes.** The runner prints the heavy gates it skipped, and printing
+them is not the same as acting on them. A change that touches a component or a message
+needs `ci-a11y-light` at minimum — a colour token used for the wrong thing
 put fourteen contrast violations on one page, in both themes, and the sweep found
 them in less time than the commit message took to write. A change that touches a
 `dev/*.mjs` with a hand-written `.d.mts` beside it needs `npm run typecheck`,
@@ -84,25 +79,25 @@ desktop's pages into swap. That froze the browser twice and killed a tmux sessio
 the load average past 40 on sixteen cores.
 
 ```sh
-coverage
-stories -- -u
+ci-coverage
+ci-stories -u
 ci-lighthouse
-a11y-light
+ci-a11y-light
 ci-test-browser
 ```
 
 | Command | What it does |
 | --- | --- |
-| `coverage` | `npm run coverage`: instruments the whole tree and reruns every project. |
-| `stories` | `npm run test:storybook`: ~290 screenshots across two themes, one browser round-trip each. Run it as a check only when you mean to; `-- -u` refreshes baselines after a deliberate visual change. |
+| `ci-coverage` | `npm run coverage`: instruments the whole tree and reruns every project. |
+| `ci-stories` | `npm run test:storybook`: ~290 screenshots across two themes, one browser round-trip each. Run it as a check only when you mean to; `-u` refreshes baselines after a deliberate visual change. |
 | `ci-lighthouse` | Builds the site, then drives 22 pages through headless Chrome. |
-| `a11y-light` / `a11y-dark` | Builds the site, then axe over the same 22 pages. |
+| `ci-a11y-light` / `ci-a11y-dark` | Builds the site, then axe over the same 22 pages. |
 | `ci-test-browser` | `npm run test:browser`: three vitest projects — chromium, firefox, mobile — each with its own browser. |
 
 `ci-build`, `ci-hydration` and `ci-widths` carry the same limits. `breto run` starts each
 of these commands in a systemd scope of its own capped at 6 CPUs, 8G of memory without
-swap, and an IO weight of 50; `ci-test-browser` gets 14G, because its three browser
-projects run in parallel and do not fit in 8G. Closing off swap is the part that saves
+swap, and an IO weight of 50; `ci-test-browser` and `ci-stories` get 14G, because their
+browsers do not fit in 8G. Closing off swap is the part that saves
 the machine: a run that overreaches is OOM-killed inside its own scope while everything
 outside keeps its pages — the run dies instead of the desktop, and breto names the
 command and its limit. On CI the limits are skipped, so the same command line works in
@@ -246,9 +241,8 @@ it — `dev/single-locale-build.mjs` is that check, shared by the size gate, the
 sweep and `ci-lighthouse`. The trap that remains is only the one you have to ask for:
 run `npm run build` by hand, then a gate, and it stops you.
 
-The shared metio lint gate runs in CI through `metio/ci`'s reusable
-`frontend.yml`, which is why it is easy to forget it exists — its commands come
-from the `@lint` group and run here exactly as they run there. Prose
+The shared metio lint gate runs in CI as the `repository-lint` job — its commands
+come from the `@lint` group and run here exactly as they run there. Prose
 comments and locale strings are the bulk of most diffs, so `ci-typos` earns its
 place:
 
