@@ -57,6 +57,7 @@ import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
 import { type ActivitySignal, runActivity } from "../lib/activity";
 import { type KeyboardEvidence, sessionKeyboard } from "../lib/keyboardEvidence";
+import { adoptLegacyKeys } from "../lib/legacyKeys";
 
 // The app's injected integration points, gathered in one place. Every external
 // capability the UI depends on — persistence, the state stores over it, audio,
@@ -145,7 +146,7 @@ const SAMPLES_BASE = "https://samples.klimpi.app/v1";
 // The key that remembers whether the player asked for the real piano. The recordings
 // themselves live in the browser's cache, which the player never has to think about; this
 // is the choice.
-const SAMPLES_ENABLED = "plinky:samples";
+const SAMPLES_ENABLED = "klimpi:samples";
 
 function defaultSamples(overrides: Partial<AppServices>): SampleSource {
     const store = overrides.store ?? browserStore;
@@ -180,6 +181,9 @@ function defaultSamples(overrides: Partial<AppServices>): SampleSource {
 // test and hands its stores back for seeding and asserting.
 export function createServices(overrides: Partial<AppServices> = {}): AppServices {
     const store = overrides.store ?? browserStore;
+    // Before any store reads through it: a device that practised under the old name holds
+    // its keys under the old prefix, and nothing below would ever look there.
+    adoptLegacyKeys(store);
     const favorites = overrides.favorites ?? createFavoritesStore(store);
     const fetcher = overrides.fetcher ?? httpFetcher;
     // The mic samples on the Scheduler's frames, so it takes the same one the
