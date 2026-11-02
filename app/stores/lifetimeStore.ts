@@ -8,7 +8,7 @@ import { createJsonStore, parseJson } from "./jsonStore";
 // The slow-moving skill fingerprint (see core/lifetime): persisted per device,
 // folded on every finished run, read by the You page's progress grid.
 
-const KEY = "plinky:lifetime";
+const KEY = "klimpi:lifetime";
 
 export type LifetimeStore = {
     load(): Lifetime;

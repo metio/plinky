@@ -12,7 +12,7 @@ import { createJsonStore, type JsonStore, parseJson } from "./jsonStore";
 // find the record still there afterwards, or it describes only the crashes mild enough
 // not to matter.
 
-const KEY = "plinky:errors";
+const KEY = "klimpi:errors";
 
 export type ErrorLogStore = JsonStore<LoggedError[]> & {
     // Fold one fault in. Returns whether it was written down — a device that cannot

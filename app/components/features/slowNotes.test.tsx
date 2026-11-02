@@ -18,7 +18,7 @@ afterEach(() => {
 
 const mount = (stats: NoteStats) =>
     renderWithServices(<SlowNotes />, {
-        store: memoryStore({ "plinky:notestats": JSON.stringify(stats) }),
+        store: memoryStore({ "klimpi:notestats": JSON.stringify(stats) }),
     });
 
 describe("SlowNotes", () => {
@@ -98,7 +98,7 @@ describe("SlowNotes", () => {
 
     it("reads a corrupt record as nothing rather than crashing the page", () => {
         const { container } = renderWithServices(<SlowNotes />, {
-            store: memoryStore({ "plinky:notestats": "{{ not json" }),
+            store: memoryStore({ "klimpi:notestats": "{{ not json" }),
         });
 
         expect(container.firstChild).toBeNull();

@@ -32,7 +32,7 @@ describe("sight-read store", () => {
     });
 
     it("reads a corrupt entry as nothing rather than crashing", () => {
-        const kv = memoryStore({ "plinky:sightread:broken": '{"score":"nope"}' });
+        const kv = memoryStore({ "klimpi:sightread:broken": '{"score":"nope"}' });
 
         expect(createSightReadStore(kv).load("broken")).toBeNull();
     });

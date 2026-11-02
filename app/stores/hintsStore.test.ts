@@ -32,7 +32,7 @@ describe("hintsStore", () => {
     });
 
     it("reads corrupt storage as nothing seen", () => {
-        expect(createHintsStore(memoryStore({ "plinky:seen-hints": "{oops" })).seen("a")).toBe(
+        expect(createHintsStore(memoryStore({ "klimpi:seen-hints": "{oops" })).seen("a")).toBe(
             false,
         );
     });

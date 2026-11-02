@@ -50,8 +50,8 @@ describe("masteryStore", () => {
 
     it("lists every stored entry and skips a corrupt one", () => {
         const kv = memoryStore({
-            "plinky:mastery:bad": "not json",
-            "plinky:unrelated": "1",
+            "klimpi:mastery:bad": "not json",
+            "klimpi:unrelated": "1",
         });
         const store = createMasteryStore(kv);
         store.save("song-1", mastery());
@@ -62,7 +62,7 @@ describe("masteryStore", () => {
 
     it("repairs a legacy entry missing fields through the normalizer", () => {
         const kv = memoryStore({
-            "plinky:mastery:old": JSON.stringify({ bestScore: 90, learned: true }),
+            "klimpi:mastery:old": JSON.stringify({ bestScore: 90, learned: true }),
         });
         const store = createMasteryStore(kv);
         const loaded = store.load("old");

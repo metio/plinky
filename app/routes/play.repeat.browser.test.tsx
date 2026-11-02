@@ -27,7 +27,7 @@ const halos = () => document.querySelectorAll("svg rect.klimpi-note-halo").lengt
 // The page as a player with an earlier take sees it: a ghost of that take races along the
 // staff. It is stored the way the ghost store writes it, so the page finds it on its own.
 function storeGhost(onsetsMs: number[]) {
-    localStorage.setItem(`plinky:ghost:${STUDY}`, JSON.stringify(onsetsMs));
+    localStorage.setItem(`klimpi:ghost:${STUDY}`, JSON.stringify(onsetsMs));
 }
 
 async function mountAndStart() {

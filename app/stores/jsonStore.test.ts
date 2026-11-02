@@ -35,7 +35,7 @@ const parse = (raw: string | null): Shape => {
 };
 
 const shapeStore = (kv: KeyValueStore): JsonStore<Shape> =>
-    createJsonStore(kv, "plinky:test", parse);
+    createJsonStore(kv, "klimpi:test", parse);
 
 describe("readJson / writeJson", () => {
     it("reads a missing key as null", () => {
@@ -95,27 +95,27 @@ describe("parseJson", () => {
 describe("createStringSetStore", () => {
     it("reads nothing stored, corrupt JSON, and a non-array all as the empty set", () => {
         const kv = memoryStore();
-        const store = createStringSetStore(kv, "plinky:set");
+        const store = createStringSetStore(kv, "klimpi:set");
         expect(store.load().size).toBe(0);
-        kv.set("plinky:set", "{corrupt");
+        kv.set("klimpi:set", "{corrupt");
         expect(store.load().size).toBe(0);
-        kv.set("plinky:set", '{"a":1}');
+        kv.set("klimpi:set", '{"a":1}');
         expect(store.load().size).toBe(0);
     });
 
     it("round-trips a set and drops non-string entries on read", () => {
         const kv = memoryStore();
-        const store = createStringSetStore(kv, "plinky:set");
+        const store = createStringSetStore(kv, "klimpi:set");
         expect(store.save(new Set(["a", "b"]))).toBe(true);
         expect([...store.load()].sort()).toEqual(["a", "b"]);
-        kv.set("plinky:set", JSON.stringify(["a", 1, null, "b"]));
+        kv.set("klimpi:set", JSON.stringify(["a", 1, null, "b"]));
         expect([...store.load()].sort()).toEqual(["a", "b"]);
     });
 
     it("keeps only members the validity guard admits", () => {
         const kv = memoryStore();
-        kv.set("plinky:set", JSON.stringify(["keep", "drop"]));
-        const store = createStringSetStore(kv, "plinky:set", (id): id is "keep" => id === "keep");
+        kv.set("klimpi:set", JSON.stringify(["keep", "drop"]));
+        const store = createStringSetStore(kv, "klimpi:set", (id): id is "keep" => id === "keep");
         expect([...store.load()]).toEqual(["keep"]);
     });
 });
@@ -123,7 +123,7 @@ describe("createStringSetStore", () => {
 describe("mergeSubscribe", () => {
     it("registers the listener with every store and tears all of them down", () => {
         const a = shapeStore(memoryStore());
-        const b = createJsonStore(memoryStore(), "plinky:test-b", parse);
+        const b = createJsonStore(memoryStore(), "klimpi:test-b", parse);
         const onChange = vi.fn();
         const unsubscribe = mergeSubscribe(a.subscribe, b.subscribe)(onChange);
         a.save({ n: 1 });
@@ -205,7 +205,7 @@ describe("createJsonStore", () => {
             throw new Error("broken subscriber");
         });
         store.subscribe(healthy);
-        window.dispatchEvent(new StorageEvent("storage", { key: "plinky:test" }));
+        window.dispatchEvent(new StorageEvent("storage", { key: "klimpi:test" }));
         expect(healthy).toHaveBeenCalledTimes(1);
         unsubscribeBroken();
     });
@@ -221,7 +221,7 @@ describe("createJsonStore", () => {
 });
 
 const keyed = (kv: KeyValueStore) =>
-    createKeyedJsonStore<Shape>(kv, "plinky:test:", (raw) => {
+    createKeyedJsonStore<Shape>(kv, "klimpi:test:", (raw) => {
         const value = raw as Partial<Shape>;
         return { n: typeof value?.n === "number" ? value.n : 0 };
     });
@@ -249,14 +249,14 @@ describe("createKeyedJsonStore", () => {
         const kv = memoryStore();
         const store = keyed(kv);
         store.save("ok", { n: 1 });
-        kv.set("plinky:test:bad", "{corrupt");
+        kv.set("klimpi:test:bad", "{corrupt");
         expect(store.load("bad")).toBeNull();
         expect(store.loadAll()).toEqual([{ id: "ok", value: { n: 1 } }]);
     });
 
     it("ignores keys outside its prefix in loadAll", () => {
         const kv = memoryStore();
-        kv.set("plinky:other", JSON.stringify({ n: 9 }));
+        kv.set("klimpi:other", JSON.stringify({ n: 9 }));
         const store = keyed(kv);
         store.save("a", { n: 1 });
         expect(store.loadAll()).toEqual([{ id: "a", value: { n: 1 } }]);
@@ -305,7 +305,7 @@ describe("cross-tab storage events", () => {
         const store = shapeStore(memoryStore());
         const onChange = vi.fn();
         store.subscribe(onChange);
-        window.dispatchEvent(storageEvent("plinky:test"));
+        window.dispatchEvent(storageEvent("klimpi:test"));
         expect(onChange).toHaveBeenCalledTimes(1);
     });
 
@@ -313,7 +313,7 @@ describe("cross-tab storage events", () => {
         const store = shapeStore(memoryStore());
         const onChange = vi.fn();
         store.subscribe(onChange);
-        window.dispatchEvent(storageEvent("plinky:unrelated"));
+        window.dispatchEvent(storageEvent("klimpi:unrelated"));
         expect(onChange).not.toHaveBeenCalled();
     });
 
@@ -329,9 +329,9 @@ describe("cross-tab storage events", () => {
         const store = keyed(memoryStore());
         const onChange = vi.fn();
         store.subscribe(onChange);
-        window.dispatchEvent(storageEvent("plinky:test:some-id"));
+        window.dispatchEvent(storageEvent("klimpi:test:some-id"));
         expect(onChange).toHaveBeenCalledTimes(1);
-        window.dispatchEvent(storageEvent("plinky:elsewhere:id"));
+        window.dispatchEvent(storageEvent("klimpi:elsewhere:id"));
         expect(onChange).toHaveBeenCalledTimes(1);
     });
 
@@ -340,7 +340,7 @@ describe("cross-tab storage events", () => {
         const onChange = vi.fn();
         const unsubscribe = store.subscribe(onChange);
         unsubscribe();
-        window.dispatchEvent(storageEvent("plinky:test"));
+        window.dispatchEvent(storageEvent("klimpi:test"));
         expect(onChange).not.toHaveBeenCalled();
     });
 });

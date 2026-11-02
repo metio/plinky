@@ -29,11 +29,11 @@ describe("DangerZone", () => {
         // The real sample source records "recorded piano off" in the store the moment it
         // is told to forget. Written after the wipe, that key read as a refused removal
         // and every reset reported failure; it is written first and wiped with the rest.
-        const store = memoryStore({ "plinky:scores": "[]" });
+        const store = memoryStore({ "klimpi:scores": "[]" });
         const samples = {
             ...fakeSampleSource(),
             forget: () => {
-                store.set("plinky:samples", "false");
+                store.set("klimpi:samples", "false");
                 return Promise.resolve();
             },
         };
@@ -42,13 +42,13 @@ describe("DangerZone", () => {
         fireEvent.click(screen.getByRole("button", { name: m.settings_reset() }));
         fireEvent.click(screen.getByRole("button", { name: m.settings_reset_yes() }));
         expect(screen.queryByRole("alert")).toBeNull();
-        expect(store.keys().filter((key) => key.startsWith("plinky:"))).toEqual([]);
+        expect(store.keys().filter((key) => key.startsWith("klimpi:"))).toEqual([]);
     });
 
     it("reports a failed wipe instead of reloading when storage refuses removals", () => {
         // A store that keeps a Klimpi key however hard it is told to delete it — the
         // reset must surface the failure rather than reload into stale data.
-        const refusing = { ...memoryStore({ "plinky:scores": "[]" }), remove: () => {} };
+        const refusing = { ...memoryStore({ "klimpi:scores": "[]" }), remove: () => {} };
         renderWithServices(<DangerZone />, { store: refusing });
 
         fireEvent.click(screen.getByRole("button", { name: m.settings_reset() }));

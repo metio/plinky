@@ -3,6 +3,7 @@
 
 import { isRecord } from "./guards";
 import { jsonOf, NOT_JSON } from "./json";
+import { isPackFormat } from "./packFormat";
 
 // The Klimpi score-bundle format: a JSON document with MusicXML embedded, used to
 // back up a library and to share or mass-import a set of scores. Each score carries
@@ -21,12 +22,12 @@ export interface PackScore {
 }
 
 export interface ScorePack {
-    format: "plinky-scores";
+    format: "klimpi-scores";
     version: 1;
     scores: PackScore[];
 }
 
-const FORMAT = "plinky-scores";
+const FORMAT = "klimpi-scores";
 
 // Tempo and beats-per-bar feed the 60000/tempo playback and grading math, so a
 // zero, negative, or non-finite value is dropped here and re-derived from the
@@ -76,7 +77,7 @@ export function parsePack(json: string): ScorePack {
     if (data === NOT_JSON) {
         throw new Error("That file is not valid JSON.");
     }
-    if (!isRecord(data) || data.format !== FORMAT) {
+    if (!isRecord(data) || !isPackFormat(data.format, FORMAT)) {
         throw new Error("That is not a Klimpi score bundle.");
     }
     if (!Array.isArray(data.scores)) {

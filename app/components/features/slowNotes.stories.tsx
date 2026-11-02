@@ -24,7 +24,7 @@ export default meta;
 export const Default: StoryObj<typeof SlowNotes> = {
     render: () => (
         <ServicesProvider
-            services={{ store: memoryStore({ "plinky:notestats": JSON.stringify(stats) }) }}
+            services={{ store: memoryStore({ "klimpi:notestats": JSON.stringify(stats) }) }}
         >
             <SlowNotes />
         </ServicesProvider>

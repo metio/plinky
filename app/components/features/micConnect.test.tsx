@@ -143,7 +143,7 @@ describe("MicConnect", () => {
         const calibration = { noiseFloor: 0.02, softLevel: 0.03, loudLevel: 0.2, octaveShift: -1 };
         // A device that already ran the wizard: its tuning is in the prefs store.
         const store = memoryStore({
-            "plinky:prefs": JSON.stringify({ micCalibration: calibration }),
+            "klimpi:prefs": JSON.stringify({ micCalibration: calibration }),
         });
         renderWithServices(
             <MidiProvider>

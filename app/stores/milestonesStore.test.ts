@@ -40,7 +40,7 @@ describe("milestonesStore", () => {
 
     it("reads corrupt storage as fresh state", () => {
         const store = createMilestonesStore(
-            memoryStore({ "plinky:reached-grade": "{bad", "plinky:flawless-done": "nope" }),
+            memoryStore({ "klimpi:reached-grade": "{bad", "klimpi:flawless-done": "nope" }),
         );
         expect(store.reachedGrade()).toBe(0);
         expect(store.flawlessDone()).toBe(false);
@@ -72,7 +72,7 @@ describe("milestonesStore", () => {
     });
 
     it("reads corrupt badge marks as none", () => {
-        const store = createMilestonesStore(memoryStore({ "plinky:badge-marks": "{bad" }));
+        const store = createMilestonesStore(memoryStore({ "klimpi:badge-marks": "{bad" }));
         expect(store.badgeMarks()).toEqual({ star: null, earMastered: false });
     });
 

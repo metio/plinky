@@ -23,7 +23,7 @@ describe("placement store", () => {
     });
 
     it("reads a half-written result as nothing rather than a broken one", () => {
-        const kv = memoryStore({ "plinky:placement": '{"rating":900}' });
+        const kv = memoryStore({ "klimpi:placement": '{"rating":900}' });
 
         expect(createPlacementStore(kv).load()).toBeNull();
     });

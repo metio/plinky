@@ -46,7 +46,7 @@ const LOG: PracticeLog = [
 
 function withLog(log: PracticeLog) {
     const store = memoryStore();
-    store.set("plinky:practice-log", JSON.stringify(log));
+    store.set("klimpi:practice-log", JSON.stringify(log));
     return { store, practiceLog: createPracticeLogStore(store) };
 }
 

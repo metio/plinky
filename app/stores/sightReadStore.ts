@@ -21,7 +21,7 @@ export type SightReadStore = {
 export function createSightReadStore(kv: KeyValueStore): SightReadStore {
     const store = createKeyedJsonStore<SightReadRecord | null>(
         kv,
-        "plinky:sightread:",
+        "klimpi:sightread:",
         normalizeSightRead,
     );
     return {

@@ -38,7 +38,7 @@ export type FingeringStore = {
 };
 
 export function createFingeringStore(kv: KeyValueStore): FingeringStore {
-    const store = createKeyedJsonStore<FingerMap>(kv, "plinky:fingering:", (raw) => {
+    const store = createKeyedJsonStore<FingerMap>(kv, "klimpi:fingering:", (raw) => {
         // Keep only valid finger numbers, so a corrupt store can't feed nonsense
         // into the drill or the score's fingering display.
         const clean: FingerMap = {};

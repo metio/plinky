@@ -14,7 +14,7 @@ import { createStringSetStore } from "./jsonStore";
 // rather than a rotating guess, and stops offering the course at all once it is finished.
 // Nothing here expires and nothing counts consecutive anything.
 
-const KEY = "plinky:theory";
+const KEY = "klimpi:theory";
 
 export type TheoryStore = {
     met(): ReadonlySet<string>;

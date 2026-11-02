@@ -14,7 +14,7 @@ import { createJsonStore, type JsonStore, parseJson } from "./jsonStore";
 
 // The saved theme choice. The pre-paint bootstrap script in the app root reads
 // the same key directly (it runs before React), so the key is exported for it.
-export const THEME_STORAGE_KEY = "plinky:theme";
+export const THEME_STORAGE_KEY = "klimpi:theme";
 
 export type ThemeStore = JsonStore<Theme>;
 

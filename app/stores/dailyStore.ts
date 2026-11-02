@@ -10,8 +10,8 @@ import { createJsonStore, mergeSubscribe, parseJson } from "./jsonStore";
 // never counts consecutive days or punishes a missed one) and the finished run's
 // result, so re-opening the day's challenge shows it instead of a blank slate.
 
-const DONE_KEY = "plinky:daily-done";
-const RESULT_KEY = "plinky:daily-result";
+const DONE_KEY = "klimpi:daily-done";
+const RESULT_KEY = "klimpi:daily-result";
 
 export type DailyStore = {
     // The number of the last daily completed, or 0 if none.

@@ -72,7 +72,7 @@ describe("prefsStore", () => {
         const kv = memoryStore();
         const store = createPrefsStore(kv);
         expect(store.load().treadmill).toBe(false);
-        kv.set("plinky:prefs", JSON.stringify({ treadmill: true }));
+        kv.set("klimpi:prefs", JSON.stringify({ treadmill: true }));
         expect(store.load().treadmill).toBe(true);
     });
 });

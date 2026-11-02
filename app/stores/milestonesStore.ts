@@ -16,9 +16,9 @@ import { createJsonStore, mergeSubscribe, parseJson } from "./jsonStore";
 // live in core/milestones. Beside them, the badge marks: the best star tier and
 // ear mastery ever shown, kept so a shelved piece cannot take a badge back.
 
-const REACHED_GRADE_KEY = "plinky:reached-grade";
-const FLAWLESS_KEY = "plinky:flawless-done";
-const BADGE_MARKS_KEY = "plinky:badge-marks";
+const REACHED_GRADE_KEY = "klimpi:reached-grade";
+const FLAWLESS_KEY = "klimpi:flawless-done";
+const BADGE_MARKS_KEY = "klimpi:badge-marks";
 
 export type MilestonesStore = {
     reachedGrade(): number;

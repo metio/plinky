@@ -10,7 +10,7 @@ import { createStringSetStore } from "./jsonStore";
 // hand-mirrored copy. A fresh device starts empty; stars are only ever the
 // player's own choice.
 
-const KEY = "plinky:favorites";
+const KEY = "klimpi:favorites";
 
 export type FavoritesStore = {
     // The starred ids. Stable: the same Set comes back until it changes, so a

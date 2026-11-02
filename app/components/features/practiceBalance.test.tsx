@@ -29,7 +29,7 @@ const session = (daysAgo: number, minutes: number, pieces: string[]): PracticeSe
 
 function mount(log: PracticeLog) {
     const kv = memoryStore();
-    kv.set("plinky:practice-log", JSON.stringify(log));
+    kv.set("klimpi:practice-log", JSON.stringify(log));
     const practiceLog = createPracticeLogStore(kv);
     return renderWithServices(<PracticeBalance now={NOW} pieceTitle={(id) => `Piece ${id}`} />, {
         store: kv,

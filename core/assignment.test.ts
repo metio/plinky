@@ -95,7 +95,7 @@ describe("serialize / parse", () => {
         expect(() =>
             parseAssignment(
                 JSON.stringify({
-                    format: "plinky-assignment",
+                    format: "klimpi-assignment",
                     version: 1,
                     name: "Empty",
                     items: [{}],
@@ -452,7 +452,7 @@ describe("a set worked toward a date", () => {
 
     it("reads a set saved before dates existed as having none", () => {
         const legacy = JSON.stringify({
-            format: "plinky-assignment",
+            format: "klimpi-assignment",
             version: 1,
             id: "old",
             name: "Old",

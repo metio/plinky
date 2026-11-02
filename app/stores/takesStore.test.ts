@@ -95,7 +95,7 @@ describe("takesStore", () => {
 
     it("skips corrupt stored entries rather than failing the list", () => {
         const kv = memoryStore({
-            "plinky:takes:song": JSON.stringify([
+            "klimpi:takes:song": JSON.stringify([
                 { id: "ok", createdAt: 1, letter: "A", complete: true, code: "x" },
                 "junk",
             ]),

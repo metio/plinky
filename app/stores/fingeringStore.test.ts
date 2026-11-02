@@ -25,7 +25,7 @@ describe("fingeringStore", () => {
 
     it("drops corrupt or out-of-range entries on load", () => {
         const kv = memoryStore({
-            "plinky:fingering:x": JSON.stringify({
+            "klimpi:fingering:x": JSON.stringify({
                 "right:0:0:0": 3,
                 "right:0:0:1": 9,
                 "right:0:0:2": "x",

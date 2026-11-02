@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Klimpi Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Everything Klimpi stores lives under the "plinky:" localStorage prefix — scores,
+// Everything Klimpi stores lives under the "klimpi:" localStorage prefix — scores,
 // mastery, prefs, favourites, history, ghosts, assignments. Wiping every
 // such key (and nothing else) returns the device to a fresh-install state; the caller
 // reloads so first-run seeding runs again. Handy for trying flows from scratch in dev,
@@ -9,7 +9,7 @@
 
 import type { KeyValueStore } from "../ports/keyValueStore";
 
-export const PREFIX = "plinky:";
+export const PREFIX = "klimpi:";
 
 // Remove all Klimpi state from this device and report how many keys were cleared.
 // Other sites' keys are left untouched. Does not reload — the caller decides when.

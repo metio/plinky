@@ -5,6 +5,7 @@ import { TEMPO_MAX, TEMPO_MIN } from "./playback";
 import { isDateKey } from "./dateKey";
 import { isRecord } from "./guards";
 import { jsonOf, NOT_JSON } from "./json";
+import { isPackFormat } from "./packFormat";
 import { packToCode, unpackFromCode } from "./shareCode";
 import { slugify } from "./slug";
 
@@ -23,7 +24,7 @@ export interface AssignmentItem {
 }
 
 export interface Assignment {
-    format: "plinky-assignment";
+    format: "klimpi-assignment";
     version: 1;
     // How this device files the set: a slug of the name, made unique against what is
     // already stored. It is local by design — two devices that received the same link
@@ -46,7 +47,7 @@ export interface Assignment {
     items: AssignmentItem[];
 }
 
-const FORMAT = "plinky-assignment";
+const FORMAT = "klimpi-assignment";
 
 // The playable band for a target tempo. Exported so the builder's input advertises
 // the same range this rejects — a field that accepts what the save discards is a
@@ -189,7 +190,7 @@ export function parseAssignment(json: string): Assignment {
     if (data === NOT_JSON) {
         throw new Error("That file is not valid JSON.");
     }
-    if (!isRecord(data) || data.format !== FORMAT) {
+    if (!isRecord(data) || !isPackFormat(data.format, FORMAT)) {
         throw new Error("That is not a Klimpi assignment.");
     }
     if (!Array.isArray(data.items)) {

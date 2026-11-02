@@ -426,7 +426,7 @@ describe("MidiProvider", () => {
         // paired.
         const store = memoryStore();
         store.set(
-            "plinky:prefs",
+            "klimpi:prefs",
             JSON.stringify({ keyMap: rebindPedal(DEFAULT_KEY_MAP, "sustain", ";") }),
         );
         const pedals: [PedalKind, boolean][] = [];
@@ -720,7 +720,7 @@ describe("claimed keys", () => {
         // press, so the instrument must not also play whatever " is bound to.
         const store = memoryStore();
         store.set(
-            "plinky:prefs",
+            "klimpi:prefs",
             JSON.stringify({ keyMap: rebind(DEFAULT_KEY_MAP, "right", 0, '"') }),
         );
         const wrapper = ({ children }: { children: React.ReactNode }) => (

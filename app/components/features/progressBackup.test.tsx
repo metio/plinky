@@ -11,8 +11,8 @@ import { renderWithServices } from "../../testing/renderWithServices";
 import { ProgressBackup } from "./progressBackup";
 
 const device = {
-    "plinky:prefs": "{}",
-    "plinky:mastery:scale-c-major": '{"bestScore":91}',
+    "klimpi:prefs": "{}",
+    "klimpi:mastery:scale-c-major": '{"bestScore":91}',
 };
 
 function fileInput(container: HTMLElement): HTMLInputElement {
@@ -75,14 +75,14 @@ describe("ProgressBackup", () => {
         expect((await screen.findByRole("alert")).textContent).toBe(
             m.progress_backup_error_unreadable(),
         );
-        expect(store.get("plinky:mastery:scale-c-major")).toBe('{"bestScore":91}');
+        expect(store.get("klimpi:mastery:scale-c-major")).toBe('{"bestScore":91}');
     });
 
     it("names storage as the reason when the device refuses the writes", async () => {
         const store = { ...memoryStore(device), set: () => false };
         const { container } = renderWithServices(<ProgressBackup />, { store });
         const backup = JSON.stringify({
-            format: "plinky-progress",
+            format: "klimpi-progress",
             version: 1,
             entries: { prefs: "{}" },
         });
@@ -132,7 +132,7 @@ describe("ProgressBackup", () => {
             store: memoryStore(device),
         });
         const foreign = exportProgress(
-            memoryStore({ "plinky:foreign": "1" }),
+            memoryStore({ "klimpi:foreign": "1" }),
             "2026-01-01T00:00:00.000Z",
         );
         let releaseSlow = () => {};
@@ -150,6 +150,6 @@ describe("ProgressBackup", () => {
         await screen.findByRole("alert");
         releaseSlow();
         await new Promise((resolve) => setTimeout(resolve, 0));
-        expect(services.store.get("plinky:foreign")).toBeNull();
+        expect(services.store.get("klimpi:foreign")).toBeNull();
     });
 });

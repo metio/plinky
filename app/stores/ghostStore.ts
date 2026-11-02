@@ -16,7 +16,7 @@ export type GhostStore = {
 };
 
 export function createGhostStore(kv: KeyValueStore): GhostStore {
-    const store = createKeyedJsonStore<number[]>(kv, "plinky:ghost:", (raw) =>
+    const store = createKeyedJsonStore<number[]>(kv, "klimpi:ghost:", (raw) =>
         Array.isArray(raw) ? raw.filter((onset): onset is number => typeof onset === "number") : [],
     );
     return {

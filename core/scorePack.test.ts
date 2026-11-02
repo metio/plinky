@@ -29,17 +29,17 @@ describe("score pack", () => {
     });
 
     it("rejects a pack with no usable scores", () => {
-        expect(() => parsePack(JSON.stringify({ format: "plinky-scores", scores: [] }))).toThrow(
+        expect(() => parsePack(JSON.stringify({ format: "klimpi-scores", scores: [] }))).toThrow(
             /no scores|no valid scores/,
         );
-        const malformed = { format: "plinky-scores", scores: [{ id: "x" }] };
+        const malformed = { format: "klimpi-scores", scores: [{ id: "x" }] };
         expect(() => parsePack(JSON.stringify(malformed))).toThrow(/no valid scores/);
     });
 
     it("drops a non-positive or non-finite tempo so it is re-derived on import", () => {
         const pack = parsePack(
             JSON.stringify({
-                format: "plinky-scores",
+                format: "klimpi-scores",
                 scores: [
                     { id: "a", title: "A", xml: "<x/>", tempo: 0, beatsPerBar: -4 },
                     { id: "b", title: "B", xml: "<x/>", tempo: 120, beatsPerBar: 3 },
@@ -54,7 +54,7 @@ describe("score pack", () => {
     it("drops malformed scores but keeps valid ones", () => {
         const pack = parsePack(
             JSON.stringify({
-                format: "plinky-scores",
+                format: "klimpi-scores",
                 scores: [{ id: "a", title: "A", xml: "<score-partwise/>" }, { id: "bad" }],
             }),
         );
@@ -67,7 +67,7 @@ describe("a score with no name", () => {
         // The library keys on the id and /play/<id> links to it, so the empty string
         // names nothing — the board and the progress bundle drop theirs the same way.
         const pack = JSON.stringify({
-            format: "plinky-scores",
+            format: "klimpi-scores",
             version: 1,
             scores: [
                 { id: "", title: "Nameless", xml: "<score/>" },
@@ -79,7 +79,7 @@ describe("a score with no name", () => {
 
     it("refuses a bundle whose every score is nameless", () => {
         const pack = JSON.stringify({
-            format: "plinky-scores",
+            format: "klimpi-scores",
             version: 1,
             scores: [{ id: "", title: "T", xml: "<score/>" }],
         });

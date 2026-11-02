@@ -18,7 +18,7 @@ export type HistoryStore = JsonStore<History> & {
 
 // The pre-paint bootstrap script in the app root reads this key directly (it runs
 // before React), so the key is exported for it.
-export const HISTORY_STORAGE_KEY = "plinky:history";
+export const HISTORY_STORAGE_KEY = "klimpi:history";
 
 // The pre-paint bootstrap the app root inlines beside the theme's: marks a device
 // that has played before, so Today can open on the day's practice while the

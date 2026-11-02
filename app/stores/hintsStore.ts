@@ -8,7 +8,7 @@ import { createStringSetStore } from "./jsonStore";
 // shows at most once. A plain per-device set under one key — cleared by the
 // Settings reset.
 
-const KEY = "plinky:seen-hints";
+const KEY = "klimpi:seen-hints";
 
 export type HintsStore = {
     seen(id: string): boolean;

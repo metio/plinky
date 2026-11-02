@@ -31,7 +31,7 @@ describe("Basics", () => {
             </MemoryRouter>,
             {
                 store: memoryStore({
-                    "plinky:prefs": JSON.stringify({
+                    "klimpi:prefs": JSON.stringify({
                         noteLabels: "all",
                         colorNotes: true,
                         noteHints: "always",
@@ -58,7 +58,7 @@ describe("Basics", () => {
             </MemoryRouter>,
             {
                 store: memoryStore({
-                    "plinky:prefs": JSON.stringify({ volume: 25, sound: false }),
+                    "klimpi:prefs": JSON.stringify({ volume: 25, sound: false }),
                 }),
             },
         );

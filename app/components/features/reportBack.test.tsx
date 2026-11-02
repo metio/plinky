@@ -38,7 +38,7 @@ describe("ReportBack", () => {
 
     it("reports what the device scored, and what it never played", () => {
         mount({
-            "plinky:mastery:twinkle": JSON.stringify({ bestScore: 88, learned: true }),
+            "klimpi:mastery:twinkle": JSON.stringify({ bestScore: 88, learned: true }),
         });
 
         fireEvent.change(screen.getByLabelText(m.report_who()), { target: { value: "Ada" } });
@@ -74,7 +74,7 @@ describe("ReportBack", () => {
     it("does not say the code was copied where there is no clipboard to copy to", async () => {
         vi.stubGlobal("navigator", {});
         try {
-            mount({ "plinky:mastery:twinkle": JSON.stringify({ bestScore: 88, learned: true }) });
+            mount({ "klimpi:mastery:twinkle": JSON.stringify({ bestScore: 88, learned: true }) });
             fireEvent.change(screen.getByLabelText(m.report_who()), { target: { value: "Ada" } });
             fireEvent.click(screen.getByRole("button", { name: m.report_make() }));
             fireEvent.click(screen.getByRole("button", { name: m.report_copy() }));

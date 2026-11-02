@@ -9,10 +9,10 @@ import { countProgressEntries, exportProgress, importProgress } from "./progress
 import { PREFIX } from "./resetDevice";
 
 const device = {
-    "plinky:prefs": '{"noteLabels":"all"}',
-    "plinky:mastery:scale-c-major": '{"bestScore":91,"learned":true}',
-    "plinky:takes:ode-to-joy": "[]",
-    "plinky:theme": '"dark"',
+    "klimpi:prefs": '{"noteLabels":"all"}',
+    "klimpi:mastery:scale-c-major": '{"bestScore":91,"learned":true}',
+    "klimpi:takes:ode-to-joy": "[]",
+    "klimpi:theme": '"dark"',
 };
 
 // A store that refuses writes past `limit`, standing in for a device out of quota.
@@ -33,8 +33,8 @@ describe("progress backup", () => {
 
         expect(result).toEqual({ ok: true, restored: 4, savedAt: "2026-07-28T10:00:00.000Z" });
         expect(restored.keys().sort()).toEqual(Object.keys(device).sort());
-        expect(restored.get("plinky:mastery:scale-c-major")).toBe(
-            device["plinky:mastery:scale-c-major"],
+        expect(restored.get("klimpi:mastery:scale-c-major")).toBe(
+            device["klimpi:mastery:scale-c-major"],
         );
     });
 
@@ -44,23 +44,23 @@ describe("progress backup", () => {
     });
 
     it("replaces the device's state rather than merging into it", () => {
-        const source = memoryStore({ "plinky:prefs": '{"noteLabels":"off"}' });
+        const source = memoryStore({ "klimpi:prefs": '{"noteLabels":"off"}' });
         // A piece deleted before the backup was taken must not come back to life.
         const target = memoryStore({
-            "plinky:prefs": '{"noteLabels":"all"}',
-            "plinky:mastery:deleted-piece": "{}",
+            "klimpi:prefs": '{"noteLabels":"all"}',
+            "klimpi:mastery:deleted-piece": "{}",
         });
 
         importProgress(target, exportProgress(source, ""));
 
-        expect(target.keys()).toEqual(["plinky:prefs"]);
-        expect(target.get("plinky:prefs")).toBe('{"noteLabels":"off"}');
+        expect(target.keys()).toEqual(["klimpi:prefs"]);
+        expect(target.get("klimpi:prefs")).toBe('{"noteLabels":"off"}');
     });
 
     it("cannot be made to write outside Klimpi's own keys", () => {
         const target = memoryStore({ "other-app": "keep" });
         const hostile = JSON.stringify({
-            format: "plinky-progress",
+            format: "klimpi-progress",
             entries: { "../other-app": "owned", prefs: "{}" },
         });
 
@@ -68,15 +68,15 @@ describe("progress backup", () => {
         // The hostile key is confined under the prefix rather than escaping it, and
         // the other site's value is neither overwritten nor pruned.
         expect(target.get("other-app")).toBe("keep");
-        expect(target.get("plinky:../other-app")).toBe("owned");
+        expect(target.get("klimpi:../other-app")).toBe("owned");
     });
 
     it("restores a bundle that fits only once the device's own values are gone", () => {
         // The device's takes and the bundle's takes are different keys. Holding both at
         // once would need room for the two together, although the device after the
         // restore holds only the bundle's — so the device's are cleared first.
-        const here = { "plinky:takes:x": x(300), "plinky:takes:y": x(300) };
-        const there = { "plinky:takes:p": x(250), "plinky:takes:q": x(250) };
+        const here = { "klimpi:takes:x": x(300), "klimpi:takes:y": x(300) };
+        const there = { "klimpi:takes:p": x(250), "klimpi:takes:q": x(250) };
         const target = quotaStore(here, sizeOf(memoryStore(here)));
 
         const result = importProgress(target, exportProgress(memoryStore(there), ""));
@@ -86,7 +86,7 @@ describe("progress backup", () => {
     });
 
     it("keeps what the device had when the bundle cannot fit at all", () => {
-        const before = { "plinky:mastery:keep-me": "{}", "other-app": "keep" };
+        const before = { "klimpi:mastery:keep-me": "{}", "other-app": "keep" };
         const target = quotaStore(before, sizeOf(memoryStore(before)) + 20);
 
         const result = importProgress(target, exportProgress(memoryStore(device), ""));
@@ -102,8 +102,8 @@ describe("progress backup", () => {
         // nothing had changed. Here the first write lands and the second is refused, so
         // both halves of the rollback run: the bundle's key goes, the device's come back.
         const before = {
-            "plinky:mastery:one": '{"bestScore":10}',
-            "plinky:mastery:two": '{"bestScore":20}',
+            "klimpi:mastery:one": '{"bestScore":10}',
+            "klimpi:mastery:two": '{"bestScore":20}',
         };
         const target = quotaStore(before, sizeOf(memoryStore(before)));
 
@@ -117,8 +117,8 @@ describe("progress backup", () => {
         // The bundle shrinks a value the device holds, then brings a large new one. Putting
         // the old value back while the new one is still stored would need more room than
         // the device ever had, so the new one goes first.
-        const before = { "plinky:a": x(100), "plinky:z": x(50) };
-        const bundle = { "plinky:a": x(10), "plinky:b": x(130), "plinky:c": x(100) };
+        const before = { "klimpi:a": x(100), "klimpi:z": x(50) };
+        const bundle = { "klimpi:a": x(10), "klimpi:b": x(130), "klimpi:c": x(100) };
         const target = quotaStore(before, sizeOf(memoryStore(before)));
 
         const result = importProgress(target, exportProgress(memoryStore(bundle), ""));
@@ -132,8 +132,8 @@ describe("progress backup", () => {
         // bundle's empty one is written into the room it left, and a larger value is then
         // refused: putting the device's back needs that room again, so the bundle's must go
         // first, although both values are the same length.
-        const before = { "plinky:s": "" };
-        const bundle = { "plinky:t": "", "plinky:u": x(10) };
+        const before = { "klimpi:s": "" };
+        const bundle = { "klimpi:t": "", "klimpi:u": x(10) };
         const target = quotaStore(before, sizeOf(memoryStore(before)));
 
         const result = importProgress(target, exportProgress(memoryStore(bundle), ""));
@@ -145,7 +145,7 @@ describe("progress backup", () => {
     it("clears nothing on a device that refuses every write", () => {
         // Such a device could not take back a value once cleared, whatever its size, so
         // it is found out before anything is removed and keeps all it held.
-        const before = { "plinky:mastery:keep-me": "{}", "plinky:takes:mine": "[]" };
+        const before = { "klimpi:mastery:keep-me": "{}", "klimpi:takes:mine": "[]" };
         const target = crowdedStore(before, 0);
 
         const result = importProgress(target, exportProgress(memoryStore(device), ""));
@@ -158,7 +158,7 @@ describe("progress backup", () => {
         // A device that takes one write and then refuses the rest gets past the check,
         // clears its own values and cannot take them back. The copy has to say the
         // device changed rather than claim nothing did.
-        const target = crowdedStore({ "plinky:mastery:keep-me": "{}" }, 1);
+        const target = crowdedStore({ "klimpi:mastery:keep-me": "{}" }, 1);
 
         const result = importProgress(target, exportProgress(memoryStore(device), ""));
 
@@ -170,7 +170,7 @@ describe("progress backup", () => {
         // genuinely mixed, and the copy has to say that rather than claim nothing
         // changed. It has to be a key the bundle also carries: rolling back a key that
         // was never here is a remove, and a remove cannot be refused.
-        const target = crowdedStore({ "plinky:prefs": '{"noteLabels":"off"}' }, 2);
+        const target = crowdedStore({ "klimpi:prefs": '{"noteLabels":"off"}' }, 2);
 
         const result = importProgress(target, exportProgress(memoryStore(device), ""));
 

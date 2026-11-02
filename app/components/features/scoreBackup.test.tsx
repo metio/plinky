@@ -12,7 +12,7 @@ import { renderWithServices } from "../../testing/renderWithServices";
 import { ScoreBackup } from "./scoreBackup";
 
 const PACK = JSON.stringify({
-    format: "plinky-scores",
+    format: "klimpi-scores",
     version: 1,
     scores: [
         { id: "x", title: "X", xml: "<score-partwise><part/></score-partwise>" },
@@ -69,7 +69,7 @@ describe("ScoreBackup", () => {
         );
         const pack = (n: number) =>
             JSON.stringify({
-                format: "plinky-scores",
+                format: "klimpi-scores",
                 version: 1,
                 scores: Array.from({ length: n }, (_, i) => ({
                     id: `s${i}`,

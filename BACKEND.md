@@ -392,7 +392,7 @@ implementation, both directions.
 
 **Stores.** Only where backend state is persistent and shared between views — the
 vault's sync metadata, the teacher's own class tokens, and the pupil's set of
-class memberships (`plinky:classes`, see
+class memberships (`klimpi:classes`, see
 [result collection](#capability-result-collection)). Transient request state lives
 in a hook.
 
@@ -571,7 +571,7 @@ the obvious case; one school where a pupil takes both piano and theory is the
 common one. A device therefore holds a set of memberships, not one:
 
 ```text
-plinky:classes → { classId, writeToken, label, joinedAt }[]
+klimpi:classes → { classId, writeToken, label, joinedAt }[]
 ```
 
 Joining is a per-class act — the teacher shares a join link, the device stores
@@ -889,7 +889,7 @@ The highest-risk capability in the document, because it is the only one that can
 destroy data a player already has.
 
 **The problem with the obvious design.** The existing progress bundle is a flat
-map of `plinky:`-prefixed key to raw stored string, and `importProgress` applies
+map of `klimpi:`-prefixed key to raw stored string, and `importProgress` applies
 it by writing every entry and then deleting every key not in the bundle. Replace
 rather than merge is exactly right for the file-based device handoff it was built
 for — a piece you deleted before backing up does not come back to life. It is
@@ -965,34 +965,34 @@ implementation detail:
 
 | Key or family | Merge | Reason |
 | --- | --- | --- |
-| `plinky:prefs` | Field-wise LWW, minus a do-not-sync list | One object, ~35 fields; whole-object LWW discards a concurrent edit to a different field |
-| `plinky:theme` | Not synced | Device-scoped: a phone and a desktop legitimately differ |
-| `plinky:discovered`, `plinky:seen-hints` | Set union | Genuinely grow-only; both stores only ever add |
-| `plinky:favorites` | OR-Set with per-id tombstones | The only mutator is a toggle that *deletes*; plain union means the star list can never shrink |
-| `plinky:mastery:<id>` | Field-wise: `max` on `bestScore`, LWW on `learned`, LWW on `backlog`, LWW on `intervalDays`/`reviewAt` | `learned` and `backlog` are reversible toggles, so `or` would make un-marking impossible |
-| `plinky:history` | Per-day `max` | Each day's note count is a total; the larger reflects more practice |
-| `plinky:practice-log` | OR-Set by session `start`, with tombstones | `remove(start)` deletes a session from the teacher's report, so a plain union resurrects it |
-| `plinky:theory` | Set union | Grow-only: `markMet` only ever adds, and unknown lesson ids are dropped on read |
-| `plinky:samples` | Not synced | Device-scoped, and the only value that is not JSON — a raw `"1"`/`"0"` naming whether this device downloads recordings |
-| `plinky:lifetime` | Per-date field-wise `max`, cap at 14 after merge | Days hold a path-dependent average, so only a per-field rule is well defined |
-| `plinky:notestats` | Per-device lanes, summed at read | Absolute lifetime totals; summing two snapshots is not idempotent and doubles on every re-sync |
-| `plinky:takes:<id>` | OR-Set by take id, **no cap applied on merge** | A recording is the only value that cannot be re-derived; capping the union at 5 destroys recordings |
-| `plinky:ghost:<id>` | LWW on the merge clock | It holds the last complete run, which may be a deliberately adopted friend's ghost, so "keep the faster" would silently delete it |
-| `plinky:sectionbest:<id>` | Element-wise `max` | Per-section bests |
-| `plinky:sightread:<id>` | Keep the one with the lowest server `rev` | It records a first read; ordering by client `playedAt` lets a skewed clock install a practised re-read as the true one |
-| `plinky:daily-done` | `max` | A forward-only counter |
-| `plinky:daily-result` | Keep the higher `number`, tie-broken by better grade | Scoped to one day; the store is forward-only |
-| `plinky:placement` | LWW on the merge clock | A deliberate one-off test; the latest taking is the current one |
-| `plinky:reached-grade` | `max` | Forward-only milestone |
-| `plinky:flawless-done` | `or` | A genuinely one-way achievement |
-| `plinky:assignments` | LWW-map by assignment id, with tombstones | `save()` is an upsert, so one id legitimately holds different bodies on two devices; `remove()` exists |
-| `plinky:classes` | OR-Set by class id, with tombstones | A pupil joins several classes and leaves them; leaving must stay left. Carries a write token, so see the note below |
-| `plinky:fingering:<id>` | LWW-register per finger key, whole-map tombstone on `clear()` | Whole-map LWW discards an entire hand of hard-won per-note edits |
-| `plinky:scores` | OR-Set by song id, R2-backed | See below |
+| `klimpi:prefs` | Field-wise LWW, minus a do-not-sync list | One object, ~35 fields; whole-object LWW discards a concurrent edit to a different field |
+| `klimpi:theme` | Not synced | Device-scoped: a phone and a desktop legitimately differ |
+| `klimpi:discovered`, `klimpi:seen-hints` | Set union | Genuinely grow-only; both stores only ever add |
+| `klimpi:favorites` | OR-Set with per-id tombstones | The only mutator is a toggle that *deletes*; plain union means the star list can never shrink |
+| `klimpi:mastery:<id>` | Field-wise: `max` on `bestScore`, LWW on `learned`, LWW on `backlog`, LWW on `intervalDays`/`reviewAt` | `learned` and `backlog` are reversible toggles, so `or` would make un-marking impossible |
+| `klimpi:history` | Per-day `max` | Each day's note count is a total; the larger reflects more practice |
+| `klimpi:practice-log` | OR-Set by session `start`, with tombstones | `remove(start)` deletes a session from the teacher's report, so a plain union resurrects it |
+| `klimpi:theory` | Set union | Grow-only: `markMet` only ever adds, and unknown lesson ids are dropped on read |
+| `klimpi:samples` | Not synced | Device-scoped, and the only value that is not JSON — a raw `"1"`/`"0"` naming whether this device downloads recordings |
+| `klimpi:lifetime` | Per-date field-wise `max`, cap at 14 after merge | Days hold a path-dependent average, so only a per-field rule is well defined |
+| `klimpi:notestats` | Per-device lanes, summed at read | Absolute lifetime totals; summing two snapshots is not idempotent and doubles on every re-sync |
+| `klimpi:takes:<id>` | OR-Set by take id, **no cap applied on merge** | A recording is the only value that cannot be re-derived; capping the union at 5 destroys recordings |
+| `klimpi:ghost:<id>` | LWW on the merge clock | It holds the last complete run, which may be a deliberately adopted friend's ghost, so "keep the faster" would silently delete it |
+| `klimpi:sectionbest:<id>` | Element-wise `max` | Per-section bests |
+| `klimpi:sightread:<id>` | Keep the one with the lowest server `rev` | It records a first read; ordering by client `playedAt` lets a skewed clock install a practised re-read as the true one |
+| `klimpi:daily-done` | `max` | A forward-only counter |
+| `klimpi:daily-result` | Keep the higher `number`, tie-broken by better grade | Scoped to one day; the store is forward-only |
+| `klimpi:placement` | LWW on the merge clock | A deliberate one-off test; the latest taking is the current one |
+| `klimpi:reached-grade` | `max` | Forward-only milestone |
+| `klimpi:flawless-done` | `or` | A genuinely one-way achievement |
+| `klimpi:assignments` | LWW-map by assignment id, with tombstones | `save()` is an upsert, so one id legitimately holds different bodies on two devices; `remove()` exists |
+| `klimpi:classes` | OR-Set by class id, with tombstones | A pupil joins several classes and leaves them; leaving must stay left. Carries a write token, so see the note below |
+| `klimpi:fingering:<id>` | LWW-register per finger key, whole-map tombstone on `clear()` | Whole-map LWW discards an entire hand of hard-won per-note edits |
+| `klimpi:scores` | OR-Set by song id, R2-backed | See below |
 
 **An unlisted key is refused, never guessed.** A key with no row does not sync,
 and the client surfaces that it was skipped. A gate in the spirit of
-`npm run tokens` and `npm run messages:check` fails the build when a `plinky:`
+`npm run tokens` and `npm run messages:check` fails the build when a `klimpi:`
 key exists in the app with no policy in this table, so the table cannot silently
 fall behind the stores.
 
@@ -1012,7 +1012,7 @@ silence onto a device with no instrument attached, where the player would press 
 hear nothing with no clue why.
 
 **Class memberships carry a credential, which is a deliberate trade.**
-`plinky:classes` holds write tokens, so syncing it puts them in the vault in
+`klimpi:classes` holds write tokens, so syncing it puts them in the vault in
 plain text. Syncing is still the right call: a class write token grants only
 "append a result to this one class", it is already shared with everyone in the
 room, and the alternative is making a pupil re-join every school on every device.
@@ -1060,7 +1060,7 @@ keys cannot push in one request. Batches are capped at 40 entries, a sync is a
 sequence of requests, and the client applies nothing to local storage until the
 whole pull completes. An interrupted sync resumes from `lastSeenRev`.
 
-**Large values go to R2.** `plinky:scores` holds full MusicXML text per imported
+**Large values go to R2.** `klimpi:scores` holds full MusicXML text per imported
 score, unbounded in count and size, and it is the one key that would blow both the
 D1 row limit and the 500 MB database. Scores are stored at
 `vault/<vaultId>/<songId>`. Deduplication is **within a vault**, not across
@@ -1073,7 +1073,7 @@ content fingerprint cannot carry per-player fields.
 **Interaction with the two existing recovery paths.** Both are destructive
 operations the vault would otherwise undo, and both must become vault-aware:
 
-- `resetDevice()` wipes every `plinky:` key locally. With the vault enabled it
+- `resetDevice()` wipes every `klimpi:` key locally. With the vault enabled it
   must first leave the vault, so nothing is pulled back. "Start over" that
   silently restores everything is worse than no reset at all.
 - `importProgress()` writes a bundle and then prunes every prefixed key the bundle
@@ -1377,7 +1377,7 @@ CREATE TABLE vault_member (
 -- One row per storage key per vault.
 CREATE TABLE vault_entry (
     vault           TEXT NOT NULL REFERENCES vault(id) ON DELETE CASCADE,
-    key             TEXT NOT NULL,          -- bare key, plinky: prefix stripped
+    key             TEXT NOT NULL,          -- bare key, klimpi: prefix stripped
     value           TEXT,                   -- raw stored string; NULL when R2-backed or deleted
     blob_key        TEXT,                   -- R2 object key when the value is large
     hlc             INTEGER NOT NULL,       -- hybrid logical clock; survives device clock skew
@@ -1879,7 +1879,7 @@ Three prerequisites land before any network code, because each is a change to
 their own: a **stable assignment identity carried through the share code** — the
 `origin` field, wire shape now `{n, d?, u?, o?, i}` — and **element and length caps
 on the report parser**, with properties asserting them. The third is outstanding:
-the **`plinky:classes` membership store**, so a pupil can belong to several classes
+the **`klimpi:classes` membership store**, so a pupil can belong to several classes
 at once. It waits for the classes it names, since a store of memberships nothing can
 join is a store with nothing in it.
 
@@ -2027,7 +2027,7 @@ good. `CLAUDE.md` carries it as a standing convention so that it reaches a sessi
 that never opens this file.
 
 **One part of this document is mechanically enforced, and more should become so.**
-The merge-policy table gets a gate that fails the build when a `plinky:` key
+The merge-policy table gets a gate that fails the build when a `klimpi:` key
 exists in the app with no policy row, in the spirit of `npm run tokens` and
 `npm run messages:check`. A convention nobody can forget beats a convention
 everybody is told about, so each phase should ask which of its invariants can be

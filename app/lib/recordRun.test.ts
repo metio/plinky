@@ -202,7 +202,7 @@ describe("recordRun", () => {
                 store: {
                     ...store,
                     set: (key, value) =>
-                        key.startsWith("plinky:mastery:") ? false : store.set(key, value),
+                        key.startsWith("klimpi:mastery:") ? false : store.set(key, value),
                 },
             });
             loadMock.mockResolvedValue([]);
@@ -218,7 +218,7 @@ describe("recordRun", () => {
                 store: {
                     ...store,
                     set: (key, value) =>
-                        key === "plinky:lifetime" ? false : store.set(key, value),
+                        key === "klimpi:lifetime" ? false : store.set(key, value),
                 },
             });
             loadMock.mockResolvedValue([]);

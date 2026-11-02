@@ -9,7 +9,7 @@ import { createJsonStore, parseJson } from "./jsonStore";
 // The received/authored assignments kept on this device (see core/assignment
 // for the model, validation and share-link codec).
 
-const KEY = "plinky:assignments";
+const KEY = "klimpi:assignments";
 
 export type AssignmentsStore = {
     list(): Assignment[];

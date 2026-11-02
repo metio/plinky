@@ -19,7 +19,22 @@ import { NO_SAMPLES } from "../ports/sampleSource";
 // everything here treats a miss as "fetch it again", never as an error. What cannot be
 // re-fetched is not kept here.
 
-const CACHE = "plinky-piano-v1";
+const CACHE = "klimpi-piano-v1";
+
+// The name recordings were kept under before the rebrand. A device that fetched a pack
+// under it still holds those megabytes, and nothing else ever asks for them, so both names
+// go together wherever the player asks for the space back.
+const CACHES = [CACHE, "plinky-piano-v1"];
+
+async function dropCaches() {
+    for (const name of CACHES) {
+        try {
+            await caches.delete(name);
+        } catch {
+            // Nothing to delete, or no cache to delete it from.
+        }
+    }
+}
 
 // How many recordings the whole-pack fetch asks for at a time.
 const BATCH = 6;
@@ -292,22 +307,14 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
         // arriving again with the next piece.
         async clear() {
             buffers.clear();
-            try {
-                await caches.delete(CACHE);
-            } catch {
-                // Nothing to delete, or no cache to delete it from.
-            }
+            await dropCaches();
             settle({ ready: 0, held: 0 });
         },
         async forget() {
             options.remember(false);
             buffers.clear();
             manifest = null;
-            try {
-                await caches.delete(CACHE);
-            } catch {
-                // Nothing to delete, or no cache to delete it from.
-            }
+            await dropCaches();
             settle({ enabled: false, ready: 0, held: 0, loading: false, wanted: 0 });
         },
     };

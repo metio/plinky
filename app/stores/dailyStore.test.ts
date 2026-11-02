@@ -58,7 +58,7 @@ describe("dailyStore.lastDone / recordDone", () => {
     });
 
     it("reads a tampered non-number as nothing completed", () => {
-        expect(createDailyStore(memoryStore({ "plinky:daily-done": '"ten"' })).lastDone()).toBe(0);
+        expect(createDailyStore(memoryStore({ "klimpi:daily-done": '"ten"' })).lastDone()).toBe(0);
     });
 });
 
@@ -98,11 +98,11 @@ describe("dailyStore.loadResult / saveResult", () => {
 
     it("returns null for a malformed store rather than throwing", () => {
         expect(
-            createDailyStore(memoryStore({ "plinky:daily-result": "{ not json" })).loadResult(5),
+            createDailyStore(memoryStore({ "klimpi:daily-result": "{ not json" })).loadResult(5),
         ).toBeNull();
         expect(
             createDailyStore(
-                memoryStore({ "plinky:daily-result": JSON.stringify({ number: 5, grade: 1 }) }),
+                memoryStore({ "klimpi:daily-result": JSON.stringify({ number: 5, grade: 1 }) }),
             ).loadResult(5),
         ).toBeNull();
     });
@@ -111,7 +111,7 @@ describe("dailyStore.loadResult / saveResult", () => {
         // typeof null === "object", so a stored null grade slips past a bare object
         // check and the result page reads grade.letter off null.
         const kv = memoryStore({
-            "plinky:daily-result": JSON.stringify({
+            "klimpi:daily-result": JSON.stringify({
                 number: 5,
                 grade: null,
                 grid: [],

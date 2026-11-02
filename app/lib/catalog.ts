@@ -39,7 +39,7 @@ function bundledFiles(): Record<string, string> {
     return bundled;
 }
 
-const STORAGE_KEY = "plinky:scores";
+const STORAGE_KEY = "klimpi:scores";
 
 // Re-exported so importers that reach for the catalogue's slug keep working.
 

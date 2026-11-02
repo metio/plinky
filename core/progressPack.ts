@@ -3,6 +3,7 @@
 
 import { isRecord } from "./guards";
 import { jsonOf, NOT_JSON } from "./json";
+import { isPackFormat } from "./packFormat";
 
 // The Klimpi progress-bundle format: every value this device holds — mastery,
 // review schedule, lifetime fingerprint, takes, ghosts, fingerings, preferences,
@@ -19,7 +20,7 @@ import { jsonOf, NOT_JSON } from "./json";
 // only ever address Klimpi's own keys — a hand-edited or hostile file has no way to
 // name a key belonging to anything else on the origin.
 
-export const PROGRESS_FORMAT = "plinky-progress";
+export const PROGRESS_FORMAT = "klimpi-progress";
 
 export interface ProgressPack {
     format: typeof PROGRESS_FORMAT;
@@ -59,7 +60,7 @@ export function parseProgressPack(json: string): ProgressParseResult {
     if (data === NOT_JSON) {
         return { ok: false, problem: "json" };
     }
-    if (!isRecord(data) || data.format !== PROGRESS_FORMAT) {
+    if (!isRecord(data) || !isPackFormat(data.format, PROGRESS_FORMAT)) {
         return { ok: false, problem: "format" };
     }
     if (!isRecord(data.entries)) {

@@ -57,7 +57,7 @@ describe("Placement", () => {
 
     it("remembers the last result and offers another go", () => {
         mount({
-            "plinky:placement": JSON.stringify({ rating: 900, grade: 3, takenAt: 1 }),
+            "klimpi:placement": JSON.stringify({ rating: 900, grade: 3, takenAt: 1 }),
         });
 
         expect(screen.getByText(m.placement_last({ rating: 900, grade: 3 }))).toBeTruthy();
@@ -70,7 +70,7 @@ describe("Placement", () => {
         fireEvent.click(screen.getByRole("button", { name: m.placement_start() }));
 
         // Nothing is written until the ladder actually ends.
-        expect(store.get("plinky:placement")).toBeNull();
+        expect(store.get("klimpi:placement")).toBeNull();
     });
 
     it("reads on its own terms, whatever the player turned on", () => {
@@ -86,7 +86,7 @@ describe("Placement", () => {
             keyLights: true,
         });
         seenPrefs.mockClear();
-        mount({ "plinky:prefs": helped });
+        mount({ "klimpi:prefs": helped });
         fireEvent.click(screen.getByRole("button", { name: m.placement_start() }));
 
         const prefs = seenPrefs.mock.calls.at(-1)?.[0];
@@ -103,7 +103,7 @@ describe("Placement", () => {
         // The other hand resting, or each chord cut to one note, would let a player clear
         // rungs they could not read as written, and the grade saved would say so.
         seenPrefs.mockClear();
-        mount({ "plinky:prefs": JSON.stringify({ reduction }) });
+        mount({ "klimpi:prefs": JSON.stringify({ reduction }) });
         fireEvent.click(screen.getByRole("button", { name: m.placement_start() }));
 
         expect(seenPrefs.mock.calls.at(-1)?.[0].reduction).toBe("");

@@ -11,16 +11,16 @@ afterEach(() => localStorage.clear());
 
 describe("resetDevice", () => {
     it("clears every klimpi key and leaves others untouched", () => {
-        localStorage.setItem("plinky:prefs", "{}");
-        localStorage.setItem("plinky:mastery:scale-c-major", "{}");
-        localStorage.setItem("plinky:scores", "[]");
+        localStorage.setItem("klimpi:prefs", "{}");
+        localStorage.setItem("klimpi:mastery:scale-c-major", "{}");
+        localStorage.setItem("klimpi:scores", "[]");
         localStorage.setItem("other-app", "keep");
 
         const cleared = resetDevice(browserStore);
 
         expect(cleared).toBe(3);
-        expect(localStorage.getItem("plinky:prefs")).toBeNull();
-        expect(localStorage.getItem("plinky:mastery:scale-c-major")).toBeNull();
+        expect(localStorage.getItem("klimpi:prefs")).toBeNull();
+        expect(localStorage.getItem("klimpi:mastery:scale-c-major")).toBeNull();
         expect(localStorage.getItem("other-app")).toBe("keep");
     });
 

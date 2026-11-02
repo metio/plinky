@@ -26,7 +26,7 @@ function Panel({ best }: { best: number[] }) {
     return (
         <ServicesProvider
             services={{
-                store: memoryStore({ "plinky:sectionbest:song": JSON.stringify(best) }),
+                store: memoryStore({ "klimpi:sectionbest:song": JSON.stringify(best) }),
             }}
         >
             <SectionBest scoreId="song" notes={notes} tolerance={60} tempoScale={1} />

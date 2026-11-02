@@ -31,7 +31,7 @@ export type PracticeLogStore = JsonStore<PracticeLog> & {
 };
 
 export function createPracticeLogStore(kv: KeyValueStore): PracticeLogStore {
-    const store = createJsonStore(kv, "plinky:practice-log", parsePracticeLog);
+    const store = createJsonStore(kv, "klimpi:practice-log", parsePracticeLog);
 
     // A no-op fold returns the same array, so an unchanged log needs no write and
     // wakes no subscriber — and still reports success, because nothing was lost.

@@ -29,7 +29,7 @@ describe("historyStore", () => {
     });
 
     it("recovers from a stored array by folding onto a fresh history", () => {
-        const store = createHistoryStore(memoryStore({ "plinky:history": "[1,2,3]" }));
+        const store = createHistoryStore(memoryStore({ "klimpi:history": "[1,2,3]" }));
         expect(store.load()).toEqual({});
         store.record(10, NOW);
         expect(store.load()["2026-06-23"]).toBe(10);

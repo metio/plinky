@@ -15,7 +15,7 @@ const ORIGIN = "https://klimpi.app";
 const SOURCE = readFileSync("public/sw.js", "utf8")
     .replace("__BUILD_HASH__", "test")
     .replace("__PRECACHE__", "/assets/entry-abc.js");
-const CACHE = "plinky-build-test";
+const CACHE = "klimpi-build-test";
 
 type Handler = (event: FetchEventLike) => void;
 type FetchEventLike = {
@@ -362,17 +362,17 @@ describe("keeping a language on the device", () => {
 describe("a new build taking over", () => {
     it("carries the hashed assets it still ships over from the old cache", async () => {
         const old = world.caches;
-        old.set("plinky-build-old", new Map());
-        old.get("plinky-build-old")!.set(`${ORIGIN}/assets/shared-111.js`, new Response("shared"));
-        old.get("plinky-build-old")!.set(`${ORIGIN}/de/`, new Response("stale page"));
+        old.set("klimpi-build-old", new Map());
+        old.get("klimpi-build-old")!.set(`${ORIGIN}/assets/shared-111.js`, new Response("shared"));
+        old.get("klimpi-build-old")!.set(`${ORIGIN}/de/`, new Response("stale page"));
         await world.activate();
-        expect(world.caches.has("plinky-build-old")).toBe(false);
+        expect(world.caches.has("klimpi-build-old")).toBe(false);
         expect(held("/assets/shared-111.js")).toBe(true);
         // Un-hashed pages are not carried: they may have changed under the same URL.
         expect(held("/de/")).toBe(false);
     });
 
-    it.each(["plinky-v1", "plinky-0123456789ab"])(
+    it.each(["plinky-v1", "plinky-0123456789ab", "plinky-build-old"])(
         "evicts %s, a build cache named the way earlier workers named them",
         async (name) => {
             world.caches.set(
@@ -387,9 +387,9 @@ describe("a new build taking over", () => {
 
     it("keeps the piano recordings the page stored in a cache of its own", async () => {
         const recording = "https://samples.klimpi.app/v1/C4v8.m4a";
-        world.caches.set("plinky-piano-v1", new Map([[recording, new Response("C4")]]));
+        world.caches.set("klimpi-piano-v1", new Map([[recording, new Response("C4")]]));
         await world.activate();
-        const piano = world.caches.get("plinky-piano-v1");
+        const piano = world.caches.get("klimpi-piano-v1");
         expect(piano?.has(recording)).toBe(true);
         expect(await piano?.get(recording)?.text()).toBe("C4");
         // Nor are they copied into the build's cache, which the next deploy evicts.

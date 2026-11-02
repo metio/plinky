@@ -9,7 +9,7 @@ import { createStringSetStore } from "./jsonStore";
 // player has reached. The derived steps read real state elsewhere; this store
 // only remembers the ones that leave no other trace.
 
-const KEY = "plinky:discovered";
+const KEY = "klimpi:discovered";
 
 export type OnboardingStore = {
     marked(): ReadonlySet<DiscoveryId>;

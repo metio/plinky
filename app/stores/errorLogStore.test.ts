@@ -55,7 +55,7 @@ describe("errorLogStore", () => {
     });
 
     it("reads corrupt storage as an empty log rather than failing the page", () => {
-        const kv = memoryStore({ "plinky:errors": "{not json" });
+        const kv = memoryStore({ "klimpi:errors": "{not json" });
         expect(createErrorLogStore(kv).load()).toEqual([]);
     });
 

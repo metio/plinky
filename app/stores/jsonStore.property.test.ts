@@ -22,7 +22,7 @@ import {
 // through here, so a fault here is their data, and the verdict is what the
 // storage-health banner reads.
 
-const KEY = "plinky:thing";
+const KEY = "klimpi:thing";
 
 const arbValue = fc.oneof(
     fc.integer(),
@@ -176,7 +176,7 @@ describe("a value kept under one key", () => {
 });
 
 describe("a family of entries under one prefix", () => {
-    const PREFIX = "plinky:take:";
+    const PREFIX = "klimpi:take:";
     const arbEntries = fc.array(fc.tuple(fc.stringMatching(/^[a-z0-9]{1,8}$/), fc.integer()), {
         maxLength: 8,
     });
@@ -248,7 +248,7 @@ describe("a family of entries under one prefix", () => {
     });
 
     it("ignores keys that are not its own", () => {
-        const kv = memoryStore({ "plinky:other": "1", [`${PREFIX}mine`]: "2" });
+        const kv = memoryStore({ "klimpi:other": "1", [`${PREFIX}mine`]: "2" });
 
         expect(takes(kv).loadAll()).toEqual([{ id: "mine", value: 2 }]);
     });
@@ -262,7 +262,7 @@ describe("a set of strings under one key", () => {
         fc.assert(
             fc.property(fc.array(fc.constantFrom("a", "b", "c"), { maxLength: 10 }), (ids) => {
                 const kv = memoryStore();
-                const store = createStringSetStore<"a" | "b" | "c">(kv, "plinky:seen", known);
+                const store = createStringSetStore<"a" | "b" | "c">(kv, "klimpi:seen", known);
 
                 store.save(new Set(ids));
 
@@ -276,11 +276,11 @@ describe("a set of strings under one key", () => {
             fc.property(
                 fc.array(fc.constantFrom("a", "b", "zz", "1"), { maxLength: 10 }),
                 (ids) => {
-                    const kv = memoryStore({ "plinky:seen": JSON.stringify(ids) });
+                    const kv = memoryStore({ "klimpi:seen": JSON.stringify(ids) });
 
                     const held = createStringSetStore<"a" | "b" | "c">(
                         kv,
-                        "plinky:seen",
+                        "klimpi:seen",
                         known,
                     ).load();
 
@@ -289,9 +289,9 @@ describe("a set of strings under one key", () => {
             ),
         );
         for (const junk of ["", "{}", "not json", "[1,2]", "null"]) {
-            const kv = memoryStore({ "plinky:seen": junk });
+            const kv = memoryStore({ "klimpi:seen": junk });
 
-            expect(createStringSetStore<"a" | "b" | "c">(kv, "plinky:seen", known).load()).toEqual(
+            expect(createStringSetStore<"a" | "b" | "c">(kv, "klimpi:seen", known).load()).toEqual(
                 new Set(),
             );
         }
@@ -301,8 +301,8 @@ describe("a set of strings under one key", () => {
 describe("subscribing across several stores at once", () => {
     it("detaches from every one of them", () => {
         const kv = memoryStore();
-        const first = createJsonStore(kv, "plinky:one", parseAny);
-        const second = createJsonStore(kv, "plinky:two", parseAny);
+        const first = createJsonStore(kv, "klimpi:one", parseAny);
+        const second = createJsonStore(kv, "klimpi:two", parseAny);
         let woken = 0;
 
         const off = mergeSubscribe(

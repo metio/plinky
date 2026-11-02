@@ -32,7 +32,7 @@ const stumbled: RunNote[] = Array.from({ length: 24 }, (_, index) => ({
 
 const mount = (best?: number[], run: RunNote[] = notes) =>
     renderWithServices(<SectionBest scoreId="song" notes={run} tolerance={60} tempoScale={1} />, {
-        store: memoryStore(best ? { "plinky:sectionbest:song": JSON.stringify(best) } : {}),
+        store: memoryStore(best ? { "klimpi:sectionbest:song": JSON.stringify(best) } : {}),
     });
 
 describe("SectionBest", () => {

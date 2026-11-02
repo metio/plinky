@@ -41,7 +41,7 @@ function normalize(raw: unknown): PlacementResult | null {
 }
 
 export function createPlacementStore(kv: KeyValueStore): PlacementStore {
-    const store = createJsonStore<PlacementResult | null>(kv, "plinky:placement", (raw) =>
+    const store = createJsonStore<PlacementResult | null>(kv, "klimpi:placement", (raw) =>
         parseJson(raw, null, normalize),
     );
     return {

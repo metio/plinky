@@ -38,13 +38,13 @@ describe("section best store", () => {
     });
 
     it("reads a corrupt record as none rather than a wrong one", () => {
-        const kv = memoryStore({ "plinky:sectionbest:song": '"not an array"' });
+        const kv = memoryStore({ "klimpi:sectionbest:song": '"not an array"' });
 
         expect(createSectionBestStore(kv).load("song")).toBeNull();
     });
 
     it("rebuilds a record stored at the wrong length", () => {
-        const kv = memoryStore({ "plinky:sectionbest:song": "[50,60]" });
+        const kv = memoryStore({ "klimpi:sectionbest:song": "[50,60]" });
 
         // Trusting a short record would drop the sections it never mentioned.
         expect(createSectionBestStore(kv).load("song")).toEqual([50, 60, 0, 0, 0, 0]);

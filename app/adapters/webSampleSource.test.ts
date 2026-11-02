@@ -164,7 +164,9 @@ describe("webSampleSource", () => {
             expect(source.state().held).toBe(1);
 
             await source.clear();
-            expect(deleted).toEqual(["plinky-piano-v1"]);
+            // Both names, so a device that fetched a pack under the old brand gets that
+            // space back too rather than keeping megabytes nothing will ever ask for.
+            expect(deleted).toEqual(["klimpi-piano-v1", "plinky-piano-v1"]);
             expect(source.state()).toMatchObject({ enabled: true, held: 0, ready: 0 });
             expect(source.manifest()).not.toBeNull();
         } finally {

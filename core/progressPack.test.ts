@@ -39,7 +39,7 @@ describe("progress pack", () => {
 
     it("reports unreadable documents by problem rather than throwing", () => {
         expect(parseProgressPack("not json")).toEqual({ ok: false, problem: "json" });
-        expect(parseProgressPack(JSON.stringify({ format: "plinky-scores" }))).toEqual({
+        expect(parseProgressPack(JSON.stringify({ format: "klimpi-scores" }))).toEqual({
             ok: false,
             problem: "format",
         });

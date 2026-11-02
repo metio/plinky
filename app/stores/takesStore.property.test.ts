@@ -170,7 +170,7 @@ describe("the takes shelf, over any run of saves and removals", () => {
     it("reads a shelf it cannot make sense of as empty rather than crashing", () => {
         fc.assert(
             fc.property(fc.string({ maxLength: 30 }), (junk) => {
-                const store = createTakesStore(memoryStore({ "plinky:takes:song": junk }));
+                const store = createTakesStore(memoryStore({ "klimpi:takes:song": junk }));
 
                 expect(() => store.list("song")).not.toThrow();
                 expect(store.list("song")).toEqual([]);

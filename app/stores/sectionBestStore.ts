@@ -17,7 +17,7 @@ export type SectionBestStore = {
 };
 
 export function createSectionBestStore(kv: KeyValueStore): SectionBestStore {
-    const store = createKeyedJsonStore<number[] | null>(kv, "plinky:sectionbest:", normalizeBest);
+    const store = createKeyedJsonStore<number[] | null>(kv, "klimpi:sectionbest:", normalizeBest);
     return {
         load: (scoreId) => store.load(scoreId),
         record(scoreId, run) {

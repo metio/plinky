@@ -21,7 +21,7 @@ type Story = StoryObj<typeof RecentProblems>;
 const AT = Date.UTC(2026, 7, 27, 9, 15);
 
 function seeded(faults: LoggedError[]) {
-    return memoryStore({ "plinky:errors": JSON.stringify(faults) });
+    return memoryStore({ "klimpi:errors": JSON.stringify(faults) });
 }
 
 function panel(faults: LoggedError[]) {

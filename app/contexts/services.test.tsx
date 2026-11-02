@@ -15,8 +15,8 @@ import { createServices, ServicesProvider, useStore } from "./services";
 // trivial to test.
 function Probe() {
     const store = useStore();
-    store.set("plinky:probe", "hi");
-    return <output>{store.get("plinky:probe")}</output>;
+    store.set("klimpi:probe", "hi");
+    return <output>{store.get("klimpi:probe")}</output>;
 }
 
 describe("ServicesProvider", () => {
@@ -31,7 +31,7 @@ describe("ServicesProvider", () => {
         );
         expect(getByRole("status").textContent).toBe("hi");
         // The write went to the fake we handed in — nothing else to inspect.
-        expect(fake.get("plinky:probe")).toBe("hi");
+        expect(fake.get("klimpi:probe")).toBe("hi");
     });
 
     it("supplies working services even with no provider above it", () => {

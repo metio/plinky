@@ -15,9 +15,9 @@ describe("memoryStore", () => {
     });
 
     it("stands in for a store that already holds state via the seed", () => {
-        const store = memoryStore({ "plinky:prefs": "{}", "plinky:theme": "dark" });
-        expect(store.get("plinky:theme")).toBe("dark");
-        expect(store.keys().sort()).toEqual(["plinky:prefs", "plinky:theme"]);
+        const store = memoryStore({ "klimpi:prefs": "{}", "klimpi:theme": "dark" });
+        expect(store.get("klimpi:theme")).toBe("dark");
+        expect(store.keys().sort()).toEqual(["klimpi:prefs", "klimpi:theme"]);
     });
 
     it("keeps stores independent", () => {

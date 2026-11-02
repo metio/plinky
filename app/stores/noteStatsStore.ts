@@ -17,7 +17,7 @@ export type NoteStatsStore = {
 };
 
 export function createNoteStatsStore(kv: KeyValueStore): NoteStatsStore {
-    const store = createJsonStore<NoteStats>(kv, "plinky:notestats", (raw) =>
+    const store = createJsonStore<NoteStats>(kv, "klimpi:notestats", (raw) =>
         parseJson(raw, {}, normalizeNoteStats),
     );
     return {

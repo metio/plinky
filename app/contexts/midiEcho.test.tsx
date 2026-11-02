@@ -23,7 +23,7 @@ async function mount(echo = true) {
     const midi = fakeMidi({ outputs: ["Piano"] });
     const scheduler = fakeScheduler();
     const services = createServices({
-        store: memoryStore({ "plinky:prefs": JSON.stringify({ midiEcho: echo }) }),
+        store: memoryStore({ "klimpi:prefs": JSON.stringify({ midiEcho: echo }) }),
         midi,
         scheduler,
     });

@@ -54,7 +54,7 @@ describe("assignmentsStore", () => {
 
     it("drops malformed stored entries rather than failing the list", () => {
         const kv = memoryStore({
-            "plinky:assignments": JSON.stringify([
+            "klimpi:assignments": JSON.stringify([
                 { id: "ok", name: "Good", items: [{ id: "x" }] },
                 { id: "empty", name: "No items", items: [] },
                 "junk",
@@ -69,7 +69,7 @@ describe("assignmentsStore", () => {
 
     it("reads corrupt storage as an empty list", () => {
         expect(
-            createAssignmentsStore(memoryStore({ "plinky:assignments": "{oops" })).list(),
+            createAssignmentsStore(memoryStore({ "klimpi:assignments": "{oops" })).list(),
         ).toEqual([]);
     });
 

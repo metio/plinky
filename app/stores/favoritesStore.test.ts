@@ -54,13 +54,13 @@ describe("favoritesStore", () => {
     });
 
     it("falls back to an empty set for corrupt data", () => {
-        const favorites = createFavoritesStore(memoryStore({ "plinky:favorites": "not json" }));
+        const favorites = createFavoritesStore(memoryStore({ "klimpi:favorites": "not json" }));
         expect(favorites.load().size).toBe(0);
     });
 
     it("ignores non-string entries", () => {
         const favorites = createFavoritesStore(
-            memoryStore({ "plinky:favorites": JSON.stringify(["ok", 5, null]) }),
+            memoryStore({ "klimpi:favorites": JSON.stringify(["ok", 5, null]) }),
         );
         expect([...favorites.load()]).toEqual(["ok"]);
     });

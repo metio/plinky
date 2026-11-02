@@ -71,7 +71,7 @@ describe("Collect", () => {
 
     it("names a piece the device knows and falls back to its id", () => {
         const store = memoryStore({
-            "plinky:scores": JSON.stringify([
+            "klimpi:scores": JSON.stringify([
                 { id: "twinkle", title: "Twinkle", xml: "<score-partwise/>" },
             ]),
         });

@@ -36,7 +36,7 @@ describe("onboardingStore", () => {
     it("drops non-markable junk from a tampered store", () => {
         const store = createOnboardingStore(
             memoryStore({
-                "plinky:discovered": JSON.stringify(["keyboardMet", "played", "bogus"]),
+                "klimpi:discovered": JSON.stringify(["keyboardMet", "played", "bogus"]),
             }),
         );
         expect([...store.marked()]).toEqual(["keyboardMet"]);

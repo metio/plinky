@@ -13,7 +13,7 @@ import { createJsonStore, type JsonStore } from "./jsonStore";
 export type PrefsStore = JsonStore<Prefs>;
 
 export function createPrefsStore(kv: KeyValueStore): PrefsStore {
-    return createJsonStore(kv, "plinky:prefs", parsePrefs, (prefs) => ({
+    return createJsonStore(kv, "klimpi:prefs", parsePrefs, (prefs) => ({
         ...prefs,
         volume: clampVolume(prefs.volume),
     }));

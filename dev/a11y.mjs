@@ -77,7 +77,7 @@ for (const path of PAGES) {
     });
     await page.addInitScript((theme) => {
         try {
-            localStorage.setItem("plinky:theme", JSON.stringify(theme));
+            localStorage.setItem("klimpi:theme", JSON.stringify(theme));
         } catch {}
     }, THEME);
     await page.goto(`http://localhost:${PORT}${path}`, { waitUntil: "networkidle" });

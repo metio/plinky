@@ -92,7 +92,7 @@ describe("lifetimeStore.recordRun", () => {
 describe("lifetimeStore.load", () => {
     it("drops days with a malformed skill rather than crashing the fold", () => {
         const kv = memoryStore({
-            "plinky:lifetime": JSON.stringify({ days: [{ date: "2026-06-01", skill: null }] }),
+            "klimpi:lifetime": JSON.stringify({ days: [{ date: "2026-06-01", skill: null }] }),
         });
         const store = createLifetimeStore(kv);
         expect(store.load().days).toEqual([]);
@@ -103,7 +103,7 @@ describe("lifetimeStore.load", () => {
     });
 
     it("reads corrupt storage as an empty fingerprint", () => {
-        expect(createLifetimeStore(memoryStore({ "plinky:lifetime": "{oops" })).load()).toEqual({
+        expect(createLifetimeStore(memoryStore({ "klimpi:lifetime": "{oops" })).load()).toEqual({
             days: [],
         });
     });

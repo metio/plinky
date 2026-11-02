@@ -15,8 +15,8 @@ describe("ghostStore", () => {
 
     it("reads malformed or empty stored data as no ghost", () => {
         const kv = memoryStore({
-            "plinky:ghost:x": JSON.stringify({ not: "an array" }),
-            "plinky:ghost:y": "[]",
+            "klimpi:ghost:x": JSON.stringify({ not: "an array" }),
+            "klimpi:ghost:y": "[]",
         });
         const ghosts = createGhostStore(kv);
         expect(ghosts.load("x")).toBeNull();
@@ -24,7 +24,7 @@ describe("ghostStore", () => {
     });
 
     it("drops non-numeric entries rather than racing NaN", () => {
-        const kv = memoryStore({ "plinky:ghost:x": JSON.stringify([0, "fast", 500]) });
+        const kv = memoryStore({ "klimpi:ghost:x": JSON.stringify([0, "fast", 500]) });
         expect(createGhostStore(kv).load("x")).toEqual([0, 500]);
     });
 

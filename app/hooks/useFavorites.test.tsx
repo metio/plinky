@@ -34,7 +34,7 @@ describe("useFavorites", () => {
     });
 
     it("reads favorites persisted before mount", () => {
-        const kv = memoryStore({ "plinky:favorites": JSON.stringify(["a", "b"]) });
+        const kv = memoryStore({ "klimpi:favorites": JSON.stringify(["a", "b"]) });
         const wrapper = ({ children }: { children: ReactNode }) => (
             <ServicesProvider services={{ store: kv }}>{children}</ServicesProvider>
         );

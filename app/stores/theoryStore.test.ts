@@ -35,7 +35,7 @@ describe("the theory store", () => {
 
     it("drops a remembered id the course no longer has", () => {
         const kv = memoryStore();
-        kv.set("plinky:theory", JSON.stringify([lessonId, "a-lesson-that-was-removed"]));
+        kv.set("klimpi:theory", JSON.stringify([lessonId, "a-lesson-that-was-removed"]));
         expect([...createTheoryStore(kv).met()]).toEqual([lessonId]);
     });
 

@@ -13,5 +13,5 @@ import { createKeyedJsonStore, type KeyedJsonStore } from "./jsonStore";
 export type MasteryStore = KeyedJsonStore<Mastery>;
 
 export function createMasteryStore(kv: KeyValueStore): MasteryStore {
-    return createKeyedJsonStore(kv, "plinky:mastery:", normalizeMastery);
+    return createKeyedJsonStore(kv, "klimpi:mastery:", normalizeMastery);
 }

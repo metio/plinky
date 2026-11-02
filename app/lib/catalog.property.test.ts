@@ -117,7 +117,7 @@ describe("the library of imported pieces", () => {
     it("reads whatever is in storage as a library of usable pieces", () => {
         fc.assert(
             fc.property(arbStored, (raw) => {
-                const kv = memoryStore({ "plinky:scores": raw });
+                const kv = memoryStore({ "klimpi:scores": raw });
 
                 expect(() => parseUserScores(raw)).not.toThrow();
                 const scores = parseUserScores(raw);
@@ -146,7 +146,7 @@ describe("the library of imported pieces", () => {
                 const kv = memoryStore();
                 saveUserScore(kv, kept);
                 const before = loadUserScores(kv);
-                const full = quotaStore({ "plinky:scores": kv.get("plinky:scores") ?? "[]" }, 0);
+                const full = quotaStore({ "klimpi:scores": kv.get("klimpi:scores") ?? "[]" }, 0);
 
                 expect(saveUserScore(full, refused)).toBe(false);
 

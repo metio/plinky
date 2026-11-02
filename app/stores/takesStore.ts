@@ -35,7 +35,7 @@ export type TakesStore = {
 };
 
 export function createTakesStore(kv: KeyValueStore): TakesStore {
-    const store = createKeyedJsonStore<StoredTake[]>(kv, "plinky:takes:", (raw) =>
+    const store = createKeyedJsonStore<StoredTake[]>(kv, "klimpi:takes:", (raw) =>
         Array.isArray(raw) ? (raw as StoredTake[]) : [],
     );
 

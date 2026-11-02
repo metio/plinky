@@ -25,7 +25,7 @@ describe("note stats store", () => {
     });
 
     it("reads a corrupt record as no stats rather than throwing", () => {
-        const kv = memoryStore({ "plinky:notestats": "{{ broken" });
+        const kv = memoryStore({ "klimpi:notestats": "{{ broken" });
 
         expect(createNoteStatsStore(kv).load()).toEqual({});
     });

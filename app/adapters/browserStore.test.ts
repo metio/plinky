@@ -12,15 +12,15 @@ afterEach(() => {
 
 describe("browserStore", () => {
     it("round-trips through localStorage", () => {
-        browserStore.set("plinky:x", "1");
-        expect(browserStore.get("plinky:x")).toBe("1");
-        expect(browserStore.keys()).toContain("plinky:x");
-        browserStore.remove("plinky:x");
-        expect(browserStore.get("plinky:x")).toBeNull();
+        browserStore.set("klimpi:x", "1");
+        expect(browserStore.get("klimpi:x")).toBe("1");
+        expect(browserStore.keys()).toContain("klimpi:x");
+        browserStore.remove("klimpi:x");
+        expect(browserStore.get("klimpi:x")).toBeNull();
     });
 
     it("exposes one shared instance behind the module's store and health", () => {
-        expect(withDeniedStorage(() => browserStore.set("plinky:x", "1"))).toBe(false);
+        expect(withDeniedStorage(() => browserStore.set("klimpi:x", "1"))).toBe(false);
         expect(storageHealth.problem()).toBe("refused");
     });
 });
@@ -33,7 +33,7 @@ describe("createBrowserStore", () => {
         expect(first.health.failed()).toBe(false);
         expect(second.health.failed()).toBe(false);
 
-        withDeniedStorage(() => first.store.set("plinky:x", "1"));
+        withDeniedStorage(() => first.store.set("klimpi:x", "1"));
 
         expect(first.health.failed()).toBe(true);
         expect(second.health.failed()).toBe(false);
@@ -46,12 +46,12 @@ describe("createBrowserStore", () => {
         health.subscribe(kept);
         health.subscribe(dropped)();
 
-        expect(withDeniedStorage(() => store.set("plinky:x", "1"))).toBe(false);
+        expect(withDeniedStorage(() => store.set("klimpi:x", "1"))).toBe(false);
         expect(health.failed()).toBe(true);
         expect(kept).toHaveBeenCalledTimes(1);
         expect(dropped).not.toHaveBeenCalled();
 
-        expect(withDeniedStorage(() => store.set("plinky:x", "1"))).toBe(false);
+        expect(withDeniedStorage(() => store.set("klimpi:x", "1"))).toBe(false);
         expect(kept).toHaveBeenCalledTimes(1);
     });
 
@@ -61,7 +61,7 @@ describe("createBrowserStore", () => {
         health.subscribe(listener);
 
         withDeniedStorage(() => {
-            store.remove("plinky:x");
+            store.remove("klimpi:x");
         });
 
         expect(health.failed()).toBe(true);
@@ -70,18 +70,18 @@ describe("createBrowserStore", () => {
 
     it("leaves the latch alone when writes land", () => {
         const { store, health } = createBrowserStore();
-        expect(store.set("plinky:x", "1")).toBe(true);
-        store.remove("plinky:x");
+        expect(store.set("klimpi:x", "1")).toBe(true);
+        store.remove("klimpi:x");
         expect(health.failed()).toBe(false);
     });
 
     it("keeps the store fully working after a past failure — a signal, not a circuit breaker", () => {
         const { store, health } = createBrowserStore();
-        withDeniedStorage(() => store.set("plinky:x", "1"));
+        withDeniedStorage(() => store.set("klimpi:x", "1"));
 
         expect(health.failed()).toBe(true);
-        expect(store.set("plinky:x", "2")).toBe(true);
-        expect(store.get("plinky:x")).toBe("2");
+        expect(store.set("klimpi:x", "2")).toBe(true);
+        expect(store.get("klimpi:x")).toBe("2");
     });
 });
 
@@ -92,10 +92,10 @@ describe("browserStore under denied storage", () => {
     it("degrades to empty results when storage is blocked, never throwing", () => {
         const { store } = createBrowserStore();
         withDeniedStorage(() => {
-            expect(() => store.set("plinky:x", "1")).not.toThrow();
-            expect(store.get("plinky:x")).toBeNull();
+            expect(() => store.set("klimpi:x", "1")).not.toThrow();
+            expect(store.get("klimpi:x")).toBeNull();
             expect(store.keys()).toEqual([]);
-            expect(() => store.remove("plinky:x")).not.toThrow();
+            expect(() => store.remove("klimpi:x")).not.toThrow();
         });
     });
 });

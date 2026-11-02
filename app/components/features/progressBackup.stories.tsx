@@ -18,10 +18,10 @@ export default meta;
 type Story = StoryObj<typeof ProgressBackup>;
 
 const seeded = memoryStore({
-    "plinky:prefs": "{}",
-    "plinky:mastery:scale-c-major": '{"bestScore":91,"learned":true}',
-    "plinky:takes:ode-to-joy": "[]",
-    "plinky:theme": '"dark"',
+    "klimpi:prefs": "{}",
+    "klimpi:mastery:scale-c-major": '{"bestScore":91,"learned":true}',
+    "klimpi:takes:ode-to-joy": "[]",
+    "klimpi:theme": '"dark"',
 });
 
 export const Default: Story = {

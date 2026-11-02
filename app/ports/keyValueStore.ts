@@ -18,6 +18,6 @@ export interface KeyValueStore {
     // Forget `key`. Best-effort, like set.
     remove(key: string): void;
     // Every key currently held, so callers can find or clear a family of keys (e.g.
-    // every `plinky:mastery:*`, or a full device reset). Empty when storage is unreadable.
+    // every `klimpi:mastery:*`, or a full device reset). Empty when storage is unreadable.
     keys(): string[];
 }

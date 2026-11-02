@@ -10,29 +10,25 @@ import type { Release } from "./changelog";
 
 export const LATEST_RELEASES: Release[] = [
     {
-        date: "2026-11-01",
-        label: "night",
+        date: "2026-11-02",
+        label: null,
         entries: [
             {
-                body: "**The bar at the top of your phone takes the colour of the page.** In dark or black\nit was staying white, a bright strip above a dark screen. It now follows whichever\ntheme and colours you picked.",
+                body: "**If you practised at the old address, your progress can come with you.** Klimpi used\nto answer to plinky.fun, and anything played there is saved in that browser rather\nthan this one. That address now shows the way across — a backup carries it over.",
+                twip: true,
+            },
+            {
+                body: "**The two pieces that come with Klimpi say where they are from again.** Ode to Joy and\nTwinkle Twinkle lost their source line when the name changed. Every piece here names\nits composer, its source and its licence, and our own two transcriptions are no\nexception.",
                 twip: true,
             },
         ],
     },
     {
         date: "2026-11-01",
-        label: "evening",
+        label: "night",
         entries: [
             {
-                body: "**Plinky is now Klimpi.** New name, new mark — a piano keyboard standing upright as\nthe K, with the key you press in fuchsia. Everything you have done is still here:\nyour scores, your pieces, your takes, all on your device as before. Nothing to sign\nin to, nothing to move across.",
-                twip: true,
-            },
-            {
-                body: "**A new set of colours to go with it.** Fuchsia for what you press, aubergine for\nthe page at night, brass for what you earned. It opens this way, and the two you\nalready know are still in Settings → Colours: Indigo and Violet. Any of the three\nworks in light, dark or black, so pick the pair you like.",
-                twip: true,
-            },
-            {
-                body: "**A link that opens a particular ear drill, or the shelf's Manage tab, opens without\nredrawing itself.** A link naming an exercise and its level — a review link, or one\nof today's suggestions — arrives as the same page everyone gets, with only the\naddress saying which drill it is, and the browser threw that page away and drew it\nagain the moment it read the address. Those links now open as they arrive, and still\nland where they name.",
+                body: "**The bar at the top of your phone takes the colour of the page.** In dark or black\nit was staying white, a bright strip above a dark screen. It now follows whichever\ntheme and colours you picked.",
                 twip: true,
             },
         ],

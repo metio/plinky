@@ -6,7 +6,7 @@ import type { KeyValueStore } from "../ports/keyValueStore";
 
 // The key the device's shape is stamped under. Namespaced like everything else, so a
 // device reset and the progress backup carry it with the rest.
-export const SCHEMA_KEY = "plinky:schema";
+export const SCHEMA_KEY = "klimpi:schema";
 
 // A store that will not write over values a newer build wrote.
 //
