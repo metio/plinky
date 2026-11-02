@@ -20,6 +20,7 @@ import { browserStore } from "../adapters/browserStore";
 import { memoryStore } from "../adapters/memoryStore";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { withDeniedStorage } from "../testing/deniedStorage";
+import { sourceInfo } from "../../core/attribution";
 import type { XmlCodec } from "../../core/xml";
 
 function xml(title = "Test", beats = 4): string {
@@ -81,12 +82,12 @@ describe("subscribeUserScores", () => {
         const off = subscribeUserScores(kv, () => {
             heard += 1;
         });
-        window.dispatchEvent(new StorageEvent("storage", { key: "plinky:scores" }));
+        window.dispatchEvent(new StorageEvent("storage", { key: "klimpi:scores" }));
         expect(heard).toBe(1);
-        window.dispatchEvent(new StorageEvent("storage", { key: "plinky:other" }));
+        window.dispatchEvent(new StorageEvent("storage", { key: "klimpi:other" }));
         expect(heard).toBe(1);
         off();
-        window.dispatchEvent(new StorageEvent("storage", { key: "plinky:scores" }));
+        window.dispatchEvent(new StorageEvent("storage", { key: "klimpi:scores" }));
         expect(heard).toBe(1);
     });
 
@@ -121,7 +122,7 @@ describe("parseUserScores", () => {
             beatsPerBar: 4,
             bundled: false,
         });
-        expect(parseUserScores(kv.get("plinky:scores"))).toEqual(loadUserScores(kv));
+        expect(parseUserScores(kv.get("klimpi:scores"))).toEqual(loadUserScores(kv));
     });
 
     it("reads nothing stored, corrupt JSON and a non-array as an empty library", () => {
@@ -134,7 +135,7 @@ describe("parseUserScores", () => {
 describe("loadUserScores robustness", () => {
     it("drops corrupt stored entries so the catalogue sort never throws", () => {
         kv.set(
-            "plinky:scores",
+            "klimpi:scores",
             JSON.stringify([
                 {
                     id: "ok",
@@ -155,7 +156,7 @@ describe("loadUserScores robustness", () => {
 
     it("repairs a non-finite stored tempo to the default", () => {
         kv.set(
-            "plinky:scores",
+            "klimpi:scores",
             JSON.stringify([{ id: "x", title: "X", xml: "<x/>", tempo: 0, beatsPerBar: -1 }]),
         );
         const score = loadUserScores(kv)[0];
@@ -237,6 +238,17 @@ describe("loadBundledScores", () => {
         const bundled = loadBundledScores();
         expect(bundled.length).toBeGreaterThan(0);
         expect(bundled.every((score) => score.bundled)).toBe(true);
+    });
+
+    // The source id set here is looked up in core/attribution's own table, and the two
+    // sit in different files with nothing but this string between them. An id that names
+    // no entry resolves to null, and the piece then renders with no source credit at all —
+    // which the catalogue is not allowed to do, least of all for our own transcriptions.
+    it("names a source the attribution table can resolve", () => {
+        for (const score of loadBundledScores()) {
+            expect(sourceInfo(score.source)).not.toBeNull();
+            expect(sourceInfo(score.source)?.url).toMatch(/^https:\/\//);
+        }
     });
 });
 
