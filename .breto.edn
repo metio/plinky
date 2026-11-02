@@ -7,7 +7,7 @@
              :description "Install the browsers of the playwright version in package.json"}
  "coverage" {:run "exec npm run coverage \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
              :description "Instrument the whole tree and rerun every project"}
- "stories" {:run "exec npm run test:storybook \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+ "stories" {:run "exec npm run test:storybook \"$@\"" :limits {:cpus 6 :memory "14G" :io-weight 50}
             :description "Screenshot every story in both themes; -u refreshes the baselines"}
  "a11y-light" {:run "exec npm run a11y:light \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
                :description "Build the site and run axe over its pages in the light theme"}
