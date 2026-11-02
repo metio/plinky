@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: The Klimpi Authors
+# SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 .idea/
@@ -10,9 +10,7 @@
 .classpath
 .DS_Store
 .claude/settings.local.json
-result
-result-*
-.direnv/
+.breto.local.edn
 node_modules/
 /.idea/
 /.ilo.rc
