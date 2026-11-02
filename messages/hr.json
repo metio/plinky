@@ -2029,5 +2029,8 @@
     "exercise_form_sevenths": "četverozvuci",
     "exercise_form_open": "široki slog",
     "exercise_form_alberti": "Albertijev bas",
-    "exercise_form_broken": "razloženi akordi"
+    "exercise_form_broken": "razloženi akordi",
+    "moved_notice": "Klimpi sada živi na {host}. Tvoj napredak je sačuvan u ovom pregledniku i sam se ne seli — sigurnosna kopija ga nosi sa sobom.",
+    "moved_backup": "Ponesi svoj napredak",
+    "moved_new_home": "Idi na {host}"
 }

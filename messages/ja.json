@@ -1951,5 +1951,8 @@
     "exercise_form_sevenths": "七の和音",
     "exercise_form_open": "開離配置",
     "exercise_form_alberti": "アルベルティ・バス",
-    "exercise_form_broken": "分散和音"
+    "exercise_form_broken": "分散和音",
+    "moved_notice": "Klimpi は {host} に移りました。これまで弾いたものはこのブラウザーに保存されていて、自動では移動しません。バックアップがいっしょに運びます。",
+    "moved_backup": "記録を持っていく",
+    "moved_new_home": "{host} へ"
 }

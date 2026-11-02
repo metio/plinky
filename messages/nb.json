@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "septimakkorder",
     "exercise_form_open": "spredt beliggenhet",
     "exercise_form_alberti": "Alberti-bass",
-    "exercise_form_broken": "brutte akkorder"
+    "exercise_form_broken": "brutte akkorder",
+    "moved_notice": "Klimpi bor nå på {host}. Alt du har spilt ligger i denne nettleseren og flytter ikke med av seg selv — en sikkerhetskopi tar det med.",
+    "moved_backup": "Ta fremgangen din med",
+    "moved_new_home": "Gå til {host}"
 }

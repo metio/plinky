@@ -2068,5 +2068,8 @@
     "exercise_form_sevenths": "септаккорды",
     "exercise_form_open": "широкое расположение",
     "exercise_form_alberti": "альбертиевы басы",
-    "exercise_form_broken": "разложенные аккорды"
+    "exercise_form_broken": "разложенные аккорды",
+    "moved_notice": "Klimpi теперь живёт на {host}. Твой прогресс хранится в этом браузере и сам не переедет — резервная копия возьмёт его с собой.",
+    "moved_backup": "Забери свой прогресс",
+    "moved_new_home": "Перейти на {host}"
 }

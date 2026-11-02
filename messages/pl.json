@@ -2068,5 +2068,8 @@
     "exercise_form_sevenths": "akordy septymowe",
     "exercise_form_open": "układ rozległy",
     "exercise_form_alberti": "bas Albertiego",
-    "exercise_form_broken": "akordy rozłożone"
+    "exercise_form_broken": "akordy rozłożone",
+    "moved_notice": "Klimpi mieszka teraz pod adresem {host}. Twoje postępy są zapisane w tej przeglądarce i same się nie przenoszą — kopia zabierze je ze sobą.",
+    "moved_backup": "Zabierz swoje postępy",
+    "moved_new_home": "Przejdź na {host}"
 }

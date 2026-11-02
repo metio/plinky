@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "sevenths",
     "exercise_form_open": "open position",
     "exercise_form_alberti": "Alberti bass",
-    "exercise_form_broken": "broken chords"
+    "exercise_form_broken": "broken chords",
+    "moved_notice": "Klimpi now lives at {host}. Everything you’ve played is saved in this browser and doesn’t travel on its own — a backup carries it over.",
+    "moved_backup": "Take your progress with you",
+    "moved_new_home": "Go to {host}"
 }

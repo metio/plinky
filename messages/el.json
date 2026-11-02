@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "συγχορδίες έβδομης",
     "exercise_form_open": "ανοιχτή θέση",
     "exercise_form_alberti": "μπάσο Αλμπέρτι",
-    "exercise_form_broken": "σπασμένες συγχορδίες"
+    "exercise_form_broken": "σπασμένες συγχορδίες",
+    "moved_notice": "Το Klimpi μένει πλέον στο {host}. Ό,τι έχεις παίξει είναι αποθηκευμένο σε αυτόν τον φυλλομετρητή και δεν μετακομίζει μόνο του — ένα αντίγραφο το παίρνει μαζί.",
+    "moved_backup": "Πάρε μαζί σου την πρόοδό σου",
+    "moved_new_home": "Πήγαινε στο {host}"
 }

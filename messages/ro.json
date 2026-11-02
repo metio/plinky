@@ -2029,5 +2029,8 @@
     "exercise_form_sevenths": "acorduri de septimă",
     "exercise_form_open": "poziție largă",
     "exercise_form_alberti": "bas Alberti",
-    "exercise_form_broken": "acorduri arpegiate"
+    "exercise_form_broken": "acorduri arpegiate",
+    "moved_notice": "Klimpi stă acum la {host}. Tot ce ai cântat este salvat în acest browser și nu se mută singur — o copie îl ia cu tine.",
+    "moved_backup": "Ia-ți progresul cu tine",
+    "moved_new_home": "Mergi la {host}"
 }

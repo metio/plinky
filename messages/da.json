@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "septimakkorder",
     "exercise_form_open": "spredt beliggenhed",
     "exercise_form_alberti": "Alberti-bas",
-    "exercise_form_broken": "brudte akkorder"
+    "exercise_form_broken": "brudte akkorder",
+    "moved_notice": "Klimpi bor nu på {host}. Alt, du har spillet, ligger i denne browser og flytter ikke med af sig selv — en sikkerhedskopi tager det med.",
+    "moved_backup": "Tag dine fremskridt med",
+    "moved_new_home": "Gå til {host}"
 }

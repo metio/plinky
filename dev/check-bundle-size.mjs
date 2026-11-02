@@ -564,7 +564,7 @@ const BUDGET_APP_KB = APP_RECORDED_KB + APP_HEADROOM_KB;
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
 // `import.meta.env.PROD` early-return that the production build strips as dead
 // code; this asserts the stripping actually happened, on the artifact itself.
-const FORBIDDEN = ["__klimpi", "Test bridge", "plinky-preview-mocks"];
+const FORBIDDEN = ["__klimpi", "Test bridge"];
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

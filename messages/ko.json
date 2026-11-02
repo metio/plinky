@@ -1951,5 +1951,8 @@
     "exercise_form_sevenths": "7화음",
     "exercise_form_open": "개리 배치",
     "exercise_form_alberti": "알베르티 베이스",
-    "exercise_form_broken": "분산 화음"
+    "exercise_form_broken": "분산 화음",
+    "moved_notice": "Klimpi는 이제 {host}에 있습니다. 지금까지 연주한 기록은 이 보여주기에 저장되어 있어 저절로 운기지 않습니다. 백업이 함꺘 운겨 줍니다.",
+    "moved_backup": "기록을 가지가기",
+    "moved_new_home": "{host}으로 가기"
 }

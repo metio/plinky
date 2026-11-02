@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "négyeshangzatok",
     "exercise_form_open": "tág fekvés",
     "exercise_form_alberti": "Alberti-basszus",
-    "exercise_form_broken": "felbontott akkordok"
+    "exercise_form_broken": "felbontott akkordok",
+    "moved_notice": "A Klimpi új helye: {host}. Amit eddig játszottál, ebben a böngészőben van elmentve, és magától nem jön át — egy mentés viszi magával.",
+    "moved_backup": "Vidd magaddal a haladásodat",
+    "moved_new_home": "Tovább a {host} oldalra"
 }

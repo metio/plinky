@@ -2029,5 +2029,8 @@
     "exercise_form_sevenths": "accords de septième",
     "exercise_form_open": "position large",
     "exercise_form_alberti": "basse d’Alberti",
-    "exercise_form_broken": "accords brisés"
+    "exercise_form_broken": "accords brisés",
+    "moved_notice": "Klimpi habite maintenant {host}. Tout ce que tu as joué est enregistré dans ce navigateur et ne suit pas tout seul — une sauvegarde l’emporte avec toi.",
+    "moved_backup": "Emporte ta progression",
+    "moved_new_home": "Aller sur {host}"
 }

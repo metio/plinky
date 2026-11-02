@@ -2068,5 +2068,8 @@
     "exercise_form_sevenths": "septakordy",
     "exercise_form_open": "široká poloha",
     "exercise_form_alberti": "Albertiho bas",
-    "exercise_form_broken": "rozložené akordy"
+    "exercise_form_broken": "rozložené akordy",
+    "moved_notice": "Klimpi teď žije na {host}. Tvůj pokrok je uložený v tomhle prohlížeči a sám se nepřestěhuje — záloha ho vezme s sebou.",
+    "moved_backup": "Vezmi si svůj pokrok s sebou",
+    "moved_new_home": "Přejít na {host}"
 }

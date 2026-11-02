@@ -2029,5 +2029,8 @@
     "exercise_form_sevenths": "acordes de séptima",
     "exercise_form_open": "posición abierta",
     "exercise_form_alberti": "bajo de Alberti",
-    "exercise_form_broken": "acordes arpegiados"
+    "exercise_form_broken": "acordes arpegiados",
+    "moved_notice": "Klimpi ahora vive en {host}. Todo lo que has tocado está guardado en este navegador y no viaja solo: una copia se lo lleva.",
+    "moved_backup": "Llévate tu progreso",
+    "moved_new_home": "Ir a {host}"
 }

@@ -8,6 +8,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Klimpi has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 2 November 2026
+
+**If you practised at the old address, your progress can come with you.** Klimpi used
+to answer to plinky.fun, and anything played there is saved in that browser rather
+than this one. That address now shows the way across — a backup carries it over.
+
+**The two pieces that come with Klimpi say where they are from again.** Ode to Joy and
+Twinkle Twinkle lost their source line when the name changed. Every piece here names
+its composer, its source and its licence, and our own two transcriptions are no
+exception.
+
 ## 1 November 2026 — night
 
 **The bar at the top of your phone takes the colour of the page.** In dark or black

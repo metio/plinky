@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "yedili akorlar",
     "exercise_form_open": "açık dizilim",
     "exercise_form_alberti": "Alberti bası",
-    "exercise_form_broken": "kırık akorlar"
+    "exercise_form_broken": "kırık akorlar",
+    "moved_notice": "Klimpi artık {host} adresinde. Çaldığın her şey bu tarayıcıda kayıtlı ve kendi başına taşınmıyor — bir yedek onu yanında götürür.",
+    "moved_backup": "İlerlemeni yanında götür",
+    "moved_new_home": "{host} adresine git"
 }

@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "akorde të shtatës",
     "exercise_form_open": "pozicion i hapur",
     "exercise_form_alberti": "bas Alberti",
-    "exercise_form_broken": "akorde të thyera"
+    "exercise_form_broken": "akorde të thyera",
+    "moved_notice": "Klimpi tani jeton në {host}. Çdo gjë që ke luajtur është e ruajtur në këtë shfletues dhe nuk zhvendoset vetë — një kopje e merr me vete.",
+    "moved_backup": "Merr me ty progresin tënd",
+    "moved_new_home": "Shko në {host}"
 }

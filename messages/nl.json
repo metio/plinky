@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "septiemakkoorden",
     "exercise_form_open": "wijde ligging",
     "exercise_form_alberti": "Alberti-bas",
-    "exercise_form_broken": "gebroken akkoorden"
+    "exercise_form_broken": "gebroken akkoorden",
+    "moved_notice": "Klimpi woont nu op {host}. Alles wat je hebt gespeeld staat in deze browser en verhuist niet van zichzelf — een back-up neemt het mee.",
+    "moved_backup": "Neem je voortgang mee",
+    "moved_new_home": "Naar {host}"
 }

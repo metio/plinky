@@ -1951,5 +1951,8 @@
     "exercise_form_sevenths": "七和弦",
     "exercise_form_open": "开放排列",
     "exercise_form_alberti": "阿尔贝蒂低音",
-    "exercise_form_broken": "分解和弦"
+    "exercise_form_broken": "分解和弦",
+    "moved_notice": "Klimpi 现在住在 {host}。你弹过的一切都保存在这个浏览器里，不会自己搬家 — 备份会把它带过去。",
+    "moved_backup": "带走你的进度",
+    "moved_new_home": "前往 {host}"
 }

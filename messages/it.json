@@ -2029,5 +2029,8 @@
     "exercise_form_sevenths": "accordi di settima",
     "exercise_form_open": "posizione lata",
     "exercise_form_alberti": "basso albertino",
-    "exercise_form_broken": "accordi spezzati"
+    "exercise_form_broken": "accordi spezzati",
+    "moved_notice": "Klimpi ora abita su {host}. Tutto quello che hai suonato è salvato in questo browser e non viaggia da solo: un backup lo porta con te.",
+    "moved_backup": "Porta con te i tuoi progressi",
+    "moved_new_home": "Vai su {host}"
 }

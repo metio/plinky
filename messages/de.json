@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "Septakkorde",
     "exercise_form_open": "weite Lage",
     "exercise_form_alberti": "Alberti-Bass",
-    "exercise_form_broken": "gebrochene Akkorde"
+    "exercise_form_broken": "gebrochene Akkorde",
+    "moved_notice": "Klimpi wohnt jetzt unter {host}. Alles, was du gespielt hast, liegt in diesem Browser und zieht nicht von allein mit — eine Sicherung nimmt es mit.",
+    "moved_backup": "Nimm deinen Fortschritt mit",
+    "moved_new_home": "Zu {host}"
 }

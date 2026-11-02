@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "septimackord",
     "exercise_form_open": "spritt läge",
     "exercise_form_alberti": "Albertibas",
-    "exercise_form_broken": "brutna ackord"
+    "exercise_form_broken": "brutna ackord",
+    "moved_notice": "Klimpi bor nu på {host}. Allt du har spelat sparas i den här webbläsaren och följer inte med av sig själv — en säkerhetskopia tar det med.",
+    "moved_backup": "Ta med dina framsteg",
+    "moved_new_home": "Gå till {host}"
 }

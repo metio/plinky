@@ -1990,5 +1990,8 @@
     "exercise_form_sevenths": "nelisoinnut",
     "exercise_form_open": "hajotettu asettelu",
     "exercise_form_alberti": "Alberti-basso",
-    "exercise_form_broken": "murretut soinnut"
+    "exercise_form_broken": "murretut soinnut",
+    "moved_notice": "Klimpi asuu nyt osoitteessa {host}. Kaikki soittamasi on tallessa tässä selaimessa eikä siirry itsestään — varmuuskopio ottaa sen mukaan.",
+    "moved_backup": "Ota edistymisesi mukaan",
+    "moved_new_home": "Siirry osoitteeseen {host}"
 }

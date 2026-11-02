@@ -17,10 +17,13 @@ import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { FaultRecorder } from "./components/features/faultRecorder";
 import { StorageBanner } from "./components/features/storageBanner";
 import { KeepOffline } from "./components/features/keepOffline";
+import { MovedBanner } from "./components/features/movedBanner";
+import { useHydrated } from "./hooks/useHydrated";
 import { UpdateBanner } from "./components/features/updateBanner";
 import { MilestoneBannerHost } from "./components/features/milestoneBanner";
 import { MilestoneProvider } from "./contexts/milestone";
 import { SoundHint } from "./components/features/soundHint";
+import { offerMove } from "../core/oldDomain";
 import { isInAppBrowser, isIosLike } from "../core/platform";
 import { browserCookies } from "./adapters/browserCookie";
 import { browserStore, storageHealth } from "./adapters/browserStore";
@@ -227,6 +230,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const hasNavigator = typeof navigator !== "undefined";
     const iosLike = hasNavigator && isIosLike(navigator.userAgent, navigator.maxTouchPoints ?? 0);
     const inAppBrowser = hasNavigator && isInAppBrowser(navigator.userAgent);
+    // Which address this page was served from, decided here so the notice itself reads no
+    // global. One static document is served to every domain this build answers for, so a
+    // first render that reads the host disagrees with the markup it is hydrating and React
+    // throws the document away — the same hazard as reading the query string, and the same
+    // gate. The notice appears on the render after hydration.
+    const movedHere = useHydrated() && offerMove(location.hostname, new Date());
 
     return (
         <html lang={locale}>
@@ -326,6 +335,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         is nothing to announce. What is worth saying is the opposite: this
                         device can no longer receive updates at all. */}
                     <UpdateBanner updateBroken={updateBroken} />
+                    {/* Only on the address Klimpi used to answer to: practice is kept
+                        per origin, so nothing here reaches the new one by itself. */}
+                    <MovedBanner offer={movedHere} />
                     {/* The worker is a browser global, so the announcer is built here and
                         handed down; the component only decides when to send. */}
                     <KeepOffline announce={announceKeepOffline} />
