@@ -1,7 +1,7 @@
 ;; SPDX-FileCopyrightText: The Klimpi Authors
 ;; SPDX-License-Identifier: AGPL-3.0-or-later
 
-{:packages ["@lint" "jq" "node@24.22.2"]
+{:packages ["@lint" "jq"]
  :commands
  {"browsers" {:run "exec npx playwright install chromium firefox \"$@\""
              :description "Install the browsers of the playwright version in package.json"}

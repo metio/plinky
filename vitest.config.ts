@@ -71,6 +71,9 @@ export default defineConfig({
                     ...LIMITS,
                     name: "node",
                     environment: "node",
+                    // Node's own localStorage is undefined without --localstorage-file, and as
+                    // a global it hides the one jsdom provides to the component tests.
+                    execArgv: ["--no-experimental-webstorage"],
                     // core/ is the pure domain layer and dev/ the catalogue build tooling
                     // (import filters, grading); both are unit-tested here alongside app/.
                     // functions/ is the edge middleware the deploy ships, which is plain
