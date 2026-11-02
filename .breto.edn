@@ -5,19 +5,17 @@
  :commands
  {"browsers" {:run "exec npx playwright install chromium firefox \"$@\""
              :description "Install the browsers of the playwright version in package.json"}
- "capped" {:run "set -e
-if [ -n \"${CI:-}\" ] || ! systemd-run --user --scope --quiet -- true >/dev/null 2>&1; then
-  exec \"$@\"
-fi
-exec systemd-run --user --scope --quiet --collect \\
-  -p \"CPUQuota=${CAPPED_CPU:-600%}\" \\
-  -p \"MemoryMax=${CAPPED_MEM:-8G}\" \\
-  -p MemorySwapMax=0 \\
-  -p IOWeight=50 \\
-  -- \"$@\""}
+ "coverage" {:run "exec npm run coverage \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+             :description "Instrument the whole tree and rerun every project"}
+ "stories" {:run "exec npm run test:storybook \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+            :description "Screenshot every story in both themes; -u refreshes the baselines"}
+ "a11y-light" {:run "exec npm run a11y:light \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+               :description "Build the site and run axe over its pages in the light theme"}
+ "a11y-dark" {:run "exec npm run a11y:dark \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}
+              :description "Build the site and run axe over its pages in the dark theme"}
  "ci-typecheck" {:run "exec npm run typecheck \"$@\""}
  "ci-test" {:run "exec npm run test \"$@\""}
- "ci-test-browser" {:run "exec npm run test:browser \"$@\""}
+ "ci-test-browser" {:run "exec npm run test:browser \"$@\"" :limits {:cpus 6 :memory "14G" :io-weight 50}}
  "ci-arch" {:run "exec npm run arch \"$@\""}
  "ci-nav" {:run "exec npm run nav \"$@\""}
  "ci-bytes" {:run "exec npm run bytes \"$@\""}
@@ -33,16 +31,18 @@ exec systemd-run --user --scope --quiet --collect \\
  "ci-mark-check" {:run "exec npm run mark -- --check \"$@\""}
  "ci-news-check" {:run "exec npm run news:check \"$@\""}
  "ci-twip" {:run "exec npm run twip -- \"$@\""}
- "ci-build" {:run "exec npm run build:single \"$@\""}
+ "ci-build" {:run "exec npm run build:single \"$@\"" :limits {:cpus 6 :memory "8G" :io-weight 50}}
  "ci-lighthouse" {:run "set -e
 npm run build:single
 node dev/single-locale-build.mjs \"the lighthouse gate\"
-exec npx --yes @lhci/cli autorun \"$@\""}
+exec npx --yes @lhci/cli autorun \"$@\""
+                  :limits {:cpus 6 :memory "8G" :io-weight 50}}
  "ci-size" {:run "exec npm run size \"$@\""}
  "ci-hydration" {:run "set -e
 npm run build:single
 node dev/single-locale-build.mjs \"the hydration gate\"
-exec npm run hydration \"$@\""}
+exec npm run hydration \"$@\""
+                 :limits {:cpus 6 :memory "8G" :io-weight 50}}
  "ci-widths" {:run "set -e
 # One locale per writing system, not one worst case. The widest word is an
 # argument about LENGTH and a sound one: if the longest fits, every shorter
@@ -55,7 +55,8 @@ for locale in $(node dev/locale-stress.mjs --scripts); do
   echo \"── $locale ──\"
   KLIMPI_LOCALE=\"$locale\" npm run build
   npm run widths \"$@\"
-done"}
+done"
+              :limits {:cpus 6 :memory "8G" :io-weight 50}}
  "ci-anchors" {:run "exec npm run songs:anchors \"$@\""}
  "ci-promo" {:run "exec npm run promo:check \"$@\""}
  "ci-parity" {:run "exec npm run ci:parity \"$@\""}}}

@@ -12,7 +12,7 @@
 //
 // Heavy gates are skipped by default and NAMED when they are, because a runner that
 // quietly leaves eight out prints a green summary of a partial truth. --all includes them,
-// and expects the machine to be free: on this host they belong under `capped`.
+// and expects the machine to be free; their .breto.edn commands carry :limits.
 //
 // Usage: npm run ci:local [-- --all]
 
@@ -47,9 +47,7 @@ for (const [index, name] of chosen.entries()) {
 }
 
 if (skipped.length > 0) {
-    console.log(
-        `\nNot run (heavy — pass --all, under \`capped\` on this host):\n  ${skipped.join("\n  ")}`,
-    );
+    console.log(`\nNot run (heavy — pass --all):\n  ${skipped.join("\n  ")}`);
 }
 
 // The Frontend job delegates to metio/ci's reusable workflow, so the gates it brings —

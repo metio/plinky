@@ -77,51 +77,42 @@ declaring it compiles locally and fails the job.
 you, slower and after the push. `.breto.edn` exists so that local and CI
 resolve identical tools.
 
-**Five gates are heavy, and on this host they run under `capped` — always.**
-They instrument the whole tree or drive a browser over every page, and run loose
-they do not merely take a long time: they push the desktop's pages into swap.
-That froze the browser twice and killed a tmux session, with the load average
-past 40 on sixteen cores.
+**The heavy gates run through their `.breto.edn` commands, which carry `:limits` —
+always, never as a bare `npm run`.** They instrument the whole tree or drive a browser
+over every page, and run loose they do not merely take a long time: they push the
+desktop's pages into swap. That froze the browser twice and killed a tmux session, with
+the load average past 40 on sixteen cores.
 
 ```sh
-capped npm run coverage
-capped npm run test:storybook -- -u
-capped ci-lighthouse
-capped npm run a11y:light
-CAPPED_MEM=14G capped npm run test:browser
+coverage
+stories -- -u
+ci-lighthouse
+a11y-light
+ci-test-browser
 ```
 
-| Gate | What it does |
+| Command | What it does |
 | --- | --- |
-| `npm run coverage` | Instruments the whole tree and reruns every project. |
-| `npm run test:storybook` | ~290 screenshots across two themes, one browser round-trip each. Run it as a check only when you mean to; `-- -u` refreshes baselines after a deliberate visual change. |
+| `coverage` | `npm run coverage`: instruments the whole tree and reruns every project. |
+| `stories` | `npm run test:storybook`: ~290 screenshots across two themes, one browser round-trip each. Run it as a check only when you mean to; `-- -u` refreshes baselines after a deliberate visual change. |
 | `ci-lighthouse` | Builds the site, then drives 22 pages through headless Chrome. |
-| `npm run a11y:light` / `a11y:dark` | Builds the site, then axe over the same 22 pages, twice. |
-| `npm run test:browser` | Three vitest projects — chromium, firefox, mobile — each with its own browser. Needs `CAPPED_MEM=14G`; see below. |
+| `a11y-light` / `a11y-dark` | Builds the site, then axe over the same 22 pages. |
+| `ci-test-browser` | `npm run test:browser`: three vitest projects — chromium, firefox, mobile — each with its own browser. |
 
-`capped` is a command in `.breto.edn` that puts the command in a systemd
-scope with `CPUQuota=600%`, `MemoryMax=8G`, `MemorySwapMax=0` and `IOWeight=50`.
-`MemorySwapMax=0` is the one that saves the machine: denied swap, a run that
-overreaches is OOM-killed inside its own scope while everything outside keeps its
-pages — the run dies instead of the desktop. On CI, and anywhere without a
-systemd user session, it execs straight through, so the same command line works in
-both places.
+`ci-build`, `ci-hydration` and `ci-widths` carry the same limits. `breto run` starts each
+of these commands in a systemd scope of its own capped at 6 CPUs, 8G of memory without
+swap, and an IO weight of 50; `ci-test-browser` gets 14G, because its three browser
+projects run in parallel and do not fit in 8G. Closing off swap is the part that saves
+the machine: a run that overreaches is OOM-killed inside its own scope while everything
+outside keeps its pages — the run dies instead of the desktop, and breto names the
+command and its limit. On CI the limits are skipped, so the same command line works in
+both places. `:limits` in a `.breto.local.edn` resizes them for one machine, such as
+`{:limits {"ci-test-browser" {:memory "20G"}}}`.
 
-`CAPPED_CPU` and `CAPPED_MEM` override the defaults, and both take a systemd value
-rather than a bare number — `CAPPED_CPU=1000%`, where `1000` is refused outright
-with `Failed to parse CPUQuota= value`. **`npm run test:browser` does not fit in the
-default 8G**: its three browser projects run in parallel, and the kernel OOM-kills
-the scope partway through. That failure is quiet in a way the others are not —
-exit 143 and a log that stops after `RUN v4.x`, with no summary line and no failing
-test named — so a run whose log has no `Test Files` line has not passed, whatever
-the exit code of a pipeline around it says. `CAPPED_MEM=14G` completes it, and on
-this 30G host still leaves the desktop its pages.
-
-Two things `capped` does not fix. It bounds one command, not two: running two
-`npm …` invocations at once still races on the gitignored
-`app/paraglide/` (see below), and two capped runs still add up. And CI remains
-where these gates are *expected* to run — pushing and reading the run is still
-cheaper than a local sweep when you have no particular reason to reproduce one.
+The limits bound one command, not two: running two `npm …` invocations at once still
+races on the gitignored `app/paraglide/` (see below), and two limited runs still add up.
+And CI remains where these gates are *expected* to run — pushing and reading the run is
+still cheaper than a local sweep when you have no particular reason to reproduce one.
 
 The other host limit is the ordinary one: this is a Fedora Atomic (ostree)
 machine with rootless Podman, so a gate needing `kind`, a
@@ -164,7 +155,7 @@ The repo's own gates:
 ```sh
 npm run typecheck   # app + core, AND dev/*.mts via tsconfig.devcheck.json
 npm test              # node project (vitest)
-npm run test:browser  # real chromium + firefox (vitest browser mode) — capped, see above
+npm run test:browser  # real chromium + firefox (vitest browser mode) — run it as ci-test-browser, see above
 npm run test:storybook # CI ONLY as a check; locally only `-- -u` to refresh baselines
 npm run coverage      # CI ONLY — ratchet thresholds; a drop fails the build (skips
                       # the storybook project: screenshots measure no lines and starve

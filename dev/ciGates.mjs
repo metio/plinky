@@ -54,7 +54,7 @@ export function gatesInWorkflow(path = ".github/workflows/verify.yml") {
 // The gates that need a built site, a browser fleet, or an instrumented run of the whole
 // tree. Named rather than guessed, and NAMED IN THE OUTPUT when skipped: a runner that
 // quietly leaves five gates out reads as "everything passed" when it is not.
-// The wrappers `npm run ci:local` leaves to CI or to a deliberate `--all` under `capped`:
+// The wrappers `npm run ci:local` leaves to CI or to a deliberate `--all`:
 // each builds the site or drives a browser over it. Named as .breto.edn defines them, and
 // the parity gate checks that every name here is one .breto.edn defines — a heavy gate
 // listed under a name it never had would run loose on the first job that added it.
