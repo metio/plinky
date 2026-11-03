@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Verify
 on:
+  merge_group:
   pull_request:
     branches: [main]
 permissions:
